@@ -1,0 +1,19 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+	<bean id="orchestrator" class="eu.europeana.uim.Orchestrator"/>
+
+	<command-bundle xmlns="http://felix.apache.org/karaf/xmlns/shell/v1.0.0">
+		<command name="test/uim">
+			<action class="eu.europeana.karaf.shell.HelloUIM">
+				<property name="orchestrator" ref="orchestrator"/>
+			</action>
+		</command>
+	</command-bundle>
+	
+	
+	<reference-list interface="eu.europeana.uim.plugin.IngestionPlugin" availability="optional">
+		<reference-listener 
+              bind-method="addPlugin" unbind-method="removePlugin" ref="orchestrator">
+      	</reference-listener>
+	</reference-list>
+</blueprint>
