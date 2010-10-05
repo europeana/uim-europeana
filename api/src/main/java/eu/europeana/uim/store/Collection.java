@@ -13,6 +13,6 @@ import java.util.List;
 public class Collection {
     // Document object, ie nested hashlist
 
-	private List<Request> request;
-	
+    private List<Request> request;
+
 }

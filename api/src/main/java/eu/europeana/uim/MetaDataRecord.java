@@ -98,14 +98,24 @@ import java.util.HashMap;
 public class MetaDataRecord<N> {
 
 	private HashMap<Field<N,?>, Object> fields = new HashMap<Field<N,?>, Object>();
-	
 
+    private long id;
 
-	public MetaDataRecord() {
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public MetaDataRecord() {
 
 	}
 
-	
+
+
+
 	/**
 	 * @param key
 	 * @param value
@@ -117,8 +127,8 @@ public class MetaDataRecord<N> {
 			//TODO: collission handling
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param key
 	 * @param value
@@ -130,7 +140,7 @@ public class MetaDataRecord<N> {
 		}
 		((ArrayList<T>)fields.get(key)).add(value);
 	}
-	
-	
-	
+
+
+
 }
