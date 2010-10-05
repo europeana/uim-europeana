@@ -2,6 +2,7 @@ package eu.europeana.uim.plugin.dummy;
 
 import eu.europeana.uim.Field;
 import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.plugin.IngestionPlugin;
 
 public class DummyPlugin implements IngestionPlugin {
@@ -53,4 +54,9 @@ public class DummyPlugin implements IngestionPlugin {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public void processRecord(MetaDataRecord<?> mdr) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

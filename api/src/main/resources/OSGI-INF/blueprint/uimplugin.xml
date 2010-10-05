@@ -3,9 +3,9 @@
 	<bean id="orchestrator" class="eu.europeana.uim.Orchestrator"/>
 
 	<command-bundle xmlns="http://felix.apache.org/karaf/xmlns/shell/v1.0.0">
-		<command name="test/uim">
+		<command id="test/uim">
 			<action class="eu.europeana.karaf.shell.HelloUIM">
-				<property name="orchestrator" ref="orchestrator"/>
+				<property id="orchestrator" ref="orchestrator"/>
 			</action>
 		</command>
 	</command-bundle>
