@@ -1,5 +1,7 @@
 package eu.europeana.uim.plugin.dummy;
 
+import eu.europeana.uim.Field;
+import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.plugin.IngestionPlugin;
 
 public class DummyPlugin implements IngestionPlugin {
@@ -29,5 +31,26 @@ public class DummyPlugin implements IngestionPlugin {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+
+	@Override
+	public Field<FieldRegistry, ?>[] getInputParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Field<FieldRegistry, ?>[] getOutputParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Field<FieldRegistry, ?>[] getTransientParameters() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

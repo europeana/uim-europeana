@@ -22,7 +22,7 @@
 				<configuration>
 					<instructions>
 						<Import-Package>*</Import-Package>
-						<Export-Package>eu.europeana.uim.plugin</Export-Package>
+						<Export-Package>eu.europeana.uim,eu.europeana.uim.plugin,eu.europeana.uim.store</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
