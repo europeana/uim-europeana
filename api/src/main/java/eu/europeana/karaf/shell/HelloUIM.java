@@ -1,9 +1,8 @@
 package eu.europeana.karaf.shell;
 
+import eu.europeana.uim.Orchestrator;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.karaf.shell.console.OsgiCommandSupport;
-
-import eu.europeana.uim.Orchestrator;
 
 
 @Command(scope = "test", name = "uim", description="Get informations about the UIM.")

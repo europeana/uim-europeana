@@ -1,6 +1,6 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-	<bean id="orchestrator" class="eu.europeana.uim.Orchestrator"/>
+	<bean id="orchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator"/>
 
 	<command-bundle xmlns="http://felix.apache.org/karaf/xmlns/shell/v1.0.0">
 		<command id="test/uim">

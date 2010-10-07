@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * Builds the execution process for a given workflow, and executes one or more Executions for it. Also does exception handling, reporting etc.
@@ -25,7 +26,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class WorkflowProcessor implements Runnable {
 
+    private static Logger log = Logger.getLogger(WorkflowProcessor.class.getName());
+
+
     public static final int BATCH_SIZE = 100;
+
+    private Workflow workflow;
 
     private List<Execution> executions = new ArrayList<Execution>();
 
@@ -43,9 +49,11 @@ public class WorkflowProcessor implements Runnable {
     public WorkflowProcessor(Execution e, Workflow w, Orchestrator o) {
         this.orchestrator = o;
         this.executions.add(e);
+        this.workflow = w;
 
         // construct the set of StepThreadPools based on the workflow
         for (WorkflowStep step : w.getSteps()) {
+            // TODO use a provider here so we can test this
             workflowStepProcessors.add(new StepProcessor(step));
         }
     }
@@ -86,6 +94,8 @@ public class WorkflowProcessor implements Runnable {
         // - become idle if there's nothing much to do (optimization)
         // - implement WorldPeace
 
+        log.info("Starting new WorkflowProcessor for Workfow " + workflow.getName());
+
         // FIXME there's something better out there to loop like this I suppose
         while (true) {
 
@@ -93,7 +103,7 @@ public class WorkflowProcessor implements Runnable {
                 StepProcessor sp = workflowStepProcessors.get(i);
                 if (i == 0) {
                     // special treatment for the first step which gets MDRs directly from the storage
-                    initialFillStepProcessorQueue(sp);
+                    fillFirstStepProcessorQueue(sp);
                 } else {
                     StepProcessor previous = workflowStepProcessors.get(i - 1);
                     fillStepProcessorQueue(sp, previous);
@@ -107,7 +117,7 @@ public class WorkflowProcessor implements Runnable {
      *
      * @param sp the StepProcessor for the worklow
      */
-    private void initialFillStepProcessorQueue(StepProcessor sp) {
+    private void fillFirstStepProcessorQueue(StepProcessor sp) {
         // TODO we probably can do this dynamically. For this Orchestrator#getBatchFor needs to handle an argument
         // right now we have a fixed batch size that we use in order to refill the queues
         if (sp.getQueue().remainingCapacity() > BATCH_SIZE * executions.size()) {
