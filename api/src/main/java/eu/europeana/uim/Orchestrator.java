@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * Orchestrates the ingestion job execution. The orchestrator keeps a map of WorkflowProcessors, one for each different workflow.
+ * When a new request for workflow execution comes in, the WorkflowProcessor for the Workflow is retreived, or created if it does not exist.
+ */
 public class Orchestrator {
 
     private static Logger log = Logger.getLogger(Orchestrator.class.getName());
@@ -64,6 +68,11 @@ public class Orchestrator {
         return executeWorkflow(w);
     }
 
+    /**
+     * Executes a given workflow. A new Execution is created and a WorkflowProcessor created if none exists for this workflow
+     * @param w the workflow to execute
+     * @return a new Execution for this execution request
+     */
     private Execution executeWorkflow(Workflow w) {
         Execution e = storageEngine.createExecution();
 
@@ -71,11 +80,18 @@ public class Orchestrator {
         if(we == null) {
             we = new WorkflowProcessor(e, w, this);
             processors.put(w, we);
+        } else {
+            we.addExecution(e);
         }
-        we.execute();
+        we.start();
         return e;
     }
 
+    /**
+     * Gets the next batch of MetaDataRecord IDs for a given Execution
+     * @param e the Execution for which to retrieve the next batch of IDs
+     * @return an array of MetaDataRecord IDs to process
+     */
     public long[] getBatchFor(Execution e) {
 
         // TODO: get next batch for an execution from the storage

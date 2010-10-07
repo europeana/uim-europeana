@@ -4,6 +4,12 @@ import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.workflow.WorkflowStep;
 
 /**
+ * A task that runs a workflow step against a MetaDataRecord.
+ * If the execution fails, the Throwable is kept and the task is added to the failure list of its StepProcessor.
+ * If the execution succeeds, the task is added to the success list of its StepProcessor.
+ * 
+ * TODO: support multiple MDRs per task
+ *
  * @author manu
  */
 public class UIMTask implements Runnable {

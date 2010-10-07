@@ -9,7 +9,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Processor for a workflow step, capable of running several UIMTasks concurrently 
+ * Processor for a workflow step, capable of running several UIMTasks concurrently. The processor holds a ThreadPoolExecutor
+ * and a BlockingQueue, as well as a list of successful and failed tasks.
  *
  * @author manu
  */

@@ -15,6 +15,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Builds the execution process for a given workflow, and executes one or more Executions for it. Also does exception handling, reporting etc.
+ * A WorkflowProcessor handles the processing on a per-record basis for multiple Executions.
+ * <p/>
+ * When created, the WorkflowProcessor creates a list of StepProcessors, one for each workflow step.
+ * When executed, the WorkflowProcessor starts itself (as separate Thread) and walks over the list of StepProcessors, refilling the queues as necessary.
+ * It communicates with a parent Orchestrator in order to perform storage operations and retrieve the next elements to process.
  *
  * @author manu
  */
@@ -28,6 +33,13 @@ public class WorkflowProcessor implements Runnable {
 
     protected List<StepProcessor> workflowStepProcessors = new LinkedList<StepProcessor>();
 
+    /**
+     * Creates a new WorkflowProcessor and adds the Execution to it
+     *
+     * @param e the Execution this processor will handle
+     * @param w the Workflow this processor follows
+     * @param o the Orchestrator for this processor
+     */
     public WorkflowProcessor(Execution e, Workflow w, Orchestrator o) {
         this.orchestrator = o;
         this.executions.add(e);
@@ -38,7 +50,26 @@ public class WorkflowProcessor implements Runnable {
         }
     }
 
-    public void execute() {
+    /**
+     * Adds a new Execution to the processor
+     * @param e the Execution to be handled by the processor
+     */
+    public void addExecution(Execution e) {
+        this.executions.add(e);
+    }
+
+    /**
+     * Removes an Execution from the processor. As a result, a graceful shutdown of the Execution will occur
+     * @param e the Execution to remove
+     */
+    public void removeExecution(Execution e) {
+        this.executions.remove(e);
+    }
+
+    /**
+     * Starts the processor
+     */
+    public void start() {
         Thread t = new Thread(this);
         t.start();
     }
@@ -56,49 +87,70 @@ public class WorkflowProcessor implements Runnable {
         // - implement WorldPeace
 
         // FIXME there's something better out there to loop like this I suppose
-        while(true) {
+        while (true) {
 
-            for(int i = 0; i < workflowStepProcessors.size(); i++) {
+            for (int i = 0; i < workflowStepProcessors.size(); i++) {
                 StepProcessor sp = workflowStepProcessors.get(i);
-                if(i == 0) {
+                if (i == 0) {
                     // special treatment for the first step which gets MDRs directly from the storage
                     initialFillStepProcessorQueue(sp);
                 } else {
-                    StepProcessor previous = workflowStepProcessors.get(i-1);
+                    StepProcessor previous = workflowStepProcessors.get(i - 1);
                     fillStepProcessorQueue(sp, previous);
                 }
             }
         }
     }
 
+    /**
+     * For the first step in the workflow, retrieve batches MetaDataRecords and create UIMTasks out of them
+     *
+     * @param sp the StepProcessor for the worklow
+     */
     private void initialFillStepProcessorQueue(StepProcessor sp) {
         // TODO we probably can do this dynamically. For this Orchestrator#getBatchFor needs to handle an argument
         // right now we have a fixed batch size that we use in order to refill the queues
-        if(sp.getQueue().remainingCapacity() > BATCH_SIZE * executions.size()) {
-            for(Execution e : executions) {
+        if (sp.getQueue().remainingCapacity() > BATCH_SIZE * executions.size()) {
+            for (Execution e : executions) {
                 List<UIMTask> tasks = new ArrayList<UIMTask>();
-                for(long id : orchestrator.getBatchFor(e)) {
+                for (long id : orchestrator.getBatchFor(e)) {
                     sp.getQueue().add(new UIMTask(getMetaDataRecord(id), sp));
                 }
             }
         }
     }
 
+    /**
+     * Passes MDRs from one queue to another
+     *
+     * @param sp
+     * @param previous
+     */
+    private void fillStepProcessorQueue(StepProcessor sp, StepProcessor previous) {
+        // TODO pass MDRs from one queue to another, creating new UIMTasks for them
+        // hmmmm, all this creation of new tasks does not seem to be too efficient, maybe we can re-use the UIMTask object and simply update
+        // the step
+
+    }
+
+    /**
+     * Gets the actual MetaDataRecord based on its ID
+     *
+     * @param id the ID of the MetaDataRecord to retrieve
+     * @return the MetaDataRecord provided by the storage
+     */
     private MetaDataRecord<?> getMetaDataRecord(long id) {
         // TODO
         return null;
     }
 
 
-    private void fillStepProcessorQueue(StepProcessor sp, StepProcessor previous) {
-        // TODO pass tasks from one queue to another
-        
-    }
-
-
     public static void main(String... args) {
+
+        // testing how the ThreadPoolExecutor works
+
         LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-        for(int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
             queue.add(new DummyRunnable());
         }
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 10, StepProcessor.KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS, queue);
@@ -108,9 +160,11 @@ public class WorkflowProcessor implements Runnable {
     private static class DummyRunnable implements Runnable {
         private static int count = 0;
         private int id = 0;
+
         public DummyRunnable() {
-            id=count++;
+            id = count++;
         }
+
         @Override
         public void run() {
             System.out.println("DummyRunnable " + id);
