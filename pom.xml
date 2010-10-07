@@ -12,9 +12,6 @@
 	<modules>
 		<module>api</module>
 		<module>plugins/dummy</module>
-        <module>spring-test</module>
-        <module>spring-test</module>
-        <module>spring-test</module>
     </modules>
 
 	<build>
