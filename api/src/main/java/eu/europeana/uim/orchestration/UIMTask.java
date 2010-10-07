@@ -10,14 +10,14 @@ public class UIMTask implements Runnable {
 
     private MetaDataRecord<?> mdr;
     private WorkflowStep step;
-    private WorkflowExecution parentExecution;
+    private StepProcessor processor;
 
     private Throwable t;
 
-    public UIMTask(MetaDataRecord<?> mdr, WorkflowStep step, WorkflowExecution parentExecution) {
+    public UIMTask(MetaDataRecord<?> mdr, StepProcessor processor) {
         this.mdr = mdr;
-        this.step = step;
-        this.parentExecution = parentExecution;
+        this.processor = processor;
+        this.step = processor.getStep();
     }
 
     public Throwable getThrowable() {
@@ -27,10 +27,17 @@ public class UIMTask implements Runnable {
     @Override
     public void run() {
 
+        boolean failed = false;
         try {
             step.processRecord(mdr);
-        } catch(Throwable t) {
-            this.t = t;    
+        } catch (Throwable t) {
+            this.t = t;
+            failed = true;
+            processor.addFailure(this);
+        } finally {
+            if (!failed) {
+                processor.addSuccess(this);
+            }
         }
 
     }

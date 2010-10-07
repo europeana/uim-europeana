@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>europeana-uim-plugin-dummy</artifactId>
-	<id>Unified Ingestion Manager: Dummy Plugin</id>
+	<description>Unified Ingestion Manager: Dummy Plugin</description>
 	<packaging>bundle</packaging>
 
 	<build>

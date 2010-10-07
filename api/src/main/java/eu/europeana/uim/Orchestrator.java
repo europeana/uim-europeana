@@ -1,6 +1,6 @@
 package eu.europeana.uim;
 
-import eu.europeana.uim.orchestration.WorkflowExecution;
+import eu.europeana.uim.orchestration.WorkflowProcessor;
 import eu.europeana.uim.plugin.IngestionPlugin;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
@@ -10,7 +10,9 @@ import eu.europeana.uim.store.StorageEngine;
 import eu.europeana.uim.workflow.Workflow;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class Orchestrator {
@@ -20,10 +22,10 @@ public class Orchestrator {
     private List<IngestionPlugin> plugins = new ArrayList<IngestionPlugin>();
     private List<Workflow> workflows = new ArrayList<Workflow>();
 
+    
     private StorageEngine storageEngine = null;
 
-    private List<WorkflowExecution> executions = new ArrayList<WorkflowExecution>();
-
+    private Map<Workflow, WorkflowProcessor> processors = new HashMap<Workflow, WorkflowProcessor>();
 
     public void addPlugin(IngestionPlugin plugin) {
         plugins.add(plugin);
@@ -46,28 +48,38 @@ public class Orchestrator {
     }
 
     public Execution executeWorkflow(Workflow w, MetaDataRecord mdr) {
-        return executeWorkflow(w, new long[]{mdr.getId()});
+        return executeWorkflow(w);
     }
 
     public Execution executeWorkflow(Workflow w, Collection c) {
-        return executeWorkflow(w, storageEngine.getByCollection(c));
+        return executeWorkflow(w);
     }
 
 
     public Execution executeWorkflow(Workflow w, Request r) {
-        return executeWorkflow(w, storageEngine.getByRequest(r));
+        return executeWorkflow(w);
     }
 
     public Execution executeWorkflow(Workflow w, Provider p) {
-        return executeWorkflow(w, storageEngine.getByProvider(p));
+        return executeWorkflow(w);
     }
 
-    private Execution executeWorkflow(Workflow w, long[] mdrIds) {
+    private Execution executeWorkflow(Workflow w) {
         Execution e = storageEngine.createExecution();
-        WorkflowExecution we = new WorkflowExecution(e, w);
-        executions.add(we);
-        we.execute(mdrIds);
+
+        WorkflowProcessor we = processors.get(w);
+        if(we == null) {
+            we = new WorkflowProcessor(e, w, this);
+            processors.put(w, we);
+        }
+        we.execute();
         return e;
+    }
+
+    public long[] getBatchFor(Execution e) {
+
+        // TODO: get next batch for an execution from the storage
+        return null;
     }
 
 
