@@ -5,6 +5,8 @@ import java.util.List;
 
 public interface StorageEngine {
 
+	public String getIdentifier();
+	
 	Aggregator createAggregator();
 	void updateAggregator(Aggregator aggregator);
 	List<Aggregator> getAggregators();

@@ -1,6 +1,6 @@
 package eu.europeana.uim.store;
 
-import java.util.List;
+
 
 /*
     provider    // ref to Provider obj
@@ -10,9 +10,9 @@ import java.util.List;
     language    // Primary language for collection (used as default for all fields if not given)
 
  */
-public class Collection {
-    // Document object, ie nested hashlist
-
-    private List<Request> request;
-
+public interface Collection {
+	
+	public long getId();
+	public String getName();
+	public Provider getProvider();
 }

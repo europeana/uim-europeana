@@ -1,5 +1,6 @@
 package eu.europeana.uim.store;
 
+import java.util.Date;
 /*
     collection  // ref to Collection obj
     created_time    // time stamp creation
@@ -19,7 +20,10 @@ package eu.europeana.uim.store;
     err_msg         // If in REQS_ABORTED state, explanation of what whent wrong
 
  */
-public class Request {
-    // Document object, ie nested hashlist
+public interface Request {
 
+	public long getId();
+	public Collection getCollection();
+	public Date getDate();
+	
 }
