@@ -7,12 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
 
@@ -29,10 +28,9 @@ public class ESEParser {
 
 
     public List<HashMap<String, Object>> importXml(InputStream inputStream) throws TransformerException, XMLStreamException, IOException {
-    	//XMLInputFactory inFactory = XMLInputFactory.newFactory();
-    	WstxInputFactory inFactory = new WstxInputFactory();
-        Source source = new StreamSource(inputStream, "UTF-8");
-        XMLStreamReader xml = inFactory.createXMLStreamReader(source);
+    	XMLInputFactory inFactory = new WstxInputFactory();
+    	
+        XMLStreamReader xml = inFactory.createXMLStreamReader(inputStream);
 
         int recordCount = 0;
         long startTime = System.currentTimeMillis();
