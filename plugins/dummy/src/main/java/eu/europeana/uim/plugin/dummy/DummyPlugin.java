@@ -7,20 +7,14 @@ import eu.europeana.uim.plugin.IngestionPlugin;
 
 public class DummyPlugin implements IngestionPlugin {
 
-	private String identifier;
 	private String description;
 
 	public DummyPlugin() {
-		super();
 	}
 	
 
 	public String getIdentifier() {
-		return identifier;
-	}
-
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
+		return DummyPlugin.class.getName();
 	}
 
 

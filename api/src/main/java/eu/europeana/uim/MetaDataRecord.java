@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import eu.europeana.uim.store.Request;
+
 
 /*  Uri object
 
@@ -100,6 +102,16 @@ public class MetaDataRecord<N> {
 	private HashMap<Field<N,?>, Object> fields = new HashMap<Field<N,?>, Object>();
 
     private long id;
+    private Request request;
+
+    public MetaDataRecord() {
+
+	}
+
+    public MetaDataRecord(long id) {
+    	this.id = id;
+	}
+
 
     public long getId() {
         return id;
@@ -109,11 +121,16 @@ public class MetaDataRecord<N> {
         this.id = id;
     }
 
-    public MetaDataRecord() {
 
+
+	public Request getRequest() {
+		return request;
 	}
 
 
+	public void setRequest(Request request) {
+		this.request = request;
+	}
 
 
 	/**

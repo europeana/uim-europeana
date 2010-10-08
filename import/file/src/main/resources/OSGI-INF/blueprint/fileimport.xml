@@ -1,0 +1,9 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+	<command-bundle xmlns="http://felix.apache.org/karaf/xmlns/shell/v1.0.0">
+		<command name="uim/file">
+			<action class="eu.europeana.uim.file.UIMFile"/>
+		</command>
+	</command-bundle>
+	
+</blueprint>

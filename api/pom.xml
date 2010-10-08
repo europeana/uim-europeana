@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>europeana-uim-api</artifactId>
-	<description>Unified Ingestion Manager: API</description>
+	<name>Unified Ingestion Manager: API</name>
 	<packaging>bundle</packaging>
 
 	<build>
@@ -22,7 +22,13 @@
 				<configuration>
 					<instructions>
 						<Import-Package>*</Import-Package>
-						<Export-Package>eu.europeana.uim,eu.europeana.uim.plugin,eu.europeana.uim.store</Export-Package>
+						<Export-Package>eu.europeana.uim,
+						                eu.europeana.uim.plugin,
+						                eu.europeana.uim.orchestration,
+						                eu.europeana.uim.workflow,
+						                eu.europeana.uim.store,
+						                eu.europeana.uim.store.memory</Export-Package>
+						<Embed-Dependency>trove</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -36,5 +42,11 @@
 			<version>1.0.0</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+                <groupId>trove</groupId>
+                <artifactId>trove</artifactId>
+                <version>2.1.0</version>
+        </dependency>		
+
 	</dependencies>
 </project>

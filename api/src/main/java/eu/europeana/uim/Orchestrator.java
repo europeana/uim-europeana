@@ -1,6 +1,5 @@
 package eu.europeana.uim;
 
-import eu.europeana.uim.plugin.IngestionPlugin;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
@@ -13,14 +12,8 @@ import eu.europeana.uim.workflow.Workflow;
  * @author manu
  */
 public interface Orchestrator {
-
-    void addPlugin(IngestionPlugin plugin);
-
-    void removePlugin(IngestionPlugin plugin);
-
-    void addWorkflow(Workflow workflow);
-
-    void removeWorkflow(Workflow workflow);
+	
+	public String getIdentifier();
 
     Execution executeWorkflow(Workflow w, MetaDataRecord mdr);
 

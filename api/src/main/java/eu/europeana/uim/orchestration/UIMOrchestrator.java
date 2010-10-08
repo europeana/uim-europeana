@@ -1,20 +1,17 @@
 package eu.europeana.uim.orchestration;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.Orchestrator;
-import eu.europeana.uim.plugin.IngestionPlugin;
+import eu.europeana.uim.UIMRegistry;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.StorageEngine;
 import eu.europeana.uim.workflow.Workflow;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Orchestrates the ingestion job execution. The orchestrator keeps a map of WorkflowProcessors, one for each different workflow.
@@ -24,38 +21,21 @@ public class UIMOrchestrator implements Orchestrator {
 
     private static Logger log = Logger.getLogger(UIMOrchestrator.class.getName());
 
-    private List<IngestionPlugin> plugins = new ArrayList<IngestionPlugin>();
-    private List<Workflow> workflows = new ArrayList<Workflow>();
-
+    private UIMRegistry registry;
     
-    private StorageEngine storageEngine = null;
-
     private Map<Workflow, WorkflowProcessor> processors = new HashMap<Workflow, WorkflowProcessor>();
 
-    @Override
-    public void addPlugin(IngestionPlugin plugin) {
-        plugins.add(plugin);
-        log.info("Added plugin:" + plugin.getIdentifier());
+    
+    public UIMOrchestrator(){
     }
-
-    @Override
-    public void removePlugin(IngestionPlugin plugin) {
-        plugins.remove(plugin);
-        log.info("Removed plugin:" + plugin.getIdentifier());
-    }
-
-    @Override
-    public void addWorkflow(Workflow workflow) {
-        workflows.add(workflow);
-        log.info("Added workflow: " + workflow.getName());
-    }
-
-    @Override
-    public void removeWorkflow(Workflow workflow) {
-        workflows.remove(workflow);
-        log.info("Removed workflow: " + workflow.getName());
-    }
-
+    
+	@Override
+	public String getIdentifier() {
+		return UIMOrchestrator.class.getSimpleName();
+	}
+    
+    
+    
     @Override
     public Execution executeWorkflow(Workflow w, MetaDataRecord mdr) {
         return executeWorkflow(w);
@@ -83,7 +63,7 @@ public class UIMOrchestrator implements Orchestrator {
      * @return a new Execution for this execution request
      */
     private Execution executeWorkflow(Workflow w) {
-        Execution e = storageEngine.createExecution();
+        Execution e = registry.getFirstStorage().createExecution();
 
         WorkflowProcessor we = processors.get(w);
         if(we == null) {
@@ -96,26 +76,22 @@ public class UIMOrchestrator implements Orchestrator {
         return e;
     }
 
+    
     @Override
     public long[] getBatchFor(Execution e) {
 
         // TODO: get next batch for an execution from the storage
         return null;
     }
+    
+    
 
+	public UIMRegistry getRegistry() {
+		return registry;
+	}
 
-    public String toString() {
-        if (plugins.isEmpty()) {
-            return "Orchestrator: No Plugins";
-        }
+	public void setRegistry(UIMRegistry registry) {
+		this.registry = registry;
+	}
 
-        StringBuilder builder = new StringBuilder();
-        for (IngestionPlugin plugin : plugins) {
-            if (builder.length() > 0) {
-                builder.append("\nPlugin:");
-            }
-            builder.append(plugin.getIdentifier() + ": [" + plugin.getDescription() + "]");
-        }
-        return "Orchestrator: " + builder.toString();
-    }
 }

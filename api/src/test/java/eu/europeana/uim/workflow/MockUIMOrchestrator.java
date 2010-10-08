@@ -2,7 +2,6 @@ package eu.europeana.uim.workflow;
 
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.Orchestrator;
-import eu.europeana.uim.plugin.IngestionPlugin;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
@@ -13,24 +12,8 @@ import eu.europeana.uim.store.Request;
  * @author manu
  */
 public class MockUIMOrchestrator implements Orchestrator {
-    @Override
 
-    public void addPlugin(IngestionPlugin plugin) {
-    }
-
-    @Override
-    public void removePlugin(IngestionPlugin plugin) {
-    }
-
-    @Override
-    public void addWorkflow(Workflow workflow) {
-    }
-
-    @Override
-    public void removeWorkflow(Workflow workflow) {
-    }
-
-    @Override
+	@Override
     public Execution executeWorkflow(Workflow w, MetaDataRecord mdr) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -55,4 +38,10 @@ public class MockUIMOrchestrator implements Orchestrator {
         // TODO test data
         return new long[0];  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+	@Override
+	public String getIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

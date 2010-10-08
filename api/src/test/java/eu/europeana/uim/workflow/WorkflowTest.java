@@ -45,7 +45,7 @@ public class WorkflowTest {
     public void runWorkflow() {
         Workflow w = buildTestWorkflow();
         Orchestrator o = new MockUIMOrchestrator();
-        Execution e = new Execution() { };
+        Execution e = new Execution() { public long getId() { return 0;} };
         WorkflowProcessor processor = new WorkflowProcessor(e, w, o);
 
         processor.start();

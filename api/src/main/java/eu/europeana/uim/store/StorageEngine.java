@@ -2,37 +2,49 @@ package eu.europeana.uim.store;
 
 import java.util.List;
 
+import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.MetaDataRecord;
+
 
 public interface StorageEngine {
 
 	public String getIdentifier();
+	public long size();
 	
 	Aggregator createAggregator();
 	void updateAggregator(Aggregator aggregator);
+	Aggregator getAggregator(long id);
 	List<Aggregator> getAggregators();
 
 	Provider createProvider(Aggregator aggregator);
 	void updateProvider(Provider provider);
+	Provider getProvider(long id);
 	List<Provider> getProvider();
 
 	Collection createCollection(Provider provider);
 	void updateCollection(Collection collection);
+	Collection getCollection(long id);
 	List<Collection> getCollections(Provider provider);
 
 	Request createRequest(Collection collection);
 	void updateRequest(Request request);
 	List<Request> getRequests(Collection collection);
 
+	MetaDataRecord<FieldRegistry> createMetaDataRecord(Request request);
+	void updateMetaDataRecord(MetaDataRecord<FieldRegistry> record);
+	
 	Execution createExecution();
 	void updateExecution(Execution execution);
 	List<Execution> getExecutions();
 
+	MetaDataRecord<FieldRegistry>[] getMetaDataRecords(long...ids);
+	
 
-	long[] getBatchByRequest(Request request);
-	long[] getBatchByCollection(Collection collection);
-	long[] getBatchByProvider(Provider provider);
-	long[] getBatchByAggregator(Aggregator aggregator);
-	long[] getBatchForAllIds();
+	long[] getByRequest(Request request);
+	long[] getByCollection(Collection collection);
+	long[] getByProvider(Provider provider);
+	long[] getByAggregator(Aggregator aggregator);
+	long[] getAllIds();
 
     int getTotalByRequest(Request request);
     int getTotalByCollection(Collection collection);
