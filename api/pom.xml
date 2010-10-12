@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>eu.europeana</groupId>
-		<artifactId>europeana-uim</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
-	</parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>eu.europeana</groupId>
+        <artifactId>europeana-uim</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>europeana-uim-api</artifactId>
-	<name>Unified Ingestion Manager: API</name>
-	<packaging>bundle</packaging>
+    <artifactId>europeana-uim-api</artifactId>
+    <name>Unified Ingestion Manager: API</name>
+    <packaging>bundle</packaging>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.0.1</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Import-Package>*</Import-Package>
-						<Export-Package>eu.europeana.uim,
-						                eu.europeana.uim.plugin,
-						                eu.europeana.uim.orchestration,
-						                eu.europeana.uim.workflow,
-						                eu.europeana.uim.store,
-						                eu.europeana.uim.store.memory</Export-Package>
-						<Embed-Dependency>trove</Embed-Dependency>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.0.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Import-Package>*</Import-Package>
+                        <Export-Package>eu.europeana.uim,
+                            eu.europeana.uim.plugin,
+                            eu.europeana.uim.orchestration,
+                            eu.europeana.uim.workflow,
+                            eu.europeana.uim.store,
+                            eu.europeana.uim.store.memory
+                        </Export-Package>
+                        <Embed-Dependency>trove</Embed-Dependency>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.felix.karaf.shell</groupId>
-			<artifactId>org.apache.felix.karaf.shell.console</artifactId>
-			<version>1.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-                <groupId>trove</groupId>
-                <artifactId>trove</artifactId>
-                <version>2.1.0</version>
-        </dependency>		
-
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.felix.karaf.shell</groupId>
+            <artifactId>org.apache.felix.karaf.shell.console</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>trove</groupId>
+            <artifactId>trove</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+    </dependencies>
 </project>
