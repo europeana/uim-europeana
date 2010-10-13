@@ -28,12 +28,12 @@ TEST IMPORT OF FILE
 3) Install import file:
    osgi:install -s mvn:eu.europeana/europeana-uim-import-file/1.0.0-SNAPSHOT
 
-4) Verify if UIM File Import is up and runnign:
+4) Verify if UIM File Import is up and running:
    - in Karaf shell: uim:file
    - should complain about missing parameters
    
 5) Import ESE file:
-   - in Karaf shell: uim:file /data/readingeurope/readingeurope.xml ese   
+   - in Karaf shell: uim:file <workspace-path>/uim/import/file/src/test/resources/readingeurope.xml ese
   
   
    
