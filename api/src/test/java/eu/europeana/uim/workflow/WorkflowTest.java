@@ -11,7 +11,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Test for UIMWorkflow construction
  *
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class WorkflowTest {
 

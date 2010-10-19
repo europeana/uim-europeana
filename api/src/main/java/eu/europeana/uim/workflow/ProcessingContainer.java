@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Container to hold multiple steps that should run in parallel
  *
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class ProcessingContainer implements WorkflowStep {
 

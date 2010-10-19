@@ -9,7 +9,7 @@ import eu.europeana.uim.store.Request;
 
 /**
  * MockOrchestrator, for testing its clients
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class MockUIMOrchestrator implements Orchestrator {
 

@@ -37,18 +37,13 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.apache.felix.karaf.shell</groupId>
-            <artifactId>org.apache.felix.karaf.shell.console</artifactId>
-            <version>1.0.0</version>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
             <version>2.0.2</version>
         </dependency>
+
     </dependencies>
-    
-    
+
 </project>

@@ -6,7 +6,7 @@ import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.plugin.IngestionPlugin;
 
 /**
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class MockPlugin implements IngestionPlugin {
 

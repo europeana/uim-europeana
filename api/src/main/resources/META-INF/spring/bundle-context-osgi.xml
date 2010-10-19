@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:bp="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+                            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+    <bp:blueprint>
+
+        <bp:service id="registry" ref="uimRegistry" interface="eu.europeana.uim.Registry" />
+
+        <bp:reference-list interface="eu.europeana.uim.plugin.IngestionPlugin" availability="optional">
+            <bp:reference-listener
+                    bind-method="addPlugin" unbind-method="removePlugin" ref="uimRegistry">
+            </bp:reference-listener>
+        </bp:reference-list>
+
+        <bp:reference-list interface="eu.europeana.uim.store.StorageEngine" availability="optional">
+            <bp:reference-listener
+                    bind-method="addStorage" unbind-method="removeStorage" ref="uimRegistry">
+            </bp:reference-listener>
+        </bp:reference-list>
+
+        <bp:service id="fallbackStorage" ref="memoryStore" interface="eu.europeana.uim.store.StorageEngine"/>
+
+        <bp:service id="infoShell" ref="uimInfoShell" interface="org.osgi.service.command.Function">
+            <bp:service-properties>
+                <bp:entry key="osgi.command.function" value="info"/>
+                <bp:entry key="osgi.command.scope" value="uim"/>
+            </bp:service-properties>
+        </bp:service>
+
+    </bp:blueprint>
+
+</beans>

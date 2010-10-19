@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * UIM UIMWorkflow definition
  *
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public interface Workflow {
 

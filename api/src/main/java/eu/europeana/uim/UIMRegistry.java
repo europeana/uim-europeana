@@ -1,14 +1,15 @@
 package eu.europeana.uim;
 
+import eu.europeana.uim.plugin.IngestionPlugin;
+import eu.europeana.uim.store.StorageEngine;
+import eu.europeana.uim.workflow.Workflow;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import eu.europeana.uim.plugin.IngestionPlugin;
-import eu.europeana.uim.store.StorageEngine;
-import eu.europeana.uim.workflow.Workflow;
-
-public class UIMRegistry {
+public class UIMRegistry implements Registry {
 
 	private static Logger log = Logger.getLogger(UIMRegistry.class.getName());
 
@@ -16,73 +17,58 @@ public class UIMRegistry {
 	private List<IngestionPlugin> plugins = new ArrayList<IngestionPlugin>();
 	private List<Workflow> workflows = new ArrayList<Workflow>();
 
+    @Autowired
 	private Orchestrator orchestrator = null;
 	
-	private static UIMRegistry instance = null;
-
-	public UIMRegistry(){
-		instance = this;
+	public UIMRegistry() {
 	}
 
-	public static UIMRegistry getInstance() {
-		if (instance ==null) {
-			instance = new UIMRegistry();
-		}
-		return instance;
-	}
-
-
-	public void addPlugin(IngestionPlugin plugin) {
+	@Override
+    public void addPlugin(IngestionPlugin plugin) {
 		plugins.add(plugin);
 		log.info("Added plugin:" + plugin.getIdentifier());
 	}
 
-	public void removePlugin(IngestionPlugin plugin) {
+	@Override
+    public void removePlugin(IngestionPlugin plugin) {
 		plugins.remove(plugin);
 		log.info("Removed plugin:" + plugin.getIdentifier());
 	}
 
-	public void addStorage(StorageEngine storage) {
+	@Override
+    public void addStorage(StorageEngine storage) {
 		log.info("Added storage:" + storage.getIdentifier());
 		this.storages.add(storage);
 	}
 
-	public void removeStorage(StorageEngine storage) {
+	@Override
+    public void removeStorage(StorageEngine storage) {
 		log.info("Removed storage:" + storage.getIdentifier());
 		this.storages.remove(storage);
 	}
 
 
-	public void addWorkflow(Workflow workflow) {
+	@Override
+    public void addWorkflow(Workflow workflow) {
 		workflows.add(workflow);
 		log.info("Added workflow: " + workflow.getName());
 	}
 
-	public void removeWorkflow(Workflow workflow) {
+	@Override
+    public void removeWorkflow(Workflow workflow) {
 		workflows.remove(workflow);
 		log.info("Removed workflow: " + workflow.getName());
 	}
 
-
-
-	public StorageEngine getFirstStorage() {
+	@Override
+    public StorageEngine getFirstStorage() {
 		return storages.get(0);
 	}
 
-	public void setFirstStorage(StorageEngine storage) {
+	@Override
+    public void setFirstStorage(StorageEngine storage) {
 		this.storages.add(0, storage);
 	}
-	
-
-	public Orchestrator getOrchestrator() {
-		return orchestrator;
-	}
-
-	public void setOrchestrator(Orchestrator orchestrator) {
-		this.orchestrator = orchestrator;
-	}
-
-
 	
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -111,7 +97,6 @@ public class UIMRegistry {
 			builder.append(storelist + ". ");
 		}
 		
-		builder.append("Orchestrator: " + orchestrator.getIdentifier());
 		return builder.toString();
 	}
 }

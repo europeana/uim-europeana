@@ -9,7 +9,7 @@ import eu.europeana.uim.workflow.Workflow;
 /**
  * Orchestrates the ingestion job execution.
  *
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public interface Orchestrator {
 	

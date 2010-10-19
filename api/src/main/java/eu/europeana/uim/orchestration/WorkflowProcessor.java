@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * When executed, the WorkflowProcessor starts itself (as separate Thread) and walks over the list of StepProcessors, refilling the queues as necessary.
  * It communicates with a parent Orchestrator in order to perform storage operations and retrieve the next elements to process.
  *
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class WorkflowProcessor implements Runnable {
 
@@ -96,7 +96,7 @@ public class WorkflowProcessor implements Runnable {
 
         log.info("Starting new WorkflowProcessor for Workfow " + workflow.getName());
 
-        // FIXME there's something better out there to loop like this I suppose
+        // FIXME there's something better out there to loop like this I suppose, like a repeating Task
         while (true) {
 
             for (int i = 0; i < workflowStepProcessors.size(); i++) {
@@ -137,10 +137,14 @@ public class WorkflowProcessor implements Runnable {
      * @param previous
      */
     private void fillStepProcessorQueue(StepProcessor sp, StepProcessor previous) {
-        // TODO pass MDRs from one queue to another, creating new UIMTasks for them
-        // hmmmm, all this creation of new tasks does not seem to be too efficient, maybe we can re-use the UIMTask object and simply update
-        // the step
-
+        // TODO pass MDRs from one queue to another
+        final int c = sp.getQueue().remainingCapacity();
+        for(int i = 0; i < c; i++) {
+//            UIMTask t = previous.getSuccessfulTasks().firstElement();
+//            previous.getSuccessfulTasks().remove(t);
+            // update the sp step so it points to the task
+            
+        }
     }
 
     /**

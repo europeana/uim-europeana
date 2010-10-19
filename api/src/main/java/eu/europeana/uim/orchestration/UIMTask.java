@@ -10,7 +10,7 @@ import eu.europeana.uim.workflow.WorkflowStep;
  * 
  * TODO: support multiple MDRs per task
  *
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class UIMTask implements Runnable {
 

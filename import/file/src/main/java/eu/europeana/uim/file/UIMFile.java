@@ -1,55 +1,67 @@
 package eu.europeana.uim.file;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.List;
-
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.karaf.shell.console.OsgiCommandSupport;
-
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.UIMRegistry;
+import eu.europeana.uim.Registry;
 import eu.europeana.uim.file.ese.ESEParser;
 import eu.europeana.uim.store.Aggregator;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.StorageEngine;
+import org.osgi.service.command.CommandSession;
+import org.osgi.service.command.Function;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.List;
 
 
-@Command(scope = "uim", name = "file", description="Load file.")
-public class UIMFile extends OsgiCommandSupport {
+public class UIMFile implements Function {
 
-	@Argument(name = "filename", index = 0)
 	private String filename;
 
-	@Argument(name = "format", index = 1)
 	private String format;
 
-	@Argument(name = "target", required = false, index = 2)
 	private long target = -1;
 
+    private Registry registry;
 
-	public UIMFile() {
+    @Autowired
+	public UIMFile(Registry registry) {
+        this.registry = registry;
 
 	}
 
-	protected Object doExecute() throws Exception {
-		if (filename == null) {
+    @Override
+    public Object execute(CommandSession commandSession, List<Object> arguments) throws Exception {
+
+        if(arguments.size() < 2) {
+            System.out.println("Filename and format must be specified. uim:file filename format target");
+            return null;
+        }
+
+        filename = arguments.get(0).toString();
+        if (filename == null) {
 			System.out.println("Filename must be specified. uim:file filename format target");
 			return null;
 		} 
-		if (format == null) {
+
+        format = arguments.get(1).toString();
+        if (format == null) {
 			System.out.println("Format must be specified. uim:file filename format target");
 			return null;
 		}
 
+        if(arguments.size() > 2) {
+            target = Long.parseLong(arguments.get(2).toString());
+        }
+
 		System.out.println("Loading File: Load <" + filename + "> as <" + format + "> into collection <" + (target==-1?"NEW":target) + ">");
 
-		StorageEngine storage = UIMRegistry.getInstance().getFirstStorage();
+		StorageEngine storage = registry.getFirstStorage();
 		Collection collection = storage.getCollection(target);
 		if (collection == null) {
 			if (target < 0) {

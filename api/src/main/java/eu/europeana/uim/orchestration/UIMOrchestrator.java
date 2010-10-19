@@ -1,17 +1,19 @@
 package eu.europeana.uim.orchestration;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.Orchestrator;
+import eu.europeana.uim.Registry;
 import eu.europeana.uim.UIMRegistry;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.workflow.Workflow;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Orchestrates the ingestion job execution. The orchestrator keeps a map of WorkflowProcessors, one for each different workflow.
@@ -21,12 +23,14 @@ public class UIMOrchestrator implements Orchestrator {
 
     private static Logger log = Logger.getLogger(UIMOrchestrator.class.getName());
 
-    private UIMRegistry registry;
+    private final Registry registry;
     
     private Map<Workflow, WorkflowProcessor> processors = new HashMap<Workflow, WorkflowProcessor>();
 
     
-    public UIMOrchestrator(){
+    @Autowired
+    public UIMOrchestrator(UIMRegistry registry) {
+        this.registry = registry;
     }
     
 	@Override
@@ -83,15 +87,9 @@ public class UIMOrchestrator implements Orchestrator {
         // TODO: get next batch for an execution from the storage
         return null;
     }
-    
-    
 
-	public UIMRegistry getRegistry() {
+	public Registry getRegistry() {
 		return registry;
-	}
-
-	public void setRegistry(UIMRegistry registry) {
-		this.registry = registry;
 	}
 
 }

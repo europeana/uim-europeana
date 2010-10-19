@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  * Processor for a workflow step, capable of running several UIMTasks concurrently. The processor holds a ThreadPoolExecutor
  * and a BlockingQueue, as well as a list of successful and failed tasks.
  *
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class StepProcessor {
 
@@ -62,5 +62,13 @@ public class StepProcessor {
 
     public WorkflowStep getStep() {
         return step;
+    }
+
+    public Vector<UIMTask> getSuccessfulTasks() {
+        return this.successes;
+    }
+
+    public Vector<UIMTask> getFailedTasks() {
+        return this.failures;
     }
 }
