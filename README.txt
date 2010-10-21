@@ -1,3 +1,16 @@
+PROJECT STRUCTURE
+=================
+
+Path                Name                                                    Description
+----------------------------------------------------------------------------------------------------------------------------
+/                   Unified Ingestion Manager                                The root maven project
+/common             Unified Ingestion Manager: Common                        Shared classes and resources (e.g. for testing)
+/api                Unified Ingestion Manager: API                           The UIM API bundle, used by plugins
+/import/file        Unified Ingestion Manager: Import File                   Bundle to import data from a XML file
+/plugins/dummy      Unified Ingestion Manager: Dummy Plugin                  Our beloved dummy plugin
+/integration-tests  Unified Ingestion Manager: Integration tests             The integration tests for
+
+
 INSTALLATION
 ============
 
@@ -21,10 +34,13 @@ INSTALLATION
    This should go away in the future
 
 5) Install UIM
-   - in the Karaf shell, type 'osgi:install -s mvn:eu.europeana/europeana-uim-api/1.0.0-SNAPSHOT'
+   - in the Karaf shell, type
+     'osgi:install -s mvn:eu.europeana/europeana-uim-api/1.0.0-SNAPSHOT'
+     'osgi:install -s mvn:eu.europeana/europeana-uim-common/1.0.0-SNAPSHOT'
 
 6) Verify if UIM is up and running
    - in Karaf shell: 'uim:info'
+
 
 TEST IMPORT OF FILE
 ===================
@@ -40,4 +56,4 @@ TEST IMPORT OF FILE
    - should complain about missing parameters
    
 5) Import ESE file:
-   - in Karaf shell: 'uim:file <project-path>/import/file/src/test/resources/readingeurope.xml ese'
+   - in Karaf shell: 'uim:file <project-path>/common/src/test/resources/readingeurope.xml ese'

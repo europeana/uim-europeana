@@ -22,6 +22,7 @@
         <module>import/file</module>
         <module>plugins/dummy</module>
         <module>integration-tests</module>
+        <module>common</module>
     </modules>
 
     <build>

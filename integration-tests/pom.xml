@@ -10,7 +10,7 @@
     </parent>
     <artifactId>integration-tests</artifactId>
 
-    <name>Unified Ingestion Manager - Integration tests</name>
+    <name>Unified Ingestion Manager: Integration tests</name>
 
     <dependencies>
         <dependency>

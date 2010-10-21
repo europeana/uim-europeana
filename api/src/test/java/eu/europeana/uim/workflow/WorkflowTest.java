@@ -1,9 +1,16 @@
 package eu.europeana.uim.workflow;
 
 import eu.europeana.uim.Orchestrator;
+import eu.europeana.uim.Registry;
 import eu.europeana.uim.orchestration.WorkflowProcessor;
 import eu.europeana.uim.store.Execution;
+import eu.europeana.uim.store.memory.MemoryStorageEngine;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -13,7 +20,12 @@ import static junit.framework.Assert.assertTrue;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/META-INF/spring/test-bundle-context.xml")
 public class WorkflowTest {
+
+    @Autowired
+    private Registry registry;
 
     @Test
     public void buildWorkfowRepresentation() {
@@ -41,10 +53,16 @@ public class WorkflowTest {
         return w;
     }
 
+    @Before
+    public void setup() {
+        registry.addStorage(new MemoryStorageEngine());
+    }
+    
     @Test
     public void runWorkflow() {
-        Workflow w = buildTestWorkflow();
+//        UIMFile testData = new UIMFile(registry);
         Orchestrator o = new MockUIMOrchestrator();
+        Workflow w = buildTestWorkflow();
         Execution e = new Execution() { public long getId() { return 0;} };
         WorkflowProcessor processor = new WorkflowProcessor(e, w, o);
 

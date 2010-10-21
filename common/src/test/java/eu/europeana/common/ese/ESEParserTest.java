@@ -1,16 +1,16 @@
-package eu.europeana.uim.file.ese;
+package eu.europeana.common.ese;
 
-import static org.junit.Assert.assertEquals;
+import eu.europeana.uim.common.ese.ESEParser;
+import org.junit.Test;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 
 public class ESEParserTest {

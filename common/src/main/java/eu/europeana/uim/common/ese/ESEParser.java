@@ -1,4 +1,4 @@
-package eu.europeana.uim.file.ese;
+package eu.europeana.uim.common.ese;
 
 import java.io.IOException;
 import java.io.InputStream;

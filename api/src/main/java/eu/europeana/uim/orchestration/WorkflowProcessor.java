@@ -28,14 +28,13 @@ public class WorkflowProcessor implements Runnable {
 
     private static Logger log = Logger.getLogger(WorkflowProcessor.class.getName());
 
-
     public static final int BATCH_SIZE = 100;
 
-    private Workflow workflow;
+    private final Workflow workflow;
+
+    private final Orchestrator orchestrator;
 
     private List<Execution> executions = new ArrayList<Execution>();
-
-    private Orchestrator orchestrator;
 
     protected List<StepProcessor> workflowStepProcessors = new LinkedList<StepProcessor>();
 
@@ -138,12 +137,12 @@ public class WorkflowProcessor implements Runnable {
      */
     private void fillStepProcessorQueue(StepProcessor sp, StepProcessor previous) {
         // TODO pass MDRs from one queue to another
-        final int c = sp.getQueue().remainingCapacity();
-        for(int i = 0; i < c; i++) {
-//            UIMTask t = previous.getSuccessfulTasks().firstElement();
-//            previous.getSuccessfulTasks().remove(t);
-            // update the sp step so it points to the task
-            
+        int c = sp.getQueue().remainingCapacity();
+        log.fine("Filling queue of next StepProcessor with capacity " + c + ", tasks available: " + previous.getSuccessfulTasks().size());
+        while(c > 0 && previous.getSuccessfulTasks().size() > 0) {
+            UIMTask t = previous.getSuccessfulTasks().firstElement();
+            previous.getSuccessfulTasks().remove(t);
+            c = sp.getQueue().remainingCapacity();
         }
     }
 
