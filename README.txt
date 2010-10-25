@@ -26,19 +26,26 @@ INSTALLATION
 4) Deploy Spring DM 2 on Karaf
    - for the moment, Karaf ships with Spring DM 1.2.x, and we need 2.x
    - in the Karaf console, run:
-     - features:addurl <project-path>/etc/spring-features.xml
+     - features:addurl file://<project-path>/etc/spring-features.xml
      - features:install spring-dm-2
    - you can check if the feature is installed via 'features:list'
 
    For the moment, you will most likely get a bunch of stacktraces from Spring DM and Felix.
    This should go away in the future
 
-5) Install UIM
+
+BUILDING UIM
+============
+
+1) Goto <project-path> and do a maven install 
+   Note that maven compile might fail - we need a test-jar from the common module, therefore only mvn install works.
+   
+2) Install UIM in Karaf
    - in the Karaf shell, type
      'osgi:install -s mvn:eu.europeana/europeana-uim-api/1.0.0-SNAPSHOT'
      'osgi:install -s mvn:eu.europeana/europeana-uim-common/1.0.0-SNAPSHOT'
 
-6) Verify if UIM is up and running
+6) Verify if UIM is up and running (Note that auto completion with TAB does not work yet)
    - in Karaf shell: 'uim:info'
 
 
