@@ -8,7 +8,7 @@
         <artifactId>europeana-uim</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>europeana-uim-integration</artifactId>
+    <artifactId>europeana-uim-plugin-integration</artifactId>
 
     <name>Unified Ingestion Manager: Integration tests</name>
 
@@ -19,6 +19,7 @@
             <version>3.0.2</version>
             <scope>test</scope>
         </dependency>
+        
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.main</artifactId>

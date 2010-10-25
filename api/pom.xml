@@ -60,7 +60,6 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>europeana-uim-common</artifactId>
-									<version>${pom.version}</version>
 									<classifier>tests</classifier>
 								</artifactItem>
 							</artifactItems>
@@ -96,8 +95,8 @@
             <groupId>eu.europeana</groupId>
             <artifactId>europeana-uim-common</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
             <classifier>tests</classifier>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
