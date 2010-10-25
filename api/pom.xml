@@ -56,10 +56,19 @@
                         </goals>
                         <phase>generate-test-resources</phase>
                         <configuration>
+                        	<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>europeana-uim-common</artifactId>
+									<version>${pom.version}</version>
+									<classifier>tests</classifier>
+								</artifactItem>
+							</artifactItems>
                             <outputDirectory>${project.build.directory}/generated-test-resources</outputDirectory>
-                            <includeArtifactIds>europeana-uim-common</includeArtifactIds>
-                            <includeGroupIds>${groupId}</includeGroupIds>
-                            <excludeTransitive>true</excludeTransitive>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<includes>*.xml,**/*.xml,*.txt,**/*.txt</includes>
+							<excludes>**/pom.xml</excludes>
                         </configuration>
                     </execution>
                 </executions>
@@ -74,10 +83,13 @@
         <dependency>
             <groupId>${groupId}</groupId>
             <artifactId>europeana-uim-common</artifactId>
-            <version>${version}</version>
-            <classifier>resources</classifier>
-            <type>zip</type>
-            <scope>provided</scope>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+            <version>2.0.2</version>
         </dependency>
 
         <dependency>
@@ -85,12 +97,7 @@
             <artifactId>europeana-uim-common</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
-            <version>2.0.2</version>
+            <classifier>tests</classifier>
         </dependency>
 
     </dependencies>
