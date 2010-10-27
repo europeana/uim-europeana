@@ -39,8 +39,10 @@ public class MemoryStorageEngine implements StorageEngine {
 
 	private AtomicLong mdrId= new AtomicLong();
 
+	public static final String IDENTIFIER = MemoryStorageEngine.class.getSimpleName();
+	
 	public String getIdentifier(){
-		return MemoryStorageEngine.class.getSimpleName();
+		return IDENTIFIER;
 	}
 	
 

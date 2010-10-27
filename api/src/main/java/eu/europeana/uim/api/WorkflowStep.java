@@ -1,4 +1,4 @@
-package eu.europeana.uim.workflow;
+package eu.europeana.uim.api;
 
 import eu.europeana.uim.MetaDataRecord;
 
@@ -10,4 +10,5 @@ import eu.europeana.uim.MetaDataRecord;
 public interface WorkflowStep {
 
     public void processRecord(MetaDataRecord<?> mdr);
+    
 }

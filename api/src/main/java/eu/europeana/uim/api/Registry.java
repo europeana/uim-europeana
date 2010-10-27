@@ -1,8 +1,6 @@
-package eu.europeana.uim;
+package eu.europeana.uim.api;
 
-import eu.europeana.uim.plugin.IngestionPlugin;
 import eu.europeana.uim.store.StorageEngine;
-import eu.europeana.uim.workflow.Workflow;
 
 /**
  * Registry for UIM services
@@ -21,7 +19,7 @@ public interface Registry {
 
     void removeWorkflow(Workflow workflow);
 
-    StorageEngine getFirstStorage();
+    StorageEngine getActiveStorage();
 
-    void setFirstStorage(StorageEngine storage);
+    void setFallbackStore(StorageEngine storage);
 }

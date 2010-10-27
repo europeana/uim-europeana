@@ -11,16 +11,14 @@
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="uimRegistry" class="eu.europeana.uim.UIMRegistry" scope="bundle" />
+    <bean id="uimRegistry" class="eu.europeana.uim.orchestration.UIMRegistry" scope="bundle" />
 
     <bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator">
         <constructor-arg ref="uimRegistry"/>
     </bean>
 
-    <bean id="uimInfoShell" class="eu.europeana.uim.UIMInfo">
+    <bean id="uimInfoShell" class="eu.europeana.uim.command.UIMInfo">
         <property name="registry" ref="uimRegistry" />
     </bean>
-
-    <bean id="memoryStore" class="eu.europeana.uim.store.memory.MemoryStorageEngine"/>
 
 </beans>

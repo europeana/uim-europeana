@@ -1,7 +1,9 @@
 package eu.europeana.uim.workflow;
 
-import eu.europeana.uim.Orchestrator;
-import eu.europeana.uim.Registry;
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.orchestration.WorkflowProcessor;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.memory.MemoryStorageEngine;

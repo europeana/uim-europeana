@@ -1,7 +1,7 @@
 package eu.europeana.uim.orchestration;
 
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.workflow.WorkflowStep;
+import eu.europeana.uim.api.WorkflowStep;
 
 /**
  * A task that runs a workflow step against a MetaDataRecord.

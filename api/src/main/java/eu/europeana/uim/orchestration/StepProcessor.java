@@ -1,7 +1,7 @@
 package eu.europeana.uim.orchestration;
 
+import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.workflow.ProcessingContainer;
-import eu.europeana.uim.workflow.WorkflowStep;
 
 import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;

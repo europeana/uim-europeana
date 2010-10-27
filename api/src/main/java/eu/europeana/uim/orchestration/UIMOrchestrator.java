@@ -1,19 +1,20 @@
 package eu.europeana.uim.orchestration;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.Orchestrator;
-import eu.europeana.uim.Registry;
-import eu.europeana.uim.UIMRegistry;
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.workflow.Workflow;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Orchestrates the ingestion job execution. The orchestrator keeps a map of WorkflowProcessors, one for each different workflow.
@@ -23,10 +24,12 @@ public class UIMOrchestrator implements Orchestrator {
 
     private static Logger log = Logger.getLogger(UIMOrchestrator.class.getName());
 
-    private final Registry registry;
+    private Registry registry;
     
     private Map<Workflow, WorkflowProcessor> processors = new HashMap<Workflow, WorkflowProcessor>();
 
+    public UIMOrchestrator() {
+    }
     
     @Autowired
     public UIMOrchestrator(UIMRegistry registry) {
@@ -37,27 +40,25 @@ public class UIMOrchestrator implements Orchestrator {
 	public String getIdentifier() {
 		return UIMOrchestrator.class.getSimpleName();
 	}
-    
-    
-    
-    @Override
-    public Execution executeWorkflow(Workflow w, MetaDataRecord mdr) {
+
+	@Override
+    public Execution executeWorkflow(Workflow w, MetaDataRecord<?> mdr, ProgressMonitor monitor) {
         return executeWorkflow(w);
     }
 
     @Override
-    public Execution executeWorkflow(Workflow w, Collection c) {
+    public Execution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor) {
         return executeWorkflow(w);
     }
 
 
     @Override
-    public Execution executeWorkflow(Workflow w, Request r) {
+    public Execution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor) {
         return executeWorkflow(w);
     }
 
     @Override
-    public Execution executeWorkflow(Workflow w, Provider p) {
+    public Execution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor) {
         return executeWorkflow(w);
     }
 
@@ -67,7 +68,7 @@ public class UIMOrchestrator implements Orchestrator {
      * @return a new Execution for this execution request
      */
     private Execution executeWorkflow(Workflow w) {
-        Execution e = registry.getFirstStorage().createExecution();
+        Execution e = registry.getActiveStorage().createExecution();
 
         WorkflowProcessor we = processors.get(w);
         if(we == null) {
@@ -88,8 +89,21 @@ public class UIMOrchestrator implements Orchestrator {
         return null;
     }
 
+	/**
+	 * @return the registry
+	 */
 	public Registry getRegistry() {
 		return registry;
 	}
+
+	/**
+	 * @param registry the registry to set
+	 */
+	public void setRegistry(Registry registry) {
+		this.registry = registry;
+	}
+
+    
+    
 
 }

@@ -1,17 +1,20 @@
 package eu.europeana.uim.workflow;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.Orchestrator;
-import eu.europeana.uim.common.ese.ESEParser;
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.common.ProgressMonitor;
+import eu.europeana.uim.common.parse.RecordMap;
+import eu.europeana.uim.common.parse.RecordParser;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * MockOrchestrator, for testing its clients
@@ -27,39 +30,41 @@ public class MockUIMOrchestrator implements Orchestrator {
         // if we need this someplace else we may want to refactor this step into a separate TestData class
 
         InputStream stream = getClass().getResourceAsStream("/readingeurope.xml");
-        ESEParser parser = new ESEParser();
-        List<HashMap<String,Object>> xml = null;
+        RecordParser parser = new RecordParser();
+        List<RecordMap> xml = null;
         try {
-            xml = parser.importXml(stream);
+            xml = parser.parse(stream, "europeana:record");
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        for (HashMap<String, Object> record : xml) {
+        for (RecordMap record : xml) {
             MetaDataRecord<FieldRegistry> mdr = new MetaDataRecord<FieldRegistry>();
-            mdr.setField(FieldRegistry.field0, (String) record.get("title"));
+            mdr.setField(FieldRegistry.title, record.getFirstByLocal("title"));
             testData.put(mdr.getId(), mdr);
         }
 
     }
 
+
+
 	@Override
-    public Execution executeWorkflow(Workflow w, MetaDataRecord mdr) {
+    public Execution executeWorkflow(Workflow w, MetaDataRecord<?> mdr, ProgressMonitor monitor) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Execution executeWorkflow(Workflow w, Collection c) {
+    public Execution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Execution executeWorkflow(Workflow w, Request r) {
+    public Execution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Execution executeWorkflow(Workflow w, Provider p) {
+    public Execution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

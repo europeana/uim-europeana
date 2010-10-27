@@ -1,5 +1,6 @@
 package eu.europeana.uim;
 
+import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.store.memory.MemoryStorageEngine;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,11 +20,12 @@ public class UIMRegistryTest {
 
 	@Before
 	public void setup() {
-		registry.addStorage(new MemoryStorageEngine());
+		registry.setFallbackStore(new MemoryStorageEngine());
+		
 	}
 	
 	@Test
 	public void testStorageEngine() {
-		assertNotNull(registry.getFirstStorage());
+		assertNotNull(registry.getActiveStorage());
 	}
 }

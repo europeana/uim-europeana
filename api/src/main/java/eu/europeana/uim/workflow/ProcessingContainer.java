@@ -1,6 +1,7 @@
 package eu.europeana.uim.workflow;
 
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.WorkflowStep;
 
 import java.util.Arrays;
 import java.util.LinkedList;

@@ -1,6 +1,7 @@
-package eu.europeana.uim.workflow;
+package eu.europeana.uim.api;
 
 import java.util.List;
+
 
 /**
  * UIM UIMWorkflow definition

@@ -3,6 +3,9 @@ package eu.europeana.uim.workflow;
 import java.util.LinkedList;
 import java.util.List;
 
+import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.api.WorkflowStep;
+
 public class UIMWorkflow implements Workflow {
 
     private Long id;

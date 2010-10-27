@@ -9,7 +9,7 @@
 
     <bp:blueprint>
 
-        <bp:service id="registry" ref="uimRegistry" interface="eu.europeana.uim.Registry" />
+        <bp:service id="registry" ref="uimRegistry" interface="eu.europeana.uim.api.Registry" />
 
         <bp:reference-list interface="eu.europeana.uim.plugin.IngestionPlugin" availability="optional">
             <bp:reference-listener
@@ -22,8 +22,6 @@
                     bind-method="addStorage" unbind-method="removeStorage" ref="uimRegistry">
             </bp:reference-listener>
         </bp:reference-list>
-
-        <bp:service id="fallbackStorage" ref="memoryStore" interface="eu.europeana.uim.store.StorageEngine"/>
 
         <bp:service id="infoShell" ref="uimInfoShell" interface="org.osgi.service.command.Function">
             <bp:service-properties>

@@ -1,10 +1,10 @@
 package eu.europeana.uim.orchestration;
 
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.Orchestrator;
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.store.Execution;
-import eu.europeana.uim.workflow.Workflow;
-import eu.europeana.uim.workflow.WorkflowStep;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
