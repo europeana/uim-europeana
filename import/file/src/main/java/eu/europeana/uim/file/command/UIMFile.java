@@ -8,6 +8,8 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.felix.gogo.commands.Action;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.osgi.service.command.CommandSession;
 import org.osgi.service.command.Function;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +24,16 @@ import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.StorageEngine;
 
-
+@Command(name = "uim", scope = "file")
 public class UIMFile implements Function, Action {
 
+	@Argument(required=true)
 	private String filename;
 
+	@Argument(index=1)
 	private String format;
 
+	@Argument(index=2)
 	private long collid = -1;
 
 	private Registry registry;
@@ -50,8 +55,6 @@ public class UIMFile implements Function, Action {
 	
 	@Override
 	public Object execute(CommandSession commandSession, List<Object> arguments) throws Exception {
-		if (!readArguments(arguments)) return null;
-
 		StorageEngine storage = registry.getActiveStorage();
 		long[] ids = execute(storage, commandSession);
 		if (ids == null) {
@@ -121,29 +124,29 @@ public class UIMFile implements Function, Action {
 		return collection;
 	}
 
-	private boolean readArguments(List<Object> arguments) {
-		if (arguments.size() < 2) {
-			System.out.println("Filename and format must be specified. uim:file filename format collection");
-			return false;
-		}
-
-		filename = arguments.get(0).toString();
-		if (filename == null) {
-			System.out.println("Filename must be specified. uim:file filename format collection");
-			return false;
-		}
-
-		format = arguments.get(1).toString();
-		if (format == null) {
-			System.out.println("Format must be specified. uim:file filename format collection");
-			return false;
-		}
-
-		if (arguments.size() > 2) {
-			collid = Long.parseLong(arguments.get(2).toString());
-		}
-		return true;
-	}
+//	private boolean readArguments(List<Object> arguments) {
+//		if (arguments == null || arguments.size() < 2) {
+//			System.out.println("Filename and format must be specified. uim:file filename format collection");
+//			return false;
+//		}
+//
+//		filename = arguments.get(0).toString();
+//		if (filename == null) {
+//			System.out.println("Filename must be specified. uim:file filename format collection");
+//			return false;
+//		}
+//
+//		format = arguments.get(1).toString();
+//		if (format == null) {
+//			System.out.println("Format must be specified. uim:file filename format collection");
+//			return false;
+//		}
+//
+//		if (arguments.size() > 2) {
+//			collid = Long.parseLong(arguments.get(2).toString());
+//		}
+//		return true;
+//	}
 
 	/**
 	 * @return the registry

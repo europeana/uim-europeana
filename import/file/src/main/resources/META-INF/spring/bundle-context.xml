@@ -12,7 +12,7 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 
-    <osgi:reference id="registry" interface="eu.europeana.uim.Registry" />
+    <osgi:reference id="registry" interface="eu.europeana.uim.api.Registry" />
 
     <bean id="uimFileShell" class="eu.europeana.uim.file.UIMFile">
         <constructor-arg ref="registry" />
