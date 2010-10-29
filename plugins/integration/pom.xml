@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>europeana-uim-plugin-integration</artifactId>
 
-	<name>Unified Ingestion Manager: Integration tests</name>
+	<name>Unified Ingestion Manager: Integration Tests</name>
 
 	<dependencies>
 			<dependency>

@@ -7,7 +7,7 @@
 
     <bean id="uimRegistry" class="eu.europeana.uim.UIMRegistry" />
 
-<!--	<service id="orchestrator" interface="eu.europeana.uim.api.Orchestrator"/>-->
+	<reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator" availability="optional"/>
 
 	<reference-list interface="eu.europeana.uim.api.IngestionPlugin" availability="optional">
 		<reference-listener 
