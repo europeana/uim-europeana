@@ -23,11 +23,11 @@ public class ProgressMonitorAdapter implements ProgressMonitor {
 	}
 
 	@Override
-	public void setCanceled(boolean canceled) {
+	public void setCancelled(boolean canceled) {
 	}
 
 	@Override
-	public boolean isCanceled() {
+	public boolean isCancelled() {
 		return false;
 	}
 

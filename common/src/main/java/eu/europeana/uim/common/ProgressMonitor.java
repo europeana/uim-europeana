@@ -39,15 +39,15 @@ public interface ProgressMonitor {
 	 * by the user interface therefore the execution should poll the <code>isCancelled</code>
 	 * method before every sub task.
 	 * 
-	 * @param canceled
+	 * @param cancelled
 	 */
-	public void setCanceled(boolean canceled);
+	public void setCancelled(boolean cancelled);
 
 	
 	/** Check wheater the task execution should be cancelled or not.
 	 * 
 	 * @return
 	 */
-	public boolean isCanceled();
+	public boolean isCancelled();
 	
 }

@@ -9,9 +9,9 @@ import eu.europeana.uim.common.parse.XMLStreamParserException;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.StorageEngine;
 
-public class ReadRecordsFromFile {
+public class RecordLoader {
 
-	public ReadRecordsFromFile() {
+	public RecordLoader() {
 		super();
 	}
 

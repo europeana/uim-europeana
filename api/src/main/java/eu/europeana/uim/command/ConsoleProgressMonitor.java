@@ -7,12 +7,14 @@ import eu.europeana.uim.common.ProgressMonitor;
 public class ConsoleProgressMonitor implements ProgressMonitor {
 	
 	private final CommandSession session;
+	
+	private boolean cancelled = false;
+	private int worked = 0;
 
 	public ConsoleProgressMonitor(CommandSession session) {
 		super();
 		this.session = session;
 	}
-
 	
 	@Override
 	public void beginTask(String task, int work) {
@@ -22,6 +24,10 @@ public class ConsoleProgressMonitor implements ProgressMonitor {
 	@Override
 	public void worked(int work) {
 		session.getConsole().print(".");
+		worked += work;
+		if (worked % 10 == 0) {
+			session.getConsole().print("|");
+		}
 	}
 
 	@Override
@@ -34,12 +40,13 @@ public class ConsoleProgressMonitor implements ProgressMonitor {
 	}
 
 	@Override
-	public void setCanceled(boolean canceled) {
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
 	}
 
 	@Override
-	public boolean isCanceled() {
-		return false;
+	public boolean isCancelled() {
+		return cancelled;
 	}
 
 }

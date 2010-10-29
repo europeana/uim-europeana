@@ -80,7 +80,7 @@ public class RecordParser {
 		Stack<String> path = new Stack<String>();
 		RecordMap record = null;
 		try {
-			while (xml.hasNext() && !monitor.isCanceled()) {
+			while (xml.hasNext() && !monitor.isCancelled()) {
 				xml.next();
 
 				switch (xml.getEventType()) {

@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
+import org.apache.felix.gogo.commands.Option;
 import org.osgi.service.command.CommandSession;
 import org.osgi.service.command.Function;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.command.ConsoleProgressMonitor;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
-import eu.europeana.uim.file.ReadRecordsFromFile;
+import eu.europeana.uim.file.RecordLoader;
 import eu.europeana.uim.store.Aggregator;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
@@ -26,15 +27,20 @@ import eu.europeana.uim.store.StorageEngine;
 
 @Command(name = "uim", scope = "file")
 public class UIMFile implements Function, Action {
+	
+	private enum Format {
+		ESE,
+		DCX
+	}
 
 	@Argument(required=true)
 	private String filename;
 
-	@Argument(index=1)
-	private String format;
-
-	@Argument(index=2)
+	@Option(name="-c",aliases={"--collection"})
 	private long collid = -1;
+
+	@Option(name="-f",aliases={"--format"})
+	private Format format = Format.ESE;
 
 	private Registry registry;
 
@@ -87,9 +93,11 @@ public class UIMFile implements Function, Action {
 			if (collection != null) {
 				Request request = storage.createRequest(collection);
 				storage.updateRequest(request);
-				
-				long[] ids = new ReadRecordsFromFile().doEseImport(f, storage, request, new ConsoleProgressMonitor(commandSession));
-				return ids;
+				RecordLoader reader = new RecordLoader();
+				switch (format) {
+					case ESE:
+					default: return reader.doEseImport(f, storage, request, new ConsoleProgressMonitor(commandSession));
+				}
 			} else {
 				commandSession.getConsole().println("Collection: <" + collid + "> not found.");
 			}

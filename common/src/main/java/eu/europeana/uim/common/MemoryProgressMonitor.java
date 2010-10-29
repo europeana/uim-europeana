@@ -13,7 +13,7 @@ public class MemoryProgressMonitor implements ProgressMonitor {
 	private int work =0;
 	private int worked =0;
 	
-	private boolean canceled = false;
+	private boolean cancelled = false;
 	
 
 	/** public standard constructor.
@@ -44,13 +44,13 @@ public class MemoryProgressMonitor implements ProgressMonitor {
 	}
 
 	@Override
-	public void setCanceled(boolean canceled) {
-		this.canceled = canceled;
+	public void setCancelled(boolean canceled) {
+		this.cancelled = canceled;
 	}
 
 	@Override
-	public boolean isCanceled() {
-		return canceled;
+	public boolean isCancelled() {
+		return cancelled;
 	}
 
 	/**
