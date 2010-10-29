@@ -68,6 +68,7 @@ public class RecordParser {
 		XMLStreamReader xml;
 		try {
 			xml = inFactory.createXMLStreamReader(inputStream);
+			monitor.worked(1);
 		} catch (XMLStreamException e) {
 			throw new XMLStreamParserException("Failed to create XML Stream reader from input stream:" + inputStream);
 		}

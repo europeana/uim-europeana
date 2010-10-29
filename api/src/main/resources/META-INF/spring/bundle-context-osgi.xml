@@ -11,13 +11,13 @@
 
         <bp:service id="registry" ref="uimRegistry" interface="eu.europeana.uim.api.Registry" />
 
-        <bp:reference-list interface="eu.europeana.uim.plugin.IngestionPlugin" availability="optional">
+        <bp:reference-list interface="eu.europeana.uim.api.IngestionPlugin" availability="optional">
             <bp:reference-listener
                     bind-method="addPlugin" unbind-method="removePlugin" ref="uimRegistry">
             </bp:reference-listener>
         </bp:reference-list>
 
-        <bp:reference-list interface="eu.europeana.uim.store.StorageEngine" availability="optional">
+        <bp:reference-list interface="eu.europeana.uim.api.StorageEngine" availability="optional">
             <bp:reference-listener
                     bind-method="addStorage" unbind-method="removeStorage" ref="uimRegistry">
             </bp:reference-listener>
