@@ -6,12 +6,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.store.Aggregator;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.StorageEngine;
 import gnu.trove.TLongArrayList;
 import gnu.trove.TLongLongHashMap;
 import gnu.trove.TLongLongIterator;

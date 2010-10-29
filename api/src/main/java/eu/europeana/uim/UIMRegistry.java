@@ -1,4 +1,4 @@
-package eu.europeana.uim.orchestration;
+package eu.europeana.uim;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.Workflow;
-import eu.europeana.uim.store.StorageEngine;
 import eu.europeana.uim.store.memory.MemoryStorageEngine;
 
 public class UIMRegistry implements Registry {
@@ -26,6 +26,7 @@ public class UIMRegistry implements Registry {
 	@Autowired
 	private Orchestrator orchestrator = null;
 
+	
 	public UIMRegistry() {
 	}
 

@@ -1,9 +1,14 @@
-package eu.europeana.uim.store;
+package eu.europeana.uim.api;
 
 import java.util.List;
 
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.store.Aggregator;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Execution;
+import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.store.Request;
 
 
 public interface StorageEngine {

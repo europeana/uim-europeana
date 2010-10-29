@@ -2,11 +2,11 @@ package eu.europeana.uim;
 
 import java.util.Map.Entry;
 
+import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.common.parse.RecordField;
 import eu.europeana.uim.common.parse.RecordHandler;
 import eu.europeana.uim.common.parse.RecordMap;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.StorageEngine;
 
 public class MetaDataRecordHandler implements RecordHandler {
 

@@ -1,6 +1,5 @@
 package eu.europeana.uim.api;
 
-import eu.europeana.uim.store.StorageEngine;
 
 /**
  * Registry for UIM services
