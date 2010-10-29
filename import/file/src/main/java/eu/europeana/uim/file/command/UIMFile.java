@@ -16,6 +16,7 @@ import org.osgi.service.command.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.command.ConsoleProgressMonitor;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
 import eu.europeana.uim.file.RecordLoader;
@@ -23,7 +24,6 @@ import eu.europeana.uim.store.Aggregator;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.StorageEngine;
 
 @Command(name = "uim", scope = "file")
 public class UIMFile implements Function, Action {

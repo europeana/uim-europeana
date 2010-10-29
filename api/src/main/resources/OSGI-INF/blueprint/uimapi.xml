@@ -5,23 +5,27 @@
 		   
 	<service id="registry" ref="uimRegistry" interface="eu.europeana.uim.api.Registry"/>
 
+    <bean id="uimRegistry" class="eu.europeana.uim.orchestration.UIMRegistry" />
+
+	<service id="orchestrator" ref="uimRegistry" interface="eu.europeana.uim.api.Orchestrator"/>
+
 	<reference-list interface="eu.europeana.uim.api.IngestionPlugin" availability="optional">
 		<reference-listener 
               bind-method="addPlugin" unbind-method="removePlugin" ref="uimRegistry">
       	</reference-listener>
 	</reference-list>
 	
-	<reference-list interface="eu.europeana.uim.store.StorageEngine" availability="optional">
+	<reference-list interface="eu.europeana.uim.api.StorageEngine" availability="optional">
 		<reference-listener 
               bind-method="addStorage" unbind-method="removeStorage" ref="uimRegistry">
       	</reference-listener>
 	</reference-list>
 
-    <bean id="uimRegistry" class="eu.europeana.uim.orchestration.UIMRegistry" />
-
-	<bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator">
-		<property name="registry" ref="uimRegistry" />
-	</bean>
+	<reference-list interface="eu.europeana.uim.api.Workflow" availability="optional">
+		<reference-listener 
+              bind-method="addWorkflow" unbind-method="removeWorkflow" ref="uimRegistry">
+      	</reference-listener>
+	</reference-list>
 
 	<shell:command-bundle>
 		<shell:command name="uim/info">

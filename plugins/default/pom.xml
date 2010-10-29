@@ -8,8 +8,8 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>europeana-uim-api</artifactId>
-	<name>Unified Ingestion Manager: API</name>
+	<artifactId>europeana-uim-plugin-default</artifactId>
+	<name>Unified Ingestion Manager: Default API Implementation</name>
 	<packaging>bundle</packaging>
 
 	<build>
@@ -21,72 +21,66 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Import-Package>eu.europeana.uim.common.*,gnu.trove.*,*</Import-Package>
-						<Export-Package>eu.europeana.uim,
-							eu.europeana.uim.api,
-							eu.europeana.uim.command,
-							eu.europeana.uim.store,
-							eu.europeana.uim.store.memory
-						</Export-Package>
+						<Import-Package>*</Import-Package>
+						<Export-Package>eu.europeana.uim</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
+			
+			<!-- Fetch shared test resources -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-test-resources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>europeana-uim-common</artifactId>
+									<classifier>tests</classifier>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/unpacked-test-resources
+							</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<includes>*.xml</includes>
+							<excludes>**/pom.xml,META-INF/**,OSGI-INF/**</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/test/resources</directory>
+				<includes>
+					<include>**/*.txt</include>
+					<include>**/*.xml</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>${project.build.directory}/unpacked-test-resources</directory>
+				<includes>
+					<include>**/*.txt</include>
+					<include>**/*.xml</include>
+				</includes>
+			</testResource>
+		</testResources>		
 	</build>
 
 	<dependencies>
-
-		<!-- Shared resources -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>europeana-uim-common</artifactId>
+			<artifactId>europeana-uim-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-
-		<!-- Karaf Shell, for OSGi shell commands -->
-		<dependency>
-			<groupId>org.apache.karaf.shell</groupId>
-			<artifactId>org.apache.karaf.shell.console</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-			<!-- Spring Dynamic Modules -->
-			<dependency>
-				<groupId>org.springframework.osgi</groupId>
-				<artifactId>spring-osgi-core</artifactId>
-				<version>${spring.osgi.version}</version>
-				<!-- <scope>compile</scope> -->
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>org.springframework.beans</artifactId>
-				<version>${spring.core.version}</version>
-				<!-- <scope>provided</scope> -->
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>org.springframework.core</artifactId>
-				<version>${spring.core.version}</version>
-				<!-- <scope>provided</scope> -->
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>org.springframework.context</artifactId>
-				<version>${spring.core.version}</version>
-				<!-- <scope>provided</scope> -->
-			</dependency>
-
-			<dependency>
-				<groupId>org.aopalliance</groupId>
-				<artifactId>com.springsource.org.aopalliance</artifactId>
-				<version>1.0.0</version>
-				<!-- <scope>provided</scope> -->
-			</dependency>
-
 
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -108,6 +102,7 @@
 				<version>${slf4j.version}</version>
 				<scope>provided</scope>
 			</dependency>	
+
 
 		<dependency>
 			<groupId>eu.europeana</groupId>
@@ -138,8 +133,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-
-
-
 </project>
