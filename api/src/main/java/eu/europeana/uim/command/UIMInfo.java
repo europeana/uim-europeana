@@ -1,6 +1,7 @@
 package eu.europeana.uim.command;
 
 import org.apache.felix.gogo.commands.Action;
+import org.apache.felix.gogo.commands.Command;
 import org.osgi.service.command.CommandSession;
 import org.osgi.service.command.Function;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 
+@Command(name = "uim", scope = "info")
 public class UIMInfo implements Function, Action {
 
     @Autowired

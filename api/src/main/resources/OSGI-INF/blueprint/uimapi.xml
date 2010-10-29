@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		   xmlns:bp="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-		   xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0"
-	       xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+		   xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0">
+		   
+	<service id="registry" ref="uimRegistry" interface="eu.europeana.uim.api.Registry"/>
 
-	<service id="fallbackStorage" ref="uimMemoryStore" interface="eu.europeana.uim.store.StorageEngine"/>
-	<service id="registry" ref="uimRegistry" interface="eu.europeana.uim.Registry"/>
-
-    <bean id="uimRegistry" class="eu.europeana.uim.UIMRegistry" />
-
-	<bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator">
-		<property name="registry" ref="uimRegistry" />
-	</bean>
-
-	<reference-list interface="eu.europeana.uim.plugin.IngestionPlugin" availability="optional">
+	<reference-list interface="eu.europeana.uim.api.IngestionPlugin" availability="optional">
 		<reference-listener 
               bind-method="addPlugin" unbind-method="removePlugin" ref="uimRegistry">
       	</reference-listener>
@@ -26,9 +17,15 @@
       	</reference-listener>
 	</reference-list>
 
+    <bean id="uimRegistry" class="eu.europeana.uim.orchestration.UIMRegistry" />
+
+	<bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator">
+		<property name="registry" ref="uimRegistry" />
+	</bean>
+
 	<shell:command-bundle>
 		<shell:command name="uim/info">
-			<shell:action class="eu.europeana.uim.UIMInfo">
+			<shell:action class="eu.europeana.uim.command.UIMInfo">
 				<shell:property name="registry" ref="uimRegistry" />
 			</shell:action>
 		</shell:command>

@@ -31,39 +31,54 @@ public class UIMRegistry implements Registry {
 
 	@Override
 	public void addPlugin(IngestionPlugin plugin) {
-		plugins.add(plugin);
-		log.info("Added plugin:" + plugin.getIdentifier());
+		if (plugin != null) {
+			log.info("Added plugin:" + plugin.getIdentifier());
+			plugins.add(plugin);
+		}
 	}
+	
 
 	@Override
 	public void removePlugin(IngestionPlugin plugin) {
-		plugins.remove(plugin);
-		log.info("Removed plugin:" + plugin.getIdentifier());
+		if (plugin != null) {
+			log.info("Removed plugin:" + plugin.getIdentifier());
+			plugins.remove(plugin);
+		}
 	}
+	
 
 	@Override
 	public void addStorage(StorageEngine storage) {
-		log.info("Added storage:" + storage.getIdentifier());
-		this.storages.add(storage);
+		if (storage != null) {
+			log.info("Added storage:" + storage.getIdentifier());
+			this.storages.add(storage);
+		}
 	}
+	
 
 	@Override
 	public void removeStorage(StorageEngine storage) {
-		log.info("Removed storage:" + storage.getIdentifier());
-		this.storages.remove(storage);
+		if (storage != null) {
+			log.info("Removed storage:" + storage.getIdentifier());
+			this.storages.remove(storage);
+		}
 	}
 
 
 	@Override
 	public void addWorkflow(Workflow workflow) {
-		workflows.add(workflow);
-		log.info("Added workflow: " + workflow.getName());
+		if (workflow != null) { 
+			log.info("Added workflow: " + workflow.getName());
+			workflows.add(workflow);
+		}
 	}
 
 	@Override
 	public void removeWorkflow(Workflow workflow) {
-		workflows.remove(workflow);
-		log.info("Removed workflow: " + workflow.getName());
+		if (workflow != null) {
+			log.info("Removed workflow: " + workflow.getName());
+			workflows.remove(workflow);
+		}
 	}
 
 	@Override

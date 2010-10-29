@@ -75,7 +75,7 @@ public class RecordParser {
 		int recordCount = 0;
 		long startTime = System.currentTimeMillis();
 
-		monitor.beginTask("Parsing stream for records <" + handler.getRecordElement() + ">", Integer.MAX_VALUE);
+		monitor.beginTask("Parsing stream for records <" + handler.getRecordElement() + ">", 0);
 
 		Stack<String> path = new Stack<String>();
 		RecordMap record = null;

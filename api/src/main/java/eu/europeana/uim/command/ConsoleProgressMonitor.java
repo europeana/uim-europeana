@@ -16,7 +16,7 @@ public class ConsoleProgressMonitor implements ProgressMonitor {
 	
 	@Override
 	public void beginTask(String task, int work) {
-		session.getConsole().println("Starting:" + task + ", " + work + " units of work. [");
+		session.getConsole().print("Starting:" + task + ", " + work + " units of work. [");
 	}
 
 	@Override
