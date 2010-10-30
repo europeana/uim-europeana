@@ -1,12 +1,8 @@
 package eu.europeana.uim.workflow;
 
-import eu.europeana.uim.api.Orchestrator;
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.Workflow;
-import eu.europeana.uim.api.WorkflowStep;
-import eu.europeana.uim.orchestration.WorkflowProcessor;
-import eu.europeana.uim.store.Execution;
-import eu.europeana.uim.store.memory.MemoryStorageEngine;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.orchestration.WorkflowProcessor;
+import eu.europeana.uim.store.Execution;
+import eu.europeana.uim.store.memory.MemoryStorageEngine;
 
 /**
  * Test for UIMWorkflow construction
