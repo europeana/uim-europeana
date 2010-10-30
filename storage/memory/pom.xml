@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>europeana-uim-storage-memory</artifactId>
-	<name>Unified Ingestion Manager: Storage Backend Memory</name>
+	<name>Unified Ingestion Manager: API Storage Backend Memory</name>
 	<packaging>bundle</packaging>
 
 	<build>
