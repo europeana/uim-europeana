@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>europeana-uim-import-file</artifactId>
-	<name>Unified Ingestion Manager: Import File</name>
+	<name>Unified Ingestion Manager: Import from File</name>
 	<packaging>bundle</packaging>
 
 	<build>

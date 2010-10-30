@@ -21,9 +21,17 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Import-Package>!com.sun.msv.*,!org.relaxng.*,*</Import-Package>
+						<Import-Package>!com.sun.msv.*,
+							!org.relaxng.*,
+							eu.europeana.uim.*,
+							javax.xml.*,
+							org.w3c.dom, 
+							org.xml.sax, 
+							org.xml.sax.ext</Import-Package>
 						<Export-Package>eu.europeana.uim.common,
 							eu.europeana.uim.common.parse,
+							org.apache.commons.lang;version="2.4",
+							org.apache.commons.lang.*;version="2.4",
 							gnu.trove.*</Export-Package>
 						<Embed-Dependency>commons-lang,wstx-asl,stax-api,trove4j</Embed-Dependency>
 					</instructions>

@@ -1,38 +1,31 @@
-package eu.europeana.uim.file.command;
+package eu.europeana.uim.oaipmh.command;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.List;
 
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.osgi.service.command.CommandSession;
-import org.osgi.service.command.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.command.ConsoleProgressMonitor;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
-import eu.europeana.uim.file.RecordLoader;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Request;
 
-@Command(name = "uim", scope = "file")
-public class UIMFile implements Function, Action {
+@Command(name = "uim", scope = "oaipmh")
+public class UIMOaiPmh implements Action {
 	
 	private enum Format {
 		ESE,
 		DCX
 	}
 
-	@Argument(required=true)
-	private String filename;
+	@Argument()
+	private String baseUrl;
 
 	@Option(name="-c",aliases={"--collection"},required=true)
 	private String collection;
@@ -42,29 +35,23 @@ public class UIMFile implements Function, Action {
 
 	private Registry registry;
 
-	public UIMFile() {
+	public UIMOaiPmh() {
 	}
 
 	@Autowired
-	public UIMFile(Registry registry) {
+	public UIMOaiPmh(Registry registry) {
 		this.registry = registry;
 	}
 	
 	
 	@Override
 	public Object execute(CommandSession session) throws Exception {
-		return execute(session, null);
-	}
-
-	
-	@Override
-	public Object execute(CommandSession commandSession, List<Object> arguments) throws Exception {
 		StorageEngine storage = registry.getActiveStorage();
-		long[] ids = execute(storage, commandSession);
+		long[] ids = execute(storage, session);
 		if (ids == null) {
-			commandSession.getConsole().println("Failed to read any records from: <" + filename + ">");
+			session.getConsole().println("Failed to read any records from: <" + baseUrl + ">");
 		} else {
-			commandSession.getConsole().println("Read " + ids.length + " records from: <" + filename + ">");
+			session.getConsole().println("Read " + ids.length + " records from: <" + baseUrl + ">");
 		}
 		return null;
 	}
@@ -85,27 +72,21 @@ public class UIMFile implements Function, Action {
 	 * @throws Exception
 	 */
 	public long[] execute(StorageEngine storage, CommandSession commandSession) throws XMLStreamParserException, FileNotFoundException, StorageEngineException {
-		File file = new File(filename);
-		if (file.exists()) {
-			InputStream f = new FileInputStream(file);
-			
-			Collection targetcoll = storage.findCollection(collection);
-			if (targetcoll != null) {
-				Request request = storage.createRequest(targetcoll);
-				storage.updateRequest(request);
-				RecordLoader reader = new RecordLoader();
-				switch (format) {
-					case ESE:
-					default: return reader.doEseImport(f, storage, request, new ConsoleProgressMonitor(commandSession));
-				}
-			} else {
-				commandSession.getConsole().println("Collection: <" + collection + "> not found.");
-			}
+		Collection targetcoll = storage.findCollection(collection);
+		if (targetcoll != null) {
+			Request request = storage.createRequest(targetcoll);
+			storage.updateRequest(request);
+//			RecordLoader reader = new RecordLoader();
+//			switch (format) {
+//				case ESE:
+//				default: return reader.doEseImport(f, storage, request, new ConsoleProgressMonitor(commandSession));
+//			}
 		} else {
-			commandSession.getConsole().println("File: <" + file.getAbsolutePath() + "> not found.");
+			commandSession.getConsole().println("Collection: <" + collection + "> not found.");
 		}
 		return null;
 	}
+
 
 
 	/**

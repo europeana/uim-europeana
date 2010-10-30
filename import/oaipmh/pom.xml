@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>europeana-uim-import-oaipmh</artifactId>
-	<name>Unified Ingestion Manager: Import From OAI-PMH</name>
+	<name>Unified Ingestion Manager: Import from OAI-PMH</name>
 	<description>Open Archives Initiative Protocol for Metadata Harvesting</description>
 	<packaging>bundle</packaging>
 
@@ -36,12 +36,18 @@
             <artifactId>europeana-uim-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        
 		<dependency>
 			<groupId>org.apache.karaf.shell</groupId>
 			<artifactId>org.apache.karaf.shell.console</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>org.oclc</groupId>
+            <artifactId>oclc-oai-harvester2</artifactId>
+            <version>1.2.12</version>
+        </dependency>
 
 
 	</dependencies>
