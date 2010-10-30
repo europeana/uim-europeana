@@ -10,9 +10,23 @@ package eu.europeana.uim.store;
     language    // Primary language for collection (used as default for all fields if not given)
 
  */
-public interface Collection {
+public interface Collection extends UimEntity {
 	
-	public long getId();
-	public String getName();
 	public Provider getProvider();
+
+	public String getMnemonic();
+	public void setMnemonic(String mnemonic);
+
+	public String getName();
+	public void setName(String name);
+	
+	public String getOaiBaseUrl();
+	public void setOaiBaseUrl(String baseUrl);
+
+	public String getOaiSet();
+	public void setOaiSet(String set);
+
+	public String getOaiPrefix();
+	public void setOaiPrefix(String prefix);
+
 }

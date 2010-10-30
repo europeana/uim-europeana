@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.Workflow;
-import eu.europeana.uim.store.memory.MemoryStorageEngine;
 
 public class UIMRegistry implements Registry {
 
@@ -21,12 +18,8 @@ public class UIMRegistry implements Registry {
 	private List<IngestionPlugin> plugins = new ArrayList<IngestionPlugin>();
 	private List<Workflow> workflows = new ArrayList<Workflow>();
 
-	private StorageEngine fallbackStore = new MemoryStorageEngine();
-
-	@Autowired
 	private Orchestrator orchestrator = null;
 
-	
 	public UIMRegistry() {
 	}
 
@@ -34,10 +27,11 @@ public class UIMRegistry implements Registry {
 	public void addPlugin(IngestionPlugin plugin) {
 		if (plugin != null) {
 			log.info("Added plugin:" + plugin.getIdentifier());
-			plugins.add(plugin);
+			if (!plugins.contains(plugin))
+				plugins.add(plugin);
 		}
 	}
-	
+
 
 	@Override
 	public void removePlugin(IngestionPlugin plugin) {
@@ -46,16 +40,17 @@ public class UIMRegistry implements Registry {
 			plugins.remove(plugin);
 		}
 	}
-	
+
 
 	@Override
 	public void addStorage(StorageEngine storage) {
 		if (storage != null) {
 			log.info("Added storage:" + storage.getIdentifier());
-			this.storages.add(storage);
+			if (!storages.contains(storage))
+				this.storages.add(storage);
 		}
 	}
-	
+
 
 	@Override
 	public void removeStorage(StorageEngine storage) {
@@ -70,7 +65,8 @@ public class UIMRegistry implements Registry {
 	public void addWorkflow(Workflow workflow) {
 		if (workflow != null) { 
 			log.info("Added workflow: " + workflow.getName());
-			workflows.add(workflow);
+			if (!workflows.contains(workflow))
+				workflows.add(workflow);
 		}
 	}
 
@@ -84,25 +80,9 @@ public class UIMRegistry implements Registry {
 
 	@Override
 	public StorageEngine getActiveStorage() {
-		if (storages == null || storages.isEmpty()) return getFallbackStore();
+		if (storages == null || storages.isEmpty()) return null;
 		return storages.get(0);
 	}
-
-
-	/**
-	 * @return the fallbackStore
-	 */
-	public StorageEngine getFallbackStore() {
-		return fallbackStore;
-	}
-
-	/**
-	 * @param fallbackStore the fallbackStore to set
-	 */
-	public void setFallbackStore(StorageEngine fallbackStore) {
-		this.fallbackStore = fallbackStore;
-	}
-
 
 
 	public String toString() {
@@ -120,7 +100,7 @@ public class UIMRegistry implements Registry {
 		}
 
 		if (storages.isEmpty()) {
-			builder.append("No storage. Fallback storage: " + getFallbackStore().getIdentifier());
+			builder.append("No storage.");
 		} else {
 			StringBuilder storelist = new StringBuilder();
 			for (StorageEngine storage : storages) {

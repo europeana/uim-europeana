@@ -4,7 +4,6 @@ import java.util.List;
 
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.store.Aggregator;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
@@ -16,30 +15,28 @@ public interface StorageEngine {
 	public String getIdentifier();
 	public long size();
 	
-	Aggregator createAggregator();
-	void updateAggregator(Aggregator aggregator);
-	Aggregator getAggregator(long id);
-	List<Aggregator> getAggregators();
 
-	Provider createProvider(Aggregator aggregator);
-	void updateProvider(Provider provider);
+	Provider createProvider();
+	void updateProvider(Provider provider) throws StorageEngineException;
 	Provider getProvider(long id);
+	Provider findProvider(String mnemonic);
 	List<Provider> getProvider();
 
 	Collection createCollection(Provider provider);
-	void updateCollection(Collection collection);
+	void updateCollection(Collection collection) throws StorageEngineException;
 	Collection getCollection(long id);
+	Collection findCollection(String mnemonic);
 	List<Collection> getCollections(Provider provider);
 
 	Request createRequest(Collection collection);
-	void updateRequest(Request request);
+	void updateRequest(Request request) throws StorageEngineException;
 	List<Request> getRequests(Collection collection);
 
 	MetaDataRecord<FieldRegistry> createMetaDataRecord(Request request);
-	void updateMetaDataRecord(MetaDataRecord<FieldRegistry> record);
+	void updateMetaDataRecord(MetaDataRecord<FieldRegistry> record) throws StorageEngineException;
 	
 	Execution createExecution();
-	void updateExecution(Execution execution);
+	void updateExecution(Execution execution) throws StorageEngineException;
 	List<Execution> getExecutions();
 
 	MetaDataRecord<FieldRegistry>[] getMetaDataRecords(long...ids);
@@ -47,14 +44,12 @@ public interface StorageEngine {
 
 	long[] getByRequest(Request request);
 	long[] getByCollection(Collection collection);
-	long[] getByProvider(Provider provider);
-	long[] getByAggregator(Aggregator aggregator);
+	long[] getByProvider(Provider provider, boolean recursive);
 	long[] getAllIds();
 
     int getTotalByRequest(Request request);
     int getTotalByCollection(Collection collection);
-    int getTotalByProvider(Provider provider);
-    int getTotalByAggregator(Aggregator aggregator);
+    int getTotalByProvider(Provider provider, boolean recursive);
     int getTotalForAllIds();
 
 }

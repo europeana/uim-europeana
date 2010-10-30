@@ -3,6 +3,7 @@ package eu.europeana.uim;
 import java.util.Map.Entry;
 
 import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.common.parse.RecordField;
 import eu.europeana.uim.common.parse.RecordHandler;
 import eu.europeana.uim.common.parse.RecordMap;
@@ -42,7 +43,13 @@ public class MetaDataRecordHandler implements RecordHandler {
 				}
 			}
 		}
-		storage.updateMetaDataRecord(mdr);
+		
+		try {
+			storage.updateMetaDataRecord(mdr);
+		} catch (StorageEngineException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

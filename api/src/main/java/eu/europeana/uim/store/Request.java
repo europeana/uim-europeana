@@ -20,9 +20,8 @@ import java.util.Date;
     err_msg         // If in REQS_ABORTED state, explanation of what whent wrong
 
  */
-public interface Request {
+public interface Request extends UimEntity {
 
-	public long getId();
 	public Collection getCollection();
 	public Date getDate();
 	

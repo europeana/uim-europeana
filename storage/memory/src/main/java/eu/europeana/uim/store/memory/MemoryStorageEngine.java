@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.store.Aggregator;
+import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
@@ -17,21 +17,24 @@ import gnu.trove.TLongLongHashMap;
 import gnu.trove.TLongLongIterator;
 import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
+import gnu.trove.TObjectLongHashMap;
 
 public class MemoryStorageEngine implements StorageEngine {
 
 
-	private TLongObjectHashMap<Aggregator> aggregators = new TLongObjectHashMap<Aggregator>();
 	private TLongObjectHashMap<Provider> providers = new TLongObjectHashMap<Provider>();
+	private TObjectLongHashMap<String> providerMnemonics = new TObjectLongHashMap<String>();
+
 	private TLongObjectHashMap<Collection> collections = new TLongObjectHashMap<Collection>();
+	private TObjectLongHashMap<String> collectionMnemonics = new TObjectLongHashMap<String>();
+
 	private TLongObjectHashMap<Request> requests = new TLongObjectHashMap<Request>();
 	private TLongObjectHashMap<Execution> executions = new TLongObjectHashMap<Execution>();
 
+	
 	private TLongLongHashMap metarequest = new TLongLongHashMap();
 	private TLongObjectHashMap<MetaDataRecord<?>> metadatas = new TLongObjectHashMap<MetaDataRecord<?>>();
 
-	
-	private AtomicLong aggregatorId= new AtomicLong();
 	private AtomicLong providerId= new AtomicLong();
 	private AtomicLong collectionId= new AtomicLong();
 	private AtomicLong requestId= new AtomicLong();
@@ -63,39 +66,27 @@ public class MemoryStorageEngine implements StorageEngine {
 	}
 
 
+
+
+
+
 	@Override
-	public Aggregator createAggregator() {
-		return new MemoryAggregator(aggregatorId.getAndIncrement());
+	public Provider createProvider() {
+		return new MemoryProvider(providerId.getAndIncrement());
 	}
 	@Override
-	public void updateAggregator(Aggregator aggregator) {
-		aggregators.put(aggregator.getId(), aggregator);
-	}
-	@Override
-	public List<Aggregator> getAggregators() {
-		ArrayList<Aggregator> result = new ArrayList<Aggregator>();
-		TLongObjectIterator<Aggregator> iterator = aggregators.iterator();
-		while (iterator.hasNext()) {
-			iterator.advance();
-			result.add(iterator.value());
+	public void updateProvider(Provider provider) throws StorageEngineException {
+		if (provider.getMnemonic() == null) {
+			throw new StorageEngineException("Cannot store provider without mnemonic/code.");
 		}
-		return result;
-	}
-	@Override
-	public Aggregator getAggregator(long id) {
-		return aggregators.get(id);
-	}
-
-
-
-
-	@Override
-	public Provider createProvider(Aggregator aggregator) {
-		return new MemoryProvider(providerId.getAndIncrement(), (MemoryAggregator) aggregator);
-	}
-	@Override
-	public void updateProvider(Provider provider) {
+		if (providerMnemonics.containsKey(provider.getMnemonic())) {
+			long pid = providerMnemonics.get(provider.getMnemonic());
+			if (pid != provider.getId()) {
+				throw new StorageEngineException("Cannot store provider duplicate mnemonic/code.");
+			}
+		}
 		providers.put(provider.getId(), provider);
+		providerMnemonics.put(provider.getMnemonic(), provider.getId());
 	}
 	@Override
 	public List<Provider> getProvider() {
@@ -111,6 +102,14 @@ public class MemoryStorageEngine implements StorageEngine {
 	public Provider getProvider(long id) {
 		return providers.get(id);
 	}
+	@Override
+	public Provider findProvider(String mnemonic) {
+		if (providerMnemonics.containsKey(mnemonic)) {
+			long id = providerMnemonics.get(mnemonic);
+			return providers.get(id);
+		}
+		return null;
+	}
 
 
 
@@ -120,8 +119,18 @@ public class MemoryStorageEngine implements StorageEngine {
 		return new MemoryCollection(collectionId.getAndIncrement(), (MemoryProvider) provider);
 	}
 	@Override
-	public void updateCollection(Collection collection) {
+	public void updateCollection(Collection collection) throws StorageEngineException {
+		if (collection.getMnemonic() == null) {
+			throw new StorageEngineException("Cannot store collection without mnemonic/code.");
+		}
+		if (providerMnemonics.containsKey(collection.getMnemonic())) {
+			long pid = providerMnemonics.get(collection.getMnemonic());
+			if (pid != collection.getId()) {
+				throw new StorageEngineException("Cannot store collection duplicate mnemonic/code.");
+			}
+		}
 		collections.put(collection.getId(), collection);
+		collectionMnemonics.put(collection.getMnemonic(), collection.getId());
 	}
 	@Override
 	public List<Collection> getCollections(Provider provider) {
@@ -139,6 +148,14 @@ public class MemoryStorageEngine implements StorageEngine {
 	@Override
 	public Collection getCollection(long id) {
 		return collections.get(id);
+	}
+	@Override
+	public Collection findCollection(String mnemonic) {
+		if (collectionMnemonics.containsKey(mnemonic)) {
+			long id = collectionMnemonics.get(mnemonic);
+			return collections.get(id);
+		}
+		return null;
 	}
 	
 	
@@ -223,12 +240,7 @@ public class MemoryStorageEngine implements StorageEngine {
 		return null;
 	}
 	@Override
-	public long[] getByProvider(Provider provider) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public long[] getByAggregator(Aggregator aggregator) {
+	public long[] getByProvider(Provider provider, boolean recursive) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -253,18 +265,10 @@ public class MemoryStorageEngine implements StorageEngine {
 
 
 	@Override
-	public int getTotalByProvider(Provider provider) {
+	public int getTotalByProvider(Provider provider, boolean recursive) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
-
-	@Override
-	public int getTotalByAggregator(Aggregator aggregator) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 
 	@Override
 	public int getTotalForAllIds() {

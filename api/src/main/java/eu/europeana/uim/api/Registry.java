@@ -20,5 +20,4 @@ public interface Registry {
 
     StorageEngine getActiveStorage();
 
-    void setFallbackStore(StorageEngine storage);
 }

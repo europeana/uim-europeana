@@ -34,4 +34,12 @@
 			</shell:action>
 		</shell:command>
 	</shell:command-bundle>
+	
+	<shell:command-bundle>
+		<shell:command name="uim/store">
+			<shell:action class="eu.europeana.uim.command.UIMStore">
+				<shell:property name="registry" ref="uimRegistry" />
+			</shell:action>
+		</shell:command>
+	</shell:command-bundle>
 </blueprint>

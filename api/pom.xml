@@ -21,12 +21,13 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Import-Package>eu.europeana.uim.common.*,gnu.trove.*,*</Import-Package>
+						<Import-Package>eu.europeana.uim.common.*,
+							org.apache.commons.lang.*,
+							*</Import-Package>
 						<Export-Package>eu.europeana.uim,
 							eu.europeana.uim.api,
 							eu.europeana.uim.command,
-							eu.europeana.uim.store,
-							eu.europeana.uim.store.memory
+							eu.europeana.uim.store
 						</Export-Package>
 					</instructions>
 				</configuration>

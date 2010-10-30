@@ -1,5 +1,7 @@
 package eu.europeana.uim.store;
 
+import java.util.List;
+
 
 /*
 aggregator // ref to Aggregator obj
@@ -10,10 +12,25 @@ country         // Country for Provider
 content_type    // enum PROVT_MUSEUM, PROVT_ARCHIVE, PROVT_LIBRARY, PROVT_AUDIO_VIS_ARCH, PROVT_AGGREGATOR
 
  */
-public interface Provider {
-	// Document object, ie nested hashlist
+public interface Provider extends UimEntity {
 
-	public long getId();
-	public Aggregator getAggregator();
+	public List<Provider> getRelatedOut();
+	public List<Provider> getRelatedIn();
+
+	public String getMnemonic();
+	public void setMnemonic(String mnemonic);
+
+	public String getName();
+	public void setName(String name);
+
+	public void setAggregator(boolean aggregator);
+	public boolean isAggregator();
+
+	public String getOaiBaseUrl();
+	public void setOaiBaseUrl(String baseUrl);
+
+	public String getOaiPrefix();
+	public void setOaiPrefix(String prefix);
+
 
 }

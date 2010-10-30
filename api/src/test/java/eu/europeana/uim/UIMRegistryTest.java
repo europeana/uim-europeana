@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.store.memory.MemoryStorageEngine;
+import eu.europeana.uim.store.StorageEngineAdapter;
 
 public class UIMRegistryTest {
 
@@ -14,7 +14,7 @@ public class UIMRegistryTest {
 
 	@Before
 	public void setup() {
-		registry.setFallbackStore(new MemoryStorageEngine());
+		registry.addStorage(new StorageEngineAdapter(){});
 		
 	}
 	
