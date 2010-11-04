@@ -31,9 +31,15 @@ INSTALLATION
    - go to the Karaf main directory
    - connect with 'bin/client'
 
-5) Configure UIM Feature
-     - features:addurl file://<project-path>/etc/uim-features.xml
+5) Connect to Karaf:
+   - install necessary dependencies
+   - spring feature
+     - features:install spring
+
+6) Configure UIM Feature
+   - features:addurl file://<project-path>/etc/uim-features.xml
    - you can check if the feature "uim-core" is available via 'features:list'
+     - features:install uim-core
 
 NOT NECESSARY WHEN USING BLUEPRINT!!!
 6) Deploy Spring DM 2 on Karaf
@@ -92,7 +98,6 @@ TEST IMPORT FROM FILE
    - should complain about missing arguments
    
 5) Import ESE file:
-   - in Karaf shell: 'uim:file <project-path>/common/src/test/resources/readingeurope.xml'
-   Import ESE file into specific collection:
-   - in Karaf shell: 'uim:file -c 123 <project-path>/common/src/test/resources/readingeurope.xml'
+   - in Karaf shell: 'uim:file -c 000 file://<project-path>/common/src/test/resources/readingeurope.xml'
+   
    

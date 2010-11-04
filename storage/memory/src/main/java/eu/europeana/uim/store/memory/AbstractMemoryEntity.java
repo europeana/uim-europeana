@@ -52,7 +52,7 @@ public class AbstractMemoryEntity {
 	}
 	
 	public String toString() {
-		return getMnemonic() + " " + getName();
+		return getMnemonic() + "\t" + getName();
 	}
 	
 }
