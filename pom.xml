@@ -25,7 +25,7 @@
 		<module>plugins/basic</module>
 		<module>storage/memory</module>
 
-		<module>plugins/integration</module>
+<!--		<module>plugins/integration</module>-->
 
 		<module>import/file</module>
 		<module>import/oaipmh</module>
