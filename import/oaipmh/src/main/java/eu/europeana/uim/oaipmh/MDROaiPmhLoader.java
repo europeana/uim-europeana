@@ -1,4 +1,4 @@
-package eu.europeana.uim.file;
+package eu.europeana.uim.oaipmh;
 
 import java.io.InputStream;
 
@@ -9,9 +9,9 @@ import eu.europeana.uim.common.parse.RecordParser;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
 import eu.europeana.uim.store.Request;
 
-public class RecordLoader {
+public class MDROaiPmhLoader {
 
-	public RecordLoader() {
+	public MDROaiPmhLoader() {
 		super();
 	}
 

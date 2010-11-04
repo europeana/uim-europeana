@@ -5,11 +5,11 @@ import eu.europeana.uim.store.Collection;
 public class MemoryCollection extends AbstractMemoryEntity implements Collection {
 
 	private MemoryProvider provider;
-	
+
 	private String oaiBaseUrl;
 	private String oaiPrefix;
 	private String oaiSet;
-	
+
 	public MemoryCollection(MemoryProvider provider) {
 		super();
 		this.provider = provider;
@@ -19,7 +19,7 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 		super(id);
 		this.provider = provider;
 	}
-	
+
 
 	public MemoryProvider getProvider() {
 		return provider;
@@ -29,7 +29,10 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 	 * @return the oaiBaseUrl
 	 */
 	public String getOaiBaseUrl() {
-		return oaiBaseUrl;
+		if (oaiBaseUrl != null) {
+			return oaiBaseUrl;
+		}
+		return provider.getOaiBaseUrl();
 	}
 
 	/**
@@ -57,7 +60,10 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 	 * @return the oaiPrefix
 	 */
 	public String getOaiPrefix() {
-		return oaiPrefix;
+		if (oaiSet != null) {
+			return oaiPrefix;
+		}
+		return provider.getOaiPrefix();
 	}
 
 	/**
@@ -75,14 +81,14 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 		String string = super.toString();
 		string += " [";
 		string += getOaiBaseUrl() != null ? getOaiBaseUrl() : (getProvider().getOaiBaseUrl() != null ? getProvider().getOaiBaseUrl() : "undefined");
-		
+
 		string += "?metadataPrefix=";
 		string += getOaiPrefix() != null ? getOaiPrefix() : getProvider().getOaiPrefix();
 		return string + "]";
 	}
 
-	
-	
 
-	
+
+
+
 }

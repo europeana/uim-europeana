@@ -19,7 +19,7 @@ import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.command.ConsoleProgressMonitor;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
-import eu.europeana.uim.file.RecordLoader;
+import eu.europeana.uim.file.MDRStreamLoader;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Request;
 
@@ -93,7 +93,7 @@ public class UIMFile implements Function, Action {
 			if (targetcoll != null) {
 				Request request = storage.createRequest(targetcoll);
 				storage.updateRequest(request);
-				RecordLoader reader = new RecordLoader();
+				MDRStreamLoader reader = new MDRStreamLoader();
 				switch (format) {
 					case ESE:
 					default: return reader.doEseImport(f, storage, request, new ConsoleProgressMonitor(commandSession));

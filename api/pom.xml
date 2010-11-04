@@ -52,42 +52,11 @@
 			<scope>provided</scope>
 		</dependency>
 
-			<!-- Spring Dynamic Modules -->
-			<dependency>
-				<groupId>org.springframework.osgi</groupId>
-				<artifactId>spring-osgi-core</artifactId>
-				<version>${spring.osgi.version}</version>
-				<!-- <scope>compile</scope> -->
-			</dependency>
-
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-beans</artifactId>
 				<version>${spring.core.version}</version>
-				<!-- <scope>provided</scope> -->
 			</dependency>
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-core</artifactId>
-				<version>${spring.core.version}</version>
-				<!-- <scope>provided</scope> -->
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context</artifactId>
-				<version>${spring.core.version}</version>
-				<!-- <scope>provided</scope> -->
-			</dependency>
-
-			<dependency>
-				<groupId>org.aopalliance</groupId>
-				<artifactId>com.springsource.org.aopalliance</artifactId>
-				<version>1.0.0</version>
-				<!-- <scope>provided</scope> -->
-			</dependency>
-
 
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -125,12 +94,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-test</artifactId>
-			<version>${spring.osgi.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>

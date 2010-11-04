@@ -11,6 +11,7 @@ public class MemoryProvider extends AbstractMemoryEntity implements Provider {
 	private List<Provider> relatedIn = new ArrayList<Provider>();
 	
 	private String name;
+	
 	private String oaiBaseUrl;
 	private String oaiPrefix;
 	
