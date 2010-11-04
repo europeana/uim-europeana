@@ -120,17 +120,11 @@
 
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.test</artifactId>
+			<artifactId>spring-test</artifactId>
 			<version>${spring.core.version}</version>
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-test</artifactId>
-			<version>${spring.osgi.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
