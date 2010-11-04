@@ -120,7 +120,7 @@
 
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.test</artifactId>
+			<artifactId>spring-test</artifactId>
 			<version>${spring.core.version}</version>
 			<scope>test</scope>
 		</dependency>
