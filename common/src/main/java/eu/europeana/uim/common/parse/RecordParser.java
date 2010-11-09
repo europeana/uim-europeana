@@ -110,7 +110,7 @@ public class RecordParser {
 						}
 
 						String text = xml.getElementText();
-						record.put(new RecordField(prefix, local, language), text);
+						record.add(new RecordField(prefix, local, language), text);
 						path.pop();
 					} else {
 						if (isRecordElement(path, handler)) {

@@ -7,13 +7,38 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class RecordMap extends HashMap<RecordField, String> {
+public class RecordMap extends HashMap<RecordField, List<String>> {
 
 	private HashMap<RecordField, List<String>> localToPrefixed = new HashMap<RecordField, List<String>>();
 	
 	/**
 	 */
 	private static final long serialVersionUID = 1L;
+
+
+	public String getFirst(RecordField arg0){
+		List<String> list = super.get(arg0);
+		if (list != null && !list.isEmpty()){
+			return list.iterator().next();
+		}
+		return null;
+	}
+
+
+	public String getMerged(RecordField arg0, String separator){
+		StringBuilder builder = new StringBuilder();
+		List<String> list = super.get(arg0);
+		if (list != null && !list.isEmpty()){
+			for (String string : list) {
+				if (builder.length() > 0) {
+					builder.append(separator);
+				}
+				builder.append(string);
+			}
+			return builder.toString();
+		}
+		return null;
+	}
 
 
 	public String getFirstByLocal(String local){
@@ -37,19 +62,16 @@ public class RecordMap extends HashMap<RecordField, String> {
 		List<String> result = new ArrayList<String>();
 		for (RecordField key : keys) {
 			if (containsKey(key)) {
-				result.add(get(key));
+				result.addAll(get(key));
 			}
 		}
 		return result;
 	}
-
+	
 	
 
-	/* (non-Javadoc)
-	 * @see java.util.HashMap#put(java.lang.Object, java.lang.Object)
-	 */
 	@Override
-	public String put(RecordField arg0, String arg1) {
+	public List<String> put(RecordField arg0, List<String> arg1) {
 		if (!localToPrefixed.containsKey(arg0)){
 			localToPrefixed.put(arg0, new ArrayList<String>());
 		}
@@ -57,7 +79,22 @@ public class RecordMap extends HashMap<RecordField, String> {
 		localToPrefixed.get(arg0).add(arg0.getLocal());
 		return super.put(arg0, arg1);
 	}
+
 	
+	
+
+	public void add(RecordField arg0, String arg1) {
+		if (!localToPrefixed.containsKey(arg0)){
+			localToPrefixed.put(arg0, new ArrayList<String>());
+		}
+		
+		localToPrefixed.get(arg0).add(arg0.getLocal());
+		
+		if (!super.containsKey(arg0)) {
+			super.put(arg0, new ArrayList<String>());
+		}
+		super.get(arg0).add(arg1);
+	}
 	
 	
 }

@@ -69,7 +69,7 @@ public class RecordParserTest {
 		RecordParser parser = new RecordParser();
 		List<RecordMap> xml = parser.parse(stream, "europeana:record");
 		for (RecordMap record : xml) {
-			String title = (String) record.get(new RecordField("dc", "title", "eng"));
+			String title = record.getFirst(new RecordField("dc", "title", "eng"));
 			if (title != null) {
 				List<String> local = record.getValueByLocal("title");
 				boolean matched = false;
