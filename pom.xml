@@ -189,6 +189,13 @@
 		</dependencies>
 	</dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>TEL</id>
+            <url>http://europeanalabs.eu/svn/theeuropeanlibrary/dependencies/maven/repository/</url>
+        </repository>
+    </repositories>
+
 	<reporting>
 		<plugins>
 			<plugin>
