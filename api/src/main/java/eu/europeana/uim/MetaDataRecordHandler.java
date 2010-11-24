@@ -1,5 +1,6 @@
 package eu.europeana.uim;
 
+import java.util.List;
 import java.util.Map.Entry;
 
 import eu.europeana.uim.api.StorageEngine;
@@ -34,12 +35,16 @@ public class MetaDataRecordHandler implements RecordHandler {
 	public void record(RecordMap record) {
 		MetaDataRecord<FieldRegistry> mdr = storage.createMetaDataRecord(request);
 		
-		for (Entry<RecordField, String> entry : record.entrySet()) {
+		for (Entry<RecordField, List<String>> entry : record.entrySet()) {
 			if ("title".equals(entry.getKey().getLocal())) {
 				if (entry.getKey().getLanguage() != null) {
-					mdr.setQField(FieldRegistry.title, entry.getKey().getLanguage(), entry.getValue());
+					for (String  value : entry.getValue()) {
+						mdr.setQField(FieldRegistry.title, entry.getKey().getLanguage(), value);
+					}
 				} else {
-					mdr.setField(FieldRegistry.title, entry.getValue());
+					for (String  value : entry.getValue()) {
+						mdr.setField(FieldRegistry.title, value);
+					}
 				}
 			}
 		}
