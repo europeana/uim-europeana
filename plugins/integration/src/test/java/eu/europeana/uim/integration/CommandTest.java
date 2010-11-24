@@ -41,8 +41,7 @@ public class CommandTest extends AbstractIntegrationTest {
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
                 scanFeatures(
                         maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("xml").classifier("features").versionAsInProject(),
-                        "spring"
-                ),
+                        "spring"),
 
                 // our modules. Karaf / Pax Exam don't fare well together in regards to feature descriptors
                 // so until they do have these, we need to specify the OSGIfied maven bundles by hand here
@@ -67,13 +66,26 @@ public class CommandTest extends AbstractIntegrationTest {
         // we have still to wait, in order to give the framework a chance to start up
         Thread.sleep(10000);
 
+        assertEquals("UIM Registry: No plugins. MemoryStorageEngine.", getCommandResult("uim:info"));
+    }
+
+    private String getCommandResult(String command) {
+        String res = new String();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
         CommandProcessor cp = getOsgiService(CommandProcessor.class);
         CommandSession cs = cp.createSession(System.in, ps, System.err);
-        cs.execute("uim:info");
-        cs.close();
-        assertEquals("UIM Registry: No plugins. MemoryStorageEngine.", baos.toString("UTF-8").trim());
+        try {
+            cs.execute(command);
+            res = baos.toString("UTF-8").trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cs != null)
+                cs.close();
+        }
+        return res;
+
     }
 
 }

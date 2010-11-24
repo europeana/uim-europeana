@@ -9,7 +9,7 @@
 	<shell:command-bundle>
 		<shell:command name="uim/file">
 			<shell:action class="eu.europeana.uim.file.command.UIMFile">
-				<shell:property name="registry" ref="registry" />
+				<shell:argument ref="registry" />
 			</shell:action>
 		</shell:command>
 	</shell:command-bundle>

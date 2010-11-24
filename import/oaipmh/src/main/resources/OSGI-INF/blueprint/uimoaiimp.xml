@@ -9,7 +9,7 @@
 	<shell:command-bundle>
 		<shell:command name="uim/oaipmh">
 			<shell:action class="eu.europeana.uim.oaipmh.command.UIMOaiPmh">
-				<shell:property name="registry" ref="registry" />
+				<shell:argument ref="registry" />
 			</shell:action>
 		</shell:command>
 	</shell:command-bundle>

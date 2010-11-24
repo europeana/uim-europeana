@@ -12,7 +12,6 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.osgi.service.command.CommandSession;
 import org.osgi.service.command.Function;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
@@ -45,7 +44,6 @@ public class UIMFile implements Function, Action {
 	public UIMFile() {
 	}
 
-	@Autowired
 	public UIMFile(Registry registry) {
 		this.registry = registry;
 	}
@@ -114,14 +112,4 @@ public class UIMFile implements Function, Action {
 	public Registry getRegistry() {
 		return registry;
 	}
-
-	/**
-	 * @param registry the registry to set
-	 */
-	public void setRegistry(Registry registry) {
-		this.registry = registry;
-	}
-
-	
-	
 }

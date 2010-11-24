@@ -1,20 +1,17 @@
 package eu.europeana.uim.oaipmh.command;
 
-import java.io.FileNotFoundException;
-
-import org.apache.felix.gogo.commands.Action;
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
-import org.osgi.service.command.CommandSession;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Request;
+import org.apache.felix.gogo.commands.Action;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.felix.gogo.commands.Option;
+import org.osgi.service.command.CommandSession;
+
+import java.io.FileNotFoundException;
 
 @Command(name = "uim", scope = "oaipmh")
 public class UIMOaiPmh implements Action {
@@ -33,10 +30,6 @@ public class UIMOaiPmh implements Action {
 
 	private Registry registry;
 
-	public UIMOaiPmh() {
-	}
-
-	@Autowired
 	public UIMOaiPmh(Registry registry) {
 		this.registry = registry;
 	}
@@ -91,14 +84,5 @@ public class UIMOaiPmh implements Action {
 	public Registry getRegistry() {
 		return registry;
 	}
-
-	/**
-	 * @param registry the registry to set
-	 */
-	public void setRegistry(Registry registry) {
-		this.registry = registry;
-	}
-
-
 
 }

@@ -81,11 +81,6 @@
             <artifactId>europeana-uim-import-oaipmh</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-
-
-
-
     </dependencies>
 
     <build>
@@ -104,7 +99,6 @@
                     <execution>
                         <id>generate-config</id>
                         <goals>
-                            <goal>generate-config</goal>
                             <goal>generate-depends-file</goal>
                         </goals>
                     </execution>

@@ -44,7 +44,7 @@
                     <source>1.6</source>
                 </configuration>
             </plugin>
-            
+
             <!-- generate dependencies versions -->
             <!-- this is required for the integration tests to work without explicitely specifying versions -->
             <!-- see http://wiki.ops4j.org/display/paxexam/Pax+Exam+-+Tutorial+1 -->
@@ -62,6 +62,40 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- Shared dependencies -->
+    <dependencies>
+            <!-- Spring for wiring unit tests -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <scope>test</scope>
+            </dependency>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
@@ -88,107 +122,44 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- Spring Dynamic Modules -->
+            <!-- Spring for wiring unit tests -->
             <dependency>
-                <groupId>org.springframework.osgi</groupId>
-                <artifactId>spring-osgi-core</artifactId>
-                <version>${spring.osgi.version}</version>
-                <!-- <scope>compile</scope> -->
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.core.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>org.springframework.beans</artifactId>
+                <artifactId>spring-beans</artifactId>
                 <version>${spring.core.version}</version>
-                <!-- <scope>provided</scope> -->
             </dependency>
 
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>org.springframework.core</artifactId>
+                <artifactId>spring-context</artifactId>
                 <version>${spring.core.version}</version>
-                <!-- <scope>provided</scope> -->
             </dependency>
 
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>org.springframework.context</artifactId>
+                <artifactId>spring-test</artifactId>
                 <version>${spring.core.version}</version>
-                <!-- <scope>provided</scope> -->
             </dependency>
 
             <dependency>
-                <groupId>org.aopalliance</groupId>
-                <artifactId>com.springsource.org.aopalliance</artifactId>
-                <version>1.0.0</version>
-                <!-- <scope>provided</scope> -->
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>com.springsource.slf4j.api</artifactId>
-                <version>${slf4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-                <version>${slf4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>com.springsource.slf4j.log4j</artifactId>
-                <version>${slf4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-
-            <!-- test scoped dependencies -->
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>org.springframework.test</artifactId>
-                <version>${spring.core.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.osgi</groupId>
-                <artifactId>spring-osgi-test</artifactId>
-                <version>${spring.osgi.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.osgi</groupId>
-                <artifactId>spring-osgi-extender</artifactId>
-                <version>${spring.osgi.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.osgi</groupId>
-                <artifactId>spring-osgi-annotation</artifactId>
-                <version>${spring.osgi.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.osgi</groupId>
-                <artifactId>log4j.osgi</artifactId>
-                <version>1.2.15-SNAPSHOT</version>
-                <scope>test</scope>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.5</version>
             </dependency>
 
             <dependency>
                 <groupId>ant</groupId>
                 <artifactId>ant-junit</artifactId>
                 <version>1.6.5</version>
-                <scope>test</scope>
             </dependency>
 
+            <!-- TODO what is this? -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit-dep</artifactId>
@@ -196,12 +167,6 @@
                 <scope>test</scope>
             </dependency>
 
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.5</version>
-                <scope>test</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

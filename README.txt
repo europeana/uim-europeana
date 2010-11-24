@@ -1,5 +1,17 @@
-PROJECT STRUCTURE
-=================
+INDEX
+=====
+
+1/ Project structure
+2/ Installation
+3/ Building UIM
+4/ Test import from file
+5/ Technologies in use
+
+TODO: refactor 2 and 3, they somewhat overlap
+
+
+#1 PROJECT STRUCTURE
+====================
 
 Path                Name                                                    Description
 ----------------------------------------------------------------------------------------------------------------------------
@@ -11,12 +23,12 @@ Path                Name                                                    Desc
 /import/file          Unified Ingestion Manager: Import from File              Bundle to import data from a XML file
 /import/oaipmh        Unified Ingestion Manager: Import from OAI-PMH           Bundle to import data from an OAI-PMH 
 
-/plugins/integration  Unified Ingestion Manager: Integration tests             The integration tests for
+/plugins/integration  Unified Ingestion Manager: Integration tests             The integration tests, using PAX-Exam
 /plugins/dummy        Unified Ingestion Manager: Dummy Plugin                  Our beloved dummy plugin
 
 
-INSTALLATION
-============
+#2 INSTALLATION
+===============
 
 1) Get Apache Felix Karaf at http://karaf.apache.org/
 
@@ -31,7 +43,7 @@ INSTALLATION
    - go to the Karaf main directory
    - connect with 'bin/client'
 
-5) Connect to Karaf:
+5) Set-up dependencies in Karaf:
    - install necessary dependencies
    - spring feature
      - features:install spring
@@ -41,20 +53,8 @@ INSTALLATION
    - you can check if the feature "uim-core" is available via 'features:list'
      - features:install uim-core
 
-NOT NECESSARY WHEN USING BLUEPRINT!!!
-6) Deploy Spring DM 2 on Karaf
-   - for the moment, Karaf ships with Spring DM 1.2.x, and we need 2.x
-   - in the Karaf console, run:
-     - features:addurl file://<project-path>/etc/spring-features.xml
-     - features:install spring-dm-2
-   - you can check if the feature is installed via 'features:list'
-
-   For the moment, you will most likely get a bunch of stacktraces from Spring DM and Felix.
-   This should go away in the future
-
-
-BUILDING UIM
-============
+#3 BUILDING UIM
+===============
 
 1) Goto <project-path> and do a maven install 
    Note that maven compile might fail - we need a test-jar from the common module, 
@@ -84,8 +84,8 @@ BUILDING UIM
    - in Karaf shell: 'uim:store -o listCollection'
    
 
-TEST IMPORT FROM FILE
-=====================
+#4 TEST IMPORT FROM FILE
+========================
 
 1) Install karaf and the UIM API
 
@@ -99,5 +99,13 @@ TEST IMPORT FROM FILE
    
 5) Import ESE file:
    - in Karaf shell: 'uim:file -c 000 file://<project-path>/common/src/test/resources/readingeurope.xml'
-   
-   
+
+
+#5 TECHNOLOGIES IN USE
+======================
+
+- the project runs on Apache Karaf which bundles Felix and other Apache OSGi projects (http://karaf.apache.org)
+- we use the OSGi Blueprint Container specification.
+  Karaf/Felix uses the Apache Aries implementation for that purpose, which handles inversion of control through declarative configuration (see the OSGI-INF.blueprint packages)
+- we use PAX Exam for integration tests (http://wiki.ops4j.org/display/paxexam/Pax+Exam)
+- we further use Spring for dependency injection in JUnit tests (not integration tests, nor runtime) (http://www.springsource.org/)

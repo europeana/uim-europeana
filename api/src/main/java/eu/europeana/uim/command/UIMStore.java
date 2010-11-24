@@ -1,5 +1,17 @@
 package eu.europeana.uim.command;
 
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
+import org.apache.commons.lang.StringUtils;
+import org.apache.felix.gogo.commands.Action;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.felix.gogo.commands.Option;
+import org.osgi.service.command.CommandSession;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,27 +22,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.felix.gogo.commands.Action;
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
-import org.apache.log4j.Logger;
-import org.osgi.service.command.CommandSession;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.Provider;
+import java.util.logging.Logger;
 
 
 @Command(name = "uim", scope = "store")
 public class UIMStore implements Action {
 
-	private static final Logger log = Logger.getLogger(UIMStore.class);
+	private static final Logger log = Logger.getLogger(UIMStore.class.getName());
 	
 	private enum Operation {
 		createProvider,
@@ -42,7 +40,6 @@ public class UIMStore implements Action {
 		loadSampleData
 	}
 
-	@Autowired
 	private Registry registry;
 
 	@Option(name="-o", aliases={"--operation"}, required=true)
@@ -61,7 +58,8 @@ public class UIMStore implements Action {
 	private String argument2;
 
 
-	public UIMStore() {
+	public UIMStore(Registry registry) {
+        this.registry = registry;
 	}
 
 
@@ -254,7 +252,7 @@ public class UIMStore implements Action {
 						provider.setOaiBaseUrl(arguments[1]);
 						storage.updateProvider(provider);
 					} else {
-						log.warn("Failed to set provider oai url. Provider <" + arguments[0] + " not found.");
+						log.warning("Failed to set provider oai url. Provider <" + arguments[0] + " not found.");
 					}
 				} else if (split[0].startsWith("oai.provprefix")) {
 					String[] arguments = split[1].split("\\|");
@@ -263,7 +261,7 @@ public class UIMStore implements Action {
 						provider.setOaiPrefix(arguments[1]);
 						storage.updateProvider(provider);
 					} else {
-						log.warn("Failed to set provider oai prefix. Provider <" + arguments[0] + " not found.");
+						log.warning("Failed to set provider oai prefix. Provider <" + arguments[0] + " not found.");
 					}
 				} else if (split[0].startsWith("collection")) {
 					setFieldValues(split);
@@ -275,7 +273,7 @@ public class UIMStore implements Action {
 						collection.setOaiBaseUrl(arguments[1]);
 						storage.updateCollection(collection);
 					} else {
-						log.warn("Failed to set collection oai url. Collection <" + arguments[0] + " not found.");
+						log.warning("Failed to set collection oai url. Collection <" + arguments[0] + " not found.");
 					}
 				} else if (split[0].startsWith("oai.collprefix")) {
 					String[] arguments = split[1].split("\\|");
@@ -284,7 +282,7 @@ public class UIMStore implements Action {
 						collection.setOaiPrefix(arguments[1]);
 						storage.updateCollection(collection);
 					} else {
-						log.warn("Failed to set collection oai prefix. Collection <" + arguments[0] + " not found.");
+						log.warning("Failed to set collection oai prefix. Collection <" + arguments[0] + " not found.");
 					}
 				} else if (split[0].startsWith("oai.collset")) {
 					String[] arguments = split[1].split("\\|");
@@ -293,7 +291,7 @@ public class UIMStore implements Action {
 						collection.setOaiSet(arguments[1]);
 						storage.updateCollection(collection);
 					} else {
-						log.warn("Failed to set collection oai set. Collection <" + arguments[0] + " not found.");
+						log.warning("Failed to set collection oai set. Collection <" + arguments[0] + " not found.");
 					}
 				}
 			}
@@ -329,14 +327,5 @@ public class UIMStore implements Action {
 	public Registry getRegistry() {
 		return registry;
 	}
-
-	/**
-	 * @param registry the registry to set
-	 */
-	public void setRegistry(Registry registry) {
-		this.registry = registry;
-	}
-
-
 
 }

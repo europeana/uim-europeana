@@ -1,0 +1,10 @@
+funtionality:
+- get the orchestrator to orchestrate
+- ...
+
+configuration:
+- take a look at the root POM.xml for the karaf version, we have 1.4.0 there instead of 2.1.0 and probably the old artifacts
+- clean up dependencies, probably we have duplicated declarations
+
+testing:
+- write more integration tests now that we have them working

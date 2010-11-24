@@ -30,7 +30,7 @@
 	<shell:command-bundle>
 		<shell:command name="uim/info">
 			<shell:action class="eu.europeana.uim.command.UIMInfo">
-				<shell:property name="registry" ref="uimRegistry" />
+                <shell:argument ref="uimRegistry" />
 			</shell:action>
 		</shell:command>
 	</shell:command-bundle>
@@ -38,7 +38,7 @@
 	<shell:command-bundle>
 		<shell:command name="uim/store">
 			<shell:action class="eu.europeana.uim.command.UIMStore">
-				<shell:property name="registry" ref="uimRegistry" />
+                <shell:argument ref="uimRegistry" />
 			</shell:action>
 		</shell:command>
 	</shell:command-bundle>
