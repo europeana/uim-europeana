@@ -66,23 +66,24 @@ public class UIMStore implements Action {
 	@Override
 	public Object execute(CommandSession session) throws Exception {
 		StorageEngine storage = registry.getActiveStorage();
-		switch(operation) {
-		case createProvider: createProvider(storage, session); break;
-		case updateProvider: updateProvider(storage, session); break;
-		case listProvider: listProvider(storage, session); break;
-		case createCollection: createCollection(storage, session); break;
-		case updateCollection: updateCollection(storage, session); break;
-		case listCollection: listCollection(storage, session); break;
-		case loadSampleData: loadSampleData(storage, session); break;
+        PrintStream out = session.getConsole();
+        switch(operation) {
+		case createProvider: createProvider(storage, out); break;
+		case updateProvider: updateProvider(storage, out); break;
+		case listProvider: listProvider(storage, out); break;
+		case createCollection: createCollection(storage, out); break;
+		case updateCollection: updateCollection(storage, out); break;
+		case listCollection: listCollection(storage, out); break;
+		case loadSampleData: loadSampleData(storage, out); break;
 		}
 		return null;
 	}
 
 
 
-	private Provider createProvider(StorageEngine storage, CommandSession session) throws StorageEngineException {
+	private Provider createProvider(StorageEngine storage, PrintStream out) throws StorageEngineException {
 		if (argument0 == null || argument1 == null) {
-			session.getConsole().println("Failed to create provider. No arguments specified, should be <mnemonic> <name> [<true|false>]");
+			out.println("Failed to create provider. No arguments specified, should be <mnemonic> <name> [<true|false>]");
 			return null;
 		}
 
@@ -103,7 +104,7 @@ public class UIMStore implements Action {
 				storage.updateProvider(provider);
 				storage.updateProvider(pParent);
 			} else {
-				session.getConsole().println("Failed to create provider. Parent <" + parent + "> not found.");
+				out.println("Failed to create provider. Parent <" + parent + "> not found.");
 
 			}
 		} else {
@@ -113,9 +114,9 @@ public class UIMStore implements Action {
 	}
 
 
-	private void updateProvider(StorageEngine storage, CommandSession session) throws StorageEngineException {
+	private void updateProvider(StorageEngine storage, PrintStream out) throws StorageEngineException {
 		if (argument0 == null || argument1 == null || argument2 == null) {
-			session.getConsole().println("Failed to update provider. No arguments specified, should be <mnemonic> <field> <value>");
+			out.println("Failed to update provider. No arguments specified, should be <mnemonic> <field> <value>");
 			return;
 		}
 
@@ -128,14 +129,14 @@ public class UIMStore implements Action {
 
 			storage.updateProvider(provider);
 		} catch (Throwable e) {
-			session.getConsole().println("Failed to update provider. Failed to update using method <"+method+"(" + argument2 + ")");
+			out.println("Failed to update provider. Failed to update using method <"+method+"(" + argument2 + ")");
 		}
 	}
 
 
 
 
-	private void listProvider(StorageEngine storage, CommandSession session) throws StorageEngineException {
+	private void listProvider(StorageEngine storage, PrintStream out) throws StorageEngineException {
 		List<Provider> mainprovs = new ArrayList<Provider>();
 		List<Provider> providers = storage.getProvider();
 		for (Provider provider : providers) {
@@ -145,7 +146,7 @@ public class UIMStore implements Action {
 		}
 
 		HashSet<Provider> processed = new HashSet<Provider>();
-		printTree(mainprovs, processed, "+-", session.getConsole());
+		printTree(mainprovs, processed, "+-", out);
 	}
 
 
@@ -167,15 +168,15 @@ public class UIMStore implements Action {
 	}
 
 
-	private Collection createCollection(StorageEngine storage, CommandSession session) throws StorageEngineException {
+	private Collection createCollection(StorageEngine storage, PrintStream out) throws StorageEngineException {
 		if (argument0 == null || argument1 == null || parent == null) {
-			session.getConsole().println("Failed to create collection. No arguments specified, should be -p provider <mnemonic> <name>");
+			out.println("Failed to create collection. No arguments specified, should be -p provider <mnemonic> <name>");
 			return null;
 		}
 
 		Provider provider = storage.findProvider(parent);
 		if (provider == null) {
-			session.getConsole().println("Failed to create collection. Provider \"" + parent + "\" not found.");
+			out.println("Failed to create collection. Provider \"" + parent + "\" not found.");
 			return null;
 		}
 
@@ -187,9 +188,9 @@ public class UIMStore implements Action {
 	}
 
 
-	private void updateCollection(StorageEngine storage, CommandSession session) throws StorageEngineException {
+	private void updateCollection(StorageEngine storage, PrintStream out) throws StorageEngineException {
 		if (argument0 == null || argument1 == null || argument2 == null) {
-			session.getConsole().println("Failed to update collection. No arguments specified, should be <mnemonic> <field> <value>");
+			out.println("Failed to update collection. No arguments specified, should be <mnemonic> <field> <value>");
 			return;
 		}
 
@@ -202,37 +203,37 @@ public class UIMStore implements Action {
 
 			storage.updateCollection(collection);
 		} catch (Throwable e) {
-			session.getConsole().println("Failed to update collection. Failed to update using method <"+method+"(" + argument2 + ")");
+			out.println("Failed to update collection. Failed to update using method <"+method+"(" + argument2 + ")");
 		}
 	}
-	private void listCollection(StorageEngine storage, CommandSession session) throws StorageEngineException {
+	private void listCollection(StorageEngine storage, PrintStream out) throws StorageEngineException {
 		if (parent == null) {
 			List<Provider> providers = storage.getProvider();
 			for (Provider provider : providers) {
 				List<Collection> collections = storage.getCollections(provider);
 				if (collections != null && !collections.isEmpty()) {
-					session.getConsole().println(provider.getMnemonic());
+					out.println(provider.getMnemonic());
 					for (Collection collection : collections) {
 						String p = "|  -+" + collection.toString();
-						session.getConsole().println(p);
+						out.println(p);
 					}
 				}
 			}
 		} else {
 			Provider provider = storage.findProvider(parent);
-			session.getConsole().println(provider.getMnemonic());
+			out.println(provider.getMnemonic());
 
 			List<Collection> collections = storage.getCollections(provider);
 			for (Collection collection : collections) {
 				String p = "|  -+" + collection.toString();
-				session.getConsole().println(p);
+				out.println(p);
 			}
 		}
 	}
 
 
 
-	private void loadSampleData(StorageEngine storage, CommandSession session) throws StorageEngineException, IOException {
+	public void loadSampleData(StorageEngine storage, PrintStream out) throws StorageEngineException, IOException {
 		InputStream stream = UIMStore.class.getResourceAsStream("/sampledata.properties");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
@@ -244,7 +245,7 @@ public class UIMStore implements Action {
 				String[] split = line.split("=");
 				if (split[0].startsWith("provider")) {
 					setFieldValues(split);
-					createProvider(storage, session);
+					createProvider(storage, out);
 				} else if (split[0].startsWith("oai.provurl")) {
 					String[] arguments = split[1].split("\\|");
 					Provider provider = storage.findProvider(arguments[0]);
@@ -265,7 +266,7 @@ public class UIMStore implements Action {
 					}
 				} else if (split[0].startsWith("collection")) {
 					setFieldValues(split);
-					createCollection(storage, session);
+					createCollection(storage, out);
 				} else if (split[0].startsWith("oai.collurl")) {
 					String[] arguments = split[1].split("\\|");
 					Collection collection = storage.findCollection(arguments[0]);
