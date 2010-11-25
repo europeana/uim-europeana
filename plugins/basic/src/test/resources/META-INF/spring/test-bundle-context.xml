@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <bean id="uimRegistry" class="eu.europeana.uim.UIMRegistry"/>
+    <bean id="uimRegistry" class="eu.europeana.uim.UIMRegistry" scope="singleton"/>
 
     <bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator">
         <constructor-arg ref="uimRegistry"/>

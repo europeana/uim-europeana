@@ -9,6 +9,6 @@ import eu.europeana.uim.MetaDataRecord;
  */
 public interface WorkflowStep {
 
-    public void processRecord(MetaDataRecord<?> mdr);
+    public void processRecord(MetaDataRecord<?> mdr) throws Throwable;
     
 }

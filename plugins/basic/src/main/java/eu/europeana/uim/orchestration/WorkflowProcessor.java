@@ -1,30 +1,35 @@
 package eu.europeana.uim.orchestration;
 
+import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.store.Execution;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.api.Orchestrator;
-import eu.europeana.uim.api.Workflow;
-import eu.europeana.uim.api.WorkflowStep;
-import eu.europeana.uim.store.Execution;
-
 /**
  * Builds the execution process for a given workflow, and executes one or more Executions for it. Also does exception handling, reporting etc.
  * A WorkflowProcessor handles the processing on a per-record basis for multiple Executions.
- * <p/>
+ * <br/>
  * When created, the WorkflowProcessor creates a list of StepProcessors, one for each workflow step.
- * When executed, the WorkflowProcessor starts itself (as separate Thread) and walks over the list of StepProcessors, refilling the queues as necessary.
+ * When executed, the WorkflowProcessor starts itself (as repeated timer task) and walks over the list of StepProcessors that represent the workflow,
+ * refilling the queues as necessary.
  * It communicates with a parent Orchestrator in order to perform storage operations and retrieve the next elements to process.
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class WorkflowProcessor implements Runnable {
+public class WorkflowProcessor extends TimerTask implements RecordProvider {
 
     private static Logger log = Logger.getLogger(WorkflowProcessor.class.getName());
 
@@ -34,9 +39,13 @@ public class WorkflowProcessor implements Runnable {
 
     private final Orchestrator orchestrator;
 
+    private final Registry registry;
+
     private List<Execution> executions = new ArrayList<Execution>();
 
     protected List<StepProcessor> workflowStepProcessors = new LinkedList<StepProcessor>();
+
+    private final Timer processorTimer;
 
     /**
      * Creates a new WorkflowProcessor and adds the Execution to it
@@ -45,20 +54,23 @@ public class WorkflowProcessor implements Runnable {
      * @param w the Workflow this processor follows
      * @param o the Orchestrator for this processor
      */
-    public WorkflowProcessor(Execution e, Workflow w, Orchestrator o) {
+    public WorkflowProcessor(Execution e, Workflow w, Orchestrator o, Registry r) {
         this.orchestrator = o;
         this.executions.add(e);
         this.workflow = w;
+        this.registry = r;
+        processorTimer = new Timer();
 
         // construct the set of StepThreadPools based on the workflow
         for (WorkflowStep step : w.getSteps()) {
             // TODO use a provider here so we can test this
-            workflowStepProcessors.add(new StepProcessor(step));
+            workflowStepProcessors.add(new StepProcessor(step, this));
         }
     }
 
     /**
      * Adds a new Execution to the processor
+     *
      * @param e the Execution to be handled by the processor
      */
     public void addExecution(Execution e) {
@@ -67,6 +79,7 @@ public class WorkflowProcessor implements Runnable {
 
     /**
      * Removes an Execution from the processor. As a result, a graceful shutdown of the Execution will occur
+     *
      * @param e the Execution to remove
      */
     public void removeExecution(Execution e) {
@@ -77,8 +90,8 @@ public class WorkflowProcessor implements Runnable {
      * Starts the processor
      */
     public void start() {
-        Thread t = new Thread(this);
-        t.start();
+        // TODO make this configurable
+        processorTimer.schedule(this, 0, 1000);
     }
 
     @Override
@@ -93,20 +106,16 @@ public class WorkflowProcessor implements Runnable {
         // - become idle if there's nothing much to do (optimization)
         // - implement WorldPeace
 
-        log.info("Starting new WorkflowProcessor for Workfow " + workflow.getName());
+        log.info("Starting new WorkflowProcessor for Workfow '" + workflow.getName() + "'");
 
-        // FIXME there's something better out there to loop like this I suppose, like a repeating Task
-        while (true) {
-
-            for (int i = 0; i < workflowStepProcessors.size(); i++) {
-                StepProcessor sp = workflowStepProcessors.get(i);
-                if (i == 0) {
-                    // special treatment for the first step which gets MDRs directly from the storage
-                    fillFirstStepProcessorQueue(sp);
-                } else {
-                    StepProcessor previous = workflowStepProcessors.get(i - 1);
-                    fillStepProcessorQueue(sp, previous);
-                }
+        for (int i = 0; i < workflowStepProcessors.size(); i++) {
+            StepProcessor sp = workflowStepProcessors.get(i);
+            if (i == 0) {
+                // special treatment for the first step which gets MDRs directly from the storage
+                fillFirstStepProcessorQueue(sp);
+            } else {
+                StepProcessor previous = workflowStepProcessors.get(i - 1);
+                previous.passToNext(sp);
             }
         }
     }
@@ -119,31 +128,12 @@ public class WorkflowProcessor implements Runnable {
     private void fillFirstStepProcessorQueue(StepProcessor sp) {
         // TODO we probably can do this dynamically. For this Orchestrator#getBatchFor needs to handle an argument
         // right now we have a fixed batch size that we use in order to refill the queues
-        if (sp.getQueue().remainingCapacity() > BATCH_SIZE * executions.size()) {
+        if (sp.remainingCapacity() > BATCH_SIZE * executions.size()) {
             for (Execution e : executions) {
-                List<UIMTask> tasks = new ArrayList<UIMTask>();
-                for (long id : orchestrator.getBatchFor(e)) {
-                    sp.getQueue().add(new UIMTask(getMetaDataRecord(id), sp));
-                }
+                sp.addRecords(orchestrator.getBatchFor(e));
             }
         }
-    }
-
-    /**
-     * Passes MDRs from one queue to another
-     *
-     * @param sp
-     * @param previous
-     */
-    private void fillStepProcessorQueue(StepProcessor sp, StepProcessor previous) {
-        // TODO pass MDRs from one queue to another
-        int c = sp.getQueue().remainingCapacity();
-        log.fine("Filling queue of next StepProcessor with capacity " + c + ", tasks available: " + previous.getSuccessfulTasks().size());
-        while(c > 0 && previous.getSuccessfulTasks().size() > 0) {
-            UIMTask t = previous.getSuccessfulTasks().firstElement();
-            previous.getSuccessfulTasks().remove(t);
-            c = sp.getQueue().remainingCapacity();
-        }
+        sp.startProcessing();
     }
 
     /**
@@ -152,9 +142,11 @@ public class WorkflowProcessor implements Runnable {
      * @param id the ID of the MetaDataRecord to retrieve
      * @return the MetaDataRecord provided by the storage
      */
-    private MetaDataRecord<?> getMetaDataRecord(long id) {
-        // TODO
-        return null;
+    public MetaDataRecord<FieldRegistry> getMetaDataRecord(long id) {
+        if (registry.getActiveStorage() == null) {
+            throw new RuntimeException("No storage module active");
+        }
+        return registry.getActiveStorage().getMetaDataRecords(id)[0];
     }
 
 

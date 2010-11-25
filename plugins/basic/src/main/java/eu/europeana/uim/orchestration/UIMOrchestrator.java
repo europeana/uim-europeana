@@ -66,7 +66,7 @@ public class UIMOrchestrator implements Orchestrator {
 
         WorkflowProcessor we = processors.get(w);
         if(we == null) {
-            we = new WorkflowProcessor(e, w, this);
+            we = new WorkflowProcessor(e, w, this, registry);
             processors.put(w, we);
         } else {
             we.addExecution(e);

@@ -14,20 +14,14 @@ import eu.europeana.uim.api.WorkflowStep;
  */
 public class UIMTask implements Runnable {
 
-    private MetaDataRecord<?> mdr;
-    private WorkflowStep step;
-    private StepProcessor processor;
+    private final MetaDataRecord<?> mdr;
+    private final WorkflowStep step;
+    private final StepProcessor processor;
 
-    private Throwable t;
-
-    public UIMTask(MetaDataRecord<?> mdr, StepProcessor processor) {
+    public UIMTask(MetaDataRecord<?> mdr, StepProcessor processor, WorkflowStep step) {
         this.mdr = mdr;
         this.processor = processor;
-        this.step = processor.getStep();
-    }
-
-    public Throwable getThrowable() {
-        return this.t;
+        this.step = step;
     }
 
     @Override
@@ -37,7 +31,6 @@ public class UIMTask implements Runnable {
         try {
             step.processRecord(mdr);
         } catch (Throwable t) {
-            this.t = t;
             failed = true;
             processor.addFailure(this);
         } finally {

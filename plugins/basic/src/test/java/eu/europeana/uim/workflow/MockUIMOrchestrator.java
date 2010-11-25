@@ -1,9 +1,5 @@
 package eu.europeana.uim.workflow;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.Orchestrator;
@@ -15,6 +11,10 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * MockOrchestrator, for testing its clients
@@ -38,9 +38,10 @@ public class MockUIMOrchestrator implements Orchestrator {
             e.printStackTrace();
         }
 
+        int id = 0;
         for (RecordMap record : xml) {
-            MetaDataRecord<FieldRegistry> mdr = new MetaDataRecord<FieldRegistry>();
-            mdr.setField(FieldRegistry.title, record.getFirstByLocal("title"));
+            MetaDataRecord<FieldRegistry> mdr = new MetaDataRecord<FieldRegistry>(id++);
+            mdr.setField(FieldRegistry.title, record.getFirstByLocal("dc:title"));
             testData.put(mdr.getId(), mdr);
         }
 

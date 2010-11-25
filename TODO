@@ -1,4 +1,5 @@
 funtionality:
+- refactor UIMStore to be able to use the sampleData without the Karaf Gogo classes (so it can be used in unit tests)
 - get the orchestrator to orchestrate
 - ...
 
