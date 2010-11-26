@@ -1,13 +1,19 @@
 package eu.europeana.uim.workflow;
 
-import eu.europeana.uim.FieldRegistry;
-import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.MetaDataRecordHandler;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.command.ConsoleProgressMonitor;
+import eu.europeana.uim.common.parse.RecordParser;
+import eu.europeana.uim.common.parse.XMLStreamParserException;
 import eu.europeana.uim.orchestration.WorkflowProcessor;
+import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
+import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.memory.MemoryStorageEngine;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +41,8 @@ public class WorkflowTest {
 
     @Autowired
     private Registry registry;
+
+    private long[] testIDs;
 
     @Test
     public void buildWorkfowRepresentation() {
@@ -65,16 +73,17 @@ public class WorkflowTest {
     @Before
     public void setup() throws Exception {
 
-        // FIXME
-        // we need to provision test data
-        // for this refactoring the UIMStore to be separated from the Gogo action seems to be necessary
+        // we don't do a tear down, as the main thread of the test finishes before the asynchronous methods
+        // we want to test. so instead we make a clean initialisation.
+
+        if (registry.getActiveStorage() != null) {
+            registry.removeStorage(registry.getActiveStorage());
+        }
 
         registry.addStorage(new MemoryStorageEngine());
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-//        UIMStore s = new UIMStore(registry);
-//        s.loadSampleData(registry.getActiveStorage(), ps);
+        testIDs = loadTestData();
     }
+
 
     @Test
     public void runWorkflow() throws Exception {
@@ -86,6 +95,7 @@ public class WorkflowTest {
 
         Orchestrator o = mock(Orchestrator.class);
 
+        // this is so clumsy
         long[] a1 = new long[100];
         long[] a2 = new long[100];
         long[] a3 = new long[100];
@@ -95,33 +105,54 @@ public class WorkflowTest {
         long[] a7 = new long[100];
         long[] a8 = new long[100];
         long[] a9 = new long[100];
-
-        for (int i = 0; i < 100; i++) {
-            a1[i] = i;
-            a2[i] = 100 + i;
-            a3[i] = 200 + i;
-            a3[i] = 300 + i;
-            a4[i] = 400 + i;
-            a5[i] = 500 + i;
-            a6[i] = 600 + i;
-            a7[i] = 700 + i;
-            a8[i] = 800 + i;
-            a9[i] = 900 + i;
-        }
-
-        MetaDataRecord<FieldRegistry>[] mdrs = registry.getActiveStorage().getMetaDataRecords(a1);
-        for(MetaDataRecord<FieldRegistry> r : mdrs) {
-//            System.out.println("    " + r.getId());
-        }
-
+        System.arraycopy(testIDs, 0, a1, 0, 100);
+        System.arraycopy(testIDs, 100, a2, 0, 100);
+        System.arraycopy(testIDs, 200, a3, 0, 100);
+        System.arraycopy(testIDs, 300, a4, 0, 100);
+        System.arraycopy(testIDs, 400, a5, 0, 100);
+        System.arraycopy(testIDs, 500, a6, 0, 100);
+        System.arraycopy(testIDs, 600, a7, 0, 100);
+        System.arraycopy(testIDs, 700, a8, 0, 100);
+        System.arraycopy(testIDs, 800, a9, 0, 100);
 
         when(o.getBatchFor(e)).thenReturn(a1, a2, a3, a4, a5, a6, a7, a8, a9);
-
         WorkflowProcessor processor = new WorkflowProcessor(e, w, o, registry);
-
-
         processor.start();
 
+        Thread.sleep(3000);
     }
+
+
+    private long[] loadTestData() {
+
+        // TODO maybe move this to common, so it can be used in unit tests all over the place.
+
+        try {
+
+            StorageEngine storage = registry.getActiveStorage();
+            Collection targetcoll = storage.findCollection("000");
+
+            Request request = storage.createRequest(targetcoll);
+            storage.updateRequest(request);
+
+            RecordParser parser = new RecordParser();
+            MetaDataRecordHandler handler = new MetaDataRecordHandler(storage, request, "europeana:record");
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+
+            // parse the file/stream
+            parser.parse(getClass().getResourceAsStream("/readingeurope.xml"), handler, new ConsoleProgressMonitor(ps));
+            return storage.getByRequest(request);
+
+        } catch (StorageEngineException e) {
+            e.printStackTrace();
+        } catch (XMLStreamParserException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 
 }

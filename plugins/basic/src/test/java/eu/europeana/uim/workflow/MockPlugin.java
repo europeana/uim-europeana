@@ -47,6 +47,6 @@ public class MockPlugin implements IngestionPlugin {
 
     @Override
     public void processRecord(MetaDataRecord<?> mdr) {
-        System.out.println(getIdentifier() + " is processing MDR " + mdr);
+        System.out.println(getIdentifier() + " is processing MDR " + mdr.getId());
     }
 }

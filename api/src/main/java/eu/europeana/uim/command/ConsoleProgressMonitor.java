@@ -1,38 +1,38 @@
 package eu.europeana.uim.command;
 
-import org.osgi.service.command.CommandSession;
-
 import eu.europeana.uim.common.ProgressMonitor;
+
+import java.io.PrintStream;
 
 public class ConsoleProgressMonitor implements ProgressMonitor {
 	
-	private final CommandSession session;
+	private final PrintStream out;
 	
 	private boolean cancelled = false;
 	private int worked = 0;
 
-	public ConsoleProgressMonitor(CommandSession session) {
+	public ConsoleProgressMonitor(PrintStream out) {
 		super();
-		this.session = session;
+		this.out = out;
 	}
 	
 	@Override
 	public void beginTask(String task, int work) {
-		session.getConsole().print("Starting:" + task + ", " + work + " units of work. [");
+		out.print("Starting:" + task + ", " + work + " units of work. [");
 	}
 
 	@Override
 	public void worked(int work) {
-		session.getConsole().print(".");
+		out.print(".");
 		worked += work;
 		if (worked % 10 == 0) {
-			session.getConsole().print("|");
+			out.print("|");
 		}
 	}
 
 	@Override
 	public void done() {
-		session.getConsole().println("]");
+		out.println("]");
 	}
 
 	@Override

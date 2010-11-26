@@ -94,7 +94,7 @@ public class UIMFile implements Function, Action {
 				MDRStreamLoader reader = new MDRStreamLoader();
 				switch (format) {
 					case ESE:
-					default: return reader.doEseImport(f, storage, request, new ConsoleProgressMonitor(commandSession));
+					default: return reader.doEseImport(f, storage, request, new ConsoleProgressMonitor(commandSession.getConsole()));
 				}
 			} else {
 				commandSession.getConsole().println("Collection: <" + collection + "> not found.");

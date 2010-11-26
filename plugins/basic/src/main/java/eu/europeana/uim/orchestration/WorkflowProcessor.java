@@ -90,12 +90,16 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
      * Starts the processor
      */
     public void start() {
+        log.info("Starting new WorkflowProcessor for Workfow '" + workflow.getName() + "'");
+
         // TODO make this configurable
-        processorTimer.schedule(this, 0, 1000);
+        processorTimer.schedule(this, 0, 10);
     }
 
     @Override
     public void run() {
+
+        System.out.println("Tick tack");
 
         // asynchronous: start new thread that will
         // - for the first WorkflowStepTreadPool, retrieve actual MDRs from the storage and pass them to the first queue
@@ -106,8 +110,6 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         // - become idle if there's nothing much to do (optimization)
         // - implement WorldPeace
 
-        log.info("Starting new WorkflowProcessor for Workfow '" + workflow.getName() + "'");
-
         for (int i = 0; i < workflowStepProcessors.size(); i++) {
             StepProcessor sp = workflowStepProcessors.get(i);
             if (i == 0) {
@@ -116,6 +118,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
             } else {
                 StepProcessor previous = workflowStepProcessors.get(i - 1);
                 previous.passToNext(sp);
+                sp.startProcessing();
             }
         }
     }
@@ -133,7 +136,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
                 sp.addRecords(orchestrator.getBatchFor(e));
             }
         }
-        sp.startProcessing();
+       sp.startProcessing();
     }
 
     /**

@@ -26,20 +26,21 @@ public class UIMTaskTest {
         Executor e = new DirectExecutor();
         e.execute(t);
 
-        verify(sp).addSuccess(t);
+        verify(sp).addSuccess(mdr.getId());
     }
 
     @Test
     public void failure() {
         MetaDataRecord mdr = mock(MetaDataRecord.class);
         StepProcessor sp = mock(StepProcessor.class);
-        WorkflowStep step = new FailingPlugin();
+        Throwable failure = new Exception("Terrible things happen");
+        WorkflowStep step = new FailingPlugin(failure);
         UIMTask t = new UIMTask(mdr, sp, step);
 
         Executor e = new DirectExecutor();
         e.execute(t);
 
-        verify(sp).addFailure(t);
+        verify(sp).addFailure(mdr.getId(), failure);
     }
 
     class DirectExecutor implements Executor {
@@ -49,9 +50,15 @@ public class UIMTaskTest {
     }
 
     class FailingPlugin implements WorkflowStep {
+
+        private final Throwable failure;
+
+        public FailingPlugin(Throwable failure) {
+            this.failure = failure;
+        }
         @Override
         public void processRecord(MetaDataRecord<?> mdr) throws Throwable {
-            throw new Exception("Terrible things happen");
+            throw failure;
         }
     }
 }

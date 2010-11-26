@@ -4,7 +4,7 @@ import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 
 /**
- * @author manu
+ * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public interface RecordProvider {
 

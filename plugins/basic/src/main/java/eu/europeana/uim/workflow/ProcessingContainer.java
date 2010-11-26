@@ -3,7 +3,6 @@ package eu.europeana.uim.workflow;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.WorkflowStep;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,6 +29,6 @@ public class ProcessingContainer implements WorkflowStep {
 
     @Override
     public void processRecord(MetaDataRecord<?> mdr) {
-        System.out.println("I am a ProcessingContainer running following steps: " + Arrays.toString(steps.toArray()) );
+        // this doesn't do a thing, as the container will never run tasks itself. Instead the StepProcessor takes care of that by fetching the steps
     }
 }

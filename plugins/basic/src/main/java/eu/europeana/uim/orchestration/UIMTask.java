@@ -8,7 +8,7 @@ import eu.europeana.uim.api.WorkflowStep;
  * If the execution fails, the Throwable is kept and the task is added to the failure list of its StepProcessor.
  * If the execution succeeds, the task is added to the success list of its StepProcessor.
  * 
- * TODO: support multiple MDRs per task
+ * TODO: maybe for optimization, support multiple MDRs per task...
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
@@ -32,10 +32,10 @@ public class UIMTask implements Runnable {
             step.processRecord(mdr);
         } catch (Throwable t) {
             failed = true;
-            processor.addFailure(this);
+            processor.addFailure(mdr.getId(), t);
         } finally {
             if (!failed) {
-                processor.addSuccess(this);
+                processor.addSuccess(mdr.getId());
             }
         }
 
