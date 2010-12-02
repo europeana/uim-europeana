@@ -24,10 +24,20 @@ public interface Orchestrator {
 
     Execution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor);
 
+    boolean allDataProcessed(ActiveExecution e);
+
+    /** notify the Orchestrator that an execution is done **/
+    void notifyExecutionDone(ActiveExecution e);
+
     /**
      * Gets the next batch of MetaDataRecord IDs for a given Execution
      * @param e the Execution for which to retrieve the next batch of IDs
      * @return an array of MetaDataRecord IDs to process
      */
     long[] getBatchFor(Execution e);
+
+    /**
+     * Gets the total number of items to be processed for this dataset
+     */
+    int getTotal(ActiveExecution dataset);
 }

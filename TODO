@@ -1,11 +1,15 @@
+design:
+- Execution & ActiveExecution: perhaps extend Execution instead and add a state enum to it?
+- better name for the RecordProvider contract
+- maybe a better name for UimEntity? MetaDataRecord, Collection, Provider, ... are all data sets of some sort --> DataSet?
+
 funtionality:
-- refactor UIMStore to be able to use the sampleData without the Karaf Gogo classes (so it can be used in unit tests)
-- get the orchestrator to orchestrate
-- ...
+- implementation of the ProcessingContainer (see FIXMEs)
 
 configuration:
 - take a look at the root POM.xml for the karaf version, we have 1.4.0 there instead of 2.1.0 and probably the old artifacts
 - clean up dependencies, probably we have duplicated declarations
 
 testing:
+- unit tests for the orchestration components (WorfklowProcessor, UIMOrchestrator, StepProcessor)
 - write more integration tests now that we have them working

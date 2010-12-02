@@ -2,17 +2,19 @@ package eu.europeana.uim.orchestration;
 
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.Task;
+import eu.europeana.uim.api.TaskStatus;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStep;
-import eu.europeana.uim.store.Execution;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,30 +35,29 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
 
     private static Logger log = Logger.getLogger(WorkflowProcessor.class.getName());
 
-    public static final int BATCH_SIZE = 100;
-
     private final Workflow workflow;
 
     private final Orchestrator orchestrator;
 
     private final Registry registry;
 
-    private List<Execution> executions = new ArrayList<Execution>();
+    private Vector<UIMExecution> executions = new Vector<UIMExecution>();
 
-    protected List<StepProcessor> workflowStepProcessors = new LinkedList<StepProcessor>();
+    // keep track of tasks for monitoring
+    private Map<Task, ActiveExecution> tasks = new ConcurrentHashMap<Task, ActiveExecution>();
+
+    protected Vector<StepProcessor> workflowStepProcessors = new Vector<StepProcessor>();
 
     private final Timer processorTimer;
 
     /**
      * Creates a new WorkflowProcessor and adds the Execution to it
      *
-     * @param e the Execution this processor will handle
      * @param w the Workflow this processor follows
      * @param o the Orchestrator for this processor
      */
-    public WorkflowProcessor(Execution e, Workflow w, Orchestrator o, Registry r) {
+    public WorkflowProcessor(Workflow w, Orchestrator o, Registry r) {
         this.orchestrator = o;
-        this.executions.add(e);
         this.workflow = w;
         this.registry = r;
         processorTimer = new Timer();
@@ -69,12 +70,21 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
     }
 
     /**
-     * Adds a new Execution to the processor
+     * Adds a new execution to the processor
      *
-     * @param e the Execution to be handled by the processor
+     * @param e the UIMExecution to be handled by the processor
      */
-    public void addExecution(Execution e) {
+    public void addExecution(UIMExecution e) {
+        e.getMonitor().beginTask(buildTaskName(e), orchestrator.getTotal(e));
         this.executions.add(e);
+    }
+
+    /**
+     * Adds a task so they can be kept track of
+     */
+    @Override
+    public void addTask(Task t, ActiveExecution e) {
+        tasks.put(t, e);
     }
 
     /**
@@ -82,8 +92,10 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
      *
      * @param e the Execution to remove
      */
-    public void removeExecution(Execution e) {
+    public void removeExecution(UIMExecution e) {
         this.executions.remove(e);
+
+        // TODO remove all associated tasks from the tasks map
     }
 
     /**
@@ -93,13 +105,13 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         log.info("Starting new WorkflowProcessor for Workfow '" + workflow.getName() + "'");
 
         // TODO make this configurable
-        processorTimer.schedule(this, 0, 10);
+        processorTimer.schedule(this, 0, 100);
     }
 
     @Override
     public void run() {
 
-        System.out.println("Tick tack");
+        // System.out.println("Tick tack");
 
         // asynchronous: start new thread that will
         // - for the first WorkflowStepTreadPool, retrieve actual MDRs from the storage and pass them to the first queue
@@ -110,17 +122,66 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         // - become idle if there's nothing much to do (optimization)
         // - implement WorldPeace
 
-        for (int i = 0; i < workflowStepProcessors.size(); i++) {
-            StepProcessor sp = workflowStepProcessors.get(i);
-            if (i == 0) {
-                // special treatment for the first step which gets MDRs directly from the storage
-                fillFirstStepProcessorQueue(sp);
+        if(executions.size() > 0) {
+            for (int i = 0; i < workflowStepProcessors.size(); i++) {
+                StepProcessor sp = workflowStepProcessors.get(i);
+                //System.out.println("STEP " + i + " " + sp.toString());
+
+                if (i == 0) {
+                    // special treatment for the first step which gets MDRs directly from the storage
+                    fillFirstStepProcessorQueue(sp);
+                } else {
+                    StepProcessor previous = workflowStepProcessors.get(i - 1);
+                    sp.startProcessing();
+                    previous.passToNext(sp);
+
+                    if(i == workflowStepProcessors.size() - 1) {
+                        // clear the successful tasks of the last step
+                        sp.clearSuccess();
+                    }
+                }
+            }
+
+            // monitoring for tasks
+            Vector<Task> doneTasks = new Vector<Task>();
+            for(Task t : tasks.keySet()) {
+                if(t.getStatus() == TaskStatus.DONE || t.getStatus() == TaskStatus.FAILED) {
+                    tasks.get(t).getMonitor().worked(1);
+                    doneTasks.add(t);
+                }
+            }
+            for(Task t : doneTasks) {
+                tasks.remove(t);
+            }
+
+            // check our executions
+            Vector<ActiveExecution> done = new Vector<ActiveExecution>();
+            for(UIMExecution e : executions) {
+                if(executionDone(e)) {
+                    done.add(e);
+                    e.getMonitor().done();
+                }
+            }
+            for(ActiveExecution d : done) {
+                executions.remove(d);
+            }
+
+        }
+
+
+    }
+
+    private boolean executionDone(ActiveExecution e) {
+        boolean allTasksDone = true;
+        for(Task t : tasks.keySet()) {
+            if(t.getStatus() != TaskStatus.DONE) {
+                allTasksDone = false;
             } else {
-                StepProcessor previous = workflowStepProcessors.get(i - 1);
-                previous.passToNext(sp);
-                sp.startProcessing();
+                // cleanup
+                tasks.remove(t);
             }
         }
+        return orchestrator.allDataProcessed(e) && allTasksDone;
     }
 
     /**
@@ -131,12 +192,15 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
     private void fillFirstStepProcessorQueue(StepProcessor sp) {
         // TODO we probably can do this dynamically. For this Orchestrator#getBatchFor needs to handle an argument
         // right now we have a fixed batch size that we use in order to refill the queues
-        if (sp.remainingCapacity() > BATCH_SIZE * executions.size()) {
-            for (Execution e : executions) {
-                sp.addRecords(orchestrator.getBatchFor(e));
+        if (sp.remainingCapacity() > UIMOrchestrator.BATCH_SIZE * executions.size()) {
+            for (UIMExecution e : executions) {
+                long[] work = orchestrator.getBatchFor(e);
+                if(work != null) {
+                    sp.addRecords(e, work);
+                }
             }
         }
-       sp.startProcessing();
+        sp.startProcessing();
     }
 
     /**
@@ -151,6 +215,11 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         }
         return registry.getActiveStorage().getMetaDataRecords(id)[0];
     }
+
+    private String buildTaskName(ActiveExecution ae) {
+        return "Workflow: " + workflow.getName() + " Execution: " + ae.getId();
+    }
+
 
 
     public static void main(String... args) {

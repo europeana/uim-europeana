@@ -1,11 +1,12 @@
 package eu.europeana.uim;
 
+import eu.europeana.uim.store.Request;
+import eu.europeana.uim.store.UimEntity;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import eu.europeana.uim.store.Request;
 
 
 /** Core and generic representation of a meta data record. 
@@ -14,7 +15,7 @@ import eu.europeana.uim.store.Request;
  *
  * @param <N>
  */
-public class MetaDataRecord<N> {
+public class MetaDataRecord<N> implements UimEntity {
 
 	private HashMap<Field<N,?>, Object> fields = new HashMap<Field<N,?>, Object>();
 	private HashMap<Field<N,?>, Map<String, Object>> qFields = new HashMap<Field<N,?>, Map<String, Object>>();

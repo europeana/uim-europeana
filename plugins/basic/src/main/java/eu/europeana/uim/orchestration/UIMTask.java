@@ -1,6 +1,8 @@
 package eu.europeana.uim.orchestration;
 
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.Task;
+import eu.europeana.uim.api.TaskStatus;
 import eu.europeana.uim.api.WorkflowStep;
 
 /**
@@ -12,16 +14,22 @@ import eu.europeana.uim.api.WorkflowStep;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class UIMTask implements Runnable {
+public class UIMTask implements Task {
 
     private final MetaDataRecord<?> mdr;
-    private final WorkflowStep step;
-    private final StepProcessor processor;
+
+    // mutable fields - a task "wanders" through the workflow, i.e. through a chain of StepProcessor-s
+    private StepProcessor processor;
+    private WorkflowStep step;
+    private TaskStatus status;
+
 
     public UIMTask(MetaDataRecord<?> mdr, StepProcessor processor, WorkflowStep step) {
         this.mdr = mdr;
         this.processor = processor;
         this.step = step;
+        this.status = TaskStatus.NEW;
+        
     }
 
     @Override
@@ -29,15 +37,35 @@ public class UIMTask implements Runnable {
 
         boolean failed = false;
         try {
+            status = TaskStatus.PROCESSING;
             step.processRecord(mdr);
         } catch (Throwable t) {
             failed = true;
-            processor.addFailure(mdr.getId(), t);
+            status = TaskStatus.FAILED;
+            processor.addFailure(this, t);
         } finally {
             if (!failed) {
-                processor.addSuccess(mdr.getId());
+                status = TaskStatus.IN_QUEUE;
+                processor.addSuccess(this);
             }
         }
+    }
 
+    @Override
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void changeStep(StepProcessor nextProcessor, WorkflowStep nextStep) {
+        if(this.status == TaskStatus.PROCESSING) {
+            throw new RuntimeException("Can't change step of a processing task!");
+        }
+        this.processor = nextProcessor;
+        this.step = nextStep;
+    }
+
+    @Override
+    public void markDone() {
+        this.status = TaskStatus.DONE;
     }
 }
