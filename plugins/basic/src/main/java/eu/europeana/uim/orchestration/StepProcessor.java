@@ -71,7 +71,6 @@ public class StepProcessor {
     }
 
     public boolean addRecord(Task task) {
-        // FIXME this is broken for ProcessingContainers...
         return queue.offer(task);
     }
 
@@ -128,15 +127,17 @@ public class StepProcessor {
         boolean giveItABreak = false;
 
         // TODO the following can probably be done in batches
-        while (!giveItABreak && successes.size() != 0) {
+        while (!giveItABreak && successes.size() > 0) {
             UIMTask t = successes.firstElement();
-            giveItABreak = !next.addRecord(t);
+            giveItABreak = next.remainingCapacity() == 0;
             if(!giveItABreak) {
                 successes.remove(t);
                 t.changeStep(next, next.step);
-            } else {
-                // rollback
-                t.changeStep(this, this.step);
+                if(!next.addRecord(t)) {
+                    // rollback
+                    successes.add(t);
+                    t.changeStep(this, this.step);
+                }
             }
         }
     }

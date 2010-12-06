@@ -19,7 +19,6 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.memory.MemoryStorageEngine;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +30,11 @@ import java.io.PrintStream;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for UIMWorkflow construction
@@ -52,7 +51,6 @@ public class WorkflowTest {
     private long[] testIDs;
 
     @Test
-    @Ignore // for the moment, until we have parallel executions again
     public void buildWorkfowRepresentation() {
 
         Workflow w = buildTestWorkflow();
@@ -70,7 +68,7 @@ public class WorkflowTest {
         w.addStep(new MockPlugin("Plugin1"));
         w.addStep(new MockPlugin("Plugin2"));
         ProcessingContainer c = new ProcessingContainer();
-        //w.addStep(c);
+        w.addStep(c);
         c.addStep(new MockPlugin("ParallelPlugin1"));
         c.addStep(new MockPlugin("ParallelPlugin2"));
         c.addStep(new MockPlugin("ParallelPlugin3"));
