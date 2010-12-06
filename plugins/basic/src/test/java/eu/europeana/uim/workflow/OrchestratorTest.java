@@ -1,6 +1,7 @@
 package eu.europeana.uim.workflow;
 
 import eu.europeana.uim.api.Registry;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,6 +16,11 @@ public class OrchestratorTest {
 
     @Autowired
     private Registry registry;
+
+    @Test
+    public void someTest() {
+
+    }
 
     
 }
