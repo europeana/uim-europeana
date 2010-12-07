@@ -16,18 +16,15 @@ public interface Orchestrator {
 	
 	public String getIdentifier();
 
-    Execution executeWorkflow(Workflow w, MetaDataRecord<?> mdr, ProgressMonitor monitor);
+    ActiveExecution executeWorkflow(Workflow w, MetaDataRecord<?> mdr, ProgressMonitor monitor);
 
-    Execution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor);
+    ActiveExecution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor);
 
-    Execution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor);
+    ActiveExecution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor);
 
-    Execution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor);
+    ActiveExecution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor);
 
     boolean allDataProcessed(ActiveExecution e);
-
-    /** notify the Orchestrator that an execution is done **/
-    void notifyExecutionDone(ActiveExecution e);
 
     /**
      * Gets the next batch of MetaDataRecord IDs for a given Execution

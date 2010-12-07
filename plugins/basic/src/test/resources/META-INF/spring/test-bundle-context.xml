@@ -9,8 +9,17 @@
 
     <bean id="uimRegistry" class="eu.europeana.uim.UIMRegistry" scope="singleton"/>
 
-    <bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator">
+    <bean id="workflowProcessorProvider" class="eu.europeana.uim.workflow.UIMWorkflowProcessorProvider">
+        <constructor-arg>
+            <bean class="eu.europeana.uim.workflow.UIMStepProcessorProvider" />
+        </constructor-arg>
+
+    </bean>
+
+
+    <bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator" scope="singleton">
         <constructor-arg ref="uimRegistry"/>
+        <constructor-arg ref="workflowProcessorProvider" />
     </bean>
 
 </beans>

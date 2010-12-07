@@ -6,8 +6,15 @@
 
     <bp:reference id="registry" interface="eu.europeana.uim.api.Registry"/>
 
-    <bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator">
+    <bean id="workflowProcessorProvider" class="eu.europeana.uim.workflow.UIMWorkflowProcessorProvider" scope="singleton">
+        <argument>
+            <bean class="eu.europeana.uim.workflow.UIMStepProcessorProvider" />
+        </argument>
+    </bean>
+
+    <bean id="uimOrchestrator" class="eu.europeana.uim.orchestration.UIMOrchestrator" scope="singleton">
         <argument ref="registry"/>
+        <argument ref="workflowProcessorProvider" />
     </bean>
 
 

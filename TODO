@@ -1,15 +1,24 @@
 design:
 - Execution & ActiveExecution: perhaps extend Execution instead and add a state enum to it?
+  semanitcally, there is a difference between both of them, and from a functional perspective it would be good to be able
+  to retrieve e.g. the ProgressMonitor for an execution, unless we give that responsibility to the Orchestrator itself?
 - better name for the RecordProvider contract
 - maybe a better name for UimEntity? MetaDataRecord, Collection, Provider, ... are all data sets of some sort --> DataSet?
 
 funtionality:
-- implementation of the ProcessingContainer (see FIXMEs)
+- orchestrator: SavePoints
+- storage: MangoDB-based implementation
+- core plugins:
+  - meta data mapping / conversion
+  - URL checker
+  - thumbnail downloader
+  - ...
 
 configuration:
 - take a look at the root POM.xml for the karaf version, we have 1.4.0 there instead of 2.1.0 and probably the old artifacts
 - clean up dependencies, probably we have duplicated declarations
 
 testing:
+- unit test for ProcessingContainer / parallel execution
 - unit tests for the orchestration components (WorfklowProcessor, UIMOrchestrator, StepProcessor)
 - write more integration tests now that we have them working

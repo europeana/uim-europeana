@@ -3,7 +3,6 @@ package eu.europeana.uim.workflow;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.MetaDataRecordHandler;
 import eu.europeana.uim.api.IngestionPlugin;
-import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -14,6 +13,7 @@ import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.common.parse.RecordParser;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
 import eu.europeana.uim.orchestration.UIMExecution;
+import eu.europeana.uim.orchestration.UIMOrchestrator;
 import eu.europeana.uim.orchestration.WorkflowProcessor;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Request;
@@ -128,7 +128,7 @@ public class WorkflowTest {
         UIMExecution e = mock(UIMExecution.class);
         when(e.getId()).thenReturn(0l);
 
-        Orchestrator o = mock(Orchestrator.class);
+        UIMOrchestrator o = mock(UIMOrchestrator.class);
         when(o.allDataProcessed(e)).thenReturn(false);
 
         // this is so clumsy
@@ -157,7 +157,9 @@ public class WorkflowTest {
         when(o.getBatchFor(e)).thenReturn(a1, a2, a3, a4, a5, a6, a7, a8, a9, null);
         when(o.getTotal(e)).thenReturn(999);
 
-        WorkflowProcessor processor = new WorkflowProcessor(w, o, registry);
+        UIMStepProcessorProvider stepProvider = new UIMStepProcessorProvider();
+
+        WorkflowProcessor processor = new WorkflowProcessor(w, o, registry, stepProvider);
         processor.addExecution(e);
         processor.start();
 

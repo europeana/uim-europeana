@@ -3,12 +3,12 @@ package eu.europeana.uim.orchestration;
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.ActiveExecution;
-import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.TaskStatus;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.workflow.StepProcessorProvider;
 
 import java.util.Map;
 import java.util.Timer;
@@ -37,9 +37,11 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
 
     private final Workflow workflow;
 
-    private final Orchestrator orchestrator;
+    private final UIMOrchestrator orchestrator;
 
     private final Registry registry;
+
+    private final StepProcessorProvider stepProcessorProvider;
 
     private Vector<UIMExecution> executions = new Vector<UIMExecution>();
 
@@ -56,16 +58,16 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
      * @param w the Workflow this processor follows
      * @param o the Orchestrator for this processor
      */
-    public WorkflowProcessor(Workflow w, Orchestrator o, Registry r) {
+    public WorkflowProcessor(Workflow w, UIMOrchestrator o, Registry r, StepProcessorProvider provider) {
         this.orchestrator = o;
         this.workflow = w;
         this.registry = r;
+        this.stepProcessorProvider = provider;
         processorTimer = new Timer();
 
         // construct the set of StepThreadPools based on the workflow
         for (WorkflowStep step : w.getSteps()) {
-            // TODO use a provider here so we can test this
-            workflowStepProcessors.add(new StepProcessor(step, this));
+            workflowStepProcessors.add(provider.createStepProcessor(step, this));
         }
     }
 
@@ -164,6 +166,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
             }
             for(ActiveExecution d : done) {
                 executions.remove(d);
+                orchestrator.notifyExecutionDone(d);
             }
 
         }

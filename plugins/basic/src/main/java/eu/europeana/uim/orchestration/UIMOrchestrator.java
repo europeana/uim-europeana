@@ -12,6 +12,7 @@ import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimEntity;
+import eu.europeana.uim.workflow.WorkflowProcessorProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,14 +28,18 @@ public class UIMOrchestrator implements Orchestrator {
 
     public static final int BATCH_SIZE = 100;
 
-    private Registry registry;
+    private final Registry registry;
+
+    private WorkflowProcessorProvider processorProvider;
 
     private Map<Workflow, WorkflowProcessor> processors = new HashMap<Workflow, WorkflowProcessor>();
 
     private Map<Execution, Integer> executions = new HashMap<Execution, Integer>();
 
-    public UIMOrchestrator(Registry registry) {
+
+    public UIMOrchestrator(Registry registry, WorkflowProcessorProvider processorProvider) {
         this.registry = registry;
+        this.processorProvider = processorProvider;
     }
 
     @Override
@@ -43,24 +48,24 @@ public class UIMOrchestrator implements Orchestrator {
     }
 
     @Override
-    public Execution executeWorkflow(Workflow w, MetaDataRecord<?> mdr, ProgressMonitor monitor) {
+    public ActiveExecution executeWorkflow(Workflow w, MetaDataRecord<?> mdr, ProgressMonitor monitor) {
         monitor.beginTask(w.getName(), 1);
         return executeWorkflow(w, monitor, mdr);
     }
 
     @Override
-    public Execution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor) {
+    public ActiveExecution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor) {
         return executeWorkflow(w, monitor, c);
     }
 
 
     @Override
-    public Execution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor) {
+    public ActiveExecution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor) {
         return executeWorkflow(w, monitor, r);
     }
 
     @Override
-    public Execution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor) {
+    public ActiveExecution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor) {
         return executeWorkflow(w, monitor, p);
     }
 
@@ -73,11 +78,11 @@ public class UIMOrchestrator implements Orchestrator {
      * Executes a given workflow. A new Execution is created and a WorkflowProcessor created if none exists for this workflow
      *
      * @param w the workflow to execute
-     * @return a new Execution for this execution request
+     * @return a new ActiveExecution for this execution request
      */
-    private Execution executeWorkflow(Workflow w, ProgressMonitor monitor, UimEntity dataset) {
+    private ActiveExecution executeWorkflow(Workflow w, ProgressMonitor monitor, UimEntity dataset) {
         Execution e = registry.getActiveStorage().createExecution();
-        if(executions.containsKey(e)) {
+        if(hasExecution(e)) {
             throw new UIMError("Execution " + e.getId() + " is already running");
         }
         UIMExecution activeExecution = new UIMExecution(e.getId(), dataset, monitor);
@@ -85,12 +90,21 @@ public class UIMOrchestrator implements Orchestrator {
 
         WorkflowProcessor wp = processors.get(w);
         if (wp == null) {
-            wp = new WorkflowProcessor(w, this, registry);
+            wp = processorProvider.createProcessor(w, this, registry);
             processors.put(w, wp);
         }
         wp.addExecution(activeExecution);
         wp.start();
-        return e;
+        return activeExecution;
+    }
+
+    private boolean hasExecution(Execution e) {
+        for(Execution exec : executions.keySet()) {
+            if(exec.getId() == e.getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -145,8 +159,7 @@ public class UIMOrchestrator implements Orchestrator {
         }
     }
 
-    @Override
-    public void notifyExecutionDone(ActiveExecution e) {
+    protected void notifyExecutionDone(ActiveExecution e) {
         executions.remove(e);
     }
 }
