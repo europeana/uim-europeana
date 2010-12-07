@@ -1,22 +1,40 @@
 design:
+
 - Execution & ActiveExecution: perhaps extend Execution instead and add a state enum to it?
-  semanitcally, there is a difference between both of them, and from a functional perspective it would be good to be able
+  semantically, there is a difference between both of them, and from a functional perspective it would be good to be able
   to retrieve e.g. the ProgressMonitor for an execution, unless we give that responsibility to the Orchestrator itself?
+
 - better name for the RecordProvider contract
+
 - maybe a better name for UimEntity? MetaDataRecord, Collection, Provider, ... are all data sets of some sort --> DataSet?
 
-funtionality:
-- orchestrator: SavePoints
+- prioritisation:
+  - add priority level in the Request?
+  - how to inform the orchestrator that a priority changed?
+
+- rollback of an execution / request
+  - for now, do not do a rollback, but do a clean
+
+functionality:
+- orchestrator:
+  - SavePoints
+  - workflow bundles
+  - command interface for the orchestrator
+
 - storage: MangoDB-based implementation
+
 - core plugins:
   - meta data mapping / conversion
   - URL checker
   - thumbnail downloader
   - ...
 
+- GUI:
+  - OsgiManager in Apache Karaf / webconsole
+  - GWT integration in Karaf Webconsole
+
 configuration:
-- take a look at the root POM.xml for the karaf version, we have 1.4.0 there instead of 2.1.0 and probably the old artifacts
-- clean up dependencies, probably we have duplicated declarations
+- clean up dependencies, probably we have duplicated declarations (mvn dependency:analyze)
 
 testing:
 - unit test for ProcessingContainer / parallel execution
