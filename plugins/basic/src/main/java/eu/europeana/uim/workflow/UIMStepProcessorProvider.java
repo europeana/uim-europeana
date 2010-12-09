@@ -10,7 +10,7 @@ import eu.europeana.uim.orchestration.WorkflowProcessor;
 public class UIMStepProcessorProvider implements StepProcessorProvider {
 
     @Override
-    public StepProcessor createStepProcessor(WorkflowStep step, WorkflowProcessor processor) {
-        return new StepProcessor(step, processor);
+    public StepProcessor createStepProcessor(WorkflowStep step, WorkflowProcessor processor, boolean isSavePoint) {
+        return new StepProcessor(step, processor, processor, isSavePoint);
     }
 }

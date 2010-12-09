@@ -4,6 +4,8 @@ import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.SavePoint;
+import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.TaskStatus;
 import eu.europeana.uim.api.Workflow;
@@ -31,7 +33,7 @@ import java.util.logging.Logger;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class WorkflowProcessor extends TimerTask implements RecordProvider {
+public class WorkflowProcessor extends TimerTask implements RecordProvider, ProcessingMonitor {
 
     private static Logger log = Logger.getLogger(WorkflowProcessor.class.getName());
 
@@ -66,8 +68,29 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         processorTimer = new Timer();
 
         // construct the set of StepThreadPools based on the workflow
-        for (WorkflowStep step : w.getSteps()) {
-            workflowStepProcessors.add(provider.createStepProcessor(step, this));
+        // here comes in the logic for SavePoints, i.e. we mark a StepProcessor as "saving" if:
+        // - a SavePoint is defined _after_ the step in the workflow
+        // (- by default, if the step is a ProcessingContainer?)
+        for (int i = 0; i < w.getSteps().size(); i++) {
+            WorkflowStep step = w.getSteps().get(i);
+
+
+            // TODO save point logic for processing containers -- have a queue of some sort?
+
+            // ignore SavePoints as actual steps, they are just descriptive information
+            if (!(step instanceof SavePoint)) {
+                boolean savePoint = false;
+                if (i < w.getSteps().size() - 1) {
+                    WorkflowStep next = w.getSteps().get(i + 1);
+                    if (next instanceof SavePoint) {
+                        savePoint = true;
+                    }
+                } else if (i == w.getSteps().size() - 1) {
+                    // we always save after the last step
+                    savePoint = true;
+                }
+                workflowStepProcessors.add(provider.createStepProcessor(step, this, savePoint));
+            }
         }
     }
 
@@ -81,9 +104,6 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         this.executions.add(e);
     }
 
-    /**
-     * Adds a task so they can be kept track of
-     */
     @Override
     public void addTask(Task t, ActiveExecution e) {
         tasks.put(t, e);
@@ -124,7 +144,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         // - become idle if there's nothing much to do (optimization)
         // - implement WorldPeace
 
-        if(executions.size() > 0) {
+        if (executions.size() > 0) {
             for (int i = 0; i < workflowStepProcessors.size(); i++) {
                 StepProcessor sp = workflowStepProcessors.get(i);
                 //System.out.println("STEP " + i + " " + sp.toString());
@@ -137,7 +157,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
                     sp.startProcessing();
                     previous.passToNext(sp);
 
-                    if(i == workflowStepProcessors.size() - 1) {
+                    if (i == workflowStepProcessors.size() - 1) {
                         // clear the successful tasks of the last step
                         sp.clearSuccess();
                     }
@@ -146,25 +166,25 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
 
             // monitoring for tasks
             Vector<Task> doneTasks = new Vector<Task>();
-            for(Task t : tasks.keySet()) {
-                if(t.getStatus() == TaskStatus.DONE || t.getStatus() == TaskStatus.FAILED) {
+            for (Task t : tasks.keySet()) {
+                if (t.getStatus() == TaskStatus.DONE || t.getStatus() == TaskStatus.FAILED) {
                     tasks.get(t).getMonitor().worked(1);
                     doneTasks.add(t);
                 }
             }
-            for(Task t : doneTasks) {
+            for (Task t : doneTasks) {
                 tasks.remove(t);
             }
 
             // check our executions
             Vector<ActiveExecution> done = new Vector<ActiveExecution>();
-            for(UIMExecution e : executions) {
-                if(executionDone(e)) {
+            for (UIMExecution e : executions) {
+                if (executionDone(e)) {
                     done.add(e);
                     e.getMonitor().done();
                 }
             }
-            for(ActiveExecution d : done) {
+            for (ActiveExecution d : done) {
                 executions.remove(d);
                 orchestrator.notifyExecutionDone(d);
             }
@@ -176,8 +196,8 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
 
     private boolean executionDone(ActiveExecution e) {
         boolean allTasksDone = true;
-        for(Task t : tasks.keySet()) {
-            if(t.getStatus() != TaskStatus.DONE) {
+        for (Task t : tasks.keySet()) {
+            if (t.getStatus() != TaskStatus.DONE) {
                 allTasksDone = false;
             } else {
                 // cleanup
@@ -198,7 +218,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         if (sp.remainingCapacity() > UIMOrchestrator.BATCH_SIZE * executions.size()) {
             for (UIMExecution e : executions) {
                 long[] work = orchestrator.getBatchFor(e);
-                if(work != null) {
+                if (work != null) {
                     sp.addRecords(e, work);
                 }
             }
@@ -206,12 +226,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         sp.startProcessing();
     }
 
-    /**
-     * Gets the actual MetaDataRecord based on its ID
-     *
-     * @param id the ID of the MetaDataRecord to retrieve
-     * @return the MetaDataRecord provided by the storage
-     */
+    @Override
     public MetaDataRecord<FieldRegistry> getMetaDataRecord(long id) {
         if (registry.getActiveStorage() == null) {
             throw new RuntimeException("No storage module active");
@@ -219,10 +234,17 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider {
         return registry.getActiveStorage().getMetaDataRecords(id)[0];
     }
 
+    @Override
+    public void updateMetaDataRecord(MetaDataRecord<FieldRegistry> mdr) throws StorageEngineException {
+        if (registry.getActiveStorage() == null) {
+            throw new RuntimeException("No storage module active");
+        }
+        registry.getActiveStorage().updateMetaDataRecord(mdr);
+    }
+
     private String buildTaskName(ActiveExecution ae) {
         return "Workflow: " + workflow.getName() + " Execution: " + ae.getId();
     }
-
 
 
     public static void main(String... args) {

@@ -4,6 +4,7 @@ import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.MetaDataRecordHandler;
 import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.SavePoint;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Workflow;
@@ -32,6 +33,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,7 +53,7 @@ public class WorkflowTest {
     private long[] testIDs;
 
     @Test
-    public void buildWorkfowRepresentation() {
+    public void buildWorkflowRepresentation() {
 
         Workflow w = buildTestWorkflow();
 
@@ -94,11 +96,6 @@ public class WorkflowTest {
     @Test
     public void runWorkflow() throws Exception {
 
-        // FIXME this test is green also when nothing is really processed
-        // we need to check that 900 MDRs have been touched
-
-        // TODO write separate test to check execution behavior etc.
-
         Workflow w = new UIMWorkflow(0l, "First workflow", "Test workflow");
 
         IngestionPlugin p1 = mock(IngestionPlugin.class);
@@ -127,36 +124,9 @@ public class WorkflowTest {
 
         UIMExecution e = mock(UIMExecution.class);
         when(e.getId()).thenReturn(0l);
-
-        UIMOrchestrator o = mock(UIMOrchestrator.class);
-        when(o.allDataProcessed(e)).thenReturn(false);
-
-        // this is so clumsy
-        long[] a1 = new long[100];
-        long[] a2 = new long[100];
-        long[] a3 = new long[100];
-        long[] a4 = new long[100];
-        long[] a5 = new long[100];
-        long[] a6 = new long[100];
-        long[] a7 = new long[100];
-        long[] a8 = new long[100];
-        long[] a9 = new long[100];
-        System.arraycopy(testIDs, 0, a1, 0, 100);
-        System.arraycopy(testIDs, 100, a2, 0, 100);
-        System.arraycopy(testIDs, 200, a3, 0, 100);
-        System.arraycopy(testIDs, 300, a4, 0, 100);
-        System.arraycopy(testIDs, 400, a5, 0, 100);
-        System.arraycopy(testIDs, 500, a6, 0, 100);
-        System.arraycopy(testIDs, 600, a7, 0, 100);
-        System.arraycopy(testIDs, 700, a8, 0, 100);
-        System.arraycopy(testIDs, 800, a9, 0, 100);
-
-//        ProgressMonitor monitor = mock(ProgressMonitor.class);
         ProgressMonitor monitor = new ConsoleProgressMonitor(System.out);
         when(e.getMonitor()).thenReturn(monitor);
-        when(o.getBatchFor(e)).thenReturn(a1, a2, a3, a4, a5, a6, a7, a8, a9, null);
-        when(o.getTotal(e)).thenReturn(999);
-
+        UIMOrchestrator o = getMockOrchestrator(e);
         UIMStepProcessorProvider stepProvider = new UIMStepProcessorProvider();
 
         WorkflowProcessor processor = new WorkflowProcessor(w, o, registry, stepProvider);
@@ -170,11 +140,89 @@ public class WorkflowTest {
 
         Thread.sleep(1000);
 
-        verify(p1, times(900)).processRecord(any(MetaDataRecord.class));
-        verify(p2, times(900)).processRecord(any(MetaDataRecord.class));
-        verify(p3, times(900)).processRecord(any(MetaDataRecord.class));
+        verify(p1, times(999)).processRecord(any(MetaDataRecord.class));
+        verify(p2, times(999)).processRecord(any(MetaDataRecord.class));
+        verify(p3, times(999)).processRecord(any(MetaDataRecord.class));
     }
 
+
+    @Test
+    public void workflowWithSavePoint() throws Throwable {
+
+        Workflow w = new UIMWorkflow(0l, "SPWF", "Test workflow with SavePoint");
+        IngestionPlugin p1 = mock(IngestionPlugin.class);
+        IngestionPlugin p2 = mock(IngestionPlugin.class);
+        SavePoint save = mock(SavePoint.class);
+
+        when(p1.getIdentifier()).thenReturn("Plugin 1");
+        when(p2.getIdentifier()).thenReturn("Plugin 2");
+
+        w.addStep(p1);
+        w.addStep(save);
+        w.addStep(p2);
+        w.addStep(save);
+
+        UIMExecution e = mock(UIMExecution.class);
+        when(e.getId()).thenReturn(0l);
+        ProgressMonitor monitor = new ConsoleProgressMonitor(System.out);
+        when(e.getMonitor()).thenReturn(monitor);
+        UIMOrchestrator o = getMockOrchestrator(e);
+        UIMStepProcessorProvider stepProvider = new UIMStepProcessorProvider();
+
+        Registry mockRegistry = mock(Registry.class);
+        StorageEngine storage = spy(registry.getActiveStorage());
+        when(mockRegistry.getActiveStorage()).thenReturn(storage);
+
+        WorkflowProcessor processor = new WorkflowProcessor(w, o, mockRegistry, stepProvider);
+        processor.addExecution(e);
+        processor.start();
+
+        // this is a sortof hack
+        // but I don't see a better way to mimic the behaviour of an actual orchestrator with mockito
+        Thread.sleep(2000);
+        when(o.allDataProcessed(e)).thenReturn(true);
+
+        Thread.sleep(1000);
+
+        verify(p1, times(999)).processRecord(any(MetaDataRecord.class));
+        verify(p2, times(999)).processRecord(any(MetaDataRecord.class));
+
+        verify(save, times(0)).processRecord(any(MetaDataRecord.class));
+        verify(storage, times(1998)).updateMetaDataRecord(any(MetaDataRecord.class));
+
+
+    }
+
+    private UIMOrchestrator getMockOrchestrator(UIMExecution e) {
+        UIMOrchestrator o = mock(UIMOrchestrator.class);
+        when(o.allDataProcessed(e)).thenReturn(false);
+
+        // this is so clumsy
+        long[] a1 = new long[100];
+        long[] a2 = new long[100];
+        long[] a3 = new long[100];
+        long[] a4 = new long[100];
+        long[] a5 = new long[100];
+        long[] a6 = new long[100];
+        long[] a7 = new long[100];
+        long[] a8 = new long[100];
+        long[] a9 = new long[100];
+        long[] a10 = new long[99];
+        System.arraycopy(testIDs, 0, a1, 0, 100);
+        System.arraycopy(testIDs, 100, a2, 0, 100);
+        System.arraycopy(testIDs, 200, a3, 0, 100);
+        System.arraycopy(testIDs, 300, a4, 0, 100);
+        System.arraycopy(testIDs, 400, a5, 0, 100);
+        System.arraycopy(testIDs, 500, a6, 0, 100);
+        System.arraycopy(testIDs, 600, a7, 0, 100);
+        System.arraycopy(testIDs, 700, a8, 0, 100);
+        System.arraycopy(testIDs, 800, a9, 0, 100);
+        System.arraycopy(testIDs, 900, a10, 0, 99);
+
+        when(o.getBatchFor(e)).thenReturn(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, null);
+        when(o.getTotal(e)).thenReturn(999);
+        return o;
+    }
 
     private long[] loadTestData() {
 
@@ -206,6 +254,5 @@ public class WorkflowTest {
 
         return null;
     }
-
 
 }

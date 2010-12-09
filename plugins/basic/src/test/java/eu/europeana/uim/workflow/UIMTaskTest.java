@@ -60,9 +60,6 @@ public class UIMTaskTest {
         WorkflowStep newStep = mock(WorkflowStep.class);
 
         t.changeStep(newProcessor, newStep);
-
-
-
     }
 
     class DirectExecutor implements Executor {

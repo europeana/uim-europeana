@@ -1,5 +1,6 @@
 package eu.europeana.uim.orchestration;
 
+import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.workflow.ProcessingContainer;
@@ -40,11 +41,17 @@ public class StepProcessor {
 
     private final RecordProvider recordProvider;
 
+    private final ProcessingMonitor processingMonitor;
+
+    private final boolean savePoint;
+
     private boolean started;
 
-    public StepProcessor(WorkflowStep step, RecordProvider recordProvider) {
+    public StepProcessor(WorkflowStep step, RecordProvider recordProvider, ProcessingMonitor processingMonitor, boolean isSavePoint) {
         this.step = step;
         this.recordProvider = recordProvider;
+        this.processingMonitor = processingMonitor;
+        this.savePoint = isSavePoint;
         int maxPoolSize = 1;
         if (step instanceof ProcessingContainer) {
             ProcessingContainer pc = (ProcessingContainer) step;
@@ -84,12 +91,21 @@ public class StepProcessor {
 
     private UIMTask createTask(long id, WorkflowStep step, UIMExecution e) {
         UIMTask uimTask = new UIMTask(recordProvider.getMetaDataRecord(id), this, step);
-        recordProvider.addTask(uimTask, e);
+        processingMonitor.addTask(uimTask, e);
         return uimTask;
     }
 
     public void addSuccess(UIMTask t) {
         this.successes.add(t);
+
+        if(savePoint) {
+            try {
+                t.save(recordProvider);
+            } catch(StorageEngineException see) {
+                // FIXME proper handling
+                see.printStackTrace();
+            }
+        }
     }
 
     public void addFailure(Task t, Throwable throwable) {

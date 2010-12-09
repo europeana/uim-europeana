@@ -9,6 +9,6 @@ import eu.europeana.uim.orchestration.WorkflowProcessor;
  */
 public interface StepProcessorProvider {
 
-    StepProcessor createStepProcessor(WorkflowStep step, WorkflowProcessor processor);
+    StepProcessor createStepProcessor(WorkflowStep step, WorkflowProcessor processor, boolean isSavePoint);
 
 }
