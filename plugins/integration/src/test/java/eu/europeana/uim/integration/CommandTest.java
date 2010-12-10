@@ -48,11 +48,12 @@ public class CommandTest extends AbstractIntegrationTest {
                 // this should be in sync with the feature descriptor at /etc/uim-features.xml
 
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-common").versionAsInProject(),
+                
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-api").versionAsInProject(),
-                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-basic").versionAsInProject(),
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-storage-memory").versionAsInProject(),
-                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-import-file").versionAsInProject(),
-                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-import-oaipmh").versionAsInProject(),
+
+                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-basic").versionAsInProject(),
+                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-fileimp").versionAsInProject(),
 
                 felix(),
 
