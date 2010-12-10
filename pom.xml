@@ -21,12 +21,11 @@
         <module>api</module>
 
         <module>plugins/basic</module>
+        <module>plugins/fileimp</module>
         <module>storage/memory</module>
 
         <module>plugins/integration</module>
 
-        <module>import/file</module>
-        <module>import/oaipmh</module>
 
         <!--		<module>plugins/dummy</module>-->
         <!--		<module>webapp/webconsole</module>-->

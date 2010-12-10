@@ -8,7 +8,7 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>europeana-uim-import-file</artifactId>
+	<artifactId>europeana-uim-plugin-fileimp</artifactId>
 	<name>Unified Ingestion Manager: Import from File</name>
 	<packaging>bundle</packaging>
 
