@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features name="uim-features">
     <feature name="uim-core" version="1.0.0.SNAPSHOT">
-        <bundle>mvn:eu.europeana/europeana-uim-common/1.0.0-SNAPSHOT</bundle>
+        <bundle>mvn:eu.europeana/europeana-uim-common/1.0.1-SNAPSHOT</bundle>
+        
         <bundle>mvn:eu.europeana/europeana-uim-api/1.0.0-SNAPSHOT</bundle>
         <bundle>mvn:eu.europeana/europeana-uim-plugin-basic/1.0.0-SNAPSHOT</bundle>
         <bundle>mvn:eu.europeana/europeana-uim-plugin-fileimp/1.0.0-SNAPSHOT</bundle>

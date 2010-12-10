@@ -17,13 +17,22 @@
     </properties>
 
     <modules>
+    	<!--  a version indipendent common module -->
         <module>common</module>
+        
+    	<!--  the uim api module -->
         <module>api</module>
 
+    	<!--  the uim standard implementation module -->
         <module>plugins/basic</module>
+
+    	<!--  the uim standard file import module -->
         <module>plugins/fileimp</module>
+        
+        <!--  the uim standard in memory storage implementation -->
         <module>storage/memory</module>
 
+    	<!--  the uim integration test module -->
         <module>plugins/integration</module>
 
 
@@ -36,6 +45,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.1</version>
                 <configuration>
                     <target>1.6</target>
                     <source>1.6</source>
@@ -48,6 +58,7 @@
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
+                <version>1.2</version>
                 <executions>
                     <execution>
                         <id>generate-depends-file</id>
