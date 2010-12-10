@@ -13,20 +13,20 @@ public class MemoryProvider extends AbstractMemoryEntity implements Provider {
 	private String name;
 	
 	private String oaiBaseUrl;
-	private String oaiPrefix;
+	private String oaiMetadataPrefix;
 	
 	/**
 	 * @return the oaiPrefix
 	 */
-	public String getOaiPrefix() {
-		return oaiPrefix;
+	public String getOaiMetadataPrefix() {
+		return oaiMetadataPrefix;
 	}
 
 	/**
 	 * @param oaiPrefix the oaiPrefix to set
 	 */
-	public void setOaiPrefix(String oaiPrefix) {
-		this.oaiPrefix = oaiPrefix;
+	public void setOaiMetadataPrefix(String oaiPrefix) {
+		this.oaiMetadataPrefix = oaiPrefix;
 	}
 
 	private boolean aggregator;

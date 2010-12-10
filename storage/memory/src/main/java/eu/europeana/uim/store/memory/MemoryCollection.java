@@ -59,17 +59,17 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 	/**
 	 * @return the oaiPrefix
 	 */
-	public String getOaiPrefix() {
+	public String getOaiMetadataPrefix() {
 		if (oaiPrefix != null) {
 			return oaiPrefix;
 		}
-		return provider.getOaiPrefix();
+		return provider.getOaiMetadataPrefix();
 	}
 
 	/**
 	 * @param oaiPrefix the oaiPrefix to set
 	 */
-	public void setOaiPrefix(String oaiPrefix) {
+	public void setOaiMetadataPrefix(String oaiPrefix) {
 		this.oaiPrefix = oaiPrefix;
 	}
 	
@@ -87,7 +87,7 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 		string += getOaiBaseUrl() != null ? getOaiBaseUrl() : (getProvider().getOaiBaseUrl() != null ? getProvider().getOaiBaseUrl() : "undefined");
 
 		string += "?metadataPrefix=";
-		string += getOaiPrefix() != null ? getOaiPrefix() : getProvider().getOaiPrefix();
+		string += getOaiMetadataPrefix() != null ? getOaiMetadataPrefix() : getProvider().getOaiMetadataPrefix();
 		return string + "]";
 	}
 

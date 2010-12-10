@@ -259,7 +259,7 @@ public class UIMStore implements Action {
 					String[] arguments = split[1].split("\\|");
 					Provider provider = storage.findProvider(arguments[0]);
 					if (provider != null) {
-						provider.setOaiPrefix(arguments[1]);
+						provider.setOaiMetadataPrefix(arguments[1]);
 						storage.updateProvider(provider);
 					} else {
 						log.warning("Failed to set provider oai prefix. Provider <" + arguments[0] + " not found.");
@@ -280,7 +280,7 @@ public class UIMStore implements Action {
 					String[] arguments = split[1].split("\\|");
 					Collection collection = storage.findCollection(arguments[0]);
 					if (collection != null) {
-						collection.setOaiPrefix(arguments[1]);
+						collection.setOaiMetadataPrefix(arguments[1]);
 						storage.updateCollection(collection);
 					} else {
 						log.warning("Failed to set collection oai prefix. Collection <" + arguments[0] + " not found.");

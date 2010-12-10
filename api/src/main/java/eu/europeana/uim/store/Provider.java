@@ -29,8 +29,8 @@ public interface Provider extends UimEntity {
 	public String getOaiBaseUrl();
 	public void setOaiBaseUrl(String baseUrl);
 
-	public String getOaiPrefix();
-	public void setOaiPrefix(String prefix);
+	public String getOaiMetadataPrefix();
+	public void setOaiMetadataPrefix(String prefix);
 
 
 }

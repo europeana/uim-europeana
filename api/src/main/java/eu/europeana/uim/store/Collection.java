@@ -26,8 +26,8 @@ public interface Collection extends UimEntity {
 	public String getOaiSet();
 	public void setOaiSet(String set);
 
-	public String getOaiPrefix();
-	public void setOaiPrefix(String prefix);
+	public String getOaiMetadataPrefix();
+	public void setOaiMetadataPrefix(String prefix);
 
 
 }
