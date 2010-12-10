@@ -29,4 +29,5 @@ public interface Collection extends UimEntity {
 	public String getOaiPrefix();
 	public void setOaiPrefix(String prefix);
 
+
 }

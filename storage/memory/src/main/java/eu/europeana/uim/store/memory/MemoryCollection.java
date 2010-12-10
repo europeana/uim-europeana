@@ -9,7 +9,7 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 	private String oaiBaseUrl;
 	private String oaiPrefix;
 	private String oaiSet;
-
+	
 	public MemoryCollection(MemoryProvider provider) {
 		super();
 		this.provider = provider;
@@ -72,7 +72,11 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 	public void setOaiPrefix(String oaiPrefix) {
 		this.oaiPrefix = oaiPrefix;
 	}
+	
 
+
+	
+	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.store.memory.AbstractMemoryEntity#toString()
 	 */
