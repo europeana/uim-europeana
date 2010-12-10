@@ -60,7 +60,7 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 	 * @return the oaiPrefix
 	 */
 	public String getOaiPrefix() {
-		if (oaiSet != null) {
+		if (oaiPrefix != null) {
 			return oaiPrefix;
 		}
 		return provider.getOaiPrefix();
