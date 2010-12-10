@@ -18,9 +18,9 @@ public interface Orchestrator {
 
     ActiveExecution executeWorkflow(Workflow w, MetaDataRecord<?> mdr, ProgressMonitor monitor);
 
-    ActiveExecution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor);
-
     ActiveExecution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor);
+
+    ActiveExecution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor);
 
     ActiveExecution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor);
 
