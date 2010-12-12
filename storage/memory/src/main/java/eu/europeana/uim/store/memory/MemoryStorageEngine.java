@@ -1,8 +1,11 @@
 package eu.europeana.uim.store.memory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
@@ -21,6 +24,8 @@ import gnu.trove.TObjectLongHashMap;
 
 public class MemoryStorageEngine implements StorageEngine {
 
+	public static final String IDENTIFIER = MemoryStorageEngine.class.getSimpleName();
+	public static final Logger log = Logger.getLogger(MemoryStorageEngine.class.getName());
 
 	private TLongObjectHashMap<Provider> providers = new TLongObjectHashMap<Provider>();
 	private TObjectLongHashMap<String> providerMnemonics = new TObjectLongHashMap<String>();
@@ -42,12 +47,41 @@ public class MemoryStorageEngine implements StorageEngine {
 
 	private AtomicLong mdrId= new AtomicLong();
 
-	public static final String IDENTIFIER = MemoryStorageEngine.class.getSimpleName();
+	private EngineStatus status = EngineStatus.RUNNING;
 	
+	
+	public MemoryStorageEngine() {
+		super();
+	}
+
+
+	@Override
 	public String getIdentifier(){
 		return IDENTIFIER;
 	}
 	
+
+	@Override
+	public void initialize() {
+	}
+
+
+	@Override
+	public void setConfiguration(Map<String, String> config) {
+	}
+
+
+	@Override
+	public Map<String, String> getConfiguration() {
+		return new HashMap<String, String>();
+	}
+
+
+	@Override
+	public EngineStatus getStatus() {
+		return status;
+	}
+
 
 	@Override
 	public long size() {

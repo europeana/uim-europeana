@@ -81,7 +81,7 @@ public class UIMOrchestrator implements Orchestrator {
      * @return a new ActiveExecution for this execution request
      */
     private ActiveExecution executeWorkflow(Workflow w, ProgressMonitor monitor, UimEntity dataset) {
-        Execution e = registry.getActiveStorage().createExecution();
+        Execution e = registry.getStorage().createExecution();
         if(hasExecution(e)) {
             throw new UIMError("Execution " + e.getId() + " is already running");
         }
@@ -121,9 +121,9 @@ public class UIMOrchestrator implements Orchestrator {
         if(dataset instanceof MetaDataRecord<?>) {
             return new long[] { ((MetaDataRecord<?>) ae.getDataSet()).getId() };
         } else if(dataset instanceof Collection) {
-             all = registry.getActiveStorage().getByCollection((Collection)dataset);
+             all = registry.getStorage().getByCollection((Collection)dataset);
         } else if(dataset instanceof Provider) {
-            all = registry.getActiveStorage().getByProvider((Provider)dataset, false);
+            all = registry.getStorage().getByProvider((Provider)dataset, false);
         } else {
             throw new RuntimeException("Should not be here");
         }
@@ -151,9 +151,9 @@ public class UIMOrchestrator implements Orchestrator {
         if(dataSet instanceof MetaDataRecord<?>) {
             return 1;
         } else if(dataSet instanceof Collection) {
-            return registry.getActiveStorage().getTotalByCollection((Collection)dataSet);
+            return registry.getStorage().getTotalByCollection((Collection)dataSet);
         } else if(dataSet instanceof Provider) {
-            return registry.getActiveStorage().getTotalByProvider((Provider)dataSet, false);
+            return registry.getStorage().getTotalByProvider((Provider)dataSet, false);
         } else {
             throw new RuntimeException("Should not be here");
         }

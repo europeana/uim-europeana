@@ -1,6 +1,7 @@
 package eu.europeana.uim.api;
 
 import java.util.List;
+import java.util.Map;
 
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
@@ -12,7 +13,23 @@ import eu.europeana.uim.store.Request;
 
 public interface StorageEngine {
 
+	public enum EngineStatus {
+		REGISTERED,
+		BOOTING,
+		RUNNING,
+		STOPPED,
+		FAILURE
+	}
+	
+	
 	public String getIdentifier();
+	
+	public void setConfiguration(Map<String, String> config);
+	public Map<String, String> getConfiguration();
+	
+	public void initialize();
+	
+	public EngineStatus getStatus();
 	public long size();
 	
 

@@ -43,7 +43,8 @@
 							javax.xml.*,
 							org.w3c.dom, 
 							org.xml.sax, 
-							org.xml.sax.ext</Import-Package>
+							org.xml.sax.ext, 
+							org.xml.sax.helpers,</Import-Package>
 						<Export-Package>eu.europeana.uim.common,
 							eu.europeana.uim.common.parse,
 							org.apache.commons.lang;version="2.4",
@@ -51,7 +52,7 @@
 							org.apache.commons.io;version="2.0",
 							org.apache.commons.io.*;version="2.0",
 							gnu.trove.*</Export-Package>
-						<Embed-Dependency>commons-lang,commons-io,wstx-asl,stax-api,trove4j</Embed-Dependency>
+						<Embed-Dependency>commons-lang,commons-io,wstx-asl,geronimo-stax-api_1.0_spec,trove4j</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -99,18 +100,26 @@
             <artifactId>commons-io</artifactId>
             <version>2.0</version>
         </dependency>
-		<dependency>
-			<groupId>stax</groupId>
-			<artifactId>stax-api</artifactId>
-			<version>1.0.1</version>
-		</dependency>
 
-		<dependency>
-			<groupId>org.codehaus.woodstox</groupId>
+	    <!-- Stax -->
+	    <dependency>
+	    	<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>wstx-asl</artifactId>
-			<version>3.2.0</version>
-		</dependency>
-
+	      	<version>3.2.9</version>
+	      	<exclusions>
+	      		<exclusion>
+	      			<groupId>stax</groupId>
+	      			<artifactId>stax-api</artifactId>
+	      		</exclusion>
+	      	</exclusions>
+	    </dependency>
+		    
+	    <dependency>
+	      <groupId>org.apache.geronimo.specs</groupId>
+	      <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+	      <version>1.0.1</version>
+	    </dependency>   
+    
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>

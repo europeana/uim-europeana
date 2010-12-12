@@ -5,7 +5,7 @@
 
     <bp:reference id="registry" interface="eu.europeana.uim.api.Registry" />
 		   
-	<service interface="eu.europeana.uim.api.StorageEngine">
+	<service interface="eu.europeana.uim.api.StorageEngine" ranking="9">
 		<bean class="eu.europeana.uim.store.memory.MemoryStorageEngine" />
 	</service>
 </blueprint>

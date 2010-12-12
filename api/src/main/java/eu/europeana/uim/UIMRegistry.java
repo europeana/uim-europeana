@@ -79,37 +79,52 @@ public class UIMRegistry implements Registry {
 	}
 
 	@Override
-	public StorageEngine getActiveStorage() {
+	public StorageEngine getStorage() {
 		if (storages == null || storages.isEmpty()) return null;
 		return storages.get(0);
+	}
+
+	@Override
+	public StorageEngine getStorage(String identifier) {
+		if (storages == null || storages.isEmpty()) return null;
+		for (StorageEngine storage : storages) {
+			if (identifier.equals(storage.getIdentifier())) {
+				return storage;
+			}
+		}
+		return null;
 	}
 
 
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
+		
+		builder.append("\nRegistered plugins:");
+		builder.append("\n--------------------------------------");
 		if (plugins.isEmpty()) {
-			builder.append("No plugins. ");
+			builder.append("\n\tNo plugins. ");
 		} else {
 			for (IngestionPlugin plugin : plugins) {
 				if (builder.length() > 0) {
-					builder.append("\nPlugin:");
+					builder.append("\n\tPlugin:");
 				}
 				builder.append(plugin.getIdentifier() + ": [" + plugin.getDescription() + "]");
 			}
-			builder.append(". ");
 		}
 
+		builder.append("\nRegistered storage:");
+		builder.append("\n--------------------------------------");
 		if (storages.isEmpty()) {
-			builder.append("No storage.");
+			builder.append("\n\tNo storage.");
 		} else {
-			StringBuilder storelist = new StringBuilder();
 			for (StorageEngine storage : storages) {
-				if (storelist.length() > 0) {
-					storelist.append(", ");
+				if (builder.length() > 0) {
+					builder.append("\n\t");
 				}
-				storelist.append(storage.getIdentifier());
+				builder.append(storage.getIdentifier());
+				builder.append(" [" + storage.getStatus() + "] ");
+				builder.append(storage.getConfiguration().toString());
 			}
-			builder.append(storelist + ". ");
 		}
 
 		return builder.toString();

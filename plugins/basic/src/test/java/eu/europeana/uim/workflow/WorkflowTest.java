@@ -84,8 +84,8 @@ public class WorkflowTest {
         // we don't do a tear down, as the main thread of the test finishes before the asynchronous methods
         // we want to test. so instead we make a clean initialisation.
 
-        if (registry.getActiveStorage() != null) {
-            registry.removeStorage(registry.getActiveStorage());
+        if (registry.getStorage() != null) {
+            registry.removeStorage(registry.getStorage());
         }
 
         registry.addStorage(new MemoryStorageEngine());
@@ -170,8 +170,8 @@ public class WorkflowTest {
         UIMStepProcessorProvider stepProvider = new UIMStepProcessorProvider();
 
         Registry mockRegistry = mock(Registry.class);
-        StorageEngine storage = spy(registry.getActiveStorage());
-        when(mockRegistry.getActiveStorage()).thenReturn(storage);
+        StorageEngine storage = spy(registry.getStorage());
+        when(mockRegistry.getStorage()).thenReturn(storage);
 
         WorkflowProcessor processor = new WorkflowProcessor(w, o, mockRegistry, stepProvider);
         processor.addExecution(e);
@@ -230,7 +230,7 @@ public class WorkflowTest {
 
         try {
 
-            StorageEngine storage = registry.getActiveStorage();
+            StorageEngine storage = registry.getStorage();
             Collection targetcoll = storage.findCollection("000");
 
             Request request = storage.createRequest(targetcoll);

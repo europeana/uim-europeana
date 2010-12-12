@@ -1,6 +1,7 @@
 package eu.europeana.uim.store;
 
 import java.util.List;
+import java.util.Map;
 
 import eu.europeana.uim.FieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
@@ -11,6 +12,28 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 
 	@Override
 	public String getIdentifier() {
+		return null;
+	}
+	
+
+	@Override
+	public void initialize() {
+	}
+
+
+	@Override
+	public void setConfiguration(Map<String, String> config) {
+	}
+
+
+	@Override
+	public Map<String, String> getConfiguration() {
+		return null;
+	}
+
+
+	@Override
+	public EngineStatus getStatus() {
 		return null;
 	}
 

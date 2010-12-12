@@ -20,6 +20,6 @@ public class UIMRegistryTest {
 	
 	@Test
 	public void testStorageEngine() {
-		assertNotNull(registry.getActiveStorage());
+		assertNotNull(registry.getStorage());
 	}
 }

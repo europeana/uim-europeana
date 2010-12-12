@@ -1,18 +1,5 @@
 package eu.europeana.uim.integration;
 
-import org.apache.karaf.testing.AbstractIntegrationTest;
-import org.apache.karaf.testing.Helper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.osgi.service.command.CommandProcessor;
-import org.osgi.service.command.CommandSession;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.maven;
@@ -21,6 +8,23 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.waitForFrameworkStartup;
 import static org.ops4j.pax.exam.OptionUtils.combine;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import org.apache.karaf.testing.AbstractIntegrationTest;
+import org.apache.karaf.testing.Helper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.Configuration;
+import org.ops4j.pax.exam.junit.JUnit4TestRunner;
+import org.osgi.framework.Constants;
+import org.osgi.service.command.CommandProcessor;
+import org.osgi.service.command.CommandSession;
+
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
 
 
 /**
@@ -35,11 +39,12 @@ public class CommandTest extends AbstractIntegrationTest {
 
     @Configuration
     public static Option[] configuration() throws Exception {
-        return combine(
-                Helper.getDefaultOptions(),
-                // this is how you set the default log level when using pax logging (logProfile)
-                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
-                scanFeatures(
+         return combine(
+ 				Helper.getDefaultOptions(
+						systemProperty("karaf.name").value("junit"),
+						systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO")),
+						
+				scanFeatures(
                         maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("xml").classifier("features").versionAsInProject(),
                         "spring"),
 
@@ -52,8 +57,8 @@ public class CommandTest extends AbstractIntegrationTest {
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-api").versionAsInProject(),
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-storage-memory").versionAsInProject(),
 
-                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-basic").versionAsInProject(),
-                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-fileimp").versionAsInProject(),
+//                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-basic").versionAsInProject(),
+//                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-fileimp").versionAsInProject(),
 
                 felix(),
 
@@ -63,11 +68,20 @@ public class CommandTest extends AbstractIntegrationTest {
 
     @Test
     public void testUIInfo() throws Exception {
+    	Registry registry = getOsgiService(Registry.class);
 
-        // we have still to wait, in order to give the framework a chance to start up
-        Thread.sleep(10000);
+    	StorageEngine storage = null;
+    	while (storage == null) {
+    		storage = registry.getStorage();
+    		Thread.sleep(500);
+    	}
 
-        assertEquals("UIM Registry: No plugins. MemoryStorageEngine.", getCommandResult("uim:info"));
+        assertEquals("MemoryStorageEngine", registry.getStorage().getIdentifier());
+
+        String property = bundleContext.getProperty( Constants.FRAMEWORK_VERSION );
+        assertEquals("1.5", property);
+        
+        //assertEquals("UIM Registry: No plugins. MemoryStorageEngine.", getCommandResult("uim:info"));
     }
 
     private String getCommandResult(String command) {

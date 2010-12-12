@@ -228,18 +228,18 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
 
     @Override
     public MetaDataRecord<FieldRegistry> getMetaDataRecord(long id) {
-        if (registry.getActiveStorage() == null) {
+        if (registry.getStorage() == null) {
             throw new RuntimeException("No storage module active");
         }
-        return registry.getActiveStorage().getMetaDataRecords(id)[0];
+        return registry.getStorage().getMetaDataRecords(id)[0];
     }
 
     @Override
     public void updateMetaDataRecord(MetaDataRecord<FieldRegistry> mdr) throws StorageEngineException {
-        if (registry.getActiveStorage() == null) {
+        if (registry.getStorage() == null) {
             throw new RuntimeException("No storage module active");
         }
-        registry.getActiveStorage().updateMetaDataRecord(mdr);
+        registry.getStorage().updateMetaDataRecord(mdr);
     }
 
     private String buildTaskName(ActiveExecution ae) {

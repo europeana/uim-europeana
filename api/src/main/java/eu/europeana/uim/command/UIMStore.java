@@ -65,7 +65,7 @@ public class UIMStore implements Action {
 
 	@Override
 	public Object execute(CommandSession session) throws Exception {
-		StorageEngine storage = registry.getActiveStorage();
+		StorageEngine storage = registry.getStorage();
         PrintStream out = session.getConsole();
         switch(operation) {
 		case createProvider: createProvider(storage, out); break;

@@ -57,7 +57,7 @@ public class UIMFile implements Function, Action {
 	
 	@Override
 	public Object execute(CommandSession commandSession, List<Object> arguments) throws Exception {
-		StorageEngine storage = registry.getActiveStorage();
+		StorageEngine storage = registry.getStorage();
 		long[] ids = execute(storage, commandSession);
 		if (ids == null) {
 			commandSession.getConsole().println("Failed to read any records from: <" + filename + ">");

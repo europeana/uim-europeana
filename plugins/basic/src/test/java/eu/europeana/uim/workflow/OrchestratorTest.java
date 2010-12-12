@@ -54,7 +54,7 @@ public class OrchestratorTest {
 
     @After
     public void tearDown() {
-        registry.removeStorage(registry.getActiveStorage());
+        registry.removeStorage(registry.getStorage());
     }
 
 
@@ -106,7 +106,7 @@ public class OrchestratorTest {
         // mock registry & storage
         Registry mockRegistry = mock(Registry.class);
         StorageEngine storage = mock(StorageEngine.class);
-        when(mockRegistry.getActiveStorage()).thenReturn(storage);
+        when(mockRegistry.getStorage()).thenReturn(storage);
         when(storage.getTotalByCollection(c)).thenReturn(why);
         Execution mockExecution = mock(Execution.class);
         when(storage.createExecution()).thenReturn(mockExecution);

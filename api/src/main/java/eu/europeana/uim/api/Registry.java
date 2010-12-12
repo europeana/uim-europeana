@@ -18,6 +18,8 @@ public interface Registry {
 
     void removeWorkflow(Workflow workflow);
 
-    StorageEngine getActiveStorage();
+    StorageEngine getStorage();
+
+    StorageEngine getStorage(String identifier);
 
 }
