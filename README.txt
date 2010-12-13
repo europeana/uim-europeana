@@ -13,18 +13,23 @@ TODO: refactor 2 and 3, they somewhat overlap
 #1 PROJECT STRUCTURE
 ====================
 
-Path                Name                                                    Description
-----------------------------------------------------------------------------------------------------------------------------
-/                     Unified Ingestion Manager                                The root maven project
-/common               Unified Ingestion Manager: Common                        Shared classes and resources (e.g. for testing)
-/api                  Unified Ingestion Manager: API                           The UIM API bundle, used by plugins
-/plugins/basic        Unified Ingestion Manager: API Basic Implementation      The basic/default implementation of the API
+Path                              Name                                                    Description
+-------------------------------------------------------------------------------------------------------------------------------------------
+/                                 Unified Ingestion Manager                                The root maven project
+/common                           Unified Ingestion Manager: Common                        Shared classes and resources (e.g. for testing)
+/api                              Unified Ingestion Manager: API                           The UIM API bundle, used by plugins
+/plugins/basic                    Unified Ingestion Manager: API Basic Implementation      The basic/default implementation of the API
 
-/import/file          Unified Ingestion Manager: Import from File              Bundle to import data from a XML file
-/import/oaipmh        Unified Ingestion Manager: Import from OAI-PMH           Bundle to import data from an OAI-PMH 
+/gui/uim-webconsole-extension     Unified Ingestion Manager: Webconsole extension          UIM GUI extension for the Karaf Webconsole
 
-/plugins/integration  Unified Ingestion Manager: Integration tests             The integration tests, using PAX-Exam
-/plugins/dummy        Unified Ingestion Manager: Dummy Plugin                  Our beloved dummy plugin
+/storage/memory                   Unified Ingestion Manager: Storage Backend Memory        In-memory implementation of the storage engine
+
+/plugins/fileimp                  Unified Ingestion Manager: Import from File              Bundle to import data from a XML file
+/plugins/integration              Unified Ingestion Manager: Integration tests             The integration tests, using PAX-Exam
+/plugins/dummy                    Unified Ingestion Manager: Dummy Plugin                  Our beloved dummy plugin
+
+/workflows/dummy                  Unified Ingestion Manager: Dummy Workflow                Our beloved dummy workflow
+
 
 
 #2 INSTALLATION
