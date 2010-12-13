@@ -48,6 +48,6 @@ public class DummyPlugin implements IngestionPlugin {
 
     @Override
     public void processRecord(MetaDataRecord<?> mdr) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        System.out.println("Dummy plugin is processing MDR " + mdr.getId());
     }
 }
