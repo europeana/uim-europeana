@@ -17,5 +17,7 @@
         <argument ref="workflowProcessorProvider" />
     </bean>
 
+    <bp:service id="orchestrator" ref="uimOrchestrator" interface="eu.europeana.uim.api.Orchestrator" />
+
 
 </blueprint>

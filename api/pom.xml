@@ -27,7 +27,8 @@
 						<Export-Package>eu.europeana.uim,
 							eu.europeana.uim.api,
 							eu.europeana.uim.command,
-							eu.europeana.uim.store
+							eu.europeana.uim.store,
+                            eu.europeana.uim.workflow
 						</Export-Package>
 					</instructions>
 				</configuration>
@@ -52,7 +53,13 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>0.9.94</version>
+        </dependency>
+
+        <dependency>
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-uim-common</artifactId>
 			<version>${project.version}</version>

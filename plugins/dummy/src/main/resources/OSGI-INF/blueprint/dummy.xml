@@ -4,7 +4,6 @@
        <property name="description" value="dummy plugin description."/>
     </bean>
 
-	<service id="dummyOne" ref="dummyPlugin" interface="eu.europeana.uim.plugin.IngestionPlugin">
-	</service>
+	<service id="dummyOne" ref="dummyPlugin" interface="eu.europeana.uim.api.IngestionPlugin" />
 
 </blueprint>

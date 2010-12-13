@@ -7,5 +7,9 @@
         <bundle>mvn:eu.europeana/europeana-uim-plugin-basic/1.0.0-SNAPSHOT</bundle>
         <bundle>mvn:eu.europeana/europeana-uim-plugin-fileimp/1.0.0-SNAPSHOT</bundle>
         <bundle>mvn:eu.europeana/europeana-uim-storage-memory/1.0.0-SNAPSHOT</bundle>
+
+        <bundle>mvn:eu.europeana/europeana-uim-plugin-dummy/1.0.0-SNAPSHOT</bundle>
+        <bundle>mvn:eu.europeana/europeana-uim-workflow-dummy/1.0.0-SNAPSHOT</bundle>
+
     </feature>
 </features>

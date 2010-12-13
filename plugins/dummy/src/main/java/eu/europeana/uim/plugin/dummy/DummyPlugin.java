@@ -17,9 +17,6 @@ public class DummyPlugin implements IngestionPlugin {
 		return DummyPlugin.class.getName();
 	}
 
-
-
-
 	public String getDescription() {
 		return description;
 	}

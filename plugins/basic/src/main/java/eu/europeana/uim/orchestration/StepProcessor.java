@@ -1,5 +1,6 @@
 package eu.europeana.uim.orchestration;
 
+import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.WorkflowStep;
@@ -172,6 +173,23 @@ public class StepProcessor {
 
     @Override
     public String toString() {
-        return "SP '" + step.toString() + "', queue: " + currentQueueSize() + ", success: " + successes.size() + ", failures: " + failures.size();
+        return getDescription(step);
+    }
+
+    private String getDescription(WorkflowStep step) {
+        String stepDescription = null;
+        if(step instanceof IngestionPlugin) {
+            stepDescription = "Plugin '" + ((IngestionPlugin)step).getIdentifier() + "'";
+        }
+        if(step instanceof ProcessingContainer) {
+            stepDescription = "Processing container with plugins:\n'";
+            for(WorkflowStep s: ((ProcessingContainer)step).getSteps()) {
+                stepDescription+= "  " + getDescription(s);
+            }
+        }
+
+        return "Step '" + stepDescription + "', queue: " + currentQueueSize() + ", success: " + successes.size() + ", failures: " + failures.size();
+
+
     }
 }

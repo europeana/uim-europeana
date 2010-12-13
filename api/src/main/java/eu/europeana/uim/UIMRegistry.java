@@ -1,21 +1,23 @@
 package eu.europeana.uim;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.Workflow;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 public class UIMRegistry implements Registry {
 
 	private static Logger log = Logger.getLogger(UIMRegistry.class.getName());
 
 	private List<StorageEngine> storages = new ArrayList<StorageEngine>();
-	private List<IngestionPlugin> plugins = new ArrayList<IngestionPlugin>();
+	private Map<String, IngestionPlugin> plugins = new HashMap<String, IngestionPlugin>();
 	private List<Workflow> workflows = new ArrayList<Workflow>();
 
 	private Orchestrator orchestrator = null;
@@ -23,17 +25,36 @@ public class UIMRegistry implements Registry {
 	public UIMRegistry() {
 	}
 
-	@Override
+    @Override
+    public List<Workflow> getWorkflows() {
+        return workflows;
+    }
+
+    @Override
+    public Workflow getWorfklow(String identifier) {
+        for(Workflow w : workflows) {
+            if(w.getName().equals(identifier)) {
+                return w;
+            }
+        }
+        return null;
+    }
+
+    @Override
 	public void addPlugin(IngestionPlugin plugin) {
 		if (plugin != null) {
 			log.info("Added plugin:" + plugin.getIdentifier());
-			if (!plugins.contains(plugin))
-				plugins.add(plugin);
+			if (!plugins.containsKey(plugin.getIdentifier()))
+				plugins.put(plugin.getIdentifier(), plugin);
 		}
 	}
 
+    @Override
+    public IngestionPlugin getPlugin(String identifier) {
+        return plugins.get(identifier);
+    }
 
-	@Override
+    @Override
 	public void removePlugin(IngestionPlugin plugin) {
 		if (plugin != null) {
 			log.info("Removed plugin:" + plugin.getIdentifier());
@@ -104,7 +125,7 @@ public class UIMRegistry implements Registry {
 		if (plugins.isEmpty()) {
 			builder.append("\n\tNo plugins. ");
 		} else {
-			for (IngestionPlugin plugin : plugins) {
+			for (IngestionPlugin plugin : plugins.values()) {
 				if (builder.length() > 0) {
 					builder.append("\n\tPlugin:");
 				}

@@ -50,7 +50,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
     // keep track of tasks for monitoring
     private Map<Task, ActiveExecution> tasks = new ConcurrentHashMap<Task, ActiveExecution>();
 
-    protected Vector<StepProcessor> workflowStepProcessors = new Vector<StepProcessor>();
+    protected Vector<StepProcessor> stepProcessors = new Vector<StepProcessor>();
 
     private final Timer processorTimer;
 
@@ -89,7 +89,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
                     // we always save after the last step
                     savePoint = true;
                 }
-                workflowStepProcessors.add(provider.createStepProcessor(step, this, savePoint));
+                stepProcessors.add(stepProcessorProvider.createStepProcessor(step, this, savePoint));
             }
         }
     }
@@ -145,19 +145,19 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
         // - implement WorldPeace
 
         if (executions.size() > 0) {
-            for (int i = 0; i < workflowStepProcessors.size(); i++) {
-                StepProcessor sp = workflowStepProcessors.get(i);
+            for (int i = 0; i < stepProcessors.size(); i++) {
+                StepProcessor sp = stepProcessors.get(i);
                 //System.out.println("STEP " + i + " " + sp.toString());
 
                 if (i == 0) {
                     // special treatment for the first step which gets MDRs directly from the storage
                     fillFirstStepProcessorQueue(sp);
                 } else {
-                    StepProcessor previous = workflowStepProcessors.get(i - 1);
+                    StepProcessor previous = stepProcessors.get(i - 1);
                     sp.startProcessing();
                     previous.passToNext(sp);
 
-                    if (i == workflowStepProcessors.size() - 1) {
+                    if (i == stepProcessors.size() - 1) {
                         // clear the successful tasks of the last step
                         sp.clearSuccess();
                     }
@@ -246,6 +246,15 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
         return "Workflow: " + workflow.getName() + " Execution: " + ae.getId();
     }
 
+    @Override
+    public String toString() {
+        String res = "";
+        res += "WorkflowProcessor for workflow '" + workflow.getName() + "' (" + workflow.getDescription() + ")\n\n";
+        for(StepProcessor sp : stepProcessors) {
+            res += sp.toString() + "\n";
+        }
+        return res;
+    }
 
     public static void main(String... args) {
 

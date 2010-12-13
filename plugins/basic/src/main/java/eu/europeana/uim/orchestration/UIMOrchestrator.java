@@ -34,7 +34,7 @@ public class UIMOrchestrator implements Orchestrator {
 
     private Map<Workflow, WorkflowProcessor> processors = new HashMap<Workflow, WorkflowProcessor>();
 
-    private Map<Execution, Integer> executions = new HashMap<Execution, Integer>();
+    private Map<ActiveExecution, Integer> executions = new HashMap<ActiveExecution, Integer>();
 
 
     public UIMOrchestrator(Registry registry, WorkflowProcessorProvider processorProvider) {
@@ -70,6 +70,11 @@ public class UIMOrchestrator implements Orchestrator {
     }
 
     @Override
+    public java.util.Collection<ActiveExecution> getActiveExecutions() {
+        return executions.keySet();
+    }
+
+    @Override
     public boolean allDataProcessed(ActiveExecution e) {
         return executions.get(e) == getTotal(e);
     }
@@ -85,7 +90,7 @@ public class UIMOrchestrator implements Orchestrator {
         if(hasExecution(e)) {
             throw new UIMError("Execution " + e.getId() + " is already running");
         }
-        UIMExecution activeExecution = new UIMExecution(e.getId(), dataset, monitor);
+        UIMExecution activeExecution = new UIMExecution(e.getId(), dataset, monitor, w);
         executions.put(activeExecution, 0);
 
         WorkflowProcessor wp = processors.get(w);
@@ -109,7 +114,7 @@ public class UIMOrchestrator implements Orchestrator {
 
 
     @Override
-    public synchronized long[] getBatchFor(Execution e) {
+    public synchronized long[] getBatchFor(ActiveExecution e) {
 
         UIMExecution ae = (UIMExecution) e;
         Integer counter = executions.get(ae);

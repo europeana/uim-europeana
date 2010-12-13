@@ -3,7 +3,6 @@ package eu.europeana.uim.api;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 
@@ -24,6 +23,8 @@ public interface Orchestrator {
 
     ActiveExecution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor);
 
+    java.util.Collection<ActiveExecution> getActiveExecutions();
+
     boolean allDataProcessed(ActiveExecution e);
 
     /**
@@ -31,7 +32,7 @@ public interface Orchestrator {
      * @param e the Execution for which to retrieve the next batch of IDs
      * @return an array of MetaDataRecord IDs to process
      */
-    long[] getBatchFor(Execution e);
+    long[] getBatchFor(ActiveExecution e);
 
     /**
      * Gets the total number of items to be processed for this dataset

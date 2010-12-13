@@ -17,27 +17,33 @@
     </properties>
 
     <modules>
-    	<!--  a version indipendent common module -->
+        <!--  a version independent common module -->
         <module>common</module>
-        
-    	<!--  the uim api module -->
+
+        <!--  the uim api module -->
         <module>api</module>
 
-    	<!--  the uim standard implementation module -->
+        <!--  the uim standard implementation module -->
         <module>plugins/basic</module>
 
-    	<!--  the uim standard file import module -->
+        <!--  the uim standard file import module -->
         <module>plugins/fileimp</module>
-        
+
         <!--  the uim standard in memory storage implementation -->
         <module>storage/memory</module>
 
-    	<!--  the uim integration test module -->
+        <!-- a dummy plugin for testing -->
+        <module>plugins/dummy</module>
+
+        <!-- a dummy workflow for testing -->
+        <module>workflows/dummy</module>
+
+        <!--  the uim integration test module -->
         <module>plugins/integration</module>
 
+        <!-- webconsole-based GUI -->
+        <module>gui/uim-webconsole-extension</module>
 
-        <!--		<module>plugins/dummy</module>-->
-        <!--		<module>webapp/webconsole</module>-->
     </modules>
 
     <build>
@@ -73,9 +79,16 @@
 
     <!-- Shared dependencies -->
     <dependencies>
-        <!-- Spring for wiring unit tests -->
+
         <dependency>
-            <groupId>org.springframework</groupId>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+            <!-- Spring for wiring unit tests -->
+        <dependency>
+        <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <scope>test</scope>
         </dependency>
@@ -114,6 +127,18 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- OSGi spec -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>4.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>4.2.0</version>
+            </dependency>
+
             <!-- Felix core -->
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -135,6 +160,14 @@
                 <artifactId>org.apache.karaf.shell.console</artifactId>
                 <version>${karaf.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- Servlet, for webconsole extension -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <scope>provided</scope>
+                <version>2.5</version>
             </dependency>
 
             <!-- Spring for wiring unit tests -->

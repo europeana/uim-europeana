@@ -21,7 +21,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Import-Package>*</Import-Package>
+						<Import-Package>java.util.logging; provider=paxlogging,*</Import-Package>
 						<Export-Package>eu.europeana.uim</Export-Package>
 					</instructions>
 				</configuration>

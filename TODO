@@ -1,3 +1,6 @@
+- make the dummy plugin work (it does not install)
+
+
 design:
 
 - Execution & ActiveExecution: perhaps extend Execution instead and add a state enum to it?

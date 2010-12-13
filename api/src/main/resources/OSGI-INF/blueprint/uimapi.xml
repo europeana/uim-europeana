@@ -42,4 +42,14 @@
 			</shell:action>
 		</shell:command>
 	</shell:command-bundle>
+
+    <shell:command-bundle>
+        <shell:command name="uim/orchestrator">
+            <shell:action class="eu.europeana.uim.command.UIMOrchestratorCommand">
+                <shell:argument ref="uimRegistry" />
+                <shell:argument ref="orchestrator" />
+            </shell:action>
+        </shell:command>
+    </shell:command-bundle>
+
 </blueprint>
