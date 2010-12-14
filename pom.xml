@@ -80,12 +80,12 @@
     <!-- Shared dependencies -->
     <dependencies>
 
-        <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-api</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-
+<!--        <dependency>-->
+<!--            <groupId>org.ops4j.pax.logging</groupId>-->
+<!--            <artifactId>pax-logging-api</artifactId>-->
+<!--            <version>1.5.3</version>-->
+<!--        </dependency>-->
+<!---->
             <!-- Spring for wiring unit tests -->
         <dependency>
         <groupId>org.springframework</groupId>

@@ -28,6 +28,7 @@ public interface StorageEngine {
 	public Map<String, String> getConfiguration();
 	
 	public void initialize();
+	public void shutdown();
 	
 	public EngineStatus getStatus();
 	public long size();

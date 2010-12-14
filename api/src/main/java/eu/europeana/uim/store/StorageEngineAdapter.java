@@ -20,6 +20,10 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	public void initialize() {
 	}
 
+	@Override
+	public void shutdown() {
+	}
+
 
 	@Override
 	public void setConfiguration(Map<String, String> config) {

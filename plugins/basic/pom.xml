@@ -21,7 +21,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Import-Package>java.util.logging; provider=paxlogging,*</Import-Package>
+						<Import-Package>*</Import-Package>
 						<Export-Package>eu.europeana.uim</Export-Package>
 					</instructions>
 				</configuration>
@@ -92,7 +92,7 @@
 		<dependency>
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-uim-common</artifactId>
-			<version>${project.version}</version>
+			<version>1.0.1-SNAPSHOT</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
