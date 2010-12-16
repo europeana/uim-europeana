@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>eu.europeana</groupId>
-    <artifactId>uim-webconsole-extension</artifactId>
+    <artifactId>europeana-uim-webconsole-extension</artifactId>
     <name>Unified Ingestion Manager: Webconsole extension</name>
     <packaging>bundle</packaging>
 

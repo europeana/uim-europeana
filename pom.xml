@@ -44,6 +44,9 @@
         <!-- webconsole-based GUI -->
         <module>gui/uim-webconsole-extension</module>
 
+        <!-- GWT-based GUI -->
+        <module>gui/uim-gui-gwt</module>
+
     </modules>
 
     <build>
@@ -86,7 +89,7 @@
 <!--            <version>1.5.3</version>-->
 <!--        </dependency>-->
 <!---->
-            <!-- Spring for wiring unit tests -->
+        <!-- Spring for wiring unit tests -->
         <dependency>
         <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -127,6 +130,7 @@
 
     <dependencyManagement>
         <dependencies>
+            
             <!-- OSGi spec -->
             <dependency>
                 <groupId>org.osgi</groupId>

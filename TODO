@@ -1,7 +1,33 @@
-- make the dummy plugin work (it does not install)
+functionality:
+==============
+
+- GUI:
+  - GWT module integration
+    - integrate compiled javasource code via extension point (servlet)
+      - wrapper for OSGi services through GWT RPC servlets
+
+- orchestrator:
+  - workflow bundles
+  - command interface orchestrator:
+    - pause
+    - cancel
+    - show status
+
+- storage: MangoDB-based implementation
+
+- core plugins:
+  - meta data mapping / conversion
+  - URL checker
+  - thumbnail downloader
+  - ...
+
+- GUI:
+  - OsgiManager in Apache Karaf / webconsole
+  - GWT integration in Karaf Webconsole
 
 
 design:
+=======
 
 - Execution & ActiveExecution: perhaps extend Execution instead and add a state enum to it?
   semantically, there is a difference between both of them, and from a functional perspective it would be good to be able
@@ -16,27 +42,13 @@ design:
 - rollback of an execution / request
   - for now, do not do a rollback, but do a clean
 
-functionality:
-- orchestrator:
-  - workflow bundles
-  - command interface for the orchestrator
-
-- storage: MangoDB-based implementation
-
-- core plugins:
-  - meta data mapping / conversion
-  - URL checker
-  - thumbnail downloader
-  - ...
-
-- GUI:
-  - OsgiManager in Apache Karaf / webconsole
-  - GWT integration in Karaf Webconsole
 
 configuration:
+==============
 - clean up dependencies, probably we have duplicated declarations (mvn dependency:analyze)
 
 testing:
+========
 - unit test for ProcessingContainer / parallel execution
 - unit tests for the orchestration components (WorfklowProcessor, UIMOrchestrator, StepProcessor)
 - write more integration tests now that we have them working

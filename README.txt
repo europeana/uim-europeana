@@ -21,7 +21,7 @@ Path                              Name                                          
 /plugins/basic                    Unified Ingestion Manager: API Basic Implementation      The basic/default implementation of the API
 
 /gui/uim-webconsole-extension     Unified Ingestion Manager: Webconsole extension          UIM GUI extension for the Karaf Webconsole
-
+/gui/uim-gui-gwt                  Unified Ingestion Manager: GWT User Interface            UIM GWT frontend
 /storage/memory                   Unified Ingestion Manager: Storage Backend Memory        In-memory implementation of the storage engine
 
 /plugins/fileimp                  Unified Ingestion Manager: Import from File              Bundle to import data from a XML file
@@ -50,8 +50,9 @@ Path                              Name                                          
 
 5) Set-up dependencies in Karaf:
    - install necessary dependencies
-   - spring feature
+   - install necessary features:
      - features:install spring
+     - features:install war
 
 6) Configure UIM Feature
    - features:addurl file://<project-path>/etc/uim-features.xml
