@@ -75,6 +75,15 @@ public class UIMOrchestrator implements Orchestrator {
     }
 
     @Override
+    public void pause(ActiveExecution execution) {
+        throw new RuntimeException("No can do");
+    }
+
+    @Override
+    public void cancel(ActiveExecution execution) {
+        throw new RuntimeException("No can do");
+    }
+
     public boolean allDataProcessed(ActiveExecution e) {
         return executions.get(e) == getTotal(e);
     }

@@ -25,7 +25,9 @@ public interface Orchestrator {
 
     java.util.Collection<ActiveExecution> getActiveExecutions();
 
-    boolean allDataProcessed(ActiveExecution e);
+    void pause(ActiveExecution execution);
+
+    void cancel(ActiveExecution execution);
 
     /**
      * Gets the next batch of MetaDataRecord IDs for a given Execution

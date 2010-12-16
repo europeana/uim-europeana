@@ -81,10 +81,16 @@ public class UIMOrchestratorCommand implements Action {
             case start:
                 start(out);
                 break;
-
+            case pause:
+                out.println("Master, this is not implemented yet.");
+                break;
+            case cancel:
+                out.println("Master, this is not implemented yet.");
+                break;
+            case status:
+                out.println("Master, this is not implemented yet.");
             default:
-                out.println("I am truly sorry but this doesn't work.");
-
+                out.println("Master, I am truly sorry but this doesn't work.");
         }
 
         return null;
