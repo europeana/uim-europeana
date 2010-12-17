@@ -133,6 +133,20 @@ public class UIMRegistry implements Registry {
 			}
 		}
 
+        builder.append("\nRegistered workflows:");
+        builder.append("\n--------------------------------------");
+        if (plugins.isEmpty()) {
+            builder.append("\n\tNo workflows. ");
+        } else {
+            for (Workflow worfklow : workflows) {
+                if (builder.length() > 0) {
+                    builder.append("\n\tWorkflow:");
+                }
+                builder.append(worfklow.getName() + ": [" + worfklow.getDescription() + "]");
+            }
+        }
+
+
 		builder.append("\nRegistered storage:");
 		builder.append("\n--------------------------------------");
 		if (storages.isEmpty()) {

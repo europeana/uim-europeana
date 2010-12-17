@@ -33,6 +33,34 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Pax Web provides an (extended) implementation of the OSGI HttpService and it comes by default with Karaf -->
+        <dependency>
+            <groupId>org.ops4j.pax.web</groupId>
+            <artifactId>pax-web-api</artifactId>
+            <!-- Be dead sure this is the same freaking version as the one coming with Karaf or you will
+                 hear yourself curse a lot -->
+            <version>0.7.3</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -109,13 +137,20 @@
                     </supportedProjectTypes>
                     <instructions>
                         <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+                        <Bundle-Activator>eu.europeana.uim.gui.gwt.server.RemoteServiceDependenciesActivator</Bundle-Activator>
                         <Embed-Directory>WEB-INF/lib</Embed-Directory>
-                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Dependency>
+                            *;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
-                        <Import-Package>*;resolution:=optional</Import-Package>
+                        <Import-Package>
+                            *;resolution:=optional,
+                            javax.servlet,
+                            javax.servlet.http
+                        </Import-Package>
+
                         <!-- OSGi spec config option -->
                         <Web-ContextPath>gui</Web-ContextPath>
-                        <!-- Pax Runner knows this option -->
+                        <!-- Pax Web Extender knows this option -->
                         <Webapp-Context>gui</Webapp-Context>
                     </instructions>
                 </configuration>
