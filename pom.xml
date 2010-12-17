@@ -18,7 +18,7 @@
 
     <modules>
         <!--  a version independent common module -->
-        <module>common</module>
+        <!-- module>common</module -->
 
         <!--  the uim api module -->
         <module>api</module>
@@ -42,10 +42,10 @@
         <module>plugins/integration</module>
 
         <!-- webconsole-based GUI -->
-        <module>gui/uim-webconsole-extension</module>
+        <!-- module>gui/uim-webconsole-extension</module -->
 
         <!-- GWT-based GUI -->
-        <module>gui/uim-gui-gwt</module>
+        <!-- module>gui/uim-gui-gwt</module -->
 
     </modules>
 
@@ -60,7 +60,15 @@
                     <source>1.6</source>
                 </configuration>
             </plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<tagBase>https://europeanalabs.eu/svn/europeana/releases</tagBase>
+				</configuration>
+			</plugin>
+			
             <!-- generate dependencies versions -->
             <!-- this is required for the integration tests to work without explicitely specifying versions -->
             <!-- see http://wiki.ops4j.org/display/paxexam/Pax+Exam+-+Tutorial+1 -->
@@ -82,13 +90,6 @@
 
     <!-- Shared dependencies -->
     <dependencies>
-
-<!--        <dependency>-->
-<!--            <groupId>org.ops4j.pax.logging</groupId>-->
-<!--            <artifactId>pax-logging-api</artifactId>-->
-<!--            <version>1.5.3</version>-->
-<!--        </dependency>-->
-<!---->
         <!-- Spring for wiring unit tests -->
         <dependency>
         <groupId>org.springframework</groupId>
@@ -265,4 +266,11 @@
             </plugin>
         </plugins>
     </reporting>
+    
+    
+        
+	<scm>
+	    <connection>scm:svn:https://europeanalabs.eu/svn/europeana/trunk/uim/</connection>
+	    <developerConnection>scm:svn:https://europeanalabs.eu/svn/europeana/trunk/uim/</developerConnection>
+	</scm>	
 </project>

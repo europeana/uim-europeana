@@ -1,11 +1,11 @@
 package eu.europeana.uim;
 
-public class FieldRegistry {
+public class MDRFieldRegistry {
 
-	public static final Field<FieldRegistry, String> title = Field.register(FieldRegistry.class, "title", String.class);
+	public static final TKey<MDRFieldRegistry, String> title = TKey.register(MDRFieldRegistry.class, "title", String.class);
 	
-	public static final Field<FieldRegistry, String> rawformat = Field.register(FieldRegistry.class, "rawformat", String.class);
-	public static final Field<FieldRegistry, String> rawrecord = Field.register(FieldRegistry.class, "rawrecord", String.class);
+	public static final TKey<MDRFieldRegistry, String> rawformat = TKey.register(MDRFieldRegistry.class, "rawformat", String.class);
+	public static final TKey<MDRFieldRegistry, String> rawrecord = TKey.register(MDRFieldRegistry.class, "rawrecord", String.class);
 
 	/*  Uri object
 

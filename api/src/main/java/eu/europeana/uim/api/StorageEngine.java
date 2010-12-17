@@ -3,7 +3,7 @@ package eu.europeana.uim.api;
 import java.util.List;
 import java.util.Map;
 
-import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
@@ -50,14 +50,14 @@ public interface StorageEngine {
 	void updateRequest(Request request) throws StorageEngineException;
 	List<Request> getRequests(Collection collection);
 
-	MetaDataRecord<FieldRegistry> createMetaDataRecord(Request request);
-	void updateMetaDataRecord(MetaDataRecord<FieldRegistry> record) throws StorageEngineException;
+	MetaDataRecord<MDRFieldRegistry> createMetaDataRecord(Request request);
+	void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) throws StorageEngineException;
 	
 	Execution createExecution();
 	void updateExecution(Execution execution) throws StorageEngineException;
 	List<Execution> getExecutions();
 
-	MetaDataRecord<FieldRegistry>[] getMetaDataRecords(long...ids);
+	MetaDataRecord<MDRFieldRegistry>[] getMetaDataRecords(long...ids);
 	
 
 	long[] getByRequest(Request request);

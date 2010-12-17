@@ -1,5 +1,8 @@
 package eu.europeana.uim.orchestration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.UIMError;
 import eu.europeana.uim.api.ActiveExecution;
@@ -14,17 +17,11 @@ import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimEntity;
 import eu.europeana.uim.workflow.WorkflowProcessorProvider;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
 /**
  * Orchestrates the ingestion job execution. The orchestrator keeps a map of WorkflowProcessors, one for each different workflow.
  * When a new request for workflow execution comes in, the WorkflowProcessor for the Workflow is retrieved, or created if it does not exist.
  */
 public class UIMOrchestrator implements Orchestrator {
-
-    private static Logger log = Logger.getLogger(UIMOrchestrator.class.getName());
 
     public static final int BATCH_SIZE = 100;
 

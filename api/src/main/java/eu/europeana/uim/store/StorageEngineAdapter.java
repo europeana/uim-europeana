@@ -3,7 +3,7 @@ package eu.europeana.uim.store;
 import java.util.List;
 import java.util.Map;
 
-import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -125,13 +125,13 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	}
 
 	@Override
-	public MetaDataRecord<FieldRegistry> createMetaDataRecord(Request request) {
+	public MetaDataRecord<MDRFieldRegistry> createMetaDataRecord(Request request) {
 		
 		return null;
 	}
 
 	@Override
-	public void updateMetaDataRecord(MetaDataRecord<FieldRegistry> record)
+	public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record)
 			throws StorageEngineException {
 		
 
@@ -157,7 +157,7 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	}
 
 	@Override
-	public MetaDataRecord<FieldRegistry>[] getMetaDataRecords(long... ids) {
+	public MetaDataRecord<MDRFieldRegistry>[] getMetaDataRecords(long... ids) {
 		
 		return null;
 	}

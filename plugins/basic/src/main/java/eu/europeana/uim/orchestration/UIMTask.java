@@ -1,6 +1,6 @@
 package eu.europeana.uim.orchestration;
 
-import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
@@ -18,7 +18,7 @@ import eu.europeana.uim.api.WorkflowStep;
  */
 public class UIMTask implements Task {
 
-    private final MetaDataRecord<FieldRegistry> mdr;
+    private final MetaDataRecord<MDRFieldRegistry> mdr;
 
     // mutable fields - a task "wanders" through the workflow, i.e. through a chain of StepProcessor-s
     private StepProcessor processor;
@@ -26,7 +26,7 @@ public class UIMTask implements Task {
     private TaskStatus status;
 
 
-    public UIMTask(MetaDataRecord<FieldRegistry> mdr, StepProcessor processor, WorkflowStep step) {
+    public UIMTask(MetaDataRecord<MDRFieldRegistry> mdr, StepProcessor processor, WorkflowStep step) {
         this.mdr = mdr;
         this.processor = processor;
         this.step = step;

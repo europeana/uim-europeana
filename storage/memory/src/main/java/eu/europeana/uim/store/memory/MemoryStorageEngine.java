@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
-import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -96,10 +96,10 @@ public class MemoryStorageEngine implements StorageEngine {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public MetaDataRecord<FieldRegistry>[] getMetaDataRecords(long... ids) {
-		ArrayList<MetaDataRecord<FieldRegistry>> result = new ArrayList<MetaDataRecord<FieldRegistry>>(ids.length);
+	public MetaDataRecord<MDRFieldRegistry>[] getMetaDataRecords(long... ids) {
+		ArrayList<MetaDataRecord<MDRFieldRegistry>> result = new ArrayList<MetaDataRecord<MDRFieldRegistry>>(ids.length);
 		for (long id : ids) {
-			result.add((MetaDataRecord<FieldRegistry>) metadatas.get(id));
+			result.add((MetaDataRecord<MDRFieldRegistry>) metadatas.get(id));
 		}
 		return result.toArray(new MetaDataRecord[result.size()]);
 	}
@@ -226,13 +226,13 @@ public class MemoryStorageEngine implements StorageEngine {
 	
 
 	@Override
-	public MetaDataRecord<FieldRegistry> createMetaDataRecord(Request request) {
-		MetaDataRecord<FieldRegistry> mdr = new MetaDataRecord<FieldRegistry>(mdrId.getAndIncrement());
+	public MetaDataRecord<MDRFieldRegistry> createMetaDataRecord(Request request) {
+		MetaDataRecord<MDRFieldRegistry> mdr = new MetaDataRecord<MDRFieldRegistry>(mdrId.getAndIncrement());
 		mdr.setRequest(request);
 		return mdr;
 	}
 	@Override
-	public void updateMetaDataRecord(MetaDataRecord<FieldRegistry> record) {
+	public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) {
 		metadatas.put(record.getId(), record);
 		metarequest.put(record.getId(), record.getRequest().getId());
 	}

@@ -1,7 +1,7 @@
 package eu.europeana.uim.plugin.dummy;
 
-import eu.europeana.uim.Field;
-import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.TKey;
+import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.IngestionPlugin;
 
@@ -27,21 +27,21 @@ public class DummyPlugin implements IngestionPlugin {
 
 
 	@Override
-	public Field<FieldRegistry, ?>[] getInputParameters() {
+	public TKey<MDRFieldRegistry, ?>[] getInputParameters() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
 	@Override
-	public Field<FieldRegistry, ?>[] getOutputParameters() {
+	public TKey<MDRFieldRegistry, ?>[] getOutputParameters() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
 	@Override
-	public Field<FieldRegistry, ?>[] getTransientParameters() {
+	public TKey<MDRFieldRegistry, ?>[] getTransientParameters() {
 		// TODO Auto-generated method stub
 		return null;
 	}

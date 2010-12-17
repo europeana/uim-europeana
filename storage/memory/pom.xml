@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>europeana-uim-storage-memory</artifactId>
-	<name>Unified Ingestion Manager: Storage Backend Memory</name>
+	<name>Unified Ingestion Manager: API Memory Only Storage</name>
 	<packaging>bundle</packaging>
 
 	<build>
@@ -34,12 +34,6 @@
 	</build>
 
 	<dependencies>
-        <dependency>
-            <groupId>eu.europeana</groupId>
-            <artifactId>europeana-uim-common</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
-        </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>europeana-uim-api</artifactId>

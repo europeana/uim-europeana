@@ -1,6 +1,6 @@
 package eu.europeana.uim.orchestration;
 
-import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Registry;
@@ -227,7 +227,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
     }
 
     @Override
-    public MetaDataRecord<FieldRegistry> getMetaDataRecord(long id) {
+    public MetaDataRecord<MDRFieldRegistry> getMetaDataRecord(long id) {
         if (registry.getStorage() == null) {
             throw new RuntimeException("No storage module active");
         }
@@ -235,7 +235,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
     }
 
     @Override
-    public void updateMetaDataRecord(MetaDataRecord<FieldRegistry> mdr) throws StorageEngineException {
+    public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> mdr) throws StorageEngineException {
         if (registry.getStorage() == null) {
             throw new RuntimeException("No storage module active");
         }

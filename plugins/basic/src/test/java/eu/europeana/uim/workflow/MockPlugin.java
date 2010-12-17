@@ -1,7 +1,7 @@
 package eu.europeana.uim.workflow;
 
-import eu.europeana.uim.Field;
-import eu.europeana.uim.FieldRegistry;
+import eu.europeana.uim.TKey;
+import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.IngestionPlugin;
 
@@ -10,8 +10,8 @@ import eu.europeana.uim.api.IngestionPlugin;
  */
 public class MockPlugin implements IngestionPlugin {
 
-    public static final Field<FieldRegistry, String> inputField = Field.register(FieldRegistry.class, "inputField", String.class);
-    public static final Field<FieldRegistry, String> outputField = Field.register(FieldRegistry.class, "outputField", String.class);
+    public static final TKey<MDRFieldRegistry, String> inputField = TKey.register(MDRFieldRegistry.class, "inputField", String.class);
+    public static final TKey<MDRFieldRegistry, String> outputField = TKey.register(MDRFieldRegistry.class, "outputField", String.class);
 
     private String id;
 
@@ -31,17 +31,17 @@ public class MockPlugin implements IngestionPlugin {
     }
 
     @Override
-    public Field<FieldRegistry, ?>[] getInputParameters() {
-        return new Field[] { inputField };
+    public TKey<MDRFieldRegistry, ?>[] getInputParameters() {
+        return new TKey[] { inputField };
     }
 
     @Override
-    public Field<FieldRegistry, ?>[] getOutputParameters() {
-        return new Field[] { outputField };
+    public TKey<MDRFieldRegistry, ?>[] getOutputParameters() {
+        return new TKey[] { outputField };
     }
 
     @Override
-    public Field<FieldRegistry, ?>[] getTransientParameters() {
+    public TKey<MDRFieldRegistry, ?>[] getTransientParameters() {
         return null;
     }
 

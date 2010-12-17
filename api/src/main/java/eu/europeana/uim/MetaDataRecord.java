@@ -17,8 +17,8 @@ import java.util.Map;
  */
 public class MetaDataRecord<N> implements UimEntity {
 
-	private HashMap<Field<N,?>, Object> fields = new HashMap<Field<N,?>, Object>();
-	private HashMap<Field<N,?>, Map<String, Object>> qFields = new HashMap<Field<N,?>, Map<String, Object>>();
+	private HashMap<TKey<N,?>, Object> fields = new HashMap<TKey<N,?>, Object>();
+	private HashMap<TKey<N,?>, Map<String, Object>> qFields = new HashMap<TKey<N,?>, Map<String, Object>>();
 
     private long id;
     private Request request;
@@ -56,7 +56,7 @@ public class MetaDataRecord<N> implements UimEntity {
 	 * @param key
 	 * @param value
 	 */
-	public <T extends Serializable> void setField(Field<N, T> key, T value){
+	public <T extends Serializable> void setField(TKey<N, T> key, T value){
 		if (!fields.containsKey(key)) {
 			fields.put(key, value);
 		} else {
@@ -69,7 +69,7 @@ public class MetaDataRecord<N> implements UimEntity {
 	 * @param key
 	 * @param value
 	 */
-	public <T extends Serializable> void setQField(Field<N, T> key, String qualifier, T value){
+	public <T extends Serializable> void setQField(TKey<N, T> key, String qualifier, T value){
 		if (!qFields.containsKey(key)) {
 			qFields.put(key, new HashMap<String, Object>());
 		}
@@ -82,7 +82,7 @@ public class MetaDataRecord<N> implements UimEntity {
 	 * @param value
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> void addField(Field<N, ArrayList<T>> key, T value){
+	public <T> void addField(TKey<N, ArrayList<T>> key, T value){
 		if (!fields.containsKey(key)) {
 			fields.put(key, new ArrayList<T>());
 		}
@@ -95,7 +95,7 @@ public class MetaDataRecord<N> implements UimEntity {
 	 * @param value
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> void addQField(Field<N, ArrayList<T>> key, String qualifier, T value){
+	public <T> void addQField(TKey<N, ArrayList<T>> key, String qualifier, T value){
 		if (!qFields.containsKey(key)) {
 			qFields.put(key, new HashMap<String, Object>());
 		}
