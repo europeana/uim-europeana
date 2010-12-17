@@ -4,7 +4,7 @@
 
     <artifactId>europeana-uim</artifactId>
     <groupId>eu.europeana</groupId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Unified Ingestion Manager</name>
 
@@ -227,13 +227,6 @@
 
         </dependencies>
     </dependencyManagement>
-
-    <repositories>
-        <repository>
-            <id>TEL</id>
-            <url>http://europeanalabs.eu/svn/theeuropeanlibrary/dependencies/maven/repository/</url>
-        </repository>
-    </repositories>
 
     <reporting>
         <plugins>
