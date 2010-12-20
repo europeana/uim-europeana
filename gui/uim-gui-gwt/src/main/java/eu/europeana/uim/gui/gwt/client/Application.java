@@ -4,8 +4,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
@@ -26,8 +26,12 @@ public class Application implements EntryPoint {
      */
     public void onModuleLoad() {
         TabLayoutPanel tabs = new TabLayoutPanel(1.5, Style.Unit.EM);
-        LayoutPanel overview = new LayoutPanel();
-        LayoutPanel executions = new LayoutPanel();
+        tabs.setHeight("500px");
+
+        FlowPanel overview = new FlowPanel();
+        FlowPanel executions = new FlowPanel();
+        overview.setHeight("500px");
+        executions.setHeight("500px");
 
         tabs.add(overview, "Overview");
         tabs.add(executions, "Executions");
@@ -38,12 +42,12 @@ public class Application implements EntryPoint {
 
     }
 
-    private void buildOverview(LayoutPanel overview) {
+    private void buildOverview(FlowPanel overview) {
         HTML welcome = new HTML("Welcome to the Matrix");
         overview.add(welcome);
     }
 
-    private void buildExecutions(LayoutPanel executions) {
+    private void buildExecutions(FlowPanel executions) {
 
         // pick a workflow
         final ListBox workflowList = new ListBox(false);
