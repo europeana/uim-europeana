@@ -7,7 +7,7 @@
     <parent>
         <groupId>eu.europeana</groupId>
         <artifactId>europeana-uim</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>europeana-uim-gui-gwt</artifactId>
@@ -84,12 +84,21 @@
                         </goals>
                     </execution>
                 </executions>
-                <!-- Plugin configuration. There are many available options, see gwt-maven-plugin
-             documentation at codehaus.org -->
                 <configuration>
                     <runTarget>Application.html</runTarget>
                     <hostedWebapp>${webappDirectory}</hostedWebapp>
                     <i18nMessagesBundle>eu.europeana.uim.gui.gwt.client.Messages</i18nMessagesBundle>
+
+                    <!-- Additional configuration to be able to run the development mode against the webapp
+                         deployed on the OSGI platform -->
+                    <port>8181</port>
+                    <noServer>true</noServer>
+                    <runTarget>gui/Application.html</runTarget>
+                    <!-- custom argument to tell the AbstractOSGIRemoteServiceServlet that it can trust
+                         this environment -->
+                    <!-- note the whitespace, I suppose this is due to the maven-gwt-plugin already providing some
+                    additional VM arguments -->
+                    <extraJvmArgs> -Ddevmode=true</extraJvmArgs>
                 </configuration>
             </plugin>
 
@@ -137,10 +146,11 @@
                     </supportedProjectTypes>
                     <instructions>
                         <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
-                        <Bundle-Activator>eu.europeana.uim.gui.gwt.server.RemoteServiceDependenciesActivator</Bundle-Activator>
+                        <Bundle-Activator>eu.europeana.uim.gui.gwt.server.UIMDependenciesActivator</Bundle-Activator>
                         <Embed-Directory>WEB-INF/lib</Embed-Directory>
                         <Embed-Dependency>
-                            *;scope=compile|runtime</Embed-Dependency>
+                            *;scope=compile|runtime
+                        </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Import-Package>
                             *;resolution:=optional,
@@ -156,7 +166,72 @@
                 </configuration>
             </plugin>
 
+
+            <plugin>
+                <groupId>org.ops4j</groupId>
+                <artifactId>maven-pax-plugin</artifactId>
+                <configuration>
+                    <provision>
+                        <param>--platform=felix</param>
+                        <param>--profiles=compendium,web,war,gogo,blueprint</param>
+                    </provision>
+                    <deployPoms>
+                        ${project.basedir}/../../common/pom.xml,
+                        ${project.basedir}/../../api/pom.xml,
+                        ${project.basedir}/../../plugins/basic/pom.xml,
+                        ${project.basedir}/../../plugins/dummy/pom.xml,
+                        ${project.basedir}/../../storage/memory/pom.xml,
+                        ${project.basedir}/../../workflows/dummy/pom.xml
+                    </deployPoms>
+                </configuration>
+                <!--
+
+                -->
+                
+
+            </plugin>
+
+
+            <!-- convenience mechanism that allows to load features via maven using
+                 'features:addurl mvn:eu.europeana/europeana-uim/1.1.0-SNAPSHOT/xml/features'
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>etc/uim-features.xml</file>
+                                    <type>xml</type>
+                                    <classifier>features</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+             -->
+            
+
         </plugins>
+
     </build>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>ops4j.releases</id>
+            <url>http://repository.ops4j.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

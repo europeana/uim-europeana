@@ -3,8 +3,11 @@ functionality:
 
 - GUI:
   - GWT module integration
-    - integrate compiled javasource code via extension point (servlet)
-      - wrapper for OSGi services through GWT RPC servlets
+    - JVM arg to tell that we run in dev mode and that it is safe to disregard security check
+    - configure pax runner to run the stack via mvn pax:run
+    - make sure development mode works well via mvn gwt:run
+
+
 
 - orchestrator:
   - workflow bundles

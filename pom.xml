@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>europeana-uim</artifactId>
@@ -17,7 +18,7 @@
 
     <modules>
         <!--  a version independent common module -->
-        <!-- module>common</module -->
+        <module>common</module>
 
         <!--  the uim api module -->
         <module>api</module>
@@ -41,10 +42,10 @@
         <module>plugins/integration</module>
 
         <!-- webconsole-based GUI -->
-        <!-- module>gui/uim-webconsole-extension</module -->
+        <module>gui/uim-webconsole-extension</module>
 
         <!-- GWT-based GUI -->
-        <!-- module>gui/uim-gui-gwt</module -->
+        <module>gui/uim-gui-gwt</module>
 
     </modules>
 
@@ -59,15 +60,15 @@
                     <source>1.6</source>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<tagBase>https://europeanalabs.eu/svn/europeana/releases</tagBase>
-				</configuration>
-			</plugin>
-			
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <tagBase>https://europeanalabs.eu/svn/europeana/releases</tagBase>
+                </configuration>
+            </plugin>
+
             <!-- generate dependencies versions -->
             <!-- this is required for the integration tests to work without explicitely specifying versions -->
             <!-- see http://wiki.ops4j.org/display/paxexam/Pax+Exam+-+Tutorial+1 -->
@@ -91,7 +92,7 @@
     <dependencies>
         <!-- Spring for wiring unit tests -->
         <dependency>
-        <groupId>org.springframework</groupId>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <scope>test</scope>
         </dependency>
@@ -130,7 +131,7 @@
 
     <dependencyManagement>
         <dependencies>
-            
+
             <!-- OSGi spec -->
             <dependency>
                 <groupId>org.osgi</groupId>
@@ -217,6 +218,7 @@
                 <version>1.6.5</version>
             </dependency>
 
+
             <!-- TODO what is this? -->
             <dependency>
                 <groupId>junit</groupId>
@@ -258,11 +260,10 @@
             </plugin>
         </plugins>
     </reporting>
-    
-    
-        
-	<scm>
-	    <connection>scm:svn:https://europeanalabs.eu/svn/europeana/trunk/uim/</connection>
-	    <developerConnection>scm:svn:https://europeanalabs.eu/svn/europeana/trunk/uim/</developerConnection>
-	</scm>	
+
+
+    <scm>
+        <connection>scm:svn:https://europeanalabs.eu/svn/europeana/trunk/uim/</connection>
+        <developerConnection>scm:svn:https://europeanalabs.eu/svn/europeana/trunk/uim/</developerConnection>
+    </scm>
 </project>
