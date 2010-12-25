@@ -5,12 +5,12 @@
 
 <web-app>
     <servlet>
-        <servlet-name>eu.europeana.uim.gui.gwt.Application WorkflowService</servlet-name>
-        <servlet-class>eu.europeana.uim.gui.gwt.server.WorkflowServiceImpl</servlet-class>
+        <servlet-name>eu.europeana.uim.gui.gwt.Application OrchestrationService</servlet-name>
+        <servlet-class>eu.europeana.uim.gui.gwt.server.OrchestrationServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>eu.europeana.uim.gui.gwt.Application WorkflowService</servlet-name>
-        <url-pattern>/Application/workflow</url-pattern>
+        <servlet-name>eu.europeana.uim.gui.gwt.Application OrchestrationService</servlet-name>
+        <url-pattern>/Application/orchestrator</url-pattern>
     </servlet-mapping>
 
     <!-- Default page to serve -->

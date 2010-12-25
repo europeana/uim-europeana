@@ -31,9 +31,19 @@ public class UIMRegistry implements Registry {
     }
 
     @Override
-    public Workflow getWorfklow(String identifier) {
+    public Workflow getWorkflow(String identifier) {
         for(Workflow w : workflows) {
             if(w.getName().equals(identifier)) {
+                return w;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Workflow getWorkflow(Long id) {
+        for(Workflow w : workflows) {
+            if(w.getId().equals(id)) {
                 return w;
             }
         }

@@ -1,13 +1,29 @@
+in progress
+===========
+- Status model for GWT GUI to track status
+- additional functionality in Orchestration service to retrieve status based on Execution ID
+
 functionality:
 ==============
 
 - GUI:
   - GWT module integration
-    - JVM arg to tell that we run in dev mode and that it is safe to disregard security check
     - configure pax runner to run the stack via mvn pax:run
     - make sure development mode works well via mvn gwt:run
-
-
+  - New execution
+    - better labels / clearer steps
+    - "All" option for collections
+    - later: display total number of MDRs on collection selection
+    - when clicking start -> go back to overview
+  - Overview
+    - list of currently running executions
+      - overall status (number of MDRs processed vs. total number of MDRs)
+      - cancel execution button (with "are you sure" confirmation message)
+    - list of N (10?) past executions
+    - later: link to view with full history
+  - Execution detail view (refreshed every N seconds)
+    - steps / plugins (later: on click, detail of plugin)
+    - tasks in queue per step
 
 - orchestrator:
   - workflow bundles

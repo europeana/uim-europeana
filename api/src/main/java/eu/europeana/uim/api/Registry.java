@@ -22,7 +22,9 @@ public interface Registry {
 
     List<Workflow> getWorkflows();
 
-    Workflow getWorfklow(String identifier);
+    Workflow getWorkflow(String identifier);
+
+    Workflow getWorkflow(Long id);
 
     void removeWorkflow(Workflow workflow);
 

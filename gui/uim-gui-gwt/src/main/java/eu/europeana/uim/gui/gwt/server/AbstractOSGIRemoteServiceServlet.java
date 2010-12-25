@@ -31,4 +31,11 @@ public class AbstractOSGIRemoteServiceServlet extends RemoteServiceServlet {
         }
         super.checkPermutationStrongName();
     }
+
+    protected UIMEngine getEngine() {
+        if(engine == null) {
+            throw new RuntimeException("No engine found. Make sure the OSGi platform is running and all UIM modules are started");
+        }
+        return engine;
+    }
 }
