@@ -1,7 +1,7 @@
 in progress
 ===========
-- Status model for GWT GUI to track status
-- additional functionality in Orchestration service to retrieve status based on Execution ID
+- past executions in overview
+- make GUI more robust against backend failures
 
 functionality:
 ==============
@@ -12,9 +12,7 @@ functionality:
     - make sure development mode works well via mvn gwt:run
   - New execution
     - better labels / clearer steps
-    - "All" option for collections
     - later: display total number of MDRs on collection selection
-    - when clicking start -> go back to overview
   - Overview
     - list of currently running executions
       - overall status (number of MDRs processed vs. total number of MDRs)

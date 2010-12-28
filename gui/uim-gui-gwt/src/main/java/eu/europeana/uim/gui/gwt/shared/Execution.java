@@ -9,11 +9,14 @@ public class Execution implements IsSerializable {
 
     private Long id;
 
-    public Execution() {
-    }
+    private String name;
 
-    public Execution(Long id) {
-        this.id = id;
+    private Integer progress;
+
+    private Integer total;
+
+    public Execution() {
+
     }
 
     public Long getId() {
@@ -22,5 +25,33 @@ public class Execution implements IsSerializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Integer progress) {
+        this.progress = progress;
+    }
+
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+
+    public boolean isDone() {
+        return progress == total;
     }
 }

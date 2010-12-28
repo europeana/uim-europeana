@@ -27,6 +27,8 @@ public interface OrchestrationService extends RemoteService {
 
     Execution startProvider(Long workflow, Long provider);
 
+    Execution getExecution(Long id);
+
 
 
 }

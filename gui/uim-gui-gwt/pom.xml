@@ -32,6 +32,12 @@
             <version>2.1.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google</groupId>
+            <artifactId>gwt-incubator</artifactId>
+            <version>20101117-r1766</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>eu.europeana</groupId>
@@ -157,7 +163,7 @@
                         <Bundle-Activator>eu.europeana.uim.gui.gwt.server.UIMDependenciesActivator</Bundle-Activator>
                         <Embed-Directory>WEB-INF/lib</Embed-Directory>
                         <Embed-Dependency>
-                            *;scope=compile|runtime
+                            *;scope=compile|runtime|system
                         </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Import-Package>

@@ -1,8 +1,5 @@
 package eu.europeana.uim.orchestration;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.UIMError;
 import eu.europeana.uim.api.ActiveExecution;
@@ -16,6 +13,9 @@ import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimEntity;
 import eu.europeana.uim.workflow.WorkflowProcessorProvider;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Orchestrates the ingestion job execution. The orchestrator keeps a map of WorkflowProcessors, one for each different workflow.
@@ -31,7 +31,7 @@ public class UIMOrchestrator implements Orchestrator {
 
     private Map<Workflow, WorkflowProcessor> processors = new HashMap<Workflow, WorkflowProcessor>();
 
-    private Map<ActiveExecution, Integer> executions = new HashMap<ActiveExecution, Integer>();
+    private Map<ActiveExecution, Integer> executionTotals = new HashMap<ActiveExecution, Integer>();
 
 
     public UIMOrchestrator(Registry registry, WorkflowProcessorProvider processorProvider) {
@@ -68,7 +68,7 @@ public class UIMOrchestrator implements Orchestrator {
 
     @Override
     public java.util.Collection<ActiveExecution> getActiveExecutions() {
-        return executions.keySet();
+        return executionTotals.keySet();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class UIMOrchestrator implements Orchestrator {
     }
 
     public boolean allDataProcessed(ActiveExecution e) {
-        return executions.get(e) == getTotal(e);
+        return executionTotals.get(e) == getTotal(e);
     }
 
     /**
@@ -97,20 +97,20 @@ public class UIMOrchestrator implements Orchestrator {
             throw new UIMError("Execution " + e.getId() + " is already running");
         }
         UIMExecution activeExecution = new UIMExecution(e.getId(), dataset, monitor, w);
-        executions.put(activeExecution, 0);
+        executionTotals.put(activeExecution, 0);
 
         WorkflowProcessor wp = processors.get(w);
         if (wp == null) {
             wp = processorProvider.createProcessor(w, this, registry);
             processors.put(w, wp);
+            wp.start();
         }
         wp.addExecution(activeExecution);
-        wp.start();
         return activeExecution;
     }
 
     private boolean hasExecution(Execution e) {
-        for(Execution exec : executions.keySet()) {
+        for(Execution exec : executionTotals.keySet()) {
             if(exec.getId() == e.getId()) {
                 return true;
             }
@@ -123,7 +123,7 @@ public class UIMOrchestrator implements Orchestrator {
     public synchronized long[] getBatchFor(ActiveExecution e) {
 
         UIMExecution ae = (UIMExecution) e;
-        Integer counter = executions.get(ae);
+        Integer counter = executionTotals.get(ae);
         int total = getTotal(ae);
         long[] all;
         long[] result = new long[BATCH_SIZE];
@@ -142,12 +142,12 @@ public class UIMOrchestrator implements Orchestrator {
         int remaining = total - counter;
         if(remaining > BATCH_SIZE) {
             counter += BATCH_SIZE;
-            executions.put(e, counter);
+            executionTotals.put(e, counter);
             // TODO room for optimization
             System.arraycopy(all, counter.intValue(), result, 0, BATCH_SIZE);
         } else if(remaining < BATCH_SIZE && remaining > 0) {
             counter = total;
-            executions.put(e, counter);
+            executionTotals.put(e, counter);
             System.arraycopy(all, counter.intValue(), result, 0, remaining);
         } else if(remaining == 0) {
             return null;
@@ -171,6 +171,6 @@ public class UIMOrchestrator implements Orchestrator {
     }
 
     protected void notifyExecutionDone(ActiveExecution e) {
-        executions.remove(e);
+        executionTotals.remove(e);
     }
 }

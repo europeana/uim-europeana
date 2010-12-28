@@ -5,8 +5,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -15,13 +16,17 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.widgetideas.client.ProgressBar;
 import eu.europeana.uim.gui.gwt.shared.Collection;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 import eu.europeana.uim.gui.gwt.shared.Provider;
 import eu.europeana.uim.gui.gwt.shared.Workflow;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -35,6 +40,10 @@ public class Application implements EntryPoint {
     private final List<Execution> executions = new ArrayList<Execution>();
 
     private TabLayoutPanel tabs = null;
+
+    private VerticalPanel currentExecutionsPanel = null;
+
+    private Map<Long, ProgressBar> progressBars = new HashMap<Long, ProgressBar>();
 
     /**
      * This is the entry point method.
@@ -61,6 +70,10 @@ public class Application implements EntryPoint {
         HTML welcome = new HTML("Welcome to the Matrix");
         overview.add(welcome);
 
+        Label currentExecutionsLabel = new Label("Current executions");
+        overview.add(currentExecutionsLabel);
+        currentExecutionsPanel = new VerticalPanel();
+        overview.add(currentExecutionsPanel);
     }
 
     private void buildExecutionPanel(FlowPanel executionPanel) {
@@ -81,7 +94,7 @@ public class Application implements EntryPoint {
             @Override
             public void onSuccess(List<Workflow> workflows) {
                 for (Workflow w : workflows) {
-                    workflowList.addItem(w.getName());
+                    workflowList.addItem(w.getName(), w.getId().toString());
                 }
             }
         });
@@ -139,7 +152,7 @@ public class Application implements EntryPoint {
                     @Override
                     public void onSuccess(List<Collection> collections) {
                         collectionList.clear();
-                        if(collections.size() > 0) {
+                        if (collections.size() > 0) {
                             // "all" option
                             collectionList.addItem("All collections", ALL_COLLECTIONS);
                         }
@@ -152,10 +165,10 @@ public class Application implements EntryPoint {
             }
         });
 
-        start.addMouseDownHandler(new MouseDownHandler() {
+        start.addClickHandler(new ClickHandler() {
 
             @Override
-            public void onMouseDown(MouseDownEvent mouseDownEvent) {
+            public void onClick(ClickEvent clickEvent) {
                 String selectedWorkflow = workflowList.getValue(workflowList.getSelectedIndex());
                 Long workflowId = Long.parseLong(selectedWorkflow);
                 String selectedDataSource = collectionList.getValue(collectionList.getSelectedIndex());
@@ -171,7 +184,7 @@ public class Application implements EntryPoint {
 
                         @Override
                         public void onSuccess(Execution execution) {
-                            executions.add(execution);
+                            addExecution(execution);
                         }
                     });
                 } else {
@@ -200,6 +213,46 @@ public class Application implements EntryPoint {
                 workflowList.setSelectedIndex(0);
             }
         });
+    }
 
+    private void addExecution(final Execution execution) {
+        executions.add(execution);
+        final ProgressBar bar = new ProgressBar(0.0, execution.getTotal());
+        bar.setTitle(execution.getName());
+        currentExecutionsPanel.add(bar);
+        progressBars.put(execution.getId(), bar);
+
+        // poll the execution status every second
+        Timer t = new Timer() {
+            @Override
+            public void run() {
+                orchestrationService.getExecution(execution.getId(), new AsyncCallback<Execution>() {
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        // TODO panic
+                        throwable.printStackTrace();
+                    }
+
+                    @Override
+                    public void onSuccess(Execution execution) {
+                        bar.setProgress(execution.getProgress());
+                        if(execution.isDone()) {
+                            cancel();
+                            executionDone(execution);
+
+                        }
+                    }
+                });
+
+            }
+        };
+        t.scheduleRepeating(1000);
+    }
+
+    private void executionDone(Execution e) {
+        ProgressBar widget = progressBars.get(e.getId());
+        currentExecutionsPanel.remove(widget);
+
+        // TODO add to "past executions" panel
     }
 }

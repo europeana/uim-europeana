@@ -2,23 +2,39 @@ package eu.europeana.uim.gui.gwt.server;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import eu.europeana.uim.common.ProgressMonitor;
+import eu.europeana.uim.gui.gwt.shared.Execution;
 
 /**
+ * GWT implementation of a ProgressMonitor. Since we display things on the client and the monitor is on the server,
+ * we have to pass through an intermediary model (the Execution). We need to poll it from the client, this is why
+ * we update it here. (Once WebSockets are standard, we'll be able to use those).
+ *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class UIMProgressMonitor implements ProgressMonitor, IsSerializable {
+public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
 
     private String name;
     private int total;
     private int status;
     private boolean done;
     private boolean cancelled;
+    private Execution execution;
+
+    public GWTProgressMonitor() {
+    }
+
+    public GWTProgressMonitor(Execution execution) {
+        this.execution = execution;
+    }
 
     @Override
     public void beginTask(String task, int work) {
         this.name = task;
         this.total = work;
         this.status = 0;
+        execution.setProgress(0);
+        execution.setTotal(work);
+        execution.setName(task);
     }
 
     @Override
@@ -29,6 +45,7 @@ public class UIMProgressMonitor implements ProgressMonitor, IsSerializable {
         } else {
             this.status = status + work;
         }
+        execution.setProgress(status);
     }
 
     @Override
@@ -50,19 +67,11 @@ public class UIMProgressMonitor implements ProgressMonitor, IsSerializable {
         return cancelled;
     }
 
+    public void setExecution(Execution execution) {
+        this.execution = execution;
+    }
+
     public String getName() {
         return name;
-    }
-
-    public int getTotal() {
-        return total;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public boolean isDone() {
-        return done;
     }
 }

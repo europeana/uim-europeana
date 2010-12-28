@@ -69,9 +69,10 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
             throw new RuntimeException("Error: cannot find collection " + collection);
         }
         eu.europeana.uim.api.Workflow w = getWorkflow(workflow);
-        UIMProgressMonitor monitor = new UIMProgressMonitor();
+        Execution execution = new Execution();
+        GWTProgressMonitor monitor = new GWTProgressMonitor(execution);
         eu.europeana.uim.store.Execution e = getEngine().getOrchestrator().executeWorkflow(w, c, monitor);
-        Execution execution = new Execution(e.getId());
+        execution.setId(e.getId());
         progressMonitorMap.put(execution.getId(), monitor);
         wrappedExecutions.put(e.getId(), execution);
 
@@ -86,13 +87,19 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
             throw new RuntimeException("Error: cannot find provider " + provider);
         }
         eu.europeana.uim.api.Workflow w = getWorkflow(workflow);
-        UIMProgressMonitor monitor = new UIMProgressMonitor();
+        Execution execution = new Execution();
+        GWTProgressMonitor monitor = new GWTProgressMonitor(execution);
         eu.europeana.uim.store.Execution e = getEngine().getOrchestrator().executeWorkflow(w, p, monitor);
-        Execution execution = new Execution(e.getId());
+        execution.setId(e.getId());
         progressMonitorMap.put(execution.getId(), monitor);
         wrappedExecutions.put(e.getId(), execution);
 
         return execution;
+    }
+
+    @Override
+    public Execution getExecution(Long id) {
+        return wrappedExecutions.get(id);
     }
 
     private eu.europeana.uim.api.Workflow getWorkflow(Long id) {

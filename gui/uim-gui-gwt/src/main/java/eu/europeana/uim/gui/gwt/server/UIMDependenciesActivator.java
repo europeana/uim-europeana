@@ -63,6 +63,11 @@ public class UIMDependenciesActivator implements BundleActivator {
         public Orchestrator getOrchestrator() {
             return orchestrator;
         }
+
+        @Override
+        public String toString() {
+            return "UIM OSGI Engine";
+        }
     }
 
 

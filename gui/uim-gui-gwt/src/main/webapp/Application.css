@@ -1,23 +1,22 @@
 /** Add css rules here for your application. */
 
-
 /** Example rules used by the template application (remove for your app) */
 h1 {
-  font-size: 2em;
-  font-weight: bold;
-  color: #777777;
-  margin: 40px 0px 70px;
-  text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: #777777;
+    margin: 40px 0px 70px;
+    text-align: center;
 }
 
 .sendButton {
-  display: block;
-  font-size: 16pt;
+    display: block;
+    font-size: 16pt;
 }
 
 /** Most GWT widgets already have a style name defined */
 .gwt-DialogBox {
-  width: 400px;
+    width: 400px;
 }
 
 gwt-TabLayoutPanel {
@@ -30,16 +29,35 @@ gwt-TabLayoutPanelContent {
 }
 
 .dialogVPanel {
-  margin: 5px;
+    margin: 5px;
 }
 
 .serverResponseLabelError {
-  color: red;
+    color: red;
+}
+
+.gwt-ProgressBar-shell {
+    border: 2px solid #faf9f7;
+    border-right: 2px solid #848280;
+    border-bottom: 2px solid #848280;
+    background-color: #AAAAAA;
+    height: 14pt;
+    width: 50%;
+}
+
+.gwt-ProgressBar-shell .gwt-ProgressBar-bar {
+    background-color: #67A7E3;
+}
+
+.gwt-ProgressBar-shell .gwt-ProgressBar-text {
+    padding: 0px;
+    margin: 0px;
+    color: white;
 }
 
 /** Set ids using widget.getElement().setId("idOfElement") */
 #closeButton {
-  margin: 15px 6px 6px;
+    margin: 15px 6px 6px;
 }
 
 
