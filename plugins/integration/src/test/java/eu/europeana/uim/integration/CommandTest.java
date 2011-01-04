@@ -1,17 +1,7 @@
 package eu.europeana.uim.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.ops4j.pax.exam.CoreOptions.felix;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.waitForFrameworkStartup;
-import static org.ops4j.pax.exam.OptionUtils.combine;
-import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
 import org.apache.karaf.testing.AbstractIntegrationTest;
 import org.apache.karaf.testing.Helper;
 import org.junit.Test;
@@ -23,8 +13,17 @@ import org.osgi.framework.Constants;
 import org.osgi.service.command.CommandProcessor;
 import org.osgi.service.command.CommandSession;
 
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.waitForFrameworkStartup;
+import static org.ops4j.pax.exam.OptionUtils.combine;
+import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
 
 
 /**
@@ -85,7 +84,7 @@ public class CommandTest extends AbstractIntegrationTest {
     }
 
     private String getCommandResult(String command) {
-        String res = new String();
+        String res = "";
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
         CommandProcessor cp = getOsgiService(CommandProcessor.class);

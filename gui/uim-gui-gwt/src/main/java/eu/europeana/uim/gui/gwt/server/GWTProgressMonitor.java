@@ -67,6 +67,10 @@ public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
         return cancelled;
     }
 
+    public boolean isDone() {
+        return done;
+    }
+
     public void setExecution(Execution execution) {
         this.execution = execution;
     }

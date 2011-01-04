@@ -3,6 +3,10 @@ in progress
 - past executions in overview
 - make GUI more robust against backend failures
 
+- mongodb storage:
+  - MDR implementation, probably impacts on existing MetaDataRecord object
+  - finish implementing MongoStorageEngine
+
 functionality:
 ==============
 

@@ -52,6 +52,6 @@ public class Execution implements IsSerializable {
     }
 
     public boolean isDone() {
-        return progress == total;
+        return progress.equals(total);
     }
 }

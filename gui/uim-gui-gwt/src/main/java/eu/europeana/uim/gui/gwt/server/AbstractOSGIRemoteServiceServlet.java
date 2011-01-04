@@ -11,7 +11,7 @@ public class AbstractOSGIRemoteServiceServlet extends RemoteServiceServlet {
 
     private static final String DEVMODE = "devmode";
 
-    protected final UIMEngine engine;
+    private final UIMEngine engine;
 
     public AbstractOSGIRemoteServiceServlet() {
         this.engine = UIMDependenciesActivator.getUIMEngine();

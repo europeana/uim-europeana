@@ -130,7 +130,7 @@ public class UIMOrchestrator implements Orchestrator {
 
         UimEntity dataset = ae.getDataSet();
         if(dataset instanceof MetaDataRecord<?>) {
-            return new long[] { ((MetaDataRecord<?>) ae.getDataSet()).getId() };
+            return new long[] { ae.getDataSet().getId() };
         } else if(dataset instanceof Collection) {
              all = registry.getStorage().getByCollection((Collection)dataset);
         } else if(dataset instanceof Provider) {
@@ -144,11 +144,11 @@ public class UIMOrchestrator implements Orchestrator {
             counter += BATCH_SIZE;
             executionTotals.put(e, counter);
             // TODO room for optimization
-            System.arraycopy(all, counter.intValue(), result, 0, BATCH_SIZE);
+            System.arraycopy(all, counter, result, 0, BATCH_SIZE);
         } else if(remaining < BATCH_SIZE && remaining > 0) {
             counter = total;
             executionTotals.put(e, counter);
-            System.arraycopy(all, counter.intValue(), result, 0, remaining);
+            System.arraycopy(all, counter, result, 0, remaining);
         } else if(remaining == 0) {
             return null;
         }

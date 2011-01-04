@@ -43,8 +43,6 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
 
     private final Registry registry;
 
-    private final StepProcessorProvider stepProcessorProvider;
-
     private Vector<UIMExecution> executions = new Vector<UIMExecution>();
 
     // keep track of tasks for monitoring
@@ -64,7 +62,6 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
         this.orchestrator = o;
         this.workflow = w;
         this.registry = r;
-        this.stepProcessorProvider = provider;
         processorTimer = new Timer();
 
         // construct the set of StepThreadPools based on the workflow
@@ -89,7 +86,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
                     // we always save after the last step
                     savePoint = true;
                 }
-                stepProcessors.add(stepProcessorProvider.createStepProcessor(step, this, savePoint));
+                stepProcessors.add(provider.createStepProcessor(step, this, savePoint));
             }
         }
     }

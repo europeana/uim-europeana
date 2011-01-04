@@ -1,6 +1,5 @@
 package eu.europeana.uim.gui.gwt.server;
 
-import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.gui.gwt.client.OrchestrationService;
 import eu.europeana.uim.gui.gwt.shared.Collection;
 import eu.europeana.uim.gui.gwt.shared.Execution;
@@ -25,9 +24,6 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
     private Map<Long, Provider> wrappedProviders = new HashMap<Long, Provider>();
 
     private Map<Long, Execution> wrappedExecutions = new HashMap<Long, Execution>();
-
-    private Map<Long, ProgressMonitor> progressMonitorMap = new HashMap<Long, ProgressMonitor>();
-
 
     @Override
     public List<Workflow> getWorkflows() {
@@ -57,7 +53,7 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
         eu.europeana.uim.store.Provider p = getEngine().getRegistry().getStorage().getProvider(provider);
         List<eu.europeana.uim.store.Collection> cols = getEngine().getRegistry().getStorage().getCollections(p);
         for (eu.europeana.uim.store.Collection col : cols) {
-            res.add(new Collection(col.getId(), col.getName(), wrappedProviders.get(p)));
+            res.add(new Collection(col.getId(), col.getName(), wrappedProviders.get(provider)));
         }
         return res;
     }
@@ -73,7 +69,6 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
         GWTProgressMonitor monitor = new GWTProgressMonitor(execution);
         eu.europeana.uim.store.Execution e = getEngine().getOrchestrator().executeWorkflow(w, c, monitor);
         execution.setId(e.getId());
-        progressMonitorMap.put(execution.getId(), monitor);
         wrappedExecutions.put(e.getId(), execution);
 
         return execution;
@@ -91,7 +86,6 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
         GWTProgressMonitor monitor = new GWTProgressMonitor(execution);
         eu.europeana.uim.store.Execution e = getEngine().getOrchestrator().executeWorkflow(w, p, monitor);
         execution.setId(e.getId());
-        progressMonitorMap.put(execution.getId(), monitor);
         wrappedExecutions.put(e.getId(), execution);
 
         return execution;

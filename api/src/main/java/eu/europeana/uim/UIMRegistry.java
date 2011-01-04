@@ -68,7 +68,7 @@ public class UIMRegistry implements Registry {
 	public void removePlugin(IngestionPlugin plugin) {
 		if (plugin != null) {
 			log.info("Removed plugin:" + plugin.getIdentifier());
-			plugins.remove(plugin);
+			plugins.remove(plugin.getIdentifier());
 		}
 	}
 
@@ -139,7 +139,7 @@ public class UIMRegistry implements Registry {
 				if (builder.length() > 0) {
 					builder.append("\n\tPlugin:");
 				}
-				builder.append(plugin.getIdentifier() + ": [" + plugin.getDescription() + "]");
+                builder.append(plugin.getIdentifier()).append(": [").append(plugin.getDescription()).append("]");
 			}
 		}
 
@@ -152,7 +152,7 @@ public class UIMRegistry implements Registry {
                 if (builder.length() > 0) {
                     builder.append("\n\tWorkflow:");
                 }
-                builder.append(worfklow.getName() + ": [" + worfklow.getDescription() + "]");
+                builder.append(worfklow.getName()).append(": [").append(worfklow.getDescription()).append("]");
             }
         }
 
@@ -167,7 +167,7 @@ public class UIMRegistry implements Registry {
 					builder.append("\n\t");
 				}
 				builder.append(storage.getIdentifier());
-				builder.append(" [" + storage.getStatus() + "] ");
+                builder.append(" [").append(storage.getStatus()).append("] ");
 				builder.append(storage.getConfiguration().toString());
 			}
 		}

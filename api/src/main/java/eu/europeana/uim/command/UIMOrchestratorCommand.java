@@ -166,7 +166,7 @@ public class UIMOrchestratorCommand implements Action {
             return ((Provider) dataSet).getName();
         }
         if (dataSet instanceof MetaDataRecord) {
-            return "MetaDataRecord " + ((MetaDataRecord) dataSet).getId();
+            return "MetaDataRecord " + dataSet.getId();
         }
         if (dataSet instanceof Request) {
             Request request = ((Request) dataSet);

@@ -199,7 +199,7 @@ public class Application implements EntryPoint {
 
                         @Override
                         public void onSuccess(Execution execution) {
-                            executions.add(execution);
+                            addExecution(execution);
                         }
                     });
                 }
