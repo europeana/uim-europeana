@@ -1,5 +1,7 @@
-package eu.europeana.uim;
+package eu.europeana.uim.store.memory;
 
+import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.TKey;
 import eu.europeana.uim.store.Request;
 
 import java.io.Serializable;

@@ -1,7 +1,6 @@
 package eu.europeana.uim.store.memory;
 
 import eu.europeana.uim.MDRFieldRegistry;
-import eu.europeana.uim.MemoryMetaDataRecord;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
