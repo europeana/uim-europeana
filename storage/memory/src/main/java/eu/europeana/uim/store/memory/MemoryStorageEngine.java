@@ -1,13 +1,7 @@
 package eu.europeana.uim.store.memory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
-
 import eu.europeana.uim.MDRFieldRegistry;
+import eu.europeana.uim.MemoryMetaDataRecord;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -21,6 +15,13 @@ import gnu.trove.TLongLongIterator;
 import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
 import gnu.trove.TObjectLongHashMap;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 public class MemoryStorageEngine implements StorageEngine {
 
@@ -227,7 +228,7 @@ public class MemoryStorageEngine implements StorageEngine {
 
 	@Override
 	public MetaDataRecord<MDRFieldRegistry> createMetaDataRecord(Request request) {
-		MetaDataRecord<MDRFieldRegistry> mdr = new MetaDataRecord<MDRFieldRegistry>(mdrId.getAndIncrement());
+		MemoryMetaDataRecord<MDRFieldRegistry> mdr = new MemoryMetaDataRecord<MDRFieldRegistry>(mdrId.getAndIncrement());
 		mdr.setRequest(request);
 		return mdr;
 	}
