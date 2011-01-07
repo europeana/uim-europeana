@@ -35,13 +35,22 @@ Path                              Name                                          
 
 1) Get Apache Felix Karaf at http://karaf.apache.org/
 
-   Temporary (until we add it to the europeana artifactory / the ProgressBar widget makes it to GWT main):
-   install the additional gwt incubator JAR as follows:
-    'cd gui/uim-gui-gwt'
-    'mvn install:install-file -DgroupId=com.google -DartifactId=gwt-incubator -Dversion=20101117-r1766 -Dpackaging=jar -Dfile=lib/gwt-incubator-20101117-r1766.jar'
-
 2) Build UIM with maven
-   - 'mvn install'
+
+   1st time extra steps:
+     - 'mvn install'  (will fail first time, dont worry :)
+
+     (must be done after the initial (failed) mvn install above!!)
+     Temporary (until we add it to the europeana artifactory / the ProgressBar widget makes it to GWT main):
+     install the additional gwt incubator JAR as follows:
+      'cd gui/uim-gui-gwt'
+      'mvn install:install-file -DgroupId=com.google -DartifactId=gwt-incubator -Dversion=20101117-r1766 -Dpackaging=jar -Dfile=lib/gwt-incubator-20101117-r1766.jar'
+   
+     go back to top dir
+   
+   - 'mvn install'  (should now succeed)
+   
+
 
 3) Start Karaf:
    - go to the Karaf main directory
@@ -55,6 +64,7 @@ Path                              Name                                          
    - install necessary features:
      - features:install spring
      - features:install war
+     - features:install webconsole
 
 6) Configure UIM Feature
    - 'features:addurl file://<project-path>/etc/uim-features.xml'
