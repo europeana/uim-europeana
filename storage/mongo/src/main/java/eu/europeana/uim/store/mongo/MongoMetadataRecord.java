@@ -1,5 +1,7 @@
 package eu.europeana.uim.store.mongo;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.TKey;
 import eu.europeana.uim.store.Request;
@@ -12,8 +14,18 @@ import java.util.ArrayList;
  */
 public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
 
+    private DBObject object = new BasicDBObject();
+    private Request request;
+    private long lid;
+
+    public MongoMetadataRecord(DBObject object, Request request, long lid) {
+        this.object = object;
+        this.request = request;
+        this.lid = lid;
+    }
+
     public Request getRequest() {
-        return null;
+        return request;
     }
 
     public <T extends Serializable> void setField(TKey<N, T> nttKey, T value) {
@@ -29,6 +41,14 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
     }
 
     public long getId() {
-        return 0;
+        return lid;
+    }
+
+    public void setObject(BasicDBObject object) {
+        this.object = object;
+    }
+
+    public DBObject getObject() {
+        return object;
     }
 }

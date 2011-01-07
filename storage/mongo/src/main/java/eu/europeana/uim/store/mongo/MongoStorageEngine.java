@@ -2,7 +2,10 @@ package eu.europeana.uim.store.mongo;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
@@ -27,6 +30,7 @@ public class MongoStorageEngine implements StorageEngine {
     private static final String DEFAULT_UIM_DB_NAME = "UIM";
     private Mongo mongo = null;
     private DB db = null;
+    private DBCollection records = null;
     private Datastore ds = null;
 
     private EngineStatus status = EngineStatus.STOPPED;
@@ -35,6 +39,7 @@ public class MongoStorageEngine implements StorageEngine {
     private AtomicLong collectionIdCounter = null;
     private AtomicLong requestIdCounter = null;
     private AtomicLong executionIdCounter = null;
+    private AtomicLong mdrIdCounter = null;
 
     private String dbName;
 
@@ -61,6 +66,7 @@ public class MongoStorageEngine implements StorageEngine {
             status = EngineStatus.BOOTING;
             mongo = new Mongo();
             db = mongo.getDB(dbName);
+            records = db.getCollection("records");
             ds = new Morphia().createDatastore(mongo, dbName);
             status = EngineStatus.RUNNING;
 
@@ -69,7 +75,7 @@ public class MongoStorageEngine implements StorageEngine {
             requestIdCounter = new AtomicLong(ds.find(MongoRequest.class).countAll());
             collectionIdCounter = new AtomicLong(ds.find(MongodbCollection.class).countAll());
             executionIdCounter = new AtomicLong(ds.find(MongoExecution.class).countAll());
-
+            mdrIdCounter = new AtomicLong(records.count());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -162,10 +168,19 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public MetaDataRecord<MDRFieldRegistry> createMetaDataRecord(Request request) {
-        return null;
+        BasicDBObject object = new BasicDBObject();
+        MongoMetadataRecord mdr = new MongoMetadataRecord(object, request, mdrIdCounter.getAndIncrement());
+        records.insert(mdr.getObject());
+        return mdr;
     }
 
     public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) throws StorageEngineException {
+        records.save(((MongoMetadataRecord<MDRFieldRegistry>)record).getObject());
+
+        /*
+        BasicDBObject query = new BasicDBObject("lid", record.getId());
+        DBObject object = records.findOne(query);
+         */
     }
 
     public Execution createExecution() {
@@ -187,7 +202,15 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public MetaDataRecord<MDRFieldRegistry>[] getMetaDataRecords(long... ids) {
-        return null;
+        ArrayList<MetaDataRecord<MDRFieldRegistry>> res = new ArrayList<MetaDataRecord<MDRFieldRegistry>>();
+        BasicDBObject query = new BasicDBObject();
+        query.put("lid", new BasicDBObject("$in", ids));
+        for(DBObject object : records.find(query)) {
+            Request request = ds.find(MongoRequest.class).filter("lid", object.get("lid")).get();
+            res.add(new MongoMetadataRecord<MDRFieldRegistry>(object, request, ((Long)object.get("lid")).longValue()));
+        }
+
+        return res.toArray(new MetaDataRecord[res.size()]);
     }
 
     public long[] getByRequest(Request request) {

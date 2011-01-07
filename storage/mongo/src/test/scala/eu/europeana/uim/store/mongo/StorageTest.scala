@@ -3,6 +3,7 @@ package eu.europeana.uim.store.mongo
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSuite
 import com.mongodb.Mongo
+import eu.europeana.uim.{MDRFieldRegistry, MetaDataRecord}
 
 /**
  *
@@ -140,7 +141,7 @@ class StorageTest extends FunSuite with ShouldMatchers {
 
   // executions
 
-test("engine creates executions and returns an incremented id") {
+  test("engine creates executions and returns an incremented id") {
     withEngine{
       engine => {
         val e = engine.createExecution
@@ -156,9 +157,45 @@ test("engine creates executions and returns an incremented id") {
       engine =>
         val e = engine.createExecution
         val id = e.getId
-        engine.getExecutions().size should equal (1)
+        engine.getExecutions().size should equal(1)
     }
   }
 
+  // mdrs
+
+  test("engine creates mdrs and returns an incremented id") {
+    withEngine{
+      engine => {
+        val p = engine.createProvider()
+        val c = engine.createCollection(p)
+        val r = engine.createRequest(c)
+        val mdr = engine.createMetaDataRecord(r)
+        val mdr1 = engine.createMetaDataRecord(r)
+        mdr.getId should equal(0)
+        mdr1.getId should equal(1)
+      }
+    }
+  }
+
+  test("engine retrieves lists of mdrs") {
+    withEngine{
+      engine => {
+        val p = engine.createProvider()
+        val c = engine.createCollection(p)
+        val r = engine.createRequest(c)
+        val mdr = engine.createMetaDataRecord(r)
+        val mdr1 = engine.createMetaDataRecord(r)
+        val mdr2 = engine.createMetaDataRecord(r)
+
+        // FIXME does not yet work
+        val l:Array[MetaDataRecord[MDRFieldRegistry]] = engine.getMetaDataRecords(0, 1, 2)
+//        l(1).getRequest.getId should equal (r.getId)
+//        l(2).getRequest.getId should equal (r.getId)
+//        l(3).getRequest.getId should equal (r.getId)
+
+
+      }
+    }
+  }
 
 }

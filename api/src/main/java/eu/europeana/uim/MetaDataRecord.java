@@ -9,6 +9,8 @@ import java.util.ArrayList;
 /**
  * Abstract MetaDataRecord. StorageEngine implementations provide their own implementation of it.
  *
+ * TODO: documentation
+ *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public interface MetaDataRecord<N> extends UimEntity {
