@@ -1,16 +1,17 @@
 package eu.europeana.uim.store.mongo
 
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.FunSuite
 import com.mongodb.Mongo
 import eu.europeana.uim.{MDRFieldRegistry, MetaDataRecord}
+import org.junit.Test
+import org.scalatest.junit.{ShouldMatchersForJUnit, JUnitSuite}
 
 /**
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 
-class StorageTest extends FunSuite with ShouldMatchers {
+class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
 
   def withEngine(testFunction: MongoStorageEngine => Unit) {
     val e: MongoStorageEngine = new MongoStorageEngine("TEST")
@@ -30,7 +31,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
 
   // providers
 
-  test("engine creates providers and returns an incremented id") {
+  /**
+   * engine creates providers and returns an incremented id
+   */
+  @Test def createProvider() {
     withEngine{
       engine => {
         val p = engine.createProvider
@@ -41,7 +45,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
     }
   }
 
-  test("engine updates providers properly") {
+  /**
+   * engine updates providers properly
+   */
+  @Test def updateProvider() {
     withEngine{
       engine => {
         val p = engine.createProvider
@@ -55,7 +62,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
     }
   }
 
-  test("engine retrieves providers properly") {
+  /**
+   * engine retrieves providers properly
+   */
+  @Test def retrieveProvider() {
     withEngine{
       engine =>
         val p = engine.createProvider
@@ -68,11 +78,12 @@ class StorageTest extends FunSuite with ShouldMatchers {
   }
 
 
-
-
   // collections
 
-  test("engine creates collections and returns an incremented id") {
+  /**
+   * engine creates collections and returns an incremented id
+   */
+  @Test def createCollection() {
     withEngine{
       engine => {
         val p = engine.createProvider
@@ -82,9 +93,13 @@ class StorageTest extends FunSuite with ShouldMatchers {
         c1.getId should equal(1)
       }
     }
+
   }
 
-  test("engine updates collections properly") {
+  /**
+   * engine updates collections properly
+   */
+  @Test def updateCollection() {
     withEngine{
       engine => {
         val p = engine.createProvider
@@ -99,7 +114,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
     }
   }
 
-  test("engine retrieves collections properly") {
+  /**
+   * engine retrieves collections properly
+   */
+  @Test def retrieveCollection() {
     withEngine{
       engine =>
         val p = engine.createProvider
@@ -114,7 +132,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
 
   // requests
 
-  test("engine creates requests and returns an incremented id") {
+  /**
+   * engine creates requests and returns an incremented id
+   */
+  @Test def createRequest() {
     withEngine{
       engine => {
         val p = engine.createProvider
@@ -127,7 +148,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
     }
   }
 
-  test("engine retrieves requests properly") {
+  /**
+   * engine retrieves requests properly
+   */
+  @Test def retrieveRequest() {
     withEngine{
       engine =>
         val p = engine.createProvider
@@ -141,7 +165,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
 
   // executions
 
-  test("engine creates executions and returns an incremented id") {
+  /**
+   * engine creates executions and returns an incremented id
+   */
+  @Test def createExecution() {
     withEngine{
       engine => {
         val e = engine.createExecution
@@ -152,7 +179,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
     }
   }
 
-  test("engine retrieves executions properly") {
+  /**
+   * engine retrieves executions properly
+   */
+  @Test def retrieveExecution() {
     withEngine{
       engine =>
         val e = engine.createExecution
@@ -163,7 +193,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
 
   // mdrs
 
-  test("engine creates mdrs and returns an incremented id") {
+  /**
+   * engine creates mdrs and returns an incremented id
+   */
+  @Test def createMdr() {
     withEngine{
       engine => {
         val p = engine.createProvider()
@@ -177,7 +210,11 @@ class StorageTest extends FunSuite with ShouldMatchers {
     }
   }
 
-  test("engine retrieves lists of mdrs") {
+
+  /**
+   * engine retrieves lists of mdrs
+   */
+  @Test def retrieveMdrList() {
     withEngine{
       engine => {
         val p = engine.createProvider()
@@ -188,10 +225,10 @@ class StorageTest extends FunSuite with ShouldMatchers {
         val mdr2 = engine.createMetaDataRecord(r)
 
         // FIXME does not yet work
-        val l:Array[MetaDataRecord[MDRFieldRegistry]] = engine.getMetaDataRecords(0, 1, 2)
-//        l(1).getRequest.getId should equal (r.getId)
-//        l(2).getRequest.getId should equal (r.getId)
-//        l(3).getRequest.getId should equal (r.getId)
+        val l: Array[MetaDataRecord[MDRFieldRegistry]] = engine.getMetaDataRecords(0, 1, 2)
+        l(0).getRequest.getId should equal(r.getId)
+        l(1).getRequest.getId should equal(r.getId)
+        l(2).getRequest.getId should equal(r.getId)
 
 
       }
