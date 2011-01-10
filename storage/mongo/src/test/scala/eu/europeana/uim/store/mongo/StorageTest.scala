@@ -224,13 +224,107 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         val mdr1 = engine.createMetaDataRecord(r)
         val mdr2 = engine.createMetaDataRecord(r)
 
-        // FIXME does not yet work
         val l: Array[MetaDataRecord[MDRFieldRegistry]] = engine.getMetaDataRecords(0, 1, 2)
         l(0).getRequest.getId should equal(r.getId)
         l(1).getRequest.getId should equal(r.getId)
         l(2).getRequest.getId should equal(r.getId)
+      }
+    }
+  }
 
+  /**
+   * engine retrieves mdrs by request
+   */
+  @Test def retrieveAndCountMdrByRequest() {
+    withEngine{
+      engine => {
+        val p = engine.createProvider()
+        val c = engine.createCollection(p)
+        val r = engine.createRequest(c)
+        val mdr = engine.createMetaDataRecord(r)
+        val mdr1 = engine.createMetaDataRecord(r)
+        val mdr2 = engine.createMetaDataRecord(r)
 
+        val l: Array[Long] = engine.getByRequest(r)
+        l.length should equal (3)
+
+        engine.getTotalByRequest(r) should equal (3)
+      }
+    }
+  }
+
+  /**
+   * engine retrieves mdrs by collection
+   */
+  @Test def retrieveAndCountMdrByCollection() {
+    withEngine{
+      engine => {
+        val p = engine.createProvider()
+        val c = engine.createCollection(p)
+        val r = engine.createRequest(c)
+        val r1 = engine.createRequest(c)
+        val mdr1 = engine.createMetaDataRecord(r)
+        val mdr2 = engine.createMetaDataRecord(r)
+        val mdr3 = engine.createMetaDataRecord(r1)
+        val mdr4 = engine.createMetaDataRecord(r1)
+
+        val l: Array[Long] = engine.getByCollection(c)
+        l.length should equal (4)
+
+        engine.getTotalByCollection(c) should equal (4)
+      }
+    }
+  }
+
+  /**
+   * engine retrieves mdrs by provider
+   */
+  @Test def retrieveAndCountMdrByProvider() {
+    withEngine{
+      engine => {
+        val p = engine.createProvider()
+        val c = engine.createCollection(p)
+        val c1 = engine.createCollection(p)
+        val r = engine.createRequest(c)
+        val r1 = engine.createRequest(c1)
+        val mdr1 = engine.createMetaDataRecord(r)
+        val mdr2 = engine.createMetaDataRecord(r)
+        val mdr3 = engine.createMetaDataRecord(r1)
+        val mdr4 = engine.createMetaDataRecord(r1)
+
+        val l: Array[Long] = engine.getByProvider(p, true)
+        l.length should equal (4)
+
+        engine.getTotalByProvider(p, true) should equal (4)
+      }
+    }
+  }
+
+    /**
+   * engine retrieves tutti mdrs
+   */
+  @Test def retrieveAndCountTutti() {
+    withEngine{
+      engine => {
+        val p = engine.createProvider()
+        val c = engine.createCollection(p)
+        val c1 = engine.createCollection(p)
+        val c2 = engine.createCollection(p)
+        val c3 = engine.createCollection(p)
+        val r = engine.createRequest(c)
+        val r1 = engine.createRequest(c1)
+        val r2 = engine.createRequest(c2)
+        val r3 = engine.createRequest(c3)
+        val mdr1 = engine.createMetaDataRecord(r)
+        val mdr2 = engine.createMetaDataRecord(r1)
+        val mdr3 = engine.createMetaDataRecord(r2)
+        val mdr4 = engine.createMetaDataRecord(r3)
+        val mdr5 = engine.createMetaDataRecord(r3)
+
+        val l: Array[Long] = engine.getByProvider(p, true)
+        l.length should equal (5)
+
+        engine.getTotalForAllIds() should equal (5)
       }
     }
   }

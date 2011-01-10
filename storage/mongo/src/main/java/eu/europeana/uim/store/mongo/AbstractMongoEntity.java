@@ -11,6 +11,8 @@ import org.bson.types.ObjectId;
 @Entity
 public class AbstractMongoEntity implements UimEntity {
 
+    public static final String LID = "lid";
+
     @Id
     private ObjectId id;
 
@@ -22,6 +24,10 @@ public class AbstractMongoEntity implements UimEntity {
 
     public long getId() {
         return lid;
+    }
+
+    public ObjectId getMongoId() {
+        return id;
     }
 
     public String getMnemonic() {

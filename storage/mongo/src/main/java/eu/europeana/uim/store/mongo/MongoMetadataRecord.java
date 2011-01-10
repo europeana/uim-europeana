@@ -16,12 +16,12 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
 
     private DBObject object = new BasicDBObject();
     private Request request;
-    private long lid;
 
     public MongoMetadataRecord(DBObject object, Request request, long lid) {
         this.object = object;
         this.request = request;
-        this.lid = lid;
+        object.put(AbstractMongoEntity.LID, lid);
+        object.put("request", request.getId());
     }
 
     public Request getRequest() {
@@ -41,7 +41,7 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
     }
 
     public long getId() {
-        return lid;
+        return (Long) object.get(AbstractMongoEntity.LID);
     }
 
     public void setObject(BasicDBObject object) {

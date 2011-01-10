@@ -15,6 +15,7 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -23,6 +24,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * Basic implementation of a StorageEngine based on MongoDB with Morphia.
+ * Not optimized whatsoever.
+ * <p/>
+ * TODO optimize
+ * TODO implement the recursive flag for providers
+ *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class MongoStorageEngine implements StorageEngine {
@@ -60,7 +67,7 @@ public class MongoStorageEngine implements StorageEngine {
 
     public void initialize() {
         try {
-            if(dbName == null) {
+            if (dbName == null) {
                 dbName = DEFAULT_UIM_DB_NAME;
             }
             status = EngineStatus.BOOTING;
@@ -108,7 +115,7 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public Provider getProvider(long id) {
-        return ds.find(MongoProvider.class).filter("lid", id).get();
+        return ds.find(MongoProvider.class).filter(AbstractMongoEntity.LID, id).get();
     }
 
     public Provider findProvider(String mnemonic) {
@@ -117,7 +124,7 @@ public class MongoStorageEngine implements StorageEngine {
 
     public List<Provider> getProvider() {
         final List<Provider> res = new ArrayList<Provider>();
-        for(Provider p : ds.find(MongoProvider.class).asList()) {
+        for (Provider p : ds.find(MongoProvider.class).asList()) {
             res.add(p);
         }
         return res;
@@ -134,7 +141,7 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public Collection getCollection(long id) {
-        return ds.find(MongodbCollection.class).filter("lid", id).get();
+        return ds.find(MongodbCollection.class).filter(AbstractMongoEntity.LID, id).get();
     }
 
     public Collection findCollection(String mnemonic) {
@@ -143,14 +150,14 @@ public class MongoStorageEngine implements StorageEngine {
 
     public List<Collection> getCollections(Provider provider) {
         List<Collection> res = new ArrayList<Collection>();
-        for(Collection c : ds.find(MongodbCollection.class).filter("provider", provider).asList()) {
+        for (Collection c : ds.find(MongodbCollection.class).filter("provider", provider).asList()) {
             res.add(c);
         }
         return res;
     }
 
     public Request createRequest(Collection collection) {
-        Request r = new MongoRequest(requestIdCounter.getAndIncrement(), (MongodbCollection)collection);
+        Request r = new MongoRequest(requestIdCounter.getAndIncrement(), (MongodbCollection) collection);
         ds.save(r);
         return r;
     }
@@ -161,7 +168,7 @@ public class MongoStorageEngine implements StorageEngine {
 
     public List<Request> getRequests(Collection collection) {
         List<Request> res = new ArrayList<Request>();
-        for(Request r : ds.find(MongoRequest.class).filter("collection", collection).asList()) {
+        for (Request r : ds.find(MongoRequest.class).filter("collection", collection).asList()) {
             res.add(r);
         }
         return res;
@@ -175,12 +182,7 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) throws StorageEngineException {
-        records.save(((MongoMetadataRecord<MDRFieldRegistry>)record).getObject());
-
-        /*
-        BasicDBObject query = new BasicDBObject("lid", record.getId());
-        DBObject object = records.findOne(query);
-         */
+        records.save(((MongoMetadataRecord<MDRFieldRegistry>) record).getObject());
     }
 
     public Execution createExecution() {
@@ -195,7 +197,7 @@ public class MongoStorageEngine implements StorageEngine {
 
     public List<Execution> getExecutions() {
         List<Execution> res = new ArrayList<Execution>();
-        for(Execution e : ds.find(MongoExecution.class).asList()) {
+        for (Execution e : ds.find(MongoExecution.class).asList()) {
             res.add(e);
         }
         return res;
@@ -204,44 +206,112 @@ public class MongoStorageEngine implements StorageEngine {
     public MetaDataRecord<MDRFieldRegistry>[] getMetaDataRecords(long... ids) {
         ArrayList<MetaDataRecord<MDRFieldRegistry>> res = new ArrayList<MetaDataRecord<MDRFieldRegistry>>();
         BasicDBObject query = new BasicDBObject();
-        query.put("lid", new BasicDBObject("$in", ids));
-        for(DBObject object : records.find(query)) {
-            Request request = ds.find(MongoRequest.class).filter("lid", object.get("lid")).get();
-            res.add(new MongoMetadataRecord<MDRFieldRegistry>(object, request, ((Long)object.get("lid")).longValue()));
+        query.put(AbstractMongoEntity.LID, new BasicDBObject("$in", ids));
+        for (DBObject object : records.find(query)) {
+            Request request = ds.find(MongoRequest.class).filter(AbstractMongoEntity.LID, object.get("request")).get();
+            res.add(new MongoMetadataRecord<MDRFieldRegistry>(object, request, ((Long) object.get(AbstractMongoEntity.LID)).longValue()));
         }
 
         return res.toArray(new MetaDataRecord[res.size()]);
     }
 
     public long[] getByRequest(Request request) {
-        return new long[0];
+        BasicDBObject query = new BasicDBObject("request", request.getId());
+        BasicDBObject fields = new BasicDBObject(AbstractMongoEntity.LID, 1);
+        List<DBObject> results = records.find(query, fields).toArray();
+        long[] res = new long[results.size()];
+        for (int i = 0; i < results.size(); i++) {
+            res[i] = (Long) results.get(i).get(AbstractMongoEntity.LID);
+        }
+
+        return res;
     }
 
     public long[] getByCollection(Collection collection) {
-        return new long[0];
+        // mdr -> request -> collection
+        MongodbCollection mongodbCollection = ds.find(MongodbCollection.class).filter("lid", collection.getId()).get();
+        long[] reqIds = getFromCollection(mongodbCollection);
+        long[] res = getRecordsFromRequestIds(reqIds);
+        return res;
     }
 
+    private long[] getRecordsFromRequestIds(long[] reqIds) {
+        BasicDBObject query = new BasicDBObject("request", new BasicDBObject("$in", reqIds));
+        BasicDBObject fields = new BasicDBObject(AbstractMongoEntity.LID, 1);
+
+        List<DBObject> results = records.find(query, fields).toArray();
+        long[] res = new long[results.size()];
+        for (int i = 0; i < results.size(); i++) {
+            res[i] = (Long) results.get(i).get(AbstractMongoEntity.LID);
+        }
+        return res;
+    }
+
+    private long[] getFromCollection(MongodbCollection mongodbCollection) {
+        List<MongoRequest> reqs = ds.find(MongoRequest.class).filter("collection", mongodbCollection).asList();
+        long[] reqIds = new long[reqs.size()];
+        for (int i = 0; i < reqs.size(); i++) {
+            reqIds[i] = reqs.get(i).getId();
+        }
+        return reqIds;
+    }
+
+    // TODO recursive
     public long[] getByProvider(Provider provider, boolean recursive) {
-        return new long[0];
+        MongoProvider mongoProvider = ds.find(MongoProvider.class).filter("lid", provider.getId()).get();
+        long[] reqIds = getRequestIdsFromProvider(mongoProvider);
+        return getRecordsFromRequestIds(reqIds);
+    }
+
+    private long[] getRequestIdsFromProvider(MongoProvider mongoProvider) {
+        List<MongoRequest> reqs = new ArrayList<MongoRequest>();
+        List<MongodbCollection> collections = ds.find(MongodbCollection.class).filter("provider", mongoProvider).asList();
+        long[] reqIds = new long[0];
+
+        for (MongodbCollection collection : collections) {
+            reqIds = ArrayUtils.addAll(reqIds, getFromCollection(collection));
+        }
+        return reqIds;
     }
 
     public long[] getAllIds() {
-        return new long[0];
+        BasicDBObject query = new BasicDBObject("1", 1);
+        BasicDBObject fields = new BasicDBObject(AbstractMongoEntity.LID, 1);
+        List<DBObject> tutti = records.find(query, fields).toArray();
+        long[] tuttiArray = new long[tutti.size()];
+        for (int i = 0; i < tutti.size(); i++) {
+            tuttiArray[i] = (Long) tutti.get(i).get("lid");
+        }
+        return tuttiArray;
     }
 
     public int getTotalByRequest(Request request) {
-        return 0;
+        BasicDBObject query = new BasicDBObject("request", request.getId());
+        BasicDBObject fields = new BasicDBObject(AbstractMongoEntity.LID, 1);
+        return records.find(query, fields).count();
     }
 
     public int getTotalByCollection(Collection collection) {
-        return 0;
+        MongodbCollection mongodbCollection = ds.find(MongodbCollection.class).filter("lid", collection.getId()).get();
+        long[] reqIds = getFromCollection(mongodbCollection);
+
+        return getCountFromRequestIds(reqIds);
     }
 
+    private int getCountFromRequestIds(long[] reqIds) {
+        BasicDBObject query = new BasicDBObject("request", new BasicDBObject("$in", reqIds));
+        BasicDBObject fields = new BasicDBObject(AbstractMongoEntity.LID, 1);
+
+        return records.find(query, fields).count();
+    }
+
+    // TODO recursive
     public int getTotalByProvider(Provider provider, boolean recursive) {
-        return 0;
+        MongoProvider mongoProvider = ds.find(MongoProvider.class).filter("lid", provider.getId()).get();
+        return getCountFromRequestIds(getRequestIdsFromProvider(mongoProvider));
     }
 
     public int getTotalForAllIds() {
-        return 0;
+        return new Long(records.count()).intValue();
     }
 }
