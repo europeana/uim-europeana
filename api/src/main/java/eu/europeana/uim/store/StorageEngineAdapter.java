@@ -1,12 +1,12 @@
 package eu.europeana.uim.store;
 
-import java.util.List;
-import java.util.Map;
-
 import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
+
+import java.util.List;
+import java.util.Map;
 
 public abstract class StorageEngineAdapter implements StorageEngine {
 

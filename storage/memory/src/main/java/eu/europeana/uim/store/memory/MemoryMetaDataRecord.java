@@ -7,6 +7,7 @@ import eu.europeana.uim.store.Request;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -59,7 +60,7 @@ public class MemoryMetaDataRecord<N> implements MetaDataRecord<N> {
 	 * @param value
 	 */
 	@Override
-    public <T extends Serializable> void setField(TKey<N, T> key, T value){
+    public <T extends Serializable> void setFirstField(TKey<N, T> key, T value){
 		if (!fields.containsKey(key)) {
 			fields.put(key, value);
 		} else {
@@ -68,7 +69,12 @@ public class MemoryMetaDataRecord<N> implements MetaDataRecord<N> {
 	}
 
 
-	/**
+    @Override
+    public <T extends Serializable> T getFirstField(TKey<N, T> nttKey) {
+        return (T) fields.get(nttKey);
+    }
+
+    /**
 	 * @param key
 	 * @param value
 	 */
@@ -95,7 +101,13 @@ public class MemoryMetaDataRecord<N> implements MetaDataRecord<N> {
 	}
 
 
-	/**
+
+    @Override
+    public <T extends Serializable> List<T> getField(TKey<N, ArrayList<T>> nttKey) {
+        return ((ArrayList<T>) fields.get(nttKey));
+    }
+
+    /**
 	 * @param key
 	 * @param value
 	 */
@@ -112,6 +124,9 @@ public class MemoryMetaDataRecord<N> implements MetaDataRecord<N> {
 		((ArrayList<T>)qFields.get(key).get(qualifier)).add(value);
 	}
 
-
+    @Override
+    public <T extends Serializable> List<T> getQField(TKey<N, ArrayList<T>> nttKey, String qualifier) {
+        return (ArrayList<T>)qFields.get(nttKey).get(qualifier);
+    }
 
 }

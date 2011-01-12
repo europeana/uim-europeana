@@ -27,27 +27,29 @@
       	</reference-listener>
 	</reference-list>
 
-	<shell:command-bundle>
-		<shell:command name="uim/info">
-			<shell:action class="eu.europeana.uim.command.UIMInfo">
-                <shell:argument ref="uimRegistry" />
-			</shell:action>
-		</shell:command>
-	</shell:command-bundle>
-	
-	<shell:command-bundle>
-		<shell:command name="uim/store">
-			<shell:action class="eu.europeana.uim.command.UIMStore">
-                <shell:argument ref="uimRegistry" />
-			</shell:action>
-		</shell:command>
-	</shell:command-bundle>
-
     <shell:command-bundle>
+        <shell:command name="uim/info">
+            <shell:action class="eu.europeana.uim.command.UIMInfo">
+                <shell:argument ref="uimRegistry" />
+            </shell:action>
+        </shell:command>
+        <shell:command name="uim/store">
+            <shell:action class="eu.europeana.uim.command.UIMStore">
+                <shell:argument ref="uimRegistry" />
+            </shell:action>
+        </shell:command>
         <shell:command name="uim/orchestrator">
             <shell:action class="eu.europeana.uim.command.UIMOrchestratorCommand">
                 <shell:argument ref="uimRegistry" />
                 <shell:argument ref="orchestrator" />
+            </shell:action>
+        </shell:command>
+    </shell:command-bundle>
+
+    <shell:command-bundle>
+        <shell:command name="uimconfig/storage">
+            <shell:action class="eu.europeana.uim.command.UIMConfigStorage">
+                <shell:argument ref="uimRegistry" />
             </shell:action>
         </shell:command>
     </shell:command-bundle>

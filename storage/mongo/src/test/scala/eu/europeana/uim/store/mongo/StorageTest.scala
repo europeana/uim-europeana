@@ -1,10 +1,10 @@
 package eu.europeana.uim.store.mongo
 
-import org.scalatest.matchers.ShouldMatchers
 import com.mongodb.Mongo
-import eu.europeana.uim.{MDRFieldRegistry, MetaDataRecord}
 import org.junit.Test
 import org.scalatest.junit.{ShouldMatchersForJUnit, JUnitSuite}
+import eu.europeana.uim.{TKey, MDRFieldRegistry, MetaDataRecord}
+import java.util.ArrayList
 
 /**
  *
@@ -12,6 +12,8 @@ import org.scalatest.junit.{ShouldMatchersForJUnit, JUnitSuite}
  */
 
 class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
+
+
 
   def withEngine(testFunction: MongoStorageEngine => Unit) {
     val e: MongoStorageEngine = new MongoStorageEngine("TEST")
@@ -246,9 +248,9 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         val mdr2 = engine.createMetaDataRecord(r)
 
         val l: Array[Long] = engine.getByRequest(r)
-        l.length should equal (3)
+        l.length should equal(3)
 
-        engine.getTotalByRequest(r) should equal (3)
+        engine.getTotalByRequest(r) should equal(3)
       }
     }
   }
@@ -269,9 +271,9 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         val mdr4 = engine.createMetaDataRecord(r1)
 
         val l: Array[Long] = engine.getByCollection(c)
-        l.length should equal (4)
+        l.length should equal(4)
 
-        engine.getTotalByCollection(c) should equal (4)
+        engine.getTotalByCollection(c) should equal(4)
       }
     }
   }
@@ -293,14 +295,14 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         val mdr4 = engine.createMetaDataRecord(r1)
 
         val l: Array[Long] = engine.getByProvider(p, true)
-        l.length should equal (4)
+        l.length should equal(4)
 
-        engine.getTotalByProvider(p, true) should equal (4)
+        engine.getTotalByProvider(p, true) should equal(4)
       }
     }
   }
 
-    /**
+  /**
    * engine retrieves tutti mdrs
    */
   @Test def retrieveAndCountTutti() {
@@ -322,10 +324,64 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         val mdr5 = engine.createMetaDataRecord(r3)
 
         val l: Array[Long] = engine.getByProvider(p, true)
-        l.length should equal (5)
+        l.length should equal(5)
 
-        engine.getTotalForAllIds() should equal (5)
+        engine.getTotalForAllIds() should equal(5)
       }
+    }
+  }
+
+  val multiValueTitle: TKey[MDRFieldRegistry, ArrayList[String]] = TKey.register(classOf[MDRFieldRegistry], "multiValueTitle", classOf[ArrayList[String]])
+  val multiValueAuthor: TKey[MDRFieldRegistry, ArrayList[String]] = TKey.register(classOf[MDRFieldRegistry], "multiValueTitle", classOf[ArrayList[String]])
+
+  @Test def mdrTest() {
+    withEngine{
+      engine => {
+        val p = engine.createProvider()
+        val c = engine.createCollection(p)
+        val r = engine.createRequest(c)
+        val mdr: MetaDataRecord[MDRFieldRegistry] = engine.createMetaDataRecord(r)
+
+        //unqualified
+        mdr.addField(multiValueAuthor, "Goethe");
+        mdr.addField(multiValueAuthor, "Schiller");
+
+        //qualified
+        mdr.addQField(multiValueTitle, "lang:en", "Subtitle")
+        mdr.addQField(multiValueTitle, "lang:en", "Subtitle 2")
+        mdr.addQField(multiValueTitle, "lang:fr", "Soustitre")
+
+        engine.updateMetaDataRecord(mdr)
+
+        val mdr1: MetaDataRecord[MDRFieldRegistry] = engine.getMetaDataRecords(mdr.getId)(0)
+
+        val a: java.util.List[String] = mdr1.getField(multiValueAuthor);
+        a.size should equal(2)
+        a.get(0) should equal("Goethe")
+        a.get(1) should equal("Schiller")
+
+        val l1: java.util.List[String] = mdr1.getQField(multiValueTitle, "lang:en")
+
+        l1.size should equal(2)
+        l1.get(0) should equal("Subtitle")
+        l1.get(1) should equal("Subtitle 2")
+
+
+        // first/principal field
+
+        /*
+        mdr1.setFirstField(multiValueAuthor, "Mephisto")
+        mdr2.setQField(multiValueAuthor, "lang:en", "Faust")
+
+        engine.updateMetaDataRecord(mdr1)
+
+        val mdr2:MetaDataRecord[MDRFieldRegistry] = engine.getMetaDataRecords(mdr.getId)(0)
+
+        mdr2.getField(multiValueAuthor).get(0) should equal ("Mephisto")
+        mdr2.getQField(multiValueAuthor, "lang:en").get(0) should equal ("Faust")
+        */
+      }
+
     }
   }
 

@@ -1,12 +1,11 @@
 package eu.europeana.uim;
 
-import static org.junit.Assert.assertNotNull;
-
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.store.StorageEngineAdapter;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.store.StorageEngineAdapter;
+import static org.junit.Assert.assertNotNull;
 
 public class UIMRegistryTest {
 

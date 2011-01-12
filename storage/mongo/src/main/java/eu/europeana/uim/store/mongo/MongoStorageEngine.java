@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MongoStorageEngine implements StorageEngine {
 
     private static final String DEFAULT_UIM_DB_NAME = "UIM";
-    private Mongo mongo = null;
+    Mongo mongo = null;
     private DB db = null;
     private DBCollection records = null;
     private Datastore ds = null;

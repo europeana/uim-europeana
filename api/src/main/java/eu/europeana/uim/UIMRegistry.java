@@ -16,6 +16,7 @@ public class UIMRegistry implements Registry {
 
 	private static Logger log = Logger.getLogger(UIMRegistry.class.getName());
 
+  private StorageEngine activeStorage = null;
 	private List<StorageEngine> storages = new ArrayList<StorageEngine>();
 	private Map<String, IngestionPlugin> plugins = new HashMap<String, IngestionPlugin>();
 	private List<Workflow> workflows = new ArrayList<Workflow>();
@@ -91,8 +92,13 @@ public class UIMRegistry implements Registry {
 		}
 	}
 
+    @Override
+    public List<StorageEngine> getStorages() {
+        return storages;
+    }
 
-	@Override
+
+    @Override
 	public void addWorkflow(Workflow workflow) {
 		if (workflow != null) { 
 			log.info("Added workflow: " + workflow.getName());
@@ -109,10 +115,16 @@ public class UIMRegistry implements Registry {
 		}
 	}
 
-	@Override
+    @Override
+    public void setActiveStorage(StorageEngine storage) {
+        activeStorage = storage;
+    }
+
+    @Override
 	public StorageEngine getStorage() {
 		if (storages == null || storages.isEmpty()) return null;
-		return storages.get(0);
+        if(activeStorage == null) activeStorage = storages.get(0);
+        return activeStorage;
 	}
 
 	@Override

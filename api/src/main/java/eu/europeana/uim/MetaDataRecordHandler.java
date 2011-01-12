@@ -1,14 +1,14 @@
 package eu.europeana.uim;
 
-import java.util.List;
-import java.util.Map.Entry;
-
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.common.parse.RecordField;
 import eu.europeana.uim.common.parse.RecordHandler;
 import eu.europeana.uim.common.parse.RecordMap;
 import eu.europeana.uim.store.Request;
+
+import java.util.List;
+import java.util.Map.Entry;
 
 public class MetaDataRecordHandler implements RecordHandler {
 
@@ -43,7 +43,7 @@ public class MetaDataRecordHandler implements RecordHandler {
 					}
 				} else {
 					for (String  value : entry.getValue()) {
-						mdr.setField(MDRFieldRegistry.title, value);
+						mdr.setFirstField(MDRFieldRegistry.title, value);
 					}
 				}
 			}

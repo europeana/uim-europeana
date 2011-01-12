@@ -1,8 +1,8 @@
 package eu.europeana.uim.api;
 
-import eu.europeana.uim.TKey;
 import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.TKey;
 
 public interface IngestionPlugin extends WorkflowStep {
 

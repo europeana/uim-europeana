@@ -1,5 +1,6 @@
 package eu.europeana.uim.gui.gwt.server;
 
+import eu.europeana.uim.UIMRegistry;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import org.osgi.framework.BundleActivator;
@@ -29,7 +30,7 @@ public class UIMDependenciesActivator implements BundleActivator {
         Orchestrator orchestrator = null;
         ServiceReference registryRef = bundleContext.getServiceReference("eu.europeana.uim.api.Registry");
         if(registryRef != null) {
-            registry = (Registry) bundleContext.getService(registryRef);
+            registry = (UIMRegistry) bundleContext.getService(registryRef);
         }
         ServiceReference orchestratorRef = bundleContext.getServiceReference("eu.europeana.uim.api.Orchestrator");
         if(orchestratorRef != null) {

@@ -18,6 +18,10 @@ public interface Registry {
 
     void removeStorage(StorageEngine storage);
 
+    List<StorageEngine> getStorages();
+
+    void setActiveStorage(StorageEngine storage);
+
     void addWorkflow(Workflow workflow);
 
     List<Workflow> getWorkflows();
