@@ -75,4 +75,9 @@ public class AbstractMongoEntity implements UimEntity {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
+
+    public String toString() {
+        return getMnemonic() + "\t" + getName();
+    }
+
 }
