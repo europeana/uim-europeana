@@ -41,16 +41,16 @@ Path                              Name                                          
      - 'mvn install'  (will fail first time, dont worry :)
 
      (must be done after the initial (failed) mvn install above!!)
-     Temporary (until we add it to the europeana artifactory / the ProgressBar widget makes it to GWT main):
-     install the additional gwt incubator JAR as follows:
-      'cd gui/uim-gui-gwt'
-      'mvn install:install-file -DgroupId=com.google -DartifactId=gwt-incubator -Dversion=20101117-r1766 -Dpackaging=jar -Dfile=lib/gwt-incubator-20101117-r1766.jar'
-   
-     go back to top dir
-   
-   - 'mvn install'  (should now succeed)
-   
 
+     - Temporary (until we add it to the europeana artifactory / the ProgressBar widget makes it to GWT main):
+       install the additional gwt incubator JAR as follows:
+       'mvn install:install-file -DgroupId=com.google -DartifactId=gwt-incubator -Dversion=20101117-r1766 -Dpackaging=jar -Dfile=gui/uim-gui-gwt/lib/gwt-incubator-20101117-r1766.jar'
+
+     - Temporary (until we add it to the europeana artifactory / Morphia sees this issue fixed):
+       install the patched Morphia JAR as follows (see http://code.google.com/p/morphia/issues/detail?id=208):
+       'mvn install:install-file -DgroupId=com.google.code.morphia -DartifactId=morphia -Dversion=0.99-SNAPSHOT-208patch -Dpackaging=jar -Dfile=storage/mongo/lib/morphia-0.99-SNAPSHOT-208patch.jar'
+
+   - 'mvn install'  (should now succeed)
 
 3) Start Karaf:
    - go to the Karaf main directory
@@ -116,6 +116,13 @@ In order to run the development mode:
    - 'cd gui/uim-gui-gwt'
    - mvn gwt:run
 3) start a browser at the indicated URL. You may need to install the GWT plugin for frontend development
+
+#5 USING THE MONGO STORAGE ENGINE
+=================================
+
+1) install MongoDB on your machine
+2) activate the MongoDB StorageEngine via the Karaf shell:
+   'uimconfig:storage MongoStorageEngine'
 
 #5 TECHNOLOGIES IN USE
 ======================

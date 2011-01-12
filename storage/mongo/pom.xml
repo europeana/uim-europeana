@@ -20,22 +20,40 @@
         <dependency>
             <groupId>com.google.code.morphia</groupId>
             <artifactId>morphia</artifactId>
-            <version>0.98</version>
+            <version>0.99-SNAPSHOT-208patch</version>
             <scope>compile</scope>
         </dependency>
+        <!--Optional Jars (for certain features) but required by maven for building. -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
             <version>[2.1_3,)</version>
             <type>jar</type>
-            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.thoughtworks.proxytoys</groupId>
             <artifactId>proxytoys</artifactId>
             <version>1.0</version>
             <type>jar</type>
-            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.4</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -106,27 +124,24 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Bundle-Activator>eu.europeana.uim.store.mongo.MongoBundleActivator</Bundle-Activator>
                         <!--
                             morphia has a class that uses com.google.gwt.user.client.rpc but we do not need it
                             yet the maven bundle plugin will generate an entry for it due to our Embed-Dependency directive
                          -->
                         <Import-Package>
-                            !org.testng,
-                            !org.testng.annotations,
-                            !org.w3c.dom,!org.xml.sax,
-                            !org.xml.sax.ext,
-                            !org.xml.sax.helpers,
-                            !org.relaxng.datatype.*,
-                            !org.apache.tools.ant.*,
-                            !org.codehaus.aspectwerkz.hook.*,
-                            !net.sf.cglib.asm.util,
                             !com.google.gwt.user.client.rpc,
-                            !com.sun.*,*
+                            !net.sf.cglib.asm.util,
+                            !org.apache.commons.lang;version="2.4",
+                            !org.apache.tools.ant.*,
+                            !org.codehaus.aspectwerkz.hook,
+                            !org.testng.*,
+                            *
                         </Import-Package>
                         <Embed-Dependency>
                             *;scope=compile|runtime;inline=false;artifactId=!europeana-uim-common|europeana-uim-api|commons-lang|commons-io|trove4j
                         </Embed-Dependency>
-                        <Embed-Transitive>true</Embed-Transitive>
+                        <Embed-Transitive>false</Embed-Transitive>
                     </instructions>
                 </configuration>
             </plugin>

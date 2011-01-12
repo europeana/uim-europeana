@@ -1,8 +1,10 @@
 package eu.europeana.uim.store.mongo;
 
 import com.google.code.morphia.annotations.Entity;
+import com.google.code.morphia.annotations.Reference;
 import eu.europeana.uim.store.Provider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,6 +17,12 @@ public class MongoProvider extends AbstractMongoEntity implements Provider {
     private String oaiBaseUrl;
     private String oaiMetadataPrefix;
 
+    @Reference
+    private List<Provider> relatedOut = new ArrayList<Provider>();
+    @Reference
+    private List<Provider> relatedIn = new ArrayList<Provider>();
+
+
     public MongoProvider() {
     }
 
@@ -23,11 +31,11 @@ public class MongoProvider extends AbstractMongoEntity implements Provider {
     }
 
     public List<Provider> getRelatedOut() {
-        return null;
+        return relatedOut;
     }
 
     public List<Provider> getRelatedIn() {
-        return null;
+        return relatedIn;
     }
 
     public void setAggregator(boolean aggregator) {

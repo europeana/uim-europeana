@@ -86,4 +86,16 @@ public class MongodbCollection extends AbstractMongoEntity implements Collection
         result = 31 * result + provider.hashCode();
         return result;
     }
+
+
+    @Override
+    public String toString() {
+        String string = super.toString();
+        string += " [";
+        string += getOaiBaseUrl() != null ? getOaiBaseUrl() : (getProvider().getOaiBaseUrl() != null ? getProvider().getOaiBaseUrl() : "undefined");
+
+        string += "?metadataPrefix=";
+        string += getOaiMetadataPrefix() != null ? getOaiMetadataPrefix() : getProvider().getOaiMetadataPrefix();
+        return string + "]";
+    }
 }

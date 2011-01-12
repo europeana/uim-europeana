@@ -18,7 +18,6 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 
     public OrchestrationServiceImpl() {
         super();
-        System.out.println("I got a freaking engine: " + getEngine());
     }
 
     private Map<Long, Provider> wrappedProviders = new HashMap<Long, Provider>();

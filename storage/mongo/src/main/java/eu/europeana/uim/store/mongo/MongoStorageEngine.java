@@ -2,6 +2,7 @@ package eu.europeana.uim.store.mongo;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
+import com.google.code.morphia.mapping.DefaultCreator;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -19,6 +20,7 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -54,15 +56,19 @@ public class MongoStorageEngine implements StorageEngine {
         this.dbName = dbName;
     }
 
+    public MongoStorageEngine() {
+
+    }
+
     public String getIdentifier() {
-        return MongoStorageEngine.class.getName();
+        return MongoStorageEngine.class.getSimpleName();
     }
 
     public void setConfiguration(Map<String, String> config) {
     }
 
     public Map<String, String> getConfiguration() {
-        return null;
+        return new HashMap<String, String>();
     }
 
     public void initialize() {
@@ -74,7 +80,23 @@ public class MongoStorageEngine implements StorageEngine {
             mongo = new Mongo();
             db = mongo.getDB(dbName);
             records = db.getCollection("records");
-            ds = new Morphia().createDatastore(mongo, dbName);
+            Morphia morphia = new Morphia();
+
+            morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+                @Override
+                protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+                    // we're the only ones for now using Morphia so we can be sure that in any case
+                    // the classloader of this bundle has to be used
+                    return MongoBundleActivator.getBundleClassLoader();
+                }
+            });
+
+            morphia.
+                    map(MongodbCollection.class).
+                    map(MongoExecution.class).
+                    map(MongoProvider.class).
+                    map(MongoRequest.class);
+            ds = morphia.createDatastore(mongo, dbName);
             status = EngineStatus.RUNNING;
 
             // initialize counters
