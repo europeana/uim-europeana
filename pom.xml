@@ -30,7 +30,7 @@
         <module>plugins/fileimp</module>
 
         <!-- mongodb based memory storage implementation -->
-        <module>storage/mongo</module>
+<!--        <module>storage/mongo</module>-->
 
         <!--  the uim standard in memory storage implementation -->
         <module>storage/memory</module>
