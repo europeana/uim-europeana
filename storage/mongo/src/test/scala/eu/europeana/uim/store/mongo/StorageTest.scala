@@ -5,6 +5,7 @@ import org.junit.Test
 import org.scalatest.junit.{ShouldMatchersForJUnit, JUnitSuite}
 import eu.europeana.uim.{TKey, MDRFieldRegistry, MetaDataRecord}
 import java.util.ArrayList
+import eu.europeana.uim.api.StorageEngineException
 
 /**
  *
@@ -16,7 +17,7 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
 
 
   def withEngine(testFunction: MongoStorageEngine => Unit) {
-    val e: MongoStorageEngine = new MongoStorageEngine("TEST")
+    val e: MongoStorageEngine = new MongoStorageEngine("UIMTEST")
     e.initialize
 
     try {
@@ -25,9 +26,7 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
       e.shutdown
       // clear everything
       val m: Mongo = new Mongo();
-      m.dropDatabase("TEST");
-
-
+      m.dropDatabase("UIMTEST");
     }
   }
 
@@ -56,10 +55,32 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         val p = engine.createProvider
         p.getName should equal(null)
         p.setName("MyLibrary")
+        p.setMnemonic("1")
         engine.updateProvider(p)
 
         val p1 = engine.getProvider(p.getId)
         p.getName should equal("MyLibrary")
+
+        val p2 = engine.createProvider
+        p2.setName("MyLibrary")
+
+        try {
+          engine.updateProvider(p2)
+          fail()
+        } catch {
+          case e: StorageEngineException => //Expected
+        }
+
+        p2.setName("MyOtherLibrary")
+        p2.setMnemonic("1")
+
+        try {
+          engine.updateProvider(p2)
+          fail()
+        } catch {
+          case e: StorageEngineException => //Expected
+        }
+
       }
     }
   }
@@ -108,10 +129,32 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         val c = engine.createCollection(p)
         c.getName should equal(null)
         c.setName("MyCollection")
+        c.setMnemonic("1")
         engine.updateCollection(c)
 
         val c1 = engine.getCollection(c.getId)
         c1.getName should equal("MyCollection")
+
+        val c2 = engine.createCollection(p)
+        c2.setName("MyCollection")
+
+        try {
+          engine.updateCollection(c2)
+          fail()
+        } catch {
+          case e: StorageEngineException => //Expected
+        }
+
+        c2.setName("MyOtherCollection")
+        c2.setMnemonic("1")
+
+        try {
+          engine.updateCollection(c2)
+          fail()
+        } catch {
+          case e: StorageEngineException => //Expected
+        }
+
       }
     }
   }

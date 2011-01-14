@@ -133,6 +133,14 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public void updateProvider(Provider provider) throws StorageEngineException {
+        for (Provider p : getProvider()) {
+            if (p.getName() != null && p.getName().equals(provider.getName())) {
+                throw new StorageEngineException("Provider with name '" + provider.getMnemonic() + "' already exists");
+            }
+            if (p.getMnemonic() != null && p.getMnemonic().equals(provider.getMnemonic())) {
+                throw new StorageEngineException("Provider with mnemonic '" + provider.getMnemonic() + "' already exists");
+            }
+        }
         ds.save(provider);
     }
 
@@ -159,6 +167,15 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public void updateCollection(Collection collection) throws StorageEngineException {
+        for (Collection c : getAllCollections()) {
+            if (c.getName() != null && c.getName().equals(collection.getName())) {
+                throw new StorageEngineException("Collection with name '" + collection.getMnemonic() + "' already exists");
+            }
+            if (c.getMnemonic() != null && c.getMnemonic().equals(collection.getMnemonic())) {
+                throw new StorageEngineException("Collection with mnemonic '" + collection.getMnemonic() + "' already exists");
+            }
+
+        }
         ds.save(collection);
     }
 
@@ -173,6 +190,14 @@ public class MongoStorageEngine implements StorageEngine {
     public List<Collection> getCollections(Provider provider) {
         List<Collection> res = new ArrayList<Collection>();
         for (Collection c : ds.find(MongodbCollection.class).filter("provider", provider).asList()) {
+            res.add(c);
+        }
+        return res;
+    }
+
+    public List<Collection> getAllCollections() {
+        List<Collection> res = new ArrayList<Collection>();
+        for (Collection c : ds.find(MongodbCollection.class).asList()) {
             res.add(c);
         }
         return res;
