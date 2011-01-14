@@ -2,7 +2,6 @@ package eu.europeana.uim.integration;
 
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
-import org.apache.karaf.testing.AbstractIntegrationTest;
 import org.apache.karaf.testing.Helper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,11 +9,6 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.Constants;
-import org.osgi.service.command.CommandProcessor;
-import org.osgi.service.command.CommandSession;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.felix;
@@ -34,7 +28,7 @@ import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
  * @author Manuel Bernhardt
  */
 @RunWith(JUnit4TestRunner.class)
-public class CommandTest extends AbstractIntegrationTest {
+public class CommandTest extends AbstractUIMIntegrationTest {
 
     @Configuration
     public static Option[] configuration() throws Exception {
@@ -81,25 +75,6 @@ public class CommandTest extends AbstractIntegrationTest {
         assertEquals("1.5", property);
         
         //assertEquals("UIM Registry: No plugins. MemoryStorageEngine.", getCommandResult("uim:info"));
-    }
-
-    private String getCommandResult(String command) {
-        String res = "";
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-        CommandProcessor cp = getOsgiService(CommandProcessor.class);
-        CommandSession cs = cp.createSession(System.in, ps, System.err);
-        try {
-            cs.execute(command);
-            res = baos.toString("UTF-8").trim();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cs != null)
-                cs.close();
-        }
-        return res;
-
     }
 
 }
