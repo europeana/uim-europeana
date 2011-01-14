@@ -45,10 +45,10 @@
         <module>plugins/integration</module>
 
         <!-- webconsole-based GUI -->
-        <module>gui/uim-webconsole-extension</module>
+<!--        <module>gui/uim-webconsole-extension</module>-->
 
         <!-- GWT-based GUI -->
-        <module>gui/uim-gui-gwt</module>
+<!--        <module>gui/uim-gui-gwt</module>-->
 
     </modules>
 
