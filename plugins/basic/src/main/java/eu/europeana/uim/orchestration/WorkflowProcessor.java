@@ -121,7 +121,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
      * Starts the processor
      */
     public void start() {
-        log.info("Starting new WorkflowProcessor for Workfow '" + workflow.getName() + "'");
+        log.info(String.format("Starting new WorkflowProcessor for Workfow '%s'", workflow.getName()));
 
         // TODO make this configurable
         processorTimer.schedule(this, 0, 100);

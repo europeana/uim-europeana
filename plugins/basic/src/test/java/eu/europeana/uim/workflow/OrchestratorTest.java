@@ -25,6 +25,7 @@ import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -86,7 +87,7 @@ public class OrchestratorTest {
     }
 
     @Test
-    public void testWorkflowCollection() {
+    public void testWorkflowCollection() throws Exception {
 
         final int why = 4242;
 
@@ -108,6 +109,7 @@ public class OrchestratorTest {
         StorageEngine storage = mock(StorageEngine.class);
         when(mockRegistry.getStorage()).thenReturn(storage);
         when(storage.getTotalByCollection(c)).thenReturn(why);
+        when(storage.getByCollection(c)).thenReturn(new long[4242]);
         Execution mockExecution = mock(Execution.class);
         when(storage.createExecution()).thenReturn(mockExecution);
 
@@ -121,6 +123,22 @@ public class OrchestratorTest {
         assertTrue(e.getDataSet().equals(c));
 
         verify(mockProcessor).start();
+
+        for(int i = 0; i < 43; i++) {
+            Thread.sleep(10);
+            if(i < 42) {
+                assertEquals(100, o.getBatchFor(e).length);
+            } else if(i == 42) {
+                assertEquals(42, o.getBatchFor(e).length);
+            } else if(i == 43) {
+                assertNull(o.getBatchFor(e));
+            }
+
+        }
+
+        Thread.sleep(4000);
+
+
     }
 
 

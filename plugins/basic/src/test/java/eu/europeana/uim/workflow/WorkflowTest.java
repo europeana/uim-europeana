@@ -17,6 +17,7 @@ import eu.europeana.uim.orchestration.UIMExecution;
 import eu.europeana.uim.orchestration.UIMOrchestrator;
 import eu.europeana.uim.orchestration.WorkflowProcessor;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.memory.MemoryStorageEngine;
 import org.junit.Before;
@@ -231,7 +232,10 @@ public class WorkflowTest {
         try {
 
             StorageEngine storage = registry.getStorage();
-            Collection targetcoll = storage.findCollection("000");
+
+            Provider p = storage.createProvider();
+            Collection targetcoll = storage.createCollection(p);
+
 
             Request request = storage.createRequest(targetcoll);
             storage.updateRequest(request);
