@@ -36,8 +36,10 @@ public class MemoryStorageEngine implements StorageEngine {
 	private TLongObjectHashMap<Request> requests = new TLongObjectHashMap<Request>();
 	private TLongObjectHashMap<Execution> executions = new TLongObjectHashMap<Execution>();
 
-	
+
 	private TLongLongHashMap metarequest = new TLongLongHashMap();
+  private TLongLongHashMap metacollection = new TLongLongHashMap();
+  private TLongLongHashMap metaprovider = new TLongLongHashMap();
 	private TLongObjectHashMap<MetaDataRecord<?>> metadatas = new TLongObjectHashMap<MetaDataRecord<?>>();
 
 	private AtomicLong providerId= new AtomicLong();
@@ -48,8 +50,8 @@ public class MemoryStorageEngine implements StorageEngine {
 	private AtomicLong mdrId= new AtomicLong();
 
 	private EngineStatus status = EngineStatus.RUNNING;
-	
-	
+
+
 	public MemoryStorageEngine() {
 		super();
 	}
@@ -59,12 +61,12 @@ public class MemoryStorageEngine implements StorageEngine {
 	public String getIdentifier(){
 		return IDENTIFIER;
 	}
-	
+
 
 	@Override
 	public void initialize() {
 	}
-	
+
 
 	@Override
 	public void shutdown() {
@@ -184,7 +186,18 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 		return result;
 	}
-	@Override
+    @Override
+    public List<Collection> getAllCollections() {
+        ArrayList<Collection> result = new ArrayList<Collection>();
+        TLongObjectIterator<Collection> iterator = collections.iterator();
+        while (iterator.hasNext()) {
+            iterator.advance();
+            Collection collection = iterator.value();
+            result.add(collection);
+        }
+        return result;
+    }
+    @Override
 	public Collection getCollection(long id) {
 		return collections.get(id);
 	}
@@ -196,9 +209,9 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 		return null;
 	}
-	
-	
-	
+
+
+
 	@Override
 	public Request createRequest(Collection collection) {
 		return new MemoryRequest(requestId.getAndIncrement(), (MemoryCollection) collection);
@@ -220,10 +233,10 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 		return result;
 	}
-	
-	
-	
-	
+
+
+
+
 
 	@Override
 	public MetaDataRecord<MDRFieldRegistry> createMetaDataRecord(Request request) {
@@ -234,8 +247,14 @@ public class MemoryStorageEngine implements StorageEngine {
 	@Override
 	public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) {
 		metadatas.put(record.getId(), record);
-		metarequest.put(record.getId(), record.getRequest().getId());
+        addMetaDataRecord(record);
 	}
+
+    private void addMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) {
+        metarequest.put(record.getId(), record.getRequest().getId());
+        metacollection.put(record.getId(), record.getRequest().getCollection().getId());
+        metaprovider.put(record.getId(), record.getRequest().getCollection().getProvider().getId());
+    }
 
 
 	@Override
@@ -256,10 +275,10 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 		return result;
 	}
-	
-	
-	
-	
+
+
+
+
 	@Override
 	public long[] getByRequest(Request request) {
 		TLongArrayList result = new TLongArrayList();
@@ -272,16 +291,31 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 		return result.toNativeArray();
 	}
-	
+
 	@Override
 	public long[] getByCollection(Collection collection) {
-		// TODO Auto-generated method stub
-		return null;
+        TLongArrayList result = new TLongArrayList();
+        TLongLongIterator iterator = metacollection.iterator();
+        while(iterator.hasNext()) {
+            iterator.advance();
+            if (iterator.value() == collection.getId()) {
+                result.add(iterator.key());
+            }
+        }
+        return result.toNativeArray();
 	}
 	@Override
+    // TODO recursive
 	public long[] getByProvider(Provider provider, boolean recursive) {
-		// TODO Auto-generated method stub
-		return null;
+        TLongArrayList result = new TLongArrayList();
+        TLongLongIterator iterator = metaprovider.iterator();
+        while(iterator.hasNext()) {
+            iterator.advance();
+            if (iterator.value() == provider.getId()) {
+                result.add(iterator.key());
+            }
+        }
+        return result.toNativeArray();
 	}
 	@Override
 	public long[] getAllIds() {
@@ -291,28 +325,48 @@ public class MemoryStorageEngine implements StorageEngine {
 
 	@Override
 	public int getTotalByRequest(Request request) {
-		// TODO Auto-generated method stub
-		return 0;
+        int result = 0;
+        TLongLongIterator iterator = metarequest.iterator();
+        while(iterator.hasNext()) {
+            iterator.advance();
+            if (iterator.value() == request.getId()) {
+                result++;
+            }
+        }
+        return result;
 	}
 
 
 	@Override
 	public int getTotalByCollection(Collection collection) {
-		// TODO Auto-generated method stub
-		return 0;
+        int result = 0;
+        TLongLongIterator iterator = metacollection.iterator();
+        while(iterator.hasNext()) {
+            iterator.advance();
+            if (iterator.value() == collection.getId()) {
+                result++;
+            }
+        }
+        return result;
 	}
 
 
 	@Override
 	public int getTotalByProvider(Provider provider, boolean recursive) {
-		// TODO Auto-generated method stub
-		return 0;
+        int result = 0;
+        TLongLongIterator iterator = metaprovider.iterator();
+        while(iterator.hasNext()) {
+            iterator.advance();
+            if (iterator.value() == provider.getId()) {
+                result++;
+            }
+        }
+        return result;
 	}
 
 	@Override
 	public int getTotalForAllIds() {
-		// TODO Auto-generated method stub
-		return 0;
+		return metadatas.size();
 	}
 
 
