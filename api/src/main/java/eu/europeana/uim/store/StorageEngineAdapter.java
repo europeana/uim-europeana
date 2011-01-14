@@ -10,7 +10,7 @@ import java.util.Map;
 
 public abstract class StorageEngineAdapter implements StorageEngine {
 
-	@Override
+    @Override
 	public String getIdentifier() {
 		return null;
 	}
@@ -93,6 +93,11 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 		
 		return null;
 	}
+
+    @Override
+    public List<Collection> getAllCollections() {
+        return null;
+    }
 
 	@Override
 	public Collection findCollection(String mnemonic) {

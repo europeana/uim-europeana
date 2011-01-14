@@ -45,6 +45,7 @@ public interface StorageEngine {
 	Collection getCollection(long id);
 	Collection findCollection(String mnemonic);
 	List<Collection> getCollections(Provider provider);
+    List<Collection> getAllCollections();
 
 	Request createRequest(Collection collection);
 	void updateRequest(Request request) throws StorageEngineException;

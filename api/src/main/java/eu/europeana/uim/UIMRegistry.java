@@ -16,6 +16,7 @@ public class UIMRegistry implements Registry {
 
     private static Logger log = Logger.getLogger(UIMRegistry.class.getName());
 
+    private String defaultStorageEngine;
     private StorageEngine activeStorage = null;
     private List<StorageEngine> storages = new ArrayList<StorageEngine>();
     private Map<String, IngestionPlugin> plugins = new HashMap<String, IngestionPlugin>();
@@ -24,6 +25,18 @@ public class UIMRegistry implements Registry {
     private Orchestrator orchestrator = null;
 
     public UIMRegistry() {
+    }
+
+    public void setDefaultStorageEngine(String defaultStorageEngine) {
+        // do not allow setting false values
+        if (activeStorage != null && getStorage(defaultStorageEngine) != null) {
+            this.activeStorage = getStorage(defaultStorageEngine);
+            this.defaultStorageEngine = defaultStorageEngine;
+        } else if (activeStorage != null) {
+            log.severe("Attempt to set default storage engine to '" + defaultStorageEngine + "' failed, not making the change");
+        } else {
+            this.defaultStorageEngine = defaultStorageEngine;
+        }
     }
 
     @Override
@@ -81,6 +94,13 @@ public class UIMRegistry implements Registry {
             if (!storages.contains(storage)) {
                 storage.initialize();
                 this.storages.add(storage);
+
+                // activate default storage
+                if (activeStorage == null) {
+                    activeStorage = storage;
+                } else if (storage.getIdentifier().equals(defaultStorageEngine)) {
+                    activeStorage = storage;
+                }
             }
         }
     }
@@ -126,13 +146,19 @@ public class UIMRegistry implements Registry {
     @Override
     public StorageEngine getStorage() {
         if (storages == null || storages.isEmpty()) return null;
-        if (activeStorage == null) activeStorage = storages.get(0);
+        if (activeStorage == null) {
+            if (getStorage(defaultStorageEngine) != null) {
+                activeStorage = getStorage(defaultStorageEngine);
+            } else {
+                activeStorage = storages.get(0);
+            }
+        }
         return activeStorage;
     }
 
     @Override
     public StorageEngine getStorage(String identifier) {
-        if (storages == null || storages.isEmpty()) return null;
+        if (identifier == null || storages == null || storages.isEmpty()) return null;
         for (StorageEngine storage : storages) {
             if (identifier.equals(storage.getIdentifier())) {
                 return storage;
@@ -140,7 +166,6 @@ public class UIMRegistry implements Registry {
         }
         return null;
     }
-
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -171,7 +196,6 @@ public class UIMRegistry implements Registry {
             }
         }
 
-
         builder.append("\nRegistered storage:");
         builder.append("\n--------------------------------------");
         if (storages.isEmpty()) {
@@ -181,7 +205,7 @@ public class UIMRegistry implements Registry {
                 if (builder.length() > 0) {
                     builder.append("\n\t");
                 }
-                if (activeStorage.equals(storage)) {
+                if (activeStorage != null && activeStorage.equals(storage)) {
                     builder.append("* ");
                 } else {
                     builder.append("  ");

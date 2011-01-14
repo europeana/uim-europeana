@@ -11,7 +11,7 @@ import org.osgi.service.command.CommandSession;
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 
-@Command(name = "uimconfig", scope = "storage")
+@Command(name = "config", scope = "storage")
 public class UIMConfigStorage implements Action {
 
     @Argument
@@ -28,9 +28,14 @@ public class UIMConfigStorage implements Action {
 
         if (storage == null) {
             session.getConsole().println("Available storage engines: ");
+            session.getConsole().println();
             // list available storage engines
             for(StorageEngine s : registry.getStorages()) {
-                session.getConsole().println(" * " + s.getIdentifier());
+                if(s.equals(registry.getStorage())) {
+                    session.getConsole().println("* " + s.getIdentifier());
+                } else {
+                    session.getConsole().println("  " + s.getIdentifier());
+                }
             }
         } else {
             StorageEngine selected = null;
