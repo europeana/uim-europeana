@@ -7,11 +7,14 @@ import eu.europeana.uim.api.WorkflowStep;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class DummyWorkflow implements Workflow {
+
+    private static Logger log = Logger.getLogger(DummyWorkflow.class.getSimpleName());
 
     private final Long id;
 
@@ -25,6 +28,7 @@ public class DummyWorkflow implements Workflow {
 
         // that's a very exciting worklow
         definition.add(registry.getPlugin("eu.europeana.uim.plugin.dummy.DummyPlugin"));
+        log.info("Added plugin definition " + definition.get(0).toString());
     }
 
     @Override
