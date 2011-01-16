@@ -5,7 +5,8 @@ INDEX
 2/ Installation
 3/ Test import from file
 4/ GWT Development mode
-5/ Technologies in use
+5/ Configuration
+6/ Technologies in use
 
 
 #1 PROJECT STRUCTURE
@@ -21,7 +22,7 @@ Path                              Name                                          
 /gui/uim-webconsole-extension     Unified Ingestion Manager: Webconsole extension          UIM GUI extension for the Karaf Webconsole
 /gui/uim-gui-gwt                  Unified Ingestion Manager: GWT User Interface            UIM GWT frontend
 /storage/memory                   Unified Ingestion Manager: Storage Backend Memory        In-memory implementation of the storage engine
-
+/storage/mongo                    Unified Ingestion Manager: Storage Backend Mongo         Mongodb implementation of the storage engine
 /plugins/fileimp                  Unified Ingestion Manager: Import from File              Bundle to import data from a XML file
 /plugins/integration              Unified Ingestion Manager: Integration tests             The integration tests, using PAX-Exam
 /plugins/dummy                    Unified Ingestion Manager: Dummy Plugin                  Our beloved dummy plugin
@@ -102,7 +103,8 @@ Path                              Name                                          
    - should complain about missing arguments
    
 5) Import ESE file:
-   - in Karaf shell: 'uim:file -c 000 file://<project-path>/common/src/test/resources/readingeurope.xml'
+   - in Karaf shell: 'uim:file -c 1 file://<project-path>/common/src/test/resources/readingeurope.xml'
+                     'uim:file -c 2 file://<project-path>/common/src/test/resources/readingeurope.xml'
 
 #4 GWT DEVELOPMENT MODE
 =======================
@@ -117,14 +119,36 @@ In order to run the development mode:
    - mvn gwt:run
 3) start a browser at the indicated URL. You may need to install the GWT plugin for frontend development
 
-#5 USING THE MONGO STORAGE ENGINE
-=================================
+When developing and changing the GWT server-side, you need to reinstall the WAR on Karaf after having re-installed it to maven via
 
-1) install MongoDB on your machine
-2) activate the MongoDB StorageEngine via the Karaf shell:
-   'uimconfig:storage MongoStorageEngine'
+osgi:update <bundleId>
 
-#5 TECHNOLOGIES IN USE
+
+#5 CONFIGURATION
+================
+
+=== Dynamic configuration with Karaf
+
+Use Karaf's 'config' commands to update properties, e.g.
+
+  config:edit eu.europeana.uim
+  config:propset defaultStorageEngine MongoStorageEngine
+  config:update
+
+This will update the properties and save them on the file system.
+Default values are configured via blueprint in the XML definition file.
+
+=== Storage Engine configuration
+
+You can list the avaialble storage engines with
+
+  'uimconfig:storage'
+
+and switch with e.g.
+
+  'uimconfig:storage MongoStorageEngine'
+
+#6 TECHNOLOGIES IN USE
 ======================
 
 - the project runs on Apache Karaf which bundles Felix and other Apache OSGi projects (http://karaf.apache.org)

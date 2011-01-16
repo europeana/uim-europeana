@@ -8,6 +8,9 @@ import eu.europeana.uim.store.UimEntity;
 import java.util.Date;
 
 /**
+ * FIXME this should wrap an ActiveExecution and delegate stuff to it, instead of passing the ID
+ *
+ *
 * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
 */
 public class UIMExecution implements ActiveExecution {
@@ -17,12 +20,18 @@ public class UIMExecution implements ActiveExecution {
     private final Workflow workflow;
     private final Date startTime;
 
+
     public UIMExecution(long id, UimEntity dataset, ProgressMonitor monitor, Workflow workflow) {
         this.id = id;
         this.dataset = dataset;
         this.monitor = monitor;
         this.workflow = workflow;
         this.startTime = new Date();
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     @Override
@@ -44,8 +53,43 @@ public class UIMExecution implements ActiveExecution {
     }
 
     @Override
-    public long getId() {
-        return id;
+    public Boolean isActive() {
+        return true;
+    }
+
+    @Override
+    public void setDataSet(UimEntity entity) {
+        throw new RuntimeException("Read the FIXME");
+    }
+
+    @Override
+    public void setActive(boolean active) {
+        throw new RuntimeException("Read the FIXME");
+    }
+
+    @Override
+    public String getWorkflowIdentifier() {
+        throw new RuntimeException("Read the FIXME");
+    }
+
+    @Override
+    public void setWorkflowIdentifier(String identifier) {
+        throw new RuntimeException("Read the FIXME");
+    }
+
+    @Override
+    public void setStartTime(Date start) {
+        throw new RuntimeException("Read the FIXME");
+    }
+
+    @Override
+    public Date getEndTime() {
+        throw new RuntimeException("Read the FIXME");
+    }
+
+    @Override
+    public void setEndTime(Date end) {
+        throw new RuntimeException("Read the FIXME");
     }
 
 }

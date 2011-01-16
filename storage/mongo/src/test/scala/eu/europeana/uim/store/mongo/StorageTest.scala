@@ -6,6 +6,7 @@ import org.scalatest.junit.{ShouldMatchersForJUnit, JUnitSuite}
 import eu.europeana.uim.{TKey, MDRFieldRegistry, MetaDataRecord}
 import java.util.ArrayList
 import eu.europeana.uim.api.StorageEngineException
+import eu.europeana.uim.store.Execution
 
 /**
  *
@@ -233,6 +234,8 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         val e = engine.createExecution
         val id = e.getId
         engine.getExecutions().size should equal(1)
+        val e1:Execution = engine.getExecutions().get(0)
+        e1.isActive should equal (false)
     }
   }
 

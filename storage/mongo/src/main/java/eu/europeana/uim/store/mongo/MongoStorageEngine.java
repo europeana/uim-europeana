@@ -82,6 +82,7 @@ public class MongoStorageEngine implements StorageEngine {
             records = db.getCollection("records");
             Morphia morphia = new Morphia();
 
+            // see http://code.google.com/p/morphia/issues/detail?id=208
             morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
                 @Override
                 protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
@@ -134,10 +135,10 @@ public class MongoStorageEngine implements StorageEngine {
 
     public void updateProvider(Provider provider) throws StorageEngineException {
         for (Provider p : getProvider()) {
-            if (p.getName() != null && p.getName().equals(provider.getName())) {
+            if (p.getName() != null && p.getName().equals(provider.getName()) && p.getId() != provider.getId()) {
                 throw new StorageEngineException("Provider with name '" + provider.getMnemonic() + "' already exists");
             }
-            if (p.getMnemonic() != null && p.getMnemonic().equals(provider.getMnemonic())) {
+            if (p.getMnemonic() != null && p.getMnemonic().equals(provider.getMnemonic())  && p.getId() != provider.getId()) {
                 throw new StorageEngineException("Provider with mnemonic '" + provider.getMnemonic() + "' already exists");
             }
         }
@@ -168,10 +169,10 @@ public class MongoStorageEngine implements StorageEngine {
 
     public void updateCollection(Collection collection) throws StorageEngineException {
         for (Collection c : getAllCollections()) {
-            if (c.getName() != null && c.getName().equals(collection.getName())) {
+            if (c.getName() != null && c.getName().equals(collection.getName()) && c.getId() != collection.getId()) {
                 throw new StorageEngineException("Collection with name '" + collection.getMnemonic() + "' already exists");
             }
-            if (c.getMnemonic() != null && c.getMnemonic().equals(collection.getMnemonic())) {
+            if (c.getMnemonic() != null && c.getMnemonic().equals(collection.getMnemonic()) && c.getId() != collection.getId()) {
                 throw new StorageEngineException("Collection with mnemonic '" + collection.getMnemonic() + "' already exists");
             }
 

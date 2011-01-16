@@ -10,6 +10,7 @@ import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.TaskStatus;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.workflow.StepProcessorProvider;
 
 import java.util.Map;
@@ -70,7 +71,6 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
         // (- by default, if the step is a ProcessingContainer?)
         for (int i = 0; i < w.getSteps().size(); i++) {
             WorkflowStep step = w.getSteps().get(i);
-
 
             // TODO save point logic for processing containers -- have a queue of some sort?
 
@@ -142,6 +142,14 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
         // - implement WorldPeace
 
         if (executions.size() > 0) {
+
+            // FIXME this works only when there's more than one plugin!!
+            // of course any realistic workflow HAS more than one plugin
+            // so we're lazily not handling this case and throw a NoCanDoException instead
+            if(stepProcessors.size() == 1) {
+                throw new RuntimeException("Sorry mate, the Processor doesn't yet deal with workflows that have only ONE plugin, that wouldn't be very realistic.");
+            }
+
             for (int i = 0; i < stepProcessors.size(); i++) {
                 StepProcessor sp = stepProcessors.get(i);
                 //System.out.println("STEP " + i + " " + sp.toString());
@@ -165,7 +173,8 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
             Vector<Task> doneTasks = new Vector<Task>();
             for (Task t : tasks.keySet()) {
                 if (t.getStatus() == TaskStatus.DONE || t.getStatus() == TaskStatus.FAILED) {
-                    tasks.get(t).getMonitor().worked(1);
+                    ProgressMonitor monitor = tasks.get(t).getMonitor();
+                    monitor.worked(1);
                     doneTasks.add(t);
                 }
             }
@@ -178,17 +187,14 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
             for (UIMExecution e : executions) {
                 if (executionDone(e)) {
                     done.add(e);
-                    e.getMonitor().done();
                 }
             }
             for (ActiveExecution d : done) {
+                d.getMonitor().done();
                 executions.remove(d);
                 orchestrator.notifyExecutionDone(d);
             }
-
         }
-
-
     }
 
     private boolean executionDone(ActiveExecution e) {

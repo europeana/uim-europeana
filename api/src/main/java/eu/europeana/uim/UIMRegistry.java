@@ -35,6 +35,7 @@ public class UIMRegistry implements Registry {
         } else if (activeStorage != null) {
             log.severe("Attempt to set default storage engine to '" + defaultStorageEngine + "' failed, not making the change");
         } else {
+            log.info("Setting default storage engine to " + defaultStorageEngine);
             this.defaultStorageEngine = defaultStorageEngine;
         }
     }
@@ -100,6 +101,7 @@ public class UIMRegistry implements Registry {
                     activeStorage = storage;
                 } else if (storage.getIdentifier().equals(defaultStorageEngine)) {
                     activeStorage = storage;
+                    log.info("Making storage " + storage.getIdentifier() + " default");
                 }
             }
         }
@@ -205,7 +207,7 @@ public class UIMRegistry implements Registry {
                 if (builder.length() > 0) {
                     builder.append("\n\t");
                 }
-                if (activeStorage != null && activeStorage.equals(storage)) {
+                if (activeStorage != null && activeStorage == storage) {
                     builder.append("* ");
                 } else {
                     builder.append("  ");

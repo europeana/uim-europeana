@@ -109,6 +109,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>-DintegrationDir=${project.basedir}</argLine>
+                    <excludes>
+                        <exclude>**/AbstractUIMIntegrationTest.*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 

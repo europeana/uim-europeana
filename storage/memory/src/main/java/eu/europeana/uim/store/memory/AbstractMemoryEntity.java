@@ -1,6 +1,8 @@
 package eu.europeana.uim.store.memory;
 
-public class AbstractMemoryEntity {
+import eu.europeana.uim.store.UimEntity;
+
+public class AbstractMemoryEntity implements UimEntity {
 
 	private long id;
 

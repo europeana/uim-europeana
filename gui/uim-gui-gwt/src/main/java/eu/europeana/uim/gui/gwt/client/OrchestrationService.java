@@ -23,11 +23,20 @@ public interface OrchestrationService extends RemoteService {
 
     List<Collection> getCollections(Long provider);
 
+    List<Collection> getAllCollections();
+
     Execution startCollection(Long workflow, Long collection);
 
     Execution startProvider(Long workflow, Long provider);
 
     Execution getExecution(Long id);
+
+    List<Execution> getActiveExecutions();
+
+    List<Execution> getPastExecutions();
+
+    Integer getCollectionTotal(Long collection);
+
 
 
 

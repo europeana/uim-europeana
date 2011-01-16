@@ -1,31 +1,28 @@
 in progress
 ===========
-- past executions in overview
-- make GUI more robust against backend failures
 
 - mongodb storage:
-  - MDR implementation, probably impacts on existing MetaDataRecord object
-  - finish implementing MongoStorageEngine
+  - review MDR interface design, see commented out part of the StorageEngine unit test of the mongo module
 
 functionality:
 ==============
 
 - GUI:
-  - GWT module integration
-    - configure pax runner to run the stack via mvn pax:run
-    - make sure development mode works well via mvn gwt:run
   - New execution
     - better labels / clearer steps
     - later: display total number of MDRs on collection selection
   - Overview
-    - list of currently running executions
-      - overall status (number of MDRs processed vs. total number of MDRs)
-      - cancel execution button (with "are you sure" confirmation message)
-    - list of N (10?) past executions
+    - past executions: only list of 10 past executions
+    - "execution details" button --> execution details view
     - later: link to view with full history
   - Execution detail view (refreshed every N seconds)
     - steps / plugins (later: on click, detail of plugin)
     - tasks in queue per step
+  - general:
+    - make GUI more robust against backend failures
+    - better way to redeploy GWT module to OSGI environment
+       - Pax Runner is outdated there, not sure what we can do
+    - GWT integration in Karaf Webconsole? (maybe not necessary)
 
 - orchestrator:
   - workflow bundles
@@ -33,8 +30,12 @@ functionality:
     - pause
     - cancel
     - show status
+  - later: gracefully handle other services becoming unavailable (e.g. storage, ...)
 
 - storage: MangoDB-based implementation
+  - optimize it
+  - the unit test takes like forever because we re-built a whole db every time. we may wanna take a different approach and delete
+    the records instead
 
 - core plugins:
   - meta data mapping / conversion
@@ -44,15 +45,10 @@ functionality:
 
 - GUI:
   - OsgiManager in Apache Karaf / webconsole
-  - GWT integration in Karaf Webconsole
 
 
 design:
 =======
-
-- Execution & ActiveExecution: perhaps extend Execution instead and add a state enum to it?
-  semantically, there is a difference between both of them, and from a functional perspective it would be good to be able
-  to retrieve e.g. the ProgressMonitor for an execution, unless we give that responsibility to the Orchestrator itself?
 
 - maybe a better name for UimEntity? MetaDataRecord, Collection, Provider, ... are all data sets of some sort --> DataSet?
 
@@ -71,5 +67,3 @@ configuration:
 testing:
 ========
 - unit test for ProcessingContainer / parallel execution
-- unit tests for the orchestration components (WorfklowProcessor, UIMOrchestrator, StepProcessor)
-- write more integration tests now that we have them working

@@ -4,6 +4,8 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 
+import java.util.logging.Logger;
+
 /**
  * GWT implementation of a ProgressMonitor. Since we display things on the client and the monitor is on the server,
  * we have to pass through an intermediary model (the Execution). We need to poll it from the client, this is why
@@ -12,6 +14,9 @@ import eu.europeana.uim.gui.gwt.shared.Execution;
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
+
+    private static Logger log = Logger.getLogger(GWTProgressMonitor.class.getName());
+
 
     private String name;
     private int total;
@@ -32,6 +37,7 @@ public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
         this.name = task;
         this.total = work;
         this.status = 0;
+        execution.setActive(true);
         execution.setProgress(0);
         execution.setTotal(work);
         execution.setName(task);
@@ -39,7 +45,7 @@ public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
 
     @Override
     public void worked(int work) {
-        if(status + work > total) {
+        if (status + work > total) {
             status = total;
             done();
         } else {
@@ -50,6 +56,8 @@ public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
 
     @Override
     public void done() {
+        execution.setProgress(total);
+        execution.setActive(false);
         this.done = true;
     }
 

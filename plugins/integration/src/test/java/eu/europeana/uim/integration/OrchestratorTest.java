@@ -103,9 +103,11 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
         TestProgressMonitor monitor = new TestProgressMonitor();
         o.executeWorkflow(w, c, monitor);
 
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 
         assertEquals("Wrong count of processed MDRs", 999, monitor.worked);
+
+        assertEquals("Zombie execution", 0, o.getActiveExecutions().size());
 
 
 

@@ -31,7 +31,7 @@ public class UIMConfigStorage implements Action {
             session.getConsole().println();
             // list available storage engines
             for(StorageEngine s : registry.getStorages()) {
-                if(s.equals(registry.getStorage())) {
+                if(s == registry.getStorage()) {
                     session.getConsole().println("* " + s.getIdentifier());
                 } else {
                     session.getConsole().println("  " + s.getIdentifier());

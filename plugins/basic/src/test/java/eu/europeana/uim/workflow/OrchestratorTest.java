@@ -119,10 +119,14 @@ public class OrchestratorTest {
         ActiveExecution e = o.executeWorkflow(w, c, monitor);
 
         assertNotNull(e);
+        assertNotNull(e.getStartTime());
+        assertNotNull(e.getMonitor());
+        assertNotNull(e.getWorkflow());
         assertEquals(why, o.getTotal(e));
         assertTrue(e.getDataSet().equals(c));
-
         verify(mockProcessor).start();
+        verify(mockExecution).setActive(true);
+        verify(mockExecution).setWorkflowIdentifier(w.getName());
 
         for(int i = 0; i < 43; i++) {
             Thread.sleep(10);
@@ -137,8 +141,6 @@ public class OrchestratorTest {
         }
 
         Thread.sleep(4000);
-
-
     }
 
 
