@@ -84,4 +84,9 @@ public class MongoProvider extends AbstractMongoEntity implements Provider {
         result = 31 * result + (oaiMetadataPrefix != null ? oaiMetadataPrefix.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

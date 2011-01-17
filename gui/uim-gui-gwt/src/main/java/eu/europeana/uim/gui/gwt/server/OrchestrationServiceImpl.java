@@ -158,9 +158,12 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
             wrapped.setActive(e.isActive());
             wrapped.setStartTime(e.getStartTime());
             wrapped.setEndTime(e.getEndTime());
-            // TODO retrieve workflow, give details
             wrapped.setName(e.getWorkflowIdentifier() + " on " + e.getDataSet().toString());
             wrappedExecutions.put(execution, wrapped);
+        } else {
+            // update what may have changed
+            wrapped.setActive(e.isActive());
+            wrapped.setEndTime(e.getEndTime());
         }
         return wrapped;
     }
