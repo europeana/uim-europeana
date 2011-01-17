@@ -142,7 +142,7 @@ public class MongoStorageEngine implements StorageEngine {
                 throw new StorageEngineException("Provider with mnemonic '" + provider.getMnemonic() + "' already exists");
             }
         }
-        ds.save(provider);
+        ds.merge(provider);
     }
 
     public Provider getProvider(long id) {
@@ -177,7 +177,7 @@ public class MongoStorageEngine implements StorageEngine {
             }
 
         }
-        ds.save(collection);
+        ds.merge(collection);
     }
 
     public Collection getCollection(long id) {
@@ -211,7 +211,7 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public void updateRequest(Request request) throws StorageEngineException {
-        ds.save(request);
+        ds.merge(request);
     }
 
     public List<Request> getRequests(Collection collection) {
@@ -230,7 +230,8 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) throws StorageEngineException {
-        records.save(((MongoMetadataRecord<MDRFieldRegistry>) record).getObject());
+        BasicDBObject query = new BasicDBObject(AbstractMongoEntity.LID, record.getId());
+        records.update(query, ((MongoMetadataRecord<MDRFieldRegistry>) record).getObject());
     }
 
     public Execution createExecution() {
@@ -240,7 +241,7 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     public void updateExecution(Execution execution) throws StorageEngineException {
-        ds.save(execution);
+        ds.merge(execution);
     }
 
     public List<Execution> getExecutions() {

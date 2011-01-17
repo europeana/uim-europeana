@@ -60,7 +60,13 @@ class StorageTest extends JUnitSuite with ShouldMatchersForJUnit {
         engine.updateProvider(p)
 
         val p1 = engine.getProvider(p.getId)
-        p.getName should equal("MyLibrary")
+        p1.getName should equal("MyLibrary")
+
+        engine.updateProvider(p1)
+
+        val r = engine.getProvider(p1.getId)
+        r.getName should equal("MyLibrary")
+        r.getMnemonic should equal ("1")
 
         val p2 = engine.createProvider
         p2.setName("MyLibrary")
