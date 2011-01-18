@@ -1,11 +1,14 @@
 package eu.europeana.uim.gui.gwt.server;
 
 import eu.europeana.uim.api.ActiveExecution;
+import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.gui.gwt.client.OrchestrationService;
 import eu.europeana.uim.gui.gwt.shared.Collection;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 import eu.europeana.uim.gui.gwt.shared.Provider;
+import eu.europeana.uim.gui.gwt.shared.StepStatus;
 import eu.europeana.uim.gui.gwt.shared.Workflow;
+import eu.europeana.uim.store.UimEntity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,20 +107,12 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
         }
         eu.europeana.uim.api.Workflow w = getWorkflow(workflow);
         Execution execution = new Execution();
-        execution.setName(w.getName() + " on " + c.toString());
         GWTProgressMonitor monitor = new GWTProgressMonitor(execution);
         ActiveExecution ae = getEngine().getOrchestrator().executeWorkflow(w, c, monitor);
-        populateWrappedExecution(execution, ae);
+        populateWrappedExecution(execution, ae, w, c);
 
         return execution;
 
-    }
-
-    private void populateWrappedExecution(Execution execution, ActiveExecution ae) {
-        execution.setId(ae.getId());
-        execution.setTotal(getEngine().getOrchestrator().getTotal(ae));
-        execution.setStartTime(ae.getStartTime());
-        wrappedExecutions.put(ae.getId(), execution);
     }
 
     @Override
@@ -128,12 +123,20 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
         }
         eu.europeana.uim.api.Workflow w = getWorkflow(workflow);
         Execution execution = new Execution();
-        execution.setName(w.getName() + " on " + p.toString());
         GWTProgressMonitor monitor = new GWTProgressMonitor(execution);
         ActiveExecution ae = getEngine().getOrchestrator().executeWorkflow(w, p, monitor);
-        populateWrappedExecution(execution, ae);
+        populateWrappedExecution(execution, ae, w, p);
         return execution;
     }
+
+    private void populateWrappedExecution(Execution execution, ActiveExecution ae, eu.europeana.uim.api.Workflow w, UimEntity dataset) {
+         execution.setId(ae.getId());
+         execution.setName(w.getName() + " on " + dataset.toString());
+         execution.setWorkflow(w.getId());
+         execution.setTotal(getEngine().getOrchestrator().getTotal(ae));
+         execution.setStartTime(ae.getStartTime());
+         wrappedExecutions.put(ae.getId(), execution);
+     }
 
     @Override
     public Execution getExecution(Long id) {
@@ -179,6 +182,17 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
     @Override
     public Integer getCollectionTotal(Long collection) {
         return getEngine().getRegistry().getStorage().getTotalByCollection(getEngine().getRegistry().getStorage().getCollection(collection));
+    }
+
+    @Override
+    public List<StepStatus> getStatus(Long workflow) {
+        List<StepStatus> res = new ArrayList<StepStatus>();
+        List<WorkflowStepStatus> runtimeStatus = getEngine().getOrchestrator().getRuntimeStatus(getWorkflow(workflow));
+        for (WorkflowStepStatus wss : runtimeStatus) {
+            StepStatus ss = new StepStatus(wss.getStep().getIdentifier(), wss.queueSize(), wss.successes(), wss.failures());
+            res.add(ss);
+        }
+        return res;
     }
 
 }

@@ -28,6 +28,20 @@ public class ProcessingContainer implements WorkflowStep {
     }
 
     @Override
+    public String getIdentifier() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Processing container for steps ");
+        for(WorkflowStep s : steps) {
+            sb.append("'");
+            sb.append(s.getIdentifier());
+            sb.append("'");
+            sb.append(" ");
+        }
+        return sb.toString();
+
+    }
+
+    @Override
     public void processRecord(MetaDataRecord<?> mdr) {
         // this doesn't do a thing, as the container will never run tasks itself. Instead the StepProcessor takes care of that by fetching the steps
     }

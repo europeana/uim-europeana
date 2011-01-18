@@ -50,6 +50,7 @@ public class CollectionsPanel extends FlowPanel {
             @Override
             public void onSelection(SelectionEvent<Integer> integerSelectionEvent) {
                 if (integerSelectionEvent.getSelectedItem().equals(2)) {
+                    updateCollections();
                     collectionsRefreshTimer.scheduleRepeating(10000);
                 } else {
                     collectionsRefreshTimer.cancel();

@@ -44,7 +44,7 @@ public class UIMTask implements Task {
         } catch (Throwable t) {
             failed = true;
             status = TaskStatus.FAILED;
-            processor.addFailure(this, t);
+            processor.addFailure(this.mdr, t);
         } finally {
             if (!failed) {
                 status = TaskStatus.IN_QUEUE;

@@ -7,10 +7,11 @@ import java.util.Date;
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class Execution implements IsSerializable {
+public class Execution implements IsSerializable, Comparable<Execution> {
 
     private Long id;
     private String name;
+    private Long workflow;
     private Integer progress;
     private Integer total;
     private boolean isActive;
@@ -19,6 +20,14 @@ public class Execution implements IsSerializable {
 
     public Execution() {
 
+    }
+
+    public Long getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(Long workflow) {
+        this.workflow = workflow;
     }
 
     public Date getStartTime() {
@@ -79,5 +88,11 @@ public class Execution implements IsSerializable {
 
     public boolean isDone() {
         return progress.equals(total);
+    }
+
+
+    @Override
+    public int compareTo(Execution execution) {
+        return execution.getStartTime().compareTo(this.getStartTime());
     }
 }

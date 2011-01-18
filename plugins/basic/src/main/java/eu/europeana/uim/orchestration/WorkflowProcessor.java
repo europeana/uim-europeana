@@ -10,17 +10,17 @@ import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.TaskStatus;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.workflow.StepProcessorProvider;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -97,7 +97,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
      * @param e the UIMExecution to be handled by the processor
      */
     public void addExecution(UIMExecution e) {
-        e.getMonitor().beginTask(buildTaskName(e), orchestrator.getTotal(e));
+        e.getMonitor().beginTask(taskName(e), orchestrator.getTotal(e));
         this.executions.add(e);
     }
 
@@ -245,9 +245,18 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
         registry.getStorage().updateMetaDataRecord(mdr);
     }
 
-    private String buildTaskName(ActiveExecution ae) {
+    private String taskName(ActiveExecution ae) {
         return "Workflow: " + workflow.getName() + " Execution: " + ae.getId();
     }
+
+    public List<WorkflowStepStatus> getRuntimeStatus(Workflow w) {
+        List<WorkflowStepStatus> res = new ArrayList<WorkflowStepStatus>();
+        for(StepProcessor p : stepProcessors) {
+            res.add(new UIMWorkflowStepStatus(p.getStep(), p.currentQueueSize(), p.getSuccessCount(), p.getFailureCount(), p.getFailedTasks()));
+        }
+        return res;
+    }
+
 
     @Override
     public String toString() {
@@ -257,38 +266,6 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
             res += sp.toString() + "\n";
         }
         return res;
-    }
-
-    public static void main(String... args) {
-
-        // testing how the ThreadPoolExecutor works
-
-        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
-        for (int i = 0; i < 100; i++) {
-            queue.add(new DummyRunnable());
-        }
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 10, StepProcessor.KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS, queue);
-        threadPoolExecutor.execute(new Thread());
-    }
-
-    private static class DummyRunnable implements Runnable {
-        private static int count = 0;
-        private int id = 0;
-
-        public DummyRunnable() {
-            id = count++;
-        }
-
-        @Override
-        public void run() {
-            System.out.println("DummyRunnable " + id);
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }
     }
 
 }

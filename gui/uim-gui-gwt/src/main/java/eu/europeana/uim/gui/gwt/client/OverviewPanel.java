@@ -2,11 +2,16 @@ package eu.europeana.uim.gui.gwt.client;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
@@ -15,6 +20,7 @@ import com.google.gwt.widgetideas.client.ProgressBar;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,24 +39,45 @@ public class OverviewPanel extends FlowPanel {
     private final List<Execution> pastExecutions = new ArrayList<Execution>();
 
     private VerticalPanel currentExecutionsPanel = null;
-    private Map<Long, ProgressBar> progressBars = new HashMap<Long, ProgressBar>();
-    private final CellTable<Execution> pastExecutionsCellTable = new CellTable<Execution>();
+    private ExecutionDetailPanel currentExecutionsDetailPanel = null;
+    private Map<Long, HorizontalPanel> progressBars = new HashMap<Long, HorizontalPanel>();
 
+    private final CellTable<Execution> pastExecutionsCellTable = new CellTable<Execution>();
 
     public OverviewPanel(OrchestrationServiceAsync orchestrationServiceAsync) {
         this.orchestrationService = orchestrationServiceAsync;
 
-        add(new Label("Current executions"));
+        VerticalPanel executionList = new VerticalPanel();
+
+        Label l = new Label("Current executions");
+        l.setStyleName("title");
+        executionList.add(l);
+
         currentExecutionsPanel = new VerticalPanel();
-        currentExecutionsPanel.setWidth("500px");
-        add(currentExecutionsPanel);
-
+        currentExecutionsPanel.setWidth("800px");
         loadActiveExecutions();
+        executionList.add(currentExecutionsPanel);
 
-        add(new Label("Past executions"));
-        add(pastExecutionsCellTable);
+        executionList.add(new HTML("<br />"));
+        executionList.add(new HTML("<br />"));
+
+        Label l1 = new Label("Past executions");
+        l1.setStyleName("title");
+        executionList.add(l1);
+        executionList.add(pastExecutionsCellTable);
         buildPastExecutionsCellTable();
         updatePastExecutions();
+
+        currentExecutionsDetailPanel = new ExecutionDetailPanel(orchestrationServiceAsync);
+        currentExecutionsDetailPanel.setWidth("350px");
+
+        HorizontalPanel h = new HorizontalPanel();
+        h.add(executionList);
+        h.add(currentExecutionsDetailPanel);
+        add(h);
+
+
+
     }
 
     private void loadActiveExecutions() {
@@ -75,7 +102,6 @@ public class OverviewPanel extends FlowPanel {
         final ListDataProvider<Execution> dataProvider = new ListDataProvider<Execution>();
         dataProvider.setList(executions);
         dataProvider.addDataDisplay(pastExecutionsCellTable);
-
 
         final SingleSelectionModel<Execution> selectionModel = new SingleSelectionModel<Execution>();
         pastExecutionsCellTable.setSelectionModel(selectionModel);
@@ -118,8 +144,20 @@ public class OverviewPanel extends FlowPanel {
         final ProgressBar bar = new ProgressBar(0, execution.getTotal());
         bar.setTitle(execution.getName());
         bar.setTextVisible(true);
-        currentExecutionsPanel.add(bar);
-        progressBars.put(execution.getId(), bar);
+        HorizontalPanel p = new HorizontalPanel();
+        p.setWidth("800px");
+        p.add(new HTML(execution.getName()));
+        p.add(bar);
+        p.setCellWidth(bar, "400px");
+        p.add(new Button("Details", new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                displayExecutionDetail(execution);
+            }
+        }));
+        currentExecutionsPanel.add(p);
+        progressBars.put(execution.getId(), p);
+        displayExecutionDetail(execution);
 
         // poll the execution status every second
         Timer t = new Timer() {
@@ -148,9 +186,16 @@ public class OverviewPanel extends FlowPanel {
         t.scheduleRepeating(1000);
     }
 
+    private void displayExecutionDetail(Execution execution) {
+        currentExecutionsDetailPanel.display(execution);
+    }
+
     private void executionDone(Execution e) {
-        ProgressBar widget = progressBars.get(e.getId());
+        HorizontalPanel widget = progressBars.get(e.getId());
         currentExecutionsPanel.remove(widget);
+        if(currentExecutionsDetailPanel.getCurrentExecution().getId().equals(e.getId())) {
+            currentExecutionsDetailPanel.clear();
+        }
         updatePastExecutions();
     }
 
@@ -166,7 +211,12 @@ public class OverviewPanel extends FlowPanel {
             @Override
             public void onSuccess(List<Execution> executions) {
                 pastExecutions.clear();
-                pastExecutions.addAll(executions);
+                int i = 0;
+                Collections.sort(executions);
+                while(i<10 && i < executions.size()) {
+                    pastExecutions.add(executions.get(i));
+                    i++;
+                }
                 CellTableUtils.updateCellTableData(pastExecutionsCellTable, pastExecutions);
             }
         });

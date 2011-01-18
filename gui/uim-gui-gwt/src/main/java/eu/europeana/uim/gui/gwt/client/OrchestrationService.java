@@ -2,9 +2,11 @@ package eu.europeana.uim.gui.gwt.client;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.gui.gwt.shared.Collection;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 import eu.europeana.uim.gui.gwt.shared.Provider;
+import eu.europeana.uim.gui.gwt.shared.StepStatus;
 import eu.europeana.uim.gui.gwt.shared.Workflow;
 
 import java.util.List;
@@ -36,6 +38,10 @@ public interface OrchestrationService extends RemoteService {
     List<Execution> getPastExecutions();
 
     Integer getCollectionTotal(Long collection);
+
+    List<StepStatus> getStatus(Long workflow);
+
+
 
 
 

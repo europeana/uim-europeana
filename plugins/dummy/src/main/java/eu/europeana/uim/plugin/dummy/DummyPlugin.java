@@ -20,7 +20,7 @@ public class DummyPlugin implements IngestionPlugin {
 	
 
 	public String getIdentifier() {
-		return DummyPlugin.class.getName();
+		return DummyPlugin.class.getSimpleName();
 	}
 
 	public String getDescription() {

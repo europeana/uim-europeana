@@ -1,5 +1,7 @@
 package eu.europeana.uim.orchestration;
 
+import eu.europeana.uim.MDRFieldRegistry;
+import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
@@ -33,7 +35,7 @@ public class StepProcessor {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     // synchronized map for collecting failing tasks
-    private final ConcurrentHashMap<Task, Throwable> failures = new ConcurrentHashMap<Task, Throwable>();
+    private final ConcurrentHashMap<MetaDataRecord<MDRFieldRegistry>, Throwable> failures = new ConcurrentHashMap<MetaDataRecord<MDRFieldRegistry>, Throwable>();
 
     // synchronized Vector for collecting successful tasks
     private final Vector<UIMTask> successes = new Vector<UIMTask>();
@@ -109,15 +111,27 @@ public class StepProcessor {
         }
     }
 
-    public void addFailure(Task t, Throwable throwable) {
+    public void addFailure(MetaDataRecord<MDRFieldRegistry> mdr, Throwable throwable) {
 
         // FIXME we need to go over all processor's failures every now and then and clean up
         // this is a known memory leak, so to speak
-        this.failures.put(t, throwable);
+        this.failures.put(mdr, throwable);
     }
 
-    public Map<Task, Throwable> getFailedTasks() {
+    public Map<MetaDataRecord<MDRFieldRegistry>, Throwable> getFailedTasks() {
         return this.failures;
+    }
+
+    public int getSuccessCount() {
+        return successes.size();
+    }
+
+    public int getFailureCount() {
+        return failures.size();
+    }
+
+    public WorkflowStep getStep() {
+        return step;
     }
 
     /**

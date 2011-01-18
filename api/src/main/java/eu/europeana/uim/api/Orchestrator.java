@@ -6,6 +6,8 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 
+import java.util.List;
+
 /**
  * Orchestrates the ingestion job execution.
  *
@@ -40,4 +42,11 @@ public interface Orchestrator {
      * Gets the total number of items to be processed for this dataset
      */
     int getTotal(ActiveExecution dataset);
+
+    /**
+     * Gets a snapshot of the runtime information for a given workflow.
+     * As we run multiple executions through the same WorkflowProcessor, this is a global status, not related to a particular execution.
+     */
+    List<WorkflowStepStatus> getRuntimeStatus(Workflow w);
+
 }

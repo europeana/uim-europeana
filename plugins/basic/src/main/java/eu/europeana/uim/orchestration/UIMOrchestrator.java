@@ -1,13 +1,13 @@
 package eu.europeana.uim.orchestration;
 
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.UIMError;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
@@ -19,6 +19,7 @@ import org.osgi.service.blueprint.container.ServiceUnavailableException;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -102,9 +103,6 @@ public class UIMOrchestrator implements Orchestrator {
      */
     private ActiveExecution executeWorkflow(Workflow w, ProgressMonitor monitor, UimEntity dataset) {
         Execution e = getStorageService().createExecution();
-        if (hasExecution(e)) {
-            throw new UIMError("Execution " + e.getId() + " is already running");
-        }
         UIMExecution activeExecution = new UIMExecution(e.getId(), dataset, monitor, w);
         executionTotals.put(activeExecution, 0);
 
@@ -113,17 +111,17 @@ public class UIMOrchestrator implements Orchestrator {
             wp = processorProvider.createProcessor(w, this, registry);
             processors.put(w, wp);
             wp.start();
-            e.setActive(true);
-            e.setDataSet(dataset);
-            e.setWorkflowIdentifier(w.getName());
-            e.setStartTime(new Date());
+        }
+        e.setActive(true);
+        e.setDataSet(dataset);
+        e.setWorkflowIdentifier(w.getName());
+        e.setStartTime(new Date());
 
-            try {
-                registry.getStorage().updateExecution(e);
-            } catch (StorageEngineException e1) {
-                log.severe("Could not update execution details: " + e1.getMessage());
-                e1.printStackTrace();
-            }
+        try {
+            registry.getStorage().updateExecution(e);
+        } catch (StorageEngineException e1) {
+            log.severe("Could not update execution details: " + e1.getMessage());
+            e1.printStackTrace();
         }
         wp.addExecution(activeExecution);
         return activeExecution;
@@ -225,10 +223,16 @@ public class UIMOrchestrator implements Orchestrator {
         } catch (Throwable t) {
             if (t instanceof ServiceUnavailableException) {
                 // TODO shutdown gracefully
+                t.printStackTrace();
             } else {
                 t.printStackTrace();
             }
         }
         return r;
+    }
+
+    @Override
+    public List<WorkflowStepStatus> getRuntimeStatus(Workflow w) {
+        return processors.get(w).getRuntimeStatus(w);
     }
 }

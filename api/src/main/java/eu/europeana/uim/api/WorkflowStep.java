@@ -9,6 +9,8 @@ import eu.europeana.uim.MetaDataRecord;
  */
 public interface WorkflowStep {
 
+    String getIdentifier();
+
     public void processRecord(MetaDataRecord<?> mdr) throws Throwable;
     
 }

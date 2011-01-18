@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import eu.europeana.uim.gui.gwt.shared.Collection;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 import eu.europeana.uim.gui.gwt.shared.Provider;
+import eu.europeana.uim.gui.gwt.shared.StepStatus;
 import eu.europeana.uim.gui.gwt.shared.Workflow;
 
 import java.util.List;
@@ -28,4 +29,6 @@ public interface OrchestrationServiceAsync {
     void getActiveExecutions(AsyncCallback<List<Execution>> async);
 
     void getPastExecutions(AsyncCallback<List<Execution>> async);
+
+    void getStatus(Long workflow, AsyncCallback<List<StepStatus>> async);
 }

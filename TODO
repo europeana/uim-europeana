@@ -1,23 +1,16 @@
 in progress
 ===========
 
-- mongodb storage:
-  - review MDR interface design, see commented out part of the StorageEngine unit test of the mongo module
-
 functionality:
 ==============
 
 - GUI:
   - New execution
-    - better labels / clearer steps
     - later: display total number of MDRs on collection selection
   - Overview
-    - past executions: only list of 10 past executions
-    - "execution details" button --> execution details view
     - later: link to view with full history
   - Execution detail view (refreshed every N seconds)
-    - steps / plugins (later: on click, detail of plugin)
-    - tasks in queue per step
+    - display detail of ProcessingContainers
   - general:
     - make GUI more robust against backend failures
     - better way to redeploy GWT module to OSGI environment
@@ -25,16 +18,22 @@ functionality:
     - GWT integration in Karaf Webconsole? (maybe not necessary)
 
 - orchestrator:
-  - workflow bundles
+  - make timeout for task configurable
+  - error handling on task timeout
+  - cleanup failed tasks after N iterations
   - command interface orchestrator:
     - pause
     - cancel
     - show status
   - later: gracefully handle other services becoming unavailable (e.g. storage, ...)
 
+- reporting / statistics component
+  - trace the time a plugin needs to process a MDR
+  - ... (design this)
+
 - storage: MangoDB-based implementation
   - optimize it
-  - the unit test takes like forever because we re-built a whole db every time. we may wanna take a different approach and delete
+  - the unit test takes like forever because we re-build a whole db every time. we may wanna take a different approach and delete
     the records instead
 
 - core plugins:
@@ -51,6 +50,9 @@ design:
 =======
 
 - maybe a better name for UimEntity? MetaDataRecord, Collection, Provider, ... are all data sets of some sort --> DataSet?
+
+- mongodb storage:
+  - review MDR interface design, see commented out part of the StorageEngine unit test of the mongo module
 
 - prioritisation:
   - add priority level in the Request?
