@@ -44,7 +44,7 @@ public class UIMTaskTest {
         Executor e = new DirectExecutor();
         e.execute(t);
 
-        verify(sp).addFailure(t, failure);
+        verify(sp).addFailure(mdr, failure);
     }
 
     @Test
@@ -71,6 +71,11 @@ public class UIMTaskTest {
     class FailingPlugin implements WorkflowStep {
 
         private final Throwable failure;
+
+        @Override
+        public String getIdentifier() {
+            return "Failing plugin";
+        }
 
         public FailingPlugin(Throwable failure) {
             this.failure = failure;
