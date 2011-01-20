@@ -19,64 +19,6 @@
         <webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-servlet</artifactId>
-            <version>2.1.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-user</artifactId>
-            <version>2.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google</groupId>
-            <artifactId>gwt-incubator</artifactId>
-            <version>20101117-r1766</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>eu.europeana</groupId>
-            <artifactId>europeana-uim-api</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>eu.europeana</groupId>
-            <artifactId>europeana-uim-common</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Pax Web provides an (extended) implementation of the OSGI HttpService and it comes by default with Karaf -->
-        <!--
-        <dependency>
-            <groupId>org.ops4j.pax.web</groupId>
-            <artifactId>pax-web-api</artifactId>
-            <- Be dead sure this is the same freaking version as the one coming with Karaf or you will
-                 hear yourself curse a lot ->
-            <version>0.7.3</version>
-            <scope>provided</scope>
-        </dependency>-->
-
-    </dependencies>
-
     <build>
         <!-- Generate compiled stuff in the folder used for developing mode -->
         <outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
@@ -129,7 +71,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <webappDirectory>${webappDirectory}</webappDirectory>
+<!--                    <webappDirectory>${webappDirectory}</webappDirectory>-->
                     <archive>
                         <!-- add the generated manifest to the war -->
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -258,6 +200,66 @@
         </plugins>
 
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-servlet</artifactId>
+            <version>2.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
+            <version>2.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google</groupId>
+            <artifactId>gwt-incubator</artifactId>
+            <version>20101117-r1766</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Pax Web provides an (extended) implementation of the OSGI HttpService and it comes by default with Karaf -->
+        <!--
+        <dependency>
+            <groupId>org.ops4j.pax.web</groupId>
+            <artifactId>pax-web-api</artifactId>
+            <- Be dead sure this is the same freaking version as the one coming with Karaf or you will
+                 hear yourself curse a lot ->
+            <version>0.7.3</version>
+            <scope>provided</scope>
+        </dependency>-->
+
+    </dependencies>
+
+
 
     <repositories>
         <repository>
