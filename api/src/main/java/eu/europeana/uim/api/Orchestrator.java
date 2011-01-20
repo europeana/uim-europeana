@@ -29,7 +29,11 @@ public interface Orchestrator {
 
     void pause(ActiveExecution execution);
 
+    void resume(ActiveExecution execution);
+
     void cancel(ActiveExecution execution);
+
+    void shutdown();
 
     /**
      * Gets the next batch of MetaDataRecord IDs for a given Execution

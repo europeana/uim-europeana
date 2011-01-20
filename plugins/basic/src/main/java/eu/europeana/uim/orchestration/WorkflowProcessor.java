@@ -53,6 +53,8 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
 
     private final Timer processorTimer;
 
+    private final Vector<ActiveExecution> paused = new Vector<ActiveExecution>();
+
     /**
      * Creates a new WorkflowProcessor and adds the Execution to it
      *
@@ -111,10 +113,19 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
      *
      * @param e the Execution to remove
      */
-    public void removeExecution(UIMExecution e) {
+    public void removeExecution(ActiveExecution e) {
         this.executions.remove(e);
 
-        // TODO remove all associated tasks from the tasks map
+        Vector<Task> trash = new Vector<Task>();
+
+        for (Map.Entry<Task, ActiveExecution> entry : tasks.entrySet()) {
+            if (entry.getValue().equals(e)) {
+                trash.add(entry.getKey());
+            }
+        }
+        for(Task t : trash) {
+            tasks.remove(t);
+        }
     }
 
     /**
@@ -126,6 +137,29 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
         // TODO make this configurable
         processorTimer.schedule(this, 0, 100);
     }
+
+    public void pause(ActiveExecution e) {
+        if (!paused.contains(e)) {
+            paused.add(e);
+        }
+    }
+
+    public void resume(ActiveExecution e) {
+        if (paused.contains(e)) {
+            paused.remove(e);
+        }
+    }
+
+    public boolean isPaused(ActiveExecution e) {
+        return paused.contains(e);
+    }
+
+    private boolean shutdown = false;
+
+    public void shutdown() {
+        shutdown = true;
+    }
+
 
     @Override
     public void run() {
@@ -146,17 +180,17 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
             // FIXME this works only when there's more than one plugin!!
             // of course any realistic workflow HAS more than one plugin
             // so we're lazily not handling this case and throw a NoCanDoException instead
-            if(stepProcessors.size() == 1) {
+            if (stepProcessors.size() == 1) {
                 throw new RuntimeException("Sorry mate, the Processor doesn't yet deal with workflows that have only ONE plugin, that wouldn't be very realistic.");
             }
 
             for (int i = 0; i < stepProcessors.size(); i++) {
                 StepProcessor sp = stepProcessors.get(i);
-                //System.out.println("STEP " + i + " " + sp.toString());
-
                 if (i == 0) {
-                    // special treatment for the first step which gets MDRs directly from the storage
-                    fillFirstStepProcessorQueue(sp);
+                    if (!shutdown) {
+                        // special treatment for the first step which gets MDRs directly from the storage
+                        fillFirstStepProcessorQueue(sp);
+                    }
                 } else {
                     StepProcessor previous = stepProcessors.get(i - 1);
                     sp.startProcessing();
@@ -195,6 +229,10 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
                 orchestrator.notifyExecutionDone(d);
             }
         }
+
+        if (shutdown) {
+            processorTimer.cancel();
+        }
     }
 
     private boolean executionDone(ActiveExecution e) {
@@ -218,8 +256,17 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
     private void fillFirstStepProcessorQueue(StepProcessor sp) {
         // TODO we probably can do this dynamically. For this Orchestrator#getBatchFor needs to handle an argument
         // right now we have a fixed batch size that we use in order to refill the queues
-        if (sp.remainingCapacity() > UIMOrchestrator.BATCH_SIZE * executions.size()) {
-            for (UIMExecution e : executions) {
+
+        // missing scala's filter loops...
+        List<UIMExecution> execs = new ArrayList<UIMExecution>();
+        for (UIMExecution e : executions) {
+            if (!paused.contains(e)) {
+                execs.add(e);
+            }
+        }
+
+        if (sp.remainingCapacity() > UIMOrchestrator.BATCH_SIZE * execs.size()) {
+            for (UIMExecution e : execs) {
                 long[] work = orchestrator.getBatchFor(e);
                 if (work != null) {
                     sp.addRecords(e, work);
@@ -251,7 +298,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
 
     public List<WorkflowStepStatus> getRuntimeStatus(Workflow w) {
         List<WorkflowStepStatus> res = new ArrayList<WorkflowStepStatus>();
-        for(StepProcessor p : stepProcessors) {
+        for (StepProcessor p : stepProcessors) {
             res.add(new UIMWorkflowStepStatus(p.getStep(), p.currentQueueSize(), p.getSuccessCount(), p.getFailureCount(), p.getFailedTasks()));
         }
         return res;
@@ -262,7 +309,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
     public String toString() {
         String res = "";
         res += "WorkflowProcessor for workflow '" + workflow.getName() + "' (" + workflow.getDescription() + ")\n\n";
-        for(StepProcessor sp : stepProcessors) {
+        for (StepProcessor sp : stepProcessors) {
             res += sp.toString() + "\n";
         }
         return res;
