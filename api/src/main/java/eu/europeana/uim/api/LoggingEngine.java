@@ -4,6 +4,8 @@ import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.store.Execution;
 
+import java.util.List;
+
 /**
  * Service for the reporting of the processing, to be used by the orchestrator and eventually plugins
  *
@@ -26,9 +28,16 @@ public interface LoggingEngine {
     void log(Level level, String message, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin);
 
     /**
+     * Retrieves all log entries for one execution
+     * @param execution the execution
+     * @return a list of LogEntry-s
+     */
+    List<LogEntry> getExecutionLog(Execution execution);
+
+    /**
      * Logs a processing duration for a single MDR
      * @param plugin the plugin
-     * @mdr the identifier of the MDR
+     * @param mdr the identifier of the MDR
      */
     void logDuration(IngestionPlugin plugin, long mdr);
 
@@ -38,5 +47,12 @@ public interface LoggingEngine {
      * @param mdrs the identifiers of the processed MDRs
      */
     void logDuration(IngestionPlugin plugin, long[] mdrs);
+
+    /**
+     * Gets the average duration of the execution of a plugin over a MDR
+     * @param plugin the plugin
+     * @return the average duration in milliseconds
+     */
+    Long getAverageDuration(IngestionPlugin plugin);
 
 }
