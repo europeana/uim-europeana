@@ -35,6 +35,9 @@
         <!--  the uim standard in memory storage implementation -->
         <module>storage/memory</module>
 
+        <!-- simplistic in-memory logging -->
+        <module>logging/memory</module>
+
         <!-- a dummy plugin for testing -->
         <module>plugins/dummy</module>
 
