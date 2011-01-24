@@ -7,7 +7,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import eu.europeana.uim.gui.gwt.shared.Collection;
@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class CollectionsPanel extends FlowPanel {
+public class CollectionsPanel extends ScrollPanel {
 
     private OrchestrationServiceAsync orchestrationService = null;
 

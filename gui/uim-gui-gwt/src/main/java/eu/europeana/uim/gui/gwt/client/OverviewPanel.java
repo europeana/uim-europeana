@@ -33,19 +33,19 @@ import java.util.Map;
  */
 public class OverviewPanel extends FlowPanel {
 
+    private final Application application;
     private OrchestrationServiceAsync orchestrationService = null;
-
-    private final List<Execution> executions = new ArrayList<Execution>();
-    private final List<Execution> pastExecutions = new ArrayList<Execution>();
 
     private VerticalPanel currentExecutionsPanel = null;
     private ExecutionDetailPanel currentExecutionsDetailPanel = null;
     private Map<Long, HorizontalPanel> progressBars = new HashMap<Long, HorizontalPanel>();
 
+    private final List<Execution> pastExecutions = new ArrayList<Execution>();
     private final CellTable<Execution> pastExecutionsCellTable = new CellTable<Execution>();
 
-    public OverviewPanel(OrchestrationServiceAsync orchestrationServiceAsync) {
+    public OverviewPanel(OrchestrationServiceAsync orchestrationServiceAsync, final Application application) {
         this.orchestrationService = orchestrationServiceAsync;
+        this.application = application;
 
         VerticalPanel executionList = new VerticalPanel();
 
@@ -65,7 +65,14 @@ public class OverviewPanel extends FlowPanel {
         l1.setStyleName("title");
         executionList.add(l1);
         executionList.add(pastExecutionsCellTable);
-        buildPastExecutionsCellTable();
+        executionList.add(new HTML("<br />"));
+        executionList.add(new Button("See all", new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                application.selectExecutionHistoryTab();
+            }
+        }));
+        buildPastExecutionsCellTable(pastExecutionsCellTable, pastExecutions);
         updatePastExecutions();
 
         currentExecutionsDetailPanel = new ExecutionDetailPanel(orchestrationServiceAsync);
@@ -75,7 +82,6 @@ public class OverviewPanel extends FlowPanel {
         h.add(executionList);
         h.add(currentExecutionsDetailPanel);
         add(h);
-
 
 
     }
@@ -97,50 +103,7 @@ public class OverviewPanel extends FlowPanel {
         });
     }
 
-    private void buildPastExecutionsCellTable() {
-        // cell table
-        final ListDataProvider<Execution> dataProvider = new ListDataProvider<Execution>();
-        dataProvider.setList(executions);
-        dataProvider.addDataDisplay(pastExecutionsCellTable);
-
-        final SingleSelectionModel<Execution> selectionModel = new SingleSelectionModel<Execution>();
-        pastExecutionsCellTable.setSelectionModel(selectionModel);
-
-        CellTableUtils.addColumn(pastExecutionsCellTable, new TextCell(), "Execution", new CellTableUtils.GetValue<String, Execution>() {
-            public String getValue(Execution execution) {
-                return execution.getName();
-            }
-        });
-        DateTimeFormat dtf = DateTimeFormat.getFormat("dd.MM.yyyy 'at' HH:mm:ss");
-        CellTableUtils.addColumn(pastExecutionsCellTable, new DateCell(dtf), "Start time", new CellTableUtils.GetValue<Date, Execution>() {
-            public Date getValue(Execution execution) {
-                return execution.getStartTime();
-            }
-        });
-        CellTableUtils.addColumn(pastExecutionsCellTable, new DateCell(dtf), "End time", new CellTableUtils.GetValue<Date, Execution>() {
-            public Date getValue(Execution execution) {
-                return execution.getEndTime();
-            }
-        });
-
-        /*
-        addColumn(new ActionCell<Collection>(
-                "Remove", new ActionCell.Delegate<Collection>() {
-                    public void execute(Collection collection) {
-                        collections.remove(collection);
-                        updateCellTableData();
-                    }
-                }), "Action", new GetValue<Collection>() {
-
-            public Collection getValue(Collection contact) {
-                return contact;
-            }
-        });
-        */
-    }
-
     public void addExecution(final Execution execution) {
-        executions.add(execution);
         final ProgressBar bar = new ProgressBar(0, execution.getTotal());
         bar.setTitle(execution.getName());
         bar.setTextVisible(true);
@@ -193,10 +156,11 @@ public class OverviewPanel extends FlowPanel {
     private void executionDone(Execution e) {
         HorizontalPanel widget = progressBars.get(e.getId());
         currentExecutionsPanel.remove(widget);
-        if(currentExecutionsDetailPanel.getCurrentExecution().getId().equals(e.getId())) {
+        if (currentExecutionsDetailPanel.getCurrentExecution().getId().equals(e.getId())) {
             currentExecutionsDetailPanel.clear();
         }
         updatePastExecutions();
+        application.getExecutionHistory().updatePastExecutions();
     }
 
 
@@ -213,13 +177,56 @@ public class OverviewPanel extends FlowPanel {
                 pastExecutions.clear();
                 int i = 0;
                 Collections.sort(executions);
-                while(i<10 && i < executions.size()) {
+                while (i < 10 && i < executions.size()) {
                     pastExecutions.add(executions.get(i));
                     i++;
                 }
                 CellTableUtils.updateCellTableData(pastExecutionsCellTable, pastExecutions);
             }
         });
+    }
+
+
+    public static void buildPastExecutionsCellTable(CellTable pastExecutionsCellTable, List<Execution> pastExecutions) {
+        // cell table
+        final ListDataProvider<Execution> dataProvider = new ListDataProvider<Execution>();
+        dataProvider.setList(pastExecutions);
+        dataProvider.addDataDisplay(pastExecutionsCellTable);
+
+        final SingleSelectionModel<Execution> selectionModel = new SingleSelectionModel<Execution>();
+        pastExecutionsCellTable.setSelectionModel(selectionModel);
+
+        CellTableUtils.addColumn(pastExecutionsCellTable, new TextCell(), "Execution", new CellTableUtils.GetValue<String, Execution>() {
+            public String getValue(Execution execution) {
+                return execution.getName();
+            }
+        });
+        DateTimeFormat dtf = DateTimeFormat.getFormat("dd.MM.yyyy 'at' HH:mm:ss");
+        CellTableUtils.addColumn(pastExecutionsCellTable, new DateCell(dtf), "Start time", new CellTableUtils.GetValue<Date, Execution>() {
+            public Date getValue(Execution execution) {
+                return execution.getStartTime();
+            }
+        });
+        CellTableUtils.addColumn(pastExecutionsCellTable, new DateCell(dtf), "End time", new CellTableUtils.GetValue<Date, Execution>() {
+            public Date getValue(Execution execution) {
+                return execution.getEndTime();
+            }
+        });
+
+        /*
+        addColumn(new ActionCell<Collection>(
+                "Remove", new ActionCell.Delegate<Collection>() {
+                    public void execute(Collection collection) {
+                        collections.remove(collection);
+                        updateCellTableData();
+                    }
+                }), "Action", new GetValue<Collection>() {
+
+            public Collection getValue(Collection contact) {
+                return contact;
+            }
+        });
+        */
     }
 
 }

@@ -23,6 +23,7 @@ public class Application implements EntryPoint {
     private OverviewPanel overview = null;
     private ExecutionPanel executions = null;
     private CollectionsPanel collections = null;
+    private ExecutionHistoryPanel executionHistory = null;
 
     private TabLayoutPanel tabs = null;
 
@@ -33,17 +34,20 @@ public class Application implements EntryPoint {
         tabs = new TabLayoutPanel(1.5, Style.Unit.EM);
         tabs.setHeight("500px");
 
-        overview = new OverviewPanel(orchestrationService);
+        overview = new OverviewPanel(orchestrationService, this);
         executions = new ExecutionPanel(orchestrationService, this);
         collections = new CollectionsPanel(orchestrationService, this);
+        executionHistory = new ExecutionHistoryPanel(orchestrationService);
 
-        overview.setHeight("500px");
-        executions.setHeight("500px");
-        collections.setHeight("500px");
+        overview.setHeight("450px");
+        executions.setHeight("450px");
+        collections.setHeight("450px");
+        executionHistory.setHeight("450px");
 
         tabs.add(overview, "Overview");
         tabs.add(executions, "New Execution");
         tabs.add(collections, "Collections overview");
+        tabs.add(executionHistory, "Execution history");
 
         RootPanel.get().add(tabs);
     }
@@ -52,8 +56,16 @@ public class Application implements EntryPoint {
         return this.overview;
     }
 
+    public ExecutionHistoryPanel getExecutionHistory() {
+        return this.executionHistory;
+    }
+
     public void selectOverviewTab() {
         tabs.selectTab(0);
+    }
+
+    public void selectExecutionHistoryTab() {
+        tabs.selectTab(3);
     }
 
     public void addTabSelectionHandler(SelectionHandler<Integer> handler) {

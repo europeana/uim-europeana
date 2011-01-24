@@ -8,7 +8,6 @@ functionality:
   - New execution
     - later: display total number of MDRs on collection selection
   - Overview
-    - later: link to view with full history
   - Execution detail view (refreshed every N seconds)
     - display detail of ProcessingContainers
   - general:
@@ -22,8 +21,6 @@ functionality:
   - error handling on task timeout
   - cleanup failed tasks after N iterations
   - command interface orchestrator:
-    - pause
-    - cancel
     - show status
   - later: gracefully handle other services becoming unavailable (e.g. storage, ...)
 
