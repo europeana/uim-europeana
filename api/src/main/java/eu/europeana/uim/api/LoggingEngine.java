@@ -37,22 +37,13 @@ public interface LoggingEngine {
     List<LogEntry> getExecutionLog(Execution execution);
 
     /**
-     * Logs a processing duration for a single MDR
+     * Logs a processing duration for a given count of items
      *
      * @param plugin   the plugin
      * @param duration duration in ms
-     * @param mdr      the identifier of the MDR
+     * @param count    the number of items processed during this duration
      */
-    void logDuration(IngestionPlugin plugin, Long duration, long mdr);
-
-    /**
-     * Logs a processing duration for a batch of MDRs
-     *
-     * @param plugin   the plugin
-     * @param duration duration in ms
-     * @param mdrs     the identifiers of the processed MDRs
-     */
-    void logDuration(IngestionPlugin plugin, Long duration, long[] mdrs);
+    void logDuration(IngestionPlugin plugin, Long duration, int count);
 
     /**
      * Gets the average duration of the execution of plugin over a MDR
@@ -61,5 +52,15 @@ public interface LoggingEngine {
      * @return the average duration in milliseconds
      */
     Long getAverageDuration(IngestionPlugin plugin);
+
+    /**
+     * Logs a processing duration and attaches information regarding the processed MDRs
+     *
+     * @param plugin   the plugin
+     * @param duration duration in ms
+     * @param mdr      the identifier of the MDR(s)
+     */
+    void logDuration(IngestionPlugin plugin, Long duration, long... mdr);
+
 
 }

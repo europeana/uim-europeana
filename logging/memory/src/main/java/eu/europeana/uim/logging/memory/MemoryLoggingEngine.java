@@ -50,16 +50,20 @@ public class MemoryLoggingEngine implements LoggingEngine {
     }
 
     @Override
-    public void logDuration(IngestionPlugin plugin, Long duration, long mdr) {
-        getDurations(plugin).add(duration);
-    }
-
-    @Override
-    public void logDuration(IngestionPlugin plugin, Long duration, long[] mdrs) {
+    public void logDuration(IngestionPlugin plugin, Long duration, long... mdrs) {
         List<Long> d = getDurations(plugin);
         // don't show this to hardcore statisticians
         for (int i = 0; i < mdrs.length; i++) {
             d.add(duration / mdrs.length);
+        }
+    }
+
+    @Override
+    public void logDuration(IngestionPlugin plugin, Long duration, int count) {
+        List<Long> d = getDurations(plugin);
+        // don't show this to hardcore statisticians
+        for (int i = 0; i < count; i++) {
+            d.add(duration / count);
         }
     }
 
