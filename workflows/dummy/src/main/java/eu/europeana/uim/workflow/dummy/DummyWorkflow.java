@@ -28,8 +28,8 @@ public class DummyWorkflow implements Workflow {
         this.id = 0l; // doh. do we need an ID at this stage anyhow?
 
         // that's a very exciting worklow
-        IngestionPlugin plugin1 = registry.getPlugin("eu.europeana.uim.plugin.dummy.DummyPlugin");
-        IngestionPlugin plugin2 = registry.getPlugin("eu.europeana.uim.plugin.dummy.DummyPlugin");
+        IngestionPlugin plugin1 = registry.getPlugin("DummyPlugin");
+        IngestionPlugin plugin2 = registry.getPlugin("DummyPlugin");
         definition.add(plugin1);
         definition.add(plugin2);
         log.info("Added plugin definition " + definition.get(0).toString());
