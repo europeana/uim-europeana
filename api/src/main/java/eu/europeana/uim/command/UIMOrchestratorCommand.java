@@ -82,10 +82,10 @@ public class UIMOrchestratorCommand implements Action {
                 start(out);
                 break;
             case pause:
-                out.println("Master, this is not implemented yet.");
+                pause(out);
                 break;
             case cancel:
-                out.println("Master, this is not implemented yet.");
+                cancel(out);
                 break;
             case status:
                 out.println("Master, this is not implemented yet.");
@@ -94,6 +94,44 @@ public class UIMOrchestratorCommand implements Action {
         }
 
         return null;
+    }
+
+    private void pause(PrintStream out) {
+        ActiveExecution execution = getOrListExecution(out, "pause");
+        if(execution != null) {
+            orchestrator.pause(execution);
+        } else {
+            out.println("Could not find execution to pause with ID " + argument0);
+        }
+    }
+
+    private void cancel(PrintStream out) {
+        ActiveExecution execution = getOrListExecution(out, "cancel");
+        if(execution != null) {
+            orchestrator.cancel(execution);
+        } else {
+            out.println("Could not find execution to cancel with ID " + argument0);
+        }
+
+    }
+
+    private ActiveExecution getOrListExecution(PrintStream out, String command) {
+        if(argument0 == null) {
+            out.println("No can do. The correct syntax is: " + command + " <execution>");
+            out.println("Possible executions are:");
+            for(ActiveExecution e: orchestrator.getActiveExecutions()) {
+                out.println(String.format("Execution %d: Workflow %s, data set %s", e.getId(), e.getWorkflow().getName(), e.getDataSet()));
+            }
+            out.println();
+        }
+        ActiveExecution execution = null;
+        for(ActiveExecution e : orchestrator.getActiveExecutions()) {
+            if(e.getId() == Long.parseLong(argument0)) {
+                execution = e;
+                break;
+            }
+        }
+        return execution;
     }
 
 
@@ -110,18 +148,10 @@ public class UIMOrchestratorCommand implements Action {
         List<Provider> providers = storage.getProvider();
 
         if (argument0 == null) {
-            out.println("No workflow specified. Possible choices are:");
-            for (int i = 0; i < workflows.size(); i++) {
-                Workflow w = workflows.get(i);
-                out.println(i + ") " + w.getName() + " - " + w.getDescription());
-            }
+            printWorfklows(out, workflows);
         }
         if (argument0 != null && argument1 == null) {
-            out.println("No provider specified. Possible choices are:");
-            for (int i = 0; i < providers.size(); i++) {
-                Provider p = storage.getProvider(i);
-                out.println(i + ") " + p.getName());
-            }
+            printProviders(out, storage, providers);
         }
         if (argument0 != null && argument1 != null && argument2 == null) {
             int p = Integer.parseInt(argument1);
@@ -134,7 +164,6 @@ public class UIMOrchestratorCommand implements Action {
         }
 
         if (argument0 != null && argument1 != null && argument2 != null) {
-
 
             Workflow w = workflows.get(Integer.parseInt(argument0));
             Provider p = providers.get(Integer.parseInt(argument1));
@@ -149,6 +178,22 @@ public class UIMOrchestratorCommand implements Action {
         }
 
 
+    }
+
+    private void printProviders(PrintStream out, StorageEngine storage, List<Provider> providers) {
+        out.println("No provider specified. Possible choices are:");
+        for (int i = 0; i < providers.size(); i++) {
+            Provider p = storage.getProvider(i);
+            out.println(i + ") " + p.getName());
+        }
+    }
+
+    private void printWorfklows(PrintStream out, List<Workflow> workflows) {
+        out.println("No workflow specified. Possible choices are:");
+        for (int i = 0; i < workflows.size(); i++) {
+            Workflow w = workflows.get(i);
+            out.println(i + ") " + w.getName() + " - " + w.getDescription());
+        }
     }
 
     private void listExecutions(PrintStream out) {
