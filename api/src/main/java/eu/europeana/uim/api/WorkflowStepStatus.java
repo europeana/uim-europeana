@@ -15,6 +15,9 @@ public interface WorkflowStepStatus extends Serializable {
 
     WorkflowStep getStep();
 
+    /** parent step, for now this can only be a ProcessingContainer **/
+    WorkflowStep getParent();
+
     int queueSize();
     int successes();
     int failures();

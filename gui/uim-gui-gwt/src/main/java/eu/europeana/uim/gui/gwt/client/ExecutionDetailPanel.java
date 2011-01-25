@@ -14,7 +14,9 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 import eu.europeana.uim.gui.gwt.shared.StepStatus;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
@@ -84,8 +86,8 @@ public class ExecutionDetailPanel extends VerticalPanel {
     private void displayStatus(final List<StepStatus> statuses) {
         statusPanel.clear();
 
-        Grid s = new Grid(statuses.size() + 1, 4);
-        String[] labels = new String[]{"Step/Plugin", "Successes", "Failures", "Queue size"};
+        Grid s = new Grid(statuses.size() + 1, 5);
+        String[] labels = new String[]{"Parallel execution group", "Step/Plugin", "Successes", "Failures", "Queue size"};
 
         for (int i = 0; i < labels.length; i++) {
             Label l = new Label(labels[i]);
@@ -94,13 +96,27 @@ public class ExecutionDetailPanel extends VerticalPanel {
         }
 
         for (int i = 0; i < statuses.size(); i++) {
-            s.setText(i + 1, 0, statuses.get(i).getStep());
-            s.setText(i + 1, 1, Integer.toString(statuses.get(i).successes()));
-            s.setText(i + 1, 2, Integer.toString(statuses.get(i).failures()));
-            s.setText(i + 1, 3, Integer.toString(statuses.get(i).queueSize()));
+            Integer group = group(statuses.get(i).getParentName());
+            s.setText(i + 1, 0, group == -1 ? "" : group.toString());
+            s.setText(i + 1, 1, statuses.get(i).getStep());
+            s.setText(i + 1, 2, Integer.toString(statuses.get(i).successes()));
+            s.setText(i + 1, 3, Integer.toString(statuses.get(i).failures()));
+            s.setText(i + 1, 4, Integer.toString(statuses.get(i).queueSize()));
         }
 
         statusPanel.add(s);
+    }
+
+    private Map<String, Integer> containers = new HashMap<String, Integer>();
+
+    private Integer group(String parentName) {
+        if (parentName == null) return -1;
+        Integer i = containers.get(parentName);
+        if (i == null) {
+            i = containers.size();
+            containers.put(parentName, i);
+        }
+        return i;
     }
 
     private Grid buildDetail(Execution execution) {

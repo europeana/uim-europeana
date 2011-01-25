@@ -20,7 +20,7 @@ public class UIMWorkflowStepStatus implements WorkflowStepStatus {
         this.failureDetail = failureDetail;
     }
 
-    private WorkflowStep step;
+    private WorkflowStep step, parent;
     private int queueSize, successes, failures;
     private Map<MetaDataRecord<MDRFieldRegistry>, Throwable> failureDetail;
 
@@ -47,5 +47,14 @@ public class UIMWorkflowStepStatus implements WorkflowStepStatus {
     @Override
     public Map<MetaDataRecord<MDRFieldRegistry>, Throwable> getFailureDetail() {
         return failureDetail;
+    }
+
+    @Override
+    public WorkflowStep getParent() {
+        return parent;
+    }
+
+    public void setParent(WorkflowStep parent) {
+        this.parent = parent;
     }
 }

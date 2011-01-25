@@ -12,6 +12,7 @@ import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.common.ProgressMonitor;
+import eu.europeana.uim.workflow.ProcessingContainer;
 import eu.europeana.uim.workflow.StepProcessorProvider;
 
 import java.util.ArrayList;
@@ -123,7 +124,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
                 trash.add(entry.getKey());
             }
         }
-        for(Task t : trash) {
+        for (Task t : trash) {
             tasks.remove(t);
         }
     }
@@ -299,9 +300,26 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
     public List<WorkflowStepStatus> getRuntimeStatus(Workflow w) {
         List<WorkflowStepStatus> res = new ArrayList<WorkflowStepStatus>();
         for (StepProcessor p : stepProcessors) {
-            res.add(new UIMWorkflowStepStatus(p.getStep(), p.currentQueueSize(), p.getSuccessCount(), p.getFailureCount(), p.getFailedTasks()));
+            WorkflowStep step = p.getStep();
+            if (step instanceof ProcessingContainer) {
+                addExpandedProcessingContainers((ProcessingContainer) step, p, res);
+            } else {
+                res.add(new UIMWorkflowStepStatus(step, p.currentQueueSize(), p.getSuccessCount(), p.getFailureCount(), p.getFailedTasks()));
+            }
         }
         return res;
+    }
+
+    private void addExpandedProcessingContainers(ProcessingContainer pc, StepProcessor p, List<WorkflowStepStatus> statuses) {
+        for (WorkflowStep step : pc.getSteps()) {
+            if (step instanceof ProcessingContainer) {
+                addExpandedProcessingContainers((ProcessingContainer) step, p, statuses);
+            } else {
+                UIMWorkflowStepStatus s = new UIMWorkflowStepStatus(step, p.currentQueueSize(), p.getSuccessCount(), p.getFailureCount(), p.getFailedTasks());
+                s.setParent(pc);
+                statuses.add(s);
+            }
+        }
     }
 
 

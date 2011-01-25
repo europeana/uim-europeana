@@ -189,7 +189,7 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
         List<StepStatus> res = new ArrayList<StepStatus>();
         List<WorkflowStepStatus> runtimeStatus = getEngine().getOrchestrator().getRuntimeStatus(getWorkflow(workflow));
         for (WorkflowStepStatus wss : runtimeStatus) {
-            StepStatus ss = new StepStatus(wss.getStep().getIdentifier(), wss.queueSize(), wss.successes(), wss.failures());
+            StepStatus ss = new StepStatus(wss.getStep().getIdentifier(), (wss.getParent() != null ? wss.getParent().getIdentifier() : null), wss.queueSize(), wss.successes(), wss.failures());
             res.add(ss);
         }
         return res;

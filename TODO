@@ -8,10 +8,15 @@ functionality:
   - New execution
     - later: display total number of MDRs on collection selection
   - Overview
-  - Execution detail view (refreshed every N seconds)
-    - display detail of ProcessingContainers
+  - Workflow view
+    - new tab with a graphical representation of the worklows
+    - detail view (with steps) for each workflow
+  - Log view
+    - new tab that makes it possible to display the logs of an execution (select an execution -> get the logs)
+    - later: link to download the logs
   - general:
     - make GUI more robust against backend failures
+    - fix the (most likely concurrency) issue avoiding the queue size to be displayed outside its main thread
     - better way to redeploy GWT module to OSGI environment
        - Pax Runner is outdated there, not sure what we can do
     - GWT integration in Karaf Webconsole? (maybe not necessary)

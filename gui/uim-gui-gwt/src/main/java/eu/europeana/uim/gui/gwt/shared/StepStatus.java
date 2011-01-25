@@ -7,15 +7,16 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class StepStatus implements IsSerializable {
 
-    private String stepName;
+    private String stepName, parentName;
     private int queueSize, successes, failures;
 
     public StepStatus() {
 
     }
 
-    public StepStatus(String stepName, int queueSize, int successes, int failures) {
+    public StepStatus(String stepName, String parentName, int queueSize, int successes, int failures) {
         this.stepName = stepName;
+        this.parentName = parentName;
         this.queueSize = queueSize;
         this.successes = successes;
         this.failures = failures;
@@ -35,5 +36,9 @@ public class StepStatus implements IsSerializable {
 
     public int failures() {
         return failures;
+    }
+
+    public String getParentName() {
+        return parentName;
     }
 }

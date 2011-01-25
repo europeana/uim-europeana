@@ -9,10 +9,10 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class OverviewPanel extends FlowPanel {
+public class OverviewPanel extends ScrollPanel {
 
     private final Application application;
     private OrchestrationServiceAsync orchestrationService = null;
