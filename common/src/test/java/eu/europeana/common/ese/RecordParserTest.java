@@ -82,4 +82,23 @@ public class RecordParserTest {
 			}
 		}
 	}
+	
+	@Test
+	public void testParseEuropeanaTravel1() throws XMLStreamParserException {
+		InputStream stream = RecordParserTest.class.getResourceAsStream("/MS10805_09_tn.xml");
+		RecordParser parser = new RecordParser();
+		List<RecordMap> xml = parser.parse(stream, "record");
+		assertEquals(1, xml.size());
+	}
+
+	@Test
+	public void testParseEuropeanaTravel2() throws XMLStreamParserException {
+		InputStream stream = RecordParserTest.class.getResourceAsStream("/MS10805_37_tn.xml");
+		RecordParser parser = new RecordParser();
+		List<RecordMap> xml = parser.parse(stream, "record");
+		assertEquals(1, xml.size());
+	}
+
+	
+
 }
