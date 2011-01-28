@@ -7,6 +7,7 @@ import eu.europeana.uim.api.LogEntry;
 import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.store.Execution;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,25 +20,47 @@ import java.util.Map;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class MemoryLoggingEngine implements LoggingEngine {
+public class MemoryLoggingEngine<T extends Serializable> implements LoggingEngine<T> {
 
-    private Map<Execution, List<LogEntry>> executionLogs = new HashMap<Execution, List<LogEntry>>();
+    private Map<Execution, List<LogEntry<String>>> executionLogs = new HashMap<Execution, List<LogEntry<String>>>();
+
+    private Map<Execution, List<LogEntry<T>>> structuredExecutionLogs = new HashMap<Execution, List<LogEntry<T>>>();
 
     private Map<IngestionPlugin, List<Long>> durations = new HashMap<IngestionPlugin, List<Long>>();
 
     @Override
-    public void log(Level level, String message, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin) {
-        List<LogEntry> logs = executionLogs.get(execution);
-        if (logs == null) {
-            logs = new ArrayList<LogEntry>();
-            executionLogs.put(execution, logs);
-        }
-        logs.add(new MemoryLogEntry(new Date(), execution, plugin, mdr, message));
+    public String getIdentifier() {
+        return MemoryLoggingEngine.class.getSimpleName();
     }
 
     @Override
-    public List<LogEntry> getExecutionLog(Execution execution) {
+    public void log(Level level, String message, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin) {
+        List<LogEntry<String>> logs = executionLogs.get(execution);
+        if (logs == null) {
+            logs = new ArrayList<LogEntry<String>>();
+            executionLogs.put(execution, logs);
+        }
+        logs.add(new MemoryLogEntry<String>(level, new Date(), execution, plugin, mdr, message));
+    }
+
+    @Override
+    public void logStructured(Level level, T payload, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin) {
+        List<LogEntry<T>> logs = structuredExecutionLogs.get(execution);
+        if (logs == null) {
+            logs = new ArrayList<LogEntry<T>>();
+            structuredExecutionLogs.put(execution, logs);
+        }
+        logs.add(new MemoryLogEntry<T>(level, new Date(), execution, plugin, mdr, payload));
+    }
+
+    @Override
+    public List<LogEntry<String>> getExecutionLog(Execution execution) {
         return executionLogs.get(execution);
+    }
+
+    @Override
+    public List<LogEntry<T>> getStructuredExecutionLog(Execution execution) {
+        return structuredExecutionLogs.get(execution);
     }
 
     private List<Long> getDurations(IngestionPlugin plugin) {
