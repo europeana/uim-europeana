@@ -1,6 +1,5 @@
 package eu.europeana.uim.logging.mongo;
 
-import com.google.code.morphia.annotations.Entity;
 import eu.europeana.uim.api.LogEntry;
 import eu.europeana.uim.api.LoggingEngine;
 
@@ -10,7 +9,6 @@ import java.util.Date;
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-@Entity
 public class MongoLogEntry<T extends Serializable> implements LogEntry<T> {
 
     private LoggingEngine.Level level;
