@@ -38,6 +38,12 @@
         </reference-listener>
     </reference-list>
 
+    <reference-list interface="eu.europeana.uim.api.LoggingEngine" availability="optional">
+        <reference-listener
+                bind-method="addLoggingEngine" unbind-method="removeLoggingEngine" ref="uimRegistry">
+        </reference-listener>
+    </reference-list>
+
     <shell:command-bundle>
         <shell:command name="uim/info">
             <shell:action class="eu.europeana.uim.command.UIMInfo">

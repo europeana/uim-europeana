@@ -38,6 +38,8 @@ public interface Registry {
 
     void addLoggingEngine(LoggingEngine loggingEngine);
 
+    void removeLoggingEngine(LoggingEngine loggingEngine);
+
     List<LoggingEngine<?>> getLoggingEngines();
 
     LoggingEngine<?> getLoggingEngine();

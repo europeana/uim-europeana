@@ -208,6 +208,11 @@ public class UIMRegistry implements Registry {
     }
 
     @Override
+    public void removeLoggingEngine(LoggingEngine loggingEngine) {
+        loggers.remove(loggingEngine.getIdentifier());
+    }
+
+    @Override
     public List<LoggingEngine<?>> getLoggingEngines() {
         List<LoggingEngine<?>> res = new ArrayList<LoggingEngine<?>>();
         res.addAll(loggers.values());
