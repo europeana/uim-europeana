@@ -36,4 +36,14 @@ public interface Registry {
 
     StorageEngine getStorage(String identifier);
 
+    void addLoggingEngine(LoggingEngine loggingEngine);
+
+    List<LoggingEngine<?>> getLoggingEngines();
+
+    LoggingEngine<?> getLoggingEngine();
+
+    LoggingEngine<?> getLoggingEngine(String identifier);
+
+    void setActiveLoggingEngine(LoggingEngine loggingEngine);
+
 }

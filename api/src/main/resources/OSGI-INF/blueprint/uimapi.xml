@@ -7,6 +7,7 @@
     <cm:property-placeholder persistent-id="eu.europeana.uim">
         <cm:default-properties>
             <cm:property name="defaultStorageEngine" value="MemoryStorageEngine" />
+            <cm:property name="defaultLoggingEngine" value="MemoryLoggingEngine" />
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -14,6 +15,7 @@
 
     <bean id="uimRegistry" class="eu.europeana.uim.UIMRegistry">
         <property name="defaultStorageEngine" value="${defaultStorageEngine}" />
+        <property name="defaultLoggingEngine" value="${defaultLoggingEngine}" />
     </bean>
 
     <reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator" availability="optional"/>

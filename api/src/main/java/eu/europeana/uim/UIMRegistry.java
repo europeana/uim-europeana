@@ -1,6 +1,7 @@
 package eu.europeana.uim;
 
 import eu.europeana.uim.api.IngestionPlugin;
+import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
@@ -19,6 +20,11 @@ public class UIMRegistry implements Registry {
     private String defaultStorageEngine;
     private StorageEngine activeStorage = null;
     private List<StorageEngine> storages = new ArrayList<StorageEngine>();
+
+    private String defaultLoggingEngine;
+    private LoggingEngine activeLogging = null;
+    private Map<String, LoggingEngine<?>> loggers = new HashMap<String, LoggingEngine<?>>();
+
     private Map<String, IngestionPlugin> plugins = new HashMap<String, IngestionPlugin>();
     private List<Workflow> workflows = new ArrayList<Workflow>();
 
@@ -39,6 +45,21 @@ public class UIMRegistry implements Registry {
             this.defaultStorageEngine = defaultStorageEngine;
         }
     }
+
+
+    public void setDefaultLoggingEngine(String defaultLoggingEngine) {
+        // do not allow setting false values
+        if (activeLogging != null && getStorage(defaultLoggingEngine) != null) {
+            this.activeLogging = getLoggingEngine(defaultLoggingEngine);
+            this.defaultLoggingEngine = defaultLoggingEngine;
+        } else if (activeLogging != null) {
+            log.severe("Attempt to set default logging engine to '" + defaultLoggingEngine + "' failed, not making the change");
+        } else {
+            log.info("Setting default logging engine to " + defaultLoggingEngine);
+            this.defaultLoggingEngine = defaultLoggingEngine;
+        }
+    }
+
 
     @Override
     public List<Workflow> getWorkflows() {
@@ -169,6 +190,54 @@ public class UIMRegistry implements Registry {
         return null;
     }
 
+    @Override
+    public void addLoggingEngine(LoggingEngine logging) {
+        if (logging != null) {
+            log.info("Added logging engine:" + logging.getIdentifier());
+            if (!loggers.containsKey(logging.getIdentifier())) {
+                loggers.put(logging.getIdentifier(), logging);
+                // activate default logging
+                if (activeLogging == null) {
+                    activeLogging = logging;
+                } else if (logging.getIdentifier().equals(defaultLoggingEngine)) {
+                    activeLogging = logging;
+                    log.info("Making logging engine " + logging.getIdentifier() + " default");
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<LoggingEngine<?>> getLoggingEngines() {
+        List<LoggingEngine<?>> res = new ArrayList<LoggingEngine<?>>();
+        res.addAll(loggers.values());
+        return res;
+    }
+
+    @Override
+    public LoggingEngine<?> getLoggingEngine() {
+        if (loggers == null || loggers.isEmpty()) return null;
+        if (activeLogging == null) {
+            if (getLoggingEngine(defaultLoggingEngine) != null) {
+                activeLogging = getLoggingEngine(defaultLoggingEngine);
+            } else {
+                activeLogging = loggers.values().toArray(new LoggingEngine[] {})[0];
+            }
+        }
+        return activeLogging;
+    }
+
+    @Override
+    public void setActiveLoggingEngine(LoggingEngine loggingEngine) {
+        activeLogging = loggingEngine;
+    }
+
+    @Override
+    public LoggingEngine<?> getLoggingEngine(String identifier) {
+        if (identifier == null || loggers == null || loggers.isEmpty()) return null;
+        return loggers.get(identifier);
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
@@ -217,6 +286,25 @@ public class UIMRegistry implements Registry {
                 builder.append(storage.getConfiguration().toString());
             }
         }
+
+        builder.append("\nRegistered logging:");
+        builder.append("\n--------------------------------------");
+        if (loggers.isEmpty()) {
+            builder.append("\n\tNo logging.");
+        } else {
+            for (LoggingEngine loggingEngine : loggers.values()) {
+                if (builder.length() > 0) {
+                    builder.append("\n\t");
+                }
+                if (activeLogging != null && activeLogging == loggingEngine) {
+                    builder.append("* ");
+                } else {
+                    builder.append("  ");
+                }
+                builder.append(loggingEngine.getIdentifier());
+            }
+        }
+
 
         return builder.toString();
     }

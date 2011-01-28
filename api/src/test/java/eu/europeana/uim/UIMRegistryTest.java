@@ -14,7 +14,6 @@ public class UIMRegistryTest {
 	@Before
 	public void setup() {
 		registry.addStorage(new StorageEngineAdapter(){});
-		
 	}
 	
 	@Test

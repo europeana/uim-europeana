@@ -4,6 +4,7 @@ import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.store.Execution;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,11 +12,17 @@ import java.util.List;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public interface LoggingEngine {
+public interface LoggingEngine<T extends Serializable> {
 
     enum Level {
         INFO, WARNING, SEVERE
     }
+
+    /**
+     * Gets the identifier of this LoggingEngine implementation
+     * @return a unique identifier for the logging engine
+     */
+    String getIdentifier();
 
     /**
      * Logs a message
@@ -29,12 +36,31 @@ public interface LoggingEngine {
     void log(Level level, String message, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin);
 
     /**
-     * Retrieves all log entries for one execution
+     * Retrieves simple log entries for one execution
      *
      * @param execution the execution
      * @return a list of LogEntry-s
      */
-    List<LogEntry> getExecutionLog(Execution execution);
+    List<LogEntry<String>> getExecutionLog(Execution execution);
+
+    /**
+     * Logs a structured message, to be used for advanced log analysis
+     *
+     * @param level     the level of the message
+     * @param payload   a structured message object
+     * @param execution the execution during which this log was issues
+     * @param mdr       the record for which this log was issued
+     * @param plugin    the plugin reporting the log
+     */
+    void logStructured(Level level, T payload, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin);
+
+
+    /**
+     * Retrieves structured log entries for one execution
+     * @param execution the execution
+     * @return a list of LogEntry-s
+     */
+    List<LogEntry<T>> getStructuredExecutionLog(Execution execution);
 
     /**
      * Logs a processing duration for a given count of items

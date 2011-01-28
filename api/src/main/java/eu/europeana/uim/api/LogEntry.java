@@ -1,21 +1,19 @@
 package eu.europeana.uim.api;
 
-import eu.europeana.uim.MDRFieldRegistry;
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.store.Execution;
-
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Log entry
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public interface LogEntry {
+public interface LogEntry<T extends Serializable> {
 
+    LoggingEngine.Level getLevel();
     Date getDate();
-    Execution getExecution();
-    IngestionPlugin getPlugin();
-    MetaDataRecord<MDRFieldRegistry> getMetaDataRecord();
-    String getMessage();
+    Long getExecutionId();
+    String getPluginIdentifier();
+    Long getMetaDataRecordId();
+    T getMessage();
 
 }
