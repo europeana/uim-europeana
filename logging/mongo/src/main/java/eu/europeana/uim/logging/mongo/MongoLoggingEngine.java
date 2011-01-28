@@ -63,8 +63,14 @@ public class MongoLoggingEngine<T extends Serializable> implements LoggingEngine
 
     }
 
-    public void registerTypeSerializer(Class<T> type, TypeSerializer<T> serializer) {
-        this.serializer = serializer;
+    public void setTypeSerializer(String serializerClass) {
+        try {
+            Class serializer = Class.forName(serializerClass);
+            TypeSerializer<T> s = (TypeSerializer<T>) serializer.newInstance();
+            this.serializer = s;
+        } catch (Throwable t) {
+            throw new RuntimeException("Could not find or initialize serializer " + serializerClass, t);
+        }
     }
 
     public String getIdentifier() {

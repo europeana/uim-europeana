@@ -10,6 +10,11 @@ import com.mongodb.DBObject;
 public interface TypeSerializer<T> {
 
     /**
+     * The type this serializer handles
+     */
+    Class<T> getType();
+
+    /**
      * Serializes a type into a DBObject
      *
      * @param type the object to serialize

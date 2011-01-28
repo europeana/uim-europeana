@@ -30,6 +30,10 @@ class DummyTypeSerializer extends TypeSerializer[DummyType] {
   def parse(`object` : DBObject) = {
     new DummyType(`object`.get("some").asInstanceOf[String])
   }
+
+  def getType = {
+    classOf[DummyType]
+  }
 }
 
 /**
@@ -41,7 +45,7 @@ class MongoLoggingEngineTest extends Spec with BeforeAndAfterAll with BeforeAndA
 
   val DB: String = "UIMLOGTEST"
   val engine: MongoLoggingEngine[DummyType] = new MongoLoggingEngine[DummyType](DB)
-  engine.registerTypeSerializer(classOf[DummyType], new DummyTypeSerializer)
+  engine.setTypeSerializer(classOf[DummyTypeSerializer].getName);
   val m: Mongo = new Mongo();
 
   override protected def beforeAll() = {
