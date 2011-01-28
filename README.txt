@@ -23,6 +23,8 @@ Path                              Name                                          
 /gui/uim-gui-gwt                  Unified Ingestion Manager: GWT User Interface            UIM GWT frontend
 /storage/memory                   Unified Ingestion Manager: Storage Backend Memory        In-memory implementation of the storage engine
 /storage/mongo                    Unified Ingestion Manager: Storage Backend Mongo         Mongodb implementation of the storage engine
+/logging/memory                   Unified Ingestion Manager: API Memory Only Logging       In-memory implementation of the logging engine
+/logging/mongo                    Unified Ingestion Manager: API Mongodb based Logging      MongoDB based implementation of the logging engine
 /plugins/fileimp                  Unified Ingestion Manager: Import from File              Bundle to import data from a XML file
 /plugins/integration              Unified Ingestion Manager: Integration tests             The integration tests, using PAX-Exam
 /plugins/dummy                    Unified Ingestion Manager: Dummy Plugin                  Our beloved dummy plugin
@@ -110,6 +112,9 @@ Path                              Name                                          
 =======================
 
 We use GWT (Google Web Toolkit) for frontend development.
+
+/!\ In order not to wait too long for compilation, only Google Chrome compliant javascript is currently compiled.
+    Change this in the application.gwt.xml if you need to use another browser
 
 In order to run the development mode:
 
