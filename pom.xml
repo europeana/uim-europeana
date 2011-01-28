@@ -29,9 +29,6 @@
         <!--  the uim standard file import module -->
         <module>plugins/fileimp</module>
 
-        <!-- mongodb based memory storage implementation -->
-<!--        <module>storage/mongo</module>-->
-
         <!--  the uim standard in memory storage implementation -->
         <module>storage/memory</module>
 
@@ -47,12 +44,17 @@
         <!--  the uim integration test module -->
         <module>plugins/integration</module>
 
-        <!-- webconsole-based GUI -->
-<!--        <module>gui/uim-webconsole-extension</module>-->
-
         <!-- GWT-based GUI -->
-<!--        <module>gui/uim-gui-gwt</module>-->
+        <module>gui/uim-gui-gwt</module>
 
+        <!-- webconsole-based GUI -->
+        <!--        <module>gui/uim-webconsole-extension</module>-->
+
+        <!-- mongodb based memory storage implementation -->
+        <!-- <module>storage/mongo</module> -->
+
+        <!-- mongodb based logging -->
+        <!-- <module>logging/mongo</module>-->
     </modules>
 
     <build>
@@ -66,19 +68,19 @@
                     <source>1.6</source>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<tagBase>https://europeanalabs.eu/svn/europeana/releases</tagBase>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>2.2</version>
-			</plugin>		
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <tagBase>https://europeanalabs.eu/svn/europeana/releases</tagBase>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>2.2</version>
+            </plugin>
             <!-- generate dependencies versions -->
             <!-- this is required for the integration tests to work without explicitely specifying versions -->
             <!-- see http://wiki.ops4j.org/display/paxexam/Pax+Exam+-+Tutorial+1 -->
