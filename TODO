@@ -1,6 +1,8 @@
 in progress
 ===========
 
+- mongodb logging engine: integration tests
+
 functionality:
 ==============
 
@@ -22,6 +24,8 @@ functionality:
     - GWT integration in Karaf Webconsole? (maybe not necessary)
 
 - orchestrator:
+  - log the time a plugin takes for execution (statistics)
+    make this behavior configurable
   - make timeout for task configurable
   - error handling on task timeout
   - cleanup failed tasks after N iterations
@@ -29,14 +33,11 @@ functionality:
     - show status
   - later: gracefully handle other services becoming unavailable (e.g. storage, ...)
 
-- reporting / statistics component
-  - trace the time a plugin needs to process a MDR
-  - ... (design this)
+- mongo logging engine
+  - integration tests
 
 - storage: MangoDB-based implementation
   - optimize it
-  - the unit test takes like forever because we re-build a whole db every time. we may wanna take a different approach and delete
-    the records instead
 
 - core plugins:
   - meta data mapping / conversion
