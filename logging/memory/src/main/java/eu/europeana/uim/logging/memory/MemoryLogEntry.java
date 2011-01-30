@@ -19,7 +19,7 @@ public class MemoryLogEntry<T extends Serializable> implements LogEntry<T> {
     private Date date;
     private Execution execution;
     private IngestionPlugin plugin;
-    private MetaDataRecord<MDRFieldRegistry> mdr;
+    private MetaDataRecord mdr;
     private T message;
 
     @Override
@@ -52,7 +52,7 @@ public class MemoryLogEntry<T extends Serializable> implements LogEntry<T> {
         return message;
     }
 
-    public MemoryLogEntry(LoggingEngine.Level level, Date date, Execution execution, IngestionPlugin plugin, MetaDataRecord<MDRFieldRegistry> mdr, T message) {
+    public MemoryLogEntry(LoggingEngine.Level level, Date date, Execution execution, IngestionPlugin plugin, MetaDataRecord mdr, T message) {
         this.level = level;
         this.date = date;
         this.execution = execution;

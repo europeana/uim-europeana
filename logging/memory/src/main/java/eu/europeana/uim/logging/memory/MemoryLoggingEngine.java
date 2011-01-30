@@ -34,7 +34,7 @@ public class MemoryLoggingEngine<T extends Serializable> implements LoggingEngin
     }
 
     @Override
-    public void log(Level level, String message, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin) {
+    public void log(Level level, String message, Execution execution, MetaDataRecord mdr, IngestionPlugin plugin) {
         List<LogEntry<String>> logs = executionLogs.get(execution);
         if (logs == null) {
             logs = new ArrayList<LogEntry<String>>();
@@ -44,7 +44,7 @@ public class MemoryLoggingEngine<T extends Serializable> implements LoggingEngin
     }
 
     @Override
-    public void logStructured(Level level, T payload, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin) {
+    public void logStructured(Level level, T payload, Execution execution, MetaDataRecord mdr, IngestionPlugin plugin) {
         List<LogEntry<T>> logs = structuredExecutionLogs.get(execution);
         if (logs == null) {
             logs = new ArrayList<LogEntry<T>>();
