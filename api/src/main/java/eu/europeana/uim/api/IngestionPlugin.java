@@ -13,7 +13,7 @@ public interface IngestionPlugin extends WorkflowStep {
 	public TKey<MDRFieldRegistry,?>[] getOutputParameters();
 	public TKey<MDRFieldRegistry,?>[] getTransientParameters();
 
-    public void processRecord(MetaDataRecord<?> mdr);
+    public void processRecord(MetaDataRecord mdr);
 	
 	
 }

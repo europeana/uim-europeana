@@ -14,10 +14,10 @@ public interface RecordProvider {
     /**
      * Gets the actual MetaDataRecord based on its ID
      */
-    MetaDataRecord<MDRFieldRegistry> getMetaDataRecord(long id);
+    MetaDataRecord getMetaDataRecord(long id);
 
     /**
      * Persists the given MetaDataRecord
      */
-    void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> mdr) throws StorageEngineException;
+    void updateMetaDataRecord(MetaDataRecord mdr) throws StorageEngineException;
 }

@@ -27,6 +27,12 @@ public class MongoRequest extends AbstractMongoEntity implements Request {
         this.collection = c;
     }
 
+    public MongoRequest(long id, MongodbCollection c, Date d) {
+        super(id);
+        this.collection = c;
+        this.date = d;
+    }
+
     public Collection getCollection() {
         return collection;
     }

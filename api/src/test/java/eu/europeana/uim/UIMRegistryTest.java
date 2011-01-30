@@ -13,6 +13,7 @@ public class UIMRegistryTest {
 
 	@Before
 	public void setup() {
+		registry.setConfiguredStorageEngine(StorageEngineAdapter.class.getSimpleName());
 		registry.addStorage(new StorageEngineAdapter(){});
 	}
 	

@@ -14,9 +14,9 @@ public class MetaDataRecordHandler implements RecordHandler {
 
 	private final StorageEngine storage;
 	private final Request request;
-	
+
 	private final String recordElement;
-	
+
 	public MetaDataRecordHandler(StorageEngine storage, Request request, String recordElement) {
 		super();
 		this.storage = storage;
@@ -24,7 +24,7 @@ public class MetaDataRecordHandler implements RecordHandler {
 		this.recordElement = recordElement;
 	}
 
-	
+
 	@Override
 	public String getRecordElement() {
 		return recordElement;
@@ -33,23 +33,23 @@ public class MetaDataRecordHandler implements RecordHandler {
 
 	@Override
 	public void record(RecordMap record) {
-		MetaDataRecord<MDRFieldRegistry> mdr = storage.createMetaDataRecord(request);
-		
-		for (Entry<RecordField, List<String>> entry : record.entrySet()) {
-			if ("title".equals(entry.getKey().getLocal())) {
-				if (entry.getKey().getLanguage() != null) {
-					for (String  value : entry.getValue()) {
-						mdr.setQField(MDRFieldRegistry.title, entry.getKey().getLanguage(), value);
-					}
-				} else {
-					for (String  value : entry.getValue()) {
-						mdr.setFirstField(MDRFieldRegistry.title, value);
+		try {
+			MetaDataRecord mdr = storage.createMetaDataRecord(request);
+
+			for (Entry<RecordField, List<String>> entry : record.entrySet()) {
+				if ("title".equals(entry.getKey().getLocal())) {
+					if (entry.getKey().getLanguage() != null) {
+						for (String  value : entry.getValue()) {
+							mdr.addQField(MDRFieldRegistry.title, entry.getKey().getLanguage(), value);
+						}
+					} else {
+						for (String  value : entry.getValue()) {
+							mdr.setFirstField(MDRFieldRegistry.title, value);
+						}
 					}
 				}
 			}
-		}
-		
-		try {
+
 			storage.updateMetaDataRecord(mdr);
 		} catch (StorageEngineException e) {
 			// TODO Auto-generated catch block

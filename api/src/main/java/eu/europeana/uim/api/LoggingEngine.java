@@ -1,11 +1,10 @@
 package eu.europeana.uim.api;
 
-import eu.europeana.uim.MDRFieldRegistry;
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.store.Execution;
-
 import java.io.Serializable;
 import java.util.List;
+
+import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.store.Execution;
 
 /**
  * Service for the reporting of the processing, to be used by the orchestrator and eventually plugins
@@ -33,7 +32,7 @@ public interface LoggingEngine<T extends Serializable> {
      * @param mdr       the record for which this log was issued
      * @param plugin    the plugin reporting the log
      */
-    void log(Level level, String message, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin);
+    void log(Level level, String message, Execution execution, MetaDataRecord mdr, IngestionPlugin plugin);
 
     /**
      * Retrieves simple log entries for one execution
@@ -52,7 +51,7 @@ public interface LoggingEngine<T extends Serializable> {
      * @param mdr       the record for which this log was issued
      * @param plugin    the plugin reporting the log
      */
-    void logStructured(Level level, T payload, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin);
+    void logStructured(Level level, T payload, Execution execution, MetaDataRecord mdr, IngestionPlugin plugin);
 
 
     /**

@@ -1,10 +1,9 @@
 package eu.europeana.uim.api;
 
-import eu.europeana.uim.MDRFieldRegistry;
-import eu.europeana.uim.MetaDataRecord;
-
 import java.io.Serializable;
 import java.util.Map;
+
+import eu.europeana.uim.MetaDataRecord;
 
 /**
  * The runtime status of a workflow execution
@@ -22,5 +21,5 @@ public interface WorkflowStepStatus extends Serializable {
     int successes();
     int failures();
 
-    Map<MetaDataRecord<MDRFieldRegistry>, Throwable> getFailureDetail();
+    Map<MetaDataRecord, Throwable> getFailureDetail();
 }

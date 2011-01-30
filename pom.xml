@@ -11,9 +11,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.core.version>3.0.3.RELEASE</spring.core.version>
+        <spring.core.version>3.0.5.RELEASE</spring.core.version>
         <osgi.version>1.4.0</osgi.version>
-        <karaf.version>2.1.0</karaf.version>
+        <karaf.version>2.1.3</karaf.version>
     </properties>
 
     <modules>

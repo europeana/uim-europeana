@@ -17,7 +17,7 @@ public interface Orchestrator {
 	
 	public String getIdentifier();
 
-    ActiveExecution executeWorkflow(Workflow w, MetaDataRecord<?> mdr, ProgressMonitor monitor);
+    ActiveExecution executeWorkflow(Workflow w, MetaDataRecord mdr, ProgressMonitor monitor);
 
     ActiveExecution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor);
 
@@ -27,11 +27,8 @@ public interface Orchestrator {
 
     java.util.Collection<ActiveExecution> getActiveExecutions();
 
-    void pause(ActiveExecution execution);
 
-    void resume(ActiveExecution execution);
-
-    void cancel(ActiveExecution execution);
+    void pause();
 
     void shutdown();
 

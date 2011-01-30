@@ -71,7 +71,7 @@
                     </execution>
                 </executions>
                 <configuration>
-<!--                    <webappDirectory>${webappDirectory}</webappDirectory>-->
+                    <webappDirectory>${webappDirectory}</webappDirectory>
                     <archive>
                         <!-- add the generated manifest to the war -->
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>

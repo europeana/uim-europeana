@@ -60,11 +60,11 @@ public class MongoExecution extends AbstractMongoEntity implements Execution {
         this.dataSet = dataSet;
     }
 
-    public String getWorkflowIdentifier() {
+    public String getWorkflowName() {
         return workflowIdentifier;
     }
 
-    public void setWorkflowIdentifier(String workflowIdentifier) {
-        this.workflowIdentifier = workflowIdentifier;
+    public void setWorkflowName(String workflow) {
+        this.workflowIdentifier = workflow;
     }
 }

@@ -50,7 +50,9 @@ public class OrchestratorTest {
 
     @Before
     public void setup() throws Exception {
-        registry.addStorage(new MemoryStorageEngine());
+        MemoryStorageEngine storage = new MemoryStorageEngine();
+		registry.addStorage(storage);
+        registry.setConfiguredStorageEngine(storage.getIdentifier());
     }
 
     @After
@@ -106,12 +108,16 @@ public class OrchestratorTest {
 
         // mock registry & storage
         Registry mockRegistry = mock(Registry.class);
+        
         StorageEngine storage = mock(StorageEngine.class);
         when(mockRegistry.getStorage()).thenReturn(storage);
         when(storage.getTotalByCollection(c)).thenReturn(why);
         when(storage.getByCollection(c)).thenReturn(new long[4242]);
+        
         Execution mockExecution = mock(Execution.class);
-        when(storage.createExecution()).thenReturn(mockExecution);
+        mockExecution.setDataSet(c);
+        mockExecution.setWorkflowName(w.getName());
+        when(storage.createExecution(c, w.getName())).thenReturn(mockExecution);
 
         Orchestrator o = new UIMOrchestrator(mockRegistry, p);
 
@@ -126,7 +132,6 @@ public class OrchestratorTest {
         assertTrue(e.getDataSet().equals(c));
         verify(mockProcessor).start();
         verify(mockExecution).setActive(true);
-        verify(mockExecution).setWorkflowIdentifier(w.getName());
 
         for(int i = 0; i < 43; i++) {
             Thread.sleep(10);

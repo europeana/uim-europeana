@@ -16,7 +16,7 @@ public interface Execution extends UimEntity {
     UimEntity getDataSet();
     void setDataSet(UimEntity entity);
 
-    String getWorkflowIdentifier();
-    void setWorkflowIdentifier(String identifier);
+    String getWorkflowName();
+    void setWorkflowName(String name);
 
 }

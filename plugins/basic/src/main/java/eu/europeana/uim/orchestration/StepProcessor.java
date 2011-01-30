@@ -35,7 +35,7 @@ public class StepProcessor {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     // synchronized map for collecting failing tasks
-    private final ConcurrentHashMap<MetaDataRecord<MDRFieldRegistry>, Throwable> failures = new ConcurrentHashMap<MetaDataRecord<MDRFieldRegistry>, Throwable>();
+    private final ConcurrentHashMap<MetaDataRecord, Throwable> failures = new ConcurrentHashMap<MetaDataRecord, Throwable>();
 
     // synchronized Vector for collecting successful tasks
     private final Vector<UIMTask> successes = new Vector<UIMTask>();
@@ -111,14 +111,14 @@ public class StepProcessor {
         }
     }
 
-    public void addFailure(MetaDataRecord<MDRFieldRegistry> mdr, Throwable throwable) {
+    public void addFailure(MetaDataRecord mdr, Throwable throwable) {
 
         // FIXME we need to go over all processor's failures every now and then and clean up
         // this is a known memory leak, so to speak
         this.failures.put(mdr, throwable);
     }
 
-    public Map<MetaDataRecord<MDRFieldRegistry>, Throwable> getFailedTasks() {
+    public Map<MetaDataRecord, Throwable> getFailedTasks() {
         return this.failures;
     }
 

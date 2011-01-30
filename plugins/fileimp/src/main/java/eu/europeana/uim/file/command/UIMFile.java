@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.felix.gogo.commands.Action;
@@ -89,7 +90,7 @@ public class UIMFile implements Function, Action {
 			
 			Collection targetcoll = storage.findCollection(collection);
 			if (targetcoll != null) {
-				Request request = storage.createRequest(targetcoll);
+				Request request = storage.createRequest(targetcoll, new Date());
 				storage.updateRequest(request);
 				MDRStreamLoader reader = new MDRStreamLoader();
 				switch (format) {

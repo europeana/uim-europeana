@@ -1,6 +1,15 @@
 package eu.europeana.uim.store.memory;
 
-import eu.europeana.uim.MDRFieldRegistry;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
+
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -8,19 +17,13 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
+import eu.europeana.uim.store.UimEntity;
 import gnu.trove.TLongArrayList;
 import gnu.trove.TLongLongHashMap;
 import gnu.trove.TLongLongIterator;
 import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
 import gnu.trove.TObjectLongHashMap;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
 
 public class MemoryStorageEngine implements StorageEngine {
 
@@ -36,11 +39,12 @@ public class MemoryStorageEngine implements StorageEngine {
 	private TLongObjectHashMap<Request> requests = new TLongObjectHashMap<Request>();
 	private TLongObjectHashMap<Execution> executions = new TLongObjectHashMap<Execution>();
 
+	private Set<String> mdrIdentifier = new HashSet<String>();
 
 	private TLongLongHashMap metarequest = new TLongLongHashMap();
-  private TLongLongHashMap metacollection = new TLongLongHashMap();
-  private TLongLongHashMap metaprovider = new TLongLongHashMap();
-	private TLongObjectHashMap<MetaDataRecord<?>> metadatas = new TLongObjectHashMap<MetaDataRecord<?>>();
+	private TLongLongHashMap metacollection = new TLongLongHashMap();
+	private TLongLongHashMap metaprovider = new TLongLongHashMap();
+	private TLongObjectHashMap<MetaDataRecord> metadatas = new TLongObjectHashMap<MetaDataRecord>();
 
 	private AtomicLong providerId= new AtomicLong();
 	private AtomicLong collectionId= new AtomicLong();
@@ -96,12 +100,11 @@ public class MemoryStorageEngine implements StorageEngine {
 	}
 
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public MetaDataRecord<MDRFieldRegistry>[] getMetaDataRecords(long... ids) {
-		ArrayList<MetaDataRecord<MDRFieldRegistry>> result = new ArrayList<MetaDataRecord<MDRFieldRegistry>>(ids.length);
+	public MetaDataRecord[] getMetaDataRecords(long... ids) {
+		ArrayList<MetaDataRecord> result = new ArrayList<MetaDataRecord>(ids.length);
 		for (long id : ids) {
-			result.add((MetaDataRecord<MDRFieldRegistry>) metadatas.get(id));
+			result.add((MetaDataRecord) metadatas.get(id));
 		}
 		return result.toArray(new MetaDataRecord[result.size()]);
 	}
@@ -128,9 +131,20 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 		providers.put(provider.getId(), provider);
 		providerMnemonics.put(provider.getMnemonic(), provider.getId());
+		
+		for(Provider related : provider.getRelatedOut()) {
+			if (!related.getRelatedIn().contains(provider)){
+				related.getRelatedIn().add(provider);
+			}
+		}
+		for(Provider related : provider.getRelatedIn()) {
+			if (!related.getRelatedOut().contains(provider)){
+				related.getRelatedOut().add(provider);
+			}
+		}
 	}
 	@Override
-	public List<Provider> getProvider() {
+	public List<Provider> getAllProvider() {
 		ArrayList<Provider> result = new ArrayList<Provider>();
 		TLongObjectIterator<Provider> iterator = providers.iterator();
 		while (iterator.hasNext()) {
@@ -141,7 +155,8 @@ public class MemoryStorageEngine implements StorageEngine {
 	}
 	@Override
 	public Provider getProvider(long id) {
-		return providers.get(id);
+		Provider provider = providers.get(id);
+		return provider;
 	}
 	@Override
 	public Provider findProvider(String mnemonic) {
@@ -186,18 +201,18 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 		return result;
 	}
-    @Override
-    public List<Collection> getAllCollections() {
-        ArrayList<Collection> result = new ArrayList<Collection>();
-        TLongObjectIterator<Collection> iterator = collections.iterator();
-        while (iterator.hasNext()) {
-            iterator.advance();
-            Collection collection = iterator.value();
-            result.add(collection);
-        }
-        return result;
-    }
-    @Override
+	@Override
+	public List<Collection> getAllCollections() {
+		ArrayList<Collection> result = new ArrayList<Collection>();
+		TLongObjectIterator<Collection> iterator = collections.iterator();
+		while (iterator.hasNext()) {
+			iterator.advance();
+			Collection collection = iterator.value();
+			result.add(collection);
+		}
+		return result;
+	}
+	@Override
 	public Collection getCollection(long id) {
 		return collections.get(id);
 	}
@@ -213,13 +228,31 @@ public class MemoryStorageEngine implements StorageEngine {
 
 
 	@Override
-	public Request createRequest(Collection collection) {
-		return new MemoryRequest(requestId.getAndIncrement(), (MemoryCollection) collection);
+	public Request createRequest(Collection collection, Date date) {
+		return new MemoryRequest(requestId.getAndIncrement(), (MemoryCollection) collection, date);
 	}
 	@Override
 	public void updateRequest(Request request) {
+		TLongObjectIterator<Request> iterator = requests.iterator();
+		while (iterator.hasNext()) {
+			iterator.advance();
+			Request candidate = iterator.value();
+			if (request.getCollection().equals(candidate.getCollection())) {
+				if (request.getDate().equals(candidate.getDate())){
+					String unique = "REQUEST/" +request.getCollection().getMnemonic() + "/" + request.getDate();
+					throw new IllegalStateException("Duplicate unique key for request: <" + unique + ">");
+				}
+			}
+		}
+		
 		requests.put(request.getId(), request);
 	}
+	
+	@Override
+	public Request getRequest(long id) throws StorageEngineException {
+		return requests.get(id);
+	}
+
 	@Override
 	public List<Request> getRequests(Collection collection) {
 		ArrayList<Request> result = new ArrayList<Request>();
@@ -239,34 +272,46 @@ public class MemoryStorageEngine implements StorageEngine {
 
 
 	@Override
-	public MetaDataRecord<MDRFieldRegistry> createMetaDataRecord(Request request) {
-		MemoryMetaDataRecord<MDRFieldRegistry> mdr = new MemoryMetaDataRecord<MDRFieldRegistry>(mdrId.getAndIncrement());
+	public MetaDataRecord createMetaDataRecord(Request request) {
+		MemoryMetaDataRecord mdr = new MemoryMetaDataRecord(mdrId.getAndIncrement());
 		mdr.setRequest(request);
 		return mdr;
 	}
 	@Override
-	public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) {
+	public void updateMetaDataRecord(MetaDataRecord record) {
+		String unique = "MDR/" +  record.getRequest().getCollection().getProvider().getMnemonic() + "/"+ record.getIdentifier();
+
+		if (!metadatas.containsKey(record.getId())) {
+			if (mdrIdentifier.contains(unique)) {
+				throw new IllegalStateException("Duplicate unique key for record: <" + unique + ">");
+			}
+		}
+		
 		metadatas.put(record.getId(), record);
-        addMetaDataRecord(record);
+		mdrIdentifier.add(unique);
+		addMetaDataRecord(record);
 	}
 
-    private void addMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record) {
-        metarequest.put(record.getId(), record.getRequest().getId());
-        metacollection.put(record.getId(), record.getRequest().getCollection().getId());
-        metaprovider.put(record.getId(), record.getRequest().getCollection().getProvider().getId());
-    }
+	private void addMetaDataRecord(MetaDataRecord record) {
+		metarequest.put(record.getId(), record.getRequest().getId());
+		metacollection.put(record.getId(), record.getRequest().getCollection().getId());
+		metaprovider.put(record.getId(), record.getRequest().getCollection().getProvider().getId());
+	}
 
 
 	@Override
-	public Execution createExecution() {
-		return new MemoryExecution(executionId.getAndIncrement());
+	public Execution createExecution(UimEntity entity, String workflow) {
+		MemoryExecution execution = new MemoryExecution(executionId.getAndIncrement());
+		execution.setDataSet(entity);
+		execution.setWorkflowName(workflow);
+		return execution;
 	}
 	@Override
 	public void updateExecution(Execution execution) {
 		executions.put(execution.getId(), execution);
 	}
 	@Override
-	public List<Execution> getExecutions() {
+	public List<Execution> getAllExecutions() {
 		ArrayList<Execution> result = new ArrayList<Execution>();
 		TLongObjectIterator<Execution> iterator = executions.iterator();
 		while (iterator.hasNext()) {
@@ -277,6 +322,10 @@ public class MemoryStorageEngine implements StorageEngine {
 	}
 
 
+	@Override
+	public Execution getExecution(long id) throws StorageEngineException {
+		return executions.get(id);
+	}
 
 
 	@Override
@@ -294,29 +343,47 @@ public class MemoryStorageEngine implements StorageEngine {
 
 	@Override
 	public long[] getByCollection(Collection collection) {
-        TLongArrayList result = new TLongArrayList();
-        TLongLongIterator iterator = metacollection.iterator();
-        while(iterator.hasNext()) {
-            iterator.advance();
-            if (iterator.value() == collection.getId()) {
-                result.add(iterator.key());
-            }
-        }
-        return result.toNativeArray();
+		TLongArrayList result = new TLongArrayList();
+		TLongLongIterator iterator = metacollection.iterator();
+		while(iterator.hasNext()) {
+			iterator.advance();
+			if (iterator.value() == collection.getId()) {
+				result.add(iterator.key());
+			}
+		}
+		return result.toNativeArray();
 	}
 	@Override
-    // TODO recursive
 	public long[] getByProvider(Provider provider, boolean recursive) {
-        TLongArrayList result = new TLongArrayList();
-        TLongLongIterator iterator = metaprovider.iterator();
-        while(iterator.hasNext()) {
-            iterator.advance();
-            if (iterator.value() == provider.getId()) {
-                result.add(iterator.key());
-            }
-        }
-        return result.toNativeArray();
+		TLongArrayList result = new TLongArrayList();
+		
+		Set<Long> set = new HashSet<Long>();
+		if (recursive) {
+			getRecursive(provider, set);
+		} else {
+			set.add(provider.getId());
+		}
+
+		
+		TLongLongIterator iterator = metaprovider.iterator();
+		while(iterator.hasNext()) {
+			iterator.advance();
+			if (set.contains(iterator.value())) {
+				result.add(iterator.key());
+			}
+		}
+		return result.toNativeArray();
 	}
+
+	public void getRecursive(Provider provider, Set<Long> result) {
+		if (!result.contains(provider.getId())){
+			result.add(provider.getId());
+			for (Provider related : provider.getRelatedOut()) {
+				getRecursive(related, result);
+			}
+		}
+	}
+
 	@Override
 	public long[] getAllIds() {
 		return metadatas.keys();
@@ -325,43 +392,43 @@ public class MemoryStorageEngine implements StorageEngine {
 
 	@Override
 	public int getTotalByRequest(Request request) {
-        int result = 0;
-        TLongLongIterator iterator = metarequest.iterator();
-        while(iterator.hasNext()) {
-            iterator.advance();
-            if (iterator.value() == request.getId()) {
-                result++;
-            }
-        }
-        return result;
+		int result = 0;
+		TLongLongIterator iterator = metarequest.iterator();
+		while(iterator.hasNext()) {
+			iterator.advance();
+			if (iterator.value() == request.getId()) {
+				result++;
+			}
+		}
+		return result;
 	}
 
 
 	@Override
 	public int getTotalByCollection(Collection collection) {
-        int result = 0;
-        TLongLongIterator iterator = metacollection.iterator();
-        while(iterator.hasNext()) {
-            iterator.advance();
-            if (iterator.value() == collection.getId()) {
-                result++;
-            }
-        }
-        return result;
+		int result = 0;
+		TLongLongIterator iterator = metacollection.iterator();
+		while(iterator.hasNext()) {
+			iterator.advance();
+			if (iterator.value() == collection.getId()) {
+				result++;
+			}
+		}
+		return result;
 	}
 
 
 	@Override
 	public int getTotalByProvider(Provider provider, boolean recursive) {
-        int result = 0;
-        TLongLongIterator iterator = metaprovider.iterator();
-        while(iterator.hasNext()) {
-            iterator.advance();
-            if (iterator.value() == provider.getId()) {
-                result++;
-            }
-        }
-        return result;
+		int result = 0;
+		TLongLongIterator iterator = metaprovider.iterator();
+		while(iterator.hasNext()) {
+			iterator.advance();
+			if (iterator.value() == provider.getId()) {
+				result++;
+			}
+		}
+		return result;
 	}
 
 	@Override

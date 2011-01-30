@@ -1,25 +1,25 @@
 package eu.europeana.uim.store;
 
-import eu.europeana.uim.MDRFieldRegistry;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
-
-import java.util.List;
-import java.util.Map;
 
 public abstract class StorageEngineAdapter implements StorageEngine {
 
     @Override
 	public String getIdentifier() {
-		return null;
+		return "StorageEngineAdapter";
 	}
 	
 
 	@Override
 	public void initialize() {
 	}
-
+	
 	@Override
 	public void shutdown() {
 	}
@@ -70,7 +70,7 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	}
 
 	@Override
-	public List<Provider> getProvider() {
+	public List<Provider> getAllProvider() {
 		
 		return null;
 	}
@@ -112,7 +112,7 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	}
 
 	@Override
-	public Request createRequest(Collection collection) {
+	public Request createRequest(Collection collection, Date date) {
 		
 		return null;
 	}
@@ -122,6 +122,12 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 		
 
 	}
+	
+	@Override
+	public Request getRequest(long id) throws StorageEngineException {
+		return null;
+	}
+
 
 	@Override
 	public List<Request> getRequests(Collection collection) {
@@ -130,20 +136,20 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	}
 
 	@Override
-	public MetaDataRecord<MDRFieldRegistry> createMetaDataRecord(Request request) {
+	public MetaDataRecord createMetaDataRecord(Request request) {
 		
 		return null;
 	}
 
 	@Override
-	public void updateMetaDataRecord(MetaDataRecord<MDRFieldRegistry> record)
+	public void updateMetaDataRecord(MetaDataRecord record)
 			throws StorageEngineException {
 		
 
 	}
 
 	@Override
-	public Execution createExecution() {
+	public Execution createExecution(UimEntity entity, String workflow) {
 		
 		return null;
 	}
@@ -155,14 +161,22 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 
 	}
 
+	
+	
 	@Override
-	public List<Execution> getExecutions() {
+	public Execution getExecution(long id) throws StorageEngineException {
+		return null;
+	}
+
+
+	@Override
+	public List<Execution> getAllExecutions() {
 		
 		return null;
 	}
 
 	@Override
-	public MetaDataRecord<MDRFieldRegistry>[] getMetaDataRecords(long... ids) {
+	public MetaDataRecord[] getMetaDataRecords(long... ids) {
 		
 		return null;
 	}

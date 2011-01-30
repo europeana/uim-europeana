@@ -66,13 +66,20 @@ Path                              Name                                          
 5) Set-up dependencies in Karaf:
    - install necessary features:
      - features:install spring
-     - features:install war
-     - features:install webconsole
 
 6) Configure UIM Feature
    - 'features:addurl file://<project-path>/etc/uim-features.xml'
      - you can check if the feature "uim-core" is available via 'features:list'
    - 'features:install uim-core'
+
+7) Configure UIM Frontend Features
+     - features:install war
+     - features:install webconsole
+     - features:install uim-core-gui
+     
+8) Configure UIM Mongo Backend Features
+     - features:install uim-core-mongo
+ 
 
    (alternative: install bundles by hand. Note that you need to install them in the right order for this to work
     'osgi:install -s mvn:eu.europeana/europeana-uim-common/1.0.0-SNAPSHOT'
@@ -80,7 +87,7 @@ Path                              Name                                          
     'osgi:install -s mvn:eu.europeana/europeana-uim-plugin-basic/1.0.0-SNAPSHOT'
     'osgi:install -s mvn:eu.europeana/europeana-uim-storage-memory/1.0.0-SNAPSHOT')
 
-7) Verify if UIM is up and running (Note that auto completion with TAB does only work when blueprint is used)
+9) Verify if UIM is up and running (Note that auto completion with TAB does only work when blueprint is used)
    - in Karaf shell: 'uim:info'
 
 8) Load/Show sample data:

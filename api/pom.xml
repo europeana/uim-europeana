@@ -23,8 +23,10 @@
 						<Import-Package>eu.europeana.uim.common.*,
 							org.apache.commons.lang.*,
                             org.apache.felix.gogo.commands,
+                            org.osgi.framework,
                             org.osgi.service.blueprint,
-                            org.osgi.service.command
+                            org.osgi.service.command,
+                            org.osgi.service.cm
                         </Import-Package>
 						<Export-Package>eu.europeana.uim,
 							eu.europeana.uim.api,
@@ -34,6 +36,19 @@
 					</instructions>
 				</configuration>
 			</plugin>
+		     <plugin>
+		       <groupId>org.apache.maven.plugins</groupId>
+		       <artifactId>maven-jar-plugin</artifactId>
+		       <version>2.2</version>
+		       <executions>
+		         <execution>
+		           <goals>
+		             <goal>test-jar</goal>
+		           </goals>
+		         </execution>
+		       </executions>
+		     </plugin>
+			
 		</plugins>
 	</build>
 
@@ -46,6 +61,18 @@
 			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+	
 
 		<!-- Karaf Shell, for OSGi shell commands -->
 		<dependency>

@@ -18,7 +18,7 @@ import eu.europeana.uim.api.WorkflowStep;
  */
 public class UIMTask implements Task {
 
-    private final MetaDataRecord<MDRFieldRegistry> mdr;
+    private final MetaDataRecord mdr;
 
     // mutable fields - a task "wanders" through the workflow, i.e. through a chain of StepProcessor-s
     private StepProcessor processor;
@@ -26,7 +26,7 @@ public class UIMTask implements Task {
     private TaskStatus status;
 
 
-    public UIMTask(MetaDataRecord<MDRFieldRegistry> mdr, StepProcessor processor, WorkflowStep step) {
+    public UIMTask(MetaDataRecord mdr, StepProcessor processor, WorkflowStep step) {
         this.mdr = mdr;
         this.processor = processor;
         this.step = step;

@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class UIMWorkflowStepStatus implements WorkflowStepStatus {
 
-    public UIMWorkflowStepStatus(WorkflowStep step, int queueSize, int successes, int failures, Map<MetaDataRecord<MDRFieldRegistry>, Throwable> failureDetail) {
+    public UIMWorkflowStepStatus(WorkflowStep step, int queueSize, int successes, int failures, Map<MetaDataRecord, Throwable> failureDetail) {
         this.step = step;
         this.queueSize = queueSize;
         this.successes = successes;
@@ -22,7 +22,7 @@ public class UIMWorkflowStepStatus implements WorkflowStepStatus {
 
     private WorkflowStep step, parent;
     private int queueSize, successes, failures;
-    private Map<MetaDataRecord<MDRFieldRegistry>, Throwable> failureDetail;
+    private Map<MetaDataRecord, Throwable> failureDetail;
 
     @Override
     public WorkflowStep getStep() {
@@ -45,7 +45,7 @@ public class UIMWorkflowStepStatus implements WorkflowStepStatus {
     }
 
     @Override
-    public Map<MetaDataRecord<MDRFieldRegistry>, Throwable> getFailureDetail() {
+    public Map<MetaDataRecord, Throwable> getFailureDetail() {
         return failureDetail;
     }
 

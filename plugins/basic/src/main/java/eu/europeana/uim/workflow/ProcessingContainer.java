@@ -42,7 +42,7 @@ public class ProcessingContainer implements WorkflowStep {
     }
 
     @Override
-    public void processRecord(MetaDataRecord<?> mdr) {
+    public void processRecord(MetaDataRecord mdr) {
         // this doesn't do a thing, as the container will never run tasks itself. Instead the StepProcessor takes care of that by fetching the steps
     }
 }

@@ -81,7 +81,7 @@ public class UIMTaskTest {
             this.failure = failure;
         }
         @Override
-        public void processRecord(MetaDataRecord<?> mdr) throws Throwable {
+        public void processRecord(MetaDataRecord mdr) throws Throwable {
             throw failure;
         }
     }

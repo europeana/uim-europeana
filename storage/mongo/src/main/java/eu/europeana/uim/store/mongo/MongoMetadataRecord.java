@@ -1,19 +1,20 @@
 package eu.europeana.uim.store.mongo;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.TKey;
-import eu.europeana.uim.store.Request;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
+import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.TKey;
+import eu.europeana.uim.store.Request;
+
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
+public class MongoMetadataRecord implements MetaDataRecord {
 
     private DBObject object = new BasicDBObject();
     private Request request;
@@ -41,7 +42,20 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
         return request;
     }
 
-    public <T extends Serializable> void setFirstField(TKey<N, T> nttKey, T value) {
+    
+    @Override
+	public String getIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+    public void setIdentifier(String identifier) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public <N, T extends Serializable> void setFirstField(TKey<N, T> nttKey, T value) {
         BasicDBObject unqualifiedFields = (BasicDBObject) object.get(fieldName(nttKey.getFullName()));
         if(unqualifiedFields == null) {
             unqualifiedFields = new BasicDBObject();
@@ -50,11 +64,11 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
         unqualifiedFields.put("field0", value);
     }
 
-    public <T extends Serializable> T getFirstField(TKey<N, T> nttKey) {
+    public <N, T extends Serializable> T getFirstField(TKey<N, T> nttKey) {
         return (T) ((DBObject)object.get(fieldName(nttKey.getFullName()))).get(fieldName(nttKey.getFullName()));
     }
 
-    public <T extends Serializable> void setQField(TKey<N, T> nttKey, String qualifier, T value) {
+    public <N, T extends Serializable> void setFirstQField(TKey<N, T> nttKey, String qualifier, T value) {
         BasicDBObject qualifiedFields = (BasicDBObject) object.get(fieldName(nttKey.getFullName()));
         if(qualifiedFields == null) {
             qualifiedFields = new BasicDBObject();
@@ -68,7 +82,7 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
         values.put("field0", value);
     }
 
-    public <T> void addField(TKey<N, ArrayList<T>> nArrayListTKey, T value) {
+    public <N, T extends Serializable> void addField(TKey<N, T> nArrayListTKey, T value) {
         BasicDBObject unqualifiedFields = (BasicDBObject) object.get(fieldName(nArrayListTKey.getFullName()));
         if(unqualifiedFields == null) {
             unqualifiedFields = new BasicDBObject();
@@ -77,7 +91,8 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
         unqualifiedFields.put("field" + new Integer(unqualifiedFields.size()).toString(), value);
     }
 
-    public <T> void addQField(TKey<N, ArrayList<T>> nArrayListTKey, String qualifier, T value) {
+    @Override
+    public <N, T extends Serializable> void addQField(TKey<N, T> nArrayListTKey, String qualifier, T value) {
         BasicDBObject qFields = (BasicDBObject) object.get(fieldName(nArrayListTKey.getFullName()));
         if(qFields == null) {
             qFields = new BasicDBObject();
@@ -92,7 +107,7 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
         values.put("field" + new Integer(values.size()).toString(), value);
     }
 
-    public <T extends Serializable> List<T> getField(TKey<N, ArrayList<T>> nttKey) {
+    public <N, T extends Serializable> List<T> getField(TKey<N, T> nttKey) {
         List<T> res = new ArrayList<T>();
         BasicDBObject values = (BasicDBObject) object.get(fieldName(nttKey.getFullName()));
         for (String s : values.keySet()) {
@@ -103,7 +118,7 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
         return res;
     }
 
-    public <T extends Serializable> List<T> getQField(TKey<N, ArrayList<T>> nttKey, String qualifier) {
+    public <N, T extends Serializable> List<T> getQField(TKey<N, T> nttKey, String qualifier) {
         List<T> res = new ArrayList<T>();
         BasicDBObject data = (BasicDBObject) object.get(fieldName(nttKey.getFullName()));
         if(data == null) {
@@ -122,6 +137,15 @@ public class MongoMetadataRecord<N> implements MetaDataRecord<N> {
         }
         return res;
     }
+    
+    public <N, T extends Serializable> T getFirstQField(TKey<N, T> nttKey, String qualifier) {
+    	List<T> list = getQField(nttKey, qualifier);
+    	if (list != null && !list.isEmpty()) {
+    		return list.get(0);
+    	}
+    	return null;
+    }
+
 
     private String fieldName(String name) {
         return name.replaceAll(".", "_");

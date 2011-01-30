@@ -1,11 +1,23 @@
 package eu.europeana.uim.command;
 
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
+import java.io.IOException;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.command.CommandSession;
+
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
@@ -13,7 +25,8 @@ import org.osgi.service.command.CommandSession;
 
 @Command(name = "config", scope = "storage")
 public class UIMConfigStorage implements Action {
-
+	private static final Logger log = Logger.getLogger(UIMConfigStorage.class.getName());
+	
     @Argument
     String storage;
 
@@ -48,6 +61,27 @@ public class UIMConfigStorage implements Action {
             if(selected != null) {
                 registry.setActiveStorage(selected);
                 session.getConsole().println("Activated storage engine '" + selected.getIdentifier() + "'");
+                
+        		Bundle bundle = FrameworkUtil.getBundle(UIMConfigStorage.class);
+        		
+        		ServiceReference caRef = bundle.getBundleContext().getServiceReference(ConfigurationAdmin.class.getName());
+        		ConfigurationAdmin configAdmin = (ConfigurationAdmin)  bundle.getBundleContext().getService(caRef);
+
+        		try {
+        			Configuration config = configAdmin.getConfiguration("eu.europeana.uim");
+
+        			@SuppressWarnings("unchecked")
+					Dictionary<String, String> dictionary = config.getProperties();
+        			if (dictionary == null) {
+        				dictionary = new Hashtable<String, String>();
+        			}
+        			dictionary.put("defaultStorageEngine", selected.getIdentifier());
+        			config.update(dictionary);
+        			
+        		} catch (IOException e) {
+        			log.log(Level.SEVERE, "Failed to store config change with config service.", e);
+        		}
+                
             } else {
                 session.getConsole().println("Could not find storage engine with identifier '" + storage + "'");
             }

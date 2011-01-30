@@ -55,12 +55,12 @@ public class MemoryExecution extends AbstractMemoryEntity implements Execution {
     }
 
     @Override
-    public String getWorkflowIdentifier() {
+    public String getWorkflowName() {
         return workflowIdentifier;
     }
 
     @Override
-    public void setWorkflowIdentifier(String identifier) {
+    public void setWorkflowName(String identifier) {
         this.workflowIdentifier = identifier;
     }
 }

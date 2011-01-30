@@ -1,6 +1,7 @@
 package eu.europeana.uim.api;
 
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,7 +19,9 @@ public interface Registry {
 
     void removeStorage(StorageEngine storage);
 
-    List<StorageEngine> getStorages();
+    Collection<StorageEngine> getStorages();
+
+    void setConfiguredStorageEngine(String configuredStorageEngine);
 
     void setActiveStorage(StorageEngine storage);
 

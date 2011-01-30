@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import eu.europeana.uim.MetaDataRecordHandler;
 import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.common.parse.RecordParser;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
@@ -16,7 +17,7 @@ public class MDRStreamLoader {
 	}
 
 	
-	public long[] doEseImport(InputStream data, StorageEngine storage, Request request, ProgressMonitor monitor) throws XMLStreamParserException {
+	public long[] doEseImport(InputStream data, StorageEngine storage, Request request, ProgressMonitor monitor) throws XMLStreamParserException, StorageEngineException {
 		long[] ids = null;
 		
 		RecordParser parser = new RecordParser();

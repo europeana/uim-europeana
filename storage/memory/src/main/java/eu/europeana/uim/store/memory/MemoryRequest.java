@@ -1,6 +1,9 @@
 package eu.europeana.uim.store.memory;
 
+import java.util.Calendar;
 import java.util.Date;
+
+import org.apache.commons.lang.time.DateUtils;
 
 import eu.europeana.uim.store.Request;
 
@@ -14,12 +17,20 @@ public class MemoryRequest extends AbstractMemoryEntity implements Request {
 		this.collection = collection;
 	}
 
+
 	public MemoryRequest(long id, MemoryCollection collection) {
 		super(id);
 		this.collection = collection;
 	}
 
 	
+
+	public MemoryRequest(long id, MemoryCollection collection,
+			Date date) {
+		super(id);
+		this.collection = collection;
+		this.date= date;
+	}
 
 	public MemoryCollection getCollection() {
 		return collection;
@@ -30,7 +41,7 @@ public class MemoryRequest extends AbstractMemoryEntity implements Request {
 	}
 
 	public void setDate(Date date) {
-		this.date = date;
+		this.date = DateUtils.truncate(date, Calendar.SECOND);
 	}
 
 }

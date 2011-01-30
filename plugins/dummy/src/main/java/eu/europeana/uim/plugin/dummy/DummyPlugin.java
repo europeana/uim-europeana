@@ -53,7 +53,7 @@ public class DummyPlugin implements IngestionPlugin {
 	}
 
     @Override
-    public void processRecord(MetaDataRecord<?> mdr) {
+    public void processRecord(MetaDataRecord mdr) {
         counter++;
         if(counter % 50 == 0) {
             log.info("Dummy plugin is processing MDR " + mdr.getId());

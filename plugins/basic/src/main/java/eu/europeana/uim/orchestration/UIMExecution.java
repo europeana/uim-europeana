@@ -68,12 +68,12 @@ public class UIMExecution implements ActiveExecution {
     }
 
     @Override
-    public String getWorkflowIdentifier() {
+    public String getWorkflowName() {
         throw new RuntimeException("Read the FIXME");
     }
 
     @Override
-    public void setWorkflowIdentifier(String identifier) {
+    public void setWorkflowName(String identifier) {
         throw new RuntimeException("Read the FIXME");
     }
 

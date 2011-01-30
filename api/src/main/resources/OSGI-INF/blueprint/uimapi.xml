@@ -6,7 +6,7 @@
 
     <cm:property-placeholder persistent-id="eu.europeana.uim">
         <cm:default-properties>
-            <cm:property name="defaultStorageEngine" value="MemoryStorageEngine" />
+            <cm:property name="configuredStorageEngine" value="MemoryStorageEngine" />
             <cm:property name="defaultLoggingEngine" value="MemoryLoggingEngine" />
         </cm:default-properties>
     </cm:property-placeholder>
@@ -14,7 +14,7 @@
     <service id="registry" ref="uimRegistry" interface="eu.europeana.uim.api.Registry"/>
 
     <bean id="uimRegistry" class="eu.europeana.uim.UIMRegistry">
-        <property name="defaultStorageEngine" value="${defaultStorageEngine}" />
+        <property name="configuredStorageEngine" value="${configuredStorageEngine}" />
         <property name="defaultLoggingEngine" value="${defaultLoggingEngine}" />
     </bean>
 

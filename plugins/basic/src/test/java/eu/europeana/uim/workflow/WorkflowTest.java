@@ -1,5 +1,25 @@
 package eu.europeana.uim.workflow;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Date;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.MetaDataRecordHandler;
 import eu.europeana.uim.api.IngestionPlugin;
@@ -20,24 +40,6 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.memory.MemoryStorageEngine;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Test for UIMWorkflow construction
@@ -237,7 +239,7 @@ public class WorkflowTest {
             Collection targetcoll = storage.createCollection(p);
 
 
-            Request request = storage.createRequest(targetcoll);
+            Request request = storage.createRequest(targetcoll, new Date(0));
             storage.updateRequest(request);
 
             RecordParser parser = new RecordParser();

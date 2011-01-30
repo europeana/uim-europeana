@@ -1,11 +1,10 @@
 package eu.europeana.uim;
 
+import java.io.Serializable;
+import java.util.List;
+
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimEntity;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Abstract MetaDataRecord. StorageEngine implementations provide their own implementation of it.
@@ -14,24 +13,28 @@ import java.util.List;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public interface MetaDataRecord<N> extends UimEntity {
-    Request getRequest();
+public interface MetaDataRecord extends UimEntity {
+    
+	Request getRequest();
 
-    <T extends Serializable> void setFirstField(TKey<N, T> key, T value);
+    String getIdentifier();
+    
+    void setIdentifier(String identifier);
+    
+    <N, T extends Serializable> void setFirstField(TKey<N, T> key, T value);
 
-    <T extends Serializable> T getFirstField(TKey<N, T> key);
+    <N, T extends Serializable> T getFirstField(TKey<N, T> key);
 
-    <T extends Serializable> void setQField(TKey<N, T> key, String qualifier, T value);
+    <N, T extends Serializable> void setFirstQField(TKey<N, T> key, String qualifier, T value);
 
-    @SuppressWarnings("unchecked")
-    <T> void addField(TKey<N, ArrayList<T>> key, T value);
+    <N, T extends Serializable> T getFirstQField(TKey<N, T> key, String qualifier);
 
-    <T extends Serializable> List<T> getField(TKey<N, ArrayList<T>> key);
+    <N, T extends Serializable> void addField(TKey<N, T> key, T value);
 
-    @SuppressWarnings("unchecked")
-    <T> void addQField(TKey<N, ArrayList<T>> key, String qualifier, T value);
+    <N, T extends Serializable> List<T> getField(TKey<N, T> key);
 
-    <T extends Serializable> List<T> getQField(TKey<N, ArrayList<T>> key, String qualifier);
+    <N, T extends Serializable> void addQField(TKey<N, T> key, String qualifier, T value);
 
+    <N, T extends Serializable> List<T> getQField(TKey<N, T> key, String qualifier);
 
 }

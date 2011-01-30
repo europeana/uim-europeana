@@ -1,26 +1,28 @@
 package eu.europeana.uim.command;
 
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.api.ActiveExecution;
-import eu.europeana.uim.api.Orchestrator;
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.Workflow;
-import eu.europeana.uim.common.ProgressMonitor;
-import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.UimEntity;
+import java.io.PrintStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.osgi.service.command.CommandSession;
 
-import java.io.PrintStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.List;
+import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.ActiveExecution;
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.common.ProgressMonitor;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.store.Request;
+import eu.europeana.uim.store.UimEntity;
 
 /**
  * uim:orchestrator
@@ -84,9 +86,9 @@ public class UIMOrchestratorCommand implements Action {
             case pause:
                 pause(out);
                 break;
-            case cancel:
-                cancel(out);
-                break;
+//            case cancel:
+//                cancel(out);
+//                break;
             case status:
                 out.println("Master, this is not implemented yet.");
             default:
@@ -99,21 +101,21 @@ public class UIMOrchestratorCommand implements Action {
     private void pause(PrintStream out) {
         ActiveExecution execution = getOrListExecution(out, "pause");
         if(execution != null) {
-            orchestrator.pause(execution);
+            orchestrator.pause();
         } else {
             out.println("Could not find execution to pause with ID " + argument0);
         }
     }
 
-    private void cancel(PrintStream out) {
-        ActiveExecution execution = getOrListExecution(out, "cancel");
-        if(execution != null) {
-            orchestrator.cancel(execution);
-        } else {
-            out.println("Could not find execution to cancel with ID " + argument0);
-        }
-
-    }
+//    private void cancel(PrintStream out) {
+//        ActiveExecution execution = getOrListExecution(out, "cancel");
+//        if(execution != null) {
+//            orchestrator.cancel(execution);
+//        } else {
+//            out.println("Could not find execution to cancel with ID " + argument0);
+//        }
+//
+//    }
 
     private ActiveExecution getOrListExecution(PrintStream out, String command) {
         if(argument0 == null) {
@@ -135,7 +137,7 @@ public class UIMOrchestratorCommand implements Action {
     }
 
 
-    private void start(PrintStream out) {
+    private void start(PrintStream out) throws StorageEngineException {
 
 
         if (argument0 == null || argument1 == null || argument2 == null) {
@@ -145,7 +147,7 @@ public class UIMOrchestratorCommand implements Action {
 
         StorageEngine storage = registry.getStorage();
         List<Workflow> workflows = registry.getWorkflows();
-        List<Provider> providers = storage.getProvider();
+        List<Provider> providers = storage.getAllProvider();
 
         if (argument0 == null) {
             printWorfklows(out, workflows);
@@ -183,8 +185,13 @@ public class UIMOrchestratorCommand implements Action {
     private void printProviders(PrintStream out, StorageEngine storage, List<Provider> providers) {
         out.println("No provider specified. Possible choices are:");
         for (int i = 0; i < providers.size(); i++) {
-            Provider p = storage.getProvider(i);
-            out.println(i + ") " + p.getName());
+			try {
+				Provider p = storage.getProvider(i);
+				out.println(i + ") " + p.getName());
+
+			} catch (StorageEngineException e) {
+				out.println(i + ") failed. " + e.getMessage() );
+			}
         }
     }
 

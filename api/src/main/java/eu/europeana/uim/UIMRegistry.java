@@ -1,5 +1,13 @@
 package eu.europeana.uim;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.Orchestrator;
@@ -7,19 +15,13 @@ import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.Workflow;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
 public class UIMRegistry implements Registry {
 
     private static Logger log = Logger.getLogger(UIMRegistry.class.getName());
 
-    private String defaultStorageEngine;
+    private String configuredStorageEngine;
     private StorageEngine activeStorage = null;
-    private List<StorageEngine> storages = new ArrayList<StorageEngine>();
+    private Map<String, StorageEngine> storages = new HashMap<String, StorageEngine>();
 
     private String defaultLoggingEngine;
     private LoggingEngine activeLogging = null;
@@ -33,17 +35,12 @@ public class UIMRegistry implements Registry {
     public UIMRegistry() {
     }
 
-    public void setDefaultStorageEngine(String defaultStorageEngine) {
-        // do not allow setting false values
-        if (activeStorage != null && getStorage(defaultStorageEngine) != null) {
-            this.activeStorage = getStorage(defaultStorageEngine);
-            this.defaultStorageEngine = defaultStorageEngine;
-        } else if (activeStorage != null) {
-            log.severe("Attempt to set default storage engine to '" + defaultStorageEngine + "' failed, not making the change");
-        } else {
-            log.info("Setting default storage engine to " + defaultStorageEngine);
-            this.defaultStorageEngine = defaultStorageEngine;
-        }
+    
+    public void setConfiguredStorageEngine(String configuredStorageEngine) {
+    	// this may happen before the storage services are loaded
+    	// we set the active storage "lazy"
+    	this.configuredStorageEngine = configuredStorageEngine;
+    	this.activeStorage = null;
     }
 
 
@@ -113,14 +110,12 @@ public class UIMRegistry implements Registry {
     public void addStorage(StorageEngine storage) {
         if (storage != null) {
             log.info("Added storage:" + storage.getIdentifier());
-            if (!storages.contains(storage)) {
+            if (!storages.containsKey(storage.getIdentifier())) {
                 storage.initialize();
-                this.storages.add(storage);
+                this.storages.put(storage.getIdentifier(), storage);
 
                 // activate default storage
-                if (activeStorage == null) {
-                    activeStorage = storage;
-                } else if (storage.getIdentifier().equals(defaultStorageEngine)) {
+                if (storage.getIdentifier().equals(configuredStorageEngine)) {
                     activeStorage = storage;
                     log.info("Making storage " + storage.getIdentifier() + " default");
                 }
@@ -134,13 +129,13 @@ public class UIMRegistry implements Registry {
         if (storage != null) {
             log.info("Removed storage:" + storage.getIdentifier());
             storage.shutdown();
-            this.storages.remove(storage);
+            this.storages.remove(storage.getIdentifier());
         }
     }
 
     @Override
-    public List<StorageEngine> getStorages() {
-        return storages;
+    public Collection<StorageEngine> getStorages() {
+        return storages.values();
     }
 
 
@@ -170,11 +165,10 @@ public class UIMRegistry implements Registry {
     public StorageEngine getStorage() {
         if (storages == null || storages.isEmpty()) return null;
         if (activeStorage == null) {
-            if (getStorage(defaultStorageEngine) != null) {
-                activeStorage = getStorage(defaultStorageEngine);
-            } else {
-                activeStorage = storages.get(0);
-            }
+        	activeStorage = getStorage(configuredStorageEngine);
+        	if (activeStorage == null) {
+        		throw new IllegalStateException("Cannot retrieve configured storage engine <" + configuredStorageEngine + ">. The following storages are available: " + Arrays.toString(storages.keySet().toArray(new String[0])));
+        	}
         }
         return activeStorage;
     }
@@ -182,12 +176,7 @@ public class UIMRegistry implements Registry {
     @Override
     public StorageEngine getStorage(String identifier) {
         if (identifier == null || storages == null || storages.isEmpty()) return null;
-        for (StorageEngine storage : storages) {
-            if (identifier.equals(storage.getIdentifier())) {
-                return storage;
-            }
-        }
-        return null;
+        return storages.get(identifier);
     }
 
     @Override
@@ -277,7 +266,7 @@ public class UIMRegistry implements Registry {
         if (storages.isEmpty()) {
             builder.append("\n\tNo storage.");
         } else {
-            for (StorageEngine storage : storages) {
+            for (StorageEngine storage : storages.values()) {
                 if (builder.length() > 0) {
                     builder.append("\n\t");
                 }
@@ -286,6 +275,7 @@ public class UIMRegistry implements Registry {
                 } else {
                     builder.append("  ");
                 }
+                
                 builder.append(storage.getIdentifier());
                 builder.append(" [").append(storage.getStatus()).append("] ");
                 builder.append(storage.getConfiguration().toString());
