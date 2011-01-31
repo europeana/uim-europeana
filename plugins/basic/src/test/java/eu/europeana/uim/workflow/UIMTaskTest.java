@@ -1,6 +1,9 @@
 package eu.europeana.uim.workflow;
 
+import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.TKey;
+import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.orchestration.StepProcessor;
 import eu.europeana.uim.orchestration.UIMExecution;
@@ -37,7 +40,7 @@ public class UIMTaskTest {
         MetaDataRecord mdr = mock(MetaDataRecord.class);
         StepProcessor sp = mock(StepProcessor.class);
         UIMExecution ae = mock(UIMExecution.class);
-        Throwable failure = new Exception("Terrible things happen");
+        RuntimeException failure = new RuntimeException("Terrible things happen");
         WorkflowStep step = new FailingPlugin(failure);
         UIMTask t = new UIMTask(mdr, sp, step);
 
@@ -68,21 +71,45 @@ public class UIMTaskTest {
         }
     }
 
-    class FailingPlugin implements WorkflowStep {
+    class FailingPlugin implements IngestionPlugin {
 
-        private final Throwable failure;
+        private final RuntimeException failure;
 
         @Override
         public String getIdentifier() {
             return "Failing plugin";
         }
 
-        public FailingPlugin(Throwable failure) {
+        public FailingPlugin(RuntimeException failure) {
             this.failure = failure;
         }
         @Override
-        public void processRecord(MetaDataRecord mdr) throws Throwable {
+        public void processRecord(MetaDataRecord mdr) {
             throw failure;
         }
+
+		@Override
+		public String getDescription() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public TKey<MDRFieldRegistry, ?>[] getInputParameters() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public TKey<MDRFieldRegistry, ?>[] getOutputParameters() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public TKey<MDRFieldRegistry, ?>[] getTransientParameters() {
+			// TODO Auto-generated method stub
+			return null;
+		}
     }
 }
