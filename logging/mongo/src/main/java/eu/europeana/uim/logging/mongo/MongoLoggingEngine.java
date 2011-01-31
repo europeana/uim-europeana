@@ -6,7 +6,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
-import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.LogEntry;
@@ -77,7 +76,7 @@ public class MongoLoggingEngine<T extends Serializable> implements LoggingEngine
         return MongoLoggingEngine.class.getSimpleName();
     }
 
-    public void log(Level level, String message, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin) {
+    public void log(Level level, String message, Execution execution, MetaDataRecord mdr, IngestionPlugin plugin) {
         DBObject entry = new BasicDBObject();
         entry.put("level", level.toString());
         entry.put("executionId", execution.getId());
@@ -97,7 +96,7 @@ public class MongoLoggingEngine<T extends Serializable> implements LoggingEngine
         return res;
     }
 
-    public void logStructured(Level level, T payload, Execution execution, MetaDataRecord<MDRFieldRegistry> mdr, IngestionPlugin plugin) {
+    public void logStructured(Level level, T payload, Execution execution, MetaDataRecord mdr, IngestionPlugin plugin) {
         DBObject entry = new BasicDBObject();
         entry.put("level", level.toString());
         entry.put("executionId", execution.getId());
