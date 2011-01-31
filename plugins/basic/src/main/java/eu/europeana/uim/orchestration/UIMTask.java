@@ -1,7 +1,7 @@
 package eu.europeana.uim.orchestration;
 
-import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.TaskStatus;
@@ -40,7 +40,11 @@ public class UIMTask implements Task {
         boolean failed = false;
         try {
             status = TaskStatus.PROCESSING;
-            step.processRecord(mdr);
+            if(step instanceof IngestionPlugin) {
+                ((IngestionPlugin)step).processRecord(mdr);
+            } else {
+                throw new Throwable("Cannot execute WorkflowStep of unknown type: " + step.getClass().getName());
+            }
         } catch (Throwable t) {
             failed = true;
             status = TaskStatus.FAILED;
