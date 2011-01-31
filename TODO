@@ -27,6 +27,9 @@ functionality:
   - log the time a plugin takes for execution (statistics)
     make this behavior configurable
   - make timeout for task configurable
+  - recovery handling: Orchestrator#getBatchFor should provide for crash recovery, i.e. the engine should
+    persist the status of MDRs in the workflow, i.e. if they went through the full workflow
+    later: fine-grained recovery on step basis
   - error handling on task timeout
   - cleanup failed tasks after N iterations
   - command interface orchestrator:
