@@ -92,6 +92,7 @@ public class WorkflowTest {
         }
 
         registry.addStorage(new MemoryStorageEngine());
+        registry.setConfiguredStorageEngine(MemoryStorageEngine.class.getSimpleName());
         testIDs = loadTestData();
     }
 
@@ -211,6 +212,7 @@ public class WorkflowTest {
         long[] a8 = new long[100];
         long[] a9 = new long[100];
         long[] a10 = new long[99];
+        
         System.arraycopy(testIDs, 0, a1, 0, 100);
         System.arraycopy(testIDs, 100, a2, 0, 100);
         System.arraycopy(testIDs, 200, a3, 0, 100);
@@ -220,7 +222,7 @@ public class WorkflowTest {
         System.arraycopy(testIDs, 600, a7, 0, 100);
         System.arraycopy(testIDs, 700, a8, 0, 100);
         System.arraycopy(testIDs, 800, a9, 0, 100);
-        System.arraycopy(testIDs, 900, a10, 0, 99);
+        System.arraycopy(testIDs, 900, a10, 0, 98);
 
         when(o.getBatchFor(e)).thenReturn(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, null);
         when(o.getTotal(e)).thenReturn(999);
@@ -236,8 +238,12 @@ public class WorkflowTest {
             StorageEngine storage = registry.getStorage();
 
             Provider p = storage.createProvider();
-            Collection targetcoll = storage.createCollection(p);
+            p.setMnemonic("TEST");
+            storage.updateProvider(p);
 
+            Collection targetcoll = storage.createCollection(p);
+            targetcoll.setMnemonic("TEST");
+            storage.updateCollection(targetcoll);
 
             Request request = storage.createRequest(targetcoll, new Date(0));
             storage.updateRequest(request);
