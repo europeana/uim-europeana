@@ -25,7 +25,7 @@ public class UIMTaskTest {
 
         MetaDataRecord mdr = mock(MetaDataRecord.class);
         StepProcessor sp = mock(StepProcessor.class);
-        WorkflowStep step = mock(WorkflowStep.class);
+        WorkflowStep step = mock(IngestionPlugin.class);
         UIMExecution ae = mock(UIMExecution.class);
         UIMTask t = new UIMTask(mdr, sp, step);
 
