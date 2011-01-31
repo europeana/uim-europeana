@@ -45,13 +45,13 @@
         <module>plugins/integration</module>
 
         <!-- GWT-based GUI -->
-        <module>gui/uim-gui-gwt</module>
+		<!--        <module>gui/uim-gui-gwt</module>-->
 
         <!-- webconsole-based GUI -->
         <!--        <module>gui/uim-webconsole-extension</module>-->
 
         <!-- mongodb based memory storage implementation -->
-        <!-- <module>storage/mongo</module> -->
+        <!--        <module>storage/mongo</module> -->
 
         <!-- mongodb based logging -->
         <!-- <module>logging/mongo</module>-->
