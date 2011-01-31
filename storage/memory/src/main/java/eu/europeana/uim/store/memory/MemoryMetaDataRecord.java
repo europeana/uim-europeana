@@ -144,7 +144,10 @@ public class MemoryMetaDataRecord implements MetaDataRecord {
 
 		for (TKey<?, ?> qkey : qFields.keySet()) {
 			if (qkey.equals(nttKey)) {
-				result.addAll((Collection<? extends T>) qFields.get(qkey).values());
+				Collection<Object> values = qFields.get(qkey).values();
+				for (Object object : values) {
+					result.add((T)object);
+				}
 			}
 		} 
 		return result; 
