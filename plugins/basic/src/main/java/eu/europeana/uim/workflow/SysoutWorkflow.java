@@ -2,7 +2,7 @@ package eu.europeana.uim.workflow;
 
 import eu.europeana.uim.api.AbstractWorkflow;
 import eu.europeana.uim.api.IngestionWorkflowStep;
-import eu.europeana.uim.orchestration.BatchWorkflowStart;
+import eu.europeana.uim.util.BatchWorkflowStart;
 
 public class SysoutWorkflow extends AbstractWorkflow {
 

@@ -1,4 +1,4 @@
-package eu.europeana.uim.orchestration.processing;
+package eu.europeana.uim.api;
 
 import java.util.Queue;
 

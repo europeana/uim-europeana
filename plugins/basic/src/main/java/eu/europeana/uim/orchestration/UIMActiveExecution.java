@@ -9,11 +9,11 @@ import java.util.Queue;
 
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStart;
 import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.common.ProgressMonitor;
-import eu.europeana.uim.orchestration.processing.Task;
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
 

@@ -9,6 +9,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.api.Task;
+import eu.europeana.uim.api.TaskStatus;
 
 
 /**

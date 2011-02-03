@@ -1,13 +1,13 @@
-package eu.europeana.uim.orchestration;
+package eu.europeana.uim;
 
 import java.util.Queue;
 
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.api.Task;
+import eu.europeana.uim.api.TaskStatus;
 import eu.europeana.uim.api.WorkflowStep;
-import eu.europeana.uim.orchestration.processing.Task;
-import eu.europeana.uim.orchestration.processing.TaskStatus;
 
 public class UIMTask implements Task {
 

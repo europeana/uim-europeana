@@ -7,7 +7,7 @@ import eu.europeana.uim.api.AbstractWorkflow;
 import eu.europeana.uim.api.IngestionWorkflowStep;
 import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.api.WorkflowStepComposite;
-import eu.europeana.uim.orchestration.BatchWorkflowStart;
+import eu.europeana.uim.util.BatchWorkflowStart;
 
 public class MixedWorkflow extends AbstractWorkflow {
 

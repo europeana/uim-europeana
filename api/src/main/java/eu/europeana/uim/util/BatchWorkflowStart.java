@@ -1,6 +1,7 @@
-package eu.europeana.uim.orchestration;
+package eu.europeana.uim.util;
 
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.UIMTask;
 import eu.europeana.uim.api.AbstractWorkflowStart;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngineException;

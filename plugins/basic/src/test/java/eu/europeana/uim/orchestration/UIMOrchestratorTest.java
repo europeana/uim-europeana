@@ -2,7 +2,7 @@ package eu.europeana.uim.orchestration;
 
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,10 +19,10 @@ import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.common.MemoryProgressMonitor;
 import eu.europeana.uim.common.ProgressMonitor;
-import eu.europeana.uim.orchestration.processing.Task;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
