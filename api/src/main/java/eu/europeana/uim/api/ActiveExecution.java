@@ -80,6 +80,9 @@ public interface ActiveExecution<T> extends Execution {
 	
 	long[] nextBatch();
 	
-	public void waitUntilFinished();
+	void waitUntilFinished();
+	
+	void putValue(WorkflowStep step, String key, Object value);
+	Object getValue(WorkflowStep step, String key);
 	
 }

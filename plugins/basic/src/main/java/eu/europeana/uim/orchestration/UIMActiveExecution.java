@@ -21,31 +21,33 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 
 	private HashMap<String, LinkedList<Task>> success = new LinkedHashMap<String, LinkedList<Task>>();
 	private HashMap<String, LinkedList<Task>> failure = new LinkedHashMap<String, LinkedList<Task>>();
-	
+
+	private HashMap<String, HashMap<String, Object>> values = new HashMap<String, HashMap<String, Object>>();
+
 	private final StorageEngine engine;
-	
+
 	private final Execution execution;
 	private final Workflow workflow;
 	private final ProgressMonitor monitor;
-	
+
 	private boolean paused;
 	private Throwable throwable;
-	
-	private int current = 0;
+
+	private int scheduled = 0;
 	private ArrayList<long[]> batches = new ArrayList<long[]>();
-	
+
 	private int completed = 0;
-	
+
 	public UIMActiveExecution(Execution execution, Workflow workflow, ProgressMonitor monitor, StorageEngine engine){
 		this.execution = execution;
 		this.workflow = workflow;
 		this.monitor = monitor;
 		this.engine = engine;
-		
+
 		WorkflowStart start = workflow.getStart();
 		success.put(start.getIdentifier(), new LinkedList<Task>());
 		failure.put(start.getIdentifier(), new LinkedList<Task>());
-		
+
 		for (WorkflowStep step : workflow.getSteps()) {
 			success.put(step.getIdentifier(), new LinkedList<Task>());
 			failure.put(step.getIdentifier(), new LinkedList<Task>());
@@ -142,12 +144,14 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 	public void done(int count) {
 		completed += count;
 	}
-	
+
 	@Override
 	public int getRemainingSize() {
 		int size = 0;
-		for (int i = current; i < batches.size(); i ++) {
-			size += batches.get(i).length;
+		synchronized(batches) {
+			for (int i = 0; i < batches.size(); i ++) {
+				size += batches.get(i).length;
+			}
 		}
 		return size;
 	}
@@ -158,10 +162,7 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 		for (LinkedList<Task> tasks : success.values()) {
 			size += tasks.size();
 		}
-		
-		// we need to subtract the success from the last step - tasks
-		// in that step success pipe are considered as completed.
-		size -= getCompletedSize();
+
 		return size;
 	}
 
@@ -175,49 +176,44 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 		return size;
 	}
 
-	
+
 	@Override
 	public int getScheduledSize() {
-		int size = 0;
-		
-		// count elements in batches
-		for (long[] batch : batches) {
-			size += batch.length;
-		}
-		return size;
+		return scheduled;
 	}
 
 	@Override
 	public int getCompletedSize() {
 		return completed;
 	}
-	
-	
+
+
 	@Override
 	public boolean isFinished() {
-		return getScheduledSize() == getFailureSize() + getCompletedSize();
+		return getWorkflow().getStart().isFinished(this) && 
+		       getScheduledSize() == getFailureSize() + getCompletedSize();
 	}
 
-	
+
 	@Override
 	public long[] nextBatch() {
-		if (current >= batches.size()) return null;
-		
-		return batches.get(current++);
+		if (batches.isEmpty()) return null;
+		return batches.remove(0);
 	}
 
 	@Override
 	public void addBatch(long[] ids) {
 		batches.add(ids);
+		scheduled += ids.length;
 	}
 
-	
+
 	@Override
 	public Workflow getWorkflow() {
 		return workflow;
 	}
-	
-	
+
+
 	@Override
 	public void waitUntilFinished() {
 		while (!isFinished()) {
@@ -226,9 +222,26 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 			} catch (InterruptedException e) {
 			}
 		}
-		
+
 		System.out.println("Finished:" + getCompletedSize());
 		System.out.println("Failed:" + getFailureSize());
 	}
+
+	@Override
+	public void putValue(WorkflowStep step, String key, Object value) {
+		if (!values.containsKey(step.getIdentifier())) {
+			values.put(step.getIdentifier(), new HashMap<String, Object>());
+		}
+		values.get(step.getIdentifier()).put(key, value);
+	}
+
+	@Override
+	public Object getValue(WorkflowStep step, String key) {
+		if (!values.containsKey(step.getIdentifier())) return null;
+		return values.get(step.getIdentifier()).get(key);
+	}
+
+
+
 
 }

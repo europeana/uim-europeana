@@ -15,6 +15,7 @@ import eu.europeana.uim.store.Request;
 public class BatchWorkflowStart extends AbstractWorkflowStart implements WorkflowStart {
 
 	private int batchSize = 250;
+	private boolean initialized = false;
 
 	public BatchWorkflowStart() {
 		super(BatchWorkflowStart.class.getName());
@@ -39,38 +40,48 @@ public class BatchWorkflowStart extends AbstractWorkflowStart implements Workflo
 
 	@Override
 	public <T> void initialize(ActiveExecution<T> visitor) throws StorageEngineException {
-		long[] ids;
+		try {
+			long[] ids;
 
-		DataSet dataSet = visitor.getDataSet();
-		if (dataSet instanceof Provider) {
-			ids = visitor.getStorageEngine().getByProvider((Provider)dataSet, false);
-		} else if (dataSet instanceof Collection) {
-			ids = visitor.getStorageEngine().getByCollection((Collection)dataSet);
-		} else if (dataSet instanceof Request) {
-			ids = visitor.getStorageEngine().getByRequest((Request)dataSet);
-		} else if (dataSet instanceof MetaDataRecord) {
-			ids = new long[]{((MetaDataRecord)dataSet).getId()};
-		} else {
-			throw new IllegalStateException("Unsupported dataset <" + visitor.getDataSet() + ">");
-		}
-
-		if (ids.length > batchSize) {
-			int batches = (int)Math.ceil(1.0 * ids.length / batchSize);
-			for (int i = 0; i < batches; i++) {
-				int end = Math.min(ids.length, (i + 1) * batchSize);
-				int start = i * batchSize;
-
-				long[] batch = new long[end - start];
-				System.arraycopy(ids, start, batch, 0, end-start);
-				visitor.addBatch(batch);
+			DataSet dataSet = visitor.getDataSet();
+			if (dataSet instanceof Provider) {
+				ids = visitor.getStorageEngine().getByProvider((Provider)dataSet, false);
+			} else if (dataSet instanceof Collection) {
+				ids = visitor.getStorageEngine().getByCollection((Collection)dataSet);
+			} else if (dataSet instanceof Request) {
+				ids = visitor.getStorageEngine().getByRequest((Request)dataSet);
+			} else if (dataSet instanceof MetaDataRecord) {
+				ids = new long[]{((MetaDataRecord)dataSet).getId()};
+			} else {
+				throw new IllegalStateException("Unsupported dataset <" + visitor.getDataSet() + ">");
 			}
 
-		} else {
-			visitor.addBatch(ids);
-		}
+			if (ids.length > batchSize) {
+				int batches = (int)Math.ceil(1.0 * ids.length / batchSize);
+				for (int i = 0; i < batches; i++) {
+					int end = Math.min(ids.length, (i + 1) * batchSize);
+					int start = i * batchSize;
 
+					long[] batch = new long[end - start];
+					System.arraycopy(ids, start, batch, 0, end-start);
+					visitor.addBatch(batch);
+				}
+
+			} else {
+				visitor.addBatch(ids);
+			}
+		} finally {
+			initialized = true;
+		}
 	}
 
+	
+	
+
+	@Override
+	public <T> boolean isFinished(ActiveExecution<T> visitor) {
+		return initialized;
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override

@@ -11,5 +11,7 @@ package eu.europeana.uim.api;
 public interface WorkflowStart extends WorkflowStep{
 
     <T> int createTasks(ActiveExecution<T>  visitor);
+
+	<T> boolean isFinished(ActiveExecution<T> visitor);
     
 }

@@ -3,12 +3,11 @@ package eu.europeana.uim;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.command.UIMConfigStorage;
 import eu.europeana.uim.common.parse.RecordField;
 import eu.europeana.uim.common.parse.RecordHandler;
 import eu.europeana.uim.common.parse.RecordMap;

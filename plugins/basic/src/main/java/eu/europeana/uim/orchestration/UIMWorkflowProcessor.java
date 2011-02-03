@@ -62,9 +62,13 @@ public class UIMWorkflowProcessor implements Runnable {
 							//so we 
 							if (tasks == 0) {
 								if (execution.isFinished()) {
-									execution.setActive(false);
-									execution.setEndTime(new Date());
-									iterator.remove();
+									Thread.sleep(100);
+
+									if (execution.isFinished()) {
+										execution.setActive(false);
+										execution.setEndTime(new Date());
+										iterator.remove();
+									}
 								}
 							}
 						} 
@@ -78,7 +82,10 @@ public class UIMWorkflowProcessor implements Runnable {
 
 							// get successfull tasks from previouse step
 							// and schedule them into the step executor.
-							Task task = success.poll();
+							Task task = null;
+							synchronized (success) {
+								task = success.poll();
+							}
 							while(task != null){
 								task.setStep(step);
 								task.setOnSuccess(thisSuccess);
@@ -87,20 +94,27 @@ public class UIMWorkflowProcessor implements Runnable {
 								task.setStatus(TaskStatus.QUEUED);
 								step.getThreadPoolExecutor().execute(task);
 
-								task = success.poll();
+								synchronized (success) {
+									task = success.poll();
+								}
 							}
 
 							// make the current success list the "next" input list
 							success = thisSuccess;
 						}
-						
+
 						// save and clean final
-						Task task = success.poll();
+						Task task;
+						synchronized (success) {
+							task = success.poll();
+						}
 						while(task != null){
 							task.save();
 							execution.done(1);
 
-							task = success.poll();
+							synchronized (success) {
+								task = success.poll();
+							}
 						}						
 
 					} catch (Throwable exc){
@@ -131,7 +145,7 @@ public class UIMWorkflowProcessor implements Runnable {
 		if (start == null) {
 			execution.getWorkflow().setStart(new BatchWorkflowStart());
 		}
-		
+
 		start.initialize(execution);
 		TaskExecutorRegistry.getInstance().initialize(start, start.getMaximumThreadCount());
 
