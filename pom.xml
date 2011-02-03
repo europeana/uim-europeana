@@ -4,7 +4,7 @@
 
     <artifactId>europeana-uim</artifactId>
     <groupId>eu.europeana</groupId>
-    <version>1.1.0</version>
+    <version>1.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Unified Ingestion Manager</name>
 
@@ -280,7 +280,7 @@
 
 
     <scm>
-        <connection>scm:svn:https://europeanalabs.eu/svn/europeana/releases/europeana-uim-1.1.0</connection>
-        <developerConnection>scm:svn:https://europeanalabs.eu/svn/europeana/releases/europeana-uim-1.1.0</developerConnection>
+        <connection>scm:svn:https://europeanalabs.eu/svn/europeana/trunk/uim/</connection>
+        <developerConnection>scm:svn:https://europeanalabs.eu/svn/europeana/trunk/uim/</developerConnection>
     </scm>
 </project>
