@@ -1,15 +1,15 @@
 package eu.europeana.uim.gui.gwt.client;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import eu.europeana.uim.api.WorkflowStepStatus;
+
 import eu.europeana.uim.gui.gwt.shared.Collection;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 import eu.europeana.uim.gui.gwt.shared.Provider;
 import eu.europeana.uim.gui.gwt.shared.StepStatus;
 import eu.europeana.uim.gui.gwt.shared.Workflow;
-
-import java.util.List;
 
 /**
  * Service to get the available workflows and so on
@@ -27,9 +27,9 @@ public interface OrchestrationService extends RemoteService {
 
     List<Collection> getAllCollections();
 
-    Execution startCollection(Long workflow, Long collection);
+    Execution startCollection(String workflow, Long collection);
 
-    Execution startProvider(Long workflow, Long provider);
+    Execution startProvider(String workflow, Long provider);
 
     Execution getExecution(Long id);
 
@@ -39,7 +39,7 @@ public interface OrchestrationService extends RemoteService {
 
     Integer getCollectionTotal(Long collection);
 
-    List<StepStatus> getStatus(Long workflow);
+    List<StepStatus> getStatus(String workflow);
 
 
 

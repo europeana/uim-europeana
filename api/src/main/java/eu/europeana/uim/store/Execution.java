@@ -4,7 +4,7 @@ import java.util.Date;
 
 public interface Execution extends UimEntity {
 
-    Boolean isActive();
+    boolean isActive();
     void setActive(boolean active);
 
     Date getStartTime();
@@ -13,8 +13,8 @@ public interface Execution extends UimEntity {
     Date getEndTime();
     void setEndTime(Date end);
 
-    UimEntity getDataSet();
-    void setDataSet(UimEntity entity);
+    DataSet getDataSet();
+    void setDataSet(DataSet entity);
 
     String getWorkflowName();
     void setWorkflowName(String name);

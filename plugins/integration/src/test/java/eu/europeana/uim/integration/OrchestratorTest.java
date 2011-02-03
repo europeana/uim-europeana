@@ -45,7 +45,7 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
                         systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("FINE")),
 
                         // rhaa
-                        systemProperty("integrationDir").value(System.getProperty("integrationDir")),
+                        // systemProperty("integrationDir").value(System.getProperty("integrationDir")),
                         
                 //PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006" ),
                 

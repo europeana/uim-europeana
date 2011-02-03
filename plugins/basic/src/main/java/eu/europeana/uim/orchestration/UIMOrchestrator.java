@@ -1,28 +1,21 @@
 package eu.europeana.uim.orchestration;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
-import org.osgi.service.blueprint.container.ServiceUnavailableException;
-
-import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.common.ProgressMonitor;
-import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.orchestration.processing.Task;
+import eu.europeana.uim.orchestration.processing.TaskExecutor;
+import eu.europeana.uim.orchestration.processing.TaskExecutorRegistry;
+import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
-import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.UimEntity;
-import eu.europeana.uim.workflow.WorkflowProcessorProvider;
 
 /**
  * Orchestrates the ingestion job execution. The orchestrator keeps a map of WorkflowProcessors, one for each different workflow.
@@ -35,79 +28,17 @@ public class UIMOrchestrator implements Orchestrator {
 	public static final int BATCH_SIZE = 100;
 
 	private final Registry registry;
+	private final UIMWorkflowProcessor processor = new UIMWorkflowProcessor(); 
 
-	private WorkflowProcessorProvider processorProvider;
-
-	private Map<Workflow, WorkflowProcessor> processors = new HashMap<Workflow, WorkflowProcessor>();
-
-	private Map<ActiveExecution, Integer> executionTotals = new HashMap<ActiveExecution, Integer>();
-
-
-	public UIMOrchestrator(Registry registry, WorkflowProcessorProvider processorProvider) {
+	public UIMOrchestrator(Registry registry) {
 		this.registry = registry;
-		this.processorProvider = processorProvider;
+
+		processor.startup();
 	}
 
 	@Override
 	public String getIdentifier() {
 		return UIMOrchestrator.class.getSimpleName();
-	}
-
-	@Override
-	public ActiveExecution executeWorkflow(Workflow w, MetaDataRecord mdr, ProgressMonitor monitor) {
-		monitor.beginTask(w.getName(), 1);
-		return executeWorkflow(w, monitor, mdr);
-	}
-
-	@Override
-	public ActiveExecution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor) {
-		return executeWorkflow(w, monitor, c);
-	}
-
-
-	@Override
-	public ActiveExecution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor) {
-		return executeWorkflow(w, monitor, r);
-	}
-
-	@Override
-	public ActiveExecution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor) {
-		return executeWorkflow(w, monitor, p);
-	}
-
-	@Override
-	public java.util.Collection<ActiveExecution> getActiveExecutions() {
-		return executionTotals.keySet();
-	}
-
-	public boolean allDataProcessed(ActiveExecution e) {
-		return executionTotals.get(e) == getTotal(e);
-	}
-	
-	public void pause() {
-		//TODO
-    }
-
-	public void pause(ActiveExecution execution) {
-        processors.get(execution.getWorkflow()).pause(execution);
-    }
-
-    public void resume(ActiveExecution execution) {
-        processors.get(execution.getWorkflow()).resume(execution);
-    }
-
-    public void cancel(ActiveExecution execution) {
-        processors.get(execution.getWorkflow()).removeExecution(execution);
-    }
-	
-
-	@Override
-	public void shutdown() {
-		for(WorkflowProcessor processor : processors.values()) {
-			processor.shutdown();
-		}
-		processors.clear();
-		executionTotals.clear();
 	}
 
 	/**
@@ -118,25 +49,24 @@ public class UIMOrchestrator implements Orchestrator {
 	 * @param dataset the data set on which this Execution runs
 	 * @return a new ActiveExecution for this execution request
 	 */
-	private ActiveExecution executeWorkflow(Workflow w, ProgressMonitor monitor, UimEntity dataset) {
-		try {
-			Execution e = getStorageService().createExecution(dataset, w.getName());
-			
-			UIMExecution activeExecution = new UIMExecution(e.getId(), dataset, monitor, w);
-			executionTotals.put(activeExecution, 0);
+	@Override
+	public ActiveExecution<Task> executeWorkflow(Workflow w, DataSet dataset, ProgressMonitor monitor) {
+		monitor.beginTask(w.getName(), 1);
 
-			WorkflowProcessor wp = processors.get(w);
-			if (wp == null) {
-				wp = processorProvider.createProcessor(w, this, registry);
-				processors.put(w, wp);
-				wp.start();
-			}
+		try {
+			Execution e = registry.getStorage().createExecution(dataset, w.getName());
 			e.setActive(true);
 			e.setStartTime(new Date());
-
 			registry.getStorage().updateExecution(e);
-			wp.addExecution(activeExecution);
-			return activeExecution;
+
+			try {
+				UIMActiveExecution activeExecution = new UIMActiveExecution(e, w, monitor, registry.getStorage());
+				processor.schedule(activeExecution);
+
+				return activeExecution;
+			} catch (Throwable t) {
+				log.severe("Could not update execution details: " + t.getMessage());
+			}
 		} catch (StorageEngineException e1) {
 			log.severe("Could not update execution details: " + e1.getMessage());
 			e1.printStackTrace();
@@ -144,128 +74,44 @@ public class UIMOrchestrator implements Orchestrator {
 		return null;
 	}
 
-	private boolean hasExecution(Execution e) {
-		for (Execution exec : executionTotals.keySet()) {
-			if (exec.getId() == e.getId()) {
-				return true;
-			}
-		}
-		return false;
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ActiveExecution<Task>> getActiveExecutions() {
+		return processor.getExecutions();
 	}
+
+
+
+	public void pause(ActiveExecution<Task> execution) {
+		execution.setPaused(true);
+	}
+
+	public void resume(ActiveExecution<Task> execution) {
+		execution.setPaused(false);
+	}
+
+	public void cancel(ActiveExecution<Task> execution) {
+		execution.getMonitor().setCancelled(true);
+	}
+
 
 
 	@Override
-	public synchronized long[] getBatchFor(ActiveExecution e) {
-
-		log.fine(String.format("Requesting next batch for execution %d", e.getId()));
-
-		UIMExecution ae = (UIMExecution) e;
-		Integer counter = executionTotals.get(ae);
-		// if we don't have anything for this execution, assume it's done
-		if (counter == null) {
-			return null;
-		}
-		int total = getTotal(ae);
-		long[] all = null;
-
-		try {
-			UimEntity dataset = ae.getDataSet();
-			if (dataset instanceof MetaDataRecord) {
-				return new long[]{ae.getDataSet().getId()};
-			} else if (dataset instanceof Collection) {
-				all = getStorageService().getByCollection((Collection) dataset);
-			} else if (dataset instanceof Provider) {
-				all = getStorageService().getByProvider((Provider) dataset, false);
-			} else {
-				throw new RuntimeException("Should not be here");
-			}
-		} catch (StorageEngineException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		if (all == null) {
-			return null;
-		}
-
-		int remaining = total - counter;
-		long[] result = null;
-		if (remaining > BATCH_SIZE) {
-			result = new long[BATCH_SIZE];
-			//            log.fine(String.format("Preparing batch from all MDRs with size %d, counter at %d, remaining: %d", all.length, counter, remaining));
-			System.arraycopy(all, counter, result, 0, BATCH_SIZE);
-			counter += BATCH_SIZE;
-			executionTotals.put(e, counter);
-		} else if (remaining < BATCH_SIZE && remaining > 0) {
-			result = new long[remaining];
-			System.arraycopy(all, counter, result, 0, remaining);
-			counter = total;
-			executionTotals.put(e, counter);
-		} else if (remaining == 0) {
-			return null;
-		}
-
-		return result;
-	}
-
-	@Override
-	public int getTotal(ActiveExecution e) {
-		try {
-			UimEntity dataSet = e.getDataSet();
-			if (dataSet instanceof MetaDataRecord) {
-				return 1;
-			} else if (dataSet instanceof Collection) {
-				return getStorageService().getTotalByCollection((Collection) dataSet);
-			} else if (dataSet instanceof Provider) {
-				return getStorageService().getTotalByProvider((Provider) dataSet, false);
-			} else {
-				throw new RuntimeException("Should not be here, we got a " + dataSet);
-			}
-		} catch (StorageEngineException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		return -1;
-	}
-
-	protected void notifyExecutionDone(ActiveExecution e) {
-		try {
-			for (Execution execution : registry.getStorage().getAllExecutions()) {
-				if (execution.getId() == e.getId()) {
-					execution.setActive(false);
-					execution.setEndTime(new Date());
-					try {
-						registry.getStorage().updateExecution(execution);
-					} catch (StorageEngineException e1) {
-						log.severe("Could not update execution details: " + e1.getMessage());
-						e1.printStackTrace();
-					}
-				}
-			}
-			executionTotals.remove(e);
-		} catch (StorageEngineException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+	public void shutdown() {
+		processor.shutdown();
+		for(TaskExecutor executor : TaskExecutorRegistry.getInstance().getAllExecutor()) {
+			executor.shutdownNow();
 		}
 	}
 
-	private StorageEngine getStorageService() {
-		StorageEngine r = null;
-		try {
-			r = registry.getStorage();
-		} catch (Throwable t) {
-			if (t instanceof ServiceUnavailableException) {
-				// TODO shutdown gracefully
-				t.printStackTrace();
-			} else {
-				t.printStackTrace();
-			}
-		}
-		return r;
-	}
+
 
 	@Override
 	public List<WorkflowStepStatus> getRuntimeStatus(Workflow w) {
-		return processors.get(w).getRuntimeStatus(w);
+		return null; //processors.get(w).getRuntimeStatus(w);
 	}
+
+
+
 }

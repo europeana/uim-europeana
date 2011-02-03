@@ -1,83 +1,111 @@
 package eu.europeana.uim.orchestration;
 
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.api.IngestionPlugin;
-import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.api.Task;
-import eu.europeana.uim.api.TaskStatus;
-import eu.europeana.uim.api.WorkflowStep;
+import java.util.Queue;
 
-/**
- * A task that runs a workflow step against a MetaDataRecord.
- * If the execution fails, the Throwable is kept and the task is added to the failure list of its StepProcessor.
- * If the execution succeeds, the task is added to the success list of its StepProcessor.
- * 
- * TODO: maybe for optimization, support multiple MDRs per task...
- *
- * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
- */
+import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.orchestration.processing.Task;
+import eu.europeana.uim.orchestration.processing.TaskStatus;
+
 public class UIMTask implements Task {
 
-    private final MetaDataRecord mdr;
+	private TaskStatus status = TaskStatus.NEW;
+	private Throwable throwable;
+	
+	private Queue<Task> success = null;
+	private Queue<Task> failure = null;
+	
+	private WorkflowStep step;
+	
+	private final StorageEngine engine;
+	private final MetaDataRecord record;
+	
+	
+	public UIMTask(MetaDataRecord record, StorageEngine engine) {
+		super();
+		this.engine = engine;
+		this.record = record;
+	}
 
-    // mutable fields - a task "wanders" through the workflow, i.e. through a chain of StepProcessor-s
-    private StepProcessor processor;
-    private WorkflowStep step;
-    private TaskStatus status;
+	
+	@Override
+	public void run() {
+		step.processRecord(record);
+	}
+
+	@Override
+	public TaskStatus getStatus() {
+		return status;
+	}
+
+	@Override
+	public void setStatus(TaskStatus status) {
+		this.status = status;
+	}
 
 
-    public UIMTask(MetaDataRecord mdr, StepProcessor processor, WorkflowStep step) {
-        this.mdr = mdr;
-        this.processor = processor;
-        this.step = step;
-        this.status = TaskStatus.NEW;
-        
-    }
+	@Override
+	public void setUp() {
+	}
+	
+	
 
-    @Override
-    public void run() {
+	@Override
+	public void tearDown() {
+	}
+	
+	
+	
 
-        boolean failed = false;
-        try {
-            status = TaskStatus.PROCESSING;
-            if(step instanceof IngestionPlugin) {
-                ((IngestionPlugin)step).processRecord(mdr);
-            } else {
-                throw new Throwable("Cannot execute WorkflowStep of unknown type: " + step.getClass().getName());
-            }
-        } catch (Throwable t) {
-            failed = true;
-            status = TaskStatus.FAILED;
-            processor.addFailure(this.mdr, t);
-        } finally {
-            if (!failed) {
-                status = TaskStatus.IN_QUEUE;
-                processor.addSuccess(this);
-            }
-        }
-    }
 
-    @Override
-    public TaskStatus getStatus() {
-        return status;
-    }
+	@Override
+	public void save() throws StorageEngineException {
+		engine.updateMetaDataRecord(record);
+	}
 
-    public void changeStep(StepProcessor nextProcessor, WorkflowStep nextStep) {
-        if(this.status == TaskStatus.PROCESSING) {
-            throw new RuntimeException("Can't change step of a processing task!");
-        }
-        this.processor = nextProcessor;
-        this.step = nextStep;
-    }
 
-    @Override
-    public void markDone() {
-        this.status = TaskStatus.DONE;
-    }
+	@Override
+	public WorkflowStep getStep() {
+		return step;
+	}
 
-    public void save(RecordProvider handler) throws StorageEngineException {
-        // can't wait for closures
-        handler.updateMetaDataRecord(this.mdr);
-    }
 
+	@Override
+	public void setStep(WorkflowStep step) {
+		this.step = step;
+	}
+
+	@Override
+	public void setOnSuccess(Queue<Task> success) {
+		this.success = success;
+	}
+
+	@Override
+	public Queue<Task> getOnSuccess() {
+		return success;
+	}
+
+	@Override
+	public void setOnFailure(Queue<Task> failure) {
+		this.failure = failure;
+	}
+
+	@Override
+	public Queue<Task> getOnFailure() {
+		return failure;
+	}
+
+	@Override
+	public void setThrowable(Throwable throwable) {
+		this.throwable =throwable;
+	}
+
+	@Override
+	public Throwable getThrowable() {
+		return throwable;
+	}
+	
+	
 }

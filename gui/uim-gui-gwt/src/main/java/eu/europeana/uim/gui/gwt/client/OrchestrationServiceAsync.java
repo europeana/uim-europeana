@@ -18,9 +18,9 @@ public interface OrchestrationServiceAsync {
 
     void getAllCollections(AsyncCallback<List<Collection>> async);
 
-    void startCollection(Long workflow, Long collection, AsyncCallback<Execution> async);
+    void startCollection(String workflow, Long collection, AsyncCallback<Execution> async);
 
-    void startProvider(Long workflow, Long provider, AsyncCallback<Execution> async);
+    void startProvider(String workflow, Long provider, AsyncCallback<Execution> async);
 
     void getExecution(Long id, AsyncCallback<Execution> async);
 
@@ -30,5 +30,5 @@ public interface OrchestrationServiceAsync {
 
     void getPastExecutions(AsyncCallback<List<Execution>> async);
 
-    void getStatus(Long workflow, AsyncCallback<List<StepStatus>> async);
+    void getStatus(String workflow, AsyncCallback<List<StepStatus>> async);
 }

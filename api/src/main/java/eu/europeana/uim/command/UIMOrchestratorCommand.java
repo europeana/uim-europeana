@@ -101,7 +101,8 @@ public class UIMOrchestratorCommand implements Action {
     private void pause(PrintStream out) {
         ActiveExecution execution = getOrListExecution(out, "pause");
         if(execution != null) {
-            orchestrator.pause();
+        	execution.setPaused(true);
+//            orchestrator.pause();
         } else {
             out.println("Could not find execution to pause with ID " + argument0);
         }
@@ -175,7 +176,6 @@ public class UIMOrchestratorCommand implements Action {
             out.println("Starting to run worfklow '" + w.getName() + "' on collection '" + c.getName() + "' of provider '" + p.getName() + "'");
 
             ProgressMonitor pm = new ConsoleProgressMonitor(out);
-
             orchestrator.executeWorkflow(w, c, pm);
         }
 

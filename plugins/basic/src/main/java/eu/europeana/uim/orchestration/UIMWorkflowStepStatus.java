@@ -1,11 +1,10 @@
 package eu.europeana.uim.orchestration;
 
-import eu.europeana.uim.MDRFieldRegistry;
+import java.util.Map;
+
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.api.WorkflowStepStatus;
-
-import java.util.Map;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>

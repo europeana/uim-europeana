@@ -10,14 +10,14 @@ import java.util.List;
  */
 public interface Workflow {
 
-    public Long getId();
-
     public String getName();
 
     public String getDescription();
 
-    public void addStep(WorkflowStep step);
+    public WorkflowStart getStart();
 
     public List<WorkflowStep> getSteps();
+
+	public void setStart(WorkflowStart start);
 
 }

@@ -1,6 +1,5 @@
 package eu.europeana.uim.orchestration;
 
-import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngineException;
 

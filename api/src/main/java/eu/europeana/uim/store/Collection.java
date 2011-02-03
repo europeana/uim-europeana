@@ -10,7 +10,7 @@ package eu.europeana.uim.store;
     language    // Primary language for collection (used as default for all fields if not given)
 
  */
-public interface Collection extends UimEntity {
+public interface Collection  extends DataSet {
 	
 	public Provider getProvider();
 

@@ -1,12 +1,9 @@
 package eu.europeana.uim.api;
 
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.common.ProgressMonitor;
-import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.store.Request;
-
 import java.util.List;
+
+import eu.europeana.uim.common.ProgressMonitor;
+import eu.europeana.uim.store.DataSet;
 
 /**
  * Orchestrates the ingestion job execution.
@@ -17,18 +14,11 @@ public interface Orchestrator {
 	
 	public String getIdentifier();
 
-    ActiveExecution executeWorkflow(Workflow w, MetaDataRecord mdr, ProgressMonitor monitor);
-
-    ActiveExecution executeWorkflow(Workflow w, Request r, ProgressMonitor monitor);
-
-    ActiveExecution executeWorkflow(Workflow w, Collection c, ProgressMonitor monitor);
-
-    ActiveExecution executeWorkflow(Workflow w, Provider p, ProgressMonitor monitor);
-
-    java.util.Collection<ActiveExecution> getActiveExecutions();
+    ActiveExecution<?> executeWorkflow(Workflow w, DataSet dataset, ProgressMonitor monitor);
 
 
-    void pause();
+    <T> java.util.Collection<ActiveExecution<T>> getActiveExecutions();
+
 
     void shutdown();
 
@@ -37,12 +27,12 @@ public interface Orchestrator {
      * @param e the Execution for which to retrieve the next batch of IDs
      * @return an array of MetaDataRecord IDs to process
      */
-    long[] getBatchFor(ActiveExecution e);
+    //long[] getBatchFor(ActiveExecution e);
 
     /**
      * Gets the total number of items to be processed for this dataset
      */
-    int getTotal(ActiveExecution dataset);
+    //int getTotal(ActiveExecution dataset);
 
     /**
      * Gets a snapshot of the runtime information for a given workflow.

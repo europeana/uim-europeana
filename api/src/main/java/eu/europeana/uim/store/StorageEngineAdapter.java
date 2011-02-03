@@ -149,7 +149,7 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	}
 
 	@Override
-	public Execution createExecution(UimEntity entity, String workflow) {
+	public Execution createExecution(DataSet entity, String workflow) {
 		
 		return null;
 	}

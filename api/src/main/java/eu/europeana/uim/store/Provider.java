@@ -12,7 +12,7 @@ country         // Country for Provider
 content_type    // enum PROVT_MUSEUM, PROVT_ARCHIVE, PROVT_LIBRARY, PROVT_AUDIO_VIS_ARCH, PROVT_AGGREGATOR
 
  */
-public interface Provider extends UimEntity {
+public interface Provider  extends DataSet {
 
 	public List<Provider> getRelatedOut();
 	public List<Provider> getRelatedIn();

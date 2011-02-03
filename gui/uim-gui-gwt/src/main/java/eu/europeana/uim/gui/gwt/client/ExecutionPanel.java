@@ -1,5 +1,7 @@
 package eu.europeana.uim.gui.gwt.client;
 
+import java.util.List;
+
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -9,12 +11,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+
 import eu.europeana.uim.gui.gwt.shared.Collection;
 import eu.europeana.uim.gui.gwt.shared.Execution;
 import eu.europeana.uim.gui.gwt.shared.Provider;
 import eu.europeana.uim.gui.gwt.shared.Workflow;
-
-import java.util.List;
 
 /**
  * The panel making it possible to run new executions
@@ -74,12 +75,11 @@ public class ExecutionPanel extends FlowPanel {
             @Override
             public void onClick(ClickEvent clickEvent) {
                 String selectedWorkflow = workflowList.getValue(workflowList.getSelectedIndex());
-                Long workflowId = Long.parseLong(selectedWorkflow);
                 String selectedDataSource = collectionList.getValue(collectionList.getSelectedIndex());
                 if (selectedDataSource.equals(ALL_COLLECTIONS)) {
-                    executeProvider(workflowId, providerList, application);
+                    executeProvider(selectedWorkflow, providerList, application);
                 } else {
-                    executeCollection(workflowId, selectedDataSource, application);
+                    executeCollection(selectedWorkflow, selectedDataSource, application);
                 }
 
                 // jump to the overview panel and clear this one
@@ -95,7 +95,7 @@ public class ExecutionPanel extends FlowPanel {
 
     }
 
-    private void executeCollection(Long workflowId, String selectedDataSource, final Application application) {
+    private void executeCollection(String workflowId, String selectedDataSource, final Application application) {
         // start on collection
         Long collectionId = Long.parseLong(selectedDataSource);
         orchestrationService.startCollection(workflowId, collectionId, new AsyncCallback<Execution>() {
@@ -112,7 +112,7 @@ public class ExecutionPanel extends FlowPanel {
         });
     }
 
-    private void executeProvider(Long workflowId, ListBox providerList, final Application application) {
+    private void executeProvider(String workflowId, ListBox providerList, final Application application) {
         // start on provider
         Long providerId = Long.parseLong(providerList.getValue(providerList.getSelectedIndex()));
         orchestrationService.startProvider(workflowId, providerId, new AsyncCallback<Execution>() {
@@ -181,7 +181,7 @@ public class ExecutionPanel extends FlowPanel {
             @Override
             public void onSuccess(List<Workflow> workflows) {
                 for (Workflow w : workflows) {
-                    workflowList.addItem(w.getName(), w.getId().toString());
+                    workflowList.addItem(w.getName(), w.getName());
                 }
             }
         });

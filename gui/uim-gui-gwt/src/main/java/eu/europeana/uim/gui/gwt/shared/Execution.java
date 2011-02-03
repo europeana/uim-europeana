@@ -11,7 +11,7 @@ public class Execution implements IsSerializable, Comparable<Execution> {
 
     private Long id;
     private String name;
-    private Long workflow;
+    private String workflow;
     private Integer progress;
     private Integer total;
     private boolean isActive;
@@ -22,11 +22,11 @@ public class Execution implements IsSerializable, Comparable<Execution> {
 
     }
 
-    public Long getWorkflow() {
+    public String getWorkflow() {
         return workflow;
     }
 
-    public void setWorkflow(Long workflow) {
+    public void setWorkflow(String workflow) {
         this.workflow = workflow;
     }
 

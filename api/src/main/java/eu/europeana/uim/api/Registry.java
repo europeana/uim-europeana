@@ -23,15 +23,13 @@ public interface Registry {
 
     void setConfiguredStorageEngine(String configuredStorageEngine);
 
-    void setActiveStorage(StorageEngine storage);
+    //void setActiveStorage(StorageEngine storage);
 
     void addWorkflow(Workflow workflow);
 
     List<Workflow> getWorkflows();
 
-    Workflow getWorkflow(String identifier);
-
-    Workflow getWorkflow(Long id);
+    Workflow getWorkflow(String name);
 
     void removeWorkflow(Workflow workflow);
 

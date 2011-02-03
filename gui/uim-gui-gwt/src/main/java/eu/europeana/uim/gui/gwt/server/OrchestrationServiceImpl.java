@@ -38,7 +38,7 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 		List<eu.europeana.uim.api.Workflow> workflows = getEngine().getRegistry().getWorkflows();
 		if (workflows != null) {
 			for (eu.europeana.uim.api.Workflow w : workflows) {
-				res.add(new Workflow(w.getId(), w.getName(), w.getDescription()));
+				res.add(new Workflow(w.getName(), w.getDescription()));
 			}
 		}
 		return res;
@@ -126,7 +126,7 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 	}
 
 	@Override
-	public Execution startCollection(Long workflow, Long collection) {
+	public Execution startCollection(String workflow, Long collection) {
 		try {
 			eu.europeana.uim.store.Collection c = getEngine().getRegistry().getStorage().getCollection(collection);
 			if (c == null) {
@@ -147,7 +147,7 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 	}
 
 	@Override
-	public Execution startProvider(Long workflow, Long provider) {
+	public Execution startProvider(String workflow, Long provider) {
 		try {
 			eu.europeana.uim.store.Provider p = getEngine().getRegistry().getStorage().getProvider(provider);
 			if (p == null) {
@@ -169,8 +169,8 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 	private void populateWrappedExecution(Execution execution, ActiveExecution ae, eu.europeana.uim.api.Workflow w, UimEntity dataset) {
 		execution.setId(ae.getId());
 		execution.setName(w.getName() + " on " + dataset.toString());
-		execution.setWorkflow(w.getId());
-		execution.setTotal(getEngine().getOrchestrator().getTotal(ae));
+		execution.setWorkflow(w.getName());
+		execution.setTotal(ae.getScheduledSize());
 		execution.setStartTime(ae.getStartTime());
 		wrappedExecutions.put(ae.getId(), execution);
 	}
@@ -213,8 +213,8 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 		return wrapped;
 	}
 
-	private eu.europeana.uim.api.Workflow getWorkflow(Long id) {
-		eu.europeana.uim.api.Workflow workflow = getEngine().getRegistry().getWorkflow(id);
+	private eu.europeana.uim.api.Workflow getWorkflow(String name) {
+		eu.europeana.uim.api.Workflow workflow = getEngine().getRegistry().getWorkflow(name);
 		if (workflow == null) {
 			throw new RuntimeException("Error: cannot find workflow " + workflow);
 		}
@@ -233,7 +233,7 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 	}
 
 	@Override
-	public List<StepStatus> getStatus(Long workflow) {
+	public List<StepStatus> getStatus(String workflow) {
 		List<StepStatus> res = new ArrayList<StepStatus>();
 		List<WorkflowStepStatus> runtimeStatus = getEngine().getOrchestrator().getRuntimeStatus(getWorkflow(workflow));
 		for (WorkflowStepStatus wss : runtimeStatus) {

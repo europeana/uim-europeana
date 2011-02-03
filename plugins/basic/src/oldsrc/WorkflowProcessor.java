@@ -50,7 +50,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
     // keep track of tasks for monitoring
     private Map<Task, ActiveExecution> tasks = new ConcurrentHashMap<Task, ActiveExecution>();
 
-    protected Vector<StepProcessor> stepProcessors = new Vector<StepProcessor>();
+    protected Vector<WorkflowStepProcessor> stepProcessors = new Vector<WorkflowStepProcessor>();
 
     private final Timer processorTimer;
 
@@ -62,7 +62,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
      * @param w the Workflow this processor follows
      * @param o the Orchestrator for this processor
      */
-    public WorkflowProcessor(Workflow w, UIMOrchestrator o, Registry r, StepProcessorProvider provider) {
+    public WorkflowProcessor(Workflow w, UIMOrchestrator o, Registry r) {
         this.orchestrator = o;
         this.workflow = w;
         this.registry = r;
@@ -89,7 +89,8 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
                     // we always save after the last step
                     savePoint = true;
                 }
-                stepProcessors.add(provider.createStepProcessor(step, this, savePoint));
+                
+                stepProcessors.add(new WorkflowStepProcessor(step, this, this, savePoint));
             }
         }
     }
@@ -186,14 +187,14 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
             }
 
             for (int i = 0; i < stepProcessors.size(); i++) {
-                StepProcessor sp = stepProcessors.get(i);
+                WorkflowStepProcessor sp = stepProcessors.get(i);
                 if (i == 0) {
                     if (!shutdown) {
                         // special treatment for the first step which gets MDRs directly from the storage
                         fillFirstStepProcessorQueue(sp);
                     }
                 } else {
-                    StepProcessor previous = stepProcessors.get(i - 1);
+                    WorkflowStepProcessor previous = stepProcessors.get(i - 1);
                     sp.startProcessing();
                     previous.passToNext(sp);
 
@@ -254,7 +255,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
      *
      * @param sp the StepProcessor for the worklow
      */
-    private void fillFirstStepProcessorQueue(StepProcessor sp) {
+    private void fillFirstStepProcessorQueue(WorkflowStepProcessor sp) {
         // TODO we probably can do this dynamically. For this Orchestrator#getBatchFor needs to handle an argument
         // right now we have a fixed batch size that we use in order to refill the queues
 
@@ -303,7 +304,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
 
     public List<WorkflowStepStatus> getRuntimeStatus(Workflow w) {
         List<WorkflowStepStatus> res = new ArrayList<WorkflowStepStatus>();
-        for (StepProcessor p : stepProcessors) {
+        for (WorkflowStepProcessor p : stepProcessors) {
             WorkflowStep step = p.getStep();
             if (step instanceof ProcessingContainer) {
                 addExpandedProcessingContainers((ProcessingContainer) step, p, res);
@@ -314,7 +315,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
         return res;
     }
 
-    private void addExpandedProcessingContainers(ProcessingContainer pc, StepProcessor p, List<WorkflowStepStatus> statuses) {
+    private void addExpandedProcessingContainers(ProcessingContainer pc, WorkflowStepProcessor p, List<WorkflowStepStatus> statuses) {
         for (WorkflowStep step : pc.getSteps()) {
             if (step instanceof ProcessingContainer) {
                 addExpandedProcessingContainers((ProcessingContainer) step, p, statuses);
@@ -331,7 +332,7 @@ public class WorkflowProcessor extends TimerTask implements RecordProvider, Proc
     public String toString() {
         String res = "";
         res += "WorkflowProcessor for workflow '" + workflow.getName() + "' (" + workflow.getDescription() + ")\n\n";
-        for (StepProcessor sp : stepProcessors) {
+        for (WorkflowStepProcessor sp : stepProcessors) {
             res += sp.toString() + "\n";
         }
         return res;

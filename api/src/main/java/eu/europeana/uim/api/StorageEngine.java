@@ -6,10 +6,10 @@ import java.util.Map;
 
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.UimEntity;
 
 
 public interface StorageEngine {
@@ -56,7 +56,7 @@ public interface StorageEngine {
 	MetaDataRecord createMetaDataRecord(Request request) throws StorageEngineException;
 	void updateMetaDataRecord(MetaDataRecord record) throws StorageEngineException;
 	
-	Execution createExecution(UimEntity entity, String workflow) throws StorageEngineException;
+	Execution createExecution(DataSet dataSet, String workflow) throws StorageEngineException;
 	void updateExecution(Execution execution) throws StorageEngineException;
 	Execution getExecution(long id) throws StorageEngineException;
 	List<Execution> getAllExecutions() throws StorageEngineException;

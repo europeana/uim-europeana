@@ -73,15 +73,6 @@ public class UIMRegistry implements Registry {
         return null;
     }
 
-    @Override
-    public Workflow getWorkflow(Long id) {
-        for (Workflow w : workflows) {
-            if (w.getId().equals(id)) {
-                return w;
-            }
-        }
-        return null;
-    }
 
     @Override
     public void addPlugin(IngestionPlugin plugin) {
@@ -156,10 +147,6 @@ public class UIMRegistry implements Registry {
         }
     }
 
-    @Override
-    public void setActiveStorage(StorageEngine storage) {
-        activeStorage = storage;
-    }
 
     @Override
     public StorageEngine getStorage() {
@@ -197,8 +184,10 @@ public class UIMRegistry implements Registry {
     }
 
     @Override
-    public void removeLoggingEngine(LoggingEngine loggingEngine) {
-        loggers.remove(loggingEngine.getIdentifier());
+    public void removeLoggingEngine(LoggingEngine logging) {
+    	if (logging != null){
+    		loggers.remove(logging.getIdentifier());
+    	}
     }
 
     @Override

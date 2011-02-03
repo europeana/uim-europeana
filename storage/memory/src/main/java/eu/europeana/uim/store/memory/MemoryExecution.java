@@ -1,15 +1,17 @@
 package eu.europeana.uim.store.memory;
 
-import eu.europeana.uim.store.Execution;
-import eu.europeana.uim.store.UimEntity;
-
 import java.util.Date;
 
-public class MemoryExecution extends AbstractMemoryEntity implements Execution {
+import eu.europeana.uim.store.DataSet;
+import eu.europeana.uim.store.Execution;
 
-    private boolean isActive = false;
+public class MemoryExecution implements Execution {
+
+	private long id;
+
+    private boolean active = false;
     private Date startTime, endTime;
-    private UimEntity dataSet;
+    private DataSet dataSet;
     private String workflowIdentifier;
 
     public MemoryExecution() {
@@ -17,8 +19,10 @@ public class MemoryExecution extends AbstractMemoryEntity implements Execution {
 	}
 
 	public MemoryExecution(long id) {
-		super(id);
+		this.id = id;
 	}
+	
+	
 
     public Date getStartTime() {
         return startTime;
@@ -36,22 +40,22 @@ public class MemoryExecution extends AbstractMemoryEntity implements Execution {
         this.endTime = endTime;
     }
 
-    public UimEntity getDataSet() {
+    public DataSet getDataSet() {
         return dataSet;
     }
 
-    public void setDataSet(UimEntity dataSet) {
+    public void setDataSet(DataSet dataSet) {
         this.dataSet = dataSet;
     }
 
     @Override
-    public Boolean isActive() {
-        return isActive();
+    public boolean isActive() {
+        return active;
     }
 
     @Override
     public void setActive(boolean active) {
-        this.isActive = active;
+        this.active = active;
     }
 
     @Override
@@ -63,4 +67,17 @@ public class MemoryExecution extends AbstractMemoryEntity implements Execution {
     public void setWorkflowName(String identifier) {
         this.workflowIdentifier = identifier;
     }
+
+	@Override
+	public long getId() {
+		return id;
+	}
+
+	@Override
+	public String toString() {
+		return "MemoryExecution [id=" + id + ", workflowIdentifier="
+				+ workflowIdentifier + ", dataSet=" + dataSet + "]";
+	}
+	
+	
 }

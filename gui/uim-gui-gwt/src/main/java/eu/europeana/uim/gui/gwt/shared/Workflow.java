@@ -1,15 +1,16 @@
 package eu.europeana.uim.gui.gwt.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class Workflow extends DataSource {
+public class Workflow implements IsSerializable {
 
     private String name;
     private String description;
 
-    public Workflow(Long id, String name, String description) {
-        super(id);
+    public Workflow(String name, String description) {
         this.name = name;
         this.description = description;
     }

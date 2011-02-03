@@ -36,6 +36,11 @@
             <artifactId>europeana-uim-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>europeana-uim-plugin-basic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 

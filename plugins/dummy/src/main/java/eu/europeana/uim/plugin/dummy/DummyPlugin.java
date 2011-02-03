@@ -59,4 +59,16 @@ public class DummyPlugin implements IngestionPlugin {
             log.info("Dummy plugin is processing MDR " + mdr.getId());
         }
     }
+
+
+	@Override
+	public int getPreferredThreadCount() {
+		return 0;
+	}
+
+
+	@Override
+	public int getMaximumThreadCount() {
+		return 0;
+	}
 }

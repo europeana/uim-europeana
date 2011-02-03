@@ -3,8 +3,8 @@ package eu.europeana.uim;
 import java.io.Serializable;
 import java.util.List;
 
+import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.UimEntity;
 
 /**
  * Abstract MetaDataRecord. StorageEngine implementations provide their own implementation of it.
@@ -13,7 +13,7 @@ import eu.europeana.uim.store.UimEntity;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public interface MetaDataRecord extends UimEntity {
+public interface MetaDataRecord extends DataSet {
     
 	Request getRequest();
 

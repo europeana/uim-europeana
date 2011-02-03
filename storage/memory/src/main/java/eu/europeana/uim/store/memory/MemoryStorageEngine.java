@@ -1,6 +1,7 @@
 package eu.europeana.uim.store.memory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,10 +15,10 @@ import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.UimEntity;
 import gnu.trove.TLongArrayList;
 import gnu.trove.TLongLongHashMap;
 import gnu.trove.TLongLongIterator;
@@ -300,7 +301,7 @@ public class MemoryStorageEngine implements StorageEngine {
 
 
 	@Override
-	public Execution createExecution(UimEntity entity, String workflow) {
+	public Execution createExecution(DataSet entity, String workflow) {
 		MemoryExecution execution = new MemoryExecution(executionId.getAndIncrement());
 		execution.setDataSet(entity);
 		execution.setWorkflowName(workflow);
@@ -338,7 +339,10 @@ public class MemoryStorageEngine implements StorageEngine {
 				result.add(iterator.key());
 			}
 		}
-		return result.toNativeArray();
+		
+		long[] ids = result.toNativeArray();
+		Arrays.sort(ids);
+		return ids;
 	}
 
 	@Override
@@ -351,8 +355,12 @@ public class MemoryStorageEngine implements StorageEngine {
 				result.add(iterator.key());
 			}
 		}
-		return result.toNativeArray();
+		
+		long[] ids = result.toNativeArray();
+		Arrays.sort(ids);
+		return ids;
 	}
+	
 	@Override
 	public long[] getByProvider(Provider provider, boolean recursive) {
 		TLongArrayList result = new TLongArrayList();
@@ -372,7 +380,10 @@ public class MemoryStorageEngine implements StorageEngine {
 				result.add(iterator.key());
 			}
 		}
-		return result.toNativeArray();
+		
+		long[] ids = result.toNativeArray();
+		Arrays.sort(ids);
+		return ids;
 	}
 
 	public void getRecursive(Provider provider, Set<Long> result) {

@@ -59,7 +59,7 @@ public class UIMConfigStorage implements Action {
                 }
             }
             if(selected != null) {
-                registry.setActiveStorage(selected);
+                registry.setConfiguredStorageEngine(selected.getIdentifier());
                 session.getConsole().println("Activated storage engine '" + selected.getIdentifier() + "'");
                 
         		Bundle bundle = FrameworkUtil.getBundle(UIMConfigStorage.class);
