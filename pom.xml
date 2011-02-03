@@ -143,6 +143,20 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- common things -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>europeana-uim-common</artifactId>
+                <version>1.1.0</version>
+            </dependency>
+
+			<dependency>
+				<groupId>eu.europeana</groupId>
+				<artifactId>europeana-uim-common</artifactId>
+                <version>1.1.0</version>
+				<classifier>tests</classifier>
+				<scope>test</scope>
+			</dependency>
 
             <!-- OSGi spec -->
             <dependency>

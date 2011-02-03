@@ -229,13 +229,6 @@
         </dependency>
 
         <dependency>
-            <groupId>eu.europeana</groupId>
-            <artifactId>europeana-uim-common</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <scope>provided</scope>
