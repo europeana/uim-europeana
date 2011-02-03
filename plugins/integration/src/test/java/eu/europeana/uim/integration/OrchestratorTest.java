@@ -10,15 +10,18 @@ import static org.ops4j.pax.exam.OptionUtils.combine;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.karaf.testing.Helper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.container.def.PaxRunnerOptions;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
@@ -27,6 +30,7 @@ import eu.europeana.uim.common.MemoryProgressMonitor;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
+import eu.europeana.uim.workflow.dummy.DummyWorkflow;
 
 /**
  * Integration test for the Orchestrator, using the MemoryStorageEngine
@@ -47,7 +51,7 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
                         // rhaa
                         // systemProperty("integrationDir").value(System.getProperty("integrationDir")),
                         
-                //PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006" ),
+                PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006" ),
                 
                 scanFeatures(
                         maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("xml").classifier("features").versionAsInProject(),
@@ -85,8 +89,7 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
         getCommandResult("uim:store -o loadSampleData");
         Thread.sleep(3000);
 
-        // run the workflow
-        Workflow w = registry.getWorkflows().get(0);
+        
         Provider p = registry.getStorage().getProvider(0);
         Collection c = registry.getStorage().getCollections(p).get(0);
         Request r = registry.getStorage().createRequest(c, new Date());
@@ -103,9 +106,17 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
 
         Orchestrator o = getOsgiService(Orchestrator.class);
         MemoryProgressMonitor monitor = new MemoryProgressMonitor();
-        o.executeWorkflow(w, c, monitor);
-
-        Thread.sleep(10000);
+        // run the workflow
+        Workflow w = null;
+        List<Workflow> workflows = registry.getWorkflows();
+        for (Workflow workflow : workflows) {
+			if (workflow.getName().equals(DummyWorkflow.class.getName())) {
+				w = workflow;
+			}
+		}
+        
+        ActiveExecution<?> execution = o.executeWorkflow(w, c, monitor);
+        execution.waitUntilFinished();
 
         assertEquals("Wrong count of processed MDRs", 999, monitor.getWorked());
 

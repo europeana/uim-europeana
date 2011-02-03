@@ -2,9 +2,14 @@ package eu.europeana.uim.workflow;
 
 import eu.europeana.uim.api.AbstractWorkflow;
 import eu.europeana.uim.api.IngestionWorkflowStep;
+import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.util.BatchWorkflowStart;
 
 public class SysoutWorkflow extends AbstractWorkflow {
+	
+	public SysoutWorkflow(Registry registry) {
+		this(1, 50, false, false);
+	}
 
 	public SysoutWorkflow(int plugins, int batchSize, boolean randsleep, boolean savepoint) {
 		setName(SysoutWorkflow.class.getSimpleName()); 

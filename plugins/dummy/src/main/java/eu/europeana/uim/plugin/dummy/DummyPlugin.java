@@ -63,12 +63,12 @@ public class DummyPlugin implements IngestionPlugin {
 
 	@Override
 	public int getPreferredThreadCount() {
-		return 0;
+		return 5;
 	}
 
 
 	@Override
 	public int getMaximumThreadCount() {
-		return 0;
+		return 5;
 	}
 }

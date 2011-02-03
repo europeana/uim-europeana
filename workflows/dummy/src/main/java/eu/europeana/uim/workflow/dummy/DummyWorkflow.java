@@ -7,6 +7,7 @@ import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.IngestionWorkflowStep;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.util.BatchWorkflowStart;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
@@ -18,8 +19,10 @@ public class DummyWorkflow extends AbstractWorkflow implements Workflow {
     public DummyWorkflow(Registry registry) {
     	//can but doesnt need to be.
     	//setStart(new BatchWorkflowStart());
-    	setName("Dummy workflow");
+    	setName(DummyWorkflow.class.getName());
     	setDescription("This awesome workflow demonstrates the capabilities of the UIM");
+    	
+    	setStart(new BatchWorkflowStart());
     	
         // that's a very exciting worklow
         IngestionPlugin plugin1 = registry.getPlugin("DummyPlugin");

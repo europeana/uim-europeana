@@ -31,7 +31,8 @@
 						<Export-Package>eu.europeana.uim,
 							eu.europeana.uim.api,
 							eu.europeana.uim.command,
-							eu.europeana.uim.store
+							eu.europeana.uim.store,
+							eu.europeana.uim.util
 						</Export-Package>
 					</instructions>
 				</configuration>

@@ -111,6 +111,7 @@ public class UIMWorkflowProcessor implements Runnable {
 						while(task != null){
 							task.save();
 							execution.done(1);
+							execution.getMonitor().worked(1);
 
 							synchronized (success) {
 								task = success.poll();

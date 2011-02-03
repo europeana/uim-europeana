@@ -83,10 +83,15 @@ public class TaskExecutor extends ThreadPoolExecutor {
 					if (task.getStep().isSavepoint()) {
 						task.save();
 					}
+					synchronized(task.getOnSuccess()) {
+						task.getOnSuccess().add(task);
+					}
 				} catch (StorageEngineException e1) {
 					task.setThrowable(t);
 					task.setStatus(TaskStatus.FAILED);
-					task.getOnFailure().add(task);
+					synchronized(task.getOnFailure()) {
+						task.getOnFailure().add(task);
+					}
 					try {
 						task.save();
 					} catch (Throwable e2) {
@@ -94,12 +99,13 @@ public class TaskExecutor extends ThreadPoolExecutor {
 					}
 				}
 
-				task.getOnSuccess().add(task);
 			} else {
 				task.setThrowable(t);
 				task.setStatus(TaskStatus.FAILED);
-				task.getOnFailure().add(task);
-				
+				synchronized(task.getOnFailure()) {
+					task.getOnFailure().add(task);
+				}
+
 				try {
 					task.save();
 				} catch (Throwable e2) {
@@ -146,7 +152,7 @@ public class TaskExecutor extends ThreadPoolExecutor {
 
 	/**
 	 */
-	 public int getAssigned() {
+	public int getAssigned() {
 		return activeTask.size();
 	}        
 
