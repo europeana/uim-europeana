@@ -16,7 +16,6 @@ import org.apache.karaf.testing.Helper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.container.def.PaxRunnerOptions;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 
@@ -87,7 +86,7 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
 
         // load the provider data
         getCommandResult("uim:store -o loadSampleData");
-        Thread.sleep(3000);
+        Thread.sleep(1000);
 
         
         Provider p = registry.getStorage().getProvider(0);
@@ -120,10 +119,8 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
 
         assertEquals("Wrong count of processed MDRs", 999, monitor.getWorked());
 
+        Thread.sleep(1000);
         assertEquals("Zombie execution", 0, o.getActiveExecutions().size());
-
-
-
     }
 
 
