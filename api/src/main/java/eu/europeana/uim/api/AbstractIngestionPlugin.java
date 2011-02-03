@@ -10,15 +10,18 @@ import eu.europeana.uim.TKey;
 public class AbstractIngestionPlugin implements IngestionPlugin {
 	private static final Logger log = Logger.getLogger(AbstractIngestionPlugin.class.getName());
 
-	private String name;
+	private String qualifier;
 	private Level level = Level.FINEST;
 
-	public AbstractIngestionPlugin(String name) {
-		this.name = name;
+	public AbstractIngestionPlugin() {
 	}
 
-	public AbstractIngestionPlugin(String name, Level level) {
-		this.name = name;
+	public AbstractIngestionPlugin(String qualifier) {
+		this.qualifier = qualifier;
+	}
+
+	public AbstractIngestionPlugin(String qualifier, Level level) {
+		this.qualifier = qualifier;
 		this.level = level;
 	}
 
@@ -54,7 +57,7 @@ public class AbstractIngestionPlugin implements IngestionPlugin {
 
 	@Override
 	public String getIdentifier() {
-		return AbstractIngestionPlugin.class.getSimpleName() + (name != null ? ":" + name : "");
+		return AbstractIngestionPlugin.class.getSimpleName() + (qualifier != null ? ":" + qualifier : "");
 	}
 
 
@@ -67,7 +70,7 @@ public class AbstractIngestionPlugin implements IngestionPlugin {
 	public void processRecord(MetaDataRecord mdr) {
 		String identifier = mdr.getIdentifier();
 		if (log.isLoggable(level)) {
-			log.log(level, name + ":" + identifier);
+			log.log(level, qualifier + ":" + identifier);
 		}
 	}
 
