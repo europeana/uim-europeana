@@ -74,6 +74,7 @@
                 <version>2.1</version>
                 <configuration>
                     <tagBase>https://europeanalabs.eu/svn/europeana/releases</tagBase>
+                    <preparationGoals>clean install</preparationGoals>
                 </configuration>
             </plugin>
             <plugin>
