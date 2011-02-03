@@ -17,7 +17,7 @@
 
     <modules>
         <!--  a version independent common module -->
-        <!--module>common</module-->
+        <module>common</module>
 
         <!--  the uim api module -->
         <module>api</module>
