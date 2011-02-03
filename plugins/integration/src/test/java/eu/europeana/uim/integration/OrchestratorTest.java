@@ -51,7 +51,7 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
                         // rhaa
                         // systemProperty("integrationDir").value(System.getProperty("integrationDir")),
                         
-                PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006" ),
+               // PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006" ),
                 
                 scanFeatures(
                         maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("xml").classifier("features").versionAsInProject(),
