@@ -2,7 +2,7 @@ package eu.europeana.uim.store.memory;
 
 import eu.europeana.uim.store.Collection;
 
-public class MemoryCollection extends AbstractMemoryEntity implements Collection {
+public class MemoryCollection extends AbstractNamedMemoryEntity implements Collection {
 
 	private MemoryProvider provider;
 
@@ -24,6 +24,12 @@ public class MemoryCollection extends AbstractMemoryEntity implements Collection
 	public MemoryProvider getProvider() {
 		return provider;
 	}
+	
+	
+	public String getIdentifier() {
+		return "Collection:" + getMnemonic();
+	}
+	
 
 	/**
 	 * @return the oaiBaseUrl

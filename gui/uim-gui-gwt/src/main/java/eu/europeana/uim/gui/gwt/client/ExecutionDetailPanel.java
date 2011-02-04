@@ -124,7 +124,7 @@ public class ExecutionDetailPanel extends VerticalPanel {
         Grid g = new Grid(4, 2);
         String[] labels = new String[]{"Id", "Name", "Start time", "Total records"};
         DateTimeFormat format = DateTimeFormat.getFormat("dd.MM.yyyy 'at' HH:mm:ss");
-        String[] data = new String[]{execution.getId().toString(), execution.getName(), format.format(execution.getStartTime()), execution.getTotal().toString()};
+        String[] data = new String[]{execution.getId().toString(), execution.getName(), format.format(execution.getStartTime()), "" + execution.getScheduled()};
         for (int i = 0; i < labels.length; i++) {
             Label label = new Label(labels[i]);
             label.setStyleName("uimLabel");

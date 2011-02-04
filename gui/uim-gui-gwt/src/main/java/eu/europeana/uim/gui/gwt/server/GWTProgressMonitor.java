@@ -19,9 +19,9 @@ public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
 
 
     private String name;
-    private int total;
-    private int status;
-    private boolean done;
+    private int work;
+    private int worked;
+
     private boolean cancelled;
     private Execution execution;
 
@@ -35,30 +35,30 @@ public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
     @Override
     public void beginTask(String task, int work) {
         this.name = task;
-        this.total = work;
-        this.status = 0;
-        execution.setActive(true);
-        execution.setProgress(0);
-        execution.setTotal(work);
-        execution.setName(task);
+        this.work = work;
+        this.worked = 0;
+        
+        
+        execution.getProgress().setTask(task);
+        execution.getProgress().setWork(work);
     }
 
+    
     @Override
     public void worked(int work) {
-        if (status + work > total) {
-            status = total;
+        if (worked + work > work) {
+            worked = work;
             done();
         } else {
-            this.status = status + work;
+            this.worked = worked + work;
         }
-        execution.setProgress(status);
+        execution.getProgress().setWorked(worked);
     }
 
     @Override
     public void done() {
-        execution.setProgress(total);
+        execution.getProgress().setDone(true);
         execution.setActive(false);
-        this.done = true;
     }
 
     @Override
@@ -76,14 +76,10 @@ public class GWTProgressMonitor implements ProgressMonitor, IsSerializable {
     }
 
     public boolean isDone() {
-        return done;
+        return execution.isDone();
     }
 
     public void setExecution(Execution execution) {
         this.execution = execution;
-    }
-
-    public String getName() {
-        return name;
     }
 }

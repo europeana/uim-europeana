@@ -1,5 +1,11 @@
 package eu.europeana.uim.gui.gwt.server;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.WorkflowStepStatus;
@@ -10,12 +16,6 @@ import eu.europeana.uim.gui.gwt.shared.Provider;
 import eu.europeana.uim.gui.gwt.shared.StepStatus;
 import eu.europeana.uim.gui.gwt.shared.Workflow;
 import eu.europeana.uim.store.UimEntity;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
@@ -134,6 +134,7 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 			}
 			eu.europeana.uim.api.Workflow w = getWorkflow(workflow);
 			Execution execution = new Execution();
+			
 			GWTProgressMonitor monitor = new GWTProgressMonitor(execution);
 			ActiveExecution ae = getEngine().getOrchestrator().executeWorkflow(w, c, monitor);
 			populateWrappedExecution(execution, ae, w, c);
@@ -168,9 +169,14 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 
 	private void populateWrappedExecution(Execution execution, ActiveExecution ae, eu.europeana.uim.api.Workflow w, UimEntity dataset) {
 		execution.setId(ae.getId());
-		execution.setName(w.getName() + " on " + dataset.toString());
+		execution.setName(w.getName() + "/" + dataset.toString());
 		execution.setWorkflow(w.getName());
-		execution.setTotal(ae.getScheduledSize());
+		execution.setCompleted(ae.getCompletedSize());
+		execution.setFailure(ae.getFailureSize());
+		execution.setScheduled(ae.getScheduledSize());
+		execution.setDone(ae.isFinished());
+		
+		//execution.setTotal(ae.getScheduledSize());
 		execution.setStartTime(ae.getStartTime());
 		wrappedExecutions.put(ae.getId(), execution);
 	}
@@ -203,7 +209,8 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 			wrapped.setActive(e.isActive());
 			wrapped.setStartTime(e.getStartTime());
 			wrapped.setEndTime(e.getEndTime());
-			wrapped.setName(e.getWorkflowName() + " on " + e.getDataSet().toString());
+			wrapped.setDataSet(e.getDataSet().getIdentifier());
+			wrapped.setName(e.getWorkflowName() + "/" + e.getDataSet().getIdentifier());
 			wrappedExecutions.put(execution, wrapped);
 		} else {
 			// update what may have changed

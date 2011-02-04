@@ -28,6 +28,13 @@ public class MongodbCollection extends AbstractMongoEntity implements Collection
         this.provider = (MongoProvider) p;
     }
 
+	public String getIdentifier() {
+		return "Collection:" + getMnemonic();
+	}
+	
+
+
+    
     public Provider getProvider() {
         return provider;
     }

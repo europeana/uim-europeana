@@ -5,7 +5,7 @@ import java.util.List;
 
 import eu.europeana.uim.store.Provider;
 
-public class MemoryProvider extends AbstractMemoryEntity implements Provider {
+public class MemoryProvider extends AbstractNamedMemoryEntity implements Provider {
 
 	private List<Provider> relatedOut = new ArrayList<Provider>();
 	private List<Provider> relatedIn = new ArrayList<Provider>();
@@ -15,6 +15,12 @@ public class MemoryProvider extends AbstractMemoryEntity implements Provider {
 	private String oaiBaseUrl;
 	private String oaiMetadataPrefix;
 	
+	
+	public String getIdentifier() {
+		return "Provider:" + getMnemonic();
+	}
+	
+
 	/**
 	 * @return the oaiPrefix
 	 */

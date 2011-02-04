@@ -23,10 +23,10 @@ import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.UimEntity;
 
 /**
  * Basic implementation of a StorageEngine based on MongoDB with Morphia.
@@ -254,7 +254,7 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     @Override
-    public Execution createExecution(UimEntity entity, String workflow) throws StorageEngineException {
+    public Execution createExecution(DataSet entity, String workflow) throws StorageEngineException {
         MongoExecution me = new MongoExecution(executionIdCounter.getAndIncrement());
         me.setDataSet(entity);
         me.setWorkflowName(workflow);

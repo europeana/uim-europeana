@@ -33,6 +33,12 @@ public class MongoRequest extends AbstractMongoEntity implements Request {
         this.date = d;
     }
 
+	
+	public String getIdentifier() {
+		return "Request:" + getCollection().getMnemonic() + " " + getDate();
+	}
+	
+
     public Collection getCollection() {
         return collection;
     }

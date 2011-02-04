@@ -31,6 +31,13 @@ public class MemoryRequest extends AbstractMemoryEntity implements Request {
 		this.collection = collection;
 		this.date= date;
 	}
+	
+	
+	public String getIdentifier() {
+		return "Request:" + getCollection().getMnemonic() + " " + getDate();
+	}
+	
+
 
 	public MemoryCollection getCollection() {
 		return collection;

@@ -40,7 +40,10 @@ public class UIMRegistry implements Registry {
     	// this may happen before the storage services are loaded
     	// we set the active storage "lazy"
     	this.configuredStorageEngine = configuredStorageEngine;
-    	this.activeStorage = null;
+    	if (this.activeStorage != null) {
+    		this.activeStorage = null;
+        	this.activeStorage = getStorage(configuredStorageEngine);
+    	}
     }
 
 

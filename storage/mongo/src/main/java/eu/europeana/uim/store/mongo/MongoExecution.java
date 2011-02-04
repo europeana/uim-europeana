@@ -1,11 +1,12 @@
 package eu.europeana.uim.store.mongo;
 
+import java.util.Date;
+
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Reference;
-import eu.europeana.uim.store.Execution;
-import eu.europeana.uim.store.UimEntity;
 
-import java.util.Date;
+import eu.europeana.uim.store.DataSet;
+import eu.europeana.uim.store.Execution;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
@@ -19,7 +20,7 @@ public class MongoExecution extends AbstractMongoEntity implements Execution {
     private String workflowIdentifier;
 
     @Reference
-    private UimEntity dataSet;
+    private DataSet dataSet;
 
     public MongoExecution() {
     }
@@ -28,7 +29,7 @@ public class MongoExecution extends AbstractMongoEntity implements Execution {
         super(id);
     }
 
-    public Boolean isActive() {
+    public boolean isActive() {
         return isActive;
     }
 
@@ -52,11 +53,11 @@ public class MongoExecution extends AbstractMongoEntity implements Execution {
         this.endTime = endTime;
     }
 
-    public UimEntity getDataSet() {
+    public DataSet getDataSet() {
         return dataSet;
     }
 
-    public void setDataSet(UimEntity dataSet) {
+    public void setDataSet(DataSet dataSet) {
         this.dataSet = dataSet;
     }
 

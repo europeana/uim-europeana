@@ -30,6 +30,12 @@ public class MongoProvider extends AbstractMongoEntity implements Provider {
         super(id);
     }
 
+	public String getIdentifier() {
+		return "Provider:" + getMnemonic();
+	}
+	
+
+
     public List<Provider> getRelatedOut() {
         return relatedOut;
     }

@@ -104,7 +104,7 @@ public class OverviewPanel extends ScrollPanel {
     }
 
     public void addExecution(final Execution execution) {
-        final ProgressBar bar = new ProgressBar(0, execution.getTotal());
+        final ProgressBar bar = new ProgressBar(0, execution.getScheduled());
         bar.setTitle(execution.getName());
         bar.setTextVisible(true);
         HorizontalPanel p = new HorizontalPanel();
@@ -135,7 +135,7 @@ public class OverviewPanel extends ScrollPanel {
 
                     @Override
                     public void onSuccess(Execution execution) {
-                        bar.setProgress(execution.getProgress());
+                        bar.setProgress(execution.getProgress().getWorked());
                         bar.redraw();
                         if (execution.isDone()) {
                             cancel();
@@ -196,9 +196,14 @@ public class OverviewPanel extends ScrollPanel {
         final SingleSelectionModel<Execution> selectionModel = new SingleSelectionModel<Execution>();
         pastExecutionsCellTable.setSelectionModel(selectionModel);
 
-        CellTableUtils.addColumn(pastExecutionsCellTable, new TextCell(), "Execution", new CellTableUtils.GetValue<String, Execution>() {
+        CellTableUtils.addColumn(pastExecutionsCellTable, new TextCell(), "Workflow", new CellTableUtils.GetValue<String, Execution>() {
             public String getValue(Execution execution) {
-                return execution.getName();
+                return execution.getWorkflow();
+            }
+        });
+        CellTableUtils.addColumn(pastExecutionsCellTable, new TextCell(), "Dataset", new CellTableUtils.GetValue<String, Execution>() {
+            public String getValue(Execution execution) {
+                return execution.getDataSet();
             }
         });
         DateTimeFormat dtf = DateTimeFormat.getFormat("dd.MM.yyyy 'at' HH:mm:ss");

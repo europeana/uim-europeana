@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class DataSource implements IsSerializable {
 
     private Long id;
+	private String identifier;
 
     public DataSource() {
     }
@@ -22,5 +23,13 @@ public class DataSource implements IsSerializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+    
+    public String getIdentifier(){
+    	return identifier;
+    }
+    
+    public void setIdentifier(String identifier) {
+    	this.identifier = identifier;
     }
 }
