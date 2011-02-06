@@ -1,10 +1,12 @@
 package eu.europeana.uim.gui.gwt.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /** 
  * 
  * @author andreas.juffinger@kb.nl
  */
-public class Progress {
+public class Progress implements IsSerializable {
 
 	private String task ="Not defined";
 	private String subtask ="Not defined";
