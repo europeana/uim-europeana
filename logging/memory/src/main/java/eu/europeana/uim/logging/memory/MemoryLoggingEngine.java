@@ -28,7 +28,12 @@ public class MemoryLoggingEngine<T extends Serializable> implements LoggingEngin
 
     private Map<IngestionPlugin, List<Long>> durations = new HashMap<IngestionPlugin, List<Long>>();
 
-    @Override
+    
+    
+    public MemoryLoggingEngine() {
+	}
+
+	@Override
     public String getIdentifier() {
         return MemoryLoggingEngine.class.getSimpleName();
     }

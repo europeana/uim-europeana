@@ -10,7 +10,6 @@ import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.Workflow;
-import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.orchestration.processing.TaskExecutor;
 import eu.europeana.uim.orchestration.processing.TaskExecutorRegistry;
@@ -81,8 +80,19 @@ public class UIMOrchestrator implements Orchestrator {
 		return processor.getExecutions();
 	}
 
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> ActiveExecution<T> getActiveExecution(long id) {
+		for (ActiveExecution<Task> ae : processor.getExecutions()) {
+			if (ae.getId() == id) {
+				return (ActiveExecution<T>) ae;
+			}
+		}
+		return null;
+	}
 
-
+	
 	public void pause(ActiveExecution<Task> execution) {
 		execution.setPaused(true);
 	}
@@ -107,10 +117,10 @@ public class UIMOrchestrator implements Orchestrator {
 
 
 
-	@Override
-	public List<WorkflowStepStatus> getRuntimeStatus(Workflow w) {
-		return null; //processors.get(w).getRuntimeStatus(w);
-	}
+//	@Override
+//	public List<WorkflowStepStatus> getRuntimeStatus(Workflow w) {
+//		return null; //processors.get(w).getRuntimeStatus(w);
+//	}
 
 
 

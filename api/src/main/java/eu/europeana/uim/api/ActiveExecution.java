@@ -1,5 +1,6 @@
 package eu.europeana.uim.api;
 
+import java.util.List;
 import java.util.Queue;
 
 import eu.europeana.uim.common.ProgressMonitor;
@@ -75,6 +76,11 @@ public interface ActiveExecution<T> extends Execution {
 	 * @return
 	 */
 	int getScheduledSize();
+	
+	
+	List<WorkflowStepStatus> getStepStatus();
+	WorkflowStepStatus getStepStatus(WorkflowStep step);
+	
 
 	void addBatch(long[] ids);
 	

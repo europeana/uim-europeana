@@ -11,26 +11,21 @@ import eu.europeana.uim.api.WorkflowStepStatus;
  */
 public class UIMWorkflowStepStatus implements WorkflowStepStatus {
 
-    public UIMWorkflowStepStatus(WorkflowStep step, int queueSize, int successes, int failures, Map<MetaDataRecord, Throwable> failureDetail) {
+	private WorkflowStep step, parent;
+	private int successes, failures;
+	private Map<MetaDataRecord, Throwable> failureDetail;
+
+
+	public UIMWorkflowStepStatus(WorkflowStep step, int successes, int failures, Map<MetaDataRecord, Throwable> failureDetail) {
         this.step = step;
-        this.queueSize = queueSize;
         this.successes = successes;
         this.failures = failures;
         this.failureDetail = failureDetail;
     }
 
-    private WorkflowStep step, parent;
-    private int queueSize, successes, failures;
-    private Map<MetaDataRecord, Throwable> failureDetail;
-
     @Override
     public WorkflowStep getStep() {
         return step;
-    }
-
-    @Override
-    public int queueSize() {
-        return queueSize;
     }
 
     @Override

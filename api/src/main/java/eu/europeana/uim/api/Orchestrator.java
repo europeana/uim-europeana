@@ -1,7 +1,5 @@
 package eu.europeana.uim.api;
 
-import java.util.List;
-
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.store.DataSet;
 
@@ -17,6 +15,7 @@ public interface Orchestrator {
     ActiveExecution<?> executeWorkflow(Workflow w, DataSet dataset, ProgressMonitor monitor);
 
 
+    <T> ActiveExecution<T> getActiveExecution(long id);
     <T> java.util.Collection<ActiveExecution<T>> getActiveExecutions();
 
 
@@ -38,6 +37,6 @@ public interface Orchestrator {
      * Gets a snapshot of the runtime information for a given workflow.
      * As we run multiple executions through the same WorkflowProcessor, this is a global status, not related to a particular execution.
      */
-    List<WorkflowStepStatus> getRuntimeStatus(Workflow w);
+    //List<WorkflowStepStatus> getRuntimeStatus(Workflow w);
 
 }

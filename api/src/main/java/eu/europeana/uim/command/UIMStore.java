@@ -1,21 +1,5 @@
 package eu.europeana.uim.command;
 
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.Provider;
-import org.apache.commons.lang.StringUtils;
-import org.apache.felix.gogo.commands.Action;
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
-import org.osgi.service.command.CommandSession;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -23,6 +7,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.felix.gogo.commands.Action;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.felix.gogo.commands.Option;
+import org.osgi.service.command.CommandSession;
+
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.util.SampleProperties;
 
 
 @Command(name = "uim", scope = "store")
@@ -74,7 +72,7 @@ public class UIMStore implements Action {
 		case createCollection: createCollection(storage, out); break;
 		case updateCollection: updateCollection(storage, out); break;
 		case listCollection: listCollection(storage, out); break;
-		case loadSampleData: loadSampleData(storage, out); break;
+		case loadSampleData: new SampleProperties().loadSampleData(storage); break;
 		}
 		return null;
 	}
@@ -233,72 +231,7 @@ public class UIMStore implements Action {
 
 
 
-	public void loadSampleData(StorageEngine storage, PrintStream out) throws StorageEngineException, IOException {
-		InputStream stream = UIMStore.class.getResourceAsStream("/sampledata.properties");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-
-		String line = reader.readLine();
-		while (line != null) {
-			if (line.trim().startsWith("#") ||
-					line.trim().length() == 0) {
-			} else {
-				String[] split = line.split("=");
-				if (split[0].startsWith("provider")) {
-					setFieldValues(split);
-					createProvider(storage, out);
-				} else if (split[0].startsWith("oai.provurl")) {
-					String[] arguments = split[1].split("\\|");
-					Provider provider = storage.findProvider(arguments[0]);
-					if (provider != null) {
-						provider.setOaiBaseUrl(arguments[1]);
-						storage.updateProvider(provider);
-					} else {
-						log.warning("Failed to set provider oai url. Provider <" + arguments[0] + " not found.");
-					}
-				} else if (split[0].startsWith("oai.provprefix")) {
-					String[] arguments = split[1].split("\\|");
-					Provider provider = storage.findProvider(arguments[0]);
-					if (provider != null) {
-						provider.setOaiMetadataPrefix(arguments[1]);
-						storage.updateProvider(provider);
-					} else {
-						log.warning("Failed to set provider oai prefix. Provider <" + arguments[0] + " not found.");
-					}
-				} else if (split[0].startsWith("collection")) {
-					setFieldValues(split);
-					createCollection(storage, out);
-				} else if (split[0].startsWith("oai.collurl")) {
-					String[] arguments = split[1].split("\\|");
-					Collection collection = storage.findCollection(arguments[0]);
-					if (collection != null) {
-						collection.setOaiBaseUrl(arguments[1]);
-						storage.updateCollection(collection);
-					} else {
-						log.warning("Failed to set collection oai url. Collection <" + arguments[0] + " not found.");
-					}
-				} else if (split[0].startsWith("oai.collprefix")) {
-					String[] arguments = split[1].split("\\|");
-					Collection collection = storage.findCollection(arguments[0]);
-					if (collection != null) {
-						collection.setOaiMetadataPrefix(arguments[1]);
-						storage.updateCollection(collection);
-					} else {
-						log.warning("Failed to set collection oai prefix. Collection <" + arguments[0] + " not found.");
-					}
-				} else if (split[0].startsWith("oai.collset")) {
-					String[] arguments = split[1].split("\\|");
-					Collection collection = storage.findCollection(arguments[0]);
-					if (collection != null) {
-						collection.setOaiSet(arguments[1]);
-						storage.updateCollection(collection);
-					} else {
-						log.warning("Failed to set collection oai set. Collection <" + arguments[0] + " not found.");
-					}
-				}
-			}
-			line = reader.readLine();
-		}
-	}
+	
 
 
 	private void setFieldValues(String[] split) {

@@ -2,8 +2,7 @@ package eu.europeana.uim.api;
 
 import java.util.Queue;
 
-import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.MetaDataRecord;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
@@ -30,5 +29,6 @@ public interface Task extends Runnable {
 	void setThrowable(Throwable throwable);
 	Throwable getThrowable();
 
+	public MetaDataRecord getMetaDataRecord();
 	
 }

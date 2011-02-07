@@ -5,14 +5,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
+import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.api.WorkflowStart;
 import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
@@ -191,10 +195,46 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 	@Override
 	public boolean isFinished() {
 		return getWorkflow().getStart().isFinished(this) && 
-		       getScheduledSize() == getFailureSize() + getCompletedSize();
+		getScheduledSize() == getFailureSize() + getCompletedSize();
 	}
 
 
+
+
+
+	@Override
+	public List<WorkflowStepStatus> getStepStatus() {
+		List<WorkflowStepStatus> status = new ArrayList<WorkflowStepStatus>();
+		for (WorkflowStep step : getWorkflow().getSteps()) {
+			status.add(getStepStatus(step));
+		}
+		return status;
+	}
+
+
+	public WorkflowStepStatus getStepStatus(WorkflowStep step) {
+		Queue<Task> success = getSuccess(step.getIdentifier());
+		Queue<Task> failure = getFailure(step.getIdentifier());
+		
+		int successSize = 0;
+		synchronized(success) {
+			successSize = success.size();
+		}
+		
+		int failureSize = 0;
+		Map<MetaDataRecord, Throwable> exceptions = new HashMap<MetaDataRecord, Throwable>();
+		synchronized(failure) {
+			failureSize = failure.size();
+			for (Task task : failure) {
+				exceptions.put(task.getMetaDataRecord(), task.getThrowable());
+			}
+		}
+
+		WorkflowStepStatus status = new UIMWorkflowStepStatus(step, successSize, failureSize, exceptions);
+		return status;
+	}
+
+	
 	@Override
 	public long[] nextBatch() {
 		if (batches.isEmpty()) return null;
