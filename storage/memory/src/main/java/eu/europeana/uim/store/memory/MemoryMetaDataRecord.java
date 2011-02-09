@@ -3,6 +3,7 @@ package eu.europeana.uim.store.memory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,7 @@ public class MemoryMetaDataRecord implements MetaDataRecord {
 		return null;
 	}
 
-	
+
 	/**
 	 * @param key
 	 * @param value
@@ -172,7 +173,12 @@ public class MemoryMetaDataRecord implements MetaDataRecord {
 
 	@Override
 	public <N, T extends Serializable> List<T> getQField(TKey<N, T> nttKey, String qualifier) {
-		return (ArrayList<T>)qFields.get(nttKey).get(qualifier);
+		if (qFields.containsKey(nttKey)) {
+			if (qFields.get(nttKey).containsKey(qualifier)) {
+				return (ArrayList<T>)qFields.get(nttKey).get(qualifier);
+			}
+		}
+		return Collections.EMPTY_LIST;
 	}
 
 }
