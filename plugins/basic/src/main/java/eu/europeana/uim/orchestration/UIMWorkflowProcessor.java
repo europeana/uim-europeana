@@ -1,14 +1,5 @@
 package eu.europeana.uim.orchestration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
@@ -19,6 +10,15 @@ import eu.europeana.uim.orchestration.processing.TaskExecutorRegistry;
 import eu.europeana.uim.orchestration.processing.TaskExecutorThread;
 import eu.europeana.uim.orchestration.processing.TaskExecutorThreadFactory;
 import eu.europeana.uim.util.BatchWorkflowStart;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UIMWorkflowProcessor implements Runnable {
 
@@ -67,6 +67,9 @@ public class UIMWorkflowProcessor implements Runnable {
 									if (execution.isFinished()) {
 										execution.setActive(false);
 										execution.setEndTime(new Date());
+
+                                        // FIXME save the new status to the storage
+
 										iterator.remove();
 									}
 								}
