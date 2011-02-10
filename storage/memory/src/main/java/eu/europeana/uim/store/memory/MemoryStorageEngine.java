@@ -1,16 +1,5 @@
 package eu.europeana.uim.store.memory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -25,6 +14,17 @@ import gnu.trove.TLongLongIterator;
 import gnu.trove.TLongObjectHashMap;
 import gnu.trove.TLongObjectIterator;
 import gnu.trove.TObjectLongHashMap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 public class MemoryStorageEngine implements StorageEngine {
 
@@ -180,8 +180,8 @@ public class MemoryStorageEngine implements StorageEngine {
 		if (collection.getMnemonic() == null) {
 			throw new StorageEngineException("Cannot store collection without mnemonic/code.");
 		}
-		if (providerMnemonics.containsKey(collection.getMnemonic())) {
-			long pid = providerMnemonics.get(collection.getMnemonic());
+		if (collectionMnemonics.containsKey(collection.getMnemonic())) {
+			long pid = collectionMnemonics.get(collection.getMnemonic());
 			if (pid != collection.getId()) {
 				throw new StorageEngineException("Cannot store collection duplicate mnemonic/code.");
 			}

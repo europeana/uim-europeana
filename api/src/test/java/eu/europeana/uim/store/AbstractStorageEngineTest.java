@@ -1,10 +1,12 @@
 package eu.europeana.uim.store;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import eu.europeana.uim.MDRFieldRegistry;
+import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
+import org.apache.commons.lang.ArrayUtils;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -12,17 +14,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.junit.Test;
-
-import eu.europeana.uim.MDRFieldRegistry;
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractStorageEngineTest {
 
-	StorageEngine engine = getStorageEngine();
+    StorageEngine engine = null;
+
+    @Before
+    public void setUp() {
+        engine = getStorageEngine();
+        performSetUp();
+    }
+
+    /**
+     * Override this for additional setup
+     */
+    protected void performSetUp() {
+
+    }
 
 	protected abstract StorageEngine getStorageEngine();
 	
@@ -180,8 +193,8 @@ public abstract class AbstractStorageEngineTest {
 		Collection collection1;
 		try {
 			collection1 = engine.createCollection(provider0);
-			collection0.setMnemonic("a0001");
-			collection0.setName("TEL's collection 001 - DUPLICATE");
+			collection1.setMnemonic("a0001");
+			collection1.setName("TEL's collection 001 - DUPLICATE");
 			engine.updateCollection(collection1);
 			
 			fail("Duplicate mnemonci is not allowed.");
