@@ -53,7 +53,7 @@
                          this environment -->
                     <!-- note the whitespace, I suppose this is due to the maven-gwt-plugin already providing some
                     additional VM arguments -->
-                    <extraJvmArgs>-Ddevmode=true</extraJvmArgs>
+                    <extraJvmArgs> -Ddevmode=true </extraJvmArgs>
                 </configuration>
             </plugin>
 
