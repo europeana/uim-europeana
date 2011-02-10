@@ -1,10 +1,10 @@
 package eu.europeana.uim;
 
-import java.io.Serializable;
-import java.util.List;
-
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Request;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Abstract MetaDataRecord. StorageEngine implementations provide their own implementation of it.
@@ -18,9 +18,7 @@ public interface MetaDataRecord extends DataSet {
 	Request getRequest();
 
     String getIdentifier();
-    
-    void setIdentifier(String identifier);
-    
+
     <N, T extends Serializable> void setFirstField(TKey<N, T> key, T value);
 
     <N, T extends Serializable> T getFirstField(TKey<N, T> key);

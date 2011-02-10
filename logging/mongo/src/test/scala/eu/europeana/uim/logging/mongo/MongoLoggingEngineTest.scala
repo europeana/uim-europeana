@@ -113,8 +113,8 @@ class MongoLoggingEngineTest extends Spec with BeforeAndAfterAll with BeforeAndA
 
 
 
-  def mdr(id: Long):MetaDataRecord[MDRFieldRegistry] = {
-    val mdr = mock[MetaDataRecord[MDRFieldRegistry]]
+  def mdr(id: Long):MetaDataRecord = {
+    val mdr = mock[MetaDataRecord]
     when(mdr.getId).thenReturn(id)
     mdr
   }

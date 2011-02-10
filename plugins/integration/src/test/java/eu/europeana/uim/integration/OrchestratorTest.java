@@ -1,24 +1,5 @@
 package eu.europeana.uim.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.ops4j.pax.exam.CoreOptions.felix;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.waitForFrameworkStartup;
-import static org.ops4j.pax.exam.OptionUtils.combine;
-import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
-
-import java.util.Date;
-import java.util.List;
-
-import org.apache.karaf.testing.Helper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Orchestrator;
@@ -30,6 +11,24 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.workflow.dummy.DummyWorkflow;
+import org.apache.karaf.testing.Helper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.Configuration;
+import org.ops4j.pax.exam.junit.JUnit4TestRunner;
+
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.waitForFrameworkStartup;
+import static org.ops4j.pax.exam.OptionUtils.combine;
+import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
 
 /**
  * Integration test for the Orchestrator, using the MemoryStorageEngine
@@ -94,8 +93,7 @@ public class OrchestratorTest extends AbstractUIMIntegrationTest {
         Request r = registry.getStorage().createRequest(c, new Date());
         
         for (int i = 0 ; i < 999; i++) {
-        	MetaDataRecord record = registry.getStorage().createMetaDataRecord(r);
-        	record.setIdentifier("id=" + i);
+        	MetaDataRecord record = registry.getStorage().createMetaDataRecord(r, "id="+i);
         	registry.getStorage().updateMetaDataRecord(record);
         }
         

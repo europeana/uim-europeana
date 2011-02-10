@@ -407,8 +407,7 @@ public abstract class AbstractStorageEngineTest {
 		Request request0 = engine.createRequest(collection0, new Date(0));
 		engine.updateRequest(request0);
 
-		MetaDataRecord record0 = engine.createMetaDataRecord(request0);
-		record0.setIdentifier("abcd");
+		MetaDataRecord record0 = engine.createMetaDataRecord(request0, "abcd");
 		record0.addField(MDRFieldRegistry.title, "title 01");
 		record0.addField(MDRFieldRegistry.title, "title 02");
 		record0.addQField(MDRFieldRegistry.title, "EN", "title 03");
@@ -446,15 +445,13 @@ public abstract class AbstractStorageEngineTest {
 		Request request1 = engine.createRequest(collection1, new Date(0));
 		engine.updateRequest(request1);
 
-		MetaDataRecord record0 = engine.createMetaDataRecord(request0);
-		record0.setIdentifier("abcd");
+		MetaDataRecord record0 = engine.createMetaDataRecord(request0, "abcd");
 		record0.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record0);
 
 		
 		try {
-			MetaDataRecord record1 = engine.createMetaDataRecord(request0);
-			record1.setIdentifier("abcd");
+			MetaDataRecord record1 = engine.createMetaDataRecord(request0, "abcd");
 			record1.addField(MDRFieldRegistry.title, "title 01");
 			engine.updateMetaDataRecord(record1);
 
@@ -463,8 +460,7 @@ public abstract class AbstractStorageEngineTest {
 		}
 
 		try {
-			MetaDataRecord record2 = engine.createMetaDataRecord(request1);
-			record2.setIdentifier("abcd");
+			MetaDataRecord record2 = engine.createMetaDataRecord(request1, "abcd");
 			record2.addField(MDRFieldRegistry.title, "title 01");
 			engine.updateMetaDataRecord(record2);
 
@@ -486,8 +482,7 @@ public abstract class AbstractStorageEngineTest {
 		engine.updateRequest(request2);
 		
 		//same identifier for different providers is ok.
-		MetaDataRecord record2 = engine.createMetaDataRecord(request2);
-		record2.setIdentifier("abcd");
+		MetaDataRecord record2 = engine.createMetaDataRecord(request2, "abcd");
 		record2.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record2);
 	}
@@ -539,38 +534,31 @@ public abstract class AbstractStorageEngineTest {
 		engine.updateRequest(request4);
 		
 
-		MetaDataRecord record0 = engine.createMetaDataRecord(request0);
-		record0.setIdentifier("abcd0");
+		MetaDataRecord record0 = engine.createMetaDataRecord(request0, "abcd0");
 		record0.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record0);
 
-		MetaDataRecord record1 = engine.createMetaDataRecord(request0);
-		record1.setIdentifier("abcd1");
+		MetaDataRecord record1 = engine.createMetaDataRecord(request0, "abcd1");
 		record1.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record1);
 
-		MetaDataRecord record2 = engine.createMetaDataRecord(request0);
-		record2.setIdentifier("abcd2");
+		MetaDataRecord record2 = engine.createMetaDataRecord(request0, "abcd2");
 		record2.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record2);
 
-		MetaDataRecord record3 = engine.createMetaDataRecord(request1);
-		record3.setIdentifier("abcd3");
+		MetaDataRecord record3 = engine.createMetaDataRecord(request1, "abcd3");
 		record3.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record3);
 		
-		MetaDataRecord record4 = engine.createMetaDataRecord(request2);
-		record4.setIdentifier("abcd4");
+		MetaDataRecord record4 = engine.createMetaDataRecord(request2, "abcd4");
 		record4.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record4);
 		
-		MetaDataRecord record5 = engine.createMetaDataRecord(request3);
-		record5.setIdentifier("abcd5");
+		MetaDataRecord record5 = engine.createMetaDataRecord(request3, "abcd5");
 		record5.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record5);
 		
-		MetaDataRecord record6 = engine.createMetaDataRecord(request4);
-		record6.setIdentifier("abcd0");
+		MetaDataRecord record6 = engine.createMetaDataRecord(request4, "abcd6");
 		record6.addField(MDRFieldRegistry.title, "title 01");
 		engine.updateMetaDataRecord(record6);
 

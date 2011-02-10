@@ -1,15 +1,15 @@
 package eu.europeana.uim.api;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 public interface StorageEngine {
@@ -54,6 +54,7 @@ public interface StorageEngine {
 	List<Request> getRequests(Collection collection) throws StorageEngineException;
 
 	MetaDataRecord createMetaDataRecord(Request request) throws StorageEngineException;
+    MetaDataRecord createMetaDataRecord(Request request, String identifier) throws StorageEngineException;
 	void updateMetaDataRecord(MetaDataRecord record) throws StorageEngineException;
 	
 	Execution createExecution(DataSet dataSet, String workflow) throws StorageEngineException;

@@ -1,12 +1,12 @@
 package eu.europeana.uim.store;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public abstract class StorageEngineAdapter implements StorageEngine {
 
@@ -141,6 +141,11 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 		return null;
 	}
 
+    @Override
+    public MetaDataRecord createMetaDataRecord(Request request, String identifier) throws StorageEngineException {
+        return null;
+    }
+
 	@Override
 	public void updateMetaDataRecord(MetaDataRecord record)
 			throws StorageEngineException {
@@ -228,5 +233,4 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 		
 		return 0;
 	}
-
 }

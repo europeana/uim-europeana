@@ -1,30 +1,34 @@
 package eu.europeana.uim.store.mongo;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.TKey;
 import eu.europeana.uim.store.Request;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
 public class MongoMetadataRecord implements MetaDataRecord {
 
+    public static final String FIELD = "_field_";
     private DBObject object = new BasicDBObject();
     private Request request;
+    private String identifier;
 
-    public MongoMetadataRecord(DBObject object, Request request, long lid) {
+    public MongoMetadataRecord(DBObject object, Request request, String identifier, long lid) {
         this.object = object;
         this.request = request;
+        this.identifier = identifier;
         object.put(AbstractMongoEntity.LID, lid);
         object.put("request", request.getId());
+        object.put("identifier", identifier);
     }
+
 
     public long getId() {
         return (Long) object.get(AbstractMongoEntity.LID);
@@ -45,14 +49,7 @@ public class MongoMetadataRecord implements MetaDataRecord {
     
     @Override
 	public String getIdentifier() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-    public void setIdentifier(String identifier) {
-		// TODO Auto-generated method stub
-		
+        return identifier;
 	}
 
 	public <N, T extends Serializable> void setFirstField(TKey<N, T> nttKey, T value) {
@@ -61,11 +58,11 @@ public class MongoMetadataRecord implements MetaDataRecord {
             unqualifiedFields = new BasicDBObject();
             object.put(fieldName(nttKey.getFullName()), unqualifiedFields);
         }
-        unqualifiedFields.put("field0", value);
+        unqualifiedFields.put(FIELD + "0", value);
     }
 
     public <N, T extends Serializable> T getFirstField(TKey<N, T> nttKey) {
-        return (T) ((DBObject)object.get(fieldName(nttKey.getFullName()))).get(fieldName(nttKey.getFullName()));
+        return getField(nttKey).get(0);
     }
 
     public <N, T extends Serializable> void setFirstQField(TKey<N, T> nttKey, String qualifier, T value) {
@@ -79,7 +76,7 @@ public class MongoMetadataRecord implements MetaDataRecord {
             values = new BasicDBObject();
             qualifiedFields.put(qualifier, values);
         }
-        values.put("field0", value);
+        values.put(FIELD + "0", value);
     }
 
     public <N, T extends Serializable> void addField(TKey<N, T> nArrayListTKey, T value) {
@@ -88,7 +85,7 @@ public class MongoMetadataRecord implements MetaDataRecord {
             unqualifiedFields = new BasicDBObject();
             object.put(fieldName(nArrayListTKey.getFullName()), unqualifiedFields);
         }
-        unqualifiedFields.put("field" + new Integer(unqualifiedFields.size()).toString(), value);
+        unqualifiedFields.put(FIELD + new Integer(unqualifiedFields.size()).toString(), value);
     }
 
     @Override
@@ -104,15 +101,27 @@ public class MongoMetadataRecord implements MetaDataRecord {
             values = new BasicDBObject();
             qFields.put(qualifier, values);
         }
-        values.put("field" + new Integer(values.size()).toString(), value);
+        values.put(FIELD + new Integer(values.size()).toString(), value);
     }
 
     public <N, T extends Serializable> List<T> getField(TKey<N, T> nttKey) {
         List<T> res = new ArrayList<T>();
+
         BasicDBObject values = (BasicDBObject) object.get(fieldName(nttKey.getFullName()));
         for (String s : values.keySet()) {
-            if(s.startsWith("field")) {
+            // unqualified fields
+            if(s.startsWith(FIELD)) {
                 res.add((T)values.get(s));
+            } else {
+                // qualified fields
+                BasicDBObject qValues = (BasicDBObject) values.get(s);
+                for(String q : qValues.keySet()) {
+                    if(q.startsWith(FIELD)) {
+                        res.add((T)qValues.get(q));
+                    } else {
+                        throw new RuntimeException("Corrupted MDR");
+                    }
+                }
             }
         }
         return res;
@@ -131,7 +140,7 @@ public class MongoMetadataRecord implements MetaDataRecord {
             data.put(qualifier, qualifiedValues);
         }
         for (String s : qualifiedValues.keySet()) {
-            if(s.startsWith("field")) {
+            if(s.startsWith(FIELD)) {
                 res.add((T)qualifiedValues.get(s));
             }
         }

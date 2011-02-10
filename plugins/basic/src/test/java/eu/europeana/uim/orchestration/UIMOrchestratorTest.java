@@ -1,17 +1,6 @@
 package eu.europeana.uim.orchestration;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.util.Date;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.UIMRegistry;
@@ -30,6 +19,16 @@ import eu.europeana.uim.store.memory.MemoryStorageEngine;
 import eu.europeana.uim.workflow.MixedWorkflow;
 import eu.europeana.uim.workflow.SyserrWorkflow;
 import eu.europeana.uim.workflow.SysoutWorkflow;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class UIMOrchestratorTest {
 
@@ -174,8 +173,7 @@ public class UIMOrchestratorTest {
 		engine.updateRequest(request0);
 		
 		for(int i = 0 ; i < count; i++) {
-			MetaDataRecord record0 = engine.createMetaDataRecord(request0);
-			record0.setIdentifier("abcd" + i);
+			MetaDataRecord record0 = engine.createMetaDataRecord(request0, "abcd" + i);
 			record0.addField(MDRFieldRegistry.title, "title " + i);
 			engine.updateMetaDataRecord(record0);
 		}

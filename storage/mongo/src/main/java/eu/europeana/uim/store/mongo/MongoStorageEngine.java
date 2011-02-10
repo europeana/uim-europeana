@@ -4,6 +4,7 @@ import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.mapping.DefaultCreator;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -138,13 +139,27 @@ public class MongoStorageEngine implements StorageEngine {
     @Override
     public void updateProvider(Provider provider) throws StorageEngineException {
         for (Provider p : getAllProvider()) {
-            if (p.getName() != null && p.getName().equals(provider.getName()) && p.getId() != provider.getId()) {
+            if (p.getName() != null && (p.getName().equals(provider.getName()) || p.getMnemonic().equals(provider.getMnemonic())) && p.getId() != provider.getId()) {
                 throw new StorageEngineException("Provider with name '" + provider.getMnemonic() + "' already exists");
             }
-            if (p.getMnemonic() != null && p.getMnemonic().equals(provider.getMnemonic())  && p.getId() != provider.getId()) {
+            if (p.getMnemonic() != null && p.getMnemonic().equals(provider.getMnemonic()) && p.getId() != provider.getId()) {
                 throw new StorageEngineException("Provider with mnemonic '" + provider.getMnemonic() + "' already exists");
             }
         }
+
+        for (Provider related : provider.getRelatedOut()) {
+            if (!related.getRelatedIn().contains(provider)) {
+                related.getRelatedIn().add(provider);
+                ds.merge(related);
+            }
+        }
+        for (Provider related : provider.getRelatedIn()) {
+            if (!related.getRelatedOut().contains(provider)) {
+                related.getRelatedOut().add(provider);
+                ds.merge(related);
+            }
+        }
+
         ds.merge(provider);
     }
 
@@ -177,7 +192,7 @@ public class MongoStorageEngine implements StorageEngine {
     @Override
     public void updateCollection(Collection collection) throws StorageEngineException {
         for (Collection c : getAllCollections()) {
-            if (c.getName() != null && (c.getName().equals(collection.getName()) || c.getMnemonic().equals(collection.getMnemonic())) && c.getId() != collection.getId()) {
+            if (c.getName() != null && (c.getName().equals(collection.getName())) && c.getId() != collection.getId()) {
                 throw new StorageEngineException("Collection with name '" + collection.getMnemonic() + "' already exists");
             }
             if (c.getMnemonic() != null && c.getMnemonic().equals(collection.getMnemonic()) && c.getId() != collection.getId()) {
@@ -225,9 +240,12 @@ public class MongoStorageEngine implements StorageEngine {
 
     @Override
     public void updateRequest(Request request) throws StorageEngineException {
-        if(ds.find(MongoRequest.class, "date", request.getDate()).countAll() > 0) {
-            String unique = "REQUEST/" +request.getCollection().getMnemonic() + "/" + request.getDate();
-            throw new IllegalStateException("Duplicate unique key for request: <" + unique + ">");
+
+        for (Request r : ds.find(MongoRequest.class).filter("collection", request.getCollection()).asList()) {
+            if (r.getDate().equals(request.getDate()) && r.getId() != request.getId()) {
+                String unique = "REQUEST/" + request.getCollection().getMnemonic() + "/" + request.getDate();
+                throw new IllegalStateException("Duplicate unique key for request: <" + unique + ">");
+            }
         }
         ds.merge(request);
     }
@@ -242,15 +260,44 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     @Override
-    public MetaDataRecord createMetaDataRecord(Request request) {
+    public Request getRequest(long id) throws StorageEngineException {
+        return ds.find(MongoRequest.class).filter(AbstractMongoEntity.LID, id).get();
+    }
+
+
+    @Override
+    public MetaDataRecord createMetaDataRecord(Request request) throws StorageEngineException {
+        return this.createMetaDataRecord(request, null);
+    }
+
+    @Override
+    public MetaDataRecord createMetaDataRecord(Request request, String identifier) throws StorageEngineException {
         BasicDBObject object = new BasicDBObject();
-        MongoMetadataRecord mdr = new MongoMetadataRecord(object, request, mdrIdCounter.getAndIncrement());
+        MongoMetadataRecord mdr = new MongoMetadataRecord(object, request, identifier, mdrIdCounter.getAndIncrement());
         records.insert(mdr.getObject());
         return mdr;
     }
 
     @Override
     public void updateMetaDataRecord(MetaDataRecord record) throws StorageEngineException {
+
+        String unique = "MDR/" + record.getRequest().getCollection().getProvider().getMnemonic() + "/" + record.getIdentifier();
+
+        // no sql, just pain
+        // this absolutely doesn't scale, someone else will have to optimize this piece of crap - I'm not proud of it but at least it works.
+        BasicDBObject uniqueQuery = new BasicDBObject("identifier", record.getIdentifier());
+        List<DBObject> one = records.find(uniqueQuery, BasicDBObjectBuilder.start("request", 1).add(AbstractMongoEntity.LID, 1).get()).toArray();
+        List<MongoRequest> ftw = ds.find(MongoRequest.class).asList();
+        for (DBObject o : one) {
+            for (MongoRequest f : ftw) {
+                if (o.get("request").equals(f.getId()) && !o.get(AbstractMongoEntity.LID).equals(record.getId())) {
+                    if (f.getCollection().getProvider().getMnemonic().equals(record.getRequest().getCollection().getProvider().getMnemonic())) {
+                        throw new IllegalStateException("Duplicate unique key for record: <" + unique + ">");
+                    }
+                }
+            }
+        }
+
         BasicDBObject query = new BasicDBObject(AbstractMongoEntity.LID, record.getId());
         records.update(query, ((MongoMetadataRecord) record).getObject());
     }
@@ -285,7 +332,7 @@ public class MongoStorageEngine implements StorageEngine {
         query.put(AbstractMongoEntity.LID, new BasicDBObject("$in", ids));
         for (DBObject object : records.find(query)) {
             Request request = ds.find(MongoRequest.class).filter(AbstractMongoEntity.LID, object.get("request")).get();
-            res.add(new MongoMetadataRecord(object, request, ((Long) object.get(AbstractMongoEntity.LID)).longValue()));
+            res.add(new MongoMetadataRecord(object, request, (String) object.get("identifier"), ((Long) object.get(AbstractMongoEntity.LID)).longValue()));
         }
 
         return res.toArray(new MetaDataRecord[res.size()]);
@@ -336,10 +383,31 @@ public class MongoStorageEngine implements StorageEngine {
 
     // TODO recursive
     public long[] getByProvider(Provider provider, boolean recursive) {
-        MongoProvider mongoProvider = ds.find(MongoProvider.class).filter("lid", provider.getId()).get();
-        long[] reqIds = getRequestIdsFromProvider(mongoProvider);
-        return getRecordsFromRequestIds(reqIds);
+        List<Long> providers = new ArrayList<Long>();
+        if(recursive) {
+            getRecursive(provider, providers);
+        } else {
+            providers.add(provider.getId());
+        }
+
+        long[] ids = new long[0];
+
+        for(long id : providers) {
+            MongoProvider mongoProvider = ds.find(MongoProvider.class).filter("lid", id).get();
+            ids = ArrayUtils.addAll(ids, getRequestIdsFromProvider(mongoProvider));
+        }
+        return getRecordsFromRequestIds(ids);
     }
+
+    public void getRecursive(Provider provider, List<Long> result) {
+        if (!result.contains(provider.getId())){
+            result.add(provider.getId());
+            for (Provider related : provider.getRelatedOut()) {
+                getRecursive(related, result);
+            }
+        }
+    }
+
 
     private long[] getRequestIdsFromProvider(MongoProvider mongoProvider) {
         List<MongoRequest> reqs = new ArrayList<MongoRequest>();
@@ -354,9 +422,7 @@ public class MongoStorageEngine implements StorageEngine {
 
     @Override
     public long[] getAllIds() {
-        BasicDBObject query = new BasicDBObject("1", 1);
-        BasicDBObject fields = new BasicDBObject(AbstractMongoEntity.LID, 1);
-        List<DBObject> tutti = records.find(query, fields).toArray();
+        List<DBObject> tutti = records.find().toArray();
         long[] tuttiArray = new long[tutti.size()];
         for (int i = 0; i < tutti.size(); i++) {
             tuttiArray[i] = (Long) tutti.get(i).get("lid");
@@ -398,19 +464,11 @@ public class MongoStorageEngine implements StorageEngine {
         return new Long(records.count()).intValue();
     }
 
-    
-    @Override
-	public Request getRequest(long id) throws StorageEngineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public Execution getExecution(long id) throws StorageEngineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-    
-    
-    
+    @Override
+    public Execution getExecution(long id) throws StorageEngineException {
+        return ds.find(MongoExecution.class, AbstractMongoEntity.LID, id).get();
+    }
+
+
 }

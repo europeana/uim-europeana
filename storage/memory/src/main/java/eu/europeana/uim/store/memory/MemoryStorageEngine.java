@@ -278,7 +278,15 @@ public class MemoryStorageEngine implements StorageEngine {
 		mdr.setRequest(request);
 		return mdr;
 	}
-	@Override
+
+    @Override
+    public MetaDataRecord createMetaDataRecord(Request request, String identifier) throws StorageEngineException {
+        MetaDataRecord mdr = createMetaDataRecord(request);
+        ((MemoryMetaDataRecord)mdr).setIdentifier(identifier);
+        return mdr;
+    }
+
+    @Override
 	public void updateMetaDataRecord(MetaDataRecord record) {
 		String unique = "MDR/" +  record.getRequest().getCollection().getProvider().getMnemonic() + "/"+ record.getIdentifier();
 
