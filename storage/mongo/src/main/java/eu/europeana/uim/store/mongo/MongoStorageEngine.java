@@ -1,15 +1,5 @@
 package eu.europeana.uim.store.mongo;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.lang.ArrayUtils;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.mapping.DefaultCreator;
@@ -18,7 +8,6 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -27,6 +16,15 @@ import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
+import org.apache.commons.lang.ArrayUtils;
+
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Basic implementation of a StorageEngine based on MongoDB with Morphia.
@@ -179,7 +177,7 @@ public class MongoStorageEngine implements StorageEngine {
     @Override
     public void updateCollection(Collection collection) throws StorageEngineException {
         for (Collection c : getAllCollections()) {
-            if (c.getName() != null && c.getName().equals(collection.getName()) && c.getId() != collection.getId()) {
+            if (c.getName() != null && (c.getName().equals(collection.getName()) || c.getMnemonic().equals(collection.getMnemonic())) && c.getId() != collection.getId()) {
                 throw new StorageEngineException("Collection with name '" + collection.getMnemonic() + "' already exists");
             }
             if (c.getMnemonic() != null && c.getMnemonic().equals(collection.getMnemonic()) && c.getId() != collection.getId()) {
@@ -227,6 +225,10 @@ public class MongoStorageEngine implements StorageEngine {
 
     @Override
     public void updateRequest(Request request) throws StorageEngineException {
+        if(ds.find(MongoRequest.class, "date", request.getDate()).countAll() > 0) {
+            String unique = "REQUEST/" +request.getCollection().getMnemonic() + "/" + request.getDate();
+            throw new IllegalStateException("Duplicate unique key for request: <" + unique + ">");
+        }
         ds.merge(request);
     }
 

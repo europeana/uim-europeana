@@ -1,14 +1,7 @@
 package eu.europeana.uim.gui.gwt.server;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.api.WorkflowStepStatus;
 import eu.europeana.uim.gui.gwt.client.OrchestrationService;
 import eu.europeana.uim.gui.gwt.shared.Collection;
 import eu.europeana.uim.gui.gwt.shared.Execution;
@@ -16,6 +9,12 @@ import eu.europeana.uim.gui.gwt.shared.Provider;
 import eu.europeana.uim.gui.gwt.shared.StepStatus;
 import eu.europeana.uim.gui.gwt.shared.Workflow;
 import eu.europeana.uim.store.UimEntity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
@@ -242,11 +241,13 @@ public class OrchestrationServiceImpl extends AbstractOSGIRemoteServiceServlet i
 	@Override
 	public List<StepStatus> getStatus(String workflow) {
 		List<StepStatus> res = new ArrayList<StepStatus>();
+        /* FIXME re-implement this
 		List<WorkflowStepStatus> runtimeStatus = getEngine().getOrchestrator().getRuntimeStatus(getWorkflow(workflow));
 		for (WorkflowStepStatus wss : runtimeStatus) {
 			StepStatus ss = new StepStatus(wss.getStep().getIdentifier(), (wss.getParent() != null ? wss.getParent().getIdentifier() : null), wss.queueSize(), wss.successes(), wss.failures());
 			res.add(ss);
 		}
+		*/
 		return res;
 	}
 

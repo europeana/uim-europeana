@@ -53,7 +53,7 @@
                          this environment -->
                     <!-- note the whitespace, I suppose this is due to the maven-gwt-plugin already providing some
                     additional VM arguments -->
-                    <extraJvmArgs> -Ddevmode=true</extraJvmArgs>
+                    <extraJvmArgs>-Ddevmode=true</extraJvmArgs>
                 </configuration>
             </plugin>
 
@@ -137,7 +137,6 @@
 
                 it might be worth asking the pax devs what's going on / what's the best approach
 
-            -->
             <plugin>
                 <groupId>org.ops4j</groupId>
                 <artifactId>maven-pax-plugin</artifactId>
@@ -146,56 +145,23 @@
                     <runner>1.5.0</runner>
                     <framework>felix</framework>
                     <provision>
-                        <param>--log=INFO</param>
-                        <param>--shell=karaf.shell</param>
-                      <param>--profiles=gogo,compendium,core</param> <!-- ,web,war,aries.blueprint -->
+                        <param>- -log=INFO</param>
+                        <param>- -shell=karaf.shell</param>
+                        <param>- -profiles=gogo,compendium,core,web,war,aries.blueprint</param>
                     </provision>
                     <deployPoms>
                         ${project.basedir}/../../common/pom.xml,
-                    <!--
                         ${project.basedir}/../../api/pom.xml,
                         ${project.basedir}/../../plugins/basic/pom.xml,
                         ${project.basedir}/../../plugins/dummy/pom.xml,
                         ${project.basedir}/../../storage/memory/pom.xml,
                         ${project.basedir}/../../workflows/dummy/pom.xml
-                        -->
                     </deployPoms>
                 </configuration>
-                <!--
-
-                -->
-                
 
             </plugin>
+        -->
 
-
-            <!-- convenience mechanism that allows to load features via maven using
-                 'features:addurl mvn:eu.europeana/europeana-uim/1.1.0-SNAPSHOT/xml/features'
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>attach-artifacts</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>etc/uim-features.xml</file>
-                                    <type>xml</type>
-                                    <classifier>features</classifier>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-             -->
-            
 
         </plugins>
 
@@ -253,8 +219,8 @@
     </dependencies>
 
 
-
     <repositories>
+        <!--
         <repository>
             <id>pax-runner-profiles</id>
             <url>http://scm.ops4j.org/repos/ops4j/projects/pax/runner-repository/</url>
@@ -262,7 +228,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-
+        -->
     </repositories>
 
     <pluginRepositories>
