@@ -38,7 +38,7 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 	private Throwable throwable;
 
 	private int scheduled = 0;
-	private ArrayList<long[]> batches = new ArrayList<long[]>();
+//	private ArrayList<long[]> batches = new ArrayList<long[]>();
 
 	private int completed = 0;
 
@@ -149,16 +149,6 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 		completed += count;
 	}
 
-	@Override
-	public int getRemainingSize() {
-		int size = 0;
-		synchronized(batches) {
-			for (int i = 0; i < batches.size(); i ++) {
-				size += batches.get(i).length;
-			}
-		}
-		return size;
-	}
 
 	@Override
 	public int getProgressSize() {
@@ -187,6 +177,12 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 	}
 
 	@Override
+	public void incrementScheduled(int work) {
+		scheduled += work;
+	}
+	
+	
+	@Override
 	public int getCompletedSize() {
 		return completed;
 	}
@@ -194,8 +190,9 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 
 	@Override
 	public boolean isFinished() {
-		return getWorkflow().getStart().isFinished(this) && 
-		getScheduledSize() == getFailureSize() + getCompletedSize();
+		boolean finished = getWorkflow().getStart().isFinished(this);
+		boolean processed = getScheduledSize() == getFailureSize() + getCompletedSize();
+		return finished && processed;
 	}
 
 
@@ -235,17 +232,17 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 	}
 
 	
-	@Override
-	public long[] nextBatch() {
-		if (batches.isEmpty()) return null;
-		return batches.remove(0);
-	}
-
-	@Override
-	public void addBatch(long[] ids) {
-		batches.add(ids);
-		scheduled += ids.length;
-	}
+//	@Override
+//	public long[] nextBatch() {
+//		if (batches.isEmpty()) return null;
+//		return batches.remove(0);
+//	}
+//
+//	@Override
+//	public void addBatch(long[] ids) {
+//		batches.add(ids);
+//		scheduled += ids.length;
+//	}
 
 
 	@Override

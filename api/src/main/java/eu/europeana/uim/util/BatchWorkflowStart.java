@@ -1,7 +1,9 @@
 package eu.europeana.uim.util;
 
+import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
+
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.UIMTask;
 import eu.europeana.uim.api.AbstractWorkflowStart;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngineException;
@@ -12,15 +14,37 @@ import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 
 
+
+/**
+ * 
+ * 
+ * @author Andreas Juffinger (andreas.juffinger@kb.nl)
+ * @date Feb 14, 2011
+ */
 public class BatchWorkflowStart extends AbstractWorkflowStart implements WorkflowStart {
 
+	/** default batch size 
+	 */
 	private int batchSize = 250;
-	private boolean initialized = false;
+	
+	/** having a local list of batches is "overhead" - it duplicates
+	 * the parent class bath variable. Here it is only used to show
+	 * the combination of loader runnable and task runnable.
+	 */
+	private LinkedList<long[]> idchunks = new LinkedList<long[]>();
 
+
+	/**
+	 * Creates a new instance of this class.
+	 */
 	public BatchWorkflowStart() {
 		super(BatchWorkflowStart.class.getName());
 	}
 
+	/**
+	 * Creates a new instance of this class.
+	 * @param batchSize the size of each batch which is put into the workflow at once.
+	 */
 	public BatchWorkflowStart(int batchSize) {
 		super(BatchWorkflowStart.class.getName());
 		this.batchSize = batchSize;
@@ -64,48 +88,52 @@ public class BatchWorkflowStart extends AbstractWorkflowStart implements Workflo
 
 					long[] batch = new long[end - start];
 					System.arraycopy(ids, start, batch, 0, end-start);
-					visitor.addBatch(batch);
+
+					synchronized(this.idchunks) {
+						this.idchunks.add(batch);
+					}
 				}
 
 			} else {
-				visitor.addBatch(ids);
+				// adding this to the local queue and 
+				// enqueue the batch with a runnable per
+				// batch "implements" the way how this api
+				// is meant 
+				synchronized(this.idchunks) {
+					this.idchunks.add(ids);
+				}
 			}
 		} finally {
-			initialized = true;
+			setInitialized(true);
 		}
 	}
 
-	
-	
+
 
 	@Override
-	public <T> boolean isFinished(ActiveExecution<T> visitor) {
-		return initialized;
-	}
+	public <T> Runnable createLoader(ActiveExecution<T> execution) {
+		if (idchunks.isEmpty()) {
+			setFinished(true);
+			return null;
+		}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> int createTasks(ActiveExecution<T> visitor) {
-		try {
-			long[] batch;
-			synchronized(visitor) {
-				batch = visitor.nextBatch();
-			}
-
-			if (batch != null) {
-				MetaDataRecord[] mdrs = visitor.getStorageEngine().getMetaDataRecords(batch);
-				for (MetaDataRecord mdr : mdrs) {
-					visitor.getSuccess(this.getIdentifier()).add((T)new UIMTask(mdr, visitor.getStorageEngine()));
+		return new Runnable(){
+			@Override
+			public void run() {
+				synchronized(idchunks){
+					if (!idchunks.isEmpty()) {
+						try {
+							@SuppressWarnings("unused")
+							boolean offer = offer(idchunks.poll(), 500,  TimeUnit.MILLISECONDS);
+						} catch (InterruptedException e) {
+							// don't really care.
+						}
+					} else {
+						setFinished(true);
+					}
 				}
-				return mdrs.length;
 			}
-
-
-		} catch (StorageEngineException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return 0;
+		};
 	}
 
 

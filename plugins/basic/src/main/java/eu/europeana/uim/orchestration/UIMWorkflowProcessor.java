@@ -1,5 +1,14 @@
 package eu.europeana.uim.orchestration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
@@ -10,15 +19,6 @@ import eu.europeana.uim.orchestration.processing.TaskExecutorRegistry;
 import eu.europeana.uim.orchestration.processing.TaskExecutorThread;
 import eu.europeana.uim.orchestration.processing.TaskExecutorThreadFactory;
 import eu.europeana.uim.util.BatchWorkflowStart;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class UIMWorkflowProcessor implements Runnable {
 
@@ -44,7 +44,7 @@ public class UIMWorkflowProcessor implements Runnable {
 				Iterator<ActiveExecution<Task>> iterator = executions.iterator();
 				while (iterator.hasNext()) {
 					ActiveExecution<Task> execution = iterator.next();
-					total += execution.getProgressSize() + execution.getRemainingSize();
+					total += execution.getProgressSize();
 
 					// well we skip this execution if it is paused,
 					// FIXME: if only paused executions are around then
@@ -53,26 +53,32 @@ public class UIMWorkflowProcessor implements Runnable {
 
 
 					try {
-						// we ask teh workflow start if we have more to do
+						// we ask the workflow start if we have more to do
 						if (execution.getProgressSize() == 0) {
-							int tasks = execution.getWorkflow().getStart().createTasks(execution);
+							WorkflowStart start = execution.getWorkflow().getStart();
+							int tasks = start.createWorkflowTasks(execution);
 
-							//start cannot create more tasks and
-							//we do not have more in the pipeline
-							//so we 
 							if (tasks == 0) {
-								if (execution.isFinished()) {
-									Thread.sleep(100);
-
+								if (start.isFinished(execution)) {
 									if (execution.isFinished()) {
-										execution.setActive(false);
-										execution.setEndTime(new Date());
+										Thread.sleep(100);
 
-                                        // FIXME save the new status to the storage
+										if (execution.isFinished()) {
+											execution.setActive(false);
+											execution.setEndTime(new Date());
 
-										iterator.remove();
+											// FIXME save the new status to the storage
+											iterator.remove();
+										}
+									}
+								} else {
+									Runnable loader = start.createLoader(execution);
+									if (loader != null) {
+										start.getThreadPoolExecutor().execute(loader);
 									}
 								}
+							} else {
+								execution.incrementScheduled(tasks);
 							}
 						} 
 
@@ -157,6 +163,10 @@ public class UIMWorkflowProcessor implements Runnable {
 			step.initialize(execution);
 			TaskExecutorRegistry.getInstance().initialize(step, step.getMaximumThreadCount());
 		}
+
+		// start/execute the first loader task so that we do preload data
+		start.getThreadPoolExecutor().execute(start.createLoader(execution));
+
 		executions.add(execution);
 	}
 

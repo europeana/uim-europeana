@@ -41,11 +41,6 @@ public interface ActiveExecution<T> extends Execution {
 
 	void done(int count);
 	
-	/** gives an estimate of tasks/records not yet started.
-	 * 
-	 * @return
-	 */
-	int getRemainingSize();
 	
 	/** gives an estimate of tasks/records which are currently in the pipeline.
 	 * Note that failed tasks are not counted. The system can not guarantee the 
@@ -82,13 +77,18 @@ public interface ActiveExecution<T> extends Execution {
 	WorkflowStepStatus getStepStatus(WorkflowStep step);
 	
 
-	void addBatch(long[] ids);
-	
-	long[] nextBatch();
+//	void addBatch(long[] ids);
+//	
+//	long[] nextBatch();
 	
 	void waitUntilFinished();
 	
 	void putValue(WorkflowStep step, String key, Object value);
 	Object getValue(WorkflowStep step, String key);
+
+	/**
+	 * @param work
+	 */
+	void incrementScheduled(int work);
 	
 }
