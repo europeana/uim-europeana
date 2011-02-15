@@ -1,11 +1,12 @@
 package eu.europeana.uim.plugin.dummy;
 
+import java.util.logging.Logger;
+
 import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.TKey;
+import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPlugin;
-
-import java.util.logging.Logger;
 
 public class DummyPlugin implements IngestionPlugin {
 
@@ -53,7 +54,7 @@ public class DummyPlugin implements IngestionPlugin {
 	}
 
     @Override
-    public void processRecord(MetaDataRecord mdr) {
+    public void processRecord(MetaDataRecord mdr, ExecutionContext context) {
         counter++;
         if(counter % 50 == 0) {
             log.info("Dummy plugin is processing MDR " + mdr.getId());

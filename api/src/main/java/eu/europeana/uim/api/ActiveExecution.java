@@ -3,24 +3,14 @@ package eu.europeana.uim.api;
 import java.util.List;
 import java.util.Queue;
 
-import eu.europeana.uim.common.ProgressMonitor;
-import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
 
 /**
  * An Execution in a running state. It keeps track of the overall progress.
  */
-public interface ActiveExecution<T> extends Execution {
+public interface ActiveExecution<T> extends Execution, ExecutionContext {
 
 	StorageEngine getStorageEngine();
-	
-    /** workflow for this execution **/
-    Workflow getWorkflow();
-
-    DataSet getDataSet();
-    
-    /** progress monitor **/
-    ProgressMonitor getMonitor();
 
     public void setPaused(boolean paused);
     boolean isPaused();

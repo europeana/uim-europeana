@@ -49,9 +49,9 @@ public class WorkflowStepComposite implements WorkflowStep {
 
 	
 	@Override
-	public void processRecord(MetaDataRecord mdr) {
+	public void processRecord(MetaDataRecord mdr, ExecutionContext context) {
         for(WorkflowStep s : steps) {
-        	s.processRecord(mdr);
+        	s.processRecord(mdr, context);
         }
 	}
 

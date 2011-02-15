@@ -1,15 +1,14 @@
 package eu.europeana.uim.logging.mongo;
 
+import java.util.Date;
+
 import eu.europeana.uim.api.LogEntry;
 import eu.europeana.uim.api.LoggingEngine;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class MongoLogEntry<T extends Serializable> implements LogEntry<T> {
+public class MongoLogEntry<T> implements LogEntry<T> {
 
     private LoggingEngine.Level level;
     private Date date;

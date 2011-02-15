@@ -156,6 +156,14 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>europeanalabs.eu</id>
+            <name>europeanalabs.eu-releases</name>
+            <url>http://europeanalabs.eu/artifactory/assets</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -168,6 +176,5 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
 
 </project>

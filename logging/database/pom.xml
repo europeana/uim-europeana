@@ -230,5 +230,17 @@
 
 	</dependencies>
 
+    <repositories>
+        <repository>
+            <id>europeanalabs.eu</id>
+            <name>europeanalabs.eu-tel-releases</name>
+            <url>http://europeanalabs.eu/artifactory/tel</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    
+
 
 </project>

@@ -2,6 +2,7 @@ package eu.europeana.uim;
 
 import java.util.Queue;
 
+import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.Task;
@@ -18,20 +19,21 @@ public class UIMTask implements Task {
 	
 	private WorkflowStep step;
 	
-	private final StorageEngine engine;
 	private final MetaDataRecord record;
-	
-	
-	public UIMTask(MetaDataRecord record, StorageEngine engine) {
+    private final StorageEngine engine;
+    private final ExecutionContext context;
+
+	public UIMTask(MetaDataRecord record, StorageEngine engine, ExecutionContext context) {
 		super();
-		this.engine = engine;
 		this.record = record;
+        this.engine = engine;
+        this.context = context;
 	}
 
 	
 	@Override
 	public void run() {
-		step.processRecord(record);
+		step.processRecord(record, context);
 	}
 
 	@Override

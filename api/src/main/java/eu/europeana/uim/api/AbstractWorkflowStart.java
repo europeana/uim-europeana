@@ -112,7 +112,7 @@ public abstract class AbstractWorkflowStart implements WorkflowStart {
         	} else {
                 MetaDataRecord[] mdrs = executor.getStorageEngine().getMetaDataRecords(poll);
                 for (MetaDataRecord mdr : mdrs) {
-                    UIMTask task = new UIMTask(mdr, executor.getStorageEngine());
+                    UIMTask task = new UIMTask(mdr, executor.getStorageEngine(), executor);
                     
 					executor.getSuccess(this.getIdentifier()).add((T) task);
                 }
@@ -192,7 +192,7 @@ public abstract class AbstractWorkflowStart implements WorkflowStart {
 	}
 
     @Override
-    public void processRecord(MetaDataRecord mdr) {
+    public void processRecord(MetaDataRecord mdr, ExecutionContext context) {
     }
 
 

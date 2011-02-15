@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.AbstractWorkflowStart;
 import eu.europeana.uim.api.ActiveExecution;
+import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.api.WorkflowStart;
 import eu.europeana.uim.store.Collection;
@@ -137,8 +138,7 @@ public class BatchWorkflowStart extends AbstractWorkflowStart implements Workflo
 	}
 
 
-	@Override
-	public void processRecord(MetaDataRecord mdr) {
-	}
-
+    @Override
+    public void processRecord(MetaDataRecord mdr, ExecutionContext context) {
+    }
 }

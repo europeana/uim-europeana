@@ -1,19 +1,17 @@
 package eu.europeana.uim.logging.memory;
 
-import eu.europeana.uim.MDRFieldRegistry;
+import java.util.Date;
+
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.IngestionPlugin;
 import eu.europeana.uim.api.LogEntry;
 import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.store.Execution;
 
-import java.io.Serializable;
-import java.util.Date;
-
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class MemoryLogEntry<T extends Serializable> implements LogEntry<T> {
+public class MemoryLogEntry<T> implements LogEntry<T> {
 
     private LoggingEngine.Level level;
     private Date date;

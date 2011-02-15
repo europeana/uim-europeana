@@ -27,8 +27,8 @@ public class IngestionWorkflowStep extends AbstractWorkflowStep {
 	}
 
 	@Override
-	public void processRecord(MetaDataRecord mdr) {
-		plugin.processRecord(mdr);
+	public void processRecord(MetaDataRecord mdr, ExecutionContext context) {
+		plugin.processRecord(mdr, context);
 	}
 
 }

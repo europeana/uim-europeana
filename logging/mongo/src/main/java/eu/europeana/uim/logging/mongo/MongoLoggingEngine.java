@@ -12,7 +12,6 @@ import eu.europeana.uim.api.LogEntry;
 import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.store.Execution;
 
-import java.io.Serializable;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +22,7 @@ import java.util.List;
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public class MongoLoggingEngine<T extends Serializable> implements LoggingEngine<T> {
+public class MongoLoggingEngine<T> implements LoggingEngine<T> {
 
     public static final String DEFAULT_UIM_DB_NAME = "UIM";
     public static final String LOG_ENTRIES = "LogEntries";
@@ -65,6 +64,7 @@ public class MongoLoggingEngine<T extends Serializable> implements LoggingEngine
     public void setTypeSerializer(String serializerClass) {
         try {
             Class serializer = Class.forName(serializerClass);
+            @SuppressWarnings("unchecked")
             TypeSerializer<T> s = (TypeSerializer<T>) serializer.newInstance();
             this.serializer = s;
         } catch (Throwable t) {

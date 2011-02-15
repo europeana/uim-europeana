@@ -1,13 +1,22 @@
 package eu.europeana.uim.api;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.TKey;
 
-public class AbstractIngestionPlugin implements IngestionPlugin {
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Abstract ingestion plugin providing defaults and helper methods for plugin implementation.
+ * <br/>
+ * FIXME we should remove the java.util.Logger and replace it with calls to the UIM Logger
+ *
+ * @author Andreas Juffinger (andreas.juffinger@kb.nl)
+ * @author Manuel Bernhardt (bernhardt.manuel@gmail.com)
+ */
+public abstract class AbstractIngestionPlugin implements IngestionPlugin {
+
 	private static final Logger log = Logger.getLogger(AbstractIngestionPlugin.class.getName());
 
 	private String qualifier;
@@ -63,15 +72,67 @@ public class AbstractIngestionPlugin implements IngestionPlugin {
 
 	@Override
 	public String getDescription() {
-		return "Writes the identifiers of MDRs to sysout.";
+		return "Abstract Ingestion Plugin";
 	}
 
 	@Override
-	public void processRecord(MetaDataRecord mdr) {
+	public void processRecord(MetaDataRecord mdr, ExecutionContext context) {
 		String identifier = mdr.getIdentifier();
 		if (log.isLoggable(level)) {
 			log.log(level, qualifier + ":" + identifier);
 		}
+
+        processRecord(context, mdr, this);
 	}
 
+    /**
+     * This method is the entry point for implementations of this class and should execute the processing of one record in the given context.
+     * In order to implement it, use an anonymous inner class as follows:<br>
+     *     <pre>
+     *     {@code
+     *             @Override
+     *             public IngestionPluginCall processRecord(ExecutionContext context, MetaDataRecord record, IngestionPlugin plugin) {
+     *               return new IngestionPluginCall(context, record, plugin) {
+     *                 @Override
+     *                 public void processRecord(MetaDataRecord record) {
+     *                   log(LoggingEngine.Level.INFO, "Processing record " + record);
+     *                 }
+     *               };
+     *             }
+     *     }
+     *     </pre>
+     *
+     * @param context the {@link ExecutionContext} for this plugin invocation
+     * @param record the {@link MetaDataRecord} for this plugin invocation
+     * @param plugin the {@link IngestionPlugin} for this plugin invocation
+     * @return
+     */
+    public abstract IngestionPluginCall processRecord(ExecutionContext context, MetaDataRecord record, IngestionPlugin plugin);
+
+    /**
+     * Helper class for easing common operations such as logging when implementing an @{IngestionPlugin}
+     */
+    public abstract static class IngestionPluginCall {
+        private final ExecutionContext context;
+        private final MetaDataRecord record;
+        private final IngestionPlugin plugin;
+
+        public IngestionPluginCall(ExecutionContext context, MetaDataRecord record, IngestionPlugin plugin) {
+            this.context = context;
+            this.record = record;
+            this.plugin = plugin;
+        }
+
+        public abstract void processRecord(MetaDataRecord record);
+
+        protected void log(LoggingEngine.Level level, String message) {
+            context.getLoggingEngine().log(level, message, context.getExecution(), record, plugin);
+        }
+
+        protected <T> void logStructured(LoggingEngine.Level level, T payload) {
+            @SuppressWarnings("unchecked")
+            LoggingEngine<T> loggingEngine = (LoggingEngine<T>) context.getLoggingEngine();
+            loggingEngine.logStructured(level, payload, context.getExecution(), record, plugin);
+        }
+    }
 }

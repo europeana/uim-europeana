@@ -1,17 +1,16 @@
 package eu.europeana.uim.api;
 
-import java.io.Serializable;
-import java.util.List;
-
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.store.Execution;
+
+import java.util.List;
 
 /**
  * Service for the reporting of the processing, to be used by the orchestrator and eventually plugins
  *
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public interface LoggingEngine<T extends Serializable> {
+public interface LoggingEngine<T> {
 
     enum Level {
         INFO, WARNING, SEVERE
@@ -52,7 +51,6 @@ public interface LoggingEngine<T extends Serializable> {
      * @param plugin    the plugin reporting the log
      */
     void logStructured(Level level, T payload, Execution execution, MetaDataRecord mdr, IngestionPlugin plugin);
-
 
     /**
      * Retrieves structured log entries for one execution

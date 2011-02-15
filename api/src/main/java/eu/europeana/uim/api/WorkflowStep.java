@@ -26,6 +26,6 @@ public interface WorkflowStep {
     
     <T> void initialize(ActiveExecution<T> visitor) throws StorageEngineException;
 
-    void processRecord(MetaDataRecord mdr);
+    void processRecord(MetaDataRecord mdr, ExecutionContext context);
 
 }

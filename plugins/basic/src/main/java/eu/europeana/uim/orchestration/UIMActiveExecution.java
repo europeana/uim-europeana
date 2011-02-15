@@ -11,6 +11,7 @@ import java.util.Queue;
 
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.api.ActiveExecution;
+import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.Task;
 import eu.europeana.uim.api.Workflow;
@@ -29,6 +30,7 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 	private HashMap<String, HashMap<String, Object>> values = new HashMap<String, HashMap<String, Object>>();
 
 	private final StorageEngine engine;
+    private final LoggingEngine<?> loggingEngine;
 
 	private final Execution execution;
 	private final Workflow workflow;
@@ -42,11 +44,12 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 
 	private int completed = 0;
 
-	public UIMActiveExecution(Execution execution, Workflow workflow, ProgressMonitor monitor, StorageEngine engine){
+	public UIMActiveExecution(Execution execution, Workflow workflow, ProgressMonitor monitor, StorageEngine engine, LoggingEngine loggingEngine){
 		this.execution = execution;
 		this.workflow = workflow;
 		this.monitor = monitor;
 		this.engine = engine;
+        this.loggingEngine = loggingEngine;
 
 		WorkflowStart start = workflow.getStart();
 		success.put(start.getIdentifier(), new LinkedList<Task>());
@@ -58,12 +61,22 @@ public class UIMActiveExecution implements ActiveExecution<Task> {
 		}
 	}
 
-	@Override
+    @Override
+    public Execution getExecution() {
+        return this;
+    }
+
+    @Override
 	public StorageEngine getStorageEngine() {
 		return engine;
 	}
 
-	public long getId() {
+    @Override
+    public LoggingEngine<?> getLoggingEngine() {
+        return loggingEngine;
+    }
+
+    public long getId() {
 		return execution.getId();
 	}
 

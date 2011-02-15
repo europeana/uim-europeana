@@ -5,6 +5,7 @@ import java.util.Random;
 import eu.europeana.uim.MDRFieldRegistry;
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.TKey;
+import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPlugin;
 
 public class SysoutPlugin implements IngestionPlugin {
@@ -68,7 +69,7 @@ public class SysoutPlugin implements IngestionPlugin {
 	}
 
 	@Override
-	public void processRecord(MetaDataRecord mdr) {
+	public void processRecord(MetaDataRecord mdr, ExecutionContext context) {
 		String identifier = mdr.getIdentifier();
 		if (randsleep){
 			try {

@@ -59,7 +59,7 @@ public class UIMOrchestrator implements Orchestrator {
 			registry.getStorage().updateExecution(e);
 
 			try {
-				UIMActiveExecution activeExecution = new UIMActiveExecution(e, w, monitor, registry.getStorage());
+				UIMActiveExecution activeExecution = new UIMActiveExecution(e, w, monitor, registry.getStorage(), registry.getLoggingEngine());
 				processor.schedule(activeExecution);
 
 				return activeExecution;

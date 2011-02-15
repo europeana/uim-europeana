@@ -1,6 +1,11 @@
 in progress
 ===========
 
+- clean up the API
+- fix the GUI and the progress passing
+- WProcessor should save the status once a workflow is finished
+- provision the WorkflowProcessor thrhough blueprint, not through instance creation
+
 - mongodb logging engine: integration tests
 
 functionality:

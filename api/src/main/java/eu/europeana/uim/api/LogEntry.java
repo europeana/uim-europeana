@@ -1,13 +1,12 @@
 package eu.europeana.uim.api;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Log entry
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>
  */
-public interface LogEntry<T extends Serializable> {
+public interface LogEntry<T> {
 
     LoggingEngine.Level getLevel();
     Date getDate();
