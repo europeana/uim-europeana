@@ -132,7 +132,7 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 		providers.put(provider.getId(), provider);
 		providerMnemonics.put(provider.getMnemonic(), provider.getId());
-		
+
 		for(Provider related : provider.getRelatedOut()) {
 			if (!related.getRelatedIn().contains(provider)){
 				related.getRelatedIn().add(provider);
@@ -245,10 +245,10 @@ public class MemoryStorageEngine implements StorageEngine {
 				}
 			}
 		}
-		
+
 		requests.put(request.getId(), request);
 	}
-	
+
 	@Override
 	public Request getRequest(long id) throws StorageEngineException {
 		return requests.get(id);
@@ -279,25 +279,27 @@ public class MemoryStorageEngine implements StorageEngine {
 		return mdr;
 	}
 
-    @Override
-    public MetaDataRecord createMetaDataRecord(Request request, String identifier) throws StorageEngineException {
-        MetaDataRecord mdr = createMetaDataRecord(request);
-        ((MemoryMetaDataRecord)mdr).setIdentifier(identifier);
-        return mdr;
-    }
+	@Override
+	public MetaDataRecord createMetaDataRecord(Request request, String identifier) throws StorageEngineException {
+		MetaDataRecord mdr = createMetaDataRecord(request);
+		((MemoryMetaDataRecord)mdr).setIdentifier(identifier);
+		return mdr;
+	}
 
-    @Override
+	@Override
 	public void updateMetaDataRecord(MetaDataRecord record) {
 		String unique = "MDR/" +  record.getRequest().getCollection().getProvider().getMnemonic() + "/"+ record.getIdentifier();
 
-		if (!metadatas.containsKey(record.getId())) {
-			if (mdrIdentifier.contains(unique)) {
-				throw new IllegalStateException("Duplicate unique key for record: <" + unique + ">");
+		synchronized(metadatas) {
+			if (!metadatas.containsKey(record.getId())) {
+				if (mdrIdentifier.contains(unique)) {
+					throw new IllegalStateException("Duplicate unique key for record: <" + unique + ">");
+				}
 			}
+
+			metadatas.put(record.getId(), record);
+			mdrIdentifier.add(unique);
 		}
-		
-		metadatas.put(record.getId(), record);
-		mdrIdentifier.add(unique);
 		addMetaDataRecord(record);
 	}
 
@@ -347,7 +349,7 @@ public class MemoryStorageEngine implements StorageEngine {
 				result.add(iterator.key());
 			}
 		}
-		
+
 		long[] ids = result.toNativeArray();
 		Arrays.sort(ids);
 		return ids;
@@ -363,16 +365,16 @@ public class MemoryStorageEngine implements StorageEngine {
 				result.add(iterator.key());
 			}
 		}
-		
+
 		long[] ids = result.toNativeArray();
 		Arrays.sort(ids);
 		return ids;
 	}
-	
+
 	@Override
 	public long[] getByProvider(Provider provider, boolean recursive) {
 		TLongArrayList result = new TLongArrayList();
-		
+
 		Set<Long> set = new HashSet<Long>();
 		if (recursive) {
 			getRecursive(provider, set);
@@ -380,7 +382,7 @@ public class MemoryStorageEngine implements StorageEngine {
 			set.add(provider.getId());
 		}
 
-		
+
 		TLongLongIterator iterator = metaprovider.iterator();
 		while(iterator.hasNext()) {
 			iterator.advance();
@@ -388,7 +390,7 @@ public class MemoryStorageEngine implements StorageEngine {
 				result.add(iterator.key());
 			}
 		}
-		
+
 		long[] ids = result.toNativeArray();
 		Arrays.sort(ids);
 		return ids;
