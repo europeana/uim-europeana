@@ -68,7 +68,7 @@ public class LoggingTest extends AbstractUIMIntegrationTest {
                 mavenBundle().groupId("org.hibernate").artifactId("com.springsource.org.hibernate.annotations.common").version("3.3.0.ga"),
                 mavenBundle().groupId("org.hibernate").artifactId("com.springsource.org.hibernate.ejb").version("3.3.2.GA"),
 
-                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-logging-database").versionAsInProject(),
+                //mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-logging-memory").versionAsInProject(),
                 
                 felix(),
 
