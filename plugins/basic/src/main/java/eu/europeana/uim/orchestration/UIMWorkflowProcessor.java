@@ -11,14 +11,14 @@ import java.util.logging.Logger;
 
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.api.Task;
-import eu.europeana.uim.api.TaskStatus;
-import eu.europeana.uim.api.WorkflowStart;
-import eu.europeana.uim.api.WorkflowStep;
 import eu.europeana.uim.orchestration.processing.TaskExecutorRegistry;
 import eu.europeana.uim.orchestration.processing.TaskExecutorThread;
 import eu.europeana.uim.orchestration.processing.TaskExecutorThreadFactory;
 import eu.europeana.uim.util.BatchWorkflowStart;
+import eu.europeana.uim.workflow.Task;
+import eu.europeana.uim.workflow.TaskStatus;
+import eu.europeana.uim.workflow.WorkflowStart;
+import eu.europeana.uim.workflow.WorkflowStep;
 
 public class UIMWorkflowProcessor implements Runnable {
 

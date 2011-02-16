@@ -4,15 +4,15 @@ import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.api.AbstractWorkflowStart;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.api.WorkflowStart;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
+import eu.europeana.uim.workflow.AbstractWorkflowStart;
+import eu.europeana.uim.workflow.WorkflowStart;
 
 
 

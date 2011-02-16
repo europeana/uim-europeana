@@ -1,5 +1,7 @@
 package eu.europeana.uim.api;
 
+import eu.europeana.uim.workflow.WorkflowStep;
+
 
 /**
  * A SavePoint in a UIM UIMWorkflow represents a step at which data is written to the storage

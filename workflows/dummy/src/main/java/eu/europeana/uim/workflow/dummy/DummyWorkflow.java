@@ -2,12 +2,12 @@ package eu.europeana.uim.workflow.dummy;
 
 import java.util.logging.Logger;
 
-import eu.europeana.uim.api.AbstractWorkflow;
 import eu.europeana.uim.api.IngestionPlugin;
-import eu.europeana.uim.api.IngestionWorkflowStep;
 import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.util.BatchWorkflowStart;
+import eu.europeana.uim.workflow.AbstractWorkflow;
+import eu.europeana.uim.workflow.IngestionWorkflowStep;
+import eu.europeana.uim.workflow.Workflow;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>

@@ -39,7 +39,7 @@ public interface StorageEngine {
 	void updateProvider(Provider provider) throws StorageEngineException;
 	Provider getProvider(long id) throws StorageEngineException;
 	Provider findProvider(String mnemonic) throws StorageEngineException;
-	List<Provider> getAllProvider() throws StorageEngineException;
+	List<Provider> getAllProviders() throws StorageEngineException;
 
 	Collection createCollection(Provider provider) throws StorageEngineException;
 	void updateCollection(Collection collection) throws StorageEngineException;

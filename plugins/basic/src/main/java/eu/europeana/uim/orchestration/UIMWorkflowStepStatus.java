@@ -3,8 +3,8 @@ package eu.europeana.uim.orchestration;
 import java.util.Map;
 
 import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.api.WorkflowStep;
-import eu.europeana.uim.api.WorkflowStepStatus;
+import eu.europeana.uim.workflow.WorkflowStep;
+import eu.europeana.uim.workflow.WorkflowStepStatus;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>

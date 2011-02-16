@@ -1,6 +1,9 @@
-package eu.europeana.uim.api;
+package eu.europeana.uim.workflow;
 
 import java.util.concurrent.ThreadPoolExecutor;
+
+import eu.europeana.uim.api.ActiveExecution;
+import eu.europeana.uim.api.StorageEngineException;
 
 public abstract class AbstractWorkflowStep implements WorkflowStep {
 

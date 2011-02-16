@@ -136,7 +136,7 @@ public class UIMStore implements Action {
 
 	private void listProvider(StorageEngine storage, PrintStream out) throws StorageEngineException {
 		List<Provider> mainprovs = new ArrayList<Provider>();
-		List<Provider> providers = storage.getAllProvider();
+		List<Provider> providers = storage.getAllProviders();
 		for (Provider provider : providers) {
 			if (provider.getRelatedIn() == null || provider.getRelatedIn().isEmpty()) {
 				mainprovs.add(provider);
@@ -206,7 +206,7 @@ public class UIMStore implements Action {
 	}
 	private void listCollection(StorageEngine storage, PrintStream out) throws StorageEngineException {
 		if (parent == null) {
-			List<Provider> providers = storage.getAllProvider();
+			List<Provider> providers = storage.getAllProviders();
 			for (Provider provider : providers) {
 				List<Collection> collections = storage.getCollections(provider);
 				if (collections != null && !collections.isEmpty()) {

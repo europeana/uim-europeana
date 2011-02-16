@@ -8,13 +8,13 @@ import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.api.Task;
-import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.orchestration.processing.TaskExecutor;
 import eu.europeana.uim.orchestration.processing.TaskExecutorRegistry;
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
+import eu.europeana.uim.workflow.Task;
+import eu.europeana.uim.workflow.Workflow;
 
 /**
  * Orchestrates the ingestion job execution. The orchestrator keeps a map of WorkflowProcessors, one for each different workflow.

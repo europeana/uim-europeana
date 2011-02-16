@@ -8,8 +8,6 @@ import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.api.Task;
-import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.common.MemoryProgressMonitor;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.store.Collection;
@@ -19,6 +17,9 @@ import eu.europeana.uim.store.memory.MemoryStorageEngine;
 import eu.europeana.uim.workflow.MixedWorkflow;
 import eu.europeana.uim.workflow.SyserrWorkflow;
 import eu.europeana.uim.workflow.SysoutWorkflow;
+import eu.europeana.uim.workflow.Task;
+import eu.europeana.uim.workflow.Workflow;
+
 import org.junit.Before;
 import org.junit.Test;
 

@@ -145,7 +145,7 @@ public class MemoryStorageEngine implements StorageEngine {
 		}
 	}
 	@Override
-	public List<Provider> getAllProvider() {
+	public List<Provider> getAllProviders() {
 		ArrayList<Provider> result = new ArrayList<Provider>();
 		TLongObjectIterator<Provider> iterator = providers.iterator();
 		while (iterator.hasNext()) {

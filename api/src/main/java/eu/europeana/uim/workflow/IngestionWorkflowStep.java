@@ -1,6 +1,8 @@
-package eu.europeana.uim.api;
+package eu.europeana.uim.workflow;
 
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.ExecutionContext;
+import eu.europeana.uim.api.IngestionPlugin;
 
 public class IngestionWorkflowStep extends AbstractWorkflowStep {
 

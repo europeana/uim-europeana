@@ -1,4 +1,4 @@
-package eu.europeana.uim.api;
+package eu.europeana.uim.workflow;
 
 /**
  * @author Manuel Bernhardt<bernhardt.manuel@gmail.com>

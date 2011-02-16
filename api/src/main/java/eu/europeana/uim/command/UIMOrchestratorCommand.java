@@ -17,12 +17,12 @@ import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.api.Workflow;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimEntity;
+import eu.europeana.uim.workflow.Workflow;
 
 /**
  * uim:orchestrator
@@ -148,7 +148,7 @@ public class UIMOrchestratorCommand implements Action {
 
         StorageEngine storage = registry.getStorage();
         List<Workflow> workflows = registry.getWorkflows();
-        List<Provider> providers = storage.getAllProvider();
+        List<Provider> providers = storage.getAllProviders();
 
         if (argument0 == null) {
             printWorfklows(out, workflows);

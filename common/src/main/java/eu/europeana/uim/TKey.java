@@ -114,6 +114,13 @@ public final class TKey<NS, T extends Serializable> implements Serializable, Com
     public static void clear() {
     	registry.clear();
     }
+
+    
+    /** clears the static key registry.
+     */
+    public static int size() {
+    	return registry.size();
+    }
     
     /**
 	 * @return the type

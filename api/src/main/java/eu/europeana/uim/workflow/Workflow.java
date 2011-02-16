@@ -1,4 +1,4 @@
-package eu.europeana.uim.api;
+package eu.europeana.uim.workflow;
 
 import java.util.List;
 

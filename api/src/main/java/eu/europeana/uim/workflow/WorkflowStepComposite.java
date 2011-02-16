@@ -1,10 +1,13 @@
-package eu.europeana.uim.api;
+package eu.europeana.uim.workflow;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.ActiveExecution;
+import eu.europeana.uim.api.ExecutionContext;
+import eu.europeana.uim.api.StorageEngineException;
 
 public class WorkflowStepComposite implements WorkflowStep {
 

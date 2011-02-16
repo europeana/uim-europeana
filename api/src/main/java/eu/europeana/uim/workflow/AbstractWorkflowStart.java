@@ -1,4 +1,4 @@
-package eu.europeana.uim.api;
+package eu.europeana.uim.workflow;
 
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -10,6 +10,9 @@ import java.util.logging.Logger;
 
 import eu.europeana.uim.MetaDataRecord;
 import eu.europeana.uim.UIMTask;
+import eu.europeana.uim.api.ActiveExecution;
+import eu.europeana.uim.api.ExecutionContext;
+import eu.europeana.uim.api.StorageEngineException;
 
 /** Abstract implementation of a workflow start with convenient methods to manage
  * a queue of batches.

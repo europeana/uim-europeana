@@ -1,18 +1,27 @@
-package eu.europeana.uim.store;
+package eu.europeana.uim.api;
 
-import eu.europeana.uim.MetaDataRecord;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.DataSet;
+import eu.europeana.uim.store.Execution;
+import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.store.Request;
+
+/** noop storage engine adapter 
+ *
+ * @author Andreas Juffinger (andreas.juffinger@kb.nl)
+ * @date Feb 16, 2011
+ */
 public abstract class StorageEngineAdapter implements StorageEngine {
 
     @Override
 	public String getIdentifier() {
-		return "StorageEngineAdapter";
+		return StorageEngineAdapter.class.getSimpleName();
 	}
 	
 
@@ -53,13 +62,10 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 
 	@Override
 	public void updateProvider(Provider provider) throws StorageEngineException {
-		
-
 	}
 
 	@Override
 	public Provider getProvider(long id) {
-		
 		return null;
 	}
 
@@ -70,9 +76,8 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	}
 
 	@Override
-	public List<Provider> getAllProvider() {
-		
-		return null;
+	public List<Provider> getAllProviders() {
+		return new ArrayList<Provider>();
 	}
 
 	@Override
@@ -90,13 +95,12 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 
 	@Override
 	public Collection getCollection(long id) {
-		
 		return null;
 	}
 
     @Override
     public List<Collection> getAllCollections() {
-        return null;
+		return new ArrayList<Collection>();
     }
 
 	@Override
@@ -107,13 +111,11 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 
 	@Override
 	public List<Collection> getCollections(Provider provider) {
-		
-		return null;
+		return new ArrayList<Collection>();
 	}
 
 	@Override
 	public Request createRequest(Collection collection, Date date) {
-		
 		return null;
 	}
 
@@ -131,8 +133,7 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 
 	@Override
 	public List<Request> getRequests(Collection collection) {
-		
-		return null;
+		return new ArrayList<Request>();
 	}
 
 	@Override
@@ -155,7 +156,6 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 
 	@Override
 	public Execution createExecution(DataSet entity, String workflow) {
-		
 		return null;
 	}
 
@@ -176,61 +176,54 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 
 	@Override
 	public List<Execution> getAllExecutions() {
-		
-		return null;
+		return new ArrayList<Execution>();
 	}
 
 	@Override
 	public MetaDataRecord[] getMetaDataRecords(long... ids) {
-		
 		return null;
 	}
 
+	
 	@Override
 	public long[] getByRequest(Request request) {
-		
-		return null;
+		return new long[0];
 	}
 
 	@Override
 	public long[] getByCollection(Collection collection) {
-		
-		return null;
+		return  new long[0];
 	}
 
 	@Override
 	public long[] getByProvider(Provider provider, boolean recursive) {
 		
-		return null;
+		return  new long[0];
 	}
 
 	@Override
 	public long[] getAllIds() {
-		
-		return null;
+		return  new long[0];
 	}
 
+	
 	@Override
 	public int getTotalByRequest(Request request) {
-		
 		return 0;
 	}
 
 	@Override
 	public int getTotalByCollection(Collection collection) {
-		
 		return 0;
 	}
 
 	@Override
 	public int getTotalByProvider(Provider provider, boolean recursive) {
-		
 		return 0;
 	}
 
 	@Override
 	public int getTotalForAllIds() {
-		
 		return 0;
 	}
 }

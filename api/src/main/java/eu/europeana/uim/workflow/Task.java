@@ -1,8 +1,9 @@
-package eu.europeana.uim.api;
+package eu.europeana.uim.workflow;
 
 import java.util.Queue;
 
 import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.api.StorageEngineException;
 
 /**
  * @author Manuel Bernhardt <bernhardt.manuel@gmail.com>

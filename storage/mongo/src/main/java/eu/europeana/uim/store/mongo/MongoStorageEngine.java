@@ -138,7 +138,7 @@ public class MongoStorageEngine implements StorageEngine {
 
     @Override
     public void updateProvider(Provider provider) throws StorageEngineException {
-        for (Provider p : getAllProvider()) {
+        for (Provider p : getAllProviders()) {
             if (p.getName() != null && (p.getName().equals(provider.getName()) || p.getMnemonic().equals(provider.getMnemonic())) && p.getId() != provider.getId()) {
                 throw new StorageEngineException("Provider with name '" + provider.getMnemonic() + "' already exists");
             }
@@ -174,7 +174,7 @@ public class MongoStorageEngine implements StorageEngine {
     }
 
     @Override
-    public List<Provider> getAllProvider() {
+    public List<Provider> getAllProviders() {
         final List<Provider> res = new ArrayList<Provider>();
         for (Provider p : ds.find(MongoProvider.class).asList()) {
             res.add(p);

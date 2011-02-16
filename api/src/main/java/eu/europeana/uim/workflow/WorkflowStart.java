@@ -1,4 +1,6 @@
-package eu.europeana.uim.api;
+package eu.europeana.uim.workflow;
+
+import eu.europeana.uim.api.ActiveExecution;
 
 
 

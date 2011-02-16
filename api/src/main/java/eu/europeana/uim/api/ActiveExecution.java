@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Queue;
 
 import eu.europeana.uim.store.Execution;
+import eu.europeana.uim.workflow.WorkflowStep;
+import eu.europeana.uim.workflow.WorkflowStepStatus;
 
 /**
  * An Execution in a running state. It keeps track of the overall progress.

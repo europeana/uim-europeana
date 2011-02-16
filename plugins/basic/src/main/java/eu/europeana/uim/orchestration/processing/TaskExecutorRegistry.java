@@ -8,7 +8,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
-import eu.europeana.uim.api.WorkflowStep;
+import eu.europeana.uim.workflow.WorkflowStep;
 
 public class TaskExecutorRegistry {
 

@@ -13,6 +13,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
+/** A record handler implementation for meta data records to be used
+ * with the commons record parser api.
+ *
+ * @author Andreas Juffinger (andreas.juffinger@kb.nl)
+ * @date Feb 16, 2011
+ */
 public class MetaDataRecordHandler implements RecordHandler {
     private static final Logger log = Logger.getLogger(MetaDataRecordHandler.class.getName());
 
@@ -23,6 +29,12 @@ public class MetaDataRecordHandler implements RecordHandler {
     private int count;
     private Set<String> unique = new HashSet<String>();
 
+    /**
+     * Creates a new instance of this class.
+     * @param storage
+     * @param request
+     * @param recordElement
+     */
     public MetaDataRecordHandler(StorageEngine storage, Request request, String recordElement) {
         super();
         this.storage = storage;

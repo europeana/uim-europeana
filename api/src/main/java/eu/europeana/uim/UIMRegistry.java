@@ -1,7 +1,6 @@
 package eu.europeana.uim;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +12,16 @@ import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.Workflow;
+import eu.europeana.uim.workflow.Workflow;
 
+/** The central service registry for UIM. The service container registers
+ * all services with this registry (as configured in the blueprint xml files) so
+ * that one can get an overview of registered services for storage, logging as well as
+ * workflows.
+ * 
+ * @author Andreas Juffinger (andreas.juffinger@kb.nl)
+ * @date Feb 16, 2011
+ */
 public class UIMRegistry implements Registry {
 
     private static Logger log = Logger.getLogger(UIMRegistry.class.getName());
@@ -23,8 +30,8 @@ public class UIMRegistry implements Registry {
     private StorageEngine activeStorage = null;
     private Map<String, StorageEngine> storages = new HashMap<String, StorageEngine>();
 
-    private String defaultLoggingEngine;
-    private LoggingEngine activeLogging = null;
+    private String configuredLoggingEngine;
+    private LoggingEngine<?> activeLogging = null;
     private Map<String, LoggingEngine<?>> loggers = new HashMap<String, LoggingEngine<?>>();
 
     private Map<String, IngestionPlugin> plugins = new HashMap<String, IngestionPlugin>();
@@ -32,11 +39,15 @@ public class UIMRegistry implements Registry {
 
     private Orchestrator orchestrator = null;
 
+    /**
+     * Creates a new instance of this class.
+     */
     public UIMRegistry() {
     }
 
     
-    public void setConfiguredStorageEngine(String configuredStorageEngine) {
+    @Override
+	public void setConfiguredStorageEngine(String configuredStorageEngine) {
     	// this may happen before the storage services are loaded
     	// we set the active storage "lazy"
     	this.configuredStorageEngine = configuredStorageEngine;
@@ -47,16 +58,15 @@ public class UIMRegistry implements Registry {
     }
 
 
-    public void setDefaultLoggingEngine(String defaultLoggingEngine) {
-        // do not allow setting false values
-        if (activeLogging != null && getStorage(defaultLoggingEngine) != null) {
-            this.activeLogging = getLoggingEngine(defaultLoggingEngine);
-            this.defaultLoggingEngine = defaultLoggingEngine;
-        } else if (activeLogging != null) {
-            log.severe("Attempt to set default logging engine to '" + defaultLoggingEngine + "' failed, not making the change");
-        } else {
-            log.info("Setting default logging engine to " + defaultLoggingEngine);
-            this.defaultLoggingEngine = defaultLoggingEngine;
+    @Override
+	public void setConfiguredLoggingEngine(String configuredLoggingEngine) {
+    	// this may happen before the storage services are loaded
+    	// we set the active logging "lazy"
+
+    	this.configuredLoggingEngine = configuredLoggingEngine;
+    	if (this.activeLogging != null) {
+            this.activeLogging = null;
+            this.activeLogging = getLoggingEngine(configuredLoggingEngine);
         }
     }
 
@@ -123,7 +133,11 @@ public class UIMRegistry implements Registry {
         if (storage != null) {
             log.info("Removed storage:" + storage.getIdentifier());
             storage.shutdown();
-            this.storages.remove(storage.getIdentifier());
+            
+            StorageEngine remove = this.storages.remove(storage.getIdentifier());
+            if (activeStorage == remove) {
+            	activeStorage = null;
+            }
         }
     }
 
@@ -154,13 +168,21 @@ public class UIMRegistry implements Registry {
     @Override
     public StorageEngine getStorage() {
         if (storages == null || storages.isEmpty()) return null;
+        
         if (activeStorage == null) {
-        	activeStorage = getStorage(configuredStorageEngine);
-        	if (activeStorage == null) {
-        		throw new IllegalStateException("Cannot retrieve configured storage engine <" + configuredStorageEngine + ">. The following storages are available: " + Arrays.toString(storages.keySet().toArray(new String[0])));
+        	if (getStorage(configuredStorageEngine) != null) {
+        		activeStorage = getStorage(configuredStorageEngine);
+        	} else {
+            	// default to first engine
+        		activeStorage = storages.values().iterator().next();
+
         	}
         }
         return activeStorage;
+    }
+    
+    StorageEngine getActiveStorage(){
+    	return activeStorage;
     }
 
     @Override
@@ -170,7 +192,7 @@ public class UIMRegistry implements Registry {
     }
 
     @Override
-    public void addLoggingEngine(LoggingEngine logging) {
+    public void addLoggingEngine(LoggingEngine<?> logging) {
         if (logging != null) {
             log.info("Added logging engine:" + logging.getIdentifier());
             if (!loggers.containsKey(logging.getIdentifier())) {
@@ -178,7 +200,7 @@ public class UIMRegistry implements Registry {
                 // activate default logging
                 if (activeLogging == null) {
                     activeLogging = logging;
-                } else if (logging.getIdentifier().equals(defaultLoggingEngine)) {
+                } else if (logging.getIdentifier().equals(configuredLoggingEngine)) {
                     activeLogging = logging;
                     log.info("Making logging engine " + logging.getIdentifier() + " default");
                 }
@@ -187,9 +209,14 @@ public class UIMRegistry implements Registry {
     }
 
     @Override
-    public void removeLoggingEngine(LoggingEngine logging) {
+    public void removeLoggingEngine(LoggingEngine<?> logging) {
     	if (logging != null){
-    		loggers.remove(logging.getIdentifier());
+    		
+    		LoggingEngine<?> remove = loggers.remove(logging.getIdentifier());
+            if (activeLogging == remove) {
+            	activeLogging = null;
+            }
+
     	}
     }
 
@@ -200,23 +227,28 @@ public class UIMRegistry implements Registry {
         return res;
     }
 
+    
+    
     @Override
     public LoggingEngine<?> getLoggingEngine() {
         if (loggers == null || loggers.isEmpty()) return null;
+        
         if (activeLogging == null) {
-            if (getLoggingEngine(defaultLoggingEngine) != null) {
-                activeLogging = getLoggingEngine(defaultLoggingEngine);
+            if (getLoggingEngine(configuredLoggingEngine) != null) {
+                activeLogging = getLoggingEngine(configuredLoggingEngine);
             } else {
-                activeLogging = loggers.values().toArray(new LoggingEngine[] {})[0];
+            	// default to first engine
+                activeLogging = loggers.values().iterator().next();
             }
         }
         return activeLogging;
     }
 
-    @Override
-    public void setActiveLoggingEngine(LoggingEngine loggingEngine) {
-        activeLogging = loggingEngine;
+    
+    LoggingEngine<?> getActiveLoggingEngine(){
+    	return activeLogging;
     }
+
 
     @Override
     public LoggingEngine<?> getLoggingEngine(String identifier) {
@@ -224,7 +256,8 @@ public class UIMRegistry implements Registry {
         return loggers.get(identifier);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuilder builder = new StringBuilder();
 
         builder.append("\nRegistered plugins:");
@@ -279,7 +312,7 @@ public class UIMRegistry implements Registry {
         if (loggers.isEmpty()) {
             builder.append("\n\tNo logging.");
         } else {
-            for (LoggingEngine loggingEngine : loggers.values()) {
+            for (LoggingEngine<?> loggingEngine : loggers.values()) {
                 if (builder.length() > 0) {
                     builder.append("\n\t");
                 }
@@ -292,6 +325,9 @@ public class UIMRegistry implements Registry {
             }
         }
 
+        builder.append("\nRegistered logging:");
+        builder.append("\n--------------------------------------");
+        builder.append(orchestrator != null ? orchestrator.getIdentifier() : "No orchestrator defined.");
 
         return builder.toString();
     }

@@ -4,6 +4,8 @@ package eu.europeana.uim.api;
 import java.util.Collection;
 import java.util.List;
 
+import eu.europeana.uim.workflow.Workflow;
+
 /**
  * Registry for UIM services
  */
@@ -23,8 +25,8 @@ public interface Registry {
 
     void setConfiguredStorageEngine(String configuredStorageEngine);
 
-    //void setActiveStorage(StorageEngine storage);
-
+    void setConfiguredLoggingEngine(String configuredLoggingEngine);
+    
     void addWorkflow(Workflow workflow);
 
     List<Workflow> getWorkflows();
@@ -46,7 +48,5 @@ public interface Registry {
     LoggingEngine<?> getLoggingEngine();
 
     LoggingEngine<?> getLoggingEngine(String identifier);
-
-    void setActiveLoggingEngine(LoggingEngine<?> loggingEngine);
 
 }

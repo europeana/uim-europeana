@@ -3,6 +3,7 @@ package eu.europeana.uim.api;
 import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Execution;
+import eu.europeana.uim.workflow.Workflow;
 
 /**
  * Context of a running execution

@@ -3,10 +3,6 @@ package eu.europeana.uim.workflow;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.europeana.uim.api.AbstractWorkflow;
-import eu.europeana.uim.api.IngestionWorkflowStep;
-import eu.europeana.uim.api.WorkflowStep;
-import eu.europeana.uim.api.WorkflowStepComposite;
 import eu.europeana.uim.util.BatchWorkflowStart;
 
 public class MixedWorkflow extends AbstractWorkflow {
