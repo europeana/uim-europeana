@@ -75,6 +75,10 @@ public abstract class AbstractIngestionPlugin implements IngestionPlugin {
 		return "Abstract Ingestion Plugin";
 	}
 
+
+	public abstract void processRecord(MetaDataRecord mdr);
+
+	
 	@Override
 	public void processRecord(MetaDataRecord mdr, ExecutionContext context) {
 		String identifier = mdr.getIdentifier();
@@ -82,7 +86,7 @@ public abstract class AbstractIngestionPlugin implements IngestionPlugin {
 			log.log(level, qualifier + ":" + identifier);
 		}
 
-        processRecord(context, mdr, this);
+        processRecord(mdr, context, this);
 	}
 
     /**
@@ -107,8 +111,17 @@ public abstract class AbstractIngestionPlugin implements IngestionPlugin {
      * @param plugin the {@link IngestionPlugin} for this plugin invocation
      * @return
      */
-    public abstract IngestionPluginCall processRecord(ExecutionContext context, MetaDataRecord record, IngestionPlugin plugin);
+    public IngestionPluginCall processRecord(MetaDataRecord record, ExecutionContext context, IngestionPlugin plugin) {
+    	return new IngestionPluginCall(record, context, plugin) {
+    		@Override
+			public void processRecord(MetaDataRecord record) {
+    			processRecord(record);
+    		}
+    	};
+    }
 
+    
+    
     /**
      * Helper class for easing common operations such as logging when implementing an @{IngestionPlugin}
      */
@@ -117,7 +130,7 @@ public abstract class AbstractIngestionPlugin implements IngestionPlugin {
         private final MetaDataRecord record;
         private final IngestionPlugin plugin;
 
-        public IngestionPluginCall(ExecutionContext context, MetaDataRecord record, IngestionPlugin plugin) {
+        public IngestionPluginCall(MetaDataRecord record, ExecutionContext context, IngestionPlugin plugin) {
             this.context = context;
             this.record = record;
             this.plugin = plugin;
