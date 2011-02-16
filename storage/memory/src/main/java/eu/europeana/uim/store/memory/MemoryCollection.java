@@ -6,6 +6,8 @@ public class MemoryCollection extends AbstractNamedMemoryEntity implements Colle
 
 	private MemoryProvider provider;
 
+	private String language;
+	
 	private String oaiBaseUrl;
 	private String oaiPrefix;
 	private String oaiSet;
@@ -30,6 +32,15 @@ public class MemoryCollection extends AbstractNamedMemoryEntity implements Colle
 		return "Collection:" + getMnemonic();
 	}
 	
+
+	
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
 
 	/**
 	 * @return the oaiBaseUrl

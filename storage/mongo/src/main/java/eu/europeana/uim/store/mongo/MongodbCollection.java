@@ -13,6 +13,8 @@ import eu.europeana.uim.store.Provider;
 @Entity
 public class MongodbCollection extends AbstractMongoEntity implements Collection {
 
+    private String language;
+
     private String oaiBaseUrl;
     private String oaiMetadataPrefix;
     private String oaiSet;
@@ -42,8 +44,18 @@ public class MongodbCollection extends AbstractMongoEntity implements Collection
     public void setProvider(MongoProvider provider) {
         this.provider = provider;
     }
+    
+    
 
-    public String getOaiBaseUrl() {
+    public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public String getOaiBaseUrl() {
         return oaiBaseUrl;
     }
 

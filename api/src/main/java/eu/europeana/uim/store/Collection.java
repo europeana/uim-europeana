@@ -20,6 +20,9 @@ public interface Collection  extends DataSet {
 	public String getName();
 	public void setName(String name);
 	
+	public String getLanguage();
+	public void setLanguage(String name);
+	
 	public String getOaiBaseUrl();
 	public void setOaiBaseUrl(String baseUrl);
 
