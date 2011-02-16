@@ -33,7 +33,7 @@ public class RecordParser {
 	 * 
 	 * @param stream
 	 * @param record
-	 * @return
+	 * @return a list of parsed records
 	 * @throws XMLStreamParserException
 	 */
 	public List<RecordMap> parse(InputStream stream, String record) throws XMLStreamParserException {

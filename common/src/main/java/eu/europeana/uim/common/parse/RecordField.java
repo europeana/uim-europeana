@@ -1,5 +1,11 @@
 package eu.europeana.uim.common.parse;
 
+/** A simple representation of an XML record
+ * 
+ * 
+ * @author Andreas Juffinger (andreas.juffinger@kb.nl)
+ * @date Feb 16, 2011
+ */
 public class RecordField {
 
 	private final String prefix;
@@ -7,6 +13,12 @@ public class RecordField {
 	private final String language;
 	
 	
+	/**
+	 * Creates a new instance of this class.
+	 * @param prefix
+	 * @param local
+	 * @param language
+	 */
 	public RecordField(String prefix, String local, String language) {
 		super();
 		this.prefix = prefix;
@@ -39,6 +51,7 @@ public class RecordField {
 	}
 
 	
+	@Override
 	public String toString() {
 		String field = "";
 		field += prefix == null ? "" : prefix + ":";

@@ -8,20 +8,14 @@ import java.util.logging.Logger;
  * 
  * @author andreas.juffinger@kb.nl
  */
-public class LoggingProgressMonitor implements ProgressMonitor {
+public class LoggingProgressMonitor extends MemoryProgressMonitor {
 
 	private final static Logger log = Logger.getLogger(LoggingProgressMonitor.class.getName());
 	
 	private Level level;
 	private int logfrq = 100;
-	
-	private String task ="Not defined";
-	private String subtask ="Not defined";
-	
-	private int work =0;
-	private int worked =0;
-	
-	private boolean cancelled = false;
+
+	private long start;
 	
 
 	/**
@@ -49,42 +43,41 @@ public class LoggingProgressMonitor implements ProgressMonitor {
 	
 	@Override
 	public void beginTask(String task, int work) {
-		this.task = task;
-		this.work = work;
+		super.beginTask(task, work);
+		this.start = System.currentTimeMillis();
+		
 		log.log(level, "Begin task: <" + task + "> " + work + " units of work.");
 	}
 
 	@Override
 	public void worked(int work) {
-		this.worked += work;
+		super.worked(work);
 		
-		if (this.worked % logfrq == 0) {
-			log.log(level, String.format("%d units of worked. So far %d done.", logfrq, worked));
+		if (getWorked() % logfrq == 0) {
+			long period = System.currentTimeMillis() - start;
+			double persec = getWorked() * 1000.0 / period;
+			log.log(level, String.format("%d units of worked. So far %d done in %.3f sec. Average %.3f/sec", logfrq, getWorked(), period / 1000.0, persec));
 		}
 	}
 
 	@Override
 	public void done() {
-		log.log(level, String.format("%d units done.", worked));
-		this.worked = work;
+		super.done();
+		log.log(level, String.format("%d units done.", getWorked()));
 	}
 
 	@Override
 	public void subTask(String subtask) {
-		this.subtask = subtask;
-		log.log(level, String.format("%d units of worked. Start subtask: <" + subtask +">", worked));
+		super.subTask(subtask);
+		log.log(level, String.format("%d units of worked. Start subtask: <" + subtask +">", getWorked()));
 	}
 
 	@Override
 	public void setCancelled(boolean canceled) {
-		this.cancelled = canceled;
+		super.setCancelled(canceled);
 
-		log.log(level, String.format("%d units of worked. CANCEL: <" + canceled +">", worked));
+		log.log(level, String.format("%d units of worked. CANCEL: <" + canceled +">", getWorked()));
 	}
 
-	@Override
-	public boolean isCancelled() {
-		return cancelled;
-	}
 
 }

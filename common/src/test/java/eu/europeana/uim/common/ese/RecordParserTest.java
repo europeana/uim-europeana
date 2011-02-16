@@ -1,4 +1,4 @@
-package eu.europeana.common.ese;
+package eu.europeana.uim.common.ese;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -14,9 +14,18 @@ import eu.europeana.uim.common.parse.RecordParser;
 import eu.europeana.uim.common.parse.XMLStreamParserException;
 
 
+/**
+ * 
+ * 
+ * @author Andreas Juffinger (andreas.juffinger@kb.nl)
+ * @date Feb 16, 2011
+ */
 public class RecordParserTest {
 
 
+	/** method testing against a standard ese file
+	 * @throws XMLStreamParserException
+	 */
 	@Test
 	public void testParseReadingEurope() throws XMLStreamParserException {
 		InputStream stream = RecordParserTest.class.getResourceAsStream("/readingeurope.xml");
@@ -26,6 +35,9 @@ public class RecordParserTest {
 	}
 
 	
+	/** method testing against an ese file within an oai context
+	 * @throws XMLStreamParserException
+	 */
 	@Test
 	public void testParseReadingEuropeOAI() throws XMLStreamParserException {
 		InputStream stream = RecordParserTest.class.getResourceAsStream("/readingeurope.oai.xml");
@@ -35,6 +47,9 @@ public class RecordParserTest {
 	}
 
 	
+	/** method testing the path resolution of the record name
+	 * @throws XMLStreamParserException
+	 */
 	@Test
 	public void testParseReadingEuropePathESE() throws XMLStreamParserException {
 		InputStream stream = RecordParserTest.class.getResourceAsStream("/readingeurope.oai.xml");
@@ -43,6 +58,9 @@ public class RecordParserTest {
 		assertEquals(250, xml.size());
 	}
 
+	/** method testing the record name with TEL data
+	 * @throws XMLStreamParserException
+	 */
 	@Test
 	public void testParseReadingEuropeTEL() throws XMLStreamParserException {
 		InputStream stream = RecordParserTest.class.getResourceAsStream("/readingeurope.tel.xml");
@@ -52,6 +70,9 @@ public class RecordParserTest {
 	}
 
 	
+	/** method testing the path resolution of the record name
+	 * @throws XMLStreamParserException
+	 */
 	@Test
 	public void testParseReadingEuropePathTEL() throws XMLStreamParserException {
 		InputStream stream = RecordParserTest.class.getResourceAsStream("/readingeurope.tel.xml");
@@ -62,7 +83,9 @@ public class RecordParserTest {
 
 	
 
-	
+	/** method testing the existence of specific detailed info
+	 * @throws XMLStreamParserException
+	 */
 	@Test
 	public void testParseReadingEuropeDetail() throws XMLStreamParserException {
 		InputStream stream = RecordParserTest.class.getResourceAsStream("/readingeurope.oai.xml");
@@ -83,6 +106,9 @@ public class RecordParserTest {
 		}
 	}
 	
+	/** method testing the real data from europeana travel
+	 * @throws XMLStreamParserException
+	 */
 	@Test
 	public void testParseEuropeanaTravel1() throws XMLStreamParserException {
 		InputStream stream = RecordParserTest.class.getResourceAsStream("/MS10805_09_tn.xml");
@@ -91,6 +117,9 @@ public class RecordParserTest {
 		assertEquals(1, xml.size());
 	}
 
+	/** method testing the real data from europeana travel
+	 * @throws XMLStreamParserException
+	 */
 	@Test
 	public void testParseEuropeanaTravel2() throws XMLStreamParserException {
 		InputStream stream = RecordParserTest.class.getResourceAsStream("/MS10805_37_tn.xml");

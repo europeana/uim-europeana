@@ -44,9 +44,9 @@ public interface ProgressMonitor {
 	public void setCancelled(boolean cancelled);
 
 	
-	/** Check wheater the task execution should be cancelled or not.
+	/** Check whether the task execution has been canceled or not.
 	 * 
-	 * @return
+	 * @return whether the execution should be cancelled.
 	 */
 	public boolean isCancelled();
 	
