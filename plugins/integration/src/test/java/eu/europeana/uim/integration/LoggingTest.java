@@ -1,19 +1,5 @@
 package eu.europeana.uim.integration;
 
-import eu.europeana.uim.api.LoggingEngine;
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.LoggingEngine.Level;
-
-import org.apache.karaf.testing.Helper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.osgi.framework.Constants;
-
-import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
@@ -21,6 +7,19 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.waitForFrameworkStartup;
 import static org.ops4j.pax.exam.OptionUtils.combine;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
+
+import org.apache.karaf.testing.Helper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.container.def.PaxRunnerOptions;
+import org.ops4j.pax.exam.junit.Configuration;
+import org.ops4j.pax.exam.junit.JUnit4TestRunner;
+
+import eu.europeana.uim.api.LoggingEngine;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.LoggingEngine.Level;
+import eu.europeana.uim.api.Registry;
 
 
 /**
@@ -44,6 +43,8 @@ public class LoggingTest extends AbstractUIMIntegrationTest {
                         maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("xml").classifier("features").versionAsInProject(),
                         "spring"),
 
+                //PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006" ),
+                        
                 // our modules. Karaf / Pax Exam don't fare well together in regards to feature descriptors
                 // so until they do have these, we need to specify the OSGIfied maven bundles by hand here
                 // this should be in sync with the feature descriptor at /etc/uim-features.xml
@@ -67,8 +68,6 @@ public class LoggingTest extends AbstractUIMIntegrationTest {
                 mavenBundle().groupId("org.hibernate").artifactId("com.springsource.org.hibernate.annotations").version("3.3.1.ga"),
                 mavenBundle().groupId("org.hibernate").artifactId("com.springsource.org.hibernate.annotations.common").version("3.3.0.ga"),
                 mavenBundle().groupId("org.hibernate").artifactId("com.springsource.org.hibernate.ejb").version("3.3.2.GA"),
-
-                //mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-logging-memory").versionAsInProject(),
                 
                 felix(),
 
@@ -77,10 +76,15 @@ public class LoggingTest extends AbstractUIMIntegrationTest {
     }
 
     @Test
-    public void testUIInfo() throws Exception {
+    public void testLogging() throws Exception {
     	Registry registry = getOsgiService(Registry.class);
 
-    	LoggingEngine<?> logging = registry.getLoggingEngine();
+    	LoggingEngine<?> logging = null;
+    	while (logging == null) {
+    		logging = registry.getLoggingEngine();
+    		Thread.sleep(500);
+    	}
+
     	logging.log(Level.INFO, "tst tst", null, null, null);
     	
     }
