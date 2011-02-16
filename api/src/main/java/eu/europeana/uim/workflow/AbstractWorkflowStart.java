@@ -161,7 +161,7 @@ public abstract class AbstractWorkflowStart implements WorkflowStart {
 	/** Getter for the batches blocking queue
 	 * @return the queue which is used to create tasks from
 	 */
-	protected BlockingQueue<long[]> getBatches() {
+	public BlockingQueue<long[]> getBatches() {
 		return batches;
 	}
 
