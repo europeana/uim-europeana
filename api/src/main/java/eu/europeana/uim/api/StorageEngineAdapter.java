@@ -33,6 +33,10 @@ public abstract class StorageEngineAdapter implements StorageEngine {
 	public void shutdown() {
 	}
 
+	@Override
+	public void checkpoint() {
+	}
+
 
 	@Override
 	public void setConfiguration(Map<String, String> config) {

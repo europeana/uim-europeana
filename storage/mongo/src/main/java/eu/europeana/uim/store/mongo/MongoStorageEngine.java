@@ -112,6 +112,10 @@ public class MongoStorageEngine implements StorageEngine {
             e.printStackTrace();
         }
     }
+    
+	@Override
+	public void checkpoint() {
+	}
 
     public void shutdown() {
         status = EngineStatus.STOPPED;

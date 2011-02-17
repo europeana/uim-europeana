@@ -30,6 +30,7 @@ public interface StorageEngine {
 	
 	public void initialize();
 	public void shutdown();
+	public void checkpoint();
 	
 	public EngineStatus getStatus();
 	public long size();
