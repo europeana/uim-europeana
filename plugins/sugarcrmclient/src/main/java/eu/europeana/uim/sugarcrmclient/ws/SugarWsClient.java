@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -17,6 +18,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.ws.WebServiceMessage;
 import org.springframework.ws.client.core.WebServiceMessageCallback;
+import org.springframework.ws.client.core.WebServiceMessageExtractor;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.SoapMessage;
 import org.springframework.xml.transform.StringResult;
@@ -113,7 +115,10 @@ public class SugarWsClient {
 
 	
 	public <T,S> S invokeWSTemplate( T wsOperation){
+
+		@SuppressWarnings("unchecked")
 		S wsResponse = (S)webServiceTemplate.marshalSendAndReceive(wsOperation);
+	
 		return wsResponse;
 	}
 	
@@ -121,15 +126,7 @@ public class SugarWsClient {
 	public String test(){
 		StreamSource source = new StreamSource(new StringReader(TESTMESSAGE));
 		StringResult  stringResult = new StringResult();
-		
-		System.out.println(TESTMESSAGE);
-		
-		
-
-		//Class transformerFactoryClass;
-		//webServiceTemplate.setTransformerFactoryClass(SAXParserFactoryImpl.class);
-
-		
+		System.out.println(TESTMESSAGE);		
 		webServiceTemplate.sendSourceAndReceiveToResult(localserverURI, source, stringResult);
 
 		return stringResult.toString();
@@ -175,6 +172,16 @@ public class SugarWsClient {
 		
 		return response;
 	}
+	
+	
+	public GetEntriesResponse get_entries(GetEntries request){
+		
+		GetEntriesResponse response = invokeWSTemplate(request);
+		
+		return response;
+	}
+	
+	
 	
 	
 	public GetUserIdResponse get_user_id(GetUserId request){

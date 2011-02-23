@@ -8,30 +8,42 @@
 		file so that this file can easily be used for integration testing outside 
 		of an OSGi environment -->
 
+
+
 	<bean id="sugarWsClient" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClient">
 		<property name="webServiceTemplate" ref="webServiceTemplate"/>
 	</bean>
 
+
+    <bean id="messageFactory" class="eu.europeana.uim.sugarcrmclient.internal.ExtendedSaajSoapMessageFactory"/>
+
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
+         <constructor-arg ref="messageFactory"/>
          <property name="defaultUri" value="http://localhost:8080/sugarcrm/soap.php?wsdl" />
          <property name="marshaller" ref="jaxb1Marshaller" />
          <property name="unmarshaller" ref="jaxb1Marshaller" />
+         <!--  
+         <property name="messageSender">
+           <bean class="org.springframework.ws.transport.http.HttpUrlConnectionMessageSender">
+            <property name="acceptGzipEncoding" value="true" />
+           </bean>
+         </property>
+        
+         <property name="interceptors">
+           <list>
+            <ref bean="compressedSoapInterceptor" />
+           </list>
+         </property>
+         -->
     </bean>
     
+    <!--  
+    <bean id="compressedSoapInterceptor" class="eu.europeana.uim.sugarcrmclient.internal.CompressedSoapmessageInterceptor">
+    </bean>
+    -->
+    
     <bean id="jaxb1Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-
-       
-
          <property name="contextPath" value="org.xmlsoap.schemas.soap.encoding:com.sugarcrm.sugarcrm"/>
-         <!--  
-           <property name="classesToBeBound">
-            <list>
-                <value>com.sugarcrm.sugarcrm.LoginRequest</value>
-                <value>com.sugarcrm.sugarcrm.UserAuth</value>
-                <value>com.sugarcrm.sugarcrm.LoginResponse</value>                   
-            </list>
-        </property>
-         -->
     </bean>
     
 

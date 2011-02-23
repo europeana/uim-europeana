@@ -18,16 +18,25 @@ import org.junit.runner.RunWith;
 import org.springframework.test.annotation.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import com.sugarcrm.sugarcrm.GetServerVersion;
 
 import com.sugarcrm.sugarcrm.GetAvailableModules;
 import com.sugarcrm.sugarcrm.GetAvailableModulesResponse;
+import com.sugarcrm.sugarcrm.GetEntries;
+import com.sugarcrm.sugarcrm.GetEntriesResponse;
 import com.sugarcrm.sugarcrm.GetEntryList;
 import com.sugarcrm.sugarcrm.GetEntryListResponse;
 import com.sugarcrm.sugarcrm.GetEntryListResult;
@@ -41,12 +50,12 @@ import com.sugarcrm.sugarcrm.IsUserAdmin;
 import com.sugarcrm.sugarcrm.IsUserAdminResponse;
 
 import com.sugarcrm.sugarcrm.ObjectFactory;
-
-//import org.xmlsoap.schemas.soap.encoding.String;
+import org.w3c.dom.Element;
 
 /**
+ * 
+ * 
  * @author geomark
- *
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -60,7 +69,8 @@ public final class SugarCRMWSTest {
 
 	
 	
-	@Before public void setupSession(){
+	@Before 
+	public void setupSession(){
 		LoginResponse lresponse =  sugarWsClient.login2(createStandardLoginObject());
 		sessionID = lresponse.getReturn().getId();
 	}
@@ -81,14 +91,10 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testIsUserAdmin(){
 		
-		ObjectFactory factory = new ObjectFactory();
-		
-		IsUserAdmin user = factory.createIsUserAdmin();
-		
-		user.setSession(sugarWsClient.login(createStandardLoginObject()));
-		
-		IsUserAdminResponse response = sugarWsClient.is_user_admin(user);
-		
+		ObjectFactory factory = new ObjectFactory();		
+		IsUserAdmin user = factory.createIsUserAdmin();		
+		user.setSession(sessionID);		
+		IsUserAdminResponse response = sugarWsClient.is_user_admin(user);		
 		marshallReturnedObject(response);
 	}
 	
@@ -122,18 +128,38 @@ public final class SugarCRMWSTest {
 		marshallReturnedObject(response);
 	}
 	
-	//@Test
-	public void testGetEntryList(){	 
+	@Test
+	public void testGetEntries(){	 
+
+		Element rootElement = null;
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder;
+		try {
+			documentBuilder = documentBuilderFactory.newDocumentBuilder();
+	        Document document = documentBuilder.newDocument();
+	        rootElement = document.createElement("item");
+	        document.appendChild(rootElement);
+	        
+
+            rootElement.appendChild(document.createTextNode("Phone"));
+	        
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+
+		
 		ObjectFactory factory = new ObjectFactory();		
-		GetEntryList request = factory.createGetEntryList();
+		GetEntries request = factory.createGetEntries();
 		SelectFields fields = factory.createSelectFields();
-		request.setModuleName("Accounts");
-		request.setOrderBy("accounts.city");
+		fields.setArrayType("string[1]");
+
+		fields.getAnies().add(rootElement);
+  		request.setModuleName("Accounts");	
 		request.setSelectFields(fields);
-		request.setMaxResults(50);
-		request.setSession(sessionID);
+		request.setSession(sessionID);		
+		
 		marshallReturnedObject(request);
-		GetEntryListResponse response =  sugarWsClient.get_entry_list(request);
+		GetEntriesResponse response =  sugarWsClient.get_entries(request);
 		marshallReturnedObject(response);
 	}
 	
@@ -185,7 +211,7 @@ public final class SugarCRMWSTest {
 		try {
 			mdEnc = MessageDigest.getInstance("MD5");
 			mdEnc.update(value.getBytes(), 0, value.length());
-			md5Password.append(new BigInteger(1, mdEnc.digest()).toString(16)); // Encrypted string
+			md5Password.append(new BigInteger(1, mdEnc.digest()).toString(16)); 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} 
