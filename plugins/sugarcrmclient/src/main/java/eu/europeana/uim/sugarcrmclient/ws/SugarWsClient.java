@@ -76,6 +76,10 @@ import com.sugarcrm.sugarcrm.UpdatePortalUserResponse;
 import com.sugarcrm.sugarcrm.GetUserId;
 import com.sugarcrm.sugarcrm.GetUserIdResponse;
 
+
+import com.sugarcrm.sugarcrm.GetModuleFields;
+import com.sugarcrm.sugarcrm.GetModuleFieldsResponse;
+
 import com.sugarcrm.sugarcrm.GetUserTeamIdResponse;
 import com.sugarcrm.sugarcrm.GetServerTimeResponse;
 import com.sugarcrm.sugarcrm.GetGmtTimeResponse;
@@ -165,6 +169,13 @@ public class SugarWsClient {
 		return response;
 	}
 	
+	public GetModuleFieldsResponse get_module_fields(GetModuleFields request){
+
+		GetModuleFieldsResponse response = invokeWSTemplate(request);
+		
+		return response;
+	}
+
 	
 	public GetEntryListResponse get_entry_list(GetEntryList request){
 		

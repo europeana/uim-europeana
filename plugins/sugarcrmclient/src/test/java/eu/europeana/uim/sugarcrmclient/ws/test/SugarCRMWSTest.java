@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import java.io.StringWriter;
 import java.math.*;
 import java.security.*;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +41,8 @@ import com.sugarcrm.sugarcrm.GetEntriesResponse;
 import com.sugarcrm.sugarcrm.GetEntryList;
 import com.sugarcrm.sugarcrm.GetEntryListResponse;
 import com.sugarcrm.sugarcrm.GetEntryListResult;
+import com.sugarcrm.sugarcrm.GetModuleFields;
+import com.sugarcrm.sugarcrm.GetModuleFieldsResponse;
 import com.sugarcrm.sugarcrm.GetUserId;
 import com.sugarcrm.sugarcrm.GetUserIdResponse;
 import com.sugarcrm.sugarcrm.Login;
@@ -51,7 +54,7 @@ import com.sugarcrm.sugarcrm.IsUserAdminResponse;
 
 import com.sugarcrm.sugarcrm.ObjectFactory;
 import org.w3c.dom.Element;
-
+import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 /**
  * 
  * 
@@ -71,7 +74,7 @@ public final class SugarCRMWSTest {
 	
 	@Before 
 	public void setupSession(){
-		LoginResponse lresponse =  sugarWsClient.login2(createStandardLoginObject());
+		LoginResponse lresponse =  sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
 		sessionID = lresponse.getReturn().getId();
 	}
 	
@@ -80,11 +83,9 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testLogin(){
 		
-		LoginResponse response =  sugarWsClient.login2(createStandardLoginObject());
-		
+		LoginResponse response =  sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
 		System.out.println(response.getReturn().getId());
-		
-		marshallReturnedObject(response);
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
@@ -95,7 +96,7 @@ public final class SugarCRMWSTest {
 		IsUserAdmin user = factory.createIsUserAdmin();		
 		user.setSession(sessionID);		
 		IsUserAdminResponse response = sugarWsClient.is_user_admin(user);		
-		marshallReturnedObject(response);
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
@@ -104,9 +105,9 @@ public final class SugarCRMWSTest {
 		ObjectFactory factory = new ObjectFactory();		
 		GetUserId request = factory.createGetUserId();
 		request.setSession(sessionID);
-		marshallReturnedObject(request);
+		ClientUtils.logMarshalledObject(request);
 		GetUserIdResponse response =  sugarWsClient.get_user_id(request);
-		marshallReturnedObject(response);
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	//@Test
@@ -122,103 +123,81 @@ public final class SugarCRMWSTest {
 		ObjectFactory factory = new ObjectFactory();		
 		GetAvailableModules request = factory.createGetAvailableModules();
 		request.setSession(sessionID);
-		marshallReturnedObject(request);
+		ClientUtils.logMarshalledObject(request);
 		GetAvailableModulesResponse response =  sugarWsClient.get_available_modules(request);
 		
-		marshallReturnedObject(response);
+		ClientUtils.logMarshalledObject(response);
+	}
+
+	@Test
+	public void testGetModuleFields(){	 
+		ObjectFactory factory = new ObjectFactory();		
+		GetModuleFields request = factory.createGetModuleFields();
+		request.setSession(sessionID);
+		request.setModuleName("Contacts");
+		ClientUtils.logMarshalledObject(request);
+		GetModuleFieldsResponse response =  sugarWsClient.get_module_fields(request);
+		
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	@Test
+	public void testGetEntryList(){
+		
+		ObjectFactory factory = new ObjectFactory();		
+		GetEntryList request = factory.createGetEntryList();
+		
+		ArrayList <String> fieldnames = new  ArrayList<String>();
+		
+		fieldnames.add("id");
+		fieldnames.add("first_name");
+		fieldnames.add("last_name");
+		
+		fieldnames.add("salutation");
+		
+		SelectFields fields = ClientUtils.generatePopulatedSelectFields(fieldnames);
+		
+  		request.setModuleName("Contacts");	
+		//request.setSelectFields(fields);
+		request.setSession(sessionID);
+		request.setOrderBy("last_name");
+		request.setMaxResults(100);
+		//request.setOffset(10);
+		//request.setQuery("(contacts.salutation = 'Mr.' AND contacts.title LIKE 'doctor appointment%')");
+		request.setQuery("(contacts.first_name LIKE '%M%')");
+		
+		ClientUtils.logMarshalledObject(request);
+		GetEntryListResponse response =  sugarWsClient.get_entry_list(request);
+		ClientUtils.logMarshalledObject(response);
+		
+	}
+	
+	
+	@Test
 	public void testGetEntries(){	 
-
-		Element rootElement = null;
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder;
-		try {
-			documentBuilder = documentBuilderFactory.newDocumentBuilder();
-	        Document document = documentBuilder.newDocument();
-	        rootElement = document.createElement("item");
-	        document.appendChild(rootElement);
-	        
-
-            rootElement.appendChild(document.createTextNode("Phone"));
-	        
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
-
 		
 		ObjectFactory factory = new ObjectFactory();		
 		GetEntries request = factory.createGetEntries();
-		SelectFields fields = factory.createSelectFields();
-		fields.setArrayType("string[1]");
 
-		fields.getAnies().add(rootElement);
-  		request.setModuleName("Accounts");	
+		ArrayList <String> fieldnames = new  ArrayList<String>();
+		
+		fieldnames.add("id");
+		fieldnames.add("first_name");
+		fieldnames.add("last_name");
+		
+		fieldnames.add("salutation");
+		
+		SelectFields fields = ClientUtils.generatePopulatedSelectFields(fieldnames);
+
+  		request.setModuleName("Contacts");	
 		request.setSelectFields(fields);
 		request.setSession(sessionID);		
 		
-		marshallReturnedObject(request);
-		GetEntriesResponse response =  sugarWsClient.get_entries(request);
-		marshallReturnedObject(response);
-	}
-	
-	
-	
-	private Login createStandardLoginObject(){
-		
-		ObjectFactory factory = new ObjectFactory();
-		Login login = factory.createLogin();
-		UserAuth user = factory.createUserAuth();
 
-		user.setUserName("test");
-		user.setPassword(md5("test"));
-		user.setVersion("1.0");
-		
-		login.setApplicationName("sugar");
-		login.setUserAuth(user);
-		
-		return login;
-		
+		ClientUtils.logMarshalledObject(request);
+		GetEntriesResponse response =  sugarWsClient.get_entries(request);
+		ClientUtils.logMarshalledObject(response);
 	}
-	
-	
-	private void marshallReturnedObject(Object returnObject){
-		
-		JAXBContext context;
-		try {
-			context = JAXBContext.newInstance("com.sugarcrm.sugarcrm");
-			Marshaller m = context.createMarshaller();
-			
-			StringWriter writer = new StringWriter();
-			m.marshal(returnObject, writer);
-			
-			System.out.println(writer.toString());
-			
-		} catch (JAXBException e) {
-	
-			e.printStackTrace();
-		}
-		
-	}
-	
-	
-	private String md5(String value){
-		
-		StringBuffer md5Password = new StringBuffer("0");
-		
-		MessageDigest mdEnc;
-		try {
-			mdEnc = MessageDigest.getInstance("MD5");
-			mdEnc.update(value.getBytes(), 0, value.length());
-			md5Password.append(new BigInteger(1, mdEnc.digest()).toString(16)); 
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} 
-		
-		return md5Password.toString();
-	}
-	
 	
 		
 	}
