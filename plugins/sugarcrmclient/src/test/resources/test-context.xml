@@ -19,9 +19,10 @@
 
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
          <constructor-arg ref="messageFactory"/>
+
          <property name="defaultUri" value="http://localhost:8080/sugarcrm/soap.php?wsdl" />
-         <property name="marshaller" ref="jaxb1Marshaller" />
-         <property name="unmarshaller" ref="jaxb1Marshaller" />
+         <property name="marshaller" ref="jaxb2Marshaller" />
+         <property name="unmarshaller" ref="jaxb2Marshaller" />
          <!--  
          <property name="messageSender">
            <bean class="org.springframework.ws.transport.http.HttpUrlConnectionMessageSender">
@@ -37,14 +38,23 @@
          -->
     </bean>
     
-    <!--  
-    <bean id="compressedSoapInterceptor" class="eu.europeana.uim.sugarcrmclient.internal.CompressedSoapmessageInterceptor">
-    </bean>
-    -->
     
-    <bean id="jaxb1Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+    <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
          <property name="contextPath" value="org.xmlsoap.schemas.soap.encoding:com.sugarcrm.sugarcrm"/>
     </bean>
     
+   <bean id="log4jInitialization"
+	class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass"
+			value="org.springframework.util.Log4jConfigurer" />
+		<property name="targetMethod" value="initLogging" />
+		<property name="arguments">
+			<list>
+				<value>src/test/resources/log4j.properties</value>
+			</list>
+		</property>
+	</bean>
+
+
 
 </beans>
