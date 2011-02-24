@@ -25,12 +25,16 @@ import com.sugarcrm.sugarcrm.ObjectFactory;
 import com.sugarcrm.sugarcrm.SelectFields;
 import com.sugarcrm.sugarcrm.UserAuth;
 
+
+import org.apache.log4j.Logger;
+
 /**
- * @author geomark
- *
+ * 
+ * @author Georgios Markakis
  */
 public class ClientUtils {
 
+	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(ClientUtils.class);
 
 	
 	
@@ -43,18 +47,17 @@ public class ClientUtils {
 		try {
 			context = JAXBContext.newInstance("com.sugarcrm.sugarcrm");
 			Marshaller m = context.createMarshaller();
-			
 			StringWriter writer = new StringWriter();
 			m.marshal(returnObject, writer);
-			
-			System.out.println(writer.toString());
-			
+			LOGGER.info(writer.toString());
 		} catch (JAXBException e) {
 	
 			e.printStackTrace();
 		}
 		
 	}
+	
+	
 	
 	/**
 	 * 
@@ -103,6 +106,10 @@ public class ClientUtils {
 	
 	
 	
+	/**
+	 * @param fieldnames
+	 * @return
+	 */
 	public static SelectFields generatePopulatedSelectFields(List<String> fieldnames){
 		
 		ObjectFactory factory = new ObjectFactory();		
@@ -123,9 +130,6 @@ public class ClientUtils {
 		try {
 			documentBuilder = documentBuilderFactory.newDocumentBuilder();
 	        Document document = documentBuilder.newDocument();
-	        
-	       // rootElement = document.createElement("items");
-	       // document.appendChild(rootElement);
 	        
 	        for( String fieldname : fieldnames){
 	        	Element element = document.createElement("item");

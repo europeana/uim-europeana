@@ -94,9 +94,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 
+
 /**
- * @author geomark
  * 
+ * @author Georgios Markakis
  */
 public class SugarWsClient {
 
@@ -118,7 +119,13 @@ public class SugarWsClient {
 	}
 
 	
-	public <T,S> S invokeWSTemplate( T wsOperation){
+	/**
+	 * @param <T>
+	 * @param <S>
+	 * @param wsOperation
+	 * @return
+	 */
+	private <T,S> S invokeWSTemplate( T wsOperation){
 
 		@SuppressWarnings("unchecked")
 		S wsResponse = (S)webServiceTemplate.marshalSendAndReceive(wsOperation);
@@ -127,6 +134,9 @@ public class SugarWsClient {
 	}
 	
 	
+	/**
+	 * @return
+	 */
 	public String test(){
 		StreamSource source = new StreamSource(new StringReader(TESTMESSAGE));
 		StringResult  stringResult = new StringResult();
@@ -137,6 +147,10 @@ public class SugarWsClient {
 	}
 	
 	
+	/**
+	 * @param login
+	 * @return
+	 */
 	public String login(Login login){
 		
 		LoginResponse response =  invokeWSTemplate(login);
@@ -146,6 +160,10 @@ public class SugarWsClient {
 	}
 	
 
+	/**
+	 * @param login
+	 * @return
+	 */
 	public LoginResponse login2(Login login){
 		
 		LoginResponse response =  invokeWSTemplate(login);
@@ -154,6 +172,24 @@ public class SugarWsClient {
 	}
 	
 	
+	
+	
+	/**
+	 * @param request
+	 * @return
+	 */
+	public LogoutResponse logout(Logout request){
+		
+		LogoutResponse response =  invokeWSTemplate(request);
+		
+		return response;
+	}
+	
+	
+	/**
+	 * @param request
+	 * @return
+	 */
 	public IsUserAdminResponse is_user_admin(IsUserAdmin request){
 
 		IsUserAdminResponse response = invokeWSTemplate(request);
@@ -162,6 +198,10 @@ public class SugarWsClient {
 	}
 	
 	
+	/**
+	 * @param request
+	 * @return
+	 */
 	public GetAvailableModulesResponse get_available_modules(GetAvailableModules request){
 
 		GetAvailableModulesResponse response = invokeWSTemplate(request);
@@ -169,6 +209,11 @@ public class SugarWsClient {
 		return response;
 	}
 	
+	
+	/**
+	 * @param request
+	 * @return
+	 */
 	public GetModuleFieldsResponse get_module_fields(GetModuleFields request){
 
 		GetModuleFieldsResponse response = invokeWSTemplate(request);
@@ -177,6 +222,10 @@ public class SugarWsClient {
 	}
 
 	
+	/**
+	 * @param request
+	 * @return
+	 */
 	public GetEntryListResponse get_entry_list(GetEntryList request){
 		
 		GetEntryListResponse response = invokeWSTemplate(request);
@@ -185,6 +234,35 @@ public class SugarWsClient {
 	}
 	
 	
+	/**
+	 * @param request
+	 * @return
+	 */
+	public GetEntryResponse get_entry(GetEntry request){
+		
+		GetEntryResponse response = invokeWSTemplate(request);
+		
+		return response;
+	}
+	
+	
+	/**
+	 * @param request
+	 * @return
+	 */
+	public SetEntryResponse set_entry(SetEntry request){
+		
+		SetEntryResponse response = invokeWSTemplate(request);
+		
+		return response;
+	}
+	
+	
+	
+	/**
+	 * @param request
+	 * @return
+	 */
 	public GetEntriesResponse get_entries(GetEntries request){
 		
 		GetEntriesResponse response = invokeWSTemplate(request);
@@ -195,6 +273,10 @@ public class SugarWsClient {
 	
 	
 	
+	/**
+	 * @param request
+	 * @return
+	 */
 	public GetUserIdResponse get_user_id(GetUserId request){
 
 		GetUserIdResponse response = invokeWSTemplate(request);
@@ -203,10 +285,18 @@ public class SugarWsClient {
 	}
 
 	
+	/**
+	 * @return
+	 */
 	public WebServiceTemplate getWebServiceTemplate(){
 		return this.webServiceTemplate;
 	}
 	
+	
+	
+	/**
+	 * @param webServiceTemplate
+	 */
 	public void setWebServiceTemplate(WebServiceTemplate webServiceTemplate){
 		this.webServiceTemplate = webServiceTemplate;
 	}
