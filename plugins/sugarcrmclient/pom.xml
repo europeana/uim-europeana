@@ -226,7 +226,7 @@
 				<extensions>true</extensions>
 				<version>1.4.0</version>
 				<configuration>
-					<manifestLocation>META-INF</manifestLocation>
+					<manifestLocation>OSGI-INF</manifestLocation>
 					<instructions>
 						<Export-Package>
 							eu.europeana.uim.sugarcrmclient.ws

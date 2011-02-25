@@ -8,8 +8,8 @@ import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.beans.factory.InitializingBean;
 /**
+ * 
  * @author geomark
- *
  */
 public class CompressedSoapmessageInterceptor implements ClientInterceptor,InitializingBean {
 

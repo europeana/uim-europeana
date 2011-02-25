@@ -1,6 +1,3 @@
-/**
- * 
- */
 package eu.europeana.uim.sugarcrmclient.internal.helpers;
 
 import java.io.StringWriter;
@@ -30,6 +27,8 @@ import com.sugarcrm.sugarcrm.NameValue;
 import org.apache.log4j.Logger;
 
 /**
+ * This Class provides auxiliary methods that can be used for the creation & instantiation
+ * of SugarWSClient instances (see provided Junit tests for usage examples). 
  * 
  * @author Georgios Markakis
  */
@@ -40,19 +39,21 @@ public class ClientUtils {
 	
 	
 	/**
-	 * @param returnObject
+	 * This method marshals the contents of a  JAXB Element and outputs the results to the
+	 * Logger.  
+	 * @param jaxbObject A JAXB representation of a SugarCRM SOAP Element. 
 	 */
-	public static void logMarshalledObject(Object returnObject){
+	public static void logMarshalledObject(Object jaxbObject){
 		
 		JAXBContext context;
 		try {
 			context = JAXBContext.newInstance("com.sugarcrm.sugarcrm");
 			Marshaller m = context.createMarshaller();
 			StringWriter writer = new StringWriter();
-			m.marshal(returnObject, writer);
+			m.marshal(jaxbObject, writer);
 			LOGGER.info("===========================================");
 			StringBuffer sb = new StringBuffer("Soap Ouput for Class: ");
-			sb.append(returnObject.getClass().getSimpleName());
+			sb.append(jaxbObject.getClass().getSimpleName());
 			LOGGER.info(sb.toString());
 			LOGGER.info(writer.toString());
 			LOGGER.info("===========================================");
@@ -66,9 +67,9 @@ public class ClientUtils {
 	
 	
 	/**
-	 * 
-	 * @param value
-	 * @return
+	 * Encrypts a given String into a MD5 format.
+	 * @param value The string to be encrypted
+	 * @return the encrypted String
 	 */
 	public static String md5(String value){
 		
@@ -89,9 +90,10 @@ public class ClientUtils {
 	
 	
 	/**
-	 * @param username
+	 * Creates a Login Soap Request given the user credentials.
+	 * @param username 
 	 * @param passwrd
-	 * @return
+	 * @return  a Login Soap Request Jaxb representation
 	 */
 	public static Login createStandardLoginObject(String username, String passwrd){
 		
@@ -113,6 +115,8 @@ public class ClientUtils {
 	
 	
 	/**
+	 * Creates a SelectFields Soap Object given a List<String> fieldnames object which sets the 
+	 * fields to be retrieved.
 	 * @param fieldnames
 	 * @return
 	 */
@@ -158,6 +162,8 @@ public class ClientUtils {
 	}
 	
 	/**
+	 * Creates a NameValueList Soap Element given a List<String> namevalues object which sets the 
+	 * fields to be retrieved.
 	 * @param fieldnames
 	 * @return
 	 */

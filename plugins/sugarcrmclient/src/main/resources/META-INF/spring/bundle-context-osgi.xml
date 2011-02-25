@@ -11,7 +11,6 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
        
-       <osgi:service id="webServiceClientOsgi" ref="webServiceClient"                             
-      interface="eu.europeana.uim.api.Registry" />
+       <osgi:service id="webServiceClientOsgi" ref="webServiceClient" interface="eu.europeana.uim.api.Registry" />
        
 </beans>

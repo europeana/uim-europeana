@@ -11,22 +11,16 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.springframework.test.annotation.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
-
-
-import com.sugarcrm.sugarcrm.GetServerVersion;
 
 import com.sugarcrm.sugarcrm.GetAvailableModules;
 import com.sugarcrm.sugarcrm.GetAvailableModulesResponse;
@@ -35,7 +29,6 @@ import com.sugarcrm.sugarcrm.GetEntriesResponse;
 import com.sugarcrm.sugarcrm.GetEntry;
 import com.sugarcrm.sugarcrm.GetEntryList;
 import com.sugarcrm.sugarcrm.GetEntryListResponse;
-import com.sugarcrm.sugarcrm.GetEntryListResult;
 import com.sugarcrm.sugarcrm.GetEntryResponse;
 import com.sugarcrm.sugarcrm.GetModuleFields;
 import com.sugarcrm.sugarcrm.GetModuleFieldsResponse;
@@ -60,7 +53,7 @@ import org.apache.log4j.Logger;
 
 
 /**
- * 
+ * Class implementing Unit Tests for SugarWsClient
  * 
  * @author Georgios Markakis
  */
@@ -78,14 +71,26 @@ public final class SugarCRMWSTest {
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMWSTest.class);
 	
+	
 	/**
 	 *  Method invoked before each test execution. It performs the initial login in order for allow permission to the 
 	 *  subsequent web service calls. It also sets the session id for this test run. 
 	 */
 	@Before
 	public void setupSession(){
-		LoginResponse lresponse =  sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
-		sessionID = lresponse.getReturn().getId();
+		
+		LoginResponse lresponse;
+		try {
+			lresponse = sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
+			assertNotNull(lresponse);
+			sessionID = lresponse.getReturn().getId();
+			
+		} catch (LoginFailureException e) {
+			sessionID = "-1";
+			LOGGER.info(e.getMessage());
+			//e.printStackTrace();
+		}
+		
 	}
 	
 	
@@ -98,47 +103,73 @@ public final class SugarCRMWSTest {
 		Logout request = factory.createLogout();
 		request.setSession(sessionID);
 		LogoutResponse lgresponse =  sugarWsClient.logout(request );
+		assertNotNull(lgresponse);
 	}
 
 
+	/**
+	 * User Login Test (make sure that the user has been created in advance in in the configured SCRM installation)
+	 */
 	@Test
 	public void testLogin(){
-		
-		LoginResponse response =  sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
-		LOGGER.info(response.getReturn().getId());
-		ClientUtils.logMarshalledObject(response);
+		LoginResponse response;
+
+			try {
+				response = sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
+			} catch (LoginFailureException e) {
+				response = null;
+			}
+			assertNotNull(response);
+			LOGGER.info(response.getReturn().getId());
+			ClientUtils.logMarshalledObject(response);
 	}
 	
 	
+	/**
+	 * Is User Admin Test: Checks if the user has admin rights.
+	 */
 	@Test
 	public void testIsUserAdmin(){	
 		IsUserAdmin user = factory.createIsUserAdmin();		
 		user.setSession(sessionID);		
-		IsUserAdminResponse response = sugarWsClient.is_user_admin(user);		
+		IsUserAdminResponse response = sugarWsClient.is_user_admin(user);
+		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
+	/**
+	 * Get User ID Test: Retrieves a user id for a session.
+	 */
 	@Test
 	public void testGetUserID(){	 
 		GetUserId request = factory.createGetUserId();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetUserIdResponse response =  sugarWsClient.get_user_id(request);
+		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
+	/**
+	 * Get Available Modules: Gets the available modules for a specific SugarCRM installation.
+	 */
 	@Test
 	public void testGetAvailableModules(){	 	
 		GetAvailableModules request = factory.createGetAvailableModules();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetAvailableModulesResponse response =  sugarWsClient.get_available_modules(request);
-		
+		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 	}
 
+	
+	
+	/**
+	 * Get Module Fields Test: Get the fields for a specific modules.
+	 */
 	@Test
 	public void testGetModuleFields(){	 		
 		GetModuleFields request = factory.createGetModuleFields();
@@ -146,10 +177,17 @@ public final class SugarCRMWSTest {
 		request.setModuleName("Contacts");
 		ClientUtils.logMarshalledObject(request);
 		GetModuleFieldsResponse response =  sugarWsClient.get_module_fields(request);
-		
+		assertNotNull(response);		
 		ClientUtils.logMarshalledObject(response);
 	}
 	
+	
+	
+	
+	/**
+	 * Get Entry List Test: Retrieves all fields from a specific module that match a 
+	 * specific query String. 
+	 */
 	@Test
 	public void testGetEntryList(){		
 		GetEntryList request = factory.createGetEntryList();
@@ -174,11 +212,15 @@ public final class SugarCRMWSTest {
 		
 		ClientUtils.logMarshalledObject(request);
 		GetEntryListResponse response =  sugarWsClient.get_entry_list(request);
+		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 		
 	}
 	
 	
+	/**
+	 * Get Entry Test: Retrieves all fields from a specific module. 
+	 */
 	@Test
 	public void testGetEntries(){	 		
 		GetEntries request = factory.createGetEntries();
@@ -199,7 +241,7 @@ public final class SugarCRMWSTest {
 	
 	
 	/**
-	 * 
+	 * Get Entry Test: Get a test entry for a specific ID.
 	 */
 	@Test
 	public void testGetEntry(){
@@ -213,8 +255,11 @@ public final class SugarCRMWSTest {
 				
 	}
 	
+	
+	
 	/**
-	 * Test the SetEntry Operation:
+	 * Set Entry Test: Create an entry with the specified ID and the declared 
+	 * name-value pairs and update it if it already exists. 
 	 */
 	@Test
 	public void testSetEntry(){
