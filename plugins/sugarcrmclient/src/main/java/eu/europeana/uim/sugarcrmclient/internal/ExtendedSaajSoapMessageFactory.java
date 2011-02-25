@@ -109,15 +109,19 @@ public class ExtendedSaajSoapMessageFactory extends SaajSoapMessageFactory {
         return pushbackInputStream;
     }
     
-    public static InputStream decompressStream(PushbackInputStream pb) throws IOException {
-    	System.out.println(GZIPInputStream.GZIP_MAGIC);
-    	
+    
+    
+    /**
+     * @param pb
+     * @return
+     * @throws IOException
+     */
+    public static InputStream decompressStream(PushbackInputStream pb) throws IOException {    	
         byte [] signature = new byte[2];
-        pb.read( signature ); //read the signature
-        pb.unread( signature ); //push back the signature to the stream
-        System.out.println(signature[ 0 ]);
-        System.out.println(signature[ 1 ]);     
-        if( signature[ 0 ] == 31 && signature[ 1 ] == -117 ) //check if matches standard gzip maguc number
+        pb.read( signature ); 
+        pb.unread( signature );
+    
+        if( signature[ 0 ] == 31 && signature[ 1 ] == -117 ) 
           return new GZIPInputStream( pb );
         else 
           return pb;

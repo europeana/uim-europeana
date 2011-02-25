@@ -101,16 +101,7 @@ import javax.xml.transform.TransformerFactory;
  */
 public class SugarWsClient {
 
-	private static final String MESSAGE = "<get_server_version xmlns=\"http://www.sugarcrm.com/sugarcrm\"></get_server_version>";
 	
-	private static final String MESSAGE2 = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns4:login xmlns:ns4=\"http://www.sugarcrm.com/sugarcrm\" xmlns:ns3=\"http://schemas.xmlsoap.org/soap/encoding/\"><user_auth><user_name>test</user_name><password>098f6bcd4621d373cade4e832627b4f6</password></user_auth><application_name>sugar</application_name></ns4:login>";
-	//private static final String TESTMESSAGE = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:get_available_modules xmlns:ns2=\"http://www.sugarcrm.com/sugarcrm\" xmlns:ns3=\"http://schemas.xmlsoap.org/soap/encoding/\"><ns2:session>uf5n1lfbq6k0hisij5u3r7ai90</ns2:session></ns2:get_available_modules>";
-	private static final String TESTMESSAGE = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:get_available_modules xmlns:ns2=\"http://www.sugarcrm.com/sugarcrm\" xmlns:ns3=\"http://schemas.xmlsoap.org/soap/encoding/\"><ns2:session>8r1i6hjko1q5gqhl7jb3tffck6</ns2:session></ns2:get_available_modules>";
-	
-	private static final String cnrserverURI = "http://sandbox13.isti.cnr.it/sugarcrm/soap.php";
-	private static final String localserverURI = "http://localhost:8080/sugarcrm/soap.php";
-	
-
 	private WebServiceTemplate webServiceTemplate;
 
 	public void setDefaultUri(String defaultUri) {
@@ -134,17 +125,6 @@ public class SugarWsClient {
 	}
 	
 	
-	/**
-	 * @return
-	 */
-	public String test(){
-		StreamSource source = new StreamSource(new StringReader(TESTMESSAGE));
-		StringResult  stringResult = new StringResult();
-		System.out.println(TESTMESSAGE);		
-		webServiceTemplate.sendSourceAndReceiveToResult(localserverURI, source, stringResult);
-
-		return stringResult.toString();
-	}
 	
 	
 	/**

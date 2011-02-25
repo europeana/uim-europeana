@@ -24,7 +24,8 @@ import com.sugarcrm.sugarcrm.Login;
 import com.sugarcrm.sugarcrm.ObjectFactory;
 import com.sugarcrm.sugarcrm.SelectFields;
 import com.sugarcrm.sugarcrm.UserAuth;
-
+import com.sugarcrm.sugarcrm.NameValueList;
+import com.sugarcrm.sugarcrm.NameValue;
 
 import org.apache.log4j.Logger;
 
@@ -49,7 +50,12 @@ public class ClientUtils {
 			Marshaller m = context.createMarshaller();
 			StringWriter writer = new StringWriter();
 			m.marshal(returnObject, writer);
+			LOGGER.info("===========================================");
+			StringBuffer sb = new StringBuffer("Soap Ouput for Class: ");
+			sb.append(returnObject.getClass().getSimpleName());
+			LOGGER.info(sb.toString());
 			LOGGER.info(writer.toString());
+			LOGGER.info("===========================================");
 		} catch (JAXBException e) {
 	
 			e.printStackTrace();
@@ -132,7 +138,7 @@ public class ClientUtils {
 	        Document document = documentBuilder.newDocument();
 	        
 	        for( String fieldname : fieldnames){
-	        	Element element = document.createElement("item");
+	        	Element element = document.createElement("string");
 	    		selfields.getAnies().add(rootElement);
 	    		element.appendChild(document.createTextNode(fieldname));
 	    		selfields.getAnies().add(element);
@@ -151,5 +157,50 @@ public class ClientUtils {
 		
 	}
 	
-	
+	/**
+	 * @param fieldnames
+	 * @return
+	 */
+	public static NameValueList generatePopulatedNameValueList(List<NameValue> namevalues){
+
+		ObjectFactory factory = new ObjectFactory();
+		NameValueList namevalueList = factory.createNameValueList();
+		
+		StringBuffer arrayType = new StringBuffer();
+		
+		arrayType.append("name_value[");
+		arrayType.append(namevalues.size());
+		arrayType.append("]");
+				
+		namevalueList.setArrayType(arrayType.toString());
+
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder;
+		try {
+			documentBuilder = documentBuilderFactory.newDocumentBuilder();
+	        Document document = documentBuilder.newDocument();
+	        
+	        for( NameValue namevalue : namevalues){
+	        	Element name_value = document.createElement("name_value");
+	        	
+	        	Element name = document.createElement("name");
+	        	Element value = document.createElement("value");
+	        	
+	        	name.appendChild(document.createTextNode(namevalue.getName()));
+	        	value.appendChild(document.createTextNode(namevalue.getValue()));
+	        	name_value.appendChild(name);
+	        	name_value.appendChild(value);
+	        	
+	        	namevalueList.getAnies().add(name_value);
+	    		
+	        }
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		return namevalueList;
+
+	}
+		
 }

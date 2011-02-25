@@ -11,7 +11,9 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -42,6 +44,7 @@ import com.sugarcrm.sugarcrm.GetUserIdResponse;
 import com.sugarcrm.sugarcrm.Login;
 import com.sugarcrm.sugarcrm.Logout;
 import com.sugarcrm.sugarcrm.LogoutResponse;
+import com.sugarcrm.sugarcrm.NameValue;
 import com.sugarcrm.sugarcrm.NameValueList;
 import com.sugarcrm.sugarcrm.SelectFields;
 import com.sugarcrm.sugarcrm.SetEntry;
@@ -76,21 +79,18 @@ public final class SugarCRMWSTest {
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMWSTest.class);
 	
 	/**
-	 *  Method invoked before test execution. It performs the initial login in order for allow permission to the 
+	 *  Method invoked before each test execution. It performs the initial login in order for allow permission to the 
 	 *  subsequent web service calls. It also sets the session id for this test run. 
 	 */
-	@Before 
+	@Before
 	public void setupSession(){
-		
-		LOGGER.info("****Setting Up Session****");
-		
 		LoginResponse lresponse =  sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
 		sessionID = lresponse.getReturn().getId();
 	}
 	
 	
 	/**
-	 * Method invoked after all tests have been executed. It destroys the current session. 
+	 * Method invoked after each test has been executed. It destroys the current session. 
 	 */
 	@After
 	public void destroySession(){
@@ -98,19 +98,14 @@ public final class SugarCRMWSTest {
 		Logout request = factory.createLogout();
 		request.setSession(sessionID);
 		LogoutResponse lgresponse =  sugarWsClient.logout(request );
-		LOGGER.info("****Destroyed Session****");
-		ClientUtils.logMarshalledObject(lgresponse);
 	}
 
 
 	@Test
-	
 	public void testLogin(){
 		
 		LoginResponse response =  sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
-
 		LOGGER.info(response.getReturn().getId());
-		
 		ClientUtils.logMarshalledObject(response);
 	}
 	
@@ -131,13 +126,6 @@ public final class SugarCRMWSTest {
 		ClientUtils.logMarshalledObject(request);
 		GetUserIdResponse response =  sugarWsClient.get_user_id(request);
 		ClientUtils.logMarshalledObject(response);
-	}
-	
-	//@Test
-	public void simpleTest(){
-		
-		String result = sugarWsClient.test();
-		System.out.println(result);
 	}
 	
 	
@@ -231,11 +219,31 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testSetEntry(){
 		SetEntry request = factory.createSetEntry();
-		NameValueList value = factory.createNameValueList();
 		
-		value.setId("1c3a03dd-753b-7741-92e8-4d6509d442d3");
 		
-		request.setNameValueList(value);
+		NameValue nv1 = factory.createNameValue();
+		nv1.setName("id");
+		nv1.setValue("99f37146-8e19-473d-171c-4d66de7024c0");
+		
+		NameValue nv0 = factory.createNameValue();
+		nv0.setName("first_name");
+		nv0.setValue("JohnX");
+
+		NameValue nv2 = factory.createNameValue();
+		nv2.setName("last_name");
+		nv2.setValue("SmithX");		
+
+		ArrayList <NameValue> nvList = new  ArrayList <NameValue>();
+		
+		nvList.add(nv1);
+		nvList.add(nv2);
+		
+		
+		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
+
+		valueList.setId("99f37146-8e19-473d-171c-4d66de7024c0");
+		
+		request.setNameValueList(valueList);
 		request.setModuleName("Contacts");
 		request.setSession(sessionID);	
 		ClientUtils.logMarshalledObject(request);
