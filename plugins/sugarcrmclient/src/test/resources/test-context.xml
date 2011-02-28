@@ -20,7 +20,7 @@
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
          <constructor-arg ref="messageFactory"/>
 
-         <property name="defaultUri" value="http://localhost:8080/sugarcrm/soap.php?wsdl" />
+         <property name="defaultUri" value="${host}" />
          <property name="marshaller" ref="jaxb2Marshaller" />
          <property name="unmarshaller" ref="jaxb2Marshaller" />
          <!--  
@@ -43,17 +43,23 @@
          <property name="contextPath" value="org.xmlsoap.schemas.soap.encoding:com.sugarcrm.sugarcrm"/>
     </bean>
     
+    
+   <!--Log4j Configuration-->  
    <bean id="log4jInitialization"
 	class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-		<property name="targetClass"
-			value="org.springframework.util.Log4jConfigurer" />
+		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
 		<property name="targetMethod" value="initLogging" />
 		<property name="arguments">
 			<list>
-				<value>src/test/resources/log4j.properties</value>
+				<value>classpath:testlog4j.properties</value>
 			</list>
 		</property>
 	</bean>
+	
+	<!--Inject defined properties into Spring -->  
+   <bean id="propertiesPlaceholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">    
+       <property name="location" value="classpath:testConfig.properties"/>  
+   </bean>
 
 
 
