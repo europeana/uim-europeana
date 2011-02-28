@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
 	<packaging>bundle</packaging>
-	<name>Unified Ingestion Manager: Suger CRM Plugin</name>
+	<name>Unified Ingestion Manager: Sugar CRM Plugin</name>
 	<version>1.2.0-SNAPSHOT</version>
 	<url>http://www.springframework.org/osgi</url>
 
@@ -155,7 +155,9 @@
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>log4j.osgi</artifactId>
 			<version>1.2.15-SNAPSHOT</version>
+			<!--  
 			<scope>test</scope>
+			-->
 		</dependency>
 
 
@@ -164,19 +166,19 @@
 			<artifactId>europeana-uim-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-oxm</artifactId>
 			<version>1.5.4</version>
 		</dependency>
-		
+
 		<dependency>
-           <groupId>org.springframework.ws</groupId>
-           <artifactId>spring-oxm-tiger</artifactId>
-           <version>1.5.4</version>
-        </dependency>
-		
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-oxm-tiger</artifactId>
+			<version>1.5.4</version>
+		</dependency>
+
 		<dependency>
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-uim-plugin-sugarclientbindings</artifactId>
@@ -184,19 +186,39 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
 		
 		<dependency>
-           <groupId>xerces</groupId>
-           <artifactId>xercesImpl</artifactId>
-           <version>2.9.1</version>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
         </dependency>
-        
+    
         <dependency>
-   <groupId>commons-httpclient</groupId>
-   <artifactId>commons-httpclient</artifactId>
-   <version>3.1</version>
-</dependency>
-        
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+	
+
+		<!-- Karaf Shell, for OSGi shell commands -->
+		<dependency>
+			<groupId>org.apache.karaf.shell</groupId>
+			<artifactId>org.apache.karaf.shell.console</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 
 	<!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->
@@ -231,8 +253,19 @@
 						<Export-Package>
 							eu.europeana.uim.sugarcrmclient.ws
 						</Export-Package>
-						<Private-Package>eu.europeana.uim.sugarcrmclient.internal
-						</Private-Package>
+						<Import-Package>
+						    org.springframework.ws.client.core,
+						    eu.europeana.uim.sugarcrmclient.ws.exceptions.*,
+						    com.sugarcrm.sugarcrm.*,
+						    eu.europeana.uim.common.*,
+							org.apache.commons.lang.*,
+                            org.apache.felix.gogo.commands.*,
+                            org.osgi.framework.*,
+                            org.osgi.service.blueprint.*,
+                            org.osgi.service.command.*,
+                            org.osgi.service.cm.*
+                        </Import-Package>
+
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>

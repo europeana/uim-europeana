@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Export-Package: eu.europeana.uim.sugarcrmclient.ws;uses:="org.springfr
+ amework.ws.client.core,com.sugarcrm.sugarcrm,eu.europeana.uim.sugarcr
+ mclient.ws.exceptions"
+Built-By: georgiosmarkakis
+Build-Jdk: 1.6.0_22
+Bundle-Version: 1.2.0.SNAPSHOT
+Tool: Bnd-0.0.238
+Bundle-Name: Unified Ingestion Manager: Suger CRM Plugin
+Bnd-LastModified: 1298910588751
+Created-By: Apache Maven Bundle Plugin
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: eu.europeana.europeana-uim-plugin-sugarcrmclient
+Import-Package: com.sugarcrm.sugarcrm,eu.europeana.uim.sugarcrmclient.
+ ws.exceptions,org.springframework.ws.client.core
+

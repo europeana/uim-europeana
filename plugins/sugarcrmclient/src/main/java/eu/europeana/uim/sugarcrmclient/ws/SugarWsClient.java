@@ -43,9 +43,11 @@ public class SugarWsClient {
 
 	public void setDefaultUri(String defaultUri) {
 		webServiceTemplate.setDefaultUri(defaultUri);
-
 	}
 
+	public String getDefaultUri() {
+		return webServiceTemplate.getDefaultUri();
+	}
 	
 	/**
 	 * @param <T>

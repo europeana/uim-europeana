@@ -266,9 +266,9 @@ public final class SugarCRMWSTest {
 		SetEntry request = factory.createSetEntry();
 		
 		
-		NameValue nv1 = factory.createNameValue();
-		nv1.setName("id");
-		nv1.setValue("99f37146-8e19-473d-171c-4d66de7024c0");
+		//NameValue nv1 = factory.createNameValue();
+		//nv1.setName("id");
+		//nv1.setValue("99f37146-8e19-473d-171c-4d66de7024c0");
 		
 		NameValue nv0 = factory.createNameValue();
 		nv0.setName("first_name");
@@ -280,13 +280,13 @@ public final class SugarCRMWSTest {
 
 		ArrayList <NameValue> nvList = new  ArrayList <NameValue>();
 		
-		nvList.add(nv1);
+		nvList.add(nv0);
 		nvList.add(nv2);
 		
 		
 		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
 
-		valueList.setId("99f37146-8e19-473d-171c-4d66de7024c0");
+		//valueList.setId("99f37146-8e19-473d-171c-4d66de7024c0");
 		
 		request.setNameValueList(valueList);
 		request.setModuleName("Contacts");
