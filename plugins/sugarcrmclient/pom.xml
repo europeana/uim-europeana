@@ -251,19 +251,20 @@
 					<manifestLocation>OSGI-INF</manifestLocation>
 					<instructions>
 						<Export-Package>
-							eu.europeana.uim.sugarcrmclient.ws
+							eu.europeana.uim.sugarcrmclient.*
 						</Export-Package>
 						<Import-Package>
-						    org.springframework.ws.client.core,
-						    eu.europeana.uim.sugarcrmclient.ws.exceptions.*,
+						    javax.xml.bind, 
+						    javax.xml.parsers, 
+						    javax.xml.soap, 
+						    org.apache.log4j, 
+						    org.springframework.beans.factory, 
+						    org.springframework.util, 
+						    org.w3c.dom,
+						    org.springframework.ws.*,
 						    com.sugarcrm.sugarcrm.*,
-						    eu.europeana.uim.common.*,
-							org.apache.commons.lang.*,
                             org.apache.felix.gogo.commands.*,
-                            org.osgi.framework.*,
-                            org.osgi.service.blueprint.*,
                             org.osgi.service.command.*,
-                            org.osgi.service.cm.*
                         </Import-Package>
 
 

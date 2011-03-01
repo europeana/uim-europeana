@@ -1,16 +1,33 @@
 Manifest-Version: 1.0
-Export-Package: eu.europeana.uim.sugarcrmclient.ws;uses:="org.springfr
- amework.ws.client.core,com.sugarcrm.sugarcrm,eu.europeana.uim.sugarcr
- mclient.ws.exceptions"
+Export-Package: eu.europeana.uim.sugarcrmclient.plugin;uses:="eu.europ
+ eana.uim.sugarcrmclient.ws",eu.europeana.uim.sugarcrmclient.internal.
+ helpers;uses:="com.sugarcrm.sugarcrm,org.apache.log4j,javax.xml.parse
+ rs,javax.xml.bind,org.w3c.dom",eu.europeana.uim.sugarcrmclient.plugin
+ .command;uses:="eu.europeana.uim.sugarcrmclient.plugin,org.osgi.servi
+ ce.command,org.apache.felix.gogo.commands",eu.europeana.uim.sugarcrmc
+ lient.internal;uses:="org.springframework.ws,org.springframework.ws.s
+ oap,org.springframework.ws.context,org.springframework.util,org.sprin
+ gframework.ws.client,org.springframework.ws.soap.saaj,org.springframe
+ work.ws.client.support.interceptor,org.springframework.ws.transport,j
+ avax.xml.soap,org.springframework.beans.factory",eu.europeana.uim.sug
+ arcrmclient.ws;uses:="org.springframework.ws.client.core,com.sugarcrm
+ .sugarcrm,eu.europeana.uim.sugarcrmclient.ws.exceptions",eu.europeana
+ .uim.sugarcrmclient.ws.exceptions;uses:="com.sugarcrm.sugarcrm"
 Built-By: georgiosmarkakis
 Build-Jdk: 1.6.0_22
 Bundle-Version: 1.2.0.SNAPSHOT
 Tool: Bnd-0.0.238
-Bundle-Name: Unified Ingestion Manager: Suger CRM Plugin
-Bnd-LastModified: 1298910588751
+Bundle-Name: Unified Ingestion Manager: Sugar CRM Plugin
+Bnd-LastModified: 1298979900244
 Created-By: Apache Maven Bundle Plugin
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: eu.europeana.europeana-uim-plugin-sugarcrmclient
-Import-Package: com.sugarcrm.sugarcrm,eu.europeana.uim.sugarcrmclient.
- ws.exceptions,org.springframework.ws.client.core
+Import-Package: com.sugarcrm.sugarcrm,javax.xml.bind,javax.xml.parsers
+ ,javax.xml.soap,org.apache.felix.gogo.commands,org.apache.log4j;versi
+ on="1.2",org.osgi.service.command,org.springframework.beans.factory;v
+ ersion="2.5",org.springframework.util;version="2.5",org.springframewo
+ rk.ws,org.springframework.ws.client,org.springframework.ws.client.cor
+ e,org.springframework.ws.client.support.interceptor,org.springframewo
+ rk.ws.context,org.springframework.ws.soap,org.springframework.ws.soap
+ .saaj,org.springframework.ws.transport,org.w3c.dom
 
