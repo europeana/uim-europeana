@@ -59,35 +59,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging
-			</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.log4j</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.log4j</groupId>
-					<artifactId>com.springsource.org.apache.log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+
 
 		<!-- test scoped dependencies -->
 		<dependency>
@@ -155,9 +127,7 @@
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>log4j.osgi</artifactId>
 			<version>1.2.15-SNAPSHOT</version>
-			<!--  
-			<scope>test</scope>
-			-->
+			<!-- <scope>test</scope> -->
 		</dependency>
 
 
@@ -173,11 +143,6 @@
 			<version>1.5.4</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-oxm-tiger</artifactId>
-			<version>1.5.4</version>
-		</dependency>
 
 		<dependency>
 			<groupId>eu.europeana</groupId>
@@ -187,30 +152,12 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.9.1</version>
-		</dependency>
 
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.1.12</version>
 		</dependency>
-		
-		<dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <scope>provided</scope>
-        </dependency>
-	
 
 		<!-- Karaf Shell, for OSGi shell commands -->
 		<dependency>
@@ -250,28 +197,35 @@
 				<configuration>
 					<manifestLocation>OSGI-INF</manifestLocation>
 					<instructions>
+						<Import-Package>*</Import-Package>
 						<Export-Package>
 							eu.europeana.uim.sugarcrmclient.*
 						</Export-Package>
-						<Import-Package>
-						    javax.xml.bind, 
-						    javax.xml.parsers, 
-						    javax.xml.soap, 
-						    org.apache.log4j, 
-						    org.springframework.beans.factory, 
-						    org.springframework.util, 
-						    org.w3c.dom,
-						    org.springframework.ws.*,
-						    com.sugarcrm.sugarcrm.*,
-                            org.apache.felix.gogo.commands.*,
-                            org.osgi.service.command.*,
-                        </Import-Package>
-
-
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
+						<Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency>
 					</instructions>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.karaf.tooling</groupId>
+				<artifactId>features-maven-plugin</artifactId>
+				<version>2.2.0</version>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>generate-features-xml</goal>
+						</goals>
+						<configuration>
+							<bundles>src/main/resources/bundles.properties</bundles>
+							<kernelVersion>2.2.0</kernelVersion>
+							<outputFile>target/features.xml</outputFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>
@@ -313,6 +267,7 @@
 			<name>Eclipse Repository</name>
 			<url>http://repo1.maven.org/eclipse/</url>
 		</repository>
+
 		<repository>
 			<id>spring-ext</id>
 			<name>Spring External Dependencies Repository</name>
@@ -328,11 +283,13 @@
 			<url>http://download.java.net/maven/2</url>
 		</repository>
 
+		<repository>
+			<id>wp5.e-taxonomy.eu</id>
+			<name>E-taxonomy Repository</name>
+			<url>http://wp5.e-taxonomy.eu/cdmlib/mavenrepo/</url>
+		</repository>
 
 
-		<!-- Spring-DM snapshot repository - disabled by default <repository> <snapshots><enabled>true</enabled></snapshots> 
-			<id>springframework.org</id> <name>Springframework Maven SNAPSHOT Repository</name> 
-			<url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url> </repository> -->
 	</repositories>
 
 	<pluginRepositories>
@@ -347,5 +304,12 @@
 			<id>maven2-repository.dev.java.net</id>
 			<url>http://download.java.net/maven/2</url>
 		</pluginRepository>
+		
+		<pluginRepository>
+           <id>releases</id>
+           <name>Releases</name> 
+           <url>http://svn.apache.org/repos/asf/karaf/tags/karaf-2.2.0/</url>
+        </pluginRepository>
+		
 	</pluginRepositories>
 </project>

@@ -11,8 +11,11 @@ Bundle-Version: 1.2.0.SNAPSHOT
 Build-Jdk: 1.6.0_16
 Bnd-LastModified: 1298065304604
 Bundle-ManifestVersion: 2
-Import-Package: eu.europeana.uim.sugarcrmclient.ws,javax.xml.transform
- ,javax.xml.transform.stream,org.springframework.ws.client.core,org.sp
- ringframework.xml.transform;version="1.5"
+Import-Package: eu.europeana.uim.sugarcrmclient.ws,
+ javax.xml.transform,
+ javax.xml.transform.stream,
+ org.apache.log4j,
+ org.springframework.ws.client.core,
+ org.springframework.xml.transform;version="1.5"
 Bundle-SymbolicName: eu.europeana.europeana-uim-plugin-sugarcrmclient
 
