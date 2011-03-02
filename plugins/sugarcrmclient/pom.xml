@@ -110,6 +110,14 @@
 			<artifactId>spring-ws-core</artifactId>
 			<version>1.5.9</version>
 			<scope>provided</scope>
+			<!--  
+			<exclusions>
+		    	<exclusion>
+		    		<artifactId>spring-oxm</artifactId>
+		    		<groupId>org.springframework.ws</groupId>
+		    	</exclusion>
+		    </exclusions>
+		    -->
 		</dependency>
 
 		<!-- Equinox OSGi platform -->
@@ -197,16 +205,50 @@
 				<configuration>
 					<manifestLocation>OSGI-INF</manifestLocation>
 					<instructions>
-						<Import-Package>*</Import-Package>
+					    <!-- 
+						<Import-Package>
+						    javax.xml.bind, 
+						    javax.xml.parsers, 
+						    javax.xml.soap, 
+						    org.apache.log4j, 
+						    org.springframework.beans.factory, 
+						    org.springframework.util, 
+						    org.w3c.dom,
+						    org.springframework.ws.*,
+						    com.sugarcrm.sugarcrm.*,
+                            org.apache.felix.gogo.commands.*,
+                            org.osgi.service.command.*,
+                        </Import-Package>
+                         -->
+                        <Import-Package>*</Import-Package>
+                        <Private-Package>
+                            eu.europeana.uim.sugarcrmclient.ws,
+                            eu.europeana.uim.sugarcrmclient.internal
+                        </Private-Package>
 						<Export-Package>
-							eu.europeana.uim.sugarcrmclient.*
+							eu.europeana.uim.sugarcrmclient.plugin
 						</Export-Package>
+
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
 						<!--  
 						<Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency>
 						-->
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
+						<Embed-Dependency>*;scope=compile|runtime|system;artifactId=!spring-beans|spring-core|spring-context|europeana-uim-common|europeana-uim-api</Embed-Dependency>
+
+		
+                        <Include-Resource>
+						  {maven-resources}, 
+						  {maven-dependencies}
+                        </Include-Resource>
+                        <!--    				
+                       <Bundle-ClassPath>.,{maven-dependencies},europeana-uim-plugin-sugarclientbindings.jar</Bundle-ClassPath>
+
+						<Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency>
+						<Embed-Dependency>europeana-uim-plugin-sugarclientbindings,spring-ws-core</Embed-Dependency>
+						-->
+
 					</instructions>
 				</configuration>
 			</plugin>
