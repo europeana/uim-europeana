@@ -203,11 +203,15 @@
 						</Export-Package>
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
+						<!--  
 						<Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency>
+						-->
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
-
+            
+            <!--  
 			<plugin>
 				<groupId>org.apache.karaf.tooling</groupId>
 				<artifactId>features-maven-plugin</artifactId>
@@ -227,6 +231,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			-->
 
 		</plugins>
 	</build>
