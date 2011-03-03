@@ -15,8 +15,9 @@
 
 	<properties>
 		<slf4j.version>1.5.0</slf4j.version>
-		<spring.maven.artifact.version>2.5.5</spring.maven.artifact.version>
+		<spring.maven.artifact.version>2.5.6</spring.maven.artifact.version>
 		<spring.osgi.version>1.1.0</spring.osgi.version>
+		<spring.ws.version>1.5.9</spring.ws.version>
 		<equinox.ver>3.2.2</equinox.ver>
 	</properties>
 
@@ -108,17 +109,21 @@
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-ws-core</artifactId>
-			<version>1.5.9</version>
+			<version>${spring.ws.version}</version>
 			<scope>provided</scope>
-			<!--  
+
 			<exclusions>
-		    	<exclusion>
-		    		<artifactId>spring-oxm</artifactId>
-		    		<groupId>org.springframework.ws</groupId>
-		    	</exclusion>
-		    </exclusions>
-		    -->
+				<exclusion>
+					<artifactId>spring-oxm</artifactId>
+					<groupId>org.springframework.ws</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+
+
+
+
+
 
 		<!-- Equinox OSGi platform -->
 		<dependency>
@@ -146,13 +151,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-oxm</artifactId>
-			<version>1.5.4</version>
-		</dependency>
-
-
-		<dependency>
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-uim-plugin-sugarclientbindings</artifactId>
 			<version>1.2.0</version>
@@ -173,6 +171,9 @@
 			<artifactId>org.apache.karaf.shell.console</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+
+
 
 	</dependencies>
 
@@ -196,6 +197,7 @@
 			</resource>
 		</resources>
 
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -205,75 +207,83 @@
 				<configuration>
 					<manifestLocation>OSGI-INF</manifestLocation>
 					<instructions>
-					    <!-- 
 						<Import-Package>
-						    javax.xml.bind, 
-						    javax.xml.parsers, 
-						    javax.xml.soap, 
-						    org.apache.log4j, 
-						    org.springframework.beans.factory, 
-						    org.springframework.util, 
-						    org.w3c.dom,
-						    org.springframework.ws.*,
-						    com.sugarcrm.sugarcrm.*,
-                            org.apache.felix.gogo.commands.*,
-                            org.osgi.service.command.*,
-                        </Import-Package>
-                         -->
-                        <Import-Package>*</Import-Package>
-                        <Private-Package>
-                            eu.europeana.uim.sugarcrmclient.ws,
-                            eu.europeana.uim.sugarcrmclient.internal
-                        </Private-Package>
+							!bsh,
+							!com.sun.enterprise.loader,
+							!com.sun.jdmk.comm,
+							!com.sun.msv.grammar,
+							!com.sun.msv.grammar.trex,
+							!com.sun.msv.reader,
+							!com.sun.msv.reader.trex.ng,
+							!com.sun.msv.reader.util,
+							!com.sun.msv.util,
+							!com.sun.msv.verifier,
+							!com.sun.msv.verifier.regexp,
+							!com.sun.net.httpserver,
+							!com.sun.xml.fastinfoset.sax,
+							!com.sun.xml.fastinfoset.stax,
+							!edu.emory.mathcs.backport.java.util.concurrent,
+							!groovy.lang,
+							!javax.ejb,
+							!javax.interceptor,
+							!javax.jms,
+							!javax.mail,
+							!javax.mail.internet,
+							!javax.persistence.spi,
+							!net.sf.cglib.asm,
+							!net.sf.cglib.core,
+							!net.sf.cglib.proxy,
+							!oracle.classloader.util,
+							!org.apache.commons.attributes,
+							!org.apache.commons.collections,
+							!org.apache.commons.collections.map,
+							!org.aspectj.bridge,
+							!org.aspectj.weaver,
+							!org.aspectj.weaver.bcel,
+							!org.aspectj.weaver.loadtime,
+							!org.aspectj.weaver.patterns,
+							!org.codehaus.groovy.control,
+							!org.jruby,
+							!org.jruby.ast,
+							!org.jruby.exceptions,
+							!org.jruby.javasupport,
+							!org.jruby.runtime,
+							!org.jruby.runtime.builtin,
+							!org.jvnet.fastinfoset,
+							!org.jvnet.staxex,
+							!org.osgi.service.command,
+							!org.relaxng.datatype,
+							!org.springframework.instrument ,
+							!org.springframework.ws,
+							!org.springframework.ws.client,
+							!org.springframework.ws.client.core,
+							!org.springframework.ws.client.support.interceptor,
+							!org.springframework.ws.context ,
+							!org.springframework.ws.soap ,
+							!org.springframework.ws.soap.saaj,
+							!org.springframework.ws.transport,
+							*</Import-Package>
+
+
+						<!-- <Private-Package> eu.europeana.uim.sugarcrmclient.ws, eu.europeana.uim.sugarcrmclient.internal 
+							</Private-Package> <Embed-Dependency>*;scope=compile|runtime|system;artifactId=!spring-beans|spring-core|spring-context|europeana-uim-common|europeana-uim-api</Embed-Dependency> -->
+
 						<Export-Package>
-							eu.europeana.uim.sugarcrmclient.plugin
+							eu.europeana.uim.sugarcrmclient.*
 						</Export-Package>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
-						<!--  
-						<Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency>
-						-->
-                        <Embed-Transitive>true</Embed-Transitive>
-						<Embed-Dependency>*;scope=compile|runtime|system;artifactId=!spring-beans|spring-core|spring-context|europeana-uim-common|europeana-uim-api</Embed-Dependency>
 
-		
-                        <Include-Resource>
-						  {maven-resources}, 
-						  {maven-dependencies}
-                        </Include-Resource>
-                        <!--    				
-                       <Bundle-ClassPath>.,{maven-dependencies},europeana-uim-plugin-sugarclientbindings.jar</Bundle-ClassPath>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Dependency>*</Embed-Dependency>
 
-						<Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency>
-						<Embed-Dependency>europeana-uim-plugin-sugarclientbindings,spring-ws-core</Embed-Dependency>
-						-->
+						<!-- <Embed-Dependency>*;scope=compile|runtime|system;</Embed-Dependency> 
+							<Embed-Transitive>true</Embed-Transitive> -->
 
 					</instructions>
 				</configuration>
 			</plugin>
-            
-            <!--  
-			<plugin>
-				<groupId>org.apache.karaf.tooling</groupId>
-				<artifactId>features-maven-plugin</artifactId>
-				<version>2.2.0</version>
-				<executions>
-					<execution>
-						<id>generate</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>generate-features-xml</goal>
-						</goals>
-						<configuration>
-							<bundles>src/main/resources/bundles.properties</bundles>
-							<kernelVersion>2.2.0</kernelVersion>
-							<outputFile>target/features.xml</outputFile>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			-->
 
 		</plugins>
 	</build>
@@ -351,12 +361,16 @@
 			<id>maven2-repository.dev.java.net</id>
 			<url>http://download.java.net/maven/2</url>
 		</pluginRepository>
-		
+
 		<pluginRepository>
-           <id>releases</id>
-           <name>Releases</name> 
-           <url>http://svn.apache.org/repos/asf/karaf/tags/karaf-2.2.0/</url>
-        </pluginRepository>
-		
+			<id>releases</id>
+			<name>Releases</name>
+			<url>http://svn.apache.org/repos/asf/karaf/tags/karaf-2.2.0/</url>
+		</pluginRepository>
+
 	</pluginRepositories>
+
+
+
+
 </project>
