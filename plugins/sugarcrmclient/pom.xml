@@ -11,7 +11,7 @@
 	<packaging>bundle</packaging>
 	<name>Unified Ingestion Manager: Sugar CRM Plugin</name>
 	<version>1.2.0-SNAPSHOT</version>
-	<url>http://www.springframework.org/osgi</url>
+
 
 	<properties>
 		<slf4j.version>1.5.0</slf4j.version>
@@ -106,6 +106,7 @@
 			<scope>provided</scope>
 		</dependency>
 
+		
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-ws-core</artifactId>
@@ -119,10 +120,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-
-
-
 
 
 		<!-- Equinox OSGi platform -->
@@ -208,6 +205,7 @@
 					<manifestLocation>OSGI-INF</manifestLocation>
 					<instructions>
 						<Import-Package>
+						    <!--  
 							!bsh,
 							!com.sun.enterprise.loader,
 							!com.sun.jdmk.comm,
@@ -254,16 +252,21 @@
 							!org.osgi.service.command,
 							!org.relaxng.datatype,
 							!org.springframework.instrument ,
-							!org.springframework.ws,
-							!org.springframework.ws.client,
-							!org.springframework.ws.client.core,
-							!org.springframework.ws.client.support.interceptor,
-							!org.springframework.ws.context ,
-							!org.springframework.ws.soap ,
-							!org.springframework.ws.soap.saaj,
-							!org.springframework.ws.transport,
+							org.springframework.ws,
+							org.springframework.ws.client,
+							org.springframework.ws.client.core,
+							org.springframework.ws.client.support.interceptor,
+							org.springframework.ws.context ,
+							org.springframework.ws.soap ,
+							org.springframework.ws.soap.saaj,
+							org.springframework.ws.transport,
+							org.springframework.ws.transport.http,
+							-->
+							org.springframework.ws*,
+							org.springframework.ws.transport.http,
+							org.springframework.oxm.jaxb,
 							*</Import-Package>
-
+                        <DynamicImport-Package>*</DynamicImport-Package>
 
 						<!-- <Private-Package> eu.europeana.uim.sugarcrmclient.ws, eu.europeana.uim.sugarcrmclient.internal 
 							</Private-Package> <Embed-Dependency>*;scope=compile|runtime|system;artifactId=!spring-beans|spring-core|spring-context|europeana-uim-common|europeana-uim-api</Embed-Dependency> -->
@@ -273,12 +276,14 @@
 						</Export-Package>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
-						<Include-Resource>src/main/resources</Include-Resource>
+						<Include-Resource>src/main/resources/OSGI-INF/blueprint/sugarcrmclient.xml</Include-Resource>
 
-						<Embed-Transitive>true</Embed-Transitive>
-						<Embed-Dependency>*</Embed-Dependency>
+                        <Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency> 
 
-						<!-- <Embed-Dependency>*;scope=compile|runtime|system;</Embed-Dependency> 
+						<!--
+												<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Dependency>*</Embed-Dependency> 
+						    <Embed-Dependency>*;scope=compile|runtime|system;</Embed-Dependency> 
 							<Embed-Transitive>true</Embed-Transitive> -->
 
 					</instructions>

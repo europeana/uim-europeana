@@ -8,6 +8,8 @@
 
 
 
+
+
 	<bean id="sugarWsClient" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClient">
 		<property name="webServiceTemplate" ref="webServiceTemplate"/>
 	</bean>
@@ -19,14 +21,15 @@
          <property name="contextPath" value="org.xmlsoap.schemas.soap.encoding:com.sugarcrm.sugarcrm"/>
     </bean>
 
-
+ 
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
          <argument ref="messageFactory"/>
          <property name="defaultUri" value="${host}" />
          <property name="marshaller" ref="jaxb2Marshaller" />
          <property name="unmarshaller" ref="jaxb2Marshaller" />
     </bean>
-    
+
+
     
    <!--Log4j Configuration-->  
    <bean id="log4jInitialization"
@@ -44,6 +47,7 @@
    <bean id="propertiesPlaceholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">    
        <property name="location" value="classpath:testConfig.properties"/>  
    </bean>
+
 
    <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl">    
        <property name="sugarClient" ref="sugarWsClient"/>  

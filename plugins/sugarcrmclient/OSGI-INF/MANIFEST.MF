@@ -15,13 +15,14 @@ Export-Package: eu.europeana.uim.sugarcrmclient.plugin;uses:="eu.europ
 Private-Package: com.sugarcrm.sugarcrm,org.xmlsoap.schemas.soap.encodi
  ng
 Bundle-ClassPath: .,europeana-uim-plugin-sugarclientbindings-1.2.0.jar
-Built-By: geomark
+Built-By: georgiosmarkakis
 Tool: Bnd-0.0.238
 Bundle-Name: Unified Ingestion Manager: Sugar CRM Plugin
 Created-By: Apache Maven Bundle Plugin
-Build-Jdk: 1.6.0_20
+DynamicImport-Package: *
+Build-Jdk: 1.6.0_22
 Bundle-Version: 1.2.0.SNAPSHOT
-Bnd-LastModified: 1299024168962
+Bnd-LastModified: 1299254904123
 Bundle-ManifestVersion: 2
 Import-Package: eu.europeana.uim.sugarcrmclient.internal,eu.europeana.
  uim.sugarcrmclient.internal.helpers,eu.europeana.uim.sugarcrmclient.p
@@ -31,11 +32,12 @@ Import-Package: eu.europeana.uim.sugarcrmclient.internal,eu.europeana.
  rs,javax.xml.datatype,javax.xml.namespace,javax.xml.parsers,javax.xml
  .soap,org.apache.felix.gogo.commands,org.apache.log4j;version="1.2",o
  rg.osgi.service.command,org.springframework.beans.factory;version="2.
- 5",org.springframework.util;version="2.5",org.springframework.ws,org.
- springframework.ws.client,org.springframework.ws.client.core,org.spri
- ngframework.ws.client.support.interceptor,org.springframework.ws.cont
- ext,org.springframework.ws.soap,org.springframework.ws.soap.saaj,org.
- springframework.ws.transport,org.w3c.dom
+ 5",org.springframework.oxm.jaxb,org.springframework.util;version="2.5
+ ",org.springframework.ws,org.springframework.ws.client,org.springfram
+ ework.ws.client.core,org.springframework.ws.client.support.intercepto
+ r,org.springframework.ws.context,org.springframework.ws.soap,org.spri
+ ngframework.ws.soap.saaj,org.springframework.ws.transport,org.springf
+ ramework.ws.transport.http,org.w3c.dom
 Embed-Dependency: europeana-uim-plugin-sugarclientbindings
 Bundle-SymbolicName: eu.europeana.europeana-uim-plugin-sugarcrmclient
 
