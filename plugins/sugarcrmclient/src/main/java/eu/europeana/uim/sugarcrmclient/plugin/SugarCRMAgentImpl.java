@@ -1,18 +1,11 @@
 package eu.europeana.uim.sugarcrmclient.plugin;
 
-import java.util.Properties;
-
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+
 
 public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 	private SugarWsClient sugarwsClient;
-	private String sessionId;
-	
-	
-	SugarCRMAgentImpl(){
-
-	}
 	
 	
 	
@@ -45,6 +38,8 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		return connectionInfo.toString();
 	}
 
+	
+	
 	public void setSugarwsClient(SugarWsClient sugarwsClient) {
 		this.sugarwsClient = sugarwsClient;
 	}

@@ -30,6 +30,10 @@ public class UIM2SugarCrm implements Function, Action {
 	private String argument1;
 	
 	
+	public UIM2SugarCrm (SugarCRMAgentImpl sugarcrmPlugin ){
+		this.sugarcrmPlugin = sugarcrmPlugin;
+	}
+	
 	
 	@Override
 	public Object execute(CommandSession commandsession) throws Exception {

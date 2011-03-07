@@ -5,24 +5,29 @@ Export-Package: eu.europeana.uim.sugarcrmclient.plugin;uses:="eu.europ
  w3c.dom",eu.europeana.uim.sugarcrmclient.plugin.command;uses:="eu.eur
  opeana.uim.sugarcrmclient.plugin,org.osgi.service.command,org.apache.
  felix.gogo.commands",eu.europeana.uim.sugarcrmclient.internal;uses:="
- org.springframework.ws,org.springframework.ws.soap,org.springframewor
- k.ws.context,org.springframework.util,org.springframework.ws.client,o
- rg.springframework.ws.soap.saaj,org.springframework.ws.client.support
- .interceptor,org.springframework.ws.transport,javax.xml.soap,org.spri
- ngframework.beans.factory",eu.europeana.uim.sugarcrmclient.ws;uses:="
- org.springframework.ws.client.core,eu.europeana.uim.sugarcrmclient.ws
- .exceptions",eu.europeana.uim.sugarcrmclient.ws.exceptions
+ org.springframework.ws.soap,org.springframework.ws.context,org.spring
+ framework.ws.soap.saaj,org.springframework.ws.client.support.intercep
+ tor,javax.xml.soap,org.springframework.beans.factory",eu.europeana.ui
+ m.sugarcrmclient.ws;uses:="eu.europeana.uim.sugarcrmclient.ws.excepti
+ ons",eu.europeana.uim.sugarcrmclient.ws.exceptions
 Private-Package: com.sugarcrm.sugarcrm,org.xmlsoap.schemas.soap.encodi
  ng
 Bundle-ClassPath: .,europeana-uim-plugin-sugarclientbindings-1.2.0.jar
-Built-By: georgiosmarkakis
+Built-By: geomark
 Tool: Bnd-0.0.238
 Bundle-Name: Unified Ingestion Manager: Sugar CRM Plugin
 Created-By: Apache Maven Bundle Plugin
-DynamicImport-Package: *
-Build-Jdk: 1.6.0_22
+DynamicImport-Package: org.apache.commons.codec,						org.apache.commo
+ ns.httpclient,						org.springframework.ws,						org.springframework.
+ oxm.jaxb,						springframework.beans.factory,						org.springframewor
+ k.core,						org.springframework.util,						org.springframework.ws.cl
+ ient,						org.springframework.ws.client.core,						org.springframewo
+ rk.ws.support,						org.springframework.ws.transport,						org.spring
+ framework.ws.transport.http,						org.springframework.ws.transport.co
+ ntext,						org.springframework.ws.transport.support
+Build-Jdk: 1.6.0_20
 Bundle-Version: 1.2.0.SNAPSHOT
-Bnd-LastModified: 1299254904123
+Bnd-LastModified: 1299457165000
 Bundle-ManifestVersion: 2
 Import-Package: eu.europeana.uim.sugarcrmclient.internal,eu.europeana.
  uim.sugarcrmclient.internal.helpers,eu.europeana.uim.sugarcrmclient.p
@@ -32,12 +37,9 @@ Import-Package: eu.europeana.uim.sugarcrmclient.internal,eu.europeana.
  rs,javax.xml.datatype,javax.xml.namespace,javax.xml.parsers,javax.xml
  .soap,org.apache.felix.gogo.commands,org.apache.log4j;version="1.2",o
  rg.osgi.service.command,org.springframework.beans.factory;version="2.
- 5",org.springframework.oxm.jaxb,org.springframework.util;version="2.5
- ",org.springframework.ws,org.springframework.ws.client,org.springfram
- ework.ws.client.core,org.springframework.ws.client.support.intercepto
- r,org.springframework.ws.context,org.springframework.ws.soap,org.spri
- ngframework.ws.soap.saaj,org.springframework.ws.transport,org.springf
- ramework.ws.transport.http,org.w3c.dom
+ 5",org.springframework.ws.client.support.interceptor,org.springframew
+ ork.ws.context,org.springframework.ws.soap,org.springframework.ws.soa
+ p.saaj,org.w3c.dom
 Embed-Dependency: europeana-uim-plugin-sugarclientbindings
 Bundle-SymbolicName: eu.europeana.europeana-uim-plugin-sugarcrmclient
 

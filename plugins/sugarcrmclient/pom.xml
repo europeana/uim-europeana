@@ -106,7 +106,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		
+
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-ws-core</artifactId>
@@ -120,6 +120,10 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+
+
+
 
 
 		<!-- Equinox OSGi platform -->
@@ -204,87 +208,44 @@
 				<configuration>
 					<manifestLocation>OSGI-INF</manifestLocation>
 					<instructions>
-						<Import-Package>
-						    <!--  
-							!bsh,
-							!com.sun.enterprise.loader,
-							!com.sun.jdmk.comm,
-							!com.sun.msv.grammar,
-							!com.sun.msv.grammar.trex,
-							!com.sun.msv.reader,
-							!com.sun.msv.reader.trex.ng,
-							!com.sun.msv.reader.util,
-							!com.sun.msv.util,
-							!com.sun.msv.verifier,
-							!com.sun.msv.verifier.regexp,
-							!com.sun.net.httpserver,
-							!com.sun.xml.fastinfoset.sax,
-							!com.sun.xml.fastinfoset.stax,
-							!edu.emory.mathcs.backport.java.util.concurrent,
-							!groovy.lang,
-							!javax.ejb,
-							!javax.interceptor,
-							!javax.jms,
-							!javax.mail,
-							!javax.mail.internet,
-							!javax.persistence.spi,
-							!net.sf.cglib.asm,
-							!net.sf.cglib.core,
-							!net.sf.cglib.proxy,
-							!oracle.classloader.util,
-							!org.apache.commons.attributes,
-							!org.apache.commons.collections,
-							!org.apache.commons.collections.map,
-							!org.aspectj.bridge,
-							!org.aspectj.weaver,
-							!org.aspectj.weaver.bcel,
-							!org.aspectj.weaver.loadtime,
-							!org.aspectj.weaver.patterns,
-							!org.codehaus.groovy.control,
-							!org.jruby,
-							!org.jruby.ast,
-							!org.jruby.exceptions,
-							!org.jruby.javasupport,
-							!org.jruby.runtime,
-							!org.jruby.runtime.builtin,
-							!org.jvnet.fastinfoset,
-							!org.jvnet.staxex,
-							!org.osgi.service.command,
-							!org.relaxng.datatype,
-							!org.springframework.instrument ,
-							org.springframework.ws,
-							org.springframework.ws.client,
-							org.springframework.ws.client.core,
-							org.springframework.ws.client.support.interceptor,
-							org.springframework.ws.context ,
-							org.springframework.ws.soap ,
-							org.springframework.ws.soap.saaj,
-							org.springframework.ws.transport,
-							org.springframework.ws.transport.http,
-							-->
-							org.springframework.ws*,
-							org.springframework.ws.transport.http,
-							org.springframework.oxm.jaxb,
-							*</Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
 
-						<!-- <Private-Package> eu.europeana.uim.sugarcrmclient.ws, eu.europeana.uim.sugarcrmclient.internal 
-							</Private-Package> <Embed-Dependency>*;scope=compile|runtime|system;artifactId=!spring-beans|spring-core|spring-context|europeana-uim-common|europeana-uim-api</Embed-Dependency> -->
+						<DynamicImport-Package>
+						org.apache.commons.codec,
+						org.apache.commons.httpclient,
+						org.springframework.ws,
+						org.springframework.oxm.jaxb,
+						springframework.beans.factory,
+						org.springframework.core,
+						org.springframework.util,
+						org.springframework.ws.client,
+						org.springframework.ws.client.core,
+						org.springframework.ws.support,
+						org.springframework.ws.transport,
+						org.springframework.ws.transport.http,
+						org.springframework.ws.transport.context,
+						org.springframework.ws.transport.support
+					</DynamicImport-Package>
+
+						<!-- <Import-Package>org.springframework.oxm.jaxb, org.springframework.beans.factory.config, 
+							* </Import-Package> -->
+						<Private-Package>
+							eu.europeana.uim.sugarcrmclient.ws,
+							eu.europeana.uim.sugarcrmclient.internal
+                     </Private-Package>
 
 						<Export-Package>
 							eu.europeana.uim.sugarcrmclient.*
-						</Export-Package>
+					</Export-Package>
 
-						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
-						<Include-Resource>src/main/resources/OSGI-INF/blueprint/sugarcrmclient.xml</Include-Resource>
+						<Embed-Dependency>
+							europeana-uim-plugin-sugarclientbindings
+                    </Embed-Dependency>
 
-                        <Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency> 
 
-						<!--
-												<Embed-Transitive>true</Embed-Transitive>
-						<Embed-Dependency>*</Embed-Dependency> 
-						    <Embed-Dependency>*;scope=compile|runtime|system;</Embed-Dependency> 
-							<Embed-Transitive>true</Embed-Transitive> -->
+						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml 
+							<Include-Resource>src/main/resources/</Include-Resource> -->
+						<!-- <Embed-Transitive>true</Embed-Transitive> <Embed-Dependency>*</Embed-Dependency> 
+							<Embed-Dependency>*;scope=compile|runtime|system;</Embed-Dependency> <Embed-Transitive>true</Embed-Transitive> -->
 
 					</instructions>
 				</configuration>

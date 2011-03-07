@@ -115,7 +115,11 @@ public final class SugarCRMWSTest {
 		LoginResponse response;
 
 			try {
-				response = sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
+				Login login = ClientUtils.createStandardLoginObject("test", "test");
+					
+				ClientUtils.logMarshalledObject(login);
+				
+				response = sugarWsClient.login2(login);
 			} catch (LoginFailureException e) {
 				response = null;
 			}
