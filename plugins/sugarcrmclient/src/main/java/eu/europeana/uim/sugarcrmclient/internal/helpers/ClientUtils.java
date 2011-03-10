@@ -16,13 +16,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sugarcrm.sugarcrm.GetEntries;
-import com.sugarcrm.sugarcrm.Login;
-import com.sugarcrm.sugarcrm.ObjectFactory;
-import com.sugarcrm.sugarcrm.SelectFields;
-import com.sugarcrm.sugarcrm.UserAuth;
-import com.sugarcrm.sugarcrm.NameValueList;
-import com.sugarcrm.sugarcrm.NameValue;
+import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntries;
+import eu.europeana.uim.sugarcrmclient.jaxbbindings.Login;
+import eu.europeana.uim.sugarcrmclient.jaxbbindings.ObjectFactory;
+import eu.europeana.uim.sugarcrmclient.jaxbbindings.SelectFields;
+import eu.europeana.uim.sugarcrmclient.jaxbbindings.UserAuth;
+import eu.europeana.uim.sugarcrmclient.jaxbbindings.NameValueList;
+import eu.europeana.uim.sugarcrmclient.jaxbbindings.NameValue;
 
 import org.apache.log4j.Logger;
 
@@ -47,7 +47,7 @@ public class ClientUtils {
 		
 		JAXBContext context;
 		try {
-			context = JAXBContext.newInstance("com.sugarcrm.sugarcrm");
+			context = JAXBContext.newInstance("eu.europeana.uim.sugarcrmclient.jaxbbindings");
 			Marshaller m = context.createMarshaller();
 			StringWriter writer = new StringWriter();
 			m.marshal(jaxbObject, writer);

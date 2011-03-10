@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/osgi
+	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
 	<!-- regular spring configuration file defining the beans for this bundle. 
 		The configuration of OSGi definitions is kept in a separate configuration 
@@ -19,30 +23,16 @@
 
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
          <constructor-arg ref="messageFactory"/>
-
          <property name="defaultUri" value="${host}" />
          <property name="marshaller" ref="jaxb2Marshaller" />
          <property name="unmarshaller" ref="jaxb2Marshaller" />
-         <!--  
-         <property name="messageSender">
-           <bean class="org.springframework.ws.transport.http.HttpUrlConnectionMessageSender">
-            <property name="acceptGzipEncoding" value="true" />
-           </bean>
-         </property>
-        
-         <property name="interceptors">
-           <list>
-            <ref bean="compressedSoapInterceptor" />
-           </list>
-         </property>
-         -->
     </bean>
     
-    
+ 
     <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-         <property name="contextPath" value="eu.europeana.uim.sugarcrmclient.jaxbbindings"/>
+         <property name="contextPath" value="eu.europeana.uim.sugarcrmclient.jaxbbindings"/> 
     </bean>
-    
+
     
    <!--Log4j Configuration-->  
    <bean id="log4jInitialization"
@@ -51,16 +41,20 @@
 		<property name="targetMethod" value="initLogging" />
 		<property name="arguments">
 			<list>
-				<value>classpath:testlog4j.properties</value>
+				<value>classpath:log4j.properties</value>
 			</list>
 		</property>
 	</bean>
 	
 	<!--Inject defined properties into Spring -->  
    <bean id="propertiesPlaceholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">    
-       <property name="location" value="classpath:testConfig.properties"/>  
+       <property name="location" value="classpath:/META-INF/config.properties"/>  
    </bean>
 
+   <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl">    
+       <property name="sugarwsClient" ref="sugarWsClient"/>  
+   </bean>
 
+   <osgi:service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent"/>
 
 </beans>

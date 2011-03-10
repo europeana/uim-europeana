@@ -5,65 +5,6 @@
            xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0">
 
 
-
-	<bean id="sugarWsClient" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClient">
-	    <!--  
-		<property name="webServiceTemplate" ref="webServiceTemplate"/>
-		    -->
-	</bean>
-
-
-
-    <bean id="messageFactory" class="eu.europeana.uim.sugarcrmclient.internal.ExtendedSaajSoapMessageFactory"/>
-
-    
-    
-    <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-         <property name="contextPath" value="org.xmlsoap.schemas.soap.encoding:com.sugarcrm.sugarcrm"/>
-    </bean>
-
-     <bean id="messageSender" class="org.springframework.ws.transport.http.HttpUrlConnectionMessageSender">
-     </bean>
-
-
-<!--  
-
-    <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
-
-         <argument ref="messageFactory"/>
-         <property name="messagesender" ref="messageSender"/>
-         <property name="defaultUri" value="http://localhost:8080/sugarcrm/soap.php?wsdl" />
-         <property name="marshaller" ref="jaxb2Marshaller" />
-         <property name="unmarshaller" ref="jaxb2Marshaller" />
-
-    </bean>
-
-
--->
-
-    
-   <!--Log4j Configuration-->
-   <!-- 
-   <bean id="log4jInitialization"
-	class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
-		<property name="targetMethod" value="initLogging" />
-		<property name="arguments">
-			<list>
-				<value>classpath:testlog4j.properties</value>
-			</list>
-		</property>
-	</bean>
-	-->
-	
-	<!--Inject defined properties into Spring -->  
-	<!--  
-   <bean id="propertiesPlaceholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">    
-       <property name="location" value="classpath:testConfig.properties"/>  
-   </bean>
-   -->
-   
-
    <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl">    
        <property name="sugarwsClient" ref="sugarWsClient"/>  
    </bean>
