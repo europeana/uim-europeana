@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.europeana</groupId>
 	<artifactId>europeana-uim-plugin-sugarclientbindings</artifactId>
-	<version>1.2.0-SNAPSHOT</version> 
+	<version>1.2.1-SNAPSHOT</version> 
 	<name>Unified Ingestion Manager: Sugar CRM WS Client Bindings</name>
 	<description>Jaxb bindings for the Sugar CRM Webservice client module</description>
 	<packaging>jar</packaging>
@@ -45,7 +45,8 @@
 					<schemaLanguage>XMLSCHEMA</schemaLanguage>
 						<schemaIncludes>
 							<value>*.xsd</value>
-						</schemaIncludes>
+					</schemaIncludes>
+					<generatePackage>eu.europeana.uim.sugarcrmclient.jaxbbindings</generatePackage>
 				</configuration>
 			</plugin>
 
