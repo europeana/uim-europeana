@@ -10,15 +10,16 @@ import org.apache.felix.gogo.commands.Option;
 import org.osgi.service.command.CommandSession;
 import org.osgi.service.command.Function;
 
+import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl;
 
 
-@Command(name = "uim", scope = "sugarCrmAgent")
+@Command(name = "uim", scope = "sugaragent")
 public class UIM2SugarCrm implements Function, Action {
 
 	enum Operation {info,showpendingjobs,getpolltime,setpolltime}
 	
-	private SugarCRMAgentImpl sugarcrmPlugin;
+	private SugarCRMAgent sugarcrmPlugin;
 	
 	@Option(name = "-o", aliases = {"--operation"}, required = false)
 	private Operation operation;
@@ -30,7 +31,7 @@ public class UIM2SugarCrm implements Function, Action {
 	private String argument1;
 	
 	
-	public UIM2SugarCrm (SugarCRMAgentImpl sugarcrmPlugin ){
+	public UIM2SugarCrm (SugarCRMAgent sugarcrmPlugin ){
 		this.sugarcrmPlugin = sugarcrmPlugin;
 	}
 	

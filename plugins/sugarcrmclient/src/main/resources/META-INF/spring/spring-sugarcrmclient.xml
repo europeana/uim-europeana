@@ -2,10 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
 	http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/osgi
-	http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+	http://www.springframework.org/schema/osgi/spring-osgi.xsd
+	http://www.springframework.org/schema/oxm 
+	http://www.springframework.org/schema/oxm/spring-oxm-1.5.xsd">
 
 	<!-- regular spring configuration file defining the beans for this bundle. 
 		The configuration of OSGi definitions is kept in a separate configuration 
@@ -24,15 +27,21 @@
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
          <constructor-arg ref="messageFactory"/>
          <property name="defaultUri" value="${host}" />
+
+           <!-- 
          <property name="marshaller" ref="jaxb2Marshaller" />
          <property name="unmarshaller" ref="jaxb2Marshaller" />
+         -->
     </bean>
     
- 
+    
+    <oxm:jaxb2-marshaller id="jaxb2Marshaller" contextPath="eu.europeana.uim.sugarcrmclient.jaxbbindings"/>
+    
+    <!--  
     <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
          <property name="contextPath" value="eu.europeana.uim.sugarcrmclient.jaxbbindings"/> 
     </bean>
-
+     -->
     
    <!--Log4j Configuration-->  
    <bean id="log4jInitialization"

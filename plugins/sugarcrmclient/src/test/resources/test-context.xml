@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-1.5.xsd">
 
 	<!-- regular spring configuration file defining the beans for this bundle. 
 		The configuration of OSGi definitions is kept in a separate configuration 
@@ -39,10 +41,13 @@
     </bean>
     
     
-    <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+    <oxm:jaxb2-marshaller id="jaxb2Marshaller" contextPath="eu.europeana.uim.sugarcrmclient.jaxbbindings"/>
+    
+    <!--  
+    <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb1Marshaller">
          <property name="contextPath" value="eu.europeana.uim.sugarcrmclient.jaxbbindings"/>
     </bean>
-    
+    -->
     
    <!--Log4j Configuration-->  
    <bean id="log4jInitialization"

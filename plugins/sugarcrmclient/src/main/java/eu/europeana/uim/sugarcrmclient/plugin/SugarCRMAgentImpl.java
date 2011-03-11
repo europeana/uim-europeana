@@ -1,6 +1,9 @@
 package eu.europeana.uim.sugarcrmclient.plugin;
 
+import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.jaxbbindings.Login;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
 
 public class SugarCRMAgentImpl implements SugarCRMAgent{
@@ -33,7 +36,20 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		
 		String defaultURI = sugarwsClient.getDefaultUri();
 		
+		connectionInfo.append("Pointing at:");
 		connectionInfo.append(defaultURI);
+		
+		connectionInfo.append("/n");
+		connectionInfo.append("Session Id:");
+
+		Login login = ClientUtils.createStandardLoginObject("test", "test");
+		try {
+			connectionInfo.append(sugarwsClient.login(login));
+		} catch (LoginFailureException e) {			
+			connectionInfo.append("Invalid Session, login failed!");
+			e.printStackTrace();
+		}
+		
 		
 		return connectionInfo.toString();
 	}

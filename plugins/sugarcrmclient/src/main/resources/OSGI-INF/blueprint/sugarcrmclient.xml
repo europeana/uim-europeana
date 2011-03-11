@@ -5,23 +5,25 @@
            xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0">
 
 
+    <reference id="sugarcrmPluginService" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent" availability="optional"/>
+    <!--  
    <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl">    
        <property name="sugarwsClient" ref="sugarWsClient"/>  
    </bean>
 
    <service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent"/>
-
+    -->
 
    <shell:command-bundle>
         <shell:command name="uim/sugarCrmAgent">
             <shell:action class="eu.europeana.uim.sugarcrmclient.plugin.command.UIM2SugarCrm">
-                <shell:argument ref="sugarcrmPlugin"/>
+                <shell:argument ref="sugarcrmPluginService"/>
             </shell:action>
         </shell:command>
     </shell:command-bundle>
     
        
-    <!--  
-    -->
+
+
 
 </blueprint>
