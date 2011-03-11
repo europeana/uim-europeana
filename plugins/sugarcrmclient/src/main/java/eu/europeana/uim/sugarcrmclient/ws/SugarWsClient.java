@@ -5,7 +5,7 @@ package eu.europeana.uim.sugarcrmclient.ws;
 
 
 
-import org.springframework.oxm.jaxb.Jaxb1Marshaller;
+
 
 import org.springframework.ws.client.core.WebServiceTemplate;
 
@@ -75,12 +75,13 @@ public class SugarWsClient {
 	 */
 	public String login(Login login) throws LoginFailureException{
 		
+	    /*
 		Jaxb1Marshaller marshaller = new Jaxb1Marshaller();
 		
 		marshaller.setContextPath("eu.europeana.uim.sugarcrmclient.jaxbbindings");
 		webServiceTemplate.setMarshaller(marshaller);
 		webServiceTemplate.setUnmarshaller(marshaller);
-		
+		*/
 		
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		String sessionID = response.getReturn().getId();

@@ -209,7 +209,9 @@
 				<configuration>
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
+
                         <DynamicImport-Package>*</DynamicImport-Package>
+
 						<Export-Package>eu.europeana.uim.sugarcrmclient.*</Export-Package>
                         <Import-Package>
                         org.springframework.ws.soap,
@@ -229,16 +231,15 @@
 						org.springframework.ws.transport.support,
 						com.sun.xml.messaging.saaj.soap,
 						!com.sun.xml.messaging.saaj.soap.encoding,
-						eu.europeana.uim.sugarcrmclient.jaxbbindings,
-						javax.xml.bind.*,
 						*
 						</Import-Package>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
-
+                        
+                        <!--  
                         <Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency> 
-
+                        -->
 					</instructions>
 				</configuration>
 			</plugin>
