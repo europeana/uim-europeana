@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.europeana</groupId>
 	<artifactId>europeana-uim-plugin-sugarclientbindings</artifactId>
-	<version>1.2.1-SNAPSHOT</version> 
+	<version>1.2.1-SNAPSHOT</version>
 	<name>Unified Ingestion Manager: Sugar CRM WS Client Bindings</name>
 	<description>Jaxb bindings for the Sugar CRM Webservice client module</description>
 	<packaging>jar</packaging>
-	
+
 
 	<properties>
 	</properties>
@@ -17,39 +17,70 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.1.12</version>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-run</artifactId>
+			<version>1.2.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-extras</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+
 
 	</dependencies>
 
 	<build>
+
+		<resources>
+			<resource>
+				<directory>src/main/java/</directory>
+				<excludes>
+				</excludes>
+				<includes>
+					<include>**/jaxb.properties</include>
+				</includes>
+			</resource>
+		</resources>
+
 		<defaultGoal>install</defaultGoal>
 		<plugins>
 
 			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.7.1</version>
+				<groupId>org.jibx</groupId>
+				<artifactId>maven-jibx-plugin</artifactId>
+				<version>1.2.3</version>
 				<executions>
 					<execution>
+						<id>generate-java-code-from-schema</id>
 						<goals>
-							<goal>generate</goal>
+							<goal>schema-codegen</goal>
 						</goals>
+						<configuration>
+							<directory>src/main/resources</directory>
+							<includes>
+								<include>*.xsd</include>
+							</includes>
+							<options>
+								<package>eu.europeana.uim.sugarcrmclient.jibxbindings</package>
+							</options>
+						</configuration>
+					</execution>
+					<execution>
+						<id>compile-binding</id>
+						<goals>
+							<goal>bind</goal>
+						</goals>
+						<configuration>
+							<directory>target/generated-sources</directory>
+							<load>true</load>
+							<validate>true</validate>
+							<!--<verbose>true</verbose> -->
+							<verify>false</verify>
+						</configuration>
 					</execution>
 				</executions>
-				
-				<configuration>
-				    <extension>true</extension>
-					<schemaLanguage>XMLSCHEMA</schemaLanguage>
-						<schemaIncludes>
-							<value>*.xsd</value>
-					</schemaIncludes>
-					<generatePackage>eu.europeana.uim.sugarcrmclient.jaxbbindings</generatePackage>
-				</configuration>
 			</plugin>
-
 			<plugin>
 				<inherited>true</inherited>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -69,14 +100,11 @@
 	<!-- ================================================ -->
 
 	<repositories>
-
 		<repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Maven 2 Repository</name>
 			<url>http://download.java.net/maven/2</url>
-		</repository> 
-		
-
+		</repository>
 	</repositories>
 
 	<pluginRepositories>

@@ -2,21 +2,13 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
 	xmlns:tns="http://www.sugarcrm.com/sugarcrm" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.sugarcrm.com/sugarcrm" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0"
-  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-  jaxb:extensionBindingPrefixes="xjc">
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.sugarcrm.com/sugarcrm">
+	
 	<xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/"
 		schemaLocation="http://schemas.xmlsoap.org/soap/encoding/" />
-	<xsd:import namespace="http://schemas.xmlsoap.org/wsdl/" />
+	<xsd:import namespace="http://schemas.xmlsoap.org/wsdl/" schemaLocation="http://schemas.xmlsoap.org/wsdl/" />
 	
-  <xsd:annotation>
-    <xsd:appinfo>
-      <jaxb:globalBindings>
-        <xjc:simple />
-      </jaxb:globalBindings>
-    </xsd:appinfo>
-  </xsd:annotation>
+
 	
 	<xsd:element name="note_attachment" type="tns:note_attachment" />
 
