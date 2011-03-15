@@ -25,23 +25,12 @@
          <property name="defaultUri" value="${host}" />
          <property name="marshaller" ref="jaxb2Marshaller" />
          <property name="unmarshaller" ref="jaxb2Marshaller" />
-         <!--  
-         <property name="messageSender">
-           <bean class="org.springframework.ws.transport.http.HttpUrlConnectionMessageSender">
-            <property name="acceptGzipEncoding" value="true" />
-           </bean>
-         </property>
-        
-         <property name="interceptors">
-           <list>
-            <ref bean="compressedSoapInterceptor" />
-           </list>
-         </property>
-         -->
     </bean>
     
     
-    <oxm:jaxb2-marshaller id="jaxb2Marshaller" contextPath="eu.europeana.uim.sugarcrmclient.jaxbbindings"/>
+    <bean id="jaxb2Marshaller" class="org.springframework.oxm.jibx.JibxMarshaller"> 
+         <property name="targetClass" value="eu.europeana.uim.sugarcrmclient.jibxbindings.Login"/> 
+    </bean>
     
     <!--  
     <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb1Marshaller">

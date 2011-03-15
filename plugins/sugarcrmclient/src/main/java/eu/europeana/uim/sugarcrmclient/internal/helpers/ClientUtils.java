@@ -1,5 +1,8 @@
 package eu.europeana.uim.sugarcrmclient.internal.helpers;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -15,14 +18,17 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntries;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.Login;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.ObjectFactory;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.SelectFields;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.UserAuth;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.NameValueList;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.NameValue;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.Array;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.CommonAttributes;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.UserAuth;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 
 import org.apache.log4j.Logger;
 
@@ -45,6 +51,7 @@ public class ClientUtils {
 	 */
 	public static void logMarshalledObject(Object jaxbObject){
 		
+		/*
 		JAXBContext context;
 		try {
 			context = JAXBContext.newInstance("eu.europeana.uim.sugarcrmclient.jaxbbindings");
@@ -61,6 +68,7 @@ public class ClientUtils {
 	
 			e.printStackTrace();
 		}
+		*/
 		
 	}
 	
@@ -97,9 +105,9 @@ public class ClientUtils {
 	 */
 	public static Login createStandardLoginObject(String username, String passwrd){
 		
-		ObjectFactory factory = new ObjectFactory();
-		Login login = factory.createLogin();
-		UserAuth user = factory.createUserAuth();
+		
+		Login login = new Login();
+		UserAuth user = new UserAuth();
 
 		user.setUserName(username);
 		user.setPassword(md5(passwrd));
@@ -122,16 +130,22 @@ public class ClientUtils {
 	 */
 	public static SelectFields generatePopulatedSelectFields(List<String> fieldnames){
 		
-		ObjectFactory factory = new ObjectFactory();		
 
-		SelectFields selfields = factory.createSelectFields();
+
+		SelectFields selfields = new SelectFields();
 		StringBuffer arrayType = new StringBuffer();
 		
 		arrayType.append("string[");
 		arrayType.append(fieldnames.size());
 		arrayType.append("]");
 				
-		selfields.setArrayType(arrayType.toString());
+		CommonAttributes commonAttributes = new CommonAttributes();
+		
+		commonAttributes.setHref(arrayType.toString());
+		
+		selfields.setCommonAttributes(commonAttributes);
+		
+	
 
 
 		Element rootElement = null;
@@ -143,9 +157,14 @@ public class ClientUtils {
 	        
 	        for( String fieldname : fieldnames){
 	        	Element element = document.createElement("string");
-	    		selfields.getAnies().add(rootElement);
+	        	
+	        	Array array =  new Array();
+	        	array.getAnyList();
+				selfields.setArray(array );
+	        	
+	    		//selfields.getAnies().add(rootElement);
 	    		element.appendChild(document.createTextNode(fieldname));
-	    		selfields.getAnies().add(element);
+	    		//selfields.getAnies().add(element);
 	    		
 	        }
 
@@ -169,8 +188,8 @@ public class ClientUtils {
 	 */
 	public static NameValueList generatePopulatedNameValueList(List<NameValue> namevalues){
 
-		ObjectFactory factory = new ObjectFactory();
-		NameValueList namevalueList = factory.createNameValueList();
+
+		NameValueList namevalueList = new NameValueList();
 		
 		StringBuffer arrayType = new StringBuffer();
 		
@@ -178,7 +197,7 @@ public class ClientUtils {
 		arrayType.append(namevalues.size());
 		arrayType.append("]");
 				
-		namevalueList.setArrayType(arrayType.toString());
+		//namevalueList.setArrayType(arrayType.toString());
 
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
@@ -197,7 +216,7 @@ public class ClientUtils {
 	        	name_value.appendChild(name);
 	        	name_value.appendChild(value);
 	        	
-	        	namevalueList.getAnies().add(name_value);
+	        	//namevalueList.getAnies().add(name_value);
 	    		
 	        }
 		} catch (ParserConfigurationException e) {
@@ -207,6 +226,21 @@ public class ClientUtils {
 
 		return namevalueList;
 
+	}
+	
+	
+	public static Object responseFactory(String responseString) throws ParserConfigurationException, SAXException, IOException{
+		
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
+	    DocumentBuilder documentBuilder= documentBuilderFactory.newDocumentBuilder();
+
+	    Document document = documentBuilder.parse(new InputSource(new StringReader(responseString)));
+		
+	    String messageName = document.getFirstChild().getNodeName();
+	
+		
+		return document;
 	}
 		
 }

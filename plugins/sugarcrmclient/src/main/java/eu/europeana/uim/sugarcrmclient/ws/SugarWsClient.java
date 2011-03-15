@@ -7,30 +7,37 @@ package eu.europeana.uim.sugarcrmclient.ws;
 
 
 
+import java.io.StringReader;
+
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.springframework.ws.client.core.WebServiceTemplate;
 
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.IsUserAdmin;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.IsUserAdminResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntryList;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntryListResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntry;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntryResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntries;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntriesResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.SetEntry;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.SetEntryResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.Logout;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.LogoutResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetModuleFields;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetModuleFieldsResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetAvailableModules;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetAvailableModulesResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetUserId;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetUserIdResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetModuleFields;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetModuleFieldsResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.Login;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.LoginResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntriesResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.Logout;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.LogoutResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserId;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserIdResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
 
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.*;
 
@@ -67,6 +74,8 @@ public class SugarWsClient {
 	}
 	
 	
+
+	
 	
 	
 	/**
@@ -74,14 +83,6 @@ public class SugarWsClient {
 	 * @return
 	 */
 	public String login(Login login) throws LoginFailureException{
-		
-	    /*
-		Jaxb1Marshaller marshaller = new Jaxb1Marshaller();
-		
-		marshaller.setContextPath("eu.europeana.uim.sugarcrmclient.jaxbbindings");
-		webServiceTemplate.setMarshaller(marshaller);
-		webServiceTemplate.setUnmarshaller(marshaller);
-		*/
 		
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		String sessionID = response.getReturn().getId();

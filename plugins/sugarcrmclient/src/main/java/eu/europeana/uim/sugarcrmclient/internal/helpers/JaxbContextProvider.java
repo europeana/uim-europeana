@@ -3,7 +3,7 @@
  */
 package eu.europeana.uim.sugarcrmclient.internal.helpers;
 
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.ObjectFactory;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 
 
 /**
@@ -15,7 +15,7 @@ public class JaxbContextProvider {
 	
 	public ClassLoader provideJaxbClassloader() {
 		
-		return ObjectFactory.class.getClassLoader();
+		return GetAvailableModules.class.getClassLoader();
 	}
 
 	

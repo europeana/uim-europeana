@@ -22,32 +22,32 @@ import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
 
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetAvailableModules;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetAvailableModulesResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntries;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntriesResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntry;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntryList;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntryListResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetEntryResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetModuleFields;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetModuleFieldsResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetUserId;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.GetUserIdResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.Login;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.Logout;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.LogoutResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.NameValue;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.NameValueList;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.SelectFields;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.SetEntry;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.SetEntryResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.UserAuth;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.LoginResponse;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.IsUserAdmin;
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.IsUserAdminResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntriesResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserId;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserIdResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.Logout;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.LogoutResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.UserAuth;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
 
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.ObjectFactory;
+
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import org.apache.log4j.Logger;
 
@@ -67,7 +67,7 @@ public final class SugarCRMWSTest {
 	
 	private String sessionID;
 
-	private ObjectFactory factory = new ObjectFactory();	
+
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMWSTest.class);
 	
@@ -88,7 +88,6 @@ public final class SugarCRMWSTest {
 		} catch (LoginFailureException e) {
 			sessionID = "-1";
 			LOGGER.info(e.getMessage());
-			//e.printStackTrace();
 		}
 		
 	}
@@ -100,7 +99,7 @@ public final class SugarCRMWSTest {
 	@After
 	public void destroySession(){
 		
-		Logout request = factory.createLogout();
+		Logout request = new Logout();
 		request.setSession(sessionID);
 		LogoutResponse lgresponse =  sugarWsClient.logout(request );
 		assertNotNull(lgresponse);
@@ -134,7 +133,7 @@ public final class SugarCRMWSTest {
 	 */
 	@Test
 	public void testIsUserAdmin(){	
-		IsUserAdmin user = factory.createIsUserAdmin();		
+		IsUserAdmin user = new IsUserAdmin();		
 		user.setSession(sessionID);		
 		IsUserAdminResponse response = sugarWsClient.is_user_admin(user);
 		assertNotNull(response);
@@ -147,7 +146,7 @@ public final class SugarCRMWSTest {
 	 */
 	@Test
 	public void testGetUserID(){	 
-		GetUserId request = factory.createGetUserId();
+		GetUserId request = new GetUserId();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetUserIdResponse response =  sugarWsClient.get_user_id(request);
@@ -161,7 +160,7 @@ public final class SugarCRMWSTest {
 	 */
 	@Test
 	public void testGetAvailableModules(){	 	
-		GetAvailableModules request = factory.createGetAvailableModules();
+		GetAvailableModules request = new GetAvailableModules();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetAvailableModulesResponse response =  sugarWsClient.get_available_modules(request);
@@ -176,7 +175,7 @@ public final class SugarCRMWSTest {
 	 */
 	@Test
 	public void testGetModuleFields(){	 		
-		GetModuleFields request = factory.createGetModuleFields();
+		GetModuleFields request = new GetModuleFields();
 		request.setSession(sessionID);
 		request.setModuleName("Contacts");
 		ClientUtils.logMarshalledObject(request);
@@ -194,7 +193,7 @@ public final class SugarCRMWSTest {
 	 */
 	@Test
 	public void testGetEntryList(){		
-		GetEntryList request = factory.createGetEntryList();
+		GetEntryList request = new GetEntryList();
 		
 		ArrayList <String> fieldnames = new  ArrayList<String>();
 		
@@ -227,7 +226,7 @@ public final class SugarCRMWSTest {
 	 */
 	@Test
 	public void testGetEntries(){	 		
-		GetEntries request = factory.createGetEntries();
+		GetEntries request = new GetEntries();
 		ArrayList <String> fieldnames = new  ArrayList<String>();
 		fieldnames.add("id");
 		fieldnames.add("first_name");
@@ -249,7 +248,7 @@ public final class SugarCRMWSTest {
 	 */
 	@Test
 	public void testGetEntry(){
-		GetEntry request = factory.createGetEntry();
+		GetEntry request = new GetEntry();
 		request.setId("1c3a03dd-753b-7741-92e8-4d6509d442d3");
 		request.setModuleName("Contacts");
 		request.setSession(sessionID);	
@@ -267,18 +266,18 @@ public final class SugarCRMWSTest {
 	 */
 	@Test
 	public void testSetEntry(){
-		SetEntry request = factory.createSetEntry();
+		SetEntry request = new SetEntry();
 		
 		
-		//NameValue nv1 = factory.createNameValue();
+		//NameValue nv1 = new NameValue();
 		//nv1.setName("id");
 		//nv1.setValue("99f37146-8e19-473d-171c-4d66de7024c0");
 		
-		NameValue nv0 = factory.createNameValue();
+		NameValue nv0 = new NameValue();
 		nv0.setName("first_name");
 		nv0.setValue("JohnX");
 
-		NameValue nv2 = factory.createNameValue();
+		NameValue nv2 = new NameValue();
 		nv2.setName("last_name");
 		nv2.setValue("SmithX");		
 

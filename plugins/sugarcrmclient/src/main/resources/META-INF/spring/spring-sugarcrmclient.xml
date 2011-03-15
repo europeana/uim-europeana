@@ -22,25 +22,29 @@
 	</bean>
 
 
+	<bean id="sugarWsClientNB" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientNonBinding">
+		<property name="webServiceTemplate" ref="webServiceTemplate"/>
+	</bean>
+
+
     <bean id="messageFactory" class="eu.europeana.uim.sugarcrmclient.internal.ExtendedSaajSoapMessageFactory"/>
 
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
          <constructor-arg ref="messageFactory"/>
          <property name="defaultUri" value="${host}" />
-         <property name="marshaller" ref="jaxb2Marshaller" />
-         <property name="unmarshaller" ref="jaxb2Marshaller" />
+         <property name="marshaller" ref="loginUnmarshaller" />
+         <property name="unmarshaller" ref="loginUnmarshaller" />
     </bean>
     
       
-    <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-         <property name="beanClassLoader" ref="contextClassLoader"/>
-         <property name="contextPath" value="eu.europeana.uim.sugarcrmclient.jaxbbindings"/> 
+    <bean id="loginUnmarshaller" class="org.springframework.oxm.jibx.JibxMarshaller"> 
+         <property name="targetClass" value="eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse"/> 
     </bean>
     
+    <bean id="loginresMarshaller" class="org.springframework.oxm.jibx.JibxMarshaller"> 
+         <property name="targetClass" value="eu.europeana.uim.sugarcrmclient.jibxbindings.Login"/> 
+    </bean>
     
-    <bean id="contextClassLoader" factory-bean="contextClassLoaderFactory"   factory-method="provideJaxbClassloader"/>
-
-    <bean id="contextClassLoaderFactory" class="eu.europeana.uim.sugarcrmclient.internal.helpers.JaxbContextProvider" />
   
     
     
@@ -62,7 +66,7 @@
    </bean>
 
    <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl">    
-       <property name="sugarwsClient" ref="sugarWsClient"/>  
+       <property name="sugarwsClient" ref="sugarWsClientNB"/>  
    </bean>
 
    <osgi:service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent"/>

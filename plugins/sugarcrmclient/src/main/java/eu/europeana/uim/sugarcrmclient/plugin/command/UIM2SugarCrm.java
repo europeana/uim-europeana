@@ -17,7 +17,7 @@ import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl;
 @Command(name = "uim", scope = "sugaragent")
 public class UIM2SugarCrm implements Function, Action {
 
-	enum Operation {info,showpendingjobs,getpolltime,setpolltime}
+	enum Operation {info,updatesession,pending4ingestion,notifyIngestionSuccsess,notifyIngestionFailure,getpolltime,setpolltime}
 	
 	private SugarCRMAgent sugarcrmPlugin;
 	
@@ -44,7 +44,10 @@ public class UIM2SugarCrm implements Function, Action {
 		if (operation == null) {
 			out.println("Please specify an operation with the '-o' option. Possible values are:");
 			out.println("  info \t\t\t\t\t\t provides inforamtion regarding the existing remote connection to SugarCRM");
-			out.println("  showpendingjobs \t\t\t\t shows all entries in SugarCRM who are candidates for ingestion initiation.");
+			out.println("  updatesession \t\t\t\t\t\t creates a new session for the client");					
+			out.println("  pending4ingestion \t\t\t\t shows all entries in SugarCRM who are candidates for ingestion initiation.");
+			out.println("  notifyIngestionSuccsess \t\t\t\t notifies SugarCRM that ingestion for the specified entries was successfull");
+			out.println("  notifyIngestionFailure \t\t\t\t notifies SugarCRM that ingestion for the specified entries has failed");
 			out.println("  getpolltime \t\t\t\t shows the time set for the next polling session");
 			out.println("  setpolltime \t\t\t\t sets the time for the next polling session");
 			return null;
@@ -54,8 +57,17 @@ public class UIM2SugarCrm implements Function, Action {
 		case info:
 			out.println(sugarcrmPlugin.showConnectionStatus());
 			break;
-		case showpendingjobs:
+		case updatesession:
+			out.println(sugarcrmPlugin.updateSession());
+			break;
+		case pending4ingestion:
 			out.println(sugarcrmPlugin.pollForHarvestInitiators());
+			break;
+		case notifyIngestionSuccsess:
+			out.println("Not implemented yet.");
+			break;
+		case notifyIngestionFailure:
+			out.println("Not implemented yet.");
 			break;
 		case getpolltime:
 			out.println("Not implemented yet.");

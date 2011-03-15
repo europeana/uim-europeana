@@ -4,7 +4,7 @@
 package eu.europeana.uim.sugarcrmclient.ws.exceptions;
 
 
-import eu.europeana.uim.sugarcrmclient.jaxbbindings.LoginResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
 
 /**
  * Exception thrown in case of Authentication Error

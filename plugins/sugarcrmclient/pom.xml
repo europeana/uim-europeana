@@ -112,17 +112,11 @@
 			<artifactId>spring-ws-core</artifactId>
 			<version>${spring.ws.version}</version>
 			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>spring-oxm</artifactId>
-					<groupId>org.springframework.ws</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-oxm-tiger</artifactId>
+			<artifactId>spring-oxm</artifactId>
 			<version>${spring.ws.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -161,12 +155,40 @@
 		</dependency>
 
 
+        <!--  
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<version>2.1.12</version>
 		</dependency>
+		
+		 <dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.moxy</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+        -->
+        
+        		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-run</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-extras</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		
+		
+        <dependency>
+   <groupId>stax</groupId>
+   <artifactId>stax</artifactId>
+   <version>1.2.0</version>
+</dependency>
+        
 
+        
 		<!-- Karaf Shell, for OSGi shell commands -->
 		<dependency>
 			<groupId>org.apache.karaf.shell</groupId>
@@ -216,30 +238,22 @@
                         <Import-Package>
                         org.springframework.ws.soap,
                         org.springframework.ws.soap.saaj,						
-                        org.apache.commons.codec,
-						org.apache.commons.httpclient,
-						org.springframework.ws,
-						org.springframework.oxm.jaxb,
-						org.springframework.core,
-						org.springframework.util,
-						org.springframework.ws.client,
-						org.springframework.ws.client.core,
-						org.springframework.ws.support,
-						org.springframework.ws.transport,
-						org.springframework.ws.transport.http,
-						org.springframework.ws.transport.context,
-						org.springframework.ws.transport.support,
-						com.sun.xml.messaging.saaj.soap,
 						!com.sun.xml.messaging.saaj.soap.encoding,
+						org.xmlpull.mxp1,
+						org.xmlpull.v1,
 						*
 						</Import-Package>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
-                        
+
+
                         <!--  
+                        <Embed-Transitive>true</Embed-Transitive>
+                        <Embed-Dependency>spring-oxm</Embed-Dependency> 
+
                         <Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency> 
-                        -->
+                         -->
 					</instructions>
 				</configuration>
 			</plugin>
@@ -300,9 +314,9 @@
 		</repository>
 
 		<repository>
-			<id>wp5.e-taxonomy.eu</id>
-			<name>E-taxonomy Repository</name>
-			<url>http://wp5.e-taxonomy.eu/cdmlib/mavenrepo/</url>
+			<id>Eclipselink</id>
+			<name>Eclipselink</name>
+			<url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
 		</repository>
 
 

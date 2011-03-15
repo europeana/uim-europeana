@@ -4,8 +4,12 @@ public interface SugarCRMAgent {
 	
 	public String showConnectionStatus();
 	
+	public String updateSession();
+	
 	public String pollForHarvestInitiators();
 	
-	public String notifySugarForChanges();
+	public String notifySugarForIngestionSuccess();
+	
+	public String notifySugarForIngestionFailure();
 
 }
