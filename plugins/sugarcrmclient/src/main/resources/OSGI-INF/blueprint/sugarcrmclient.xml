@@ -5,14 +5,7 @@
            xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0">
 
 
-    <reference id="sugarcrmPluginService" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent" availability="optional"/>
-    <!--  
-   <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl">    
-       <property name="sugarwsClient" ref="sugarWsClient"/>  
-   </bean>
-
-   <service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent"/>
-    -->
+   <reference id="sugarcrmPluginService" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent" availability="optional"/>
 
    <shell:command-bundle>
         <shell:command name="uim/sugarCrmAgent">
