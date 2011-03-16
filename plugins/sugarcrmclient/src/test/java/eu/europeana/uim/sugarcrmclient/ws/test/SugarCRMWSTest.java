@@ -205,11 +205,11 @@ public final class SugarCRMWSTest {
 		SelectFields fields = ClientUtils.generatePopulatedSelectFields(fieldnames);
 		
   		request.setModuleName("Contacts");	
-		//request.setSelectFields(fields);
+		request.setSelectFields(fields);
 		request.setSession(sessionID);
 		request.setOrderBy("last_name");
 		request.setMaxResults(100);
-		//request.setOffset(10);
+		request.setOffset(10);
 		//request.setQuery("(contacts.salutation = 'Mr.' AND contacts.title LIKE 'doctor appointment%')");
 		request.setQuery("(contacts.first_name LIKE '%M%')");
 		
@@ -235,7 +235,8 @@ public final class SugarCRMWSTest {
 		SelectFields fields = ClientUtils.generatePopulatedSelectFields(fieldnames);
   		request.setModuleName("Contacts");	
 		request.setSelectFields(fields);
-		request.setSession(sessionID);		
+		request.setSession(sessionID);
+		request.setIds(fields);
 		ClientUtils.logMarshalledObject(request);
 		GetEntriesResponse response =  sugarWsClient.get_entries(request);
 		ClientUtils.logMarshalledObject(response);
@@ -252,6 +253,8 @@ public final class SugarCRMWSTest {
 		request.setId("1c3a03dd-753b-7741-92e8-4d6509d442d3");
 		request.setModuleName("Contacts");
 		request.setSession(sessionID);	
+		SelectFields selectFields = new SelectFields();
+		request.setSelectFields(selectFields );
 		ClientUtils.logMarshalledObject(request);
 		GetEntryResponse response =  sugarWsClient.get_entry(request);
 		ClientUtils.logMarshalledObject(response);
