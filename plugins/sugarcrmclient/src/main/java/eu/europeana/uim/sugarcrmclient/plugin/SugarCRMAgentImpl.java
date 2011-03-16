@@ -1,12 +1,15 @@
 package eu.europeana.uim.sugarcrmclient.plugin;
 
 
-
 import java.util.ArrayList;
 
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
@@ -14,13 +17,13 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
-import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientNonBinding;
+import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
 
 public class SugarCRMAgentImpl implements SugarCRMAgent{
 
-	private SugarWsClientNonBinding sugarwsClient;
+	private SugarWsClientOSGI sugarwsClient;
 	
 	
 	
@@ -41,7 +44,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
   		request.setModuleName("Contacts");	
 		request.setSelectFields(fields); //stuaoqenh2va9negtmvb1ohbm1
 		//request.setSession(sugarwsClient.getSessionID());
-  		request.setSession("stuaoqenh2va9negtmvb1ohbm1");
+  		request.setSession("821gms22fmgq8n9720dv36vk65");
 		request.setOrderBy("last_name");
 		request.setMaxResults(100);
 		request.setOffset(10);
@@ -111,6 +114,33 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 
 	
+	@Override
+	public String showAvailableModules() {
+		GetAvailableModules request = new GetAvailableModules();
+		//request.setSession(sessionID);
+  		request.setSession("821gms22fmgq8n9720dv36vk65");
+  		
+		String response =  sugarwsClient.get_available_modules(request);
+
+		return response;
+	}
+
+
+
+	@Override
+	public String showModuleFields(String module) {
+
+		GetModuleFields request = new GetModuleFields();
+		//request.setSession(sessionID);
+  		request.setSession("821gms22fmgq8n9720dv36vk65");
+		request.setModuleName(module);
+		
+		String response =  sugarwsClient.get_module_fields(request);
+
+		return response;
+	}
+	
+	
 	public void testSetEntry(){
 		SetEntry request = new SetEntry();
 		
@@ -152,13 +182,17 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	
 	
 	
-	public void setSugarwsClient(SugarWsClientNonBinding sugarwsClient) {
+	public void setSugarwsClient(SugarWsClientOSGI sugarwsClient) {
 		this.sugarwsClient = sugarwsClient;
 	}
 
-	public SugarWsClientNonBinding getSugarwsClient() {
+	public SugarWsClientOSGI getSugarwsClient() {
 		return sugarwsClient;
 	}
+
+
+
+
 
 
 

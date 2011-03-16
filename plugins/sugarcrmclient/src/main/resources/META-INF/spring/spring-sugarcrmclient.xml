@@ -22,7 +22,7 @@
 	</bean>
 
 
-	<bean id="sugarWsClientNB" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientNonBinding">
+	<bean id="sugarWsClientNB" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI">
 		<property name="webServiceTemplate" ref="webServiceTemplate"/>
 	</bean>
 

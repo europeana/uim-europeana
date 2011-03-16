@@ -12,6 +12,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -23,12 +24,16 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import org.xml.sax.SAXException;
 
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntriesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Logout;
@@ -37,15 +42,11 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
-public class SugarWsClientNonBinding {
+public class SugarWsClientOSGI {
 
 	private WebServiceTemplate webServiceTemplate;
 
 	private String sessionID;
-	
-
-	
-	
 	
 	
 	/**
@@ -80,9 +81,10 @@ public class SugarWsClientNonBinding {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (XPathExpressionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
@@ -93,6 +95,7 @@ public class SugarWsClientNonBinding {
 	
 	
 	/**
+	 * 
 	 * @param login
 	 * @return
 	 */
@@ -161,7 +164,28 @@ public class SugarWsClientNonBinding {
 	}
 	
 	
+	/**
+	 * @param request
+	 * @return
+	 */
+	public String get_available_modules(GetAvailableModules request){
+
+		String response = invokeWSPlainString(request);
+		
+		return response;
+	}
 	
+	
+	/**
+	 * @param request
+	 * @return
+	 */
+	public String get_module_fields(GetModuleFields request){
+
+		String response = invokeWSPlainString(request);
+		
+		return response;
+	}
 	
 	
 	/**

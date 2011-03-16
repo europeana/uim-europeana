@@ -15,9 +15,15 @@ import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -31,6 +37,10 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 
 import org.apache.log4j.Logger;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.JiBXException;
 
 /**
  * This Class provides auxiliary methods that can be used for the creation & instantiation
@@ -47,28 +57,34 @@ public class ClientUtils {
 	/**
 	 * This method marshals the contents of a  JAXB Element and outputs the results to the
 	 * Logger.  
-	 * @param jaxbObject A JAXB representation of a SugarCRM SOAP Element. 
+	 * @param jaxbObject A JIBX representation of a SugarCRM SOAP Element. 
 	 */
-	public static void logMarshalledObject(Object jaxbObject){
+	public static void logMarshalledObject(Object jibxObject){
 		
-		/*
-		JAXBContext context;
+		
+		IBindingFactory context;
+
+
 		try {
-			context = JAXBContext.newInstance("eu.europeana.uim.sugarcrmclient.jaxbbindings");
-			Marshaller m = context.createMarshaller();
-			StringWriter writer = new StringWriter();
-			m.marshal(jaxbObject, writer);
+			context = BindingDirectory.getFactory(jibxObject.getClass());
+
+			IMarshallingContext mctx = context.createMarshallingContext();
+			mctx.setIndent(2);
+			StringWriter stringWriter = new StringWriter();
+			mctx.setOutput(stringWriter);
+			mctx.marshalDocument(jibxObject);
+
 			LOGGER.info("===========================================");
 			StringBuffer sb = new StringBuffer("Soap Ouput for Class: ");
-			sb.append(jaxbObject.getClass().getSimpleName());
+			sb.append(jibxObject.getClass().getSimpleName());
 			LOGGER.info(sb.toString());
-			LOGGER.info(writer.toString());
+			LOGGER.info(stringWriter.toString());
 			LOGGER.info("===========================================");
-		} catch (JAXBException e) {
-	
+		} catch (JiBXException e) {
+
 			e.printStackTrace();
 		}
-		*/
+
 		
 	}
 	
@@ -229,17 +245,32 @@ public class ClientUtils {
 	}
 	
 	
-	public static Object responseFactory(String responseString) throws ParserConfigurationException, SAXException, IOException{
+	public static Object responseFactory(String responseString) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-
+		documentBuilderFactory.setNamespaceAware(true);
 	    DocumentBuilder documentBuilder= documentBuilderFactory.newDocumentBuilder();
 
 	    Document document = documentBuilder.parse(new InputSource(new StringReader(responseString)));
 		
 	    String messageName = document.getFirstChild().getNodeName();
 	
-		
+	    XPathFactory factory = XPathFactory.newInstance();
+	    XPath xpath = factory.newXPath();
+	    
+	    xpath.setNamespaceContext(new SugarCRMNamespaceContext());
+	    XPathExpression expr = xpath.compile("//ns1:get_entry_listResponse/return/entry_list/item");
+
+	    Object result = expr.evaluate(document, XPathConstants.NODESET);
+	    NodeList nodes = (NodeList) result;
+	    
+	    int z = nodes.getLength();
+	    
+	    for (int i = 0; i < nodes.getLength(); i++) {
+	        System.out.println(nodes.item(i).getNodeValue()); 
+	    }
+	    
+	    
 		return document;
 	}
 		
