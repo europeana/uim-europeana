@@ -6,50 +6,44 @@
 	<artifactId>europeana-uim-plugin-sugarclientbindings</artifactId>
 	<version>1.2.1-SNAPSHOT</version>
 	<name>Unified Ingestion Manager: Sugar CRM WS Client Bindings</name>
-	<description>Jaxb bindings for the Sugar CRM Webservice client module</description>
+	<description>JIBX bindings for the Sugar CRM Webservice client module</description>
 	<packaging>jar</packaging>
 
 
 	<properties>
+	 	<jibx.version>1.2.3</jibx.version>
 	</properties>
 
+	<!-- ================================================ -->
+	<!-- Dependencies                                     -->
+	<!-- ================================================ -->
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-run</artifactId>
-			<version>1.2.3</version>
+			<version>${jibx.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-extras</artifactId>
-			<version>1.2.3</version>
+			<version>${jibx.version}</version>
 		</dependency>
-
-
 	</dependencies>
 
 	<build>
 
-		<resources>
-			<resource>
-				<directory>src/main/java/</directory>
-				<excludes>
-				</excludes>
-				<includes>
-					<include>**/jaxb.properties</include>
-				</includes>
-			</resource>
-		</resources>
+	<!-- ================================================ -->
+	<!-- JIBX plugin Configuration                        -->
+	<!-- ================================================ -->
 
 		<defaultGoal>install</defaultGoal>
 		<plugins>
-
 			<plugin>
 				<groupId>org.jibx</groupId>
 				<artifactId>maven-jibx-plugin</artifactId>
-				<version>1.2.3</version>
+				<version>${jibx.version}</version>
 				<executions>
 					<execution>
 						<id>generate-java-code-from-schema</id>

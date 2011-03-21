@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<parent>
 		<artifactId>europeana-uim</artifactId>
 		<groupId>eu.europeana</groupId>
 		<version>1.2.0-SNAPSHOT</version>
 	</parent>
+
+
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
 	<packaging>bundle</packaging>
@@ -14,7 +17,6 @@
 
 
 	<properties>
-		<slf4j.version>1.5.0</slf4j.version>
 		<spring.maven.artifact.version>2.5.6</spring.maven.artifact.version>
 		<spring.osgi.version>1.1.0</spring.osgi.version>
 		<spring.ws.version>1.5.9</spring.ws.version>
@@ -22,6 +24,10 @@
 	</properties>
 
 	<dependencies>
+
+		<!-- ================================================ -->
+		<!-- Spring Dependencies -->
+		<!-- ================================================ -->
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -34,6 +40,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -45,6 +52,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -61,6 +69,19 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-ws-core</artifactId>
+			<version>${spring.ws.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-oxm</artifactId>
+			<version>${spring.ws.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<!-- test scoped dependencies -->
 		<dependency>
@@ -69,6 +90,7 @@
 			<version>3.8.2</version>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -85,6 +107,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>spring-osgi-test</artifactId>
@@ -106,20 +129,8 @@
 			<scope>provided</scope>
 		</dependency>
 
-		
-		<dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-ws-core</artifactId>
-			<version>${spring.ws.version}</version>
-			<scope>provided</scope>
-		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-oxm</artifactId>
-			<version>${spring.ws.version}</version>
-			<scope>provided</scope>
-		</dependency>
+
 
 		<!-- Equinox OSGi platform -->
 		<dependency>
@@ -155,21 +166,8 @@
 		</dependency>
 
 
-        <!--  
+
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.1.12</version>
-		</dependency>
-		
-		 <dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>org.eclipse.persistence.moxy</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-        -->
-        
-        		<dependency>
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-run</artifactId>
 			<version>1.2.3</version>
@@ -179,16 +177,9 @@
 			<artifactId>jibx-extras</artifactId>
 			<version>1.2.3</version>
 		</dependency>
-		
-		
-        <dependency>
-   <groupId>stax</groupId>
-   <artifactId>stax</artifactId>
-   <version>1.2.0</version>
-</dependency>
-        
 
-        
+
+
 		<!-- Karaf Shell, for OSGi shell commands -->
 		<dependency>
 			<groupId>org.apache.karaf.shell</groupId>
@@ -232,28 +223,20 @@
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
 
-                        <DynamicImport-Package>*</DynamicImport-Package>
+						<DynamicImport-Package>*</DynamicImport-Package>
 
 						<Export-Package>eu.europeana.uim.sugarcrmclient.*</Export-Package>
-                        <Import-Package>
-                        org.springframework.ws.soap,
-                        org.springframework.ws.soap.saaj,						
-						!com.sun.xml.messaging.saaj.soap.encoding,
-						org.xmlpull.mxp1,
-						org.xmlpull.v1,
-						*
+						<Import-Package>
+							org.springframework.ws.soap,
+							org.springframework.ws.soap.saaj,
+							!com.sun.xml.messaging.saaj.soap.encoding,
+							org.xmlpull.mxp1,
+							org.xmlpull.v1,
+							*
 						</Import-Package>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
-
-
-                        <!--  
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-Dependency>spring-oxm</Embed-Dependency> 
-
-                        <Embed-Dependency>europeana-uim-plugin-sugarclientbindings</Embed-Dependency> 
-                         -->
 					</instructions>
 				</configuration>
 			</plugin>
@@ -306,19 +289,11 @@
 			</url>
 		</repository>
 
-
 		<repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Maven 2 Repository</name>
 			<url>http://download.java.net/maven/2</url>
 		</repository>
-
-		<repository>
-			<id>Eclipselink</id>
-			<name>Eclipselink</name>
-			<url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
-		</repository>
-
 
 	</repositories>
 
@@ -329,21 +304,10 @@
 			<url>http://repo1.maven.org/maven2/</url>
 		</pluginRepository>
 
-
 		<pluginRepository>
 			<id>maven2-repository.dev.java.net</id>
 			<url>http://download.java.net/maven/2</url>
 		</pluginRepository>
-
-		<pluginRepository>
-			<id>releases</id>
-			<name>Releases</name>
-			<url>http://svn.apache.org/repos/asf/karaf/tags/karaf-2.2.0/</url>
-		</pluginRepository>
-
 	</pluginRepositories>
-
-
-
 
 </project>

@@ -35,21 +35,22 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		ArrayList <String> fieldnames = new  ArrayList<String>();
 		
 		fieldnames.add("id");
-		fieldnames.add("first_name");
-		fieldnames.add("last_name");
-		fieldnames.add("salutation");
+		fieldnames.add("name");
+		fieldnames.add("date_entered");
+		fieldnames.add("description");
+		fieldnames.add("sales_stage");
 		
-		SelectFields fields = ClientUtils.generatePopulatedSelectFields(fieldnames);
+		SelectFields fields = new SelectFields(); //ClientUtils.generatePopulatedSelectFields(fieldnames);
 		
-  		request.setModuleName("Contacts");	
+  		request.setModuleName("Opportunities");	
 		request.setSelectFields(fields); //stuaoqenh2va9negtmvb1ohbm1
 		//request.setSession(sugarwsClient.getSessionID());
-  		request.setSession("821gms22fmgq8n9720dv36vk65");
-		request.setOrderBy("last_name");
+  		request.setSession("103vu234p6k7s4uvaqq0rilha6");
+		request.setOrderBy("date_entered");
 		request.setMaxResults(100);
-		request.setOffset(10);
+		request.setOffset(0);
 		//request.setQuery("(contacts.salutation = 'Mr.' AND contacts.title LIKE 'doctor appointment%')");
-		request.setQuery("(contacts.first_name LIKE '%M%')");
+		request.setQuery("(opportunities.sales_stage LIKE 'Id%Decision%Makers')");
 		
 
 		String response =  sugarwsClient.get_entry_list(request);
@@ -65,18 +66,13 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		
 		Login login = ClientUtils.createStandardLoginObject("test", "test");
 		
-
 		try {
 		   connectionInfo.append(sugarwsClient.login(login));
 		} catch (LoginFailureException e) {			
 			connectionInfo.append("Invalid Session, login failed!");
 			e.printStackTrace();
 		}
-		
-		/*
-		*/
-		
-		
+
 		return connectionInfo.toString();
 	}
 
