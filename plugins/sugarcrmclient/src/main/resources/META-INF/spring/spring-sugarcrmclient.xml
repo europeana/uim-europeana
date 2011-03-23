@@ -10,22 +10,25 @@
 	http://www.springframework.org/schema/oxm 
 	http://www.springframework.org/schema/oxm/spring-oxm-1.5.xsd">
 
-	<!-- regular spring configuration file defining the beans for this bundle. 
-		The configuration of OSGi definitions is kept in a separate configuration 
-		file so that this file can easily be used for integration testing outside 
-		of an OSGi environment -->
+	<!-- Spring DM specific declarations of SugarCRM Client instances-->
 
 
 
-	<bean id="sugarWsClient" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClient">
+    <bean id="sugarWsClientOSGIfactory" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI">
+       <property name="webServiceTemplate" ref="webServiceTemplate"/>
+    </bean>
+
+    <bean id="sugarWsClientNB" factory-bean="sugarWsClientOSGIfactory" factory-method="createInstance">
+       <constructor-arg value="test"/>
+       <constructor-arg value="test"/>
+    </bean>
+
+
+    <!-- 
+	<bean id="sugarWsClientNB" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI" factory-method="createInstance">
 		<property name="webServiceTemplate" ref="webServiceTemplate"/>
 	</bean>
-
-
-	<bean id="sugarWsClientNB" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI">
-		<property name="webServiceTemplate" ref="webServiceTemplate"/>
-	</bean>
-
+    -->
 
     <bean id="messageFactory" class="eu.europeana.uim.sugarcrmclient.internal.ExtendedSaajSoapMessageFactory"/>
 

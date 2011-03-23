@@ -102,9 +102,11 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		connectionInfo.append("Pointing at:");
 		connectionInfo.append(defaultURI);
 		
-		connectionInfo.append("/n");
+		connectionInfo.append("\n");
 		connectionInfo.append("Session Id:");
-				
+		connectionInfo.append(sugarwsClient.getSessionID());
+		
+		
 		return connectionInfo.toString();
 	}
 

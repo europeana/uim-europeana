@@ -40,13 +40,39 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.Logout;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.LogoutResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.UserAuth;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
+
+
 
 public class SugarWsClientOSGI {
 
 	private WebServiceTemplate webServiceTemplate;
 
 	private String sessionID;
+	
+	
+	
+	/**
+	 * 
+	 * @param userName
+	 * @param password
+	 * @return
+	 */
+	public  SugarWsClientOSGI createInstance(String userName, String password){
+		
+		SugarWsClientOSGI client = new SugarWsClientOSGI();
+		client.setWebServiceTemplate(webServiceTemplate);
+		
+		try {
+			client.sessionID = client.login(ClientUtils.createStandardLoginObject(userName,password) );
+		} catch (LoginFailureException e) {
+			client.sessionID = "-1";
+			e.printStackTrace();
+		}
+		
+		return client;
+	}
 	
 	
 	/**
@@ -69,9 +95,7 @@ public class SugarWsClientOSGI {
 			StreamSource source = new StreamSource(new StringReader(sourceWriter.toString()));
 	        StreamResult result = new StreamResult(resultWriter);
 			webServiceTemplate.sendSourceAndReceiveToResult(source,result);
-		
- 
-			
+		 
 			ClientUtils.responseFactory(resultWriter.toString());
 			
 			return resultWriter.toString();
