@@ -54,7 +54,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		
 
 		String response =  sugarwsClient.get_entry_list(request);
-		return response;
+		return null;
 	
 	}
 

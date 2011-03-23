@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -245,7 +246,12 @@ public class ClientUtils {
 	}
 	
 	
-	public static Object responseFactory(String responseString) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
+	
+	
+	
+	public static HashMap<String,String> responseFactory(String responseString) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
+		
+		HashMap <String,String> returnMap = new HashMap<String,String>();
 		
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
@@ -264,14 +270,22 @@ public class ClientUtils {
 	    Object result = expr.evaluate(document, XPathConstants.NODESET);
 	    NodeList nodes = (NodeList) result;
 	    
-	    int z = nodes.getLength();
 	    
 	    for (int i = 0; i < nodes.getLength(); i++) {
-	        System.out.println(nodes.item(i).getNodeValue()); 
+	    	
+	    	NodeList innerNodes = nodes.item(i).getChildNodes();
+	    	
+	    	int ln = innerNodes.getLength();
+	    	
+	    	returnMap.put(innerNodes.item(0).getTextContent(), innerNodes.item(1).getTextContent());
+
+	    	System.out.println(innerNodes.item(0).getTextContent());
+	        System.out.println(innerNodes.item(1).getTextContent()); 
+	        System.out.println(innerNodes.item(2).getTextContent()); 
 	    }
 	    
 	    
-		return document;
+		return returnMap;
 	}
 		
 }
