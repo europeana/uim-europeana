@@ -249,9 +249,9 @@ public class ClientUtils {
 	
 	
 	
-	public static HashMap<String,String> responseFactory(String responseString) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
+	public static HashMap <String,HashMap<String,String>>  responseFactory(String responseString) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		
-		HashMap <String,String> returnMap = new HashMap<String,String>();
+		HashMap <String,HashMap<String,String>> returnMap = new HashMap<String,HashMap<String,String>>();
 		
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
@@ -274,18 +274,69 @@ public class ClientUtils {
 	    for (int i = 0; i < nodes.getLength(); i++) {
 	    	
 	    	NodeList innerNodes = nodes.item(i).getChildNodes();
+	    	    	
+	    	String id =  innerNodes.item(0).getTextContent();
 	    	
-	    	int ln = innerNodes.getLength();
+	    	HashMap <String,String> elementData = new HashMap <String,String>();
 	    	
-	    	returnMap.put(innerNodes.item(0).getTextContent(), innerNodes.item(1).getTextContent());
+	    	NodeList infoNodes = innerNodes.item(2).getChildNodes();
+	    	
+	    	for (int z=0; z < infoNodes.getLength(); z++){
+	    		String name = infoNodes.item(z).getFirstChild().getTextContent();
+	    		String value = infoNodes.item(z).getLastChild().getTextContent();
+	    		
+	    		elementData.put(name,value);
+	    		
+	    	}
+	    		    	
+	    	returnMap.put(id, elementData);
 
-	    	System.out.println(innerNodes.item(0).getTextContent());
-	        System.out.println(innerNodes.item(1).getTextContent()); 
-	        System.out.println(innerNodes.item(2).getTextContent()); 
 	    }
 	    
 	    
 		return returnMap;
 	}
+	
+	
+	
+	
+	public static String extractSimpleResponse(String responseString){
+		
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		documentBuilderFactory.setNamespaceAware(true);
+	    DocumentBuilder documentBuilder;
+		try {
+			documentBuilder = documentBuilderFactory.newDocumentBuilder();
+		    Document document = documentBuilder.parse(new InputSource(new StringReader(responseString)));
+			
+		    String sessionID  = null;
+		    String messageName = document.getFirstChild().getNodeName();
+		    
+		    
+		    NodeList nl = document.getElementsByTagName("id");
+		    
+		    if (nl.getLength() > 0){
+		    	sessionID = nl.item(0).getTextContent();
+		    }
+		    
+		    return sessionID;
+		    
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		return null;
+	}
+	
+	
+	
 		
 }

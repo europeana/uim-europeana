@@ -3,6 +3,7 @@ package eu.europeana.uim.sugarcrmclient.ws;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,22 +26,12 @@ import org.xml.sax.SAXException;
 
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntriesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Logout;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.LogoutResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.UserAuth;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
 
@@ -94,11 +85,12 @@ public class SugarWsClientOSGI {
 		    
 			StreamSource source = new StreamSource(new StringReader(sourceWriter.toString()));
 	        StreamResult result = new StreamResult(resultWriter);
+	        
 			webServiceTemplate.sendSourceAndReceiveToResult(source,result);
 		 
 			ClientUtils.responseFactory(resultWriter.toString());
 			
-			return resultWriter.toString();
+			return ClientUtils.extractSimpleResponse(resultWriter.toString());
 			
 		} catch (JiBXException e) {
 			e.printStackTrace();
@@ -109,13 +101,60 @@ public class SugarWsClientOSGI {
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 
 				
 		return null;
 	}
+	
+	
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private HashMap<String, HashMap<String, String>> invokeWSInfoMap(Object request){
+	
+		StringWriter sourceWriter = new StringWriter();
+		IBindingFactory bfact;
+		try {
+			bfact = BindingDirectory.getFactory(request.getClass());
+		    IMarshallingContext mctx = bfact.createMarshallingContext();
+		    mctx.setOutput(sourceWriter);
+		    ((IMarshallable)request).marshal(mctx);
+		    mctx.getXmlWriter().flush();
+		    
+			StringWriter resultWriter = new StringWriter();
+		    
+			StreamSource source = new StreamSource(new StringReader(sourceWriter.toString()));
+	        StreamResult result = new StreamResult(resultWriter);
+			webServiceTemplate.sendSourceAndReceiveToResult(source,result);
+		 
+			
+			
+			return ClientUtils.responseFactory(resultWriter.toString());
+			
+		} catch (JiBXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (XPathExpressionException e) {
+			e.printStackTrace();
+		} 
+
+				
+		return null;
+	}
+	
+	
+	
+	
 	
 	
 	/**
@@ -125,18 +164,16 @@ public class SugarWsClientOSGI {
 	 */
 	public String login(Login login) throws LoginFailureException{
 			
-		String response =  invokeWSPlainString(login);
+		String sessionID =  invokeWSPlainString(login);
 		
-		/*
-		String sessionID = response.getReturn().getId();
 		
 		if("-1".equals(sessionID)){			
-			throw new LoginFailureException(response);
+			throw new LoginFailureException(sessionID);
 		}
 		
-		*/
+
 		
-		return response;
+		return sessionID;
 	}
 	
 	
@@ -156,9 +193,9 @@ public class SugarWsClientOSGI {
 	 * @param request
 	 * @return
 	 */
-	public String get_entry_list(GetEntryList request){
+	public HashMap<String, HashMap<String, String>> get_entry_list(GetEntryList request){
 		
-		String response = invokeWSPlainString(request);
+		HashMap<String, HashMap<String, String>> response = invokeWSInfoMap(request);
 		
 		return response;
 	}

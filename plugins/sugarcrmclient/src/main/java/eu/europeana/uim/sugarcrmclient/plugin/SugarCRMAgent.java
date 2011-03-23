@@ -1,5 +1,7 @@
 package eu.europeana.uim.sugarcrmclient.plugin;
 
+import java.util.HashMap;
+
 public interface SugarCRMAgent {
 	
 	public String showConnectionStatus();
@@ -10,10 +12,10 @@ public interface SugarCRMAgent {
 	
 	public String updateSession();
 	
-	public String pollForHarvestInitiators();
+	public HashMap<String, HashMap<String, String>>  pollForHarvestInitiators();
 	
-	public String notifySugarForIngestionSuccess();
+	public String notifySugarForIngestionSuccess(String recordId);
 	
-	public String notifySugarForIngestionFailure();
+	public String notifySugarForIngestionFailure(String recordId);
 
 }

@@ -2,21 +2,17 @@ package eu.europeana.uim.sugarcrmclient.plugin;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
-import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
@@ -28,33 +24,26 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	
 	
 	@Override
-	public String pollForHarvestInitiators() {
+	public HashMap<String, HashMap<String, String>> pollForHarvestInitiators() {
 
 		GetEntryList request = new GetEntryList();
-		
-		ArrayList <String> fieldnames = new  ArrayList<String>();
-		
-		fieldnames.add("id");
-		fieldnames.add("name");
-		fieldnames.add("date_entered");
-		fieldnames.add("description");
-		fieldnames.add("sales_stage");
-		
-		SelectFields fields = new SelectFields(); //ClientUtils.generatePopulatedSelectFields(fieldnames);
-		
+				
+		SelectFields fields = new SelectFields(); //We want to retrieve all fields
+		request.setSelectFields(fields); 
   		request.setModuleName("Opportunities");	
-		request.setSelectFields(fields); //stuaoqenh2va9negtmvb1ohbm1
-		//request.setSession(sugarwsClient.getSessionID());
-  		request.setSession("103vu234p6k7s4uvaqq0rilha6");
+
+		request.setSession(sugarwsClient.getSessionID());
+		
 		request.setOrderBy("date_entered");
 		request.setMaxResults(100);
 		request.setOffset(0);
 		//request.setQuery("(contacts.salutation = 'Mr.' AND contacts.title LIKE 'doctor appointment%')");
-		request.setQuery("(opportunities.sales_stage LIKE 'Id%Decision%Makers')");
+		request.setQuery("(opportunities.sales_stage LIKE 'Needs%Analysis')");
+		//request.setQuery("(opportunities.sales_stage LIKE 'Id%Decision%Makers')");
 		
 
-		String response =  sugarwsClient.get_entry_list(request);
-		return null;
+		HashMap<String, HashMap<String, String>> response =  sugarwsClient.get_entry_list(request);
+		return response;
 	
 	}
 
@@ -77,16 +66,19 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	}
 
 	@Override
-	public String notifySugarForIngestionSuccess() {
-		String teststring = "Notify Sugar For Ingestion Success (to be implemented)";
+	public String notifySugarForIngestionSuccess(String recordId) {
+		String teststring = "Notify Sugar For Ingestion Success";
+		
+		alterSugarCRMItemStatus(recordId, "Closed Won");
 		
 		return teststring;
 	}
 
 	@Override
-	public String notifySugarForIngestionFailure() {
-		String teststring = "Notify Sugar For Ingestion Failure (to be implemented)";
+	public String notifySugarForIngestionFailure(String recordId) {
+		String teststring = "Notify Sugar For Ingestion Failure";
 		
+		alterSugarCRMItemStatus(recordId, "");
 		return teststring;
 	}
 	
@@ -115,9 +107,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	@Override
 	public String showAvailableModules() {
 		GetAvailableModules request = new GetAvailableModules();
-		//request.setSession(sessionID);
-  		request.setSession("821gms22fmgq8n9720dv36vk65");
-  		
+		request.setSession(sugarwsClient.getSessionID());
 		String response =  sugarwsClient.get_available_modules(request);
 
 		return response;
@@ -129,8 +119,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	public String showModuleFields(String module) {
 
 		GetModuleFields request = new GetModuleFields();
-		//request.setSession(sessionID);
-  		request.setSession("821gms22fmgq8n9720dv36vk65");
+		request.setSession(sugarwsClient.getSessionID());
 		request.setModuleName(module);
 		
 		String response =  sugarwsClient.get_module_fields(request);
@@ -139,26 +128,22 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	}
 	
 	
-	public void testSetEntry(){
+	private void alterSugarCRMItemStatus(String id, String status){
 		SetEntry request = new SetEntry();
 		
 		
-		//NameValue nv1 = new NameValue();
-		//nv1.setName("id");
-		//nv1.setValue("99f37146-8e19-473d-171c-4d66de7024c0");
-		
 		NameValue nv0 = new NameValue();
-		nv0.setName("first_name");
-		nv0.setValue("JohnX");
-
-		NameValue nv2 = new NameValue();
-		nv2.setName("last_name");
-		nv2.setValue("SmithX");		
-
+		nv0.setName("sales_stage");
+		nv0.setValue(status);
+		
+		NameValue nv1 = new NameValue();
+		nv1.setName("id");
+		nv1.setValue(id);
+		
 		ArrayList <NameValue> nvList = new  ArrayList <NameValue>();
 		
 		nvList.add(nv0);
-		nvList.add(nv2);
+		nvList.add(nv1);
 		
 		
 		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
