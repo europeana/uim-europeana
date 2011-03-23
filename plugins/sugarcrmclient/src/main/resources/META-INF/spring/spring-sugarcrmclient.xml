@@ -19,16 +19,9 @@
     </bean>
 
     <bean id="sugarWsClientNB" factory-bean="sugarWsClientOSGIfactory" factory-method="createInstance">
-       <constructor-arg value="test"/>
-       <constructor-arg value="test"/>
+       <constructor-arg value="${username}"/>
+       <constructor-arg value="${password}"/>
     </bean>
-
-
-    <!-- 
-	<bean id="sugarWsClientNB" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI" factory-method="createInstance">
-		<property name="webServiceTemplate" ref="webServiceTemplate"/>
-	</bean>
-    -->
 
     <bean id="messageFactory" class="eu.europeana.uim.sugarcrmclient.internal.ExtendedSaajSoapMessageFactory"/>
 
