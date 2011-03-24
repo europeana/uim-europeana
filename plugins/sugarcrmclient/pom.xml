@@ -69,6 +69,19 @@
 			</exclusions>
 		</dependency>
 
+        <dependency>
+             <groupId>org.springframework</groupId>
+             <artifactId>spring-context-support</artifactId>
+             <version>${spring.maven.artifact.version}</version>
+        </dependency>
+
+        <dependency>
+           <groupId>com.opensymphony.quartz</groupId>
+           <artifactId>com.springsource.org.quartz</artifactId>
+           <version>1.6.2</version>
+        </dependency>
+
+
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-ws-core</artifactId>
@@ -232,6 +245,8 @@
 							!com.sun.xml.messaging.saaj.soap.encoding,
 							org.xmlpull.mxp1,
 							org.xmlpull.v1,
+							org.quartz,
+							org.springframework.transaction,
 							*
 						</Import-Package>
 

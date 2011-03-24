@@ -1,7 +1,6 @@
 package eu.europeana.uim.sugarcrmclient.internal.helpers;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -10,9 +9,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,6 +25,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Array;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.ArrayAttributes;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.ArrayAttributes.ArrayType;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.CommonAttributes;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
@@ -36,6 +34,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.UserAuth;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
+
 
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
@@ -213,8 +212,19 @@ public class ClientUtils {
 		arrayType.append("name_value[");
 		arrayType.append(namevalues.size());
 		arrayType.append("]");
-				
-		//namevalueList.setArrayType(arrayType.toString());
+		
+		Array array = new Array();
+	
+		ArrayType arrTypeObj = new ArrayType();
+		arrTypeObj.setArrayType(arrayType.toString());
+		
+		ArrayAttributes atts = new ArrayAttributes();
+		
+		atts.setArrayType(arrTypeObj);
+		
+		namevalueList.setArrayAttributes(atts);
+		
+
 
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
@@ -233,9 +243,12 @@ public class ClientUtils {
 	        	name_value.appendChild(name);
 	        	name_value.appendChild(value);
 	        	
-	        	//namevalueList.getAnies().add(name_value);
-	    		
+	    		array.getAnyList().add(name_value);
+	        		    		
 	        }
+	        
+	        namevalueList.setArray(array);
+	        
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			return null;

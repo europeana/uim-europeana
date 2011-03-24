@@ -15,7 +15,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
-
+import eu.europeana.uim.sugarcrmclient.internal.helpers.DatasetStates;
 
 public class SugarCRMAgentImpl implements SugarCRMAgent{
 
@@ -33,13 +33,12 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
   		request.setModuleName("Opportunities");	
 
 		request.setSession(sugarwsClient.getSessionID());
-		
 		request.setOrderBy("date_entered");
-		request.setMaxResults(100);
+		request.setMaxResults(10000);
 		request.setOffset(0);
-		//request.setQuery("(contacts.salutation = 'Mr.' AND contacts.title LIKE 'doctor appointment%')");
+		
 		request.setQuery("(opportunities.sales_stage LIKE 'Needs%Analysis')");
-		//request.setQuery("(opportunities.sales_stage LIKE 'Id%Decision%Makers')");
+
 		
 
 		HashMap<String, HashMap<String, String>> response =  sugarwsClient.get_entry_list(request);
@@ -69,7 +68,10 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	public String notifySugarForIngestionSuccess(String recordId) {
 		String teststring = "Notify Sugar For Ingestion Success";
 		
-		alterSugarCRMItemStatus(recordId, "Closed Won");
+		
+		
+		
+		alterSugarCRMItemStatus(recordId, DatasetStates.READY_FOR_REPLICATION.getSysId());
 		
 		return teststring;
 	}
@@ -78,7 +80,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	public String notifySugarForIngestionFailure(String recordId) {
 		String teststring = "Notify Sugar For Ingestion Failure";
 		
-		alterSugarCRMItemStatus(recordId, "");
+		alterSugarCRMItemStatus(recordId, DatasetStates.DISABLED_AND_REPLACED.getSysId());
 		return teststring;
 	}
 	
@@ -128,6 +130,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	}
 	
 	
+	
+	
+	
 	private void alterSugarCRMItemStatus(String id, String status){
 		SetEntry request = new SetEntry();
 		
@@ -145,15 +150,15 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		nvList.add(nv0);
 		nvList.add(nv1);
 		
-		
 		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
-
-		//valueList.setId("99f37146-8e19-473d-171c-4d66de7024c0");
 		
 		request.setNameValueList(valueList);
-		request.setModuleName("Contacts");
-		request.setSession("sessionID");	
+		request.setModuleName("Opportunities");
+		request.setSession(sugarwsClient.getSessionID());	
 
+
+		
+		
 		String response =  sugarwsClient.set_entry(request);
 
 				
