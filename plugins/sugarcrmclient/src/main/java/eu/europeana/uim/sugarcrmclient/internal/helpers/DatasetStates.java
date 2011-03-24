@@ -16,7 +16,9 @@ public enum DatasetStates {
 	READY_FOR_REPLICATION("Id. Decision Makers","Ready for Replication"),
 	ONGOING_SCHEDULED_UPDATES("Updates","Ongoing scheduled updates"),
 	INGESTION_COMPLETE("Closed Won","Ingestion complete"),
-	DISABLED_AND_REPLACED("Replaced","Disabled and Replaced");
+	DISABLED_AND_REPLACED("Replaced","Disabled and Replaced"),
+	HARVESTING_PENDING("Harvesting Pending","Harvesting Pending"),
+	;
 
 	private final String sysId;
 	private final String description;	
