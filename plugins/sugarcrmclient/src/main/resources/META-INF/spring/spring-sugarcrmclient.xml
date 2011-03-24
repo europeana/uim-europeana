@@ -23,11 +23,6 @@
      </property>
    </bean>
    
-   <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-     <property name="targetObject" ref="sugarcrmPlugin"/>
-     <property name="targetMethod" value="pollForHarvestInitiators"/>
-  </bean>
-   
    <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
       <property name="jobDetail" ref="sugarCRMPollingJob"/>
       <property name="startDelay" value="10000"/>
