@@ -18,7 +18,7 @@
      <property name="jobClass" value="eu.europeana.uim.sugarcrmclient.ws.quartz.PollingBean"/>
      <property name="jobDataAsMap">
      <map>
-        <entry key="timeout" value="5"/>
+        <entry key="sugarcrmPlugin" value-ref="sugarcrmPlugin"/>
       </map>
      </property>
    </bean>
