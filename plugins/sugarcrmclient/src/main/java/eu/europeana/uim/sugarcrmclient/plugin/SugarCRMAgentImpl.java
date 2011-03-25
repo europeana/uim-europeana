@@ -160,10 +160,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 			
 			try {
 				
-				
 				Collection dataset = inferCollection(engine,triggers.get(it.next()) );
-			
 				orchestrator.executeWorkflow(w, dataset);
+				alterSugarCRMItemStatus(dataset.getMnemonic(), DatasetStates.READY_FOR_REPLICATION.getSysId());
 				
 				
 			} catch (StorageEngineException e) {
