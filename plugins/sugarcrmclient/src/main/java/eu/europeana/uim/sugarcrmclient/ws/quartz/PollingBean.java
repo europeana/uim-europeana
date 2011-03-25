@@ -11,8 +11,8 @@ import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent;
 
 
 /**
+ * 
  * @author georgiosmarkakis
- *
  */
 public class PollingBean extends QuartzJobBean {
 

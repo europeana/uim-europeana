@@ -21,28 +21,25 @@
         <entry key="sugarcrmPlugin" value-ref="sugarcrmPlugin"/>
       </map>
      </property>
-   </bean>
+  </bean>
    
-   <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+  <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
       <property name="jobDetail" ref="sugarCRMPollingJob"/>
       <property name="startDelay" value="10000"/>
       <property name="repeatInterval" value="50000"/>
   </bean>
   
   <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-  <property name="triggers">
-    <list>
-      <ref bean="simpleTrigger"/>
-    </list>
-  </property>
+    <property name="triggers">
+      <list>
+        <ref bean="simpleTrigger"/>
+      </list>
+    </property>
   </bean>
 
 
 
 	<!-- Spring DM specific declarations of SugarCRM Client instances-->
-
-
-
     <bean id="sugarWsClientOSGIfactory" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI">
        <property name="webServiceTemplate" ref="webServiceTemplate"/>
     </bean>
@@ -92,8 +89,16 @@
 
    <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl">    
        <property name="sugarwsClient" ref="sugarWsClientNB"/>  
+       <property name="orchestrator" ref="orchestrator"/>  
+       <property name="registry" ref="registry"/>  
+       
    </bean>
 
+    <!--Expose the SugarCRM plugin functionality as a service -->  
    <osgi:service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent"/>
+   
+   <osgi:reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator"/>
+   <osgi:reference id="registry" interface="eu.europeana.uim.api.Registry"/>
+   
 
 </beans>
