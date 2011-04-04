@@ -1,5 +1,22 @@
-/**
- * 
+/*
+ * Copyright 2007 EDL FOUNDATION
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they
+ * will be approved by the European Commission - subsequent
+ * versions of the EUPL (the "Licence");
+ * you may not use this work except in compliance with the
+ * Licence.
+ * You may obtain a copy of the Licence at:
+ *
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in
+ * writing, software distributed under the Licence is
+ * distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied.
+ * See the Licence for the specific language governing
+ * permissions and limitations under the Licence.
  */
 package eu.europeana.uim.sugarcrmclient.ws;
 
@@ -7,15 +24,8 @@ package eu.europeana.uim.sugarcrmclient.ws;
 
 
 
-import java.io.StringReader;
-
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.ws.client.core.WebServiceTemplate;
-
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
@@ -34,11 +44,8 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserId;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserIdResponse;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
-
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.*;
 
 /**

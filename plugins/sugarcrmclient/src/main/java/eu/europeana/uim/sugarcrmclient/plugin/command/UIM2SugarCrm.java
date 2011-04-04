@@ -135,7 +135,7 @@ public class UIM2SugarCrm implements Function, Action {
 		result.append(" jobs pending for ingestion. \n");
 		
 		
-		Iterator itr =resultMap.keySet().iterator();
+		Iterator<String> itr =resultMap.keySet().iterator();
 		
 		  while(itr.hasNext()){ 
 		     result.append("============================== \n"); 
@@ -147,7 +147,7 @@ public class UIM2SugarCrm implements Function, Action {
 			 
 		     HashMap<String, String> obj = resultMap.get(key);
 		     
-		     Iterator itr2 = obj.keySet().iterator();
+		     Iterator<String> itr2 = obj.keySet().iterator();
 		     
 			  while(itr2.hasNext()){ 
 				  

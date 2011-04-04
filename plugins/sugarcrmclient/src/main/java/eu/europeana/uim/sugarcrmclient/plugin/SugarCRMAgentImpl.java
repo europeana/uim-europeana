@@ -18,6 +18,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.DatasetStates;
@@ -97,21 +98,14 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 
 	@Override
-	public String showConnectionStatus() {
+	public ConnectionStatus showConnectionStatus() {
+		
+		ConnectionStatus cstatus = new ConnectionStatus();
+		
+		cstatus.setDefaultURI(sugarwsClient.getDefaultUri());
+		cstatus.setSessionID(sugarwsClient.getSessionID());
 
-		StringBuffer connectionInfo = new StringBuffer();
-		
-		String defaultURI = sugarwsClient.getDefaultUri();
-		
-		connectionInfo.append("Pointing at:");
-		connectionInfo.append(defaultURI);
-		
-		connectionInfo.append("\n");
-		connectionInfo.append("Session Id:");
-		connectionInfo.append(sugarwsClient.getSessionID());
-		
-		
-		return connectionInfo.toString();
+		return cstatus;
 	}
 
 
@@ -132,8 +126,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 		GetModuleFields request = new GetModuleFields();
 		request.setSession(sugarwsClient.getSessionID());
-		request.setModuleName(module);
-		
+		request.setModuleName(module);		
 		String response =  sugarwsClient.get_module_fields(request);
 
 		return response;
@@ -148,36 +141,19 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	private void initiateWorkflowsFromTriggers(HashMap<String, HashMap<String, String>> triggers){
 				
 		StorageEngine engine = registry.getStorage();
-		
-		
 		Workflow w = registry.getWorkflow("SysoutWorkflow");
+		Iterator<String> it = triggers.keySet().iterator();
 		
-		
-		Iterator it = triggers.keySet().iterator();
-		
-		
-		while (it.hasNext()){
-			
+		while (it.hasNext()){	
 			try {
-				
 				Collection dataset = inferCollection(engine,triggers.get(it.next()) );
 				orchestrator.executeWorkflow(w, dataset);
-				alterSugarCRMItemStatus(dataset.getMnemonic(), DatasetStates.READY_FOR_REPLICATION.getSysId());
-				
+				alterSugarCRMItemStatus(dataset.getMnemonic(), DatasetStates.READY_FOR_REPLICATION.getSysId());	
 				
 			} catch (StorageEngineException e) {
 				e.printStackTrace();
-			}
-			
-			
-		}
-		
-
-		
-
-		
-
-		
+			}	
+		}		
 	}
 	
 	

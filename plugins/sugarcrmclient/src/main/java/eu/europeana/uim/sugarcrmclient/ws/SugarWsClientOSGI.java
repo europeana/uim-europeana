@@ -1,3 +1,23 @@
+/*
+ * Copyright 2007 EDL FOUNDATION
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they
+ * will be approved by the European Commission - subsequent
+ * versions of the EUPL (the "Licence");
+ * you may not use this work except in compliance with the
+ * Licence.
+ * You may obtain a copy of the Licence at:
+ *
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in
+ * writing, software distributed under the Licence is
+ * distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied.
+ * See the Licence for the specific language governing
+ * permissions and limitations under the Licence.
+ */
 package eu.europeana.uim.sugarcrmclient.ws;
 
 import java.io.IOException;
@@ -5,12 +25,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
@@ -36,6 +51,10 @@ import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
 
 
+/**
+ * @author Georgios Markakis
+ *
+ */
 public class SugarWsClientOSGI {
 
 	private WebServiceTemplate webServiceTemplate;
@@ -163,16 +182,10 @@ public class SugarWsClientOSGI {
 	 * @return
 	 */
 	public String login(Login login) throws LoginFailureException{
-			
 		String sessionID =  invokeWSPlainString(login);
-		
-		
 		if("-1".equals(sessionID)){			
 			throw new LoginFailureException(sessionID);
 		}
-		
-
-		
 		return sessionID;
 	}
 	

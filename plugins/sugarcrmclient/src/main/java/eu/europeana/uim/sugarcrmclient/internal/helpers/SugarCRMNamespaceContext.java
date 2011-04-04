@@ -16,12 +16,11 @@ public class SugarCRMNamespaceContext implements NamespaceContext {
         return XMLConstants.NULL_NS_URI;
     }
 
-    // This method isn't necessary for XPath processing.
     public String getPrefix(String uri) {
         throw new UnsupportedOperationException();
     }
 
-    // This method isn't necessary for XPath processing either.
+    
     public Iterator getPrefixes(String uri) {
         throw new UnsupportedOperationException();
     }
