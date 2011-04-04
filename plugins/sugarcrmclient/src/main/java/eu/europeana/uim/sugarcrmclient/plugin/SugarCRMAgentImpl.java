@@ -1,3 +1,24 @@
+/*
+ * Copyright 2007 EDL FOUNDATION
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they
+ * will be approved by the European Commission - subsequent
+ * versions of the EUPL (the "Licence");
+ * you may not use this work except in compliance with the
+ * Licence.
+ * You may obtain a copy of the Licence at:
+ *
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in
+ * writing, software distributed under the Licence is
+ * distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied.
+ * See the Licence for the specific language governing
+ * permissions and limitations under the Licence.
+ */
+
 package eu.europeana.uim.sugarcrmclient.plugin;
 
 
@@ -23,6 +44,7 @@ import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.DatasetStates;
 import eu.europeana.uim.workflow.Workflow;
+import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
@@ -30,6 +52,10 @@ import eu.europeana.uim.api.StorageEngineException;
 
 
 
+/**
+ * @author georgiosmarkakis
+ *
+ */
 public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 	private SugarWsClientOSGI sugarwsClient;
@@ -37,6 +63,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	private Registry registry;
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#pollForHarvestInitiators()
+	 */
 	@Override
 	public HashMap<String, HashMap<String, String>> pollForHarvestInitiators() {
 
@@ -45,7 +74,6 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		SelectFields fields = new SelectFields(); //We want to retrieve all fields
 		request.setSelectFields(fields); 
   		request.setModuleName("Opportunities");	
-
 		request.setSession(sugarwsClient.getSessionID());
 		request.setOrderBy("date_entered");
 		request.setMaxResults(10000);
@@ -64,6 +92,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#updateSession()
+	 */
 	@Override
 	public String updateSession() {
 		StringBuffer connectionInfo = new StringBuffer();
@@ -79,7 +110,11 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 		return connectionInfo.toString();
 	}
-
+ 
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#notifySugarForIngestionSuccess(java.lang.String)
+	 */
 	@Override
 	public String notifySugarForIngestionSuccess(String recordId) {
 		String teststring = "Notify Sugar For Ingestion Success";
@@ -87,6 +122,11 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		return teststring;
 	}
 
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#notifySugarForIngestionFailure(java.lang.String)
+	 */
 	@Override
 	public String notifySugarForIngestionFailure(String recordId) {
 		String teststring = "Notify Sugar For Ingestion Failure";
@@ -97,6 +137,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#showConnectionStatus()
+	 */
 	@Override
 	public ConnectionStatus showConnectionStatus() {
 		
@@ -110,6 +153,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#showAvailableModules()
+	 */
 	@Override
 	public String showAvailableModules() {
 		GetAvailableModules request = new GetAvailableModules();
@@ -121,6 +167,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#showModuleFields(java.lang.String)
+	 */
 	@Override
 	public String showModuleFields(String module) {
 
@@ -138,18 +187,22 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	 */
 	
 	
+	/**
+	 * @param triggers
+	 */
 	private void initiateWorkflowsFromTriggers(HashMap<String, HashMap<String, String>> triggers){
 				
-		StorageEngine engine = registry.getStorage();
+		StorageEngine<?> engine = registry.getStorage();
 		Workflow w = registry.getWorkflow("SysoutWorkflow");
 		Iterator<String> it = triggers.keySet().iterator();
 		
 		while (it.hasNext()){	
 			try {
-				Collection dataset = inferCollection(engine,triggers.get(it.next()) );
-				orchestrator.executeWorkflow(w, dataset);
+				Collection<?> dataset = inferCollection(engine,triggers.get(it.next()) );
+				ActiveExecution<?> execution = orchestrator.executeWorkflow(w, dataset);
 				alterSugarCRMItemStatus(dataset.getMnemonic(), DatasetStates.READY_FOR_REPLICATION.getSysId());	
-				
+			
+				execution.waitUntilFinished();	
 			} catch (StorageEngineException e) {
 				e.printStackTrace();
 			}	
@@ -158,6 +211,12 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	
 	
 	
+	/**
+	 * @param engine
+	 * @param trigger
+	 * @return
+	 * @throws StorageEngineException
+	 */
 	private Collection inferCollection(StorageEngine engine, HashMap<String, String> trigger) throws StorageEngineException{
 		    
 		    String collectionName = trigger.get("name");
@@ -175,7 +234,6 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
             if (cuurprovider == null){
 
             	cuurprovider = engine.createProvider();
-    			
             	cuurprovider.setAggregator(true);
             	cuurprovider.setMnemonic(mnemonicCode);
             	cuurprovider.setName(providerName);
@@ -184,14 +242,12 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
             	
             	engine.updateProvider(cuurprovider);
             	engine.checkpoint();
-            	
             }
 		    
 		    
             if(currcollection == null){
             	
             	currcollection = engine.createCollection(cuurprovider);
-    			
             	currcollection.setLanguage(countryCode);
             	currcollection.setMnemonic(mnemonicCode);
             	currcollection.setName(collectionName);
