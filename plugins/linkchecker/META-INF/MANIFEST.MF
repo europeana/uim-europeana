@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Export-Package: eu.europeana.uim.plugin.linkchecker
+Built-By: georgiosmarkakis
+Build-Jdk: 1.6.0_22
+Bundle-Version: 1.2.0.SNAPSHOT
+Tool: Bnd-0.0.238
+Bundle-Name: Spring OSGi Bundle
+Bnd-LastModified: 1302001530262
+Created-By: Apache Maven Bundle Plugin
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: eu.europeana.uim-plugin-linkchecker
+Import-Package: eu.europeana.uim.plugin.linkchecker
+
