@@ -79,11 +79,8 @@ public class ClientUtils {
 	 * Logger.  
 	 * @param jaxbObject A JIBX representation of a SugarCRM SOAP Element. 
 	 */
-	public static void logMarshalledObject(Object jibxObject){
-		
-		
+	public static void logMarshalledObject(Object jibxObject){		
 		IBindingFactory context;
-
 
 		try {
 			context = BindingDirectory.getFactory(jibxObject.getClass());
@@ -166,24 +163,15 @@ public class ClientUtils {
 	 */
 	public static SelectFields generatePopulatedSelectFields(List<String> fieldnames){
 		
-
-
 		SelectFields selfields = new SelectFields();
 		StringBuffer arrayType = new StringBuffer();
-		
 		arrayType.append("string[");
 		arrayType.append(fieldnames.size());
 		arrayType.append("]");
-				
 		CommonAttributes commonAttributes = new CommonAttributes();
-		
 		commonAttributes.setHref(arrayType.toString());
-		
 		selfields.setCommonAttributes(commonAttributes);
 		
-	
-
-
 		Element rootElement = null;
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
@@ -224,28 +212,19 @@ public class ClientUtils {
 	 */
 	public static NameValueList generatePopulatedNameValueList(List<NameValue> namevalues){
 
-
 		NameValueList namevalueList = new NameValueList();
-		
 		StringBuffer arrayType = new StringBuffer();
-		
 		arrayType.append("name_value[");
 		arrayType.append(namevalues.size());
-		arrayType.append("]");
-		
+		arrayType.append("]");		
 		Array array = new Array();
-	
 		ArrayType arrTypeObj = new ArrayType();
 		arrTypeObj.setArrayType(arrayType.toString());
 		
 		ArrayAttributes atts = new ArrayAttributes();
-		
 		atts.setArrayType(arrTypeObj);
 		
 		namevalueList.setArrayAttributes(atts);
-		
-
-
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
 		try {
