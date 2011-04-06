@@ -53,8 +53,9 @@ import eu.europeana.uim.api.StorageEngineException;
 
 
 /**
- * @author georgiosmarkakis
- *
+ * This is the implementing class for the OSGI based SugarCrm plugin OSGI service.
+ * 
+ * @author Georgios Markakis
  */
 public class SugarCRMAgentImpl implements SugarCRMAgent{
 
@@ -300,7 +301,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	
 	
 	
-	
+	/*
+	 * Getters & Setters
+	 */
 	
 	
 	public void setSugarwsClient(SugarWsClientOSGI sugarwsClient) {

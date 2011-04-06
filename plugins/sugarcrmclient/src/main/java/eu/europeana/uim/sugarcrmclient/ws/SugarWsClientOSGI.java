@@ -151,6 +151,7 @@ public class SugarWsClientOSGI {
 	        StreamResult result = new StreamResult(resultWriter);
 			webServiceTemplate.sendSourceAndReceiveToResult(source,result);
 		 
+			//bfact.createUnmarshallingContext();
 			
 			
 			return ClientUtils.responseFactory(resultWriter.toString());

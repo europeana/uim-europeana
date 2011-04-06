@@ -90,7 +90,7 @@ public class ClientUtils {
 			StringWriter stringWriter = new StringWriter();
 			mctx.setOutput(stringWriter);
 			mctx.marshalDocument(jibxObject);
-
+			
 			LOGGER.info("===========================================");
 			StringBuffer sb = new StringBuffer("Soap Ouput for Class: ");
 			sb.append(jibxObject.getClass().getSimpleName());

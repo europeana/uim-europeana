@@ -39,6 +39,9 @@ public class UIM2SugarCrm implements Function, Action {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see org.apache.felix.gogo.commands.Action#execute(org.osgi.service.command.CommandSession)
+	 */
 	@Override
 	public Object execute(CommandSession commandsession) throws Exception {
 
@@ -115,6 +118,11 @@ public class UIM2SugarCrm implements Function, Action {
 		return null;
 	}
 
+	
+	
+	/* (non-Javadoc)
+	 * @see org.osgi.service.command.Function#execute(org.osgi.service.command.CommandSession, java.util.List)
+	 */
 	@Override
 	public Object execute(CommandSession commandsession, List<Object> arg1)
 			throws Exception {
@@ -126,6 +134,10 @@ public class UIM2SugarCrm implements Function, Action {
 	
 	
 	
+	/**
+	 * @param out
+	 * @param resultMap
+	 */
 	private void outputInitiators(PrintStream out ,HashMap<String, HashMap<String, String>> resultMap){
 		StringBuffer result = new StringBuffer();
 		

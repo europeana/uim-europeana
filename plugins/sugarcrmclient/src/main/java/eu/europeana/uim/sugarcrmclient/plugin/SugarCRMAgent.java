@@ -29,7 +29,7 @@ import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
 
 /**
  * This is the main interface for the OSGI based SugarCrm
- * plugin services.
+ * plugin OSGI service.
  *  
  * @author Georgios Markakis
  */
@@ -49,14 +49,39 @@ public interface SugarCRMAgent {
 	 */
 	public String showAvailableModules();
 	
-	public String showModuleFields(String module);
 	
+	
+	/**
+	 * @param module
+	 * @return
+	 */
+	public String showModuleFields(String module);
+
+	
+	/**
+	 * @return
+	 */
 	public String updateSession();
 	
+	
+	/**
+	 * @return
+	 */
 	public HashMap<String, HashMap<String, String>>  pollForHarvestInitiators();
 	
+	
+	/**
+	 * @param recordId
+	 * @return
+	 */
 	public String notifySugarForIngestionSuccess(String recordId);
 	
+	
+	
+	/**
+	 * @param recordId
+	 * @return
+	 */
 	public String notifySugarForIngestionFailure(String recordId);
 
 }

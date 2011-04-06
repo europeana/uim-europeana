@@ -21,6 +21,11 @@
 
 package eu.europeana.uim.sugarcrmclient.plugin.objects;
 
+/**
+ * 
+ * @author Georgios Markakis
+ * 
+ */
 public class ConnectionStatus {
 
 	private String defaultURI;

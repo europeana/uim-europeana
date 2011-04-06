@@ -52,7 +52,6 @@ public class PollingBean extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext arg0)
 			throws JobExecutionException {
 
- 		System.out.println("Executing");
 		sugarcrmPlugin.pollForHarvestInitiators();
 	}
 

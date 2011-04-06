@@ -91,7 +91,6 @@
        <property name="sugarwsClient" ref="sugarWsClientNB"/>  
        <property name="orchestrator" ref="orchestrator"/>  
        <property name="registry" ref="registry"/>  
-       
    </bean>
 
     <!--Expose the SugarCRM plugin functionality as a service -->  
