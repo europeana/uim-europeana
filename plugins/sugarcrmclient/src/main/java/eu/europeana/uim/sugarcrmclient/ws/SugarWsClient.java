@@ -20,11 +20,6 @@
  */
 package eu.europeana.uim.sugarcrmclient.ws;
 
-
-
-
-
-
 import org.springframework.ws.client.core.WebServiceTemplate;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
