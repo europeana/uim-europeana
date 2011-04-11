@@ -1,13 +1,13 @@
 Manifest-Version: 1.0
-Export-Package: eu.europeana
+Export-Package: eu.europeana.uim.repoxclient.rest
 Built-By: georgiosmarkakis
 Build-Jdk: 1.6.0_22
 Bundle-Version: 1.2.0.SNAPSHOT
 Tool: Bnd-0.0.238
 Bundle-Name: Repox UIM Plugin
-Bnd-LastModified: 1301992908721
+Bnd-LastModified: 1302511213821
 Created-By: Apache Maven Bundle Plugin
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: eu.europeana.uim-plugin-repox
-Import-Package: eu.europeana
+Import-Package: eu.europeana.uim.repoxclient.rest
 
