@@ -45,7 +45,7 @@ public class ExtendedSaajSoapMessageFactory extends SaajSoapMessageFactory {
     }
 	
     
-    public WebServiceMessage createWebServiceMessage(InputStream inputStream) throws IOException {
+    public SaajSoapMessage createWebServiceMessage(InputStream inputStream) throws IOException {
         MimeHeaders mimeHeaders = parseMimeHeaders(inputStream);
 
         try {
