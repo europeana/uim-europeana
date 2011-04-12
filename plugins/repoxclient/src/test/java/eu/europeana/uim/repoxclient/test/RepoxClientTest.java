@@ -40,11 +40,15 @@ import org.apache.log4j.Logger;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath:../../test-context.xml"})
+@ContextConfiguration(locations={"classpath:testContext.xml"})
 public class RepoxClientTest {
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepoxClientTest.class);
 	
+	@Test
+	public void testDummy(){
+		
+	}
 	
 	
 

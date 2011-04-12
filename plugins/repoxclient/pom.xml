@@ -179,6 +179,27 @@
 			<scope>provided</scope>
 		</dependency>
 
+        <!-- JIBX dependencies -->
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-run</artifactId>
+			<version>${jibx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-extras</artifactId>
+			<version>${jibx.version}</version>
+		</dependency>
+
+
+
+		<!-- Karaf Shell, for OSGi shell commands -->
+		<dependency>
+			<groupId>org.apache.karaf.shell</groupId>
+			<artifactId>org.apache.karaf.shell.console</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
     </dependencies>
 
     
@@ -236,6 +257,32 @@
                     </execution>
                 </executions>
             </plugin>
+            
+            
+            <plugin>
+				<groupId>org.jibx</groupId>
+				<artifactId>maven-jibx-plugin</artifactId>
+				<version>${jibx.version}</version>
+				<executions>
+					<execution>
+						<id>bind</id>
+						<goals>
+							<goal>bind</goal>
+						</goals>
+						<configuration>
+							<directory>src/main/resources/XMLBindings</directory>
+							<includes>
+								<include>*.xml</include>
+							</includes>
+							<options>
+								<package>eu.europeana.uim.repoxclient.restbindings</package>
+							</options>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+            
+            
         </plugins>
     </build>
 
