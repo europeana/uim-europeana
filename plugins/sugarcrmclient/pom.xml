@@ -20,13 +20,15 @@
 		<spring.maven.artifact.version>3.0.5.RELEASE</spring.maven.artifact.version>
 		<spring.osgi.version>1.1.0</spring.osgi.version>
 		<spring.ws.version>2.0.0.RELEASE</spring.ws.version>
+		<spring.quartz.version>1.6.2</spring.quartz.version>
 		<equinox.ver>3.2.2</equinox.ver>
+		<jibx.version>1.2.3</jibx.version>
 	</properties>
 
 	<dependencies>
 
 		<!-- ================================================ -->
-		<!-- Spring Dependencies -->
+		<!-- Spring Dependencies                              -->
 		<!-- ================================================ -->
 
 		<dependency>
@@ -75,13 +77,14 @@
              <version>${spring.maven.artifact.version}</version>
         </dependency>
 
+       <!-- Spring Quartz libraries-->
         <dependency>
            <groupId>com.opensymphony.quartz</groupId>
            <artifactId>com.springsource.org.quartz</artifactId>
-           <version>1.6.2</version>
+           <version>${spring.quartz.version}</version>
         </dependency>
 
-
+       <!-- Spring WS libraries-->
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-ws-core</artifactId>
@@ -164,31 +167,30 @@
 		</dependency>
 
 
+        <!-- UIM dependencies -->
 		<dependency>
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-uim-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
+
 		<dependency>
 			<groupId>eu.europeana</groupId>
-			<artifactId>europeana-uim-plugin-sugarclientbindings</artifactId>
-			<version>1.2.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
+			<artifactId>europeana-uim-plugin-clientbindings</artifactId>
+			<version>1.2.0</version>
 		</dependency>
 
-
-
+        <!-- JIBX dependencies -->
 		<dependency>
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-run</artifactId>
-			<version>1.2.3</version>
+			<version>${jibx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-extras</artifactId>
-			<version>1.2.3</version>
+			<version>${jibx.version}</version>
 		</dependency>
 
 
