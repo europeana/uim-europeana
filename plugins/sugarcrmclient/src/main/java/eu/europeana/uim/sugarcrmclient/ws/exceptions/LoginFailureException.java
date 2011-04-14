@@ -24,8 +24,8 @@ public class LoginFailureException extends Exception {
 	}
 
 	/**
-	 * 
-	 * @param arg0
+	 * This constructor takes as an argument a String
+	 * @param message the error message
 	 */
 	public LoginFailureException(String message) {
 		super(message);
@@ -33,8 +33,8 @@ public class LoginFailureException extends Exception {
 	
 	
 	/**
-	 * 
-	 * @param arg0
+	 * This constructor takes as an argument an LoginResponse object
+	 * @param err
 	 */
 	public LoginFailureException(LoginResponse response) {
 		super(createloginfailureMessage( response));
