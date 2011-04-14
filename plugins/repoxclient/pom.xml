@@ -200,6 +200,15 @@
 			<scope>provided</scope>
 		</dependency>
 
+
+
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-plugin-clientbindings</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+
+
     </dependencies>
 
     
@@ -258,30 +267,16 @@
                 </executions>
             </plugin>
             
-            
-            <plugin>
-				<groupId>org.jibx</groupId>
-				<artifactId>maven-jibx-plugin</artifactId>
-				<version>${jibx.version}</version>
-				<executions>
-					<execution>
-						<id>bind</id>
-						<goals>
-							<goal>bind</goal>
-						</goals>
-						<configuration>
-							<directory>src/main/resources/XMLBindings</directory>
-							<includes>
-								<include>*.xml</include>
-							</includes>
-							<options>
-								<package>eu.europeana.uim.repoxclient.restbindings</package>
-							</options>
-						</configuration>
-					</execution>
-				</executions>
+        		
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
 			</plugin>
-            
             
         </plugins>
     </build>

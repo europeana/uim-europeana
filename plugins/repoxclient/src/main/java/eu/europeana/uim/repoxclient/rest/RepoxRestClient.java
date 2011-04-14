@@ -22,6 +22,11 @@ package eu.europeana.uim.repoxclient.rest;
 
 import org.springframework.web.client.RestTemplate;
 
+
+import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
+import eu.europeana.uim.repoxclient.jibxbindings.Response;
+import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;;
+
 /**
  * Class implementing REST functionality for accessing the REPOX
  * repository.
@@ -34,30 +39,51 @@ public class RepoxRestClient {
 
 	private String defaultURI;
 	
-	
+
 	/**
-	 * @param <T>
-	 * @param <S>
+	 * Auxiliary method for invoking a REST operation
+	 * 
+	 * @param <S> the return type
 	 * @param wsOperation
 	 * @return
 	 */
-	private <T,S> S invokRestTemplate( T wsOperation, Class<S> responseClass){
+	private <S> S invokRestTemplate( String restOperation,String param, Class<S> responseClass){
 
-		@SuppressWarnings("unchecked")
-		S restResponse = (S)restTemplate.getForObject("http://url/myService/{param}", responseClass, "myParameterWord");       //.marshalSendAndReceive(wsOperation);
+		StringBuffer operation = new StringBuffer();
+		operation.append(defaultURI);
+		operation.append("?operation={param}");
+		
+		String restResponseObj = restTemplate.getForObject(operation.toString(), String.class, restOperation);		
+		S restResponse = (S)restTemplate.getForObject(operation.toString(), responseClass, restOperation);      
 		
 		return restResponse;
 	}
 	
+
 	
-	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * 
+	 * @return DataSources the available datasources
+	 * @throws RepoxException
+	 */
+	public DataSources retrieveDataSources() throws RepoxException{
+		
+		Response resp = invokRestTemplate("listDataSources","listDataSources",Response.class);
+		
+		if(resp.getDataSources() == null){
+			if(resp.getError() != null){
+				throw new RepoxException(resp.getError());
+			}
+			else
+			{
+				throw new RepoxException("Unidentified Repox Error");
+			}
+		}
+		else{
+			
+			return resp.getDataSources();
+		}
+	}
 	
 	
 	

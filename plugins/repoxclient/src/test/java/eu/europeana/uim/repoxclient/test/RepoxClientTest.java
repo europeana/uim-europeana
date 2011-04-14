@@ -31,6 +31,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.apache.log4j.Logger;
 
+import eu.europeana.uim.repoxclient.rest.RepoxRestClient;
+import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
+
 
 
 /**
@@ -45,9 +48,16 @@ public class RepoxClientTest {
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepoxClientTest.class);
 	
+	@Resource
+	RepoxRestClient repoxclient;
+	
 	@Test
-	public void testDummy(){
-		
+	public void testRetrieveDataSources(){
+		try {
+			repoxclient.retrieveDataSources();
+		} catch (RepoxException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
