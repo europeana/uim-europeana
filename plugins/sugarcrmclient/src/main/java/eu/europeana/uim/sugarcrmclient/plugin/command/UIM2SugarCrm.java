@@ -11,7 +11,11 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Function;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
+import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl;
 
@@ -136,42 +140,45 @@ public class UIM2SugarCrm implements Function, Action {
 	
 	/**
 	 * @param out
-	 * @param resultMap
+	 * @param getEntryListResponse
 	 */
-	private void outputInitiators(PrintStream out ,HashMap<String, HashMap<String, String>> resultMap){
+	private void outputInitiators(PrintStream out ,GetEntryListResponse getEntryListResponse){
 		StringBuffer result = new StringBuffer();
 		
 		
 		result.append("Found ");
-		result.append(resultMap.size());
+		
+		List<Element> anyList = getEntryListResponse.getReturn().getEntryList().getArray().getAnyList();
+		
+		result.append(anyList.size());
 		result.append(" jobs pending for ingestion. \n");
 		
 		
-		Iterator<String> itr =resultMap.keySet().iterator();
+		Iterator<Element> itr =anyList.iterator();
 		
 		  while(itr.hasNext()){ 
 		     result.append("============================== \n"); 
 			 result.append(" ITEM ID:");
 			 
-			 String key = (String) itr.next();
-			 result.append(key);
+			 
+			 
+			 Element el = itr.next();
+			 
+			 result.append(ClientUtils.extractFromElement("id", el));
 			 result.append("\n");
 			 
-		     HashMap<String, String> obj = resultMap.get(key);
-		     
-		     Iterator<String> itr2 = obj.keySet().iterator();
-		     
-			  while(itr2.hasNext()){ 
-				  
-				  String innerKey = (String) itr2.next();
-				  String innerValue = obj.get(innerKey);
-				  result.append(innerKey);
+			 
+			 NodeList nl =el.getChildNodes();
+			 
+
+			 for (int i=0;i<nl.getLength();i++){
+				  result.append(nl.item(i).getLocalName());
 				  result.append("=");
-				  result.append(innerValue);
+				  result.append(nl.item(i).getTextContent());
 				  result.append("\n");
-				  
-			  }
+			 }
 		     
+     
 			result.append("============================== \n"); 
 		  }
 		  

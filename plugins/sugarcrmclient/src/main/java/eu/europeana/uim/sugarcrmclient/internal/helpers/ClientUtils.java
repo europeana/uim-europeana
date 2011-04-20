@@ -361,6 +361,18 @@ public class ClientUtils {
 	}
 	
 	
+	public static String extractFromElement(String value, Element el){
+		
+		NodeList nl =el.getElementsByTagName(value);
+		
+		if(nl.getLength() != 0){
+			
+			return nl.item(0).getTextContent();
+		}
+		
+		
+		return null;
+	}
 	
 		
 }

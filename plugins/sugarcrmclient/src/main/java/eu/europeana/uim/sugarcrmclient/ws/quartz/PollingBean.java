@@ -23,6 +23,9 @@ package eu.europeana.uim.sugarcrmclient.ws.quartz;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+
+import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent;
 
@@ -35,12 +38,12 @@ import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent;
  */
 public class PollingBean extends QuartzJobBean {
 
-	  private SugarCRMAgentImpl sugarcrmPlugin;
+	  private SugarCRMAgent sugarcrmPlugin;
 	  
 	  /**
 	   * Setter for sugarcrmPlugin spring injected property
 	   */ 
-	  public void setSugarcrmPlugin(SugarCRMAgentImpl sugarcrmPlugin) {
+	  public void setSugarcrmPlugin(SugarCRMAgent sugarcrmPlugin) {
 	    this.sugarcrmPlugin = sugarcrmPlugin;
 	  }	
 	
@@ -52,7 +55,8 @@ public class PollingBean extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext arg0)
 			throws JobExecutionException {
 
-		sugarcrmPlugin.pollForHarvestInitiators();
+		GetEntryListResponse resp = sugarcrmPlugin.pollForHarvestInitiators();
+		ClientUtils.logMarshalledObject(resp);
 	}
 
 }

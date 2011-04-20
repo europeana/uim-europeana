@@ -24,6 +24,9 @@ package eu.europeana.uim.sugarcrmclient.plugin;
 
 import java.util.HashMap;
 
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
 
 
@@ -47,7 +50,7 @@ public interface SugarCRMAgent {
 	 * 
 	 * @return
 	 */
-	public String showAvailableModules();
+	public GetAvailableModulesResponse showAvailableModules();
 	
 	
 	
@@ -55,7 +58,7 @@ public interface SugarCRMAgent {
 	 * @param module
 	 * @return
 	 */
-	public String showModuleFields(String module);
+	public GetModuleFieldsResponse showModuleFields(String module);
 
 	
 	/**
@@ -67,7 +70,7 @@ public interface SugarCRMAgent {
 	/**
 	 * @return
 	 */
-	public HashMap<String, HashMap<String, String>>  pollForHarvestInitiators();
+	public GetEntryListResponse  pollForHarvestInitiators();
 	
 	
 	/**

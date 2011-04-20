@@ -11,11 +11,15 @@
 		of an OSGi environment -->
 
 
+    <bean id="sugarWsClientFactory" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClient">
+       <property name="webServiceTemplate" ref="webServiceTemplate"/>
+    </bean>
 
-	<bean id="sugarWsClient" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClient">
-		<property name="webServiceTemplate" ref="webServiceTemplate"/>
-	</bean>
-
+    <bean id="sugarWsClient" factory-bean="sugarWsClientFactory" factory-method="createInstance">
+       <constructor-arg value="${username}"/>
+       <constructor-arg value="${password}"/>
+    </bean>
+    
 
     <bean id="messageFactory" class="eu.europeana.uim.sugarcrmclient.internal.ExtendedSaajSoapMessageFactory"/>
 

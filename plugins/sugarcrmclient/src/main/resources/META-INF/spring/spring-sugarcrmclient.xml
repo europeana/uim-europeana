@@ -40,11 +40,11 @@
 
 
 	<!-- Spring DM specific declarations of SugarCRM Client instances-->
-    <bean id="sugarWsClientOSGIfactory" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI">
+    <bean id="sugarWsClientFactory" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClient">
        <property name="webServiceTemplate" ref="webServiceTemplate"/>
     </bean>
 
-    <bean id="sugarWsClientNB" factory-bean="sugarWsClientOSGIfactory" factory-method="createInstance">
+    <bean id="sugarWsClient" factory-bean="sugarWsClientFactory" factory-method="createInstance">
        <constructor-arg value="${username}"/>
        <constructor-arg value="${password}"/>
     </bean>
@@ -54,16 +54,13 @@
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
          <constructor-arg ref="messageFactory"/>
          <property name="defaultUri" value="${host}" />
-         <property name="marshaller" ref="loginUnmarshaller" />
-         <property name="unmarshaller" ref="loginUnmarshaller" />
+         <property name="marshaller" ref="jibxMarshaller" />
+         <property name="unmarshaller" ref="jibxMarshaller" />
     </bean>
     
       
-    <bean id="loginUnmarshaller" class="org.springframework.oxm.jibx.JibxMarshaller"> 
-         <property name="targetClass" value="eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse"/> 
-    </bean>
     
-    <bean id="loginresMarshaller" class="org.springframework.oxm.jibx.JibxMarshaller"> 
+    <bean id="jibxMarshaller" class="org.springframework.oxm.jibx.JibxMarshaller"> 
          <property name="targetClass" value="eu.europeana.uim.sugarcrmclient.jibxbindings.Login"/> 
     </bean>
     
@@ -88,7 +85,7 @@
    </bean>
 
    <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl">    
-       <property name="sugarwsClient" ref="sugarWsClientNB"/>  
+       <property name="sugarwsClient" ref="sugarWsClient"/>  
        <property name="orchestrator" ref="orchestrator"/>  
        <property name="registry" ref="registry"/>  
    </bean>

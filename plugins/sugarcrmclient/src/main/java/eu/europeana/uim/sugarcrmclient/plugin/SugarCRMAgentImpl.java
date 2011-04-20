@@ -27,20 +27,27 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
-import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientOSGI;
+import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.DatasetStates;
 import eu.europeana.uim.workflow.Workflow;
@@ -59,7 +66,7 @@ import eu.europeana.uim.api.StorageEngineException;
  */
 public class SugarCRMAgentImpl implements SugarCRMAgent{
 
-	private SugarWsClientOSGI sugarwsClient;
+	private SugarWsClient sugarwsClient;
 	private Orchestrator orchestrator;
 	private Registry registry;
 	
@@ -68,7 +75,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#pollForHarvestInitiators()
 	 */
 	@Override
-	public HashMap<String, HashMap<String, String>> pollForHarvestInitiators() {
+	public GetEntryListResponse pollForHarvestInitiators() {
 
 		GetEntryList request = new GetEntryList();
 				
@@ -82,7 +89,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		
 		request.setQuery("(opportunities.sales_stage LIKE 'Needs%Analysis')");
 
-		HashMap<String, HashMap<String, String>> response =  sugarwsClient.get_entry_list(request);
+		GetEntryListResponse response =  sugarwsClient.get_entry_list(request);
 		
 		initiateWorkflowsFromTriggers(response);
 		
@@ -158,10 +165,10 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#showAvailableModules()
 	 */
 	@Override
-	public String showAvailableModules() {
+	public GetAvailableModulesResponse showAvailableModules() {
 		GetAvailableModules request = new GetAvailableModules();
 		request.setSession(sugarwsClient.getSessionID());
-		String response =  sugarwsClient.get_available_modules(request);
+		GetAvailableModulesResponse response =  sugarwsClient.get_available_modules(request);
 
 		return response;
 	}
@@ -172,12 +179,12 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#showModuleFields(java.lang.String)
 	 */
 	@Override
-	public String showModuleFields(String module) {
+	public GetModuleFieldsResponse showModuleFields(String module) {
 
 		GetModuleFields request = new GetModuleFields();
 		request.setSession(sugarwsClient.getSessionID());
 		request.setModuleName(module);		
-		String response =  sugarwsClient.get_module_fields(request);
+		GetModuleFieldsResponse response =  sugarwsClient.get_module_fields(request);
 
 		return response;
 	}
@@ -191,15 +198,21 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	/**
 	 * @param triggers
 	 */
-	private void initiateWorkflowsFromTriggers(HashMap<String, HashMap<String, String>> triggers){
+	private void initiateWorkflowsFromTriggers(GetEntryListResponse triggers){
 				
 		StorageEngine<?> engine = registry.getStorage();
 		Workflow w = registry.getWorkflow("SysoutWorkflow");
-		Iterator<String> it = triggers.keySet().iterator();
+		
+		if(triggers.getReturn().getEntryList().getArray() != null){
+			
+		List<Element> anyList = triggers.getReturn().getEntryList().getArray().getAnyList();
+		
+		Iterator<Element> it = anyList.iterator();
+		
 		
 		while (it.hasNext()){	
 			try {
-				Collection<?> dataset = inferCollection(engine,triggers.get(it.next()) );
+				Collection<?> dataset = inferCollection(engine,it.next());
 				ActiveExecution<?> execution = orchestrator.executeWorkflow(w, dataset);
 				alterSugarCRMItemStatus(dataset.getMnemonic(), DatasetStates.MAPPING_AND_NORMALIZATION.getSysId());	
 			
@@ -208,7 +221,8 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 				e.printStackTrace();
 
 			}	
-		}		
+		}
+	   }
 	}
 	
 	
@@ -219,14 +233,14 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	 * @return
 	 * @throws StorageEngineException
 	 */
-	private Collection inferCollection(StorageEngine engine, HashMap<String, String> trigger) throws StorageEngineException{
+	private Collection inferCollection(StorageEngine engine, Element trigger) throws StorageEngineException{
 		    
-		    String collectionName = trigger.get("name");
-		    String providerName = trigger.get("account_name");
-		    String providerAcronymName = trigger.get("name_acronym_c");
-		    String mnemonicCode = trigger.get("id");
-		    String countryCode = trigger.get("country_c");
-		    String harvestUrl = trigger.get("harvest_url_c");
+		    String collectionName = extractFromElement("name",trigger);
+		    String providerName = extractFromElement("account_name",trigger); 
+		    String providerAcronymName = extractFromElement("name_acronym_c",trigger);  
+		    String mnemonicCode = extractFromElement("id",trigger); 
+		    String countryCode = extractFromElement("country_c",trigger);
+		    String harvestUrl = extractFromElement("harvest_url_c",trigger);
 		    
 		    
 		    Provider cuurprovider = engine.findProvider(mnemonicCode);
@@ -264,7 +278,18 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	}
 	
 	
-	
+	private String extractFromElement(String value, Element el){
+		
+		NodeList nl =el.getElementsByTagName(value);
+		
+		if(nl.getLength() != 0){
+			
+			return nl.item(0).getTextContent();
+		}
+		
+		
+		return null;
+	}
 	
 	
 	/**
@@ -294,7 +319,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		request.setModuleName("Opportunities");
 		request.setSession(sugarwsClient.getSessionID());	
 		
-		String response =  sugarwsClient.set_entry(request);
+		SetEntryResponse response =  sugarwsClient.set_entry(request);
 
 				
 	}
@@ -307,11 +332,11 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	 */
 	
 	
-	public void setSugarwsClient(SugarWsClientOSGI sugarwsClient) {
+	public void setSugarwsClient(SugarWsClient sugarwsClient) {
 		this.sugarwsClient = sugarwsClient;
 	}
 
-	public SugarWsClientOSGI getSugarwsClient() {
+	public SugarWsClient getSugarwsClient() {
 		return sugarwsClient;
 	}
 

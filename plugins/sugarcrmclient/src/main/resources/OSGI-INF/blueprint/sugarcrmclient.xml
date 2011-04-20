@@ -5,6 +5,7 @@
            xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0">
 
 
+
    <reference id="sugarcrmPluginService" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent" availability="optional"/>
 
    <shell:command-bundle>
@@ -14,9 +15,6 @@
             </shell:action>
         </shell:command>
     </shell:command-bundle>
-    
-       
-
-
-
+   
+   
 </blueprint>

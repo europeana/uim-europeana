@@ -52,8 +52,9 @@ import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 
 
 /**
+ * 
+ * 
  * @author Georgios Markakis
- *
  */
 public class SugarWsClientOSGI {
 
@@ -107,6 +108,10 @@ public class SugarWsClientOSGI {
 	        
 			webServiceTemplate.sendSourceAndReceiveToResult(source,result);
 		 
+			IUnmarshallingContext ucx = bfact.createUnmarshallingContext();
+			
+			ucx.unmarshalDocument(new StringReader(resultWriter.toString()));
+			
 			ClientUtils.responseFactory(resultWriter.toString());
 			
 			return ClientUtils.extractSimpleResponse(resultWriter.toString());

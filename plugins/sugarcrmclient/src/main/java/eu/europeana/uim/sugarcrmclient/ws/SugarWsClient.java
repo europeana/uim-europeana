@@ -21,6 +21,8 @@
 package eu.europeana.uim.sugarcrmclient.ws;
 
 import org.springframework.ws.client.core.WebServiceTemplate;
+
+import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
@@ -52,14 +54,31 @@ public class SugarWsClient {
 	
 	private WebServiceTemplate webServiceTemplate;
 
-	public void setDefaultUri(String defaultUri) {
-				
-		webServiceTemplate.setDefaultUri(defaultUri);
-	}
+	private String sessionID;
+	
 
-	public String getDefaultUri() {
-		return webServiceTemplate.getDefaultUri();
+	/**
+	 * 
+	 * @param userName
+	 * @param password
+	 * @return
+	 */
+	public  SugarWsClient createInstance(String userName, String password){
+		
+		SugarWsClient client = new SugarWsClient();
+		client.setWebServiceTemplate(webServiceTemplate);
+		
+		try {
+			client.sessionID = client.login(ClientUtils.createStandardLoginObject(userName,password) );
+		} catch (LoginFailureException e) {
+			client.sessionID = "-1";
+			e.printStackTrace();
+		}
+		
+		return client;
 	}
+	
+	
 	
 	/**
 	 * @param <T>
@@ -243,5 +262,22 @@ public class SugarWsClient {
 		this.webServiceTemplate = webServiceTemplate;
 	}
 	
+	
+	public void setDefaultUri(String defaultUri) {
+		
+		webServiceTemplate.setDefaultUri(defaultUri);
+	}
+
+	public String getDefaultUri() {
+		return webServiceTemplate.getDefaultUri();
+	}
+	
+	public void setSessionID(String sessionID) {
+		this.sessionID = sessionID;
+	}
+
+	public String getSessionID() {
+		return sessionID;
+	}
 
 }
