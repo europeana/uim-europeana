@@ -48,6 +48,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.DatasetStates;
 import eu.europeana.uim.workflow.Workflow;
@@ -113,6 +114,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 		   connectionInfo.append(sugarwsClient.login(login));
 		} catch (LoginFailureException e) {			
 			connectionInfo.append("Invalid Session, login failed!");
+			e.printStackTrace();
+		} catch (GenericSugarCRMException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

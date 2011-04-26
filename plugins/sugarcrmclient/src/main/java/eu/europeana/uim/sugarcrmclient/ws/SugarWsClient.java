@@ -46,6 +46,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.*;
 
 /**
+ * The core class for performing SOAP based sugarCRM operations  
  * 
  * @author Georgios Markakis
  */
@@ -73,6 +74,8 @@ public class SugarWsClient {
 		} catch (LoginFailureException e) {
 			client.sessionID = "-1";
 			e.printStackTrace();
+		} catch (GenericSugarCRMException e) {
+			e.printStackTrace();
 		}
 		
 		return client;
@@ -81,10 +84,13 @@ public class SugarWsClient {
 	
 	
 	/**
-	 * @param <T>
-	 * @param <S>
-	 * @param wsOperation
-	 * @return
+	 * Generic auxiliary method for marshalling and unmarshalling requests
+	 * and responses via Sring-WS
+	 * 
+	 * @param <T> Class of the request Object
+	 * @param <S> Class of the response object
+	 * @param wsOperation the instance of the request operation
+	 * @return the unmarshalled response object 
 	 */
 	private <T,S> S invokeWSTemplate( T wsOperation, Class<S> responseClass){
 
@@ -100,20 +106,27 @@ public class SugarWsClient {
 	
 	
 	/**
-	 * @param login
-	 * @return
+	 * Public method for performing Login operations (see Junit test for usage example) 
+	 * 
+	 * @param login the Login object
+	 * @return a String 
+	 * @throws LoginFailureException 
+	 * @throws GenericSugarCRMException
 	 */
-	public String login(Login login) throws LoginFailureException{
+	public String login(Login login) throws LoginFailureException,GenericSugarCRMException{
 		
+		try{
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		String sessionID = response.getReturn().getId();
-		
 		if("-1".equals(sessionID)){			
-			throw new LoginFailureException(response);
+			throw new LoginFailureException(response.getReturn().getError());
 		}
-		
-		
-		return sessionID;
+		  return sessionID;
+		}
+		catch(Exception e){
+			throw new GenericSugarCRMException();
+
+		}
 	}
 	
 
@@ -126,7 +139,7 @@ public class SugarWsClient {
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		
 		if("-1".equals(response.getReturn().getId())){			
-			throw new LoginFailureException(response);
+			throw new LoginFailureException(response.getReturn().getError());
 		}
 		
 		return response;
