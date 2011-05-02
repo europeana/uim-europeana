@@ -15,6 +15,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.clientbindings.utils.Utils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl;
@@ -60,8 +61,6 @@ public class UIM2SugarCrm implements Function, Action {
 			out.println("pending4ingestion       \t\t\t\t shows all entries in SugarCRM who are candidates for ingestion initiation.");
 			out.println("notifyIngestionSuccsess \t\t\t\t notifies SugarCRM that ingestion for the specified entries was successfull");
 			out.println("notifyIngestionFailure  \t\t\t\t notifies SugarCRM that ingestion for the specified entries has failed");
-			out.println("getpolltime             \t\t\t\t shows the time set for the next polling session");
-			out.println("setpolltime             \t\t\t\t sets the time for the next polling session");
 			return null;
 		}
 		
@@ -73,12 +72,13 @@ public class UIM2SugarCrm implements Function, Action {
 			out.println(sugarcrmPlugin.updateSession());
 			break;
 		case showavailablemodules:
-			out.println(sugarcrmPlugin.showAvailableModules());
+			ClientUtils.logMarshalledObjectOsgi(out,sugarcrmPlugin.showAvailableModules());
 			break;			
 		case showmodulefields:
 			if(argument0!=null)
 			{	
-			    out.println(sugarcrmPlugin.showModuleFields(argument0));
+				ClientUtils.logMarshalledObjectOsgi(out,sugarcrmPlugin.showModuleFields(argument0));
+
 			}
 			else
 			{
@@ -108,12 +108,6 @@ public class UIM2SugarCrm implements Function, Action {
 				out.println("Please define the module id");
 			}
 			break;	
-		case getpolltime:
-			out.println("Not implemented yet.");
-			break;
-		case setpolltime:
-			out.println("Not implemented yet.");
-			break;
 		default:
 			out.println("Unknown Command...");
 		}

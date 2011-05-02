@@ -31,7 +31,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.LougoutFailureException;
 
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
@@ -99,6 +101,8 @@ public final class SugarCRMWSTest {
 		} catch (LoginFailureException e) {
 			sessionID = "-1";
 			LOGGER.info(e.getMessage());
+		} catch (GenericSugarCRMException e) {
+			e.printStackTrace();
 		}
 		
 	}
@@ -112,8 +116,16 @@ public final class SugarCRMWSTest {
 		
 		Logout request = new Logout();
 		request.setSession(sessionID);
-		LogoutResponse lgresponse =  sugarWsClient.logout(request );
-		assertNotNull(lgresponse);
+		LogoutResponse lgresponse;
+		try {
+			lgresponse = sugarWsClient.logout(request );
+			assertNotNull(lgresponse);
+		} catch (LougoutFailureException e) {
+			e.printStackTrace();
+		} catch (GenericSugarCRMException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 
@@ -130,12 +142,16 @@ public final class SugarCRMWSTest {
 				ClientUtils.logMarshalledObject(login);
 				
 				response = sugarWsClient.login2(login);
+				
+				assertNotNull(response);
+				LOGGER.info(response.getReturn().getId());
+				ClientUtils.logMarshalledObject(response);
 			} catch (LoginFailureException e) {
 				response = null;
+			} catch (GenericSugarCRMException e) {
+				e.printStackTrace();
 			}
-			assertNotNull(response);
-			LOGGER.info(response.getReturn().getId());
-			ClientUtils.logMarshalledObject(response);
+
 	}
 	
 	

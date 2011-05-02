@@ -109,9 +109,9 @@ public class SugarWsClient {
 	 * Public method for performing Login operations (see Junit test for usage example) 
 	 * 
 	 * @param login the Login object
-	 * @return a String 
-	 * @throws LoginFailureException 
-	 * @throws GenericSugarCRMException
+	 * @return a String containing the current Session id
+	 * @throws LoginFailureException when login credentials are incorrect
+	 * @throws GenericSugarCRMException 
 	 */
 	public String login(Login login) throws LoginFailureException,GenericSugarCRMException{
 		
@@ -130,33 +130,62 @@ public class SugarWsClient {
 	}
 	
 
+
 	/**
+	 * Public method for performing Login operations (see Junit test for usage example) 
+	 * 
 	 * @param login
-	 * @return
+	 * @return a LoginResponse object
+	 * @throws LoginFailureException when login credentials are incorrect
+	 * @throws GenericSugarCRMException
 	 */
-	public LoginResponse login2(Login login) throws LoginFailureException{
-		
+	public LoginResponse login2(Login login) throws LoginFailureException,GenericSugarCRMException{
+		try{
+			
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		
 		if("-1".equals(response.getReturn().getId())){			
 			throw new LoginFailureException(response.getReturn().getError());
 		}
-		
 		return response;
+		}
+		catch(Exception e){
+			throw new GenericSugarCRMException();
+
+		}
+		
+
 	}
 	
 	
 	
 	
 	/**
-	 * @param request
-	 * @return
+	 * Public method for performing Logout operations (see Junit test for usage example) 
+	 * 
+	 * @param a logout request object
+	 * @return a LogoutResponse object
+	 * @throws LougoutFailureException when logout fails
+	 * @throws GenericSugarCRMException
 	 */
-	public LogoutResponse logout(Logout request){
-		
+	public LogoutResponse logout(Logout request) throws LougoutFailureException,GenericSugarCRMException{
+		try{
 		LogoutResponse response =  invokeWSTemplate(request,LogoutResponse.class);
 		
+		String returnvalue = response.getReturn().getNumber();
+		
+		if (!"0".equals(returnvalue)){
+			
+			throw new LougoutFailureException(response.getReturn().getDescription());
+		}
+		
 		return response;
+		
+		}
+		catch (Exception e){
+			throw new GenericSugarCRMException();
+		}
+		
 	}
 	
 	

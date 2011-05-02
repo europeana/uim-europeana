@@ -21,6 +21,7 @@
 package eu.europeana.uim.sugarcrmclient.internal.helpers;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -80,31 +81,68 @@ public class ClientUtils {
 	 * @param jaxbObject A JIBX representation of a SugarCRM SOAP Element. 
 	 */
 	public static void logMarshalledObject(Object jibxObject){		
-		IBindingFactory context;
 
 		try {
-			context = BindingDirectory.getFactory(jibxObject.getClass());
 
-			IMarshallingContext mctx = context.createMarshallingContext();
-			mctx.setIndent(2);
-			StringWriter stringWriter = new StringWriter();
-			mctx.setOutput(stringWriter);
-			mctx.marshalDocument(jibxObject);
+			String xmlContent = unmarshallObject(jibxObject);
 			
 			LOGGER.info("===========================================");
 			StringBuffer sb = new StringBuffer("Soap Ouput for Class: ");
 			sb.append(jibxObject.getClass().getSimpleName());
 			LOGGER.info(sb.toString());
-			LOGGER.info(stringWriter.toString());
+			LOGGER.info(xmlContent);
 			LOGGER.info("===========================================");
 		} catch (JiBXException e) {
 
 			e.printStackTrace();
 		}
-
 		
 	}
 	
+	
+	
+	/**
+	 * This method marshals the contents of a  JAXB Element and outputs the results to the
+	 * Karaf output console.
+	 *   
+	 * @param out the (Karaf console) printwriter
+	 * @param jibxObject
+	 */
+	public static void logMarshalledObjectOsgi(PrintStream out, Object jibxObject){
+
+		try {
+
+			String xmlContent = unmarshallObject(jibxObject);
+			
+			out.println("===========================================");
+			StringBuffer sb = new StringBuffer("Soap Ouput for Class: ");
+			sb.append(jibxObject.getClass().getSimpleName());
+			out.println(sb.toString());
+			out.println(xmlContent);
+			out.println("===========================================");
+		} catch (JiBXException e) {
+
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	
+	private static String unmarshallObject(Object jibxObject) throws JiBXException{
+		IBindingFactory context;
+		context = BindingDirectory.getFactory(jibxObject.getClass());
+
+		IMarshallingContext mctx = context.createMarshallingContext();
+		mctx.setIndent(2);
+		StringWriter stringWriter = new StringWriter();
+		mctx.setOutput(stringWriter);
+		mctx.marshalDocument(jibxObject);		
+		
+		String xmlContents = stringWriter.toString();
+		
+		return xmlContents;
+	}
 	
 	
 	/**

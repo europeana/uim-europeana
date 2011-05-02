@@ -18,9 +18,9 @@ public class LougoutFailureException extends GenericSugarCRMException {
 	 * This constructor takes as an argument an ErrorValue object
 	 * @param err the ErrorValue message
 	 */
-	public LougoutFailureException(ErrorValue err) {
+	public LougoutFailureException(String err) {
 		
-		super(generateMessageFromObject(err));
+		super(err);
 
 	}
 }
