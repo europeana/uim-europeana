@@ -21,6 +21,7 @@
 package eu.europeana.uim.repoxclient.test;
 
 import static org.junit.Assert.*;
+
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import org.junit.After;
@@ -31,9 +32,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.apache.log4j.Logger;
 
+import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.rest.RepoxRestClient;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
-
+import eu.europeana.uim.clientbindings.utils.Utils;
 
 
 /**
@@ -54,7 +56,12 @@ public class RepoxClientTest {
 	@Test
 	public void testRetrieveDataSources(){
 		try {
-			repoxclient.retrieveDataSources();
+			DataSources ds =  repoxclient.retrieveDataSources();
+			
+			assertNotNull(ds);
+			
+			Utils.logMarshalledObject(ds);
+			
 		} catch (RepoxException e) {
 			e.printStackTrace();
 		}
