@@ -23,25 +23,20 @@ package eu.europeana.uim.repoxclient.rest.exceptions;
 import eu.europeana.uim.repoxclient.jibxbindings._Error;
 
 /**
- *  Exception thrown in case Repox returns an error message
+ * Exception thrown in case of a harvesting operation error
+ * (starting or scheduling an ingestion)
+ * 
  * @author Georgios Markakis
  */
-public class RepoxException extends Exception {
+public class HarvestingOperationException extends RepoxException {
 
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * Default Constructor
-	 */
-	public RepoxException() {
-		super();
-	}
 
 	/**
 	 * This constructor takes as an argument a String
 	 * @param message the error message
 	 */
-	public RepoxException(String message) {
+	public HarvestingOperationException(String message) {
 		super(message);
 	}
 
@@ -49,29 +44,8 @@ public class RepoxException extends Exception {
 	 * This constructor takes as an argument an _Error object
 	 * @param err
 	 */
-	public RepoxException(_Error err) {
-		super(createRepoxFailureMessage(err));
+	public HarvestingOperationException(_Error err) {
+		super(err);
 	}
-
-
-	/**
-	 * Auxiliary method for extracting error information
-	 * from an _Error object
-	 * 
-	 * @param err the Error object
-	 * @return the error description
-	 */
-	private static String createRepoxFailureMessage(_Error err){
-		
-		StringBuffer sb = new StringBuffer();
-		sb.append(" Error Type: ");
-		sb.append(err.getType());
-		sb.append(" Error Cause: ");		
-		sb.append(err.getCause());
-		sb.append(" Request URI: ");		
-		sb.append(err.getRequestURI());		
-		
-		return sb.toString();
-	}
-
+	
 }
