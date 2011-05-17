@@ -17,17 +17,17 @@ import org.w3c.dom.NodeList;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.clientbindings.utils.Utils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
-import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent;
-import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgentImpl;
+import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService;
+import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMServiceImpl;
 
 
 @Command(name = "uim", scope = "sugaragent")
-public class UIM2SugarCrm implements Function, Action {
+public class SugarCrmCommand implements Function, Action {
 
 	enum Operation {info,updatesession,showavailablemodules,showmodulefields,
 		pending4ingestion,notifyIngestionSuccsess,notifyIngestionFailure,getpolltime,setpolltime}
 	
-	private SugarCRMAgent sugarcrmPlugin;
+	private SugarCRMService sugarcrmPlugin;
 	
 	@Option(name = "-o", aliases = {"--operation"}, required = false)
 	private Operation operation;
@@ -39,7 +39,7 @@ public class UIM2SugarCrm implements Function, Action {
 	private String argument1;
 	
 	
-	public UIM2SugarCrm (SugarCRMAgent sugarcrmPlugin ){
+	public SugarCrmCommand (SugarCRMService sugarcrmPlugin ){
 		this.sugarcrmPlugin = sugarcrmPlugin;
 	}
 	
@@ -55,9 +55,7 @@ public class UIM2SugarCrm implements Function, Action {
 		if (operation == null) {
 			out.println("Please specify an operation with the '-o' option. Possible values are:");
 			out.println("info                    \t\t\t\t provides inforamtion regarding the existing remote connection to SugarCRM");
-			out.println("updatesession           \t\t\t\t creates a new session for the client");			
-			out.println("showavailablemodules    \t\t\t\t shows the available modules in Sugar CRM");		
-			out.println("showmodulefields        \t\t\t\t shows the available fields for a given module");		
+			out.println("updatesession           \t\t\t\t creates a new session for the client");					
 			out.println("pending4ingestion       \t\t\t\t shows all entries in SugarCRM who are candidates for ingestion initiation.");
 			out.println("notifyIngestionSuccsess \t\t\t\t notifies SugarCRM that ingestion for the specified entries was successfull");
 			out.println("notifyIngestionFailure  \t\t\t\t notifies SugarCRM that ingestion for the specified entries has failed");
@@ -69,29 +67,15 @@ public class UIM2SugarCrm implements Function, Action {
 			out.println(sugarcrmPlugin.showConnectionStatus());
 			break;
 		case updatesession:
-			out.println(sugarcrmPlugin.updateSession());
+			//out.println(sugarcrmPlugin.updateSession());
 			break;
-		case showavailablemodules:
-			ClientUtils.logMarshalledObjectOsgi(out,sugarcrmPlugin.showAvailableModules());
-			break;			
-		case showmodulefields:
-			if(argument0!=null)
-			{	
-				ClientUtils.logMarshalledObjectOsgi(out,sugarcrmPlugin.showModuleFields(argument0));
-
-			}
-			else
-			{
-				out.println("Please define the name of the module");
-			}
-			break;	
 		case pending4ingestion:
-			outputInitiators(out,sugarcrmPlugin.pollForHarvestInitiators());
+			sugarcrmPlugin.pollForHarvestInitiators();
 			break;
 		case notifyIngestionSuccsess:
 			if(argument0!=null)
 			{	
-			    out.println(sugarcrmPlugin.notifySugarForIngestionSuccess(argument0));
+			    //out.println(sugarcrmPlugin.notifySugarForIngestionSuccess(argument0));
 			}
 			else
 			{
@@ -101,7 +85,7 @@ public class UIM2SugarCrm implements Function, Action {
 		case notifyIngestionFailure:
 			if(argument0!=null)
 			{	
-			    out.println(sugarcrmPlugin.notifySugarForIngestionFailure(argument0));
+			    //out.println(sugarcrmPlugin.notifySugarForIngestionFailure(argument0));
 			}
 			else
 			{

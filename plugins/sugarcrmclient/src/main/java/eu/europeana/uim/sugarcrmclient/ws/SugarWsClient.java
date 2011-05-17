@@ -43,6 +43,14 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserId;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserIdResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.ContactByEmail;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.ContactByEmailResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetNoteAttachment;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetNoteAttachmentResponse;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.*;
 
 /**
@@ -59,6 +67,7 @@ public class SugarWsClient {
 	
 
 	/**
+	 * Internal factory method used by Spring 
 	 * 
 	 * @param userName
 	 * @param password
@@ -85,7 +94,7 @@ public class SugarWsClient {
 	
 	/**
 	 * Generic auxiliary method for marshalling and unmarshalling requests
-	 * and responses via Sring-WS
+	 * and responses via Spring-WS
 	 * 
 	 * @param <T> Class of the request Object
 	 * @param <S> Class of the response object
@@ -113,47 +122,35 @@ public class SugarWsClient {
 	 * @throws LoginFailureException when login credentials are incorrect
 	 * @throws GenericSugarCRMException 
 	 */
-	public String login(Login login) throws LoginFailureException,GenericSugarCRMException{
+	public String login(Login login) throws LoginFailureException{
 		
-		try{
+
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		String sessionID = response.getReturn().getId();
 		if("-1".equals(sessionID)){			
 			throw new LoginFailureException(response.getReturn().getError());
 		}
 		  return sessionID;
-		}
-		catch(Exception e){
-			throw new GenericSugarCRMException();
-
-		}
 	}
 	
 
 
 	/**
-	 * Public method for performing Login operations (see Junit test for usage example) 
+	 * Public method for performing Login operations (see JUnit test for usage example) 
 	 * 
 	 * @param login
 	 * @return a LoginResponse object
 	 * @throws LoginFailureException when login credentials are incorrect
 	 * @throws GenericSugarCRMException
 	 */
-	public LoginResponse login2(Login login) throws LoginFailureException,GenericSugarCRMException{
-		try{
-			
+	public LoginResponse login2(Login login) throws LoginFailureException{
+		
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		
 		if("-1".equals(response.getReturn().getId())){			
 			throw new LoginFailureException(response.getReturn().getError());
 		}
 		return response;
-		}
-		catch(Exception e){
-			throw new GenericSugarCRMException();
-
-		}
-		
 
 	}
 	
@@ -165,11 +162,11 @@ public class SugarWsClient {
 	 * 
 	 * @param a logout request object
 	 * @return a LogoutResponse object
-	 * @throws LougoutFailureException when logout fails
+	 * @throws LogoutFailureException when logout fails
 	 * @throws GenericSugarCRMException
 	 */
-	public LogoutResponse logout(Logout request) throws LougoutFailureException,GenericSugarCRMException{
-		try{
+	public LogoutResponse logout(Logout request) throws LougoutFailureException{
+
 		LogoutResponse response =  invokeWSTemplate(request,LogoutResponse.class);
 		
 		String returnvalue = response.getReturn().getNumber();
@@ -178,115 +175,210 @@ public class SugarWsClient {
 			
 			throw new LougoutFailureException(response.getReturn().getDescription());
 		}
-		
 		return response;
-		
+	}
+	
+	
+	/**
+	 * This method returns an object indicating that the current user has admin privileges or not.
+	 * @param request
+	 * @return
+	 * @throws GenericSugarCRMException 
+	 */
+	public IsUserAdminResponse is_user_admin(IsUserAdmin request) throws GenericSugarCRMException{
+
+		try{
+		IsUserAdminResponse response = invokeWSTemplate(request,IsUserAdminResponse.class);
+	
+		return response;
 		}
 		catch (Exception e){
 			throw new GenericSugarCRMException();
 		}
-		
 	}
 	
 	
 	/**
+	 * This method gives the user name of the user who "owns" the specific session 
+	 * 
 	 * @param request
 	 * @return
+	 * @throws GenericSugarCRMException 
 	 */
-	public IsUserAdminResponse is_user_admin(IsUserAdmin request){
-
-		IsUserAdminResponse response = invokeWSTemplate(request,IsUserAdminResponse.class);
+	public GetUserIdResponse get_user_id(GetUserId request) throws GenericSugarCRMException{
 		
-		return response;
-	}
-	
-	
-	/**
-	 * @param request
-	 * @return
-	 */
-	public GetAvailableModulesResponse get_available_modules(GetAvailableModules request){
-
-		GetAvailableModulesResponse response = invokeWSTemplate(request,GetAvailableModulesResponse.class);
-		
-		return response;
-	}
-	
-	
-	/**
-	 * @param request
-	 * @return
-	 */
-	public GetModuleFieldsResponse get_module_fields(GetModuleFields request){
-
-		GetModuleFieldsResponse response = invokeWSTemplate(request,GetModuleFieldsResponse.class);
-		
-		return response;
-	}
-
-	
-	/**
-	 * @param request
-	 * @return
-	 */
-	public GetEntryListResponse get_entry_list(GetEntryList request){
-		
-		GetEntryListResponse response = invokeWSTemplate(request,GetEntryListResponse.class);
-		
-		return response;
-	}
-	
-	
-	/**
-	 * @param request
-	 * @return
-	 */
-	public GetEntryResponse get_entry(GetEntry request){
-		
-		GetEntryResponse response = invokeWSTemplate(request,GetEntryResponse.class);
-		
-		return response;
-	}
-	
-	
-	/**
-	 * @param request
-	 * @return
-	 */
-	public SetEntryResponse set_entry(SetEntry request){
-		
-		SetEntryResponse response = invokeWSTemplate(request,SetEntryResponse.class);
-		
-		return response;
-	}
-	
-	
-	
-	/**
-	 * @param request
-	 * @return
-	 */
-	public GetEntriesResponse get_entries(GetEntries request){
-		
-		GetEntriesResponse response = invokeWSTemplate(request,GetEntriesResponse.class);
-		
-		return response;
-	}
-	
-	
-	
-	
-	/**
-	 * @param request
-	 * @return
-	 */
-	public GetUserIdResponse get_user_id(GetUserId request){
-
+		try{
 		GetUserIdResponse response = invokeWSTemplate(request,GetUserIdResponse.class);
 		
 		return response;
+		}
+		catch (Exception e){
+			throw new GenericSugarCRMException();
+		}
+	}
+	
+	/**
+	 * Shows all the available module names in SugarCRM 
+	 * 
+	 * @param request
+	 * @return
+	 * @throws QueryResultException 
+	 * @throws GenericSugarCRMException 
+	 */
+	public GetAvailableModulesResponse get_available_modules(GetAvailableModules request) throws QueryResultException  {
+
+		GetAvailableModulesResponse response = invokeWSTemplate(request,GetAvailableModulesResponse.class);
+		
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new QueryResultException(response.getReturn().getError());
+		}
+		return response;
 	}
 
+
+	
+	/**
+	 * Get the fields for a specific module 
+	 * 
+	 * @param request 
+	 * @return a GetModuleFieldsResponse containing a list of module fields
+	 * @throws QueryResultException 
+	 */
+	public GetModuleFieldsResponse get_module_fields(GetModuleFields request) throws QueryResultException{
+
+		GetModuleFieldsResponse response = invokeWSTemplate(request,GetModuleFieldsResponse.class);
+		
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new QueryResultException(response.getReturn().getError());
+		}
+		
+		return response;
+	}
+
+	
+	/**
+	 * Performs a query on the records contained in sugarCRM
+	 *  
+	 * @param request
+	 * @return
+	 * @throws QueryResultException 
+	 */
+	public GetEntryListResponse get_entry_list(GetEntryList request) throws QueryResultException{
+		
+		GetEntryListResponse response = invokeWSTemplate(request,GetEntryListResponse.class);
+		
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new QueryResultException(response.getReturn().getError());
+		}
+		
+		return response;
+	}
+	
+	
+	/**
+	 * Gets a specific entry
+	 * @param request
+	 * @return
+	 * @throws QueryResultException 
+	 */
+	public GetEntryResponse get_entry(GetEntry request) throws QueryResultException{
+		
+		GetEntryResponse response = invokeWSTemplate(request,GetEntryResponse.class);
+		
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new QueryResultException(response.getReturn().getError());
+		}
+		
+		return response;
+	}
+	
+	
+	/**
+	 * Creates/Updates an entry in SugarCRM
+	 * 
+	 * @param request
+	 * @return 
+	 * @throws QueryResultException 
+	 */
+	public SetEntryResponse set_entry(SetEntry request) throws QueryResultException{
+		
+		SetEntryResponse response = invokeWSTemplate(request,SetEntryResponse.class);
+		
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new QueryResultException(response.getReturn().getError());
+		}
+		
+		return response;
+	}
+	
+	
+	
+	/**
+	 * Gets the entries for a request
+	 * 
+	 * @param request
+	 * @return
+	 * @throws QueryResultException 
+	 */
+	public GetEntriesResponse get_entries(GetEntries request) throws QueryResultException{
+		
+		GetEntriesResponse response = invokeWSTemplate(request,GetEntriesResponse.class);
+		
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new QueryResultException(response.getReturn().getError());
+		}
+		
+		return response;
+	}
+	
+	
+	/**
+	 * Contacts a user directly via e-mail
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public ContactByEmailResponse contact_by_email(ContactByEmail request){
+		
+		ContactByEmailResponse response = invokeWSTemplate(request,ContactByEmailResponse.class);
+		
+		return response;
+	}
+	
+	
+	
+	/**
+	 * Sets a note attachment to a record
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public SetNoteAttachmentResponse set_note_attachment(SetNoteAttachment request){
+		
+		SetNoteAttachmentResponse response = invokeWSTemplate(request,SetNoteAttachmentResponse.class);
+	
+		return response;
+	}
+	
+	
+
+	/**
+	 * Gets a note attachment from a record
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public GetNoteAttachmentResponse get_note_attachment(GetNoteAttachment request){
+		
+		GetNoteAttachmentResponse response = invokeWSTemplate(request,GetNoteAttachmentResponse.class);
+		
+		return response;
+	}
+	
+	
+	
+	
+	/* Getters & Setters */
 	
 	/**
 	 * @return
@@ -305,19 +397,35 @@ public class SugarWsClient {
 	}
 	
 	
+	
+	/**
+	 * @param defaultUri
+	 */
 	public void setDefaultUri(String defaultUri) {
 		
 		webServiceTemplate.setDefaultUri(defaultUri);
 	}
 
+	
+	/**
+	 * @return
+	 */
 	public String getDefaultUri() {
 		return webServiceTemplate.getDefaultUri();
 	}
 	
+	
+	/**
+	 * @param sessionID
+	 */
 	public void setSessionID(String sessionID) {
 		this.sessionID = sessionID;
 	}
 
+	
+	/**
+	 * @return
+	 */
 	public String getSessionID() {
 		return sessionID;
 	}

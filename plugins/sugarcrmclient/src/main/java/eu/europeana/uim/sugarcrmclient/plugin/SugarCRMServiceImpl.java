@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -34,12 +35,9 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
+
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
@@ -47,10 +45,16 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
-import eu.europeana.uim.sugarcrmclient.internal.helpers.DatasetStates;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
 import eu.europeana.uim.workflow.Workflow;
 import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.Orchestrator;
@@ -65,92 +69,17 @@ import eu.europeana.uim.api.StorageEngineException;
  * 
  * @author Georgios Markakis
  */
-public class SugarCRMAgentImpl implements SugarCRMAgent{
+public class SugarCRMServiceImpl implements SugarCRMService{
 
 	private SugarWsClient sugarwsClient;
 	private Orchestrator orchestrator;
 	private Registry registry;
 	
 	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#pollForHarvestInitiators()
-	 */
-	@Override
-	public GetEntryListResponse pollForHarvestInitiators() {
-
-		GetEntryList request = new GetEntryList();
-				
-		SelectFields fields = new SelectFields(); //We want to retrieve all fields
-		request.setSelectFields(fields); 
-  		request.setModuleName("Opportunities");	
-		request.setSession(sugarwsClient.getSessionID());
-		request.setOrderBy("date_entered");
-		request.setMaxResults(10000);
-		request.setOffset(0);
-		
-		request.setQuery("(opportunities.sales_stage LIKE 'Needs%Analysis')");
-
-		GetEntryListResponse response =  sugarwsClient.get_entry_list(request);
-		
-		initiateWorkflowsFromTriggers(response);
-		
-		
-		return response;
-	
-	}
-
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#updateSession()
-	 */
-	@Override
-	public String updateSession() {
-		StringBuffer connectionInfo = new StringBuffer();
-		
-		Login login = ClientUtils.createStandardLoginObject("test", "test");
-		
-		try {
-		   connectionInfo.append(sugarwsClient.login(login));
-		} catch (LoginFailureException e) {			
-			connectionInfo.append("Invalid Session, login failed!");
-			e.printStackTrace();
-		} catch (GenericSugarCRMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return connectionInfo.toString();
-	}
- 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#notifySugarForIngestionSuccess(java.lang.String)
-	 */
-	@Override
-	public String notifySugarForIngestionSuccess(String recordId) {
-		String teststring = "Notify Sugar For Ingestion Success";
-		alterSugarCRMItemStatus(recordId, DatasetStates.READY_FOR_REPLICATION.getSysId());
-		return teststring;
-	}
-
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#notifySugarForIngestionFailure(java.lang.String)
-	 */
-	@Override
-	public String notifySugarForIngestionFailure(String recordId) {
-		String teststring = "Notify Sugar For Ingestion Failure";
-		
-		alterSugarCRMItemStatus(recordId, DatasetStates.DISABLED_AND_REPLACED.getSysId());
-		return teststring;
-	}
-	
 
 
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#showConnectionStatus()
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#showConnectionStatus()
 	 */
 	@Override
 	public ConnectionStatus showConnectionStatus() {
@@ -162,35 +91,131 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 
 		return cstatus;
 	}
-
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateSession()
+	 */
+	@Override
+	public String updateSession(String username, String password) throws LoginFailureException {
+		StringBuffer connectionInfo = new StringBuffer();
+		Login login = ClientUtils.createStandardLoginObject(username, password);
+        connectionInfo.append(sugarwsClient.login(login));
+		return connectionInfo.toString();
+	}
+ 
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#changeEntryStatus(java.lang.String, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates)
+	 */
+	@Override
+	public void changeEntryStatus(String recordId, DatasetStates state)
+			throws QueryResultException {
+		alterSugarCRMItemStatus(recordId, state.getSysId());
+	}
 
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#showAvailableModules()
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateRecordData(java.lang.String, java.util.HashMap)
 	 */
 	@Override
-	public GetAvailableModulesResponse showAvailableModules() {
-		GetAvailableModules request = new GetAvailableModules();
-		request.setSession(sugarwsClient.getSessionID());
-		GetAvailableModulesResponse response =  sugarwsClient.get_available_modules(request);
+	public void updateRecordData(String recordID,
+			HashMap<UpdatableField, String> values) throws QueryResultException {
 
-		return response;
+		SetEntry request = new SetEntry();
+		ArrayList <NameValue> nvList = new  ArrayList <NameValue>();
+		Iterator<?> it = values.entrySet().iterator();
+
+	    while (it.hasNext()) {
+	        Map.Entry<UpdatableField, String> pairs = (Map.Entry<UpdatableField, String>)it.next();
+			NameValue nv = new NameValue();
+			nv.setName(pairs.getKey().getFieldId());
+			nv.setValue(pairs.getValue());
+
+			nvList.add(nv);
+	    }
+	    
+		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
+		
+		request.setNameValueList(valueList);
+		request.setModuleName("Opportunities");
+		request.setSession(sugarwsClient.getSessionID());	
+		
+		sugarwsClient.set_entry(request);		
 	}
 
-
-
+	
+	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMAgent#showModuleFields(java.lang.String)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateRecordData(eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord)
 	 */
 	@Override
-	public GetModuleFieldsResponse showModuleFields(String module) {
+	public void updateRecordData(SugarCrmRecord record) throws QueryResultException {
+		HashMap<UpdatableField, String> values = new HashMap<UpdatableField, String>();
+		
+		String recordId = record.getItemValue(RetrievableField.ID);
 
-		GetModuleFields request = new GetModuleFields();
+		values.put(UpdatableField.AMOUNT, record.getItemValue(UpdatableField.AMOUNT));
+		values.put(UpdatableField.INGESTED_IMAGE, record.getItemValue(UpdatableField.INGESTED_IMAGE));
+		values.put(UpdatableField.INGESTED_SOUND, record.getItemValue(UpdatableField.INGESTED_SOUND));
+		values.put(UpdatableField.INGESTED_TEXT, record.getItemValue(UpdatableField.INGESTED_TEXT));
+		values.put(UpdatableField.INGESTED_VIDEO, record.getItemValue(UpdatableField.INGESTED_VIDEO));
+		values.put(UpdatableField.NEXT_STEP, record.getItemValue(UpdatableField.NEXT_STEP));
+		values.put(UpdatableField.TOTAL_INGESTED, record.getItemValue(UpdatableField.TOTAL_INGESTED));
+
+		updateRecordData(recordId,values);
+	}
+	
+	
+	
+	@Override
+	public List<SugarCrmRecord> retrieveRecords(SugarCrmQuery query)
+			throws QueryResultException {
+		
+		GetEntryList request = new GetEntryList();
+		
+		SelectFields fields = new SelectFields(); //We want to retrieve all fields
+		request.setSelectFields(fields); 
+  		request.setModuleName("Opportunities");	
 		request.setSession(sugarwsClient.getSessionID());
-		request.setModuleName(module);		
-		GetModuleFieldsResponse response =  sugarwsClient.get_module_fields(request);
+		request.setOrderBy(query.getOrderBy().getFieldId());
+		request.setMaxResults(query.getMaxResults());
+		request.setOffset(query.getOffset());
+		
+		request.setQuery(query.toString());
 
-		return response;
+		GetEntryListResponse response =  sugarwsClient.get_entry_list(request);
+
+		ArrayList<Element> list = (ArrayList<Element>) response.getReturn().getEntryList().getArray().getAnyList();
+
+		ArrayList<SugarCrmRecord> returnList = wrapDomElements2Objects(list);
+
+		return returnList;
+	}
+	
+	
+	@Override
+	public void initiateWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException {
+
+			StorageEngine<?> engine = registry.getStorage();
+			Workflow w = registry.getWorkflow(worklfowName);
+			
+			Collection<?> dataset = inferCollection(engine,record.getRecord());
+			
+			ActiveExecution<?> execution = orchestrator.executeWorkflow(w, dataset);
+			alterSugarCRMItemStatus(dataset.getMnemonic(), endstate.getSysId());	
+		
+			execution.waitUntilFinished();			
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#pollForHarvestInitiators()
+	 */
+	@Override
+	public void pollForHarvestInitiators() throws QueryResultException {
+
 	}
 	
 	
@@ -198,39 +223,25 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	 * Private methods
 	 */
 	
-	
 	/**
-	 * @param triggers
+	 * @param list
+	 * @return
 	 */
-	private void initiateWorkflowsFromTriggers(GetEntryListResponse triggers){
-				
-		StorageEngine<?> engine = registry.getStorage();
-		Workflow w = registry.getWorkflow("SysoutWorkflow");
+	private ArrayList<SugarCrmRecord>  wrapDomElements2Objects(ArrayList<Element> list){
 		
-		if(triggers.getReturn().getEntryList().getArray() != null){
+		ArrayList<SugarCrmRecord> returnList = new ArrayList<SugarCrmRecord>();
+		
+		for (int i=0; i < list.size(); i++){
 			
-		List<Element> anyList = triggers.getReturn().getEntryList().getArray().getAnyList();
-		
-		Iterator<Element> it = anyList.iterator();
-		
-		
-		while (it.hasNext()){	
-			try {
-				Collection<?> dataset = inferCollection(engine,it.next());
-				ActiveExecution<?> execution = orchestrator.executeWorkflow(w, dataset);
-				alterSugarCRMItemStatus(dataset.getMnemonic(), DatasetStates.MAPPING_AND_NORMALIZATION.getSysId());	
-			
-				execution.waitUntilFinished();	
-			} catch (StorageEngineException e) {
-				e.printStackTrace();
-
-			}	
+			SugarCrmRecord record = SugarCrmRecord.getInstance(list.get(i));
+			returnList.add(record);
 		}
-	   }
+		
+		return returnList;
 	}
 	
 	
-	
+
 	/**
 	 * @param engine
 	 * @param trigger
@@ -282,6 +293,12 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	}
 	
 	
+	
+	/**
+	 * @param value
+	 * @param el
+	 * @return
+	 */
 	private String extractFromElement(String value, Element el){
 		
 		NodeList nl =el.getElementsByTagName(value);
@@ -299,8 +316,9 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	/**
 	 * @param id
 	 * @param status
+	 * @throws QueryResultException 
 	 */
-	private void alterSugarCRMItemStatus(String id, String status){
+	private void alterSugarCRMItemStatus(String id, String status) throws QueryResultException{
 		SetEntry request = new SetEntry();
 		
 		
@@ -329,6 +347,7 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	}
 	
 	
+
 	
 	
 	/*
@@ -367,6 +386,36 @@ public class SugarCRMAgentImpl implements SugarCRMAgent{
 	public Registry getRegistry() {
 		return registry;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
