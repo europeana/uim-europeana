@@ -34,6 +34,7 @@ import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LougoutFailureException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
 
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
@@ -161,10 +162,17 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testIsUserAdmin(){	
 		IsUserAdmin user = new IsUserAdmin();		
-		user.setSession(sessionID);		
-		IsUserAdminResponse response = sugarWsClient.is_user_admin(user);
-		assertNotNull(response);
-		ClientUtils.logMarshalledObject(response);
+		user.setSession(sessionID);
+		
+		IsUserAdminResponse response;
+		try {
+			response = sugarWsClient.is_user_admin(user);
+			assertNotNull(response);
+			ClientUtils.logMarshalledObject(response);
+		} catch (GenericSugarCRMException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	
@@ -176,9 +184,15 @@ public final class SugarCRMWSTest {
 		GetUserId request = new GetUserId();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
-		GetUserIdResponse response =  sugarWsClient.get_user_id(request);
-		assertNotNull(response);
-		ClientUtils.logMarshalledObject(response);
+		GetUserIdResponse response;
+		try {
+			response = sugarWsClient.get_user_id(request);
+			assertNotNull(response);
+			ClientUtils.logMarshalledObject(response);
+		} catch (GenericSugarCRMException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	
@@ -190,9 +204,15 @@ public final class SugarCRMWSTest {
 		GetAvailableModules request = new GetAvailableModules();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
-		GetAvailableModulesResponse response =  sugarWsClient.get_available_modules(request);
-		assertNotNull(response);
-		ClientUtils.logMarshalledObject(response);
+		GetAvailableModulesResponse response;
+		try {
+			response = sugarWsClient.get_available_modules(request);
+			assertNotNull(response);
+			ClientUtils.logMarshalledObject(response);
+		} catch (QueryResultException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	
@@ -206,9 +226,15 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);
 		request.setModuleName("Contacts");
 		ClientUtils.logMarshalledObject(request);
-		GetModuleFieldsResponse response =  sugarWsClient.get_module_fields(request);
-		assertNotNull(response);		
-		ClientUtils.logMarshalledObject(response);
+		GetModuleFieldsResponse response;
+		try {
+			response = sugarWsClient.get_module_fields(request);
+			assertNotNull(response);		
+			ClientUtils.logMarshalledObject(response);
+		} catch (QueryResultException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	
@@ -241,9 +267,15 @@ public final class SugarCRMWSTest {
 		request.setQuery("(contacts.first_name LIKE '%M%')");
 		
 		ClientUtils.logMarshalledObject(request);
-		GetEntryListResponse response =  sugarWsClient.get_entry_list(request);
-		assertNotNull(response);
-		ClientUtils.logMarshalledObject(response);
+		GetEntryListResponse response;
+		try {
+			response = sugarWsClient.get_entry_list(request);
+			assertNotNull(response);
+			ClientUtils.logMarshalledObject(response);
+		} catch (QueryResultException e) {
+			e.printStackTrace();
+		}
+
 		
 	}
 	
@@ -265,8 +297,14 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);
 		request.setIds(fields);
 		ClientUtils.logMarshalledObject(request);
-		GetEntriesResponse response =  sugarWsClient.get_entries(request);
-		ClientUtils.logMarshalledObject(response);
+		GetEntriesResponse response;
+		try {
+			response = sugarWsClient.get_entries(request);
+			ClientUtils.logMarshalledObject(response);
+		} catch (QueryResultException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	
@@ -283,9 +321,13 @@ public final class SugarCRMWSTest {
 		SelectFields selectFields = new SelectFields();
 		request.setSelectFields(selectFields );
 		ClientUtils.logMarshalledObject(request);
-		GetEntryResponse response =  sugarWsClient.get_entry(request);
-		ClientUtils.logMarshalledObject(response);
-				
+		GetEntryResponse response;
+		try {
+			response = sugarWsClient.get_entry(request);
+			ClientUtils.logMarshalledObject(response);
+		} catch (QueryResultException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -316,17 +358,20 @@ public final class SugarCRMWSTest {
 		nvList.add(nv0);
 		nvList.add(nv2);
 		
-		
 		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
-
-		//valueList.setId("99f37146-8e19-473d-171c-4d66de7024c0");
 		
 		request.setNameValueList(valueList);
 		request.setModuleName("Contacts");
 		request.setSession(sessionID);	
 		ClientUtils.logMarshalledObject(request);
-		SetEntryResponse response =  sugarWsClient.set_entry(request);
-		ClientUtils.logMarshalledObject(response);
+		SetEntryResponse response;
+		try {
+			response = sugarWsClient.set_entry(request);
+			ClientUtils.logMarshalledObject(response);
+		} catch (QueryResultException e) {
+			e.printStackTrace();
+		}
+
 				
 	}
 	
