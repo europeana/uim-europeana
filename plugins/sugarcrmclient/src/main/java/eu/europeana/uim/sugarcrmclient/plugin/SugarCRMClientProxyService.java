@@ -48,7 +48,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.LougoutFailureException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.LogoutFailureException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
 
 /**
@@ -89,7 +89,7 @@ public interface SugarCRMClientProxyService {
 	 * @throws LogoutFailureException when logout fails
 	 * @throws GenericSugarCRMException
 	 */
-	public LogoutResponse logout(Logout request) throws LougoutFailureException;
+	public LogoutResponse logout(Logout request) throws LogoutFailureException;
 	
 	/**
 	 * This method returns an object indicating that the current user has admin privileges or not.
@@ -162,13 +162,6 @@ public interface SugarCRMClientProxyService {
 	 */
 	public GetEntriesResponse get_entries(GetEntries request) throws QueryResultException;
 	
-	/**
-	 * Contacts a user directly via e-mail
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public ContactByEmailResponse contact_by_email(ContactByEmail request);
 	
 	/**
 	 * Sets a note attachment to a record

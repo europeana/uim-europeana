@@ -31,9 +31,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.FileAttachmentException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.LougoutFailureException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.LogoutFailureException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
 
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
@@ -53,9 +54,12 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.Logout;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.LogoutResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.NoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.UserAuth;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
@@ -82,6 +86,8 @@ public final class SugarCRMWSTest {
 	private String sessionID;
 
 
+
+
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMWSTest.class);
 	
@@ -102,9 +108,7 @@ public final class SugarCRMWSTest {
 		} catch (LoginFailureException e) {
 			sessionID = "-1";
 			LOGGER.info(e.getMessage());
-		} catch (GenericSugarCRMException e) {
-			e.printStackTrace();
-		}
+		} 
 		
 	}
 	
@@ -121,7 +125,7 @@ public final class SugarCRMWSTest {
 		try {
 			lgresponse = sugarWsClient.logout(request );
 			assertNotNull(lgresponse);
-		} catch (LougoutFailureException e) {
+		} catch (LogoutFailureException e) {
 			e.printStackTrace();
 		} catch (GenericSugarCRMException e) {
 			e.printStackTrace();
@@ -375,6 +379,33 @@ public final class SugarCRMWSTest {
 				
 	}
 	
+	/**
+	 * Set Attachment Test: Create an attachment for a specific entry 
+	 * 
+	 */
+	@Test
+	public void testSetAttachment(){
+		
+		SetNoteAttachment request = new SetNoteAttachment();
+	    NoteAttachment note = new NoteAttachment();
+	    
+	    note.setId("1c3a03dd-753b-7741-92e8-4d6509d442d3");
+	    note.setFile("asdasdsadsadsadsad");
+	    note.setFilename("test.txt");
+	    
+		request.setNote(note);
+		request.setSession(sugarWsClient.getSessionID());
+		ClientUtils.logMarshalledObject(request);
+		SetNoteAttachmentResponse resp;
+		try {
+			resp = sugarWsClient.set_note_attachment(request );
+			ClientUtils.logMarshalledObject(resp);
+		} catch (FileAttachmentException e) {
+
+			e.printStackTrace();
+		}
+
+	}
 	
 	
 		

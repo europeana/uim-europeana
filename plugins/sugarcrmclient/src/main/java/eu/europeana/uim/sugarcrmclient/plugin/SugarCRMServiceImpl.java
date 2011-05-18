@@ -23,6 +23,7 @@ package eu.europeana.uim.sugarcrmclient.plugin;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -38,20 +39,26 @@ import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 
+import eu.europeana.uim.sugarcrmclient.jibxbindings.ContactByEmail;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.NoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.FileAttachmentException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
@@ -74,7 +81,9 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	private SugarWsClient sugarwsClient;
 	private Orchestrator orchestrator;
 	private Registry registry;
+	private List<PollingListener> pollingListeners;
 	
+	private static final String DSMODULENAME = "Opportunities";
 	
 
 
@@ -170,6 +179,42 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	
 	
 	@Override
+	public SugarCrmRecord retrieveRecord(String id) throws QueryResultException {
+		GetEntryList request = new GetEntryList();
+		
+		SelectFields fields = new SelectFields(); //We want to retrieve all fields
+		request.setSelectFields(fields); 
+  		request.setModuleName(DSMODULENAME);	
+		request.setSession(sugarwsClient.getSessionID());
+		request.setOrderBy(RetrievableField.DATE_ENTERED.getFieldId());
+		request.setMaxResults(1);
+		request.setOffset(0);
+		
+		request.setQuery("(opportunities.id LIKE '" + id +"')");
+
+		GetEntryListResponse response =  sugarwsClient.get_entry_list(request);
+
+		ArrayList<Element> list = (ArrayList<Element>) response.getReturn().getEntryList().getArray().getAnyList();
+
+		Element record = list.get(0);
+			
+		if (record != null){
+			
+			return SugarCrmRecord.getInstance(record);
+		}
+		else
+		{
+			return null;
+		}
+
+	}
+	
+	
+
+
+	
+	
+	@Override
 	public List<SugarCrmRecord> retrieveRecords(SugarCrmQuery query)
 			throws QueryResultException {
 		
@@ -177,7 +222,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		
 		SelectFields fields = new SelectFields(); //We want to retrieve all fields
 		request.setSelectFields(fields); 
-  		request.setModuleName("Opportunities");	
+  		request.setModuleName(DSMODULENAME);	
 		request.setSession(sugarwsClient.getSessionID());
 		request.setOrderBy(query.getOrderBy().getFieldId());
 		request.setMaxResults(query.getMaxResults());
@@ -196,7 +241,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	
 	
 	@Override
-	public void initiateWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException {
+	public void initWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException {
 
 			StorageEngine<?> engine = registry.getStorage();
 			Workflow w = registry.getWorkflow(worklfowName);
@@ -210,12 +255,137 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#pollForHarvestInitiators()
-	 */
-	@Override
-	public void pollForHarvestInitiators() throws QueryResultException {
+	
 
+
+	@Override
+	public void initWorkflowsFromRecords(String worklfowName,
+			DatasetStates currentstate, DatasetStates endstate)
+			throws QueryResultException, StorageEngineException {
+
+
+		SimpleSugarCrmQuery query = new SimpleSugarCrmQuery();
+		
+		List<SugarCrmRecord> relevantRecords = retrieveRecords(query);
+		
+		for(SugarCrmRecord record : relevantRecords){
+			initWorkflowFromRecord(worklfowName,record,endstate);
+		}
+		
+	}
+
+
+	@Override
+	public Provider<?> createProviderFromRecord(SugarCrmRecord record)
+			throws StorageEngineException {
+		
+		StorageEngine<?> engine = registry.getStorage();
+		
+	    String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
+	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
+	    String providerAcronymName = record.getItemValue(RetrievableField.ACRONYM); //"name_acronym_c"
+	    String mnemonicCode = record.getItemValue(RetrievableField.ID);  //"id"
+	    String countryCode = record.getItemValue(RetrievableField.COUNTRY); //"country_c"
+	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
+	    
+	    Provider cuurprovider = engine.findProvider(mnemonicCode);
+	    
+        if (cuurprovider == null){
+
+        	cuurprovider = engine.createProvider();
+        	cuurprovider.setAggregator(false);
+        	cuurprovider.setMnemonic(mnemonicCode);
+        	cuurprovider.setName(providerName);
+        	cuurprovider.setOaiBaseUrl(harvestUrl);
+        	cuurprovider.setOaiMetadataPrefix("?");
+   
+        	
+        	engine.updateProvider(cuurprovider);
+        	engine.checkpoint();
+        }
+        
+        return cuurprovider;
+	}
+
+
+	@Override
+	public Collection<?> createCollectionFromRecord(SugarCrmRecord record,
+			Provider provider) throws StorageEngineException {
+		
+		StorageEngine<?> engine = registry.getStorage();
+		
+	    String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
+	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
+	    String providerAcronymName = record.getItemValue(RetrievableField.ACRONYM); //"name_acronym_c"
+	    String mnemonicCode = record.getItemValue(RetrievableField.ID);  //"id"
+	    String countryCode = record.getItemValue(RetrievableField.COUNTRY); //"country_c"
+	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
+	    
+	    Collection currcollection = engine.findCollection(mnemonicCode);
+	    
+        if(currcollection == null){
+        	
+        	currcollection = engine.createCollection(provider);
+        	currcollection.setLanguage(countryCode);
+        	currcollection.setMnemonic(mnemonicCode);
+        	currcollection.setName(collectionName);
+        	currcollection.setOaiBaseUrl(harvestUrl);
+        	currcollection.setOaiMetadataPrefix("?");
+        	
+			engine.updateCollection(currcollection);
+			engine.checkpoint();
+        }
+		
+	    return currcollection;	
+	}
+
+
+	@Override
+	public void addNoteAttachmentToRecord(String recordId, String message)
+			throws FileAttachmentException {
+		SetNoteAttachment request = new SetNoteAttachment();
+	    NoteAttachment note = new NoteAttachment();
+	    
+	    note.setId(recordId);
+	    note.setFile(message);
+	    
+	    Date date = new Date();
+	    
+	    note.setFilename(date.toString() + ".txt");
+	    
+		request.setNote(note);
+		request.setSession(sugarwsClient.getSessionID());
+		ClientUtils.logMarshalledObject(request);
+		SetNoteAttachmentResponse resp;
+		
+	}
+
+	
+	@Override
+	public void addPollingListener(PollingListener listener) {
+		this.pollingListeners.add(listener);
+		
+	}
+
+
+	@Override
+	public void removePollingListener(PollingListener listener) {
+		this.pollingListeners.remove(listener);
+		
+	}
+
+
+	@Override
+	public List<PollingListener> getPollingListeners() {
+		
+		return this.pollingListeners;
+	}
+
+
+	@Override
+	public void setPollingListeners(List<PollingListener> listeners) {
+		this.pollingListeners = listeners;
+		
 	}
 	
 	
@@ -265,7 +435,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
             if (cuurprovider == null){
 
             	cuurprovider = engine.createProvider();
-            	cuurprovider.setAggregator(true);
+            	cuurprovider.setAggregator(false);
             	cuurprovider.setMnemonic(mnemonicCode);
             	cuurprovider.setName(providerName);
             	cuurprovider.setOaiBaseUrl(harvestUrl);
@@ -338,7 +508,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
 		
 		request.setNameValueList(valueList);
-		request.setModuleName("Opportunities");
+		request.setModuleName(DSMODULENAME);
 		request.setSession(sugarwsClient.getSessionID());	
 		
 		SetEntryResponse response =  sugarwsClient.set_entry(request);
@@ -386,41 +556,6 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	public Registry getRegistry() {
 		return registry;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

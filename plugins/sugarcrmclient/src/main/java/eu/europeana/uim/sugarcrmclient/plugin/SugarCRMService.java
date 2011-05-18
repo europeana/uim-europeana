@@ -29,16 +29,20 @@ import org.w3c.dom.Element;
 
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.FileAttachmentException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
 
@@ -99,20 +103,59 @@ public interface SugarCRMService {
 	 */
 	public List<SugarCrmRecord> retrieveRecords(SugarCrmQuery query) throws QueryResultException;
 	
+	/**
+	 * @param query
+	 * @return
+	 * @throws QueryResultException
+	 */
+	public SugarCrmRecord retrieveRecord(String id) throws QueryResultException;
+	
 	
 	/**
 	 * @param worklfowName
 	 * @param record
 	 */
-	public void initiateWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException;
+	public void initWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException;
 	
+	
+	/**
+	 * @param worklfowName
+	 * @param record
+	 */
+	public void initWorkflowsFromRecords(String worklfowName,DatasetStates currentstate,DatasetStates endstate) throws QueryResultException,StorageEngineException;
+	
+	
+	/**
+	 * @param record
+	 * @return
+	 * @throws StorageEngineException
+	 */
+	public Provider<?> createProviderFromRecord(SugarCrmRecord record) throws StorageEngineException;
 	
 
 	/**
+	 * @param record
+	 * @param provider
 	 * @return
-	 * @throws QueryResultException
+	 * @throws StorageEngineException
 	 */
-	public void  pollForHarvestInitiators() throws QueryResultException;
+	public Collection<?> createCollectionFromRecord(SugarCrmRecord record,Provider<?> provider) throws StorageEngineException;
 	
-
+	
+	/**
+	 * @param recordId
+	 * @param message
+	 * @throws FileAttachmentException
+	 */
+	public void addNoteAttachmentToRecord(String recordId,String message) throws FileAttachmentException;
+	
+	
+	public void addPollingListener(PollingListener listener);
+	
+	public void removePollingListener(PollingListener listener);
+	
+	
+	public List<PollingListener> getPollingListeners();
+	
+	public void setPollingListeners(List<PollingListener> listeners);
 }

@@ -165,7 +165,7 @@ public class SugarWsClient {
 	 * @throws LogoutFailureException when logout fails
 	 * @throws GenericSugarCRMException
 	 */
-	public LogoutResponse logout(Logout request) throws LougoutFailureException{
+	public LogoutResponse logout(Logout request) throws LogoutFailureException{
 
 		LogoutResponse response =  invokeWSTemplate(request,LogoutResponse.class);
 		
@@ -173,7 +173,7 @@ public class SugarWsClient {
 		
 		if (!"0".equals(returnvalue)){
 			
-			throw new LougoutFailureException(response.getReturn().getDescription());
+			throw new LogoutFailureException(response.getReturn().getDescription());
 		}
 		return response;
 	}
@@ -338,7 +338,7 @@ public class SugarWsClient {
 	 * @param request
 	 * @return
 	 */
-	public ContactByEmailResponse contact_by_email(ContactByEmail request){
+	public ContactByEmailResponse contact_by_email(ContactByEmail request) throws FileAttachmentException{
 		
 		ContactByEmailResponse response = invokeWSTemplate(request,ContactByEmailResponse.class);
 		
@@ -353,10 +353,14 @@ public class SugarWsClient {
 	 * @param request
 	 * @return
 	 */
-	public SetNoteAttachmentResponse set_note_attachment(SetNoteAttachment request){
+	public SetNoteAttachmentResponse set_note_attachment(SetNoteAttachment request) throws FileAttachmentException{
 		
 		SetNoteAttachmentResponse response = invokeWSTemplate(request,SetNoteAttachmentResponse.class);
 	
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new FileAttachmentException(response.getReturn().getError());
+		}
+		
 		return response;
 	}
 	
@@ -368,9 +372,13 @@ public class SugarWsClient {
 	 * @param request
 	 * @return
 	 */
-	public GetNoteAttachmentResponse get_note_attachment(GetNoteAttachment request){
+	public GetNoteAttachmentResponse get_note_attachment(GetNoteAttachment request) throws FileAttachmentException{
 		
 		GetNoteAttachmentResponse response = invokeWSTemplate(request,GetNoteAttachmentResponse.class);
+		
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new FileAttachmentException(response.getReturn().getError());
+		}
 		
 		return response;
 	}

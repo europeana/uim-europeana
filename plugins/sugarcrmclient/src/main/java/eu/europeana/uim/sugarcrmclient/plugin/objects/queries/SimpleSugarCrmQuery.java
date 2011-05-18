@@ -84,4 +84,18 @@ public class SimpleSugarCrmQuery implements SugarCrmQuery{
 	public int getOffset() {
 		return offset;
 	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(DatasetStates status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public DatasetStates getStatus() {
+		return status;
+	}
 }

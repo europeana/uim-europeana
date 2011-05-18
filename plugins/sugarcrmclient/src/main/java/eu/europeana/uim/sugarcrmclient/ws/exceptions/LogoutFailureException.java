@@ -10,7 +10,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.ErrorValue;
  * 
  * @author Georgios Markakis
  */
-public class LougoutFailureException extends GenericSugarCRMException {
+public class LogoutFailureException extends GenericSugarCRMException {
 
 	private static final long serialVersionUID = 1L;
 
@@ -18,7 +18,7 @@ public class LougoutFailureException extends GenericSugarCRMException {
 	 * This constructor takes as an argument an ErrorValue object
 	 * @param err the ErrorValue message
 	 */
-	public LougoutFailureException(String err) {
+	public LogoutFailureException(String err) {
 		
 		super(err);
 
