@@ -18,6 +18,8 @@ import org.apache.felix.service.command.Function;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.clientbindings.utils.Utils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
@@ -50,6 +52,9 @@ public class SugarCrmCommand implements Function, Action {
 	@Argument(index = 1)
 	private String argument1;
 	
+	@Argument(index = 2)
+	private String argument2;
+	
 	
 	public SugarCrmCommand (SugarCRMService sugarcrmPlugin ){
 		this.sugarcrmPlugin = sugarcrmPlugin;
@@ -67,12 +72,17 @@ public class SugarCrmCommand implements Function, Action {
 	    
 		if (operation == null) {
 			out.println("Please specify an operation with the '-o' option. Possible values are:");
-			out.println("info                    \t\t\t\t provides information regarding the existing remote connection to SugarCRM");
-			out.println("updatesession           \t\t\t\t creates a new session for the client");					
-			out.println("retrieverecords         \t\t\t\t retrieves records");
-			out.println("fetchrecord             \t\t\t\t retrieves a record by id");
-			out.println("fetchrecord             \t\t\t\t retrieves a record by id");
-			out.println("initworkflowbyID            \t\t\t\t initialize a workflow ");
+			out.println("info                    \t\t\t\t connection info to Sugarcrm");
+			out.println("updatesession <username,password>          \t\t\t\t creates a new session for the client");					
+			out.println("retrieverecords <status>        \t\t\t\t retrieves records");
+			out.println("fetchrecord <recordID>            \t\t\t\t retrieves a record by id");
+			out.println("updaterecord <recordID>            \t\t\t\t retrieves a record by id");
+			out.println("changeRecordStatus <recordID,status>            \t\t\t\t retrieves a record by id");
+			out.println("initworkflowbyID  <recordID,workflowname,endstatus>            \t\t\t\t initialize a workflow ");
+			out.println("initworkflowsbyState  <workflowname,currentsate,endstate>            \t\t\t\t initialize a workflow ");
+			out.println("populateUIMfromRecord <recordID>            \t\t\t\t retrieves a record by id");
+			out.println("addNotetoRecord <recordID,message>            \t\t\t\t retrieves a record by id");
+			
 			
 			return null;
 		}
@@ -88,7 +98,7 @@ public class SugarCrmCommand implements Function, Action {
 			break;
 
 		case retrieverecords:
-			retrieverecordsCMD(out);
+			retrieverecordsCMD(out,in);
 			break;
 		case fetchrecord:
 			String recId = assignvalue("Record ID", argument0,out,in);
@@ -98,46 +108,44 @@ public class SugarCrmCommand implements Function, Action {
 			}
 			break;
 		case updaterecord:
-			String recordID = assignvalue("Record ID", argument0,out,in);
-			String threcords = assignvalue("Total Harvested Records",out,in);
-			String himages = assignvalue("Total Harvested Images",out,in);
-			String htetx = assignvalue("Total Harvested Text",out,in);
-			String hvideo = assignvalue("Total Harvested Video",out,in);
-			String hsound = assignvalue("Total Harvested Sound",out,in);
-			
-			HashMap<UpdatableField, String> values  = new HashMap<UpdatableField, String>();
-			values.put(UpdatableField.TOTAL_INGESTED, threcords);
-			values.put(UpdatableField.INGESTED_IMAGE, himages);
-			values.put(UpdatableField.INGESTED_TEXT, htetx);			
-			values.put(UpdatableField.INGESTED_VIDEO, hvideo);
-			values.put(UpdatableField.INGESTED_SOUND, hsound);
-			
-			sugarcrmPlugin.updateRecordData(recordID, values);
+			updaterecordCMD(out,in); 
 			break;
 		case changeRecordStatus:
-			if(argument0!=null)
-			{	
-			    //out.println(sugarcrmPlugin.notifySugarForIngestionSuccess(argument0));
-			}
-			else
-			{
-				out.println("Please define the module id");
-			}
+			String chrecID = assignvalue("Record ID", argument0,out,in);
+			DatasetStates chstate = assigndatastate(argument2,out,in); 
+			sugarcrmPlugin.changeEntryStatus(chrecID, chstate);
 			break;	
 		case initworkflowbyID:
-			String worklfowName = "asd";
-			SugarCrmRecord record = null;
-			DatasetStates endstate = DatasetStates.MAPPING_AND_NORMALIZATION;
+			String recID = assignvalue("Record ID", argument0,out,in);
+			String worklfowName = assignvalue("Workflow Name", argument1,out,in);
+			SugarCrmRecord record = sugarcrmPlugin.retrieveRecord(recID);
+			DatasetStates endstate = assigndatastate(argument2,out,in); 
 			sugarcrmPlugin.initWorkflowFromRecord(worklfowName, record, endstate);			
 			break;
 		case initworkflowsbyState:
-		
+			String wfname = assignvalue("Record ID", argument0,out,in);
+			DatasetStates currentstate = assigndatastate(argument1,out,in); 
+			DatasetStates ndstate = assigndatastate(argument2,out,in); 
+			sugarcrmPlugin.initWorkflowsFromRecords(wfname, currentstate, ndstate);
 			break;
 		case populateUIMfromRecord:
-			
+			String poprecID = assignvalue("Record ID", argument0,out,in);
+			SugarCrmRecord re = sugarcrmPlugin.retrieveRecord(poprecID);
+			if(re != null)
+			{
+				Provider prov = sugarcrmPlugin.createProviderFromRecord(re);
+				Collection coll = sugarcrmPlugin.createCollectionFromRecord(re, prov);
+				
+				out.println("Provider/Collection created successfully");
+			}
+			else{
+				out.println("Invalid Record Id");
+			}			
 			break;
 		case addNotetoRecord:
-			
+			String noterecID = assignvalue("Record ID", argument0,out,in);
+			String contents = assignvalue("Message Contents", argument0,out,in);
+			sugarcrmPlugin.addNoteAttachmentToRecord(noterecID, contents);
 			break;
 		case addpollinglistener:
 			
@@ -166,12 +174,13 @@ public class SugarCrmCommand implements Function, Action {
 	
 	
 	
-	private void retrieverecordsCMD(PrintStream out) throws QueryResultException{
+	private void retrieverecordsCMD(PrintStream out,BufferedReader in) throws QueryResultException, IOException{
+		DatasetStates status = assigndatastate(argument0,out,in);
 		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery();
 		query.setMaxResults(1000);
 		query.setOffset(0);
 		query.setOrderBy(RetrievableField.DATE_ENTERED);
-		query.setStatus(DatasetStates.MAPPING_AND_NORMALIZATION);
+		query.setStatus(status);
 		List<SugarCrmRecord> records = sugarcrmPlugin.retrieveRecords(query);
 		out.println("Number of Records retrieved: " + records.size());
 		out.println("NO | RECORD ID");
@@ -181,6 +190,26 @@ public class SugarCrmCommand implements Function, Action {
 		}
 	}
 	
+	
+	private void updaterecordCMD(PrintStream out,BufferedReader in  ) throws IOException, QueryResultException{
+		String recordID = assignvalue("Record ID", argument0,out,in);
+		String threcords = assignvalue("Total Harvested Records",out,in);
+		String himages = assignvalue("Total Harvested Images",out,in);
+		String htetx = assignvalue("Total Harvested Text",out,in);
+		String hvideo = assignvalue("Total Harvested Video",out,in);
+		String hsound = assignvalue("Total Harvested Sound",out,in);
+		
+		HashMap<UpdatableField, String> values  = new HashMap<UpdatableField, String>();
+		values.put(UpdatableField.TOTAL_INGESTED, threcords);
+		values.put(UpdatableField.INGESTED_IMAGE, himages);
+		values.put(UpdatableField.INGESTED_TEXT, htetx);			
+		values.put(UpdatableField.INGESTED_VIDEO, hvideo);
+		values.put(UpdatableField.INGESTED_SOUND, hsound);
+		
+		sugarcrmPlugin.updateRecordData(recordID, values);
+	}
+	
+	
 	private String assignvalue(String description,String argument,PrintStream out,BufferedReader in ) throws IOException{
 		String retval = null;
 		
@@ -188,7 +217,7 @@ public class SugarCrmCommand implements Function, Action {
 			return argument;
 		}
 		else{	
-			while(retval!= null){
+			while(retval== null){
 			    out.println("Please enter the"+ description +":");
 			    retval = in.readLine();
 			}		
@@ -196,10 +225,50 @@ public class SugarCrmCommand implements Function, Action {
 		}
 	}
 	
+	
+	private DatasetStates assigndatastate(String argument,PrintStream out,BufferedReader in ) throws IOException{
+		DatasetStates retval = null;
+		
+		if (argument != null){
+
+			retval =  extractDSfromString(argument,out);
+
+		}
+		if (retval == null){
+			while(retval== null){
+			    out.println("Please enter the DataState:");
+			    retval = extractDSfromString(in.readLine(),out);
+			}		
+		}
+		return retval;
+	}
+	
+	private DatasetStates extractDSfromString(String argument,PrintStream out){
+		try
+        {
+            return DatasetStates.valueOf(argument);
+        }
+        catch(IllegalArgumentException ex)
+        {
+        	out.println("Please select one of the following:");
+        	
+        	DatasetStates[] values = DatasetStates.values();
+
+        	for(int i=0;i<values.length;i++){
+
+        		out.println(values[i].toString());
+        	}
+        	
+        	out.println(DatasetStates.values());
+        	
+        	return null;
+        }
+	}
+	
 	private String assignvalue(String description,PrintStream out,BufferedReader in ) throws IOException{
 
 		String retval = null;
-		while(retval!= null){
+		while(retval== null){
 		    out.println("Please enter the"+ description +":");
 		    retval = in.readLine();
 		}		

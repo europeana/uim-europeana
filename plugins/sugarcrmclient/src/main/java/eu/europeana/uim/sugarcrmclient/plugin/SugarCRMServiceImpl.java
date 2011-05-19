@@ -232,8 +232,15 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 
 		GetEntryListResponse response =  sugarwsClient.get_entry_list(request);
 
-		ArrayList<Element> list = (ArrayList<Element>) response.getReturn().getEntryList().getArray().getAnyList();
-
+		ArrayList<Element> list = null;
+		
+		if(response.getReturn().getEntryList().getArray() != null)
+		{
+		  list = (ArrayList<Element>) response.getReturn().getEntryList().getArray().getAnyList();
+		}
+		else{
+			list = new ArrayList<Element>();
+		}
 		ArrayList<SugarCrmRecord> returnList = wrapDomElements2Objects(list);
 
 		return returnList;
