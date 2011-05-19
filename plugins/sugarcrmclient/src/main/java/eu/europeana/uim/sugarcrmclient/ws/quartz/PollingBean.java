@@ -31,6 +31,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMServiceImpl;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
@@ -74,7 +75,9 @@ public class PollingBean extends QuartzJobBean {
 					SimpleSugarCrmQuery query = new SimpleSugarCrmQuery();
 					
 					query.setStatus(listener.getTrigger());
-					
+					query.setMaxResults(100);
+					query.setOffset(0);
+					query.setOrderBy(RetrievableField.DATE_ENTERED);
 					try {
 						
 						List<SugarCrmRecord> results = sugarcrmPlugin.retrieveRecords(query);

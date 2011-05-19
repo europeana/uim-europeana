@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,9 +30,12 @@ import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
+import eu.europeana.uim.workflow.Workflow;
 
 
 @Command(name = "uim", scope = "sugaragent")
@@ -39,7 +43,8 @@ public class SugarCrmCommand implements Function, Action {
 
 	enum Operation {info,updatesession,retrieverecords,initworkflowbyID,
 		initworkflowsbyState,fetchrecord,updaterecord,
-		changeRecordStatus,populateUIMfromRecord,addNotetoRecord,addpollinglistener}
+		changeRecordStatus,populateUIMfromRecord,addNotetoRecord,
+		addpollinglistener,removepollinglisteners}
 	
 	private SugarCRMService sugarcrmPlugin;
 	
@@ -72,25 +77,28 @@ public class SugarCrmCommand implements Function, Action {
 	    
 		if (operation == null) {
 			out.println("Please specify an operation with the '-o' option. Possible values are:");
-			out.println("info                    \t\t\t\t connection info to Sugarcrm");
-			out.println("updatesession <username,password>          \t\t\t\t creates a new session for the client");					
-			out.println("retrieverecords <status>        \t\t\t\t retrieves records");
-			out.println("fetchrecord <recordID>            \t\t\t\t retrieves a record by id");
-			out.println("updaterecord <recordID>            \t\t\t\t retrieves a record by id");
-			out.println("changeRecordStatus <recordID,status>            \t\t\t\t retrieves a record by id");
-			out.println("initworkflowbyID  <recordID,workflowname,endstatus>            \t\t\t\t initialize a workflow ");
-			out.println("initworkflowsbyState  <workflowname,currentsate,endstate>            \t\t\t\t initialize a workflow ");
-			out.println("populateUIMfromRecord <recordID>            \t\t\t\t retrieves a record by id");
-			out.println("addNotetoRecord <recordID,message>            \t\t\t\t retrieves a record by id");
-			
+			out.println("info                                                       \t\t\t\t Connection info to Sugarcrm");
+			out.println("updatesession <username,password>                          \t\t\t\t Creates a new session for the client");					
+			out.println("retrieverecords <status>                                   \t\t\t\t Retrieves records by status");
+			out.println("fetchrecord <recordID>                                     \t\t\t\t Retrieves a record by id");
+			out.println("updaterecord <recordID>                                    \t\t\t\t Updates a record by id");
+			out.println("changeRecordStatus <recordID,status>                       \t\t\t\t Changes a record status by id");
+			out.println("initworkflowbyID  <recordID,workflowname,endstatus>        \t\t\t\t Initialize a workflow by id");
+			out.println("initworkflowsbyState  <workflowname,currentsate,endstate>  \t\t\t\t Initializes workflows according ot records states ");
+			out.println("populateUIMfromRecord <recordID>                           \t\t\t\t Creates Collection/Providers objects from a record");
+			out.println("addNotetoRecord <recordID,message>                         \t\t\t\t Adds a note attachment to a specific record");
+			out.println("addpollinglistener                                         \t\t\t\t Adds a sample polling listener to UIM");
+			out.println("removepollinglisteners                                     \t\t\t\t Removes all polling Listeners");
 			
 			return null;
 		}
 		
 		switch (operation) {
+		
 		case info:
 			out.println(sugarcrmPlugin.showConnectionStatus());
 			break;
+			
 		case updatesession:
 			String username = assignvalue("Username", argument0,out,in);
 			String password = assignvalue("Password", argument1,out,in);
@@ -100,6 +108,7 @@ public class SugarCrmCommand implements Function, Action {
 		case retrieverecords:
 			retrieverecordsCMD(out,in);
 			break;
+			
 		case fetchrecord:
 			String recId = assignvalue("Record ID", argument0,out,in);
 			SugarCrmRecord rec = sugarcrmPlugin.retrieveRecord(recId);
@@ -107,27 +116,34 @@ public class SugarCrmCommand implements Function, Action {
 				out.println(rec.toString());
 			}
 			break;
+			
 		case updaterecord:
 			updaterecordCMD(out,in); 
 			break;
+			
 		case changeRecordStatus:
 			String chrecID = assignvalue("Record ID", argument0,out,in);
 			DatasetStates chstate = assigndatastate(argument2,out,in); 
 			sugarcrmPlugin.changeEntryStatus(chrecID, chstate);
 			break;	
+			
 		case initworkflowbyID:
 			String recID = assignvalue("Record ID", argument0,out,in);
 			String worklfowName = assignvalue("Workflow Name", argument1,out,in);
 			SugarCrmRecord record = sugarcrmPlugin.retrieveRecord(recID);
 			DatasetStates endstate = assigndatastate(argument2,out,in); 
-			sugarcrmPlugin.initWorkflowFromRecord(worklfowName, record, endstate);			
+			sugarcrmPlugin.initWorkflowFromRecord(worklfowName, record, endstate);
+			out.println("Workflow Initialized...");
 			break;
+			
 		case initworkflowsbyState:
 			String wfname = assignvalue("Record ID", argument0,out,in);
 			DatasetStates currentstate = assigndatastate(argument1,out,in); 
 			DatasetStates ndstate = assigndatastate(argument2,out,in); 
-			sugarcrmPlugin.initWorkflowsFromRecords(wfname, currentstate, ndstate);
+			List<Workflow> wfs = sugarcrmPlugin.initWorkflowsFromRecords(wfname, currentstate, ndstate);
+			out.println(wfs.size() + " Workflows Initialized...");
 			break;
+			
 		case populateUIMfromRecord:
 			String poprecID = assignvalue("Record ID", argument0,out,in);
 			SugarCrmRecord re = sugarcrmPlugin.retrieveRecord(poprecID);
@@ -135,20 +151,42 @@ public class SugarCrmCommand implements Function, Action {
 			{
 				Provider prov = sugarcrmPlugin.createProviderFromRecord(re);
 				Collection coll = sugarcrmPlugin.createCollectionFromRecord(re, prov);
-				
 				out.println("Provider/Collection created successfully");
 			}
 			else{
 				out.println("Invalid Record Id");
 			}			
 			break;
+			
 		case addNotetoRecord:
 			String noterecID = assignvalue("Record ID", argument0,out,in);
 			String contents = assignvalue("Message Contents", argument0,out,in);
 			sugarcrmPlugin.addNoteAttachmentToRecord(noterecID, contents);
 			break;
-		case addpollinglistener:
 			
+		case addpollinglistener:
+			sugarcrmPlugin.addPollingListener(new PollingListener(){
+
+				@Override
+				public DatasetStates getTrigger() {
+					return DatasetStates.OAI_PMH_TESTING;
+				}
+
+				@Override
+				public void performAction(SugarCRMService pluginReference,
+						List<SugarCrmRecord> retrievedRecords)
+						throws GenericSugarCRMException {
+					System.out.println("Invoking Poller...");
+					
+				}
+				
+			});
+			out.println("PollingListener Added");
+			break;
+		case removepollinglisteners:
+			ArrayList<PollingListener> listeners = new ArrayList<PollingListener>();
+			sugarcrmPlugin.setPollingListeners(listeners);
+			System.out.println("Pollers Removed");
 			break;
 		default:
 			out.println("Unknown Command...");
@@ -174,6 +212,12 @@ public class SugarCrmCommand implements Function, Action {
 	
 	
 	
+	/**
+	 * @param out
+	 * @param in
+	 * @throws QueryResultException
+	 * @throws IOException
+	 */
 	private void retrieverecordsCMD(PrintStream out,BufferedReader in) throws QueryResultException, IOException{
 		DatasetStates status = assigndatastate(argument0,out,in);
 		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery();
@@ -183,14 +227,22 @@ public class SugarCrmCommand implements Function, Action {
 		query.setStatus(status);
 		List<SugarCrmRecord> records = sugarcrmPlugin.retrieveRecords(query);
 		out.println("Number of Records retrieved: " + records.size());
-		out.println("NO | RECORD ID");
+		out.println("NO | RECORD ID                          | COLLECTION NAME");
 
 		for(int i=0; i< records.size(); i++){
-			out.println( i + "  :       " + records.get(i).getItemValue(RetrievableField.ID));
+			out.println( (i+1) + " : " + records.get(i).getItemValue(RetrievableField.ID) + " | " +
+					records.get(i).getItemValue(RetrievableField.NAME)	) ;
 		}
 	}
 	
 	
+	
+	/**
+	 * @param out
+	 * @param in
+	 * @throws IOException
+	 * @throws QueryResultException
+	 */
 	private void updaterecordCMD(PrintStream out,BufferedReader in  ) throws IOException, QueryResultException{
 		String recordID = assignvalue("Record ID", argument0,out,in);
 		String threcords = assignvalue("Total Harvested Records",out,in);
@@ -210,9 +262,18 @@ public class SugarCrmCommand implements Function, Action {
 	}
 	
 	
+	
+	
+	/**
+	 * @param description
+	 * @param argument
+	 * @param out
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
 	private String assignvalue(String description,String argument,PrintStream out,BufferedReader in ) throws IOException{
 		String retval = null;
-		
 		if (argument != null){
 			return argument;
 		}
@@ -226,6 +287,15 @@ public class SugarCrmCommand implements Function, Action {
 	}
 	
 	
+	
+	
+	/**
+	 * @param argument
+	 * @param out
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
 	private DatasetStates assigndatastate(String argument,PrintStream out,BufferedReader in ) throws IOException{
 		DatasetStates retval = null;
 		
@@ -243,6 +313,13 @@ public class SugarCrmCommand implements Function, Action {
 		return retval;
 	}
 	
+	
+	
+	/**
+	 * @param argument
+	 * @param out
+	 * @return
+	 */
 	private DatasetStates extractDSfromString(String argument,PrintStream out){
 		try
         {
@@ -265,6 +342,15 @@ public class SugarCrmCommand implements Function, Action {
         }
 	}
 	
+	
+	
+	/**
+	 * @param description
+	 * @param out
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
 	private String assignvalue(String description,PrintStream out,BufferedReader in ) throws IOException{
 
 		String retval = null;
@@ -274,10 +360,5 @@ public class SugarCrmCommand implements Function, Action {
 		}		
 	return retval;
 	}
-	
-	
-
-	
-	
 
 }

@@ -4,14 +4,16 @@
 package eu.europeana.uim.sugarcrmclient.plugin.objects;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
 
 /**
+ * 
+ * 
  * @author Georgios Markakis
- *
  */
 public class SugarCrmRecord {
 	
@@ -45,12 +47,16 @@ public class SugarCrmRecord {
 	}
 	
 	private String extractFromElement(String value, Element el){
-		NodeList nl =el.getElementsByTagName(value);
+		NodeList nl =el.getElementsByTagName("item");
 		
-		if(nl.getLength() != 0){
+		for (int i =0; i<nl.getLength(); i++){
+			Node nd = nl.item(i);
+			String textcontent = nd.getChildNodes().item(0).getTextContent(); 
+			if (value.equals(textcontent)){
+				return nd.getChildNodes().item(1).getTextContent();
+			}
 			
-			return nl.item(0).getTextContent();
-		}	
+		}
 		return null;
 	}
 	

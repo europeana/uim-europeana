@@ -109,6 +109,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	public String updateSession(String username, String password) throws LoginFailureException {
 		StringBuffer connectionInfo = new StringBuffer();
 		Login login = ClientUtils.createStandardLoginObject(username, password);
+		String newsessionID = sugarwsClient.login(login);
+		sugarwsClient.setSessionID(newsessionID);
         connectionInfo.append(sugarwsClient.login(login));
 		return connectionInfo.toString();
 	}
@@ -178,6 +180,9 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#retrieveRecord(java.lang.String)
+	 */
 	@Override
 	public SugarCrmRecord retrieveRecord(String id) throws QueryResultException {
 		GetEntryList request = new GetEntryList();
@@ -214,6 +219,9 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#retrieveRecords(eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery)
+	 */
 	@Override
 	public List<SugarCrmRecord> retrieveRecords(SugarCrmQuery query)
 			throws QueryResultException {
@@ -247,41 +255,56 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#initWorkflowFromRecord(java.lang.String, eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates)
+	 */
 	@Override
-	public void initWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException {
+	public Workflow initWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException {
 
 			StorageEngine<?> engine = registry.getStorage();
 			Workflow w = registry.getWorkflow(worklfowName);
 			
-			Collection<?> dataset = inferCollection(engine,record.getRecord());
+			Collection<?> dataset = inferCollection(engine,record);
 			
 			ActiveExecution<?> execution = orchestrator.executeWorkflow(w, dataset);
 			alterSugarCRMItemStatus(dataset.getMnemonic(), endstate.getSysId());	
 		
-			execution.waitUntilFinished();			
+			execution.waitUntilFinished();		
+			
+			return w;
 	}
 	
 	
 	
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#initWorkflowsFromRecords(java.lang.String, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates)
+	 */
 	@Override
-	public void initWorkflowsFromRecords(String worklfowName,
+	public List<Workflow>  initWorkflowsFromRecords(String worklfowName,
 			DatasetStates currentstate, DatasetStates endstate)
 			throws QueryResultException, StorageEngineException {
 
 
+		ArrayList<Workflow> wfs = new ArrayList<Workflow>();
+		
 		SimpleSugarCrmQuery query = new SimpleSugarCrmQuery();
 		
 		List<SugarCrmRecord> relevantRecords = retrieveRecords(query);
 		
 		for(SugarCrmRecord record : relevantRecords){
-			initWorkflowFromRecord(worklfowName,record,endstate);
+			Workflow ws =initWorkflowFromRecord(worklfowName,record,endstate);
+			wfs.add(ws);
 		}
 		
+		return wfs;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#createProviderFromRecord(eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord)
+	 */
 	@Override
 	public Provider<?> createProviderFromRecord(SugarCrmRecord record)
 			throws StorageEngineException {
@@ -315,6 +338,9 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#createCollectionFromRecord(eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord, eu.europeana.uim.store.Provider)
+	 */
 	@Override
 	public Collection<?> createCollectionFromRecord(SugarCrmRecord record,
 			Provider provider) throws StorageEngineException {
@@ -347,6 +373,11 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	}
 
 
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#addNoteAttachmentToRecord(java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void addNoteAttachmentToRecord(String recordId, String message)
 			throws FileAttachmentException {
@@ -363,25 +394,40 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		request.setNote(note);
 		request.setSession(sugarwsClient.getSessionID());
 		ClientUtils.logMarshalledObject(request);
-		SetNoteAttachmentResponse resp;
+		SetNoteAttachmentResponse resp = sugarwsClient.set_note_attachment(request);
 		
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#addPollingListener(eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener)
+	 */
 	@Override
 	public void addPollingListener(PollingListener listener) {
+		if(this.pollingListeners == null){
+			this.pollingListeners = new ArrayList<PollingListener>();
+		}
 		this.pollingListeners.add(listener);
 		
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#removePollingListener(eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener)
+	 */
 	@Override
 	public void removePollingListener(PollingListener listener) {
+		if(this.pollingListeners == null){
+			this.pollingListeners = new ArrayList<PollingListener>();
+		}
 		this.pollingListeners.remove(listener);
 		
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#getPollingListeners()
+	 */
 	@Override
 	public List<PollingListener> getPollingListeners() {
 		
@@ -389,6 +435,9 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#setPollingListeners(java.util.List)
+	 */
 	@Override
 	public void setPollingListeners(List<PollingListener> listeners) {
 		this.pollingListeners = listeners;
@@ -425,47 +474,10 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	 * @return
 	 * @throws StorageEngineException
 	 */
-	private Collection inferCollection(StorageEngine engine, Element trigger) throws StorageEngineException{
+	private Collection inferCollection(StorageEngine engine, SugarCrmRecord trigger) throws StorageEngineException{
 		    
-		    String collectionName = extractFromElement("name",trigger);
-		    String providerName = extractFromElement("account_name",trigger); 
-		    String providerAcronymName = extractFromElement("name_acronym_c",trigger);  
-		    String mnemonicCode = extractFromElement("id",trigger); 
-		    String countryCode = extractFromElement("country_c",trigger);
-		    String harvestUrl = extractFromElement("harvest_url_c",trigger);
-		    
-		    
-		    Provider cuurprovider = engine.findProvider(mnemonicCode);
-		    Collection currcollection = engine.findCollection(mnemonicCode);
-
-		    
-            if (cuurprovider == null){
-
-            	cuurprovider = engine.createProvider();
-            	cuurprovider.setAggregator(false);
-            	cuurprovider.setMnemonic(mnemonicCode);
-            	cuurprovider.setName(providerName);
-            	cuurprovider.setOaiBaseUrl(harvestUrl);
-            	cuurprovider.setOaiMetadataPrefix("?");
-            	
-            	engine.updateProvider(cuurprovider);
-            	engine.checkpoint();
-            }
-		    
-		    
-            if(currcollection == null){
-            	
-            	currcollection = engine.createCollection(cuurprovider);
-            	currcollection.setLanguage(countryCode);
-            	currcollection.setMnemonic(mnemonicCode);
-            	currcollection.setName(collectionName);
-            	currcollection.setOaiBaseUrl(harvestUrl);
-            	currcollection.setOaiMetadataPrefix("?");
-            	
-    			engine.updateCollection(currcollection);
-    			engine.checkpoint();
-            }
-			
+		Provider prov =  createProviderFromRecord(trigger);
+		Collection currcollection  = createCollectionFromRecord(trigger, prov);
 		return currcollection;	
 	}
 	
