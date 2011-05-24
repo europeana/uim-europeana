@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.apache.log4j.Logger;
 
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
-import eu.europeana.uim.repoxclient.rest.RepoxRestClient;
+import eu.europeana.uim.repoxclient.rest.RepoxRestClientImpl;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 import eu.europeana.uim.clientbindings.utils.Utils;
 
@@ -51,7 +51,7 @@ public class RepoxClientTest {
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepoxClientTest.class);
 	
 	@Resource
-	RepoxRestClient repoxclient;
+	RepoxRestClientImpl repoxclient;
 	
 	@Test
 	public void testRetrieveDataSources(){

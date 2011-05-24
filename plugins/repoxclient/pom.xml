@@ -95,6 +95,14 @@
           </exclusions>
         </dependency>
 
+        <!-- UIM dependencies -->
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+
         <!-- test scoped dependencies -->
         <dependency>
           <groupId>org.junit</groupId>
@@ -245,7 +253,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <instructions>
                         <Export-Package>
-                            !eu.europeana.internal,eu.europeana*
+                         
                         </Export-Package>
                         <Import-Package>*</Import-Package>
                         <Include-Resource>src/main/resources</Include-Resource>

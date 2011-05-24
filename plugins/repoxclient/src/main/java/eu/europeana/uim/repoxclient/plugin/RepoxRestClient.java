@@ -20,16 +20,21 @@
  */
 package eu.europeana.uim.repoxclient.plugin;
 
-import java.util.List;
-
 import org.joda.time.DateTime;
 
 
-import eu.europeana.uim.repoxclient.jibxbindings.Harvestlog;
-import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
+import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
+import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
+import eu.europeana.uim.repoxclient.jibxbindings.Provider;
+import eu.europeana.uim.repoxclient.jibxbindings.Providers;
+import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
+import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.Status;
+import eu.europeana.uim.repoxclient.jibxbindings.ActiveSessions;
+import eu.europeana.uim.repoxclient.jibxbindings.ScheduledSessions;
+import eu.europeana.uim.repoxclient.jibxbindings.Harvestlog;
+
+import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
@@ -39,20 +44,20 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 
 /**
- * Interface declaration of the Repox REST base OSGI service for UIM.
- * This is basically a wrapper over the previous UIM service which provides
- * UIM specific functionality. 
+ * Interface declaration of the Repox REST client OSGI service 
  * 
  * @author Georgios Markakis
  */
-public interface RepoxUIMService {
+public interface RepoxRestClient {
+
+	
 	/**
 	 * Creates an Aggregator in Repox
 	 * 
 	 * @param aggregator an Aggregator object 
 	 * @throws AggregatorOperationException
 	 */
-	public void createAggregator(Provider provider) throws AggregatorOperationException;
+	public void createAggregator(Aggregator aggregator) throws AggregatorOperationException;
 	
 	
 	/**
@@ -60,7 +65,7 @@ public interface RepoxUIMService {
 	 * @param aggregator a reference to the Aggregator object
 	 * @throws AggregatorOperationException
 	 */
-	public void deleteAggregator(Provider provider)throws AggregatorOperationException;	
+	public void deleteAggregator(Aggregator aggregator)throws AggregatorOperationException;	
 	
 	
 	/**
@@ -68,7 +73,7 @@ public interface RepoxUIMService {
 	 * @param aggregator the Aggregator object to update
 	 * @throws AggregatorOperationException
 	 */
-	public void updateAggregator(Provider provider)throws AggregatorOperationException;	
+	public void updateAggregator(Aggregator aggregator)throws AggregatorOperationException;	
 	
 	
 	/**
@@ -76,23 +81,22 @@ public interface RepoxUIMService {
 	 * @return an object containing all available Aggregators 
 	 * @throws AggregatorOperationException
 	 */
-	public List<Provider> retrieveAggregators() throws AggregatorOperationException;	
+	public Aggregators retrieveAggregators() throws AggregatorOperationException;	
 	
 	
 	/**
 	 * Creates a provider in Repox and assigns it to the specific Aggregator
-	 * 
-	 * @param prov a UIM Provider Object
-	 * @param agr a UIM Provider Object (should be an Aggregator type)
+	 * @param prov the Provider definition
+	 * @param agr the Aggregator reference
 	 * @throws ProviderOperationException
 	 */
-	public void createProvider(Provider prov,Provider agr) throws ProviderOperationException;
+	public void createProvider(Provider prov,Aggregator agr) throws ProviderOperationException;
 	
 	
 	/**
 	 * Creates a provider in Repox
 	 * 
-	 * @param prov a UIM Provider Object
+	 * @param prov the Provider definition
 	 * @throws ProviderOperationException
 	 */
 	public void createProvider(Provider prov) throws ProviderOperationException;
@@ -101,7 +105,7 @@ public interface RepoxUIMService {
 	/**
 	 * Deletes a provider from Repox
 	 * 
-	 * @param prov a UIM Provider Object
+	 * @param prov the Provider reference
 	 * @throws ProviderOperationException
 	 */
 	public void deleteProvider(Provider prov) throws ProviderOperationException;
@@ -110,7 +114,7 @@ public interface RepoxUIMService {
 	/**
 	 * Updates a provider within Repox
 	 * 
-	 * @param prov a UIM Provider Object
+	 * @param the Provider object to update
 	 * @throws ProviderOperationException
 	 */
 	public void updateProvider(Provider prov) throws ProviderOperationException;
@@ -118,10 +122,10 @@ public interface RepoxUIMService {
 	
 	/**
 	 * Retrieves all available providers within Repox
-	 * @return a List of UIM Provider objects
+	 * @return an object containing all provider references
 	 * @throws ProviderOperationException
 	 */
-	public List<Provider> retrieveProviders() throws ProviderOperationException;	
+	public Providers retrieveProviders() throws ProviderOperationException;	
 	
 	/**
 	 * Retrieve all available Repox DataSources
@@ -130,7 +134,7 @@ public interface RepoxUIMService {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public List<Collection> retrieveDataSources() throws DataSourceOperationException;
+	public DataSources retrieveDataSources() throws DataSourceOperationException;
 	
 	/**
 	 * Create a Repox DataSource 
@@ -139,26 +143,25 @@ public interface RepoxUIMService {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void createDatasource(Collection col) throws DataSourceOperationException;
+	public void createDatasource(DataSource ds) throws DataSourceOperationException;
 	
 	/**
 	 * Delete a Repox DataSource
 	 * 
-	 * @param col a UIM Collection object
+	 * @param ds
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void deleteDatasource(Collection col) throws DataSourceOperationException;
+	public void deleteDatasource(DataSource ds) throws DataSourceOperationException;
 
-	
 	/**
 	 * Update an existing DataSource
 	 * 
-	 * @param col a UIM Collection object
+	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void updateDatasource(Collection col) throws DataSourceOperationException;
+	public void updateDatasource(DataSource ds) throws DataSourceOperationException;
 	
 
 	/**
@@ -175,12 +178,12 @@ public interface RepoxUIMService {
 	 * Starts a remote harvesting process  
 	 * 
 	 * @param type the type of harvesting to perform
-	 * @param col the Collection to harvest
+	 * @param ds the DataSource to be used 
 	 * @return the harvesting processId 
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public String initiateHarvesting(HarvestingType type,Collection col) throws HarvestingOperationException;
+	public String initiateHarvesting(HarvestingType type,DataSource ds) throws HarvestingOperationException;
 	
 	/**
 	 * Starts a remote harvesting process at a specific Date (scheduling) 
@@ -192,7 +195,7 @@ public interface RepoxUIMService {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public String initiateHarvesting(HarvestingType type,Collection col,DateTime ingestionDate) throws HarvestingOperationException;
+	public String initiateHarvesting(HarvestingType type,DataSource ds,DateTime ingestionDate) throws HarvestingOperationException;
 	
 	
 	
@@ -200,7 +203,7 @@ public interface RepoxUIMService {
 	 * @param ds
 	 * @throws HarvestingOperationException
 	 */
-	public void cancelHarvesting(Collection col) throws HarvestingOperationException;
+	public void cancelHarvesting(DataSource ds) throws HarvestingOperationException;
 	
 	/**
 	 * Check the status of an existing harvesting job 
@@ -208,7 +211,7 @@ public interface RepoxUIMService {
 	 * @return the status
 	 * @throws RepoxException
 	 */
-	public Status getHarvestingStatus(Collection col) throws HarvestingOperationException;
+	public Status getHarvestingStatus(DataSource ds) throws HarvestingOperationException;
 	
 
 
@@ -217,24 +220,23 @@ public interface RepoxUIMService {
 	 * @return an object containing a reference to all DataSources
 	 * @throws HarvestingOperationException
 	 */
-	public List<Collection> getActiveHarvestingSessions() throws HarvestingOperationException;
+	public ActiveSessions getActiveHarvestingSessions() throws HarvestingOperationException;
 	
 	
 	/**
-	 * Gets a list of UIM Collections scheduled for harvesting (ingestion)
-	 * @return a List of UIM Collection object references
+	 * Gets a list of Datasources scheduled for harvesting (ingestion)
+	 * @return an object containing a reference to all DataSources
 	 * @throws HarvestingOperationException
 	 */
-	public List<Collection> getScheduledHarvestingSessions() throws HarvestingOperationException;
+	public ScheduledSessions getScheduledHarvestingSessions() throws HarvestingOperationException;
 	
 	
 	
 	/**
 	 * Gets the latest harvesting Log for a specific DataSource
-	 * @param ds a UIM Collection object reference
+	 * @param ds the DataSource reference
 	 * @return the HarvestLog
 	 * @throws HarvestingOperationException
 	 */
-	public Harvestlog getHarvestLog(Collection col) throws HarvestingOperationException;
-
+	public Harvestlog getHarvestLog(DataSource ds) throws HarvestingOperationException;
 }

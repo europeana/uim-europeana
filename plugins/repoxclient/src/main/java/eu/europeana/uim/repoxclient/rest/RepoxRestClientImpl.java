@@ -27,8 +27,10 @@ import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Response;
+import eu.europeana.uim.repoxclient.jibxbindings.Status;
+
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
-import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
+import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
@@ -41,7 +43,7 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
  * 
  * @author Georgios Markakis
  */
-public class RepoxRestClient implements RepoxUIMService {
+public class RepoxRestClientImpl  {
 
 	private RestTemplate restTemplate;
 
