@@ -20,23 +20,37 @@
  */
 package eu.europeana.uim.repoxclient.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.waitForFrameworkStartup;
+import static org.ops4j.pax.exam.OptionUtils.combine;
+import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.scanFeatures;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import org.junit.After;
-import org.junit.Before;
+import org.apache.karaf.testing.Helper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.apache.log4j.Logger;
+import org.ops4j.pax.exam.Inject;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.container.def.PaxRunnerOptions;
+import org.ops4j.pax.exam.junit.Configuration;
+import org.ops4j.pax.exam.junit.JUnit4TestRunner;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
 
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
+import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.rest.RepoxRestClientImpl;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 import eu.europeana.uim.clientbindings.utils.Utils;
-
+import org.apache.karaf.testing.AbstractIntegrationTest;
 
 /**
  * Class implementing Unit Tests for RepoxClient
@@ -44,21 +58,44 @@ import eu.europeana.uim.clientbindings.utils.Utils;
  * @author Georgios Markakis
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath:testContext.xml"})
-public class RepoxClientTest {
+
+@RunWith(JUnit4TestRunner.class)
+public class RepoxClientTest extends AbstractIntegrationTest{
 	
-	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepoxClientTest.class);
 	
-	@Resource
-	RepoxRestClientImpl repoxclient;
+
 	
+    @Configuration
+    public static Option[] configuration() throws Exception {
+         return combine(
+ 				Helper.getDefaultOptions(
+						systemProperty("karaf.name").value("junit"),
+						systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO")),
+
+
+                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-common").versionAsInProject(),
+                
+                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-api").versionAsInProject(),
+                //mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-storage-memory").versionAsInProject(),
+
+                //mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-basic").versionAsInProject(),
+                //mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-fileimp").versionAsInProject(),
+
+                felix(),
+
+                waitForFrameworkStartup()
+        );
+    }
+	
+    
+    
 	@Test
 	public void testRetrieveDataSources(){
 		try {
-			DataSources ds =  repoxclient.retrieveDataSources();
+
+			RepoxRestClient repoxclient = getOsgiService(RepoxRestClient.class);
 			
-			assertNotNull(ds);
+			DataSources ds =  repoxclient.retrieveDataSources();
 			
 			Utils.logMarshalledObject(ds);
 			
