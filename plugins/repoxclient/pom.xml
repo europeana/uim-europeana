@@ -103,7 +103,36 @@
 			<artifactId>europeana-uim-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-plugin-basic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-storage-memory</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-logging-memory</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-plugin-fileimp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-plugin-dummy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-workflow-dummy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Pax-Exam dependencies -->
         <dependency>
