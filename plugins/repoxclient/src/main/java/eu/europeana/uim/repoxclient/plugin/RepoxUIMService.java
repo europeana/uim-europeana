@@ -39,7 +39,7 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 
 /**
- * Interface declaration of the Repox REST base OSGI service for UIM.
+ * Interface declaration of the Repox REST based OSGI service for UIM.
  * This is basically a wrapper over the previous UIM service which provides
  * UIM specific functionality. 
  * 
