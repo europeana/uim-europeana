@@ -31,7 +31,15 @@
     </bean>
 
     <!--Expose the SugarCRM plugin functionality as a service -->  
-   <osgi:service id="repoxAgentService" ref="repoxRestClient" interface="eu.europeana.uim.repoxclient.plugin.RepoxRestClient"/>
+   <osgi:service id="repoxAgentService" ref="repoxAgent" interface="eu.europeana.uim.repoxclient.plugin.RepoxUIMService"/>
+   
+   <bean id="repoxAgent" class="eu.europeana.uim.repoxclient.plugin.RepoxUIMServiceImpl">    
+       <property name="repoxRestClient" ref="repoxRestClient"/>  
+       <property name="orchestrator" ref="orchestrator"/>  
+       <property name="registry" ref="registry"/>  
+   </bean>
+   
+   
    
    <osgi:reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator"/>
    <osgi:reference id="registry" interface="eu.europeana.uim.api.Registry"/>

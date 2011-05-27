@@ -46,13 +46,23 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
  * @author Georgios Markakis
  */
 public interface RepoxUIMService {
+	
+	/**
+	 * Checks if an aggregator instance in UIM also exists in Repox 
+	 * 
+	 * @param aggregator an Aggregator object 
+	 * @throws AggregatorOperationException
+	 */
+	public boolean aggregatorExists(Provider provider) throws AggregatorOperationException;
+	
+	
 	/**
 	 * Creates an Aggregator in Repox
 	 * 
 	 * @param aggregator an Aggregator object 
 	 * @throws AggregatorOperationException
 	 */
-	public void createAggregator(Provider provider) throws AggregatorOperationException;
+	public void createAggregatorfromUIMObj(Provider provider,boolean isRecursive) throws AggregatorOperationException;
 	
 	
 	/**
@@ -60,7 +70,7 @@ public interface RepoxUIMService {
 	 * @param aggregator a reference to the Aggregator object
 	 * @throws AggregatorOperationException
 	 */
-	public void deleteAggregator(Provider provider)throws AggregatorOperationException;	
+	public void deleteAggregatorfromUIMObj(Provider provider)throws AggregatorOperationException;	
 	
 	
 	/**
@@ -68,7 +78,7 @@ public interface RepoxUIMService {
 	 * @param aggregator the Aggregator object to update
 	 * @throws AggregatorOperationException
 	 */
-	public void updateAggregator(Provider provider)throws AggregatorOperationException;	
+	public void updateAggregatorfromUIMObj(Provider provider)throws AggregatorOperationException;	
 	
 	
 	/**
@@ -80,13 +90,22 @@ public interface RepoxUIMService {
 	
 	
 	/**
+	 * Checks if a UIM provider instance already exists in Repox
+	 * 
+	 * @param prov a UIM Provider Object
+	 * @throws ProviderOperationException
+	 */
+	public void providerExists(Provider prov) throws ProviderOperationException;
+	
+	
+	/**
 	 * Creates a provider in Repox and assigns it to the specific Aggregator
 	 * 
 	 * @param prov a UIM Provider Object
 	 * @param agr a UIM Provider Object (should be an Aggregator type)
 	 * @throws ProviderOperationException
 	 */
-	public void createProvider(Provider prov,Provider agr) throws ProviderOperationException;
+	public void createProviderfromUIMObj(Provider prov,Provider agr,boolean isRecursive) throws ProviderOperationException;
 	
 	
 	/**
@@ -95,16 +114,16 @@ public interface RepoxUIMService {
 	 * @param prov a UIM Provider Object
 	 * @throws ProviderOperationException
 	 */
-	public void createProvider(Provider prov) throws ProviderOperationException;
+	public void createProviderfromUIMObj(Provider prov,boolean isRecursive) throws ProviderOperationException;
 	
 	
 	/**
-	 * Deletes a provider from Repox
+	 * Deletes a provider from Repox (the Collection Objects belonging to this provider are deleted as well)
 	 * 
 	 * @param prov a UIM Provider Object
 	 * @throws ProviderOperationException
 	 */
-	public void deleteProvider(Provider prov) throws ProviderOperationException;
+	public void deleteProviderfromUIMObj(Provider prov) throws ProviderOperationException;
 	
 	
 	/**
@@ -113,7 +132,7 @@ public interface RepoxUIMService {
 	 * @param prov a UIM Provider Object
 	 * @throws ProviderOperationException
 	 */
-	public void updateProvider(Provider prov) throws ProviderOperationException;
+	public void updateProviderfromUIMObj(Provider prov) throws ProviderOperationException;
 	
 	
 	/**
@@ -122,6 +141,7 @@ public interface RepoxUIMService {
 	 * @throws ProviderOperationException
 	 */
 	public List<Provider> retrieveProviders() throws ProviderOperationException;	
+	
 	
 	/**
 	 * Retrieve all available Repox DataSources
@@ -132,6 +152,18 @@ public interface RepoxUIMService {
 	 */
 	public List<Collection> retrieveDataSources() throws DataSourceOperationException;
 	
+	
+	/**
+	 * Checks if a collection is represented as a datasource in Repox
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 * @throws RepoxException
+	 */
+	public void datasourceExists(Collection col) throws DataSourceOperationException;
+
+	
+	
 	/**
 	 * Create a Repox DataSource 
 	 * 
@@ -139,7 +171,8 @@ public interface RepoxUIMService {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void createDatasource(Collection col) throws DataSourceOperationException;
+	public void createDatasourcefromUIMObj(Collection col,Provider prov) throws DataSourceOperationException;
+	
 	
 	/**
 	 * Delete a Repox DataSource
@@ -148,7 +181,7 @@ public interface RepoxUIMService {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void deleteDatasource(Collection col) throws DataSourceOperationException;
+	public void deleteDatasourcefromUIMObj(Collection col) throws DataSourceOperationException;
 
 	
 	/**
@@ -158,7 +191,7 @@ public interface RepoxUIMService {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void updateDatasource(Collection col) throws DataSourceOperationException;
+	public void updateDatasourcefromUIMObj(Collection col) throws DataSourceOperationException;
 	
 
 	/**
@@ -171,6 +204,7 @@ public interface RepoxUIMService {
 	 */
 	public RecordResult retrieveRecord(String recordString) throws RecordOperationException;
 	
+	
 	/**
 	 * Starts a remote harvesting process  
 	 * 
@@ -180,10 +214,11 @@ public interface RepoxUIMService {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public String initiateHarvesting(HarvestingType type,Collection col) throws HarvestingOperationException;
+	public String initiateHarvestingfromUIMObj(HarvestingType type,Collection col) throws HarvestingOperationException;
+	
 	
 	/**
-	 * Starts a remote harvesting process at a specific Date (scheduling) 
+	 * Schedules a remote harvesting process at a specific Date (scheduling) 
 	 * 
 	 * @param type the type of harvesting to perform
 	 * @param ds the DataSource to be used 
@@ -192,15 +227,18 @@ public interface RepoxUIMService {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public String initiateHarvesting(HarvestingType type,Collection col,DateTime ingestionDate) throws HarvestingOperationException;
+	public String initiateHarvestingfromUIMObj(HarvestingType type,Collection col,DateTime ingestionDate) throws HarvestingOperationException;
 	
 	
 	
 	/**
+	 * Cancels the active execution of a harvesting session 
+	 * 
 	 * @param ds
 	 * @throws HarvestingOperationException
 	 */
 	public void cancelHarvesting(Collection col) throws HarvestingOperationException;
+	
 	
 	/**
 	 * Check the status of an existing harvesting job 

@@ -59,6 +59,7 @@ import eu.europeana.uim.store.Provider;
 
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
+import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 import eu.europeana.uim.clientbindings.utils.Utils;
 import org.apache.karaf.testing.AbstractIntegrationTest;
@@ -144,15 +145,10 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
     
 	@Test
 	public void testRetrieveDataSourcesService() throws Exception{
-			RepoxRestClient repoxclient = getOsgiService(RepoxRestClient.class);
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
-			assertNotNull(repoxclient);
+			assertNotNull(repoxservice);
 	
-			DataSources ds =  repoxclient.retrieveDataSources();
-
-			assertNotNull(ds);
-			
-			logMarshalledObject(ds);
 	}
 	
 	

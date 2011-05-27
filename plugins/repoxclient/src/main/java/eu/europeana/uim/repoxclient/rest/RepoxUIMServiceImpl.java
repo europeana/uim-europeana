@@ -28,6 +28,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.Harvestlog;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Status;
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
+import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
@@ -44,212 +45,176 @@ import eu.europeana.uim.store.Provider;
  */
 public class RepoxUIMServiceImpl implements RepoxUIMService {
 
+	private RepoxRestClient repoxRestClient;
 	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createAggregator(eu.europeana.uim.store.Provider)
-	 */
+	
 	@Override
-	public void createAggregator(Provider provider)
+	public boolean aggregatorExists(Provider provider)
 			throws AggregatorOperationException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void createAggregatorfromUIMObj(Provider provider,
+			boolean isRecursive) throws AggregatorOperationException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteAggregator(eu.europeana.uim.store.Provider)
-	 */
 	@Override
-	public void deleteAggregator(Provider provider)
+	public void deleteAggregatorfromUIMObj(Provider provider)
 			throws AggregatorOperationException {
-
+		// TODO Auto-generated method stub
 		
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateAggregator(eu.europeana.uim.store.Provider)
-	 */
 	@Override
-	public void updateAggregator(Provider provider)
+	public void updateAggregatorfromUIMObj(Provider provider)
 			throws AggregatorOperationException {
-
+		// TODO Auto-generated method stub
 		
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveAggregators()
-	 */
 	@Override
 	public List<Provider> retrieveAggregators()
 			throws AggregatorOperationException {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createProvider(eu.europeana.uim.store.Provider, eu.europeana.uim.store.Provider)
-	 */
 	@Override
-	public void createProvider(Provider prov, Provider agr)
+	public void providerExists(Provider prov) throws ProviderOperationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createProviderfromUIMObj(Provider prov, Provider agr,
+			boolean isRecursive) throws ProviderOperationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createProviderfromUIMObj(Provider prov, boolean isRecursive)
 			throws ProviderOperationException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createProvider(eu.europeana.uim.store.Provider)
-	 */
 	@Override
-	public void createProvider(Provider prov) throws ProviderOperationException {
-
+	public void deleteProviderfromUIMObj(Provider prov)
+			throws ProviderOperationException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteProvider(eu.europeana.uim.store.Provider)
-	 */
 	@Override
-	public void deleteProvider(Provider prov) throws ProviderOperationException {
-
+	public void updateProviderfromUIMObj(Provider prov)
+			throws ProviderOperationException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateProvider(eu.europeana.uim.store.Provider)
-	 */
-	@Override
-	public void updateProvider(Provider prov) throws ProviderOperationException {
-
-		
-	}
-
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveProviders()
-	 */
 	@Override
 	public List<Provider> retrieveProviders() throws ProviderOperationException {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveDataSources()
-	 */
 	@Override
 	public List<Collection> retrieveDataSources()
 			throws DataSourceOperationException {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createDatasource(eu.europeana.uim.store.Collection)
-	 */
 	@Override
-	public void createDatasource(Collection col)
+	public void datasourceExists(Collection col)
 			throws DataSourceOperationException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteDatasource(eu.europeana.uim.store.Collection)
-	 */
 	@Override
-	public void deleteDatasource(Collection col)
+	public void createDatasourcefromUIMObj(Collection col, Provider prov)
 			throws DataSourceOperationException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateDatasource(eu.europeana.uim.store.Collection)
-	 */
 	@Override
-	public void updateDatasource(Collection col)
+	public void deleteDatasourcefromUIMObj(Collection col)
 			throws DataSourceOperationException {
+		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveRecord(java.lang.String)
-	 */
+	@Override
+	public void updateDatasourcefromUIMObj(Collection col)
+			throws DataSourceOperationException {
+		// TODO Auto-generated method stub
+		
+	}
+
 	@Override
 	public RecordResult retrieveRecord(String recordString)
 			throws RecordOperationException {
-		
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#initiateHarvesting(eu.europeana.uim.repoxclient.objects.HarvestingType, eu.europeana.uim.store.Collection)
-	 */
 	@Override
-	public String initiateHarvesting(HarvestingType type, Collection col)
+	public String initiateHarvestingfromUIMObj(HarvestingType type,
+			Collection col) throws HarvestingOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String initiateHarvestingfromUIMObj(HarvestingType type,
+			Collection col, DateTime ingestionDate)
 			throws HarvestingOperationException {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#initiateHarvesting(eu.europeana.uim.repoxclient.objects.HarvestingType, eu.europeana.uim.store.Collection, org.joda.time.DateTime)
-	 */
-	@Override
-	public String initiateHarvesting(HarvestingType type, Collection col,
-			DateTime ingestionDate) throws HarvestingOperationException {
-
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#cancelHarvesting(eu.europeana.uim.store.Collection)
-	 */
 	@Override
 	public void cancelHarvesting(Collection col)
 			throws HarvestingOperationException {
-
+		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getHarvestingStatus(eu.europeana.uim.store.Collection)
-	 */
 	@Override
 	public Status getHarvestingStatus(Collection col)
 			throws HarvestingOperationException {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getActiveHarvestingSessions()
-	 */
 	@Override
 	public List<Collection> getActiveHarvestingSessions()
 			throws HarvestingOperationException {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getScheduledHarvestingSessions()
-	 */
 	@Override
 	public List<Collection> getScheduledHarvestingSessions()
 			throws HarvestingOperationException {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getHarvestLog(eu.europeana.uim.store.Collection)
-	 */
 	@Override
 	public Harvestlog getHarvestLog(Collection col)
 			throws HarvestingOperationException {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
 
 }
