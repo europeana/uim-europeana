@@ -23,6 +23,8 @@
 		<spring.quartz.version>1.6.2</spring.quartz.version>
 		<equinox.ver>3.2.2</equinox.ver>
 		<jibx.version>1.2.3</jibx.version>
+		<junit-version>4.5</junit-version>
+        <pax-exam-version>1.2.4</pax-exam-version>
 	</properties>
 
 	<dependencies>
@@ -147,6 +149,44 @@
 
 
 
+        <!-- Pax-Exam dependencies -->
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam</artifactId>
+            <version>${pax-exam-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit</artifactId>
+            <version>${pax-exam-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-default</artifactId>
+            <version>${pax-exam-version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- JUnit dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit-version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Apache Karaf integration -->
+        <dependency>
+            <groupId>org.apache.karaf.tooling</groupId>
+            <artifactId>org.apache.karaf.tooling.testing</artifactId>
+            <version>2.2.0</version>
+            <scope>test</scope>
+        </dependency>
+
+
 
 		<!-- Equinox OSGi platform -->
 		<dependency>
@@ -173,6 +213,36 @@
 			<artifactId>europeana-uim-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-plugin-basic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-storage-memory</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-logging-memory</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-plugin-fileimp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-plugin-dummy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-workflow-dummy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
 		<dependency>
