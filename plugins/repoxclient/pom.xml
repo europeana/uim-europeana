@@ -415,17 +415,6 @@
             </url>
         </repository>
         
-        <!--
-            
-            Spring-DM snapshot repository - disabled by default
-            
-            <repository>
-            <snapshots><enabled>true</enabled></snapshots>
-            <id>springframework.org</id>
-            <name>Springframework Maven SNAPSHOT Repository</name>
-            <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
-            </repository>
-        -->
     </repositories>
 
     <pluginRepositories>

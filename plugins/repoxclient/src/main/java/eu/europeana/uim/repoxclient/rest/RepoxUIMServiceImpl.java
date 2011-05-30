@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.repoxclient.jibxbindings.Harvestlog;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Status;
@@ -46,7 +48,8 @@ import eu.europeana.uim.store.Provider;
 public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	private RepoxRestClient repoxRestClient;
-	
+	private Orchestrator orchestrator;
+	private Registry registry;
 	
 	@Override
 	public boolean aggregatorExists(Provider provider)
@@ -213,6 +216,36 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			throws HarvestingOperationException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	
+	
+	/*
+	 * Getters & Setters 
+	 */
+	
+	public void setRepoxRestClient(RepoxRestClient repoxRestClient) {
+		this.repoxRestClient = repoxRestClient;
+	}
+
+	public RepoxRestClient getRepoxRestClient() {
+		return repoxRestClient;
+	}
+
+	public void setOrchestrator(Orchestrator orchestrator) {
+		this.orchestrator = orchestrator;
+	}
+
+	public Orchestrator getOrchestrator() {
+		return orchestrator;
+	}
+
+	public void setRegistry(Registry registry) {
+		this.registry = registry;
+	}
+
+	public Registry getRegistry() {
+		return registry;
 	}
 
 	
