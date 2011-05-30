@@ -133,11 +133,18 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	@Override
 	public void updateRecordData(String recordID,
 			HashMap<UpdatableField, String> values) throws QueryResultException {
-
+		
 		SetEntry request = new SetEntry();
 		ArrayList <NameValue> nvList = new  ArrayList <NameValue>();
 		Iterator<?> it = values.entrySet().iterator();
 
+		//First add the id name\value pair
+		NameValue nvid = new NameValue();
+		nvid.setName("id");
+		nvid.setValue(recordID);
+		nvList.add(nvid);
+		
+		
 	    while (it.hasNext()) {
 	        Map.Entry<UpdatableField, String> pairs = (Map.Entry<UpdatableField, String>)it.next();
 			NameValue nv = new NameValue();
@@ -255,6 +262,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	}
 	
 	
+	
+	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#initWorkflowFromRecord(java.lang.String, eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates)
 	 */
@@ -290,6 +299,10 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		ArrayList<Workflow> wfs = new ArrayList<Workflow>();
 		
 		SimpleSugarCrmQuery query = new SimpleSugarCrmQuery();
+		query.setMaxResults(1000);
+		query.setOffset(0);
+		query.setOrderBy(RetrievableField.DATE_ENTERED);
+		query.setStatus(currentstate);
 		
 		List<SugarCrmRecord> relevantRecords = retrieveRecords(query);
 		
@@ -317,7 +330,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	    String mnemonicCode = record.getItemValue(RetrievableField.ID);  //"id"
 	    String countryCode = record.getItemValue(RetrievableField.COUNTRY); //"country_c"
 	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
-	    
+
 	    Provider cuurprovider = engine.findProvider(mnemonicCode);
 	    
         if (cuurprovider == null){
@@ -390,7 +403,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	    Date date = new Date();
 	    
 	    note.setFilename(date.toString() + ".txt");
-	    
+
 		request.setNote(note);
 		request.setSession(sugarwsClient.getSessionID());
 		ClientUtils.logMarshalledObject(request);
