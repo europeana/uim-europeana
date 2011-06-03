@@ -48,7 +48,7 @@ Import-Service: eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService
 DynamicImport-Package: *
 Build-Jdk: 1.6.0_24
 Bundle-Version: 1.2.0.SNAPSHOT
-Bnd-LastModified: 1306766127783
+Bnd-LastModified: 1307114245017
 Bundle-ManifestVersion: 2
 Import-Package: eu.europeana.uim.api,eu.europeana.uim.store,eu.europea
  na.uim.sugarcrmclient.internal,eu.europeana.uim.sugarcrmclient.intern
