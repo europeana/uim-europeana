@@ -27,6 +27,10 @@
     <dataSource id="09409_arquivocmlx">09409_arquivocmlx</dataSource> 
     <dataSource id="09409_Bucoimbra">09409_Bucoimbra</dataSource> 
     <dataSource id="08901">DISMARC</dataSource> 
-  </dataSources> 
+  </dataSources>
+  
+  <dataSource>
+  </dataSource>
+   
   <error type="invalidRequest" requestURI="http://sip-manager.isti.cnr.it:8080/repoxbeta/rest/records/operation=listDataSources" cause="Data Source is invalid"/> 
 </response>
