@@ -4,6 +4,11 @@ package eu.europeana.uim.plugin.linkchecker;
 import java.io.*;
 import java.util.ArrayList;
 
+import eu.europeana.uim.plugin.linkchecker.errorcodes.LinkStatus;
+import eu.europeana.uim.plugin.linkchecker.errorcodes.ThumbnailStatus;
+import eu.europeana.uim.plugin.linkchecker.exceptions.FileStorageException;
+import eu.europeana.uim.plugin.linkchecker.exceptions.HttpAccessException;
+
 public class CacheItem extends CheckUrl{
     private FileTree fileTree;
 
@@ -27,7 +32,7 @@ public class CacheItem extends CheckUrl{
     }
 
     
-    public boolean createCacheFiles() {
+    public boolean createCacheFiles() throws HttpAccessException, FileStorageException {
 
         if (state == LinkStatus.UNKNOWN) {
             if (!isResponding(true))  // linkcheck hasnt been done, do it now
@@ -36,43 +41,25 @@ public class CacheItem extends CheckUrl{
 
         // ok now uri should be valid, try to use orgFile
         hashGenByContent();
-        if (!saveOrigFile()) {
-            return setState(LinkStatus.SAVE_ORIG_FAILED);
-        }
-        if (!generateThumbTiny()) {
-            return setState(LinkStatus.GENERATE_THUMB_TINY_FAILED);
-        }
-        if (!generateThumbBrief()) {
-            return setState(LinkStatus.GENERATE_THUMB_BRIEF_FAILED);
-        }
-        if (!generateThumbFull()) {
-            return setState(LinkStatus.GENERATE_THUMB_FULL_FAILED);
-        }
-        return setState(LinkStatus.CACHE_OK);  // not realy :)
+        saveOrigFile();
+        generateThumbTiny();
+        generateThumbBrief();
+        generateThumbFull();
+
+        return true;  // not realy :)
     }
 
 
 
-    private boolean generateThumbTiny() {
-        /*
-        Regarding the image resizing thing
-24-05-11 12:10
-I remember I used Java2D once
-24-05-11 12:10
-this is an integral java package
-24-05-11 12:11
-You can take a look here for an example
-24-05-11 12:11
-http://tycoontalk.freelancer.com/coding-forum/63227-image-resizing-in-java.html
-        */
+    private boolean generateThumbTiny() throws HttpAccessException{
         return false;
     }
 
-    private boolean generateThumbBrief() {
+    private boolean generateThumbBrief() throws HttpAccessException{
         return false;
     }
 
-    private boolean generateThumbFull() {
+    private boolean generateThumbFull() throws HttpAccessException{
         return false;
     }
 
@@ -86,9 +73,10 @@ http://tycoontalk.freelancer.com/coding-forum/63227-image-resizing-in-java.html
     }
 
 
-    private boolean saveOrigFile() {
+    private boolean saveOrigFile() throws FileStorageException{
         File fileOrg = new File(fileTree.getOriginalFileName(hashContent));
 
+        //Yes ok but is this a valid thing to do?
         if (fileOrg.exists()) {
             return true; // same orig already saved
         }
@@ -97,11 +85,11 @@ http://tycoontalk.freelancer.com/coding-forum/63227-image-resizing-in-java.html
             FileOutputStream os = new FileOutputStream(fileOrg);
             orgFileConent.writeTo(os);
         } catch (Exception e) {
-            System.out.println("failed to save org file");
+
             if (fileOrg.exists()) {
                 fileOrg.delete();
             }
-            return false;
+            throw new FileStorageException(ThumbnailStatus.SAVE_ORIG_FAILED);
         }
         createdFiles.add(fileOrg);
         return true;

@@ -42,6 +42,14 @@ public class LinkCheckerPlugin implements IngestionPlugin {
 	public boolean processRecord(MetaDataRecord<?> mdr, ExecutionContext context)
 	throws IngestionPluginFailedException,
 	CorruptedMetadataRecordException {
+		
+		//First check if link exists
+		
+		//Then try to save file locally and create 3 different versions of thumbnails
+		
+		
+		//If everything was ok then Log the outcome 
+		
        return false;
     }
 	
