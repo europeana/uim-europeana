@@ -9,32 +9,17 @@ public enum LinkStatus {
     FAILED_TO_CONNECT,
     HTTP_ERROR,
     NO_RESPONSE_CODE,
-
     LINK_OK,  // valid final state
-
     // States only relevant for generating thumbnails
-
     FAILED_TO_BIND_TO_INPUT_STREAM,
     FAILED_TO_READ_ORIG,
     SAVE_ORIG_FAILED,
     GENERATE_THUMB_FULL_FAILED,
     GENERATE_THUMB_BRIEF_FAILED,
     GENERATE_THUMB_TINY_FAILED,
-
     CACHE_OK,  // valid final state
-
-
-
-    //HTML_ERROR,
-    //URL_ERROR,
-
-
-
-
-
     GENERAL_EXCEPTION,
     OTHER_ERROR,
-
     MIMETYPE_ERROR,
     WRONG_FILESIZE,
     WAS_HTML_PAGE_ERROR,

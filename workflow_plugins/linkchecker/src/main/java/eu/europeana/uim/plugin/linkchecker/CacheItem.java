@@ -1,8 +1,6 @@
 package eu.europeana.uim.plugin.linkchecker;
 
 
-import com.sun.tools.javac.util.Paths;
-
 import java.io.*;
 import java.util.ArrayList;
 

@@ -1,8 +1,5 @@
 package eu.europeana.uim.plugin.linkchecker;
 
-
-import sun.awt.event.IgnorePaintEvent;
-
 import java.io.File;
 
 

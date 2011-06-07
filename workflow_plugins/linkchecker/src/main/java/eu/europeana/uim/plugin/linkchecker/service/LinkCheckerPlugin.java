@@ -20,6 +20,7 @@
  */
 package eu.europeana.uim.plugin.linkchecker.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import eu.europeana.uim.MetaDataRecord;
@@ -30,19 +31,29 @@ import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 
 /**
- * @author georgiosmarkakis
- *
+ * This is the main class implementing the UIM functionality for 
+ * the linkchecker plugin exposed as an OSGI service.
+ * 
+ * @author Georgios Markakis
  */
-public class LinkCheckerServiceImpl implements IngestionPlugin {
+public class LinkCheckerPlugin implements IngestionPlugin {
 
+	
+	public boolean processRecord(MetaDataRecord<?> mdr, ExecutionContext context)
+	throws IngestionPluginFailedException,
+	CorruptedMetadataRecordException {
+       return false;
+    }
+	
+	
+	
 	public String getName() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Linck Checker Plugin: an OSGI plugin whose main purpose " +
+				"is to check the integrity of http links contained in records";
 	}
 
 	public TKey<?, ?>[] getInputFields() {
@@ -51,13 +62,11 @@ public class LinkCheckerServiceImpl implements IngestionPlugin {
 	}
 
 	public TKey<?, ?>[] getOptionalFields() {
-		// TODO Auto-generated method stub
-		return null;
+	     return new TKey[0];
 	}
 
 	public TKey<?, ?>[] getOutputFields() {
-		// TODO Auto-generated method stub
-		return null;
+	     return new TKey[0];
 	}
 
 	public void initialize() {
@@ -71,18 +80,15 @@ public class LinkCheckerServiceImpl implements IngestionPlugin {
 	}
 
 	public List<String> getParameters() {
-		// TODO Auto-generated method stub
-		return null;
+        return Collections.EMPTY_LIST;
 	}
 
 	public int getPreferredThreadCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 5;
 	}
 
 	public int getMaximumThreadCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 10;
 	}
 
 	public void initialize(ExecutionContext context)
@@ -97,13 +103,6 @@ public class LinkCheckerServiceImpl implements IngestionPlugin {
 		
 	}
 
-	public boolean processRecord(MetaDataRecord<?> mdr, ExecutionContext context)
-			throws IngestionPluginFailedException,
-			CorruptedMetadataRecordException {
 
-		
-		
-		return false;
-	}
 
 }
