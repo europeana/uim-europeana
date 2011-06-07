@@ -20,11 +20,13 @@ public class CacheItem extends CheckUrl{
         super(uri);
         initiateParams(fileTree);
     }
+    
     public CacheItem(FileTree fileTree, String uri, Integer redirectDepth) {
         super(uri, redirectDepth);
         initiateParams(fileTree);
     }
 
+    
     public boolean createCacheFiles() {
 
         if (state == LinkStatus.UNKNOWN) {

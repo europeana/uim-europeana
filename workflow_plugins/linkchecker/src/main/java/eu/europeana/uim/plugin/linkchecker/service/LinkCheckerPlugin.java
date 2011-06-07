@@ -93,13 +93,13 @@ public class LinkCheckerPlugin implements IngestionPlugin {
 
 	public void initialize(ExecutionContext context)
 			throws IngestionPluginFailedException {
-		// TODO Auto-generated method stub
+		// TODO Put initialization code here (Sugarcrm Plugin change state)
 		
 	}
 
 	public void completed(ExecutionContext context)
 			throws IngestionPluginFailedException {
-		// TODO Auto-generated method stub
+		// TODO Put finalization code here (Sugarcrm Plugin change state)
 		
 	}
 

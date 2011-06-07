@@ -1,8 +1,5 @@
 package eu.europeana.uim.plugin.linkchecker;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.ErrorMessages;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.ErrorMsg;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -42,9 +39,13 @@ public class CheckUrl {
     public boolean isResponding() {
         return doConnection(this.redirectDepth, false);
     }
+    
+    
     public boolean isResponding(boolean saveItem) {
         return doConnection(this.redirectDepth, saveItem);
     }
+    
+    
     public boolean isResponding(Integer redirectDepth) {
         return doConnection(redirectDepth, false);
     }
