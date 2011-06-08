@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import eu.europeana.uim.plugin.linkchecker.CacheItem;
 import eu.europeana.uim.plugin.linkchecker.CheckUrl;
 import eu.europeana.uim.plugin.linkchecker.FileTree;
+import eu.europeana.uim.plugin.linkchecker.exceptions.HttpAccessException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,29 +16,21 @@ import static org.junit.Assert.assertEquals;
 public class LinkCheckerTest {
 	
 	@Test
-	public void checklinkTest() throws Exception{
-        String msg;
+	public void checklinkSuccessTest() throws Exception{
 
-        String[] uris = {"http://www.sunet.se/hjkhjk",
-                        "http://www.google.com",
-                        "http://www.badlink2.com",
-                        };
-
-        // test checking links
-
-        for (String s : uris) {
-            CheckUrl cu = new CheckUrl(s);
-            if (cu.isResponding()) {
-                msg = "ok";
-            }
-            else {
-                msg = cu.getState().toString() + " " + cu.getErrorMessage();
-            }
-            System.out.println(s + "\t" + msg);
-        }
-
+        CheckUrl cu = new CheckUrl("http://www.google.com");
+        cu.isResponding(); 
     }
 	
+	
+	
+	@Test(expected = HttpAccessException.class)
+	public void checklinkFailureTest() throws Exception{
+
+        CheckUrl cu = new CheckUrl("http://www.googleeee.com/");
+        cu.isResponding();
+     
+    }
 	
 	
 	@Test
