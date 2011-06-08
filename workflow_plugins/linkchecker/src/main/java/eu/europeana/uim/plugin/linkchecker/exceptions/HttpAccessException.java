@@ -28,6 +28,10 @@ import eu.europeana.uim.plugin.linkchecker.errorcodes.Status;
  */
 public class HttpAccessException extends GenericLinkCheckerException {
 
+
+	private static final long serialVersionUID = 1L;
+
+
 	/**
 	 * 
 	 */
