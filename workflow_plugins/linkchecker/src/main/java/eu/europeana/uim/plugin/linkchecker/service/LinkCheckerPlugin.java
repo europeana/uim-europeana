@@ -113,4 +113,11 @@ public class LinkCheckerPlugin implements IngestionPlugin {
 
 
 
+	public String getIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
 }
