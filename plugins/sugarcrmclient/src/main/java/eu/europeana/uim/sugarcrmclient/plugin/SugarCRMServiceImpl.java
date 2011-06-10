@@ -340,8 +340,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         	cuurprovider.setMnemonic(mnemonicCode);
         	cuurprovider.setName(providerName);
         	cuurprovider.setOaiBaseUrl(harvestUrl);
-        	cuurprovider.setOaiMetadataPrefix("?");
-   
+        	cuurprovider.setOaiMetadataPrefix("ese");   
         	
         	engine.updateProvider(cuurprovider);
         	engine.checkpoint();
@@ -376,7 +375,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         	currcollection.setMnemonic(mnemonicCode);
         	currcollection.setName(collectionName);
         	currcollection.setOaiBaseUrl(harvestUrl);
-        	currcollection.setOaiMetadataPrefix("?");
+        	currcollection.setOaiMetadataPrefix("ese");
         	
 			engine.updateCollection(currcollection);
 			engine.checkpoint();

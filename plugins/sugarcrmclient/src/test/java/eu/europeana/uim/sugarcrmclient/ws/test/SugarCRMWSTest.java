@@ -85,9 +85,6 @@ public final class SugarCRMWSTest {
 	
 	private String sessionID;
 
-
-
-
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMWSTest.class);
 	
