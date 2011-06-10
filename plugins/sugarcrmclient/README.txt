@@ -65,11 +65,6 @@ Edit <karaf_installation_folder>\etc\jre.properties and comment out the followin
  #javax.xml.stream.events, \
  #javax.xml.stream.util, \
 
-Download http://sip-manager.isti.cnr.it/geomark/stax-1.2.0.jar
-
-And put it into the <karaf_installation_folder>\deploy dir
-(this will probably be removed in a future release and integrated into a "features" file)
-
 1.4.2 Start Karaf (<karaf_installation_folder>\etc\ sh karaf)
 
 1.4.3. In the Karaf console add the folowing features files:
