@@ -24,21 +24,37 @@ package eu.europeana.uim.sugarcrmclient.plugin.objects.queries;
 import java.util.List;
 
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
 
 
 /**
+ * This is a simplified version of a SugarCRM query object. It is used to perform a query 
+ * in the "opportunities" module retrieving objects having a specific state.
+ * 
  * 
  * @author Georgios Markakis
  */
 public class SimpleSugarCrmQuery implements SugarCrmQuery{
 
-	private List<SugarCrmField> fieldsToRetrieve;
 	private DatasetStates status;
 	
 	private SugarCrmField orderBy;
 	private int maxResults;
 	private int offset;
+	
+	
+	/**
+	 * Default Constructor
+	 */
+	public SimpleSugarCrmQuery(DatasetStates status){
+		//Initialize fields to default values
+		this.status = status;
+		this.orderBy = RetrievableField.DATE_ENTERED;
+		this.maxResults = 100;
+		this.offset =0 ;
+	}
+	
 	
 	@Override
 	public String toString(){
@@ -47,19 +63,6 @@ public class SimpleSugarCrmQuery implements SugarCrmQuery{
 		return requestQuery;
 	}
 
-	/**
-	 * @param fieldsToRetrieve the fieldsToRetrieve to set
-	 */
-	public void setFieldsToRetrieve(List<SugarCrmField> fieldsToRetrieve) {
-		this.fieldsToRetrieve = fieldsToRetrieve;
-	}
-
-	/**
-	 * @return the fieldsToRetrieve
-	 */
-	public List<SugarCrmField> getFieldsToRetrieve() {
-		return fieldsToRetrieve;
-	}
 
 	/**
 	 * @param orderBy the orderBy to set
@@ -103,17 +106,4 @@ public class SimpleSugarCrmQuery implements SugarCrmQuery{
 		return offset;
 	}
 
-	/**
-	 * @param status the status to set
-	 */
-	public void setStatus(DatasetStates status) {
-		this.status = status;
-	}
-
-	/**
-	 * @return the status
-	 */
-	public DatasetStates getStatus() {
-		return status;
-	}
 }

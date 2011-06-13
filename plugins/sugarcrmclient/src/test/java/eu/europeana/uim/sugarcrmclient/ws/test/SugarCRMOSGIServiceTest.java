@@ -30,7 +30,10 @@ import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.ComplexSugarCrmQuery;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.EqOp;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.workflow.Workflow;
 
@@ -153,15 +156,15 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
      * @throws Exception
      */
     @Test
-    public void testRetrieveRecords() throws Exception{
+    public void testRetrieveRecordsSimpleQuery() throws Exception{
     	SugarCRMService service = getOsgiService(SugarCRMService.class);
     	
 		DatasetStates status = DatasetStates.INGESTION_COMPLETE;
-		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery();
+		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery(status);
 		query.setMaxResults(1000);
 		query.setOffset(0);
 		query.setOrderBy(RetrievableField.DATE_ENTERED);
-		query.setStatus(status);
+
 		List<SugarCrmRecord> records = service.retrieveRecords(query);
 		System.out.println("Number of Records retrieved: " + records.size());
 		System.out.println("NO | RECORD ID                          | COLLECTION NAME");
@@ -174,6 +177,29 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
     
     
     
+    /**
+     * Tests the Retrieve Records functionality
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testRetrieveRecordsComplexQuery() throws Exception{
+    
+    	SugarCRMService service = getOsgiService(SugarCRMService.class);
+    	
+		ComplexSugarCrmQuery query =  new ComplexSugarCrmQuery(RetrievableField.NAME ,EqOp.LIKE,"%sdf" );
+		//query = query.and(field, op, value)
+		
+		List<SugarCrmRecord> records = service.retrieveRecords(query);
+		System.out.println("Number of Records retrieved: " + records.size());
+		System.out.println("NO | RECORD ID                          | COLLECTION NAME");
+
+		for(int i=0; i< records.size(); i++){
+			System.out.println( (i+1) + " : " + records.get(i).getItemValue(RetrievableField.ID) + " | " +
+					records.get(i).getItemValue(RetrievableField.NAME)	) ;
+		}
+	}
+
 
     /**
      * Tests the fetch Record functionality 

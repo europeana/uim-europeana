@@ -210,11 +210,11 @@ public class SugarCrmCommand implements Function, Action {
 	 */
 	private void retrieverecordsCMD(PrintStream out,BufferedReader in) throws QueryResultException, IOException{
 		DatasetStates status = assigndatastate(argument0,out,in);
-		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery();
+		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery(status);
 		query.setMaxResults(1000);
 		query.setOffset(0);
 		query.setOrderBy(RetrievableField.DATE_ENTERED);
-		query.setStatus(status);
+
 		List<SugarCrmRecord> records = sugarcrmPlugin.retrieveRecords(query);
 		out.println("Number of Records retrieved: " + records.size());
 		out.println("NO | RECORD ID                          | COLLECTION NAME");

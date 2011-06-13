@@ -72,9 +72,8 @@ public class PollingBean extends QuartzJobBean {
 				
 				for(PollingListener listener:pollingListeners){
 					
-					SimpleSugarCrmQuery query = new SimpleSugarCrmQuery();
-					
-					query.setStatus(listener.getTrigger());
+					SimpleSugarCrmQuery query = new SimpleSugarCrmQuery(listener.getTrigger());
+
 					query.setMaxResults(100);
 					query.setOffset(0);
 					query.setOrderBy(RetrievableField.DATE_ENTERED);

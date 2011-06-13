@@ -14,9 +14,6 @@ import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
  */
 public interface SugarCrmQuery {
 
-	public void setFieldsToRetrieve(List<SugarCrmField> fieldsToRetrieve);
-	
-	public List<SugarCrmField> getFieldsToRetrieve();
 	
 	public void setOrderBy(SugarCrmField orderBy);
 	

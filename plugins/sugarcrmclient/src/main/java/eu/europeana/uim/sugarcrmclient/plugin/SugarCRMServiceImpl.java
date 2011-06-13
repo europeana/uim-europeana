@@ -296,11 +296,10 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 
 		ArrayList<Workflow> wfs = new ArrayList<Workflow>();
 		
-		SimpleSugarCrmQuery query = new SimpleSugarCrmQuery();
+		SimpleSugarCrmQuery query = new SimpleSugarCrmQuery(currentstate);
 		query.setMaxResults(1000);
 		query.setOffset(0);
 		query.setOrderBy(RetrievableField.DATE_ENTERED);
-		query.setStatus(currentstate);
 		
 		List<SugarCrmRecord> relevantRecords = retrieveRecords(query);
 		
