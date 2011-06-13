@@ -8,7 +8,7 @@ import java.util.List;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
 
 /**
- * 
+ * The interface daclaration of a SugarCrmQuery
  * 
  * @author Georgios Markakis
  */

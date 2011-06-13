@@ -18,15 +18,13 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
+
+package eu.europeana.uim.sugarcrmclient.plugin.objects.queries;
 
 /**
- * Interface declaration of a SugarCRM field
- * 
  * @author Georgios Markakis
+ *
  */
-public interface SugarCrmField {
+public class ComplexSugarCrmQuery extends SimpleSugarCrmQuery {
 
-	public String getFieldId();
-	public String getDescription();
 }

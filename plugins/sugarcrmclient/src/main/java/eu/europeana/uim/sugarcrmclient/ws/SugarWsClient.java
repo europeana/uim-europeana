@@ -247,11 +247,11 @@ public class SugarWsClient {
 	public GetModuleFieldsResponse get_module_fields(GetModuleFields request) throws QueryResultException{
 
 		GetModuleFieldsResponse response = invokeWSTemplate(request,GetModuleFieldsResponse.class);
-		
+		/*
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
 			throw new QueryResultException(response.getReturn().getError());
 		}
-		
+		*/
 		return response;
 	}
 

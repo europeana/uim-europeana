@@ -39,16 +39,16 @@ Export-Package: eu.europeana.uim.sugarcrmclient.plugin.objects.queries
  ient.plugin,org.quartz,eu.europeana.uim.sugarcrmclient.ws.exceptions,
  eu.europeana.uim.sugarcrmclient.plugin.objects.listeners,org.springfr
  amework.scheduling.quartz"
-Built-By: georgiosmarkakis
+Built-By: geomark
 Tool: Bnd-0.0.357
-Bundle-Name: Unified Ingestion Manager: Sugar CRM Plugin
+Bundle-Name: Unified Ingestion Manager: SugarCRM Client Plugin
 Created-By: Apache Maven Bundle Plugin
 Import-Service: eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService
  ;availability:=optional
 DynamicImport-Package: *
-Build-Jdk: 1.6.0_24
+Build-Jdk: 1.6.0_20
 Bundle-Version: 1.2.0.SNAPSHOT
-Bnd-LastModified: 1307114245017
+Bnd-LastModified: 1307897808580
 Bundle-ManifestVersion: 2
 Import-Package: eu.europeana.uim.api,eu.europeana.uim.store,eu.europea
  na.uim.sugarcrmclient.internal,eu.europeana.uim.sugarcrmclient.intern

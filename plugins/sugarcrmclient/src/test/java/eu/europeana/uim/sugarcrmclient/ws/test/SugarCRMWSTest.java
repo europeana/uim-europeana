@@ -92,41 +92,30 @@ public final class SugarCRMWSTest {
 	/**
 	 *  Method invoked before each test execution. It performs the initial login in order for allow permission to the 
 	 *  subsequent web service calls. It also sets the session id for this test run. 
+	 * @throws LoginFailureException 
 	 */
 	@Before
-	public void setupSession(){
-		
+	public void setupSession() throws LoginFailureException{
 		LoginResponse lresponse;
-		try {
-			lresponse = sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
-			assertNotNull(lresponse);
-			sessionID = lresponse.getReturn().getId();
-			
-		} catch (LoginFailureException e) {
-			sessionID = "-1";
-			LOGGER.info(e.getMessage());
-		} 
-		
+		lresponse = sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
+		assertNotNull(lresponse);
+		sessionID = lresponse.getReturn().getId();
 	}
 	
 	
 	/**
 	 * Method invoked after each test has been executed. It destroys the current session. 
+	 * @throws LogoutFailureException 
 	 */
 	@After
-	public void destroySession(){
+	public void destroySession() throws LogoutFailureException{
 		
 		Logout request = new Logout();
 		request.setSession(sessionID);
 		LogoutResponse lgresponse;
-		try {
-			lgresponse = sugarWsClient.logout(request );
-			assertNotNull(lgresponse);
-		} catch (LogoutFailureException e) {
-			e.printStackTrace();
-		} catch (GenericSugarCRMException e) {
-			e.printStackTrace();
-		}
+		lgresponse = sugarWsClient.logout(request );
+		assertNotNull(lgresponse);
+
 		
 	}
 
@@ -135,107 +124,79 @@ public final class SugarCRMWSTest {
 	 * User Login Test (make sure that the user has been created in advance in in the configured SCRM installation)
 	 */
 	@Test
-	public void testLogin(){
+	public void testLogin() throws Exception{
 		LoginResponse response;
-
-			try {
-				Login login = ClientUtils.createStandardLoginObject("test", "test");
-					
-				ClientUtils.logMarshalledObject(login);
-				
-				response = sugarWsClient.login2(login);
-				
-				assertNotNull(response);
-				LOGGER.info(response.getReturn().getId());
-				ClientUtils.logMarshalledObject(response);
-			} catch (LoginFailureException e) {
-				response = null;
-			} catch (GenericSugarCRMException e) {
-				e.printStackTrace();
-			}
-
+		Login login = ClientUtils.createStandardLoginObject("test", "test");			
+		ClientUtils.logMarshalledObject(login);
+		response = sugarWsClient.login2(login);		
+		assertNotNull(response);
+		LOGGER.info(response.getReturn().getId());
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
 	/**
 	 * Is User Admin Test: Checks if the user has admin rights.
+	 * @throws GenericSugarCRMException 
 	 */
 	@Test
-	public void testIsUserAdmin(){	
+	public void testIsUserAdmin() throws GenericSugarCRMException{	
 		IsUserAdmin user = new IsUserAdmin();		
 		user.setSession(sessionID);
-		
 		IsUserAdminResponse response;
-		try {
-			response = sugarWsClient.is_user_admin(user);
-			assertNotNull(response);
-			ClientUtils.logMarshalledObject(response);
-		} catch (GenericSugarCRMException e) {
-			e.printStackTrace();
-		}
-
+		response = sugarWsClient.is_user_admin(user);
+		assertNotNull(response);
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
 	/**
 	 * Get User ID Test: Retrieves a user id for a session.
+	 * @throws GenericSugarCRMException 
 	 */
 	@Test
-	public void testGetUserID(){	 
+	public void testGetUserID() throws GenericSugarCRMException{	 
 		GetUserId request = new GetUserId();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetUserIdResponse response;
-		try {
-			response = sugarWsClient.get_user_id(request);
-			assertNotNull(response);
-			ClientUtils.logMarshalledObject(response);
-		} catch (GenericSugarCRMException e) {
-			e.printStackTrace();
-		}
-
+		response = sugarWsClient.get_user_id(request);
+		assertNotNull(response);
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
 	/**
 	 * Get Available Modules: Gets the available modules for a specific SugarCRM installation.
+	 * @throws QueryResultException 
 	 */
 	@Test
-	public void testGetAvailableModules(){	 	
+	public void testGetAvailableModules() throws QueryResultException{	 	
 		GetAvailableModules request = new GetAvailableModules();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetAvailableModulesResponse response;
-		try {
-			response = sugarWsClient.get_available_modules(request);
-			assertNotNull(response);
-			ClientUtils.logMarshalledObject(response);
-		} catch (QueryResultException e) {
-			e.printStackTrace();
-		}
-
+		response = sugarWsClient.get_available_modules(request);
+		assertNotNull(response);
+		ClientUtils.logMarshalledObject(response);
 	}
 
 	
 	
 	/**
 	 * Get Module Fields Test: Get the fields for a specific modules.
+	 * @throws Exception 
 	 */
 	@Test
-	public void testGetModuleFields(){	 		
+	public void testGetModuleFields() throws Exception{	 		
 		GetModuleFields request = new GetModuleFields();
 		request.setSession(sessionID);
 		request.setModuleName("Contacts");
 		ClientUtils.logMarshalledObject(request);
 		GetModuleFieldsResponse response;
-		try {
-			response = sugarWsClient.get_module_fields(request);
-			assertNotNull(response);		
-			ClientUtils.logMarshalledObject(response);
-		} catch (QueryResultException e) {
-			e.printStackTrace();
-		}
-
+		response = sugarWsClient.get_module_fields(request);
+		assertNotNull(response);		
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
@@ -262,8 +223,8 @@ public final class SugarCRMWSTest {
 		request.setSelectFields(fields);
 		request.setSession(sessionID);
 		request.setOrderBy("last_name");
-		request.setMaxResults(100);
-		request.setOffset(10);
+		request.setMaxResults(10);
+		request.setOffset(0);
 		//request.setQuery("(contacts.salutation = 'Mr.' AND contacts.title LIKE 'doctor appointment%')");
 		request.setQuery("(contacts.first_name LIKE '%M%')");
 		
@@ -283,9 +244,10 @@ public final class SugarCRMWSTest {
 	
 	/**
 	 * Get Entry Test: Retrieves all fields from a specific module. 
+	 * @throws QueryResultException 
 	 */
 	@Test
-	public void testGetEntries(){	 		
+	public void testGetEntries() throws QueryResultException{	 		
 		GetEntries request = new GetEntries();
 		ArrayList <String> fieldnames = new  ArrayList<String>();
 		fieldnames.add("id");
@@ -299,36 +261,31 @@ public final class SugarCRMWSTest {
 		request.setIds(fields);
 		ClientUtils.logMarshalledObject(request);
 		GetEntriesResponse response;
-		try {
-			response = sugarWsClient.get_entries(request);
-			ClientUtils.logMarshalledObject(response);
-		} catch (QueryResultException e) {
-			e.printStackTrace();
-		}
-
+		response = sugarWsClient.get_entries(request);
+		ClientUtils.logMarshalledObject(response);
 	}
+	
+	
+	
 	
 	
 	
 	/**
 	 * Get Entry Test: Get a test entry for a specific ID.
+	 * @throws QueryResultException 
 	 */
 	@Test
-	public void testGetEntry(){
+	public void testGetEntry() throws QueryResultException{
 		GetEntry request = new GetEntry();
-		request.setId("1c3a03dd-753b-7741-92e8-4d6509d442d3");
-		request.setModuleName("Contacts");
+		request.setId("51b2399c-6a95-78ea-7bc7-4c585f95c530");
+		request.setModuleName("Accounts");
 		request.setSession(sessionID);	
 		SelectFields selectFields = new SelectFields();
 		request.setSelectFields(selectFields );
 		ClientUtils.logMarshalledObject(request);
 		GetEntryResponse response;
-		try {
-			response = sugarWsClient.get_entry(request);
-			ClientUtils.logMarshalledObject(response);
-		} catch (QueryResultException e) {
-			e.printStackTrace();
-		}
+		response = sugarWsClient.get_entry(request);
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	
@@ -336,23 +293,23 @@ public final class SugarCRMWSTest {
 	/**
 	 * Set Entry Test: Create an entry with the specified ID and the declared 
 	 * name-value pairs and update it if it already exists. 
+	 * @throws QueryResultException 
 	 */
 	@Test
-	public void testSetEntry(){
+	public void testSetEntry() throws QueryResultException{
 		SetEntry request = new SetEntry();
 		
-		
-		//NameValue nv1 = new NameValue();
-		//nv1.setName("id");
-		//nv1.setValue("99f37146-8e19-473d-171c-4d66de7024c0");
+		NameValue nv1 = new NameValue();
+		nv1.setName("id");
+		nv1.setValue("ac3f140f-ef12-ffab-6c97-4df512d4a9d8");
 		
 		NameValue nv0 = new NameValue();
 		nv0.setName("first_name");
-		nv0.setValue("JohnX");
+		nv0.setValue("JohnZXs");
 
 		NameValue nv2 = new NameValue();
 		nv2.setName("last_name");
-		nv2.setValue("SmithX");		
+		nv2.setValue("SmithZ");		
 
 		ArrayList <NameValue> nvList = new  ArrayList <NameValue>();
 		
@@ -366,27 +323,22 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);	
 		ClientUtils.logMarshalledObject(request);
 		SetEntryResponse response;
-		try {
-			response = sugarWsClient.set_entry(request);
-			ClientUtils.logMarshalledObject(response);
-		} catch (QueryResultException e) {
-			e.printStackTrace();
-		}
-
-				
+		response = sugarWsClient.set_entry(request);
+		ClientUtils.logMarshalledObject(response);
 	}
 	
 	/**
 	 * Set Attachment Test: Create an attachment for a specific entry 
+	 * @throws FileAttachmentException 
 	 * 
 	 */
 	@Test
-	public void testSetAttachment(){
+	public void testSetAttachment() throws FileAttachmentException{
 		
 		SetNoteAttachment request = new SetNoteAttachment();
 	    NoteAttachment note = new NoteAttachment();
 	    
-	    note.setId("1c3a03dd-753b-7741-92e8-4d6509d442d3");
+	    note.setId("ac3f140f-ef12-ffab-6c97-4df512d4a9d8");
 	    note.setFile("asdasdsadsadsadsad");
 	    note.setFilename("test.txt");
 	    
@@ -394,13 +346,8 @@ public final class SugarCRMWSTest {
 		request.setSession(sugarWsClient.getSessionID());
 		ClientUtils.logMarshalledObject(request);
 		SetNoteAttachmentResponse resp;
-		try {
-			resp = sugarWsClient.set_note_attachment(request );
-			ClientUtils.logMarshalledObject(resp);
-		} catch (FileAttachmentException e) {
-
-			e.printStackTrace();
-		}
+		resp = sugarWsClient.set_note_attachment(request );
+		ClientUtils.logMarshalledObject(resp);
 
 	}
 	

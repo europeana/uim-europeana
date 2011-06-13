@@ -33,13 +33,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.DataSet;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 
-import eu.europeana.uim.sugarcrmclient.jibxbindings.ContactByEmail;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
@@ -341,6 +339,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         	cuurprovider.setName(providerName);
         	cuurprovider.setOaiBaseUrl(harvestUrl);
         	cuurprovider.setOaiMetadataPrefix("ese");   
+
+        	
         	
         	engine.updateProvider(cuurprovider);
         	engine.checkpoint();
@@ -494,26 +494,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	}
 	
 	
-	
-	/**
-	 * @param value
-	 * @param el
-	 * @return
-	 */
-	private String extractFromElement(String value, Element el){
+
 		
-		NodeList nl =el.getElementsByTagName(value);
-		
-		if(nl.getLength() != 0){
-			
-			return nl.item(0).getTextContent();
-		}
-		
-		
-		return null;
-	}
-	
-	
 	/**
 	 * @param id
 	 * @param status

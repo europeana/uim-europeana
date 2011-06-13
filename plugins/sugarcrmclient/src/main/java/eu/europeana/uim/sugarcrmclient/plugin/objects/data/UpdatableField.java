@@ -24,6 +24,7 @@ package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
 /**
  *  This enumeration indicates the Fields that can be updated
  *  by the SugarCRM client. 
+ *  
  * @author Georgios Markakis
  */
 public enum UpdatableField implements SugarCrmField{

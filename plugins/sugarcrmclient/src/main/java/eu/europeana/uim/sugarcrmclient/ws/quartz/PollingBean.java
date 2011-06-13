@@ -43,7 +43,7 @@ import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
  * This Class implements the Quartz-based polling mechanism for sugarcrm
  * plugin.
  *   
- * @author georgiosmarkakis
+ * @author Georgios Markakis
  */
 public class PollingBean extends QuartzJobBean {
 

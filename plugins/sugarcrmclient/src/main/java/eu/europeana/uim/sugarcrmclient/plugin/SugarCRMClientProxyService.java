@@ -20,8 +20,7 @@
  */
 package eu.europeana.uim.sugarcrmclient.plugin;
 
-import eu.europeana.uim.sugarcrmclient.jibxbindings.ContactByEmail;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.ContactByEmailResponse;
+
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;

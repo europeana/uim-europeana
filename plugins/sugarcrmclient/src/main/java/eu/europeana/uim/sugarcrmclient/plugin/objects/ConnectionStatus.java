@@ -22,9 +22,9 @@
 package eu.europeana.uim.sugarcrmclient.plugin.objects;
 
 /**
+ * Hold connection status information  
  * 
  * @author Georgios Markakis
- * 
  */
 public class ConnectionStatus {
 

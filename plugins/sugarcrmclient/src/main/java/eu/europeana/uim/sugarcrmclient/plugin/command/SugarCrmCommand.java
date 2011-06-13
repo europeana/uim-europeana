@@ -2,30 +2,20 @@ package eu.europeana.uim.sugarcrmclient.plugin.command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Function;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
-import eu.europeana.uim.clientbindings.utils.Utils;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService;
-import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMServiceImpl;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;

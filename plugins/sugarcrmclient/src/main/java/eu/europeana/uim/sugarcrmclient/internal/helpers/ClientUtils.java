@@ -129,6 +129,13 @@ public class ClientUtils {
 	
 	
 	
+	/**
+	 * Private auxiliary method that performs the unmarshalling of the object
+	 * 
+	 * @param jibxObject
+	 * @return
+	 * @throws JiBXException
+	 */
 	private static String unmarshallObject(Object jibxObject) throws JiBXException{
 		IBindingFactory context;
 		context = BindingDirectory.getFactory(jibxObject.getClass());
