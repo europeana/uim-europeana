@@ -20,6 +20,8 @@
  */
 package eu.europeana.uim.sugarcrmclient.ws.quartz;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.quartz.JobExecutionContext;
@@ -64,22 +66,16 @@ public class PollingBean extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext arg0)
 			throws JobExecutionException {
 
-
-
-			List<PollingListener> pollingListeners = sugarcrmPlugin.getPollingListeners();
-			
-			if(!pollingListeners.isEmpty()){
+		    LinkedHashMap<String,PollingListener>  pollingListeners = sugarcrmPlugin.getPollingListeners();
+		    Iterator itr = pollingListeners.keySet().iterator();
+		    
+			if(pollingListeners != null){
 				
-				for(PollingListener listener:pollingListeners){
+				while(itr.hasNext()){
 					
-					SimpleSugarCrmQuery query = new SimpleSugarCrmQuery(listener.getTrigger());
-
-					query.setMaxResults(100);
-					query.setOffset(0);
-					query.setOrderBy(RetrievableField.DATE_ENTERED);
 					try {
-						
-						List<SugarCrmRecord> results = sugarcrmPlugin.retrieveRecords(query);
+						PollingListener listener = pollingListeners.get(itr.next());
+						List<SugarCrmRecord> results = sugarcrmPlugin.retrieveRecords(listener.getTrigger());
 						
 						listener.performAction(sugarcrmPlugin, results);
 						

@@ -23,6 +23,7 @@
 package eu.europeana.uim.sugarcrmclient.plugin;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.store.Collection;
@@ -186,7 +187,7 @@ public interface SugarCRMService {
 	 * @param listener an instance of any Class implementing the PollingListener interface
 	 * @see PollingListener
 	 */
-	public void addPollingListener(PollingListener listener);
+	public void addPollingListener(String id,PollingListener listener);
 	
 	
 	/**
@@ -195,7 +196,7 @@ public interface SugarCRMService {
 	 * @param listener
 	 * @see PollingListener
 	 */
-	public void removePollingListener(PollingListener listener);
+	public void removePollingListener(String id);
 	
 	
 	/**
@@ -204,7 +205,7 @@ public interface SugarCRMService {
 	 * @return the list
 	 * @see PollingListener
 	 */
-	public List<PollingListener> getPollingListeners();
+	public LinkedHashMap<String,PollingListener>  getPollingListeners();
 	
 	
 	/**
@@ -213,5 +214,5 @@ public interface SugarCRMService {
 	 * @param listeners
      * @see PollingListener
 	 */
-	public void setPollingListeners(List<PollingListener> listeners);
+	public void setPollingListeners(LinkedHashMap<String,PollingListener>  listeners);
 }

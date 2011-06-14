@@ -24,7 +24,7 @@ package eu.europeana.uim.sugarcrmclient.plugin.objects.listeners;
 import java.util.List;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 
 /**
@@ -38,12 +38,12 @@ import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 public interface PollingListener {
 	
 	/**
-	 * Returns the state of a SugarCRM record that will trigger 
-	 * the designated action.
+	 * Returns a specific query that will act as a trigger for  
+	 * the designated action (in case that any results are returned) .
 	 * 
-	 * @return the DatasetState that will be monitored
+	 * @return the SugarCrmQuery to be executed
 	 */
-	public DatasetStates getTrigger();
+	public SugarCrmQuery getTrigger();
 	
 	
 	/**

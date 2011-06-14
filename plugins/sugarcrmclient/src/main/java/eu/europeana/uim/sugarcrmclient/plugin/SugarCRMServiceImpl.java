@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,9 +80,17 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	private SugarWsClientImpl sugarwsClient;
 	private Orchestrator orchestrator;
 	private Registry registry;
-	private List<PollingListener> pollingListeners;
-	
+	private LinkedHashMap<String,PollingListener> pollingListeners;
 	private static final String DSMODULENAME = "Opportunities";
+	
+	
+	
+	/**
+	 * Default Constructor
+	 */
+	public SugarCRMServiceImpl(){
+		this.pollingListeners = new  LinkedHashMap<String,PollingListener>();
+	}
 	
 
 
@@ -414,12 +423,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#addPollingListener(eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener)
 	 */
 	@Override
-	public void addPollingListener(PollingListener listener) {
-		if(this.pollingListeners == null){
-			this.pollingListeners = new ArrayList<PollingListener>();
-		}
-		this.pollingListeners.add(listener);
-		
+	public synchronized void addPollingListener(String id,PollingListener listener) {
+		pollingListeners.put(id,listener);		
 	}
 
 
@@ -427,11 +432,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#removePollingListener(eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener)
 	 */
 	@Override
-	public void removePollingListener(PollingListener listener) {
-		if(this.pollingListeners == null){
-			this.pollingListeners = new ArrayList<PollingListener>();
-		}
-		this.pollingListeners.remove(listener);
+	public synchronized void removePollingListener(String  id) {
+		pollingListeners.remove(id);
 		
 	}
 
@@ -440,9 +442,9 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#getPollingListeners()
 	 */
 	@Override
-	public List<PollingListener> getPollingListeners() {
+	public LinkedHashMap<String,PollingListener>  getPollingListeners() {
 		
-		return this.pollingListeners;
+		return pollingListeners;
 	}
 
 
@@ -450,7 +452,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#setPollingListeners(java.util.List)
 	 */
 	@Override
-	public void setPollingListeners(List<PollingListener> listeners) {
+	public void setPollingListeners(LinkedHashMap<String,PollingListener>  listeners) {
 		this.pollingListeners = listeners;
 		
 	}

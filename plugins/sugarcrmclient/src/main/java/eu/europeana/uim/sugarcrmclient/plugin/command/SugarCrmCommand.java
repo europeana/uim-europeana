@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
@@ -155,11 +156,13 @@ public class SugarCrmCommand implements Function, Action {
 			break;
 			
 		case addpollinglistener:
-			sugarcrmPlugin.addPollingListener(new PollingListener(){
+			sugarcrmPlugin.addPollingListener("TestListener",new PollingListener(){
 
 				@Override
-				public DatasetStates getTrigger() {
-					return DatasetStates.OAI_PMH_TESTING;
+				public SugarCrmQuery getTrigger() {
+					DatasetStates status = DatasetStates.INGESTION_COMPLETE;
+					SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery(status);			
+					return query;
 				}
 
 				@Override
@@ -174,7 +177,7 @@ public class SugarCrmCommand implements Function, Action {
 			out.println("PollingListener Added");
 			break;
 		case removepollinglisteners:
-			ArrayList<PollingListener> listeners = new ArrayList<PollingListener>();
+			LinkedHashMap<String,PollingListener>  listeners = new LinkedHashMap<String,PollingListener> ();
 			sugarcrmPlugin.setPollingListeners(listeners);
 			System.out.println("Pollers Removed");
 			break;

@@ -157,7 +157,7 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
     
 
     /**
-     * Tests the Retrieve Records functionality
+     * Tests the execution of a Simple Query
      * 
      * @throws Exception
      */
@@ -184,7 +184,7 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
     
     
     /**
-     * Tests the Retrieve Records functionality
+     * Tests the execution of a Complex Query
      * 
      * @throws Exception
      */
@@ -208,7 +208,7 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
 
     
     /**
-     * Tests the Retrieve Records functionality
+     * Tests the execution of a Custom Query
      * 
      * @throws Exception
      */
