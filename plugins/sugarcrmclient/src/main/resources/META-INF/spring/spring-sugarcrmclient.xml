@@ -40,7 +40,7 @@
 
 
 	<!-- Spring DM specific declarations of SugarCRM Client instances-->
-    <bean id="sugarWsClientFactory" class="eu.europeana.uim.sugarcrmclient.ws.SugarWsClient">
+    <bean id="sugarWsClientFactory" class="eu.europeana.uim.sugarcrmclient.ws.ClientFactory">
        <property name="webServiceTemplate" ref="webServiceTemplate"/>
     </bean>
 

@@ -21,8 +21,6 @@
 
 package eu.europeana.uim.sugarcrmclient.plugin.objects.queries;
 
-import java.util.List;
-
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
@@ -42,6 +40,21 @@ public class SimpleSugarCrmQuery implements SugarCrmQuery{
 	private SugarCrmField orderBy;
 	private int maxResults;
 	private int offset;
+	
+	
+	
+	/**
+	 * Default Constructor
+	 */
+	public SimpleSugarCrmQuery(){
+		//Initialize fields to default values
+		this.status = DatasetStates.HARVESTING_PENDING;
+		this.orderBy = RetrievableField.DATE_ENTERED;
+		this.maxResults = 100;
+		this.offset =0 ;
+	}
+	
+	
 	
 	
 	/**

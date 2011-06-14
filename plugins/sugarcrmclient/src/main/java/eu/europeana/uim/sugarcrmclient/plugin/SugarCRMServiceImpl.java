@@ -55,7 +55,7 @@ import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
-import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientImpl;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.FileAttachmentException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
@@ -76,7 +76,7 @@ import eu.europeana.uim.api.StorageEngineException;
  */
 public class SugarCRMServiceImpl implements SugarCRMService{
 
-	private SugarWsClient sugarwsClient;
+	private SugarWsClientImpl sugarwsClient;
 	private Orchestrator orchestrator;
 	private Registry registry;
 	private List<PollingListener> pollingListeners;
@@ -537,11 +537,11 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	 */
 	
 	
-	public void setSugarwsClient(SugarWsClient sugarwsClient) {
+	public void setSugarwsClient(SugarWsClientImpl sugarwsClient) {
 		this.sugarwsClient = sugarwsClient;
 	}
 
-	public SugarWsClient getSugarwsClient() {
+	public SugarWsClientImpl getSugarwsClient() {
 		return sugarwsClient;
 	}
 

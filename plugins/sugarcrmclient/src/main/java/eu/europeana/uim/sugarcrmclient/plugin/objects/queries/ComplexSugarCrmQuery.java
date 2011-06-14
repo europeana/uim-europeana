@@ -35,7 +35,8 @@ public class ComplexSugarCrmQuery extends SimpleSugarCrmQuery {
 	
 	
 	public ComplexSugarCrmQuery(SugarCrmField field ,EqOp op, String value ){
-		super(null);
+		queryBuffer = new StringBuffer();
+		
 		queryBuffer.append("opportunities.");
 		queryBuffer.append(field.getFieldId());
 		queryBuffer.append(" ");
@@ -46,8 +47,9 @@ public class ComplexSugarCrmQuery extends SimpleSugarCrmQuery {
 	}
 	
 	private ComplexSugarCrmQuery(ComplexSugarCrmQuery query,String logicalOperator 
-			,SugarCrmField field ,EqOp op, String value ){
-		super(null);		
+			,SugarCrmField field ,EqOp op, String value ){	
+		queryBuffer = new StringBuffer();
+
 		queryBuffer.append(logicalOperator);
 		queryBuffer.append(" ");
 		queryBuffer.append("opportunities.");

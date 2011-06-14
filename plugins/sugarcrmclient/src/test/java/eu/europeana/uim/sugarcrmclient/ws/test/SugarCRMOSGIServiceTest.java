@@ -16,6 +16,7 @@ import java.util.List;
 import org.apache.karaf.testing.AbstractIntegrationTest;
 import org.apache.karaf.testing.Helper;
 import org.apache.log4j.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
@@ -33,6 +34,7 @@ import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.ComplexSugarCrmQuery;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.CustomSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.EqOp;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.workflow.Workflow;
@@ -41,6 +43,7 @@ import eu.europeana.uim.workflow.Workflow;
 public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
 
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMOSGIServiceTest.class);
+	
 	
     /**
      * This is the configuration section of the "virtual" Karaf container during the tests execution. It sets 
@@ -52,8 +55,8 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
     public static Option[] configuration() throws Exception {
          return combine(
  				Helper.getDefaultOptions(
-						systemProperty("karaf.name").value("junit"),
-						systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("ERROR")),
+						//systemProperty("karaf.name").value("junit"),
+						systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("OFF")),
 
 				
 				//This section corresponds to the "spring-ws" & "spring-dm" features in spring-features.xml		
@@ -103,6 +106,9 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
         );
     }
     
+    
+    
+        
     
     
     /**
@@ -187,7 +193,7 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
     
     	SugarCRMService service = getOsgiService(SugarCRMService.class);
     	
-		ComplexSugarCrmQuery query =  new ComplexSugarCrmQuery(RetrievableField.NAME ,EqOp.LIKE,"%sdf" );
+		ComplexSugarCrmQuery query =  new ComplexSugarCrmQuery(RetrievableField.NAME ,EqOp.LIKE,"00101_M_PT_Gulbenkian_biblioteca_digital" );
 		//query = query.and(field, op, value)
 		
 		List<SugarCrmRecord> records = service.retrieveRecords(query);
@@ -200,6 +206,30 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
 		}
 	}
 
+    
+    /**
+     * Tests the Retrieve Records functionality
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testRetrieveRecordsCustomQuery() throws Exception{
+    
+    	SugarCRMService service = getOsgiService(SugarCRMService.class);
+    	
+		CustomSugarCrmQuery query =  new CustomSugarCrmQuery("opportunities.sales_stage LIKE 'Needs%Analysis'");
+		
+		List<SugarCrmRecord> records = service.retrieveRecords(query);
+		System.out.println("Number of Records retrieved: " + records.size());
+		System.out.println("NO | RECORD ID                          | COLLECTION NAME");
+
+		for(int i=0; i< records.size(); i++){
+			System.out.println( (i+1) + " : " + records.get(i).getItemValue(RetrievableField.ID) + " | " +
+					records.get(i).getItemValue(RetrievableField.NAME)	) ;
+		}
+	}
+    
+    
 
     /**
      * Tests the fetch Record functionality 
@@ -330,10 +360,7 @@ public class SugarCRMOSGIServiceTest  extends AbstractIntegrationTest{
     }
 
     
-    
-    /*
-     * 
-     */
+
     
     
 }

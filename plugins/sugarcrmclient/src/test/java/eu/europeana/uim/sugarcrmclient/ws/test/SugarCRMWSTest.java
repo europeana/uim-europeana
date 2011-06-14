@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
+import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientImpl;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.FileAttachmentException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
@@ -81,7 +81,7 @@ import org.apache.log4j.Logger;
 public final class SugarCRMWSTest {
 
 	@Resource
-	private SugarWsClient sugarWsClient; 
+	private SugarWsClientImpl sugarWsClientImpl; 
 	
 	private String sessionID;
 
@@ -97,7 +97,7 @@ public final class SugarCRMWSTest {
 	@Before
 	public void setupSession() throws LoginFailureException{
 		LoginResponse lresponse;
-		lresponse = sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
+		lresponse = sugarWsClientImpl.login2(ClientUtils.createStandardLoginObject("test", "test"));
 		assertNotNull(lresponse);
 		sessionID = lresponse.getReturn().getId();
 	}
@@ -113,7 +113,7 @@ public final class SugarCRMWSTest {
 		Logout request = new Logout();
 		request.setSession(sessionID);
 		LogoutResponse lgresponse;
-		lgresponse = sugarWsClient.logout(request );
+		lgresponse = sugarWsClientImpl.logout(request );
 		assertNotNull(lgresponse);
 
 		
@@ -128,7 +128,7 @@ public final class SugarCRMWSTest {
 		LoginResponse response;
 		Login login = ClientUtils.createStandardLoginObject("test", "test");			
 		ClientUtils.logMarshalledObject(login);
-		response = sugarWsClient.login2(login);		
+		response = sugarWsClientImpl.login2(login);		
 		assertNotNull(response);
 		LOGGER.info(response.getReturn().getId());
 		ClientUtils.logMarshalledObject(response);
@@ -144,7 +144,7 @@ public final class SugarCRMWSTest {
 		IsUserAdmin user = new IsUserAdmin();		
 		user.setSession(sessionID);
 		IsUserAdminResponse response;
-		response = sugarWsClient.is_user_admin(user);
+		response = sugarWsClientImpl.is_user_admin(user);
 		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 	}
@@ -160,7 +160,7 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetUserIdResponse response;
-		response = sugarWsClient.get_user_id(request);
+		response = sugarWsClientImpl.get_user_id(request);
 		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 	}
@@ -176,7 +176,7 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetAvailableModulesResponse response;
-		response = sugarWsClient.get_available_modules(request);
+		response = sugarWsClientImpl.get_available_modules(request);
 		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 	}
@@ -194,7 +194,7 @@ public final class SugarCRMWSTest {
 		request.setModuleName("Contacts");
 		ClientUtils.logMarshalledObject(request);
 		GetModuleFieldsResponse response;
-		response = sugarWsClient.get_module_fields(request);
+		response = sugarWsClientImpl.get_module_fields(request);
 		assertNotNull(response);		
 		ClientUtils.logMarshalledObject(response);
 	}
@@ -231,7 +231,7 @@ public final class SugarCRMWSTest {
 		ClientUtils.logMarshalledObject(request);
 		GetEntryListResponse response;
 		try {
-			response = sugarWsClient.get_entry_list(request);
+			response = sugarWsClientImpl.get_entry_list(request);
 			assertNotNull(response);
 			ClientUtils.logMarshalledObject(response);
 		} catch (QueryResultException e) {
@@ -261,7 +261,7 @@ public final class SugarCRMWSTest {
 		request.setIds(fields);
 		ClientUtils.logMarshalledObject(request);
 		GetEntriesResponse response;
-		response = sugarWsClient.get_entries(request);
+		response = sugarWsClientImpl.get_entries(request);
 		ClientUtils.logMarshalledObject(response);
 	}
 	
@@ -284,7 +284,7 @@ public final class SugarCRMWSTest {
 		request.setSelectFields(selectFields );
 		ClientUtils.logMarshalledObject(request);
 		GetEntryResponse response;
-		response = sugarWsClient.get_entry(request);
+		response = sugarWsClientImpl.get_entry(request);
 		ClientUtils.logMarshalledObject(response);
 	}
 	
@@ -323,7 +323,7 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);	
 		ClientUtils.logMarshalledObject(request);
 		SetEntryResponse response;
-		response = sugarWsClient.set_entry(request);
+		response = sugarWsClientImpl.set_entry(request);
 		ClientUtils.logMarshalledObject(response);
 	}
 	
@@ -343,10 +343,10 @@ public final class SugarCRMWSTest {
 	    note.setFilename("test.txt");
 	    
 		request.setNote(note);
-		request.setSession(sugarWsClient.getSessionID());
+		request.setSession(sugarWsClientImpl.getSessionID());
 		ClientUtils.logMarshalledObject(request);
 		SetNoteAttachmentResponse resp;
-		resp = sugarWsClient.set_note_attachment(request );
+		resp = sugarWsClientImpl.set_note_attachment(request );
 		ClientUtils.logMarshalledObject(resp);
 
 	}

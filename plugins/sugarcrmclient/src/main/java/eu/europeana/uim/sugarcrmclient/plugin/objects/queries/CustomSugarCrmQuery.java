@@ -15,7 +15,6 @@ public class CustomSugarCrmQuery extends SimpleSugarCrmQuery {
 	
 	
 	public CustomSugarCrmQuery(String querystring){
-		super(null);
 		this.querystring = querystring;
 	}
 
