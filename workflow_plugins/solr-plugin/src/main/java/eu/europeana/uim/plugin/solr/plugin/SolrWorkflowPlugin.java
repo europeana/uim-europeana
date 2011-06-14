@@ -22,7 +22,7 @@ package eu.europeana.uim.plugin.solr.plugin;
 
 import java.util.List;
 
-import eu.europeana.uim.MetaDataRecord;
+import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPlugin;
