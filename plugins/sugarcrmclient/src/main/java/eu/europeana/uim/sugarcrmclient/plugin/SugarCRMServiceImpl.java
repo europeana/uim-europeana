@@ -39,6 +39,10 @@ import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationships;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationshipsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
@@ -153,7 +157,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		
 		
 	    while (it.hasNext()) {
-	        Map.Entry<UpdatableField, String> pairs = (Map.Entry<UpdatableField, String>)it.next();
+	        @SuppressWarnings("unchecked")
+			Map.Entry<UpdatableField, String> pairs = (Map.Entry<UpdatableField, String>)it.next();
 			NameValue nv = new NameValue();
 			nv.setName(pairs.getKey().getFieldId());
 			nv.setValue(pairs.getValue());
@@ -346,10 +351,9 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         	cuurprovider.setMnemonic(mnemonicCode);
         	cuurprovider.setName(providerName);
         	cuurprovider.setOaiBaseUrl(harvestUrl);
+        	//TODO: Meta data prefix is hardwired to ese. Fix this as soon as the field is available in SugarCRM 
         	cuurprovider.setOaiMetadataPrefix("ese");   
 
-        	
-        	
         	engine.updateProvider(cuurprovider);
         	engine.checkpoint();
         }
@@ -357,6 +361,52 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         return cuurprovider;
 	}
 
+	
+	
+	
+	private HashMap<String,String> getProviderInfoMap(String recordID) throws QueryResultException{
+		
+		GetRelationships request =  new GetRelationships();
+		
+		request.setDeleted(0);
+		request.setModuleId(recordID);
+		request.setModuleName("Opportunities");
+		request.setRelatedModule("Accounts");
+		request.setRelatedModuleQuery("");
+		request.setSession(sugarwsClient.getSessionID());
+		
+		
+		GetRelationshipsResponse resp = sugarwsClient.get_relationships(request);
+		
+		
+		List<Element>el = resp.getReturn().getIds().getArray().getAnyList();
+		
+		
+		//el.get(0).getElementsByTagName(arg0)
+		
+		return null;
+		
+	}
+	
+	
+	private HashMap<String,String> retrieveprovider(String providerID) throws QueryResultException{
+	
+		GetEntry request = new GetEntry();
+		request.setId(providerID);
+		request.setModuleName("Accounts");
+		request.setSession(sugarwsClient.getSessionID());	
+		SelectFields selectFields = new SelectFields();
+		request.setSelectFields(selectFields );
+
+		GetEntryResponse response = sugarwsClient.get_entry(request);
+		
+		
+		return null;
+		
+		
+	}
+	
+	
 
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#createCollectionFromRecord(eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord, eu.europeana.uim.store.Provider)
@@ -481,6 +531,10 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	
 	
 
+
+	
+	
+
 	/**
 	 * @param engine
 	 * @param trigger
@@ -492,17 +546,15 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		Provider prov =  createProviderFromRecord(trigger);
 		Collection currcollection  = createCollectionFromRecord(trigger, prov);
 		return currcollection;	
-	}
-	
-	
+	}	
 
-		
+	
 	/**
 	 * @param id
 	 * @param status
 	 * @throws QueryResultException 
 	 */
-	private void alterSugarCRMItemStatus(String id, String status) throws QueryResultException{
+	protected void alterSugarCRMItemStatus(String id, String status) throws QueryResultException{
 		SetEntry request = new SetEntry();
 		
 		
@@ -529,8 +581,6 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 
 				
 	}
-	
-	
 
 	
 	
