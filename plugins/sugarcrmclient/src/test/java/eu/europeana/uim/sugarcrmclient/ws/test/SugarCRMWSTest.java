@@ -47,6 +47,8 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationships;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationshipsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserId;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserIdResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
@@ -277,7 +279,7 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testGetEntry() throws QueryResultException{
 		GetEntry request = new GetEntry();
-		request.setId("51b2399c-6a95-78ea-7bc7-4c585f95c530");
+		request.setId("99d2439f-05f3-af5b-0d4c-4d53f081ba9b");
 		request.setModuleName("Accounts");
 		request.setSession(sessionID);	
 		SelectFields selectFields = new SelectFields();
@@ -351,6 +353,32 @@ public final class SugarCRMWSTest {
 
 	}
 	
+	
+	
+	
+	/**
+	 * Get Relationships test: Gets the Related Organizations modules for a specific Dataset Record
+	 * @throws Exception
+	 */
+	@Test
+	public void testGetRelationships() throws Exception{
+		
+		GetRelationships request =  new GetRelationships();
+		
+		request.setDeleted(0);
+		request.setModuleId("49357412-f6b0-9a19-78f0-4cffa2f08cd8");
+		request.setModuleName("Opportunities");
+		request.setRelatedModule("Accounts");
+		request.setRelatedModuleQuery("");
+		request.setSession(sessionID);
+		
+		ClientUtils.logMarshalledObject(request);
+		
+		GetRelationshipsResponse resp = sugarWsClientImpl.get_relationships(request);
+		
+		ClientUtils.logMarshalledObject(resp);
+		
+	}
 	
 		
 	}

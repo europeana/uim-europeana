@@ -52,6 +52,8 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.GetNoteAttachmentResponse;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.*;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationships;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationshipsResponse;
 
 /**
  * The core class for performing SOAP based sugarCRM operations  
@@ -355,6 +357,28 @@ public class SugarWsClientImpl implements SugarWsClient{
 		}
 		
 		return response;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Gets the Relationships for a specific module
+	 * @param request
+	 * @return
+	 * @throws QueryResultException
+	 */
+	public GetRelationshipsResponse get_relationships(GetRelationships request) throws QueryResultException{
+
+		GetRelationshipsResponse response = invokeWSTemplate(request,GetRelationshipsResponse.class);
+		
+		if(!"0".equals(response.getReturn().getError().getNumber())){			
+			throw new QueryResultException(response.getReturn().getError());
+		}
+		
+		return response;
+		
 	}
 	
 	

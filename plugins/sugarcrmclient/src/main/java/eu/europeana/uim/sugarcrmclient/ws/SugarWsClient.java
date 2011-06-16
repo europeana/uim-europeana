@@ -33,6 +33,8 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetModuleFieldsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetNoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetNoteAttachmentResponse;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationships;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationshipsResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserId;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetUserIdResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
@@ -180,5 +182,13 @@ public interface SugarWsClient {
 	 * @throws FileAttachmentException 
 	 */
 	public GetNoteAttachmentResponse get_note_attachment(GetNoteAttachment request) throws FileAttachmentException;
+	
+	/**
+	 * Gets the Relationships for a specific module
+	 * @param request
+	 * @return
+	 * @throws QueryResultException
+	 */
+	public GetRelationshipsResponse get_relationships(GetRelationships request) throws QueryResultException;
 	
 }
