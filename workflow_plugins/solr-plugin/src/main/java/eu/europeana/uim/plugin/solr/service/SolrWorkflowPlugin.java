@@ -18,7 +18,7 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package eu.europeana.uim.plugin.solr.plugin;
+package eu.europeana.uim.plugin.solr.service;
 
 import java.util.List;
 

@@ -8,7 +8,6 @@
     <packaging>jar</packaging>
     <name>Spring OSGi Bundle</name>
     <version>1.2.0-SNAPSHOT</version>
-    <url>http://www.springframework.org/osgi</url>
 
 	<properties>
         <junit-version>4.5</junit-version>
@@ -73,7 +72,7 @@
             <resource>
                 <directory>.</directory>
                 <includes>
-                    <include>plugin.xml</include>
+                    <include>solrplugin.xml</include>
                     <include>OSGI-INF/*</include>
                 </includes>
             </resource>
@@ -90,14 +89,13 @@
                     <obrRepository>NONE</obrRepository>
                     <manifestLocation>META-INF</manifestLocation>
                     <instructions>
-                        <Export-Package>
-                            !eu.europeana.uim.plugin.solr.test.internal,eu.europeana.uim.plugin.solr.test*
-                        </Export-Package>
+                        <Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
                         <Import-Package>*</Import-Package>
                         <Include-Resource>src/main/resources</Include-Resource>
                     </instructions>
                 </configuration>
             </plugin>
+            
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
