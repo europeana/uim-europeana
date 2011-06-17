@@ -20,14 +20,12 @@
             <artifactId>europeana-uim-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>europeana-uim-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
-        
-
 
         <dependency>
            <groupId>org.apache.solr</groupId>
@@ -41,8 +39,7 @@
                <version>1.4.1</version>
                <type>jar</type>
                <scope>compile</scope>
-        </dependency>
-        
+        </dependency>        
         
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -70,7 +67,7 @@
             </resource>
             <!-- plus root folder -->
             <resource>
-                <directory>.</directory>
+                 <directory>.</directory>
                 <includes>
                     <include>solrplugin.xml</include>
                     <include>OSGI-INF/*</include>
