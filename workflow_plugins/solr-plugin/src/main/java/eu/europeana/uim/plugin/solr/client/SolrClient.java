@@ -42,7 +42,7 @@ public class SolrClient {
 	 * Default Constructor
 	 */
 	public SolrClient(){
-		init();
+
 	}
 	
 	
@@ -50,7 +50,7 @@ public class SolrClient {
 		String url = "http://localhost:8983/solr";
 			  CommonsHttpSolrServer server;
 			try {
-				server = new CommonsHttpSolrServer( url );
+				server = new CommonsHttpSolrServer(url);
 				  server.setSoTimeout(1000);  // socket read timeout
 				  server.setConnectionTimeout(100);
 				  server.setDefaultMaxConnectionsPerHost(100);
@@ -75,7 +75,10 @@ public class SolrClient {
 	
 	
 	public void importRecord(SolrInputDocument solrDocument) throws SolrServerException, IOException{
+
+		init();
 		server.add(solrDocument);
+		server.commit();
 	}
 	
 	
