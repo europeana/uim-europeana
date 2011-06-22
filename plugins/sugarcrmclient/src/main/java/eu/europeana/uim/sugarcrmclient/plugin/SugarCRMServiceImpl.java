@@ -282,7 +282,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	@Override
 	public Workflow initWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException {
 
-			StorageEngine<?> engine = registry.getStorage();
+			StorageEngine<?> engine = registry.getStorageEngine();
 			Workflow w = registry.getWorkflow(worklfowName);
 			
 			Collection<?> dataset = inferCollection(engine,record);
@@ -333,7 +333,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	public Provider<?> createProviderFromRecord(SugarCrmRecord record)
 			throws StorageEngineException {
 		
-		StorageEngine<?> engine = registry.getStorage();
+		StorageEngine<?> engine = registry.getStorageEngine();
 		
 	    String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
 	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
@@ -415,7 +415,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	public Collection<?> createCollectionFromRecord(SugarCrmRecord record,
 			Provider provider) throws StorageEngineException {
 		
-		StorageEngine<?> engine = registry.getStorage();
+		StorageEngine<?> engine = registry.getStorageEngine();
 		
 	    String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
 	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
