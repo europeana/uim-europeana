@@ -4,11 +4,10 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.europeana</groupId>
-    <artifactId>europeana-uim-workflow-basic</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>europeana-uim-workflows-basic</artifactId>
+    <packaging>bundle</packaging>
     <name>Spring OSGi Bundle</name>
-    <version>1.0.3-SNAPSHOT</version>
-    <url>http://www.springframework.org/osgi</url>
+    <version>1.3.0-SNAPSHOT</version>
 
  	<properties>
         <junit-version>4.5</junit-version>
