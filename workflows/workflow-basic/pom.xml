@@ -6,7 +6,7 @@
     <groupId>eu.europeana</groupId>
     <artifactId>europeana-uim-workflows-basic</artifactId>
     <packaging>bundle</packaging>
-    <name>Spring OSGi Bundle</name>
+    <name>Europeana specific ingestion workflows</name>
     <version>1.3.0-SNAPSHOT</version>
 
  	<properties>
@@ -15,6 +15,7 @@
 
 
 	<dependencies>
+	    <!-- UIM dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>europeana-uim-common</artifactId>
@@ -26,6 +27,26 @@
             <artifactId>europeana-uim-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <!-- Ingestion Plugins dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>europeana-uim-plugin-solrosgi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>europeana-uim-plugin-linkchecker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>europeana-normalizer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
         
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -70,7 +91,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <instructions>
                         <Export-Package>
-                            !eu.europeana.internal,eu.europeana*
+                            eu.europeana.uim.europeanaspecific.workflows.*
                         </Export-Package>
                         <Import-Package>*</Import-Package>
                         <Include-Resource>src/main/resources</Include-Resource>

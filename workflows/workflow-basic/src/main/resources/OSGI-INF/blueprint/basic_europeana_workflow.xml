@@ -7,11 +7,11 @@
 
     <bp:reference id="registry" interface="eu.europeana.uim.api.Registry"/>
 
-    <bean id="sw" class="eu.europeana.uim.workflows.SysoutWorkflow">
+    <bean id="iiwClient" class="eu.europeana.uim.europeanaspecific.workflows.InitialIngestionWorkflow">
         <argument ref="registry" />
     </bean>
 
-    <service id="sysoutWorkflow" ref="sw" interface="eu.europeana.uim.workflow.Workflow"/>
+    <service id="initialIngestionWorkflow" ref="iiwClient" interface="eu.europeana.uim.workflow.Workflow"/>
 
 
 </blueprint>
