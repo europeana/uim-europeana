@@ -21,8 +21,7 @@
 package eu.europeana.uim.model.europeanaspecific;
 
 import eu.europeana.uim.common.TKey;
-import eu.europeana.uim.model.Concept;
-import eu.europeana.uim.model.GlobalModelRegistry;
+
 
 /**
  * 
