@@ -9,8 +9,10 @@ import org.junit.Test;
 import eu.europeana.uim.plugin.solr.client.SolrClient;
 
 /**
+ * 
+ * 
+ * 
  * @author Georgios Markakis
- *
  */
 public class SolrPluginTest {
 
@@ -30,7 +32,7 @@ public class SolrPluginTest {
 		solrDocument.addField("europeana_collectionName", "collection2");
 		solrDocument.addField("creator", "test2");
 		solrDocument.addField("identifier", "xxxxxxxxxx1");
-		solrDocument.addField("europeana_edm_class", "class");
+		//solrDocument.addField("europeana_edm_class", "class");
 		
 		client.importRecord(solrDocument);
 		

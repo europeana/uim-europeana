@@ -20,8 +20,13 @@
  */
 package eu.europeana.uim.plugin.solr.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import eu.europeana.uim.model.GlobalModelRegistry;
+import eu.europeana.uim.model.qualifier.AgentRelation;
+import eu.europeana.uim.model.qualifier.ConceptLevel;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
@@ -30,25 +35,52 @@ import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 
 /**
+ * 
+ * 
+ * 
  * @author georgiosmarkakis
  *
  */
 public class SolrWorkflowPlugin implements IngestionPlugin {
 
+	
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
+	 */
+	public boolean processRecord(MetaDataRecord<?> mdr, ExecutionContext context)
+			throws IngestionPluginFailedException,
+			CorruptedMetadataRecordException {
+
+
+		mdr.getQField(GlobalModelRegistry.AGENT, new HashSet<Enum<?>>(){{
+		
+			add(ConceptLevel.AGGREGATION);
+			add(AgentRelation.CREATOR);
+		}
+		});
+		
+		return false;
+	}
+	
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.api.IngestionPlugin#getIdentifier()
 	 */
 	public String getIdentifier() {
-		// TODO Auto-generated method stub
-		return null;
+		return "solr_plugin";
 	}
 
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.api.IngestionPlugin#getName()
 	 */
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return "Solr Workflow Plugin";
 	}
 
 	/* (non-Javadoc)
@@ -141,14 +173,6 @@ public class SolrWorkflowPlugin implements IngestionPlugin {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
-	 */
-	public boolean processRecord(MetaDataRecord<?> mdr, ExecutionContext context)
-			throws IngestionPluginFailedException,
-			CorruptedMetadataRecordException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+
 
 }
