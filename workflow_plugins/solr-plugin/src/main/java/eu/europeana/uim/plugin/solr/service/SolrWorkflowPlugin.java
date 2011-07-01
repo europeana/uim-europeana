@@ -20,14 +20,16 @@
  */
 package eu.europeana.uim.plugin.solr.service;
 
-import java.util.HashSet;
+
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+
 
 import eu.europeana.uim.model.GlobalModelRegistry;
 import eu.europeana.uim.model.qualifier.AgentRelation;
 import eu.europeana.uim.model.qualifier.ConceptLevel;
 import eu.europeana.uim.store.MetaDataRecord;
+import eu.europeana.uim.api.AbstractIngestionPlugin;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPlugin;
@@ -35,18 +37,22 @@ import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 
 /**
+ * This is the main class implementing the UIM functionality for 
+ * the solr workflow plugin exposed as an OSGI service.
  * 
- * 
- * 
- * @author georgiosmarkakis
+ * @author Georgios Markakis
  *
  */
-public class SolrWorkflowPlugin implements IngestionPlugin {
+public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
-	
-	
-	
-	
+
+	public SolrWorkflowPlugin() {
+		super("solr_workflow", "Solr Repository Ingestion Plugin");
+	}
+
+
+
+
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
 	 */
@@ -54,6 +60,9 @@ public class SolrWorkflowPlugin implements IngestionPlugin {
 			throws IngestionPluginFailedException,
 			CorruptedMetadataRecordException {
 
+		//mdr.getQField(GlobalModelRegistry.AGENT, ConceptLevel.AGGREGATION);
+
+		/*
 
 		mdr.getQField(GlobalModelRegistry.AGENT, new HashSet<Enum<?>>(){{
 		
@@ -61,118 +70,60 @@ public class SolrWorkflowPlugin implements IngestionPlugin {
 			add(AgentRelation.CREATOR);
 		}
 		});
-		
+		 * 
+		 */
 		return false;
 	}
-	
-	
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getIdentifier()
-	 */
-	public String getIdentifier() {
-		return "solr_plugin";
-	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getName()
-	 */
-	public String getName() {
 
-		return "Solr Workflow Plugin";
-	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getDescription()
-	 */
-	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getInputFields()
-	 */
+	
 	public TKey<?, ?>[] getInputFields() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getOptionalFields()
-	 */
 	public TKey<?, ?>[] getOptionalFields() {
-		// TODO Auto-generated method stub
-		return null;
+	     return new TKey[0];
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getOutputFields()
-	 */
 	public TKey<?, ?>[] getOutputFields() {
-		// TODO Auto-generated method stub
-		return null;
+	     return new TKey[0];
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#initialize()
-	 */
 	public void initialize() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#shutdown()
-	 */
 	public void shutdown() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getParameters()
-	 */
 	public List<String> getParameters() {
-		// TODO Auto-generated method stub
-		return null;
+        return Collections.EMPTY_LIST;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getPreferredThreadCount()
-	 */
 	public int getPreferredThreadCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 5;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#getMaximumThreadCount()
-	 */
 	public int getMaximumThreadCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 10;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#initialize(eu.europeana.uim.api.ExecutionContext)
-	 */
 	public void initialize(ExecutionContext context)
 			throws IngestionPluginFailedException {
-		// TODO Auto-generated method stub
-
+		// TODO Put initialization code here (Sugarcrm Plugin change state)
+		
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#completed(eu.europeana.uim.api.ExecutionContext)
-	 */
 	public void completed(ExecutionContext context)
 			throws IngestionPluginFailedException {
-		// TODO Auto-generated method stub
-
+		// TODO Put finalization code here (Sugarcrm Plugin change state)
+		
 	}
-
-
+	
 
 }
