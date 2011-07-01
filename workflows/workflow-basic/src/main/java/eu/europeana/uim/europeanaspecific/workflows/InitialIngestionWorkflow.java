@@ -34,14 +34,14 @@ import eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin;
  */
 public class InitialIngestionWorkflow extends AbstractWorkflow{
 
-	public InitialIngestionWorkflow(int batchSize, boolean randsleep) {
+	public InitialIngestionWorkflow() {
 
 		super("Europeana Complete Ingestion Workflow",
         "This is the workflow to be used in order to import new material from scratch...");
 
         setStart(new BatchWorkflowStart());
         
-        addStep(new LinkCheckerPlugin());
+        //addStep(new LinkCheckerPlugin());
         addStep(new SolrWorkflowPlugin());
 	}
 
