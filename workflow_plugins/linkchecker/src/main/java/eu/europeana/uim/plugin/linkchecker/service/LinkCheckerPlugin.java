@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import eu.europeana.uim.store.MetaDataRecord;
+import eu.europeana.uim.api.AbstractIngestionPlugin;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPlugin;
@@ -36,9 +37,16 @@ import eu.europeana.uim.common.TKey;
  * 
  * @author Georgios Markakis
  */
-public class LinkCheckerPlugin implements IngestionPlugin {
+public class LinkCheckerPlugin extends AbstractIngestionPlugin {
 
 	
+	public LinkCheckerPlugin() {
+		super("linkchecker_plugin", "check the integrity of http links contained in records");
+		// TODO Auto-generated constructor stub
+	}
+
+
+
 	public boolean processRecord(MetaDataRecord<?> mdr, ExecutionContext context)
 	throws IngestionPluginFailedException,
 	CorruptedMetadataRecordException {
@@ -53,16 +61,7 @@ public class LinkCheckerPlugin implements IngestionPlugin {
        return false;
     }
 	
-	
-	
-	public String getName() {
-		return null;
-	}
 
-	public String getDescription() {
-		return "Linck Checker Plugin: an OSGI plugin whose main purpose " +
-				"is to check the integrity of http links contained in records";
-	}
 
 	public TKey<?, ?>[] getInputFields() {
 		// TODO Auto-generated method stub
@@ -113,10 +112,6 @@ public class LinkCheckerPlugin implements IngestionPlugin {
 
 
 
-	public String getIdentifier() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 
