@@ -23,18 +23,20 @@ package eu.europeana.uim.repoxclient.rest;
 import org.joda.time.DateTime;
 import org.springframework.web.client.RestTemplate;
 
-import eu.europeana.uim.repoxclient.jibxbindings.ActiveSessions;
+
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
-import eu.europeana.uim.repoxclient.jibxbindings.Harvestlog;
+import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
-import eu.europeana.uim.repoxclient.jibxbindings.Providers;
+import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Response;
-import eu.europeana.uim.repoxclient.jibxbindings.ScheduledSessions;
-import eu.europeana.uim.repoxclient.jibxbindings.Status;
+import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
+import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
+import eu.europeana.uim.repoxclient.jibxbindings.Success;
+//import eu.europeana.uim.repoxclient.jibxbindings.Status;
 
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
@@ -59,6 +61,42 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	private String defaultURI;
 
 	
+	
+	@Override
+	public void createAggregator(Aggregator aggregator)
+			throws AggregatorOperationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void deleteAggregator(Aggregator aggregator)
+			throws AggregatorOperationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void updateAggregator(Aggregator aggregator)
+			throws AggregatorOperationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public Aggregators retrieveAggregators() throws AggregatorOperationException {
+
+		Response resp = invokRestTemplate("/aggregators/list", "listDataSources",
+				Response.class);
+		///rest/aggregators/list
+		
+		return resp.getAggregators();
+	}
+
+	
 	/**
 	 * 
 	 * @return DataSources the available datasources
@@ -66,7 +104,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 */
 	public DataSources retrieveDataSources() throws DataSourceOperationException {
 
-		Response resp = invokRestTemplate("listDataSources", "listDataSources",
+		Response resp = invokRestTemplate("/dataSources/list", "listDataSources",
 				Response.class);
 
 		if (resp.getDataSources() == null) {
@@ -143,12 +181,16 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 		StringBuffer operation = new StringBuffer();
 		operation.append(defaultURI);
-		operation.append("?operation={param}");
+		operation.append(restOperation);
+		//operation.append("?operation={param}");
 
-		String restResponseObj = restTemplate.getForObject(
-				operation.toString(), String.class, restOperation);
-		S restResponse = (S) restTemplate.getForObject(operation.toString(),
-				responseClass, restOperation);
+		//String restResponseObj = restTemplate.getForObject(
+		//operation.toString(), String.class, restOperation);
+		
+		S restResponse = restTemplate.getForObject(operation.toString(), responseClass);
+		
+		//S restResponse = (S) restTemplate.getForObject(operation.toString(),
+		//		responseClass, restOperation);
 
 		return restResponse;
 	}
@@ -172,36 +214,6 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 
-	@Override
-	public void createAggregator(Aggregator aggregator)
-			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void deleteAggregator(Aggregator aggregator)
-			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void updateAggregator(Aggregator aggregator)
-			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public Aggregators retrieveAggregators()
-			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 	@Override
@@ -234,9 +246,12 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	@Override
-	public Providers retrieveProviders() throws ProviderOperationException {
-		// TODO Auto-generated method stub
-		return null;
+	public DataProviders retrieveProviders() throws ProviderOperationException {
+		Response resp = invokRestTemplate("/dataProviders/list", "listDataSources",
+				Response.class);
+		///rest/aggregators/list
+		
+		return resp.getDataProviders();
 	}
 
 
@@ -249,7 +264,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	@Override
-	public Status getHarvestingStatus(DataSource ds)
+	public Success getHarvestingStatus(DataSource ds)
 			throws HarvestingOperationException {
 		// TODO Auto-generated method stub
 		return null;
@@ -257,7 +272,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	@Override
-	public ActiveSessions getActiveHarvestingSessions()
+	public RunningTasks getActiveHarvestingSessions()
 			throws HarvestingOperationException {
 		// TODO Auto-generated method stub
 		return null;
@@ -265,7 +280,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	@Override
-	public ScheduledSessions getScheduledHarvestingSessions()
+	public ScheduleTasks getScheduledHarvestingSessions()
 			throws HarvestingOperationException {
 		// TODO Auto-generated method stub
 		return null;
@@ -273,7 +288,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	@Override
-	public Harvestlog getHarvestLog(DataSource ds)
+	public Log getHarvestLog(DataSource ds)
 			throws HarvestingOperationException {
 		// TODO Auto-generated method stub
 		return null;

@@ -26,9 +26,9 @@ import org.joda.time.DateTime;
 
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.repoxclient.jibxbindings.Harvestlog;
+import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
-import eu.europeana.uim.repoxclient.jibxbindings.Status;
+import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
@@ -191,7 +191,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	}
 
 	@Override
-	public Status getHarvestingStatus(Collection col)
+	public Success getHarvestingStatus(Collection col)
 			throws HarvestingOperationException {
 		// TODO Auto-generated method stub
 		return null;
@@ -212,7 +212,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	}
 
 	@Override
-	public Harvestlog getHarvestLog(Collection col)
+	public Log getHarvestLog(Collection col)
 			throws HarvestingOperationException {
 		// TODO Auto-generated method stub
 		return null;
