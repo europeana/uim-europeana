@@ -25,14 +25,15 @@ import org.joda.time.DateTime;
 
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
+import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
-import eu.europeana.uim.repoxclient.jibxbindings.Providers;
+import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
-import eu.europeana.uim.repoxclient.jibxbindings.Status;
-import eu.europeana.uim.repoxclient.jibxbindings.ActiveSessions;
-import eu.europeana.uim.repoxclient.jibxbindings.ScheduledSessions;
-import eu.europeana.uim.repoxclient.jibxbindings.Harvestlog;
+
+import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
+import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
+import eu.europeana.uim.repoxclient.jibxbindings.Success;
 
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
@@ -125,7 +126,7 @@ public interface RepoxRestClient {
 	 * @return an object containing all provider references
 	 * @throws ProviderOperationException
 	 */
-	public Providers retrieveProviders() throws ProviderOperationException;	
+	public DataProviders retrieveProviders() throws ProviderOperationException;	
 	
 	/**
 	 * Retrieve all available Repox DataSources
@@ -211,7 +212,7 @@ public interface RepoxRestClient {
 	 * @return the status
 	 * @throws RepoxException
 	 */
-	public Status getHarvestingStatus(DataSource ds) throws HarvestingOperationException;
+	public Success getHarvestingStatus(DataSource ds) throws HarvestingOperationException;
 	
 
 
@@ -220,7 +221,7 @@ public interface RepoxRestClient {
 	 * @return an object containing a reference to all DataSources
 	 * @throws HarvestingOperationException
 	 */
-	public ActiveSessions getActiveHarvestingSessions() throws HarvestingOperationException;
+	public RunningTasks getActiveHarvestingSessions() throws HarvestingOperationException;
 	
 	
 	/**
@@ -228,7 +229,7 @@ public interface RepoxRestClient {
 	 * @return an object containing a reference to all DataSources
 	 * @throws HarvestingOperationException
 	 */
-	public ScheduledSessions getScheduledHarvestingSessions() throws HarvestingOperationException;
+	public ScheduleTasks getScheduledHarvestingSessions() throws HarvestingOperationException;
 	
 	
 	
@@ -238,5 +239,5 @@ public interface RepoxRestClient {
 	 * @return the HarvestLog
 	 * @throws HarvestingOperationException
 	 */
-	public Harvestlog getHarvestLog(DataSource ds) throws HarvestingOperationException;
+	public Log getHarvestLog(DataSource ds) throws HarvestingOperationException;
 }

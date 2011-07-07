@@ -24,12 +24,11 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-
-import eu.europeana.uim.repoxclient.jibxbindings.Harvestlog;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
-import eu.europeana.uim.repoxclient.jibxbindings.Status;
+import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
@@ -246,7 +245,7 @@ public interface RepoxUIMService {
 	 * @return the status
 	 * @throws RepoxException
 	 */
-	public Status getHarvestingStatus(Collection col) throws HarvestingOperationException;
+	public Success getHarvestingStatus(Collection col) throws HarvestingOperationException;
 	
 
 
@@ -273,6 +272,6 @@ public interface RepoxUIMService {
 	 * @return the HarvestLog
 	 * @throws HarvestingOperationException
 	 */
-	public Harvestlog getHarvestLog(Collection col) throws HarvestingOperationException;
+	public Log getHarvestLog(Collection col) throws HarvestingOperationException;
 
 }
