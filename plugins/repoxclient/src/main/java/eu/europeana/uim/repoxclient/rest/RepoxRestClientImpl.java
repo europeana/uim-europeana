@@ -31,6 +31,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
+import eu.europeana.uim.repoxclient.jibxbindings.Provider1;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Response;
 import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
@@ -154,9 +155,142 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Aggregators retrieveAggregators() throws AggregatorOperationException {
 		Response resp = invokRestTemplate("/aggregators/list",Response.class);
-		return resp.getAggregators();
+		
+		if (resp.getAggregators() == null) {
+			if (resp.getError() != null) {
+				throw new AggregatorOperationException(resp.getError());
+			} else {
+				throw new AggregatorOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getAggregators();
+		}
 	}
 
+	
+	@Override
+	public Provider1 createProvider(Provider1 prov,Aggregator agr) throws ProviderOperationException {
+		//http://bd2.inesc-id.pt:8080/repox2/rest/dataProviders/create?aggregatorId=AGGREGATOR_ID&
+		//	name=NAME&description=DESCRIPTION&country=2_LETTERS_COUNTRY&nameCode=NAME_CODE&url=URL&dataSetType=DATA_SET_TYPE
+		
+		StringBuffer aggregatorId = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer description = new StringBuffer();	
+		StringBuffer country = new StringBuffer();		
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer homepage = new StringBuffer();
+		StringBuffer datasetType = new StringBuffer();		
+		
+		
+		aggregatorId.append("aggregatorId=");
+		aggregatorId.append(agr.getId());
+		name.append("name=");
+		name.append(prov.getName().getName());
+		description.append("description=");
+		description.append(prov.getDescription().getDescription());
+		country.append("country=");
+		country.append(prov.getCountry().getCountry());
+		nameCode.append("nameCode=");
+		nameCode.append(prov.getNameCode().getNameCode());
+		homepage.append("url=");
+		homepage.append(prov.getUrl().getUrl());
+		datasetType.append("dataSetType=");
+		datasetType.append(prov.getType().getType());
+		
+		Response resp = invokRestTemplate("/dataProviders/create",Response.class,
+				aggregatorId.toString(),name.toString(),description.toString(),
+				country.toString(),nameCode.toString(),homepage.toString(),datasetType.toString());
+		
+		
+		if (resp.getProvider() == null) {
+			if (resp.getError() != null) {
+				throw new ProviderOperationException(resp.getError());
+			} else {
+				throw new ProviderOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getProvider();
+		}
+	}
+
+
+	@Override
+	public Success deleteProvider(Provider1 prov) throws ProviderOperationException {
+		StringBuffer providerId = new StringBuffer();
+		providerId.append("providerId=");
+		providerId.append(prov.getId());
+		
+		Response resp = invokRestTemplate("/dataProviders/delete",Response.class,
+				providerId.toString());
+
+		if (resp.getSuccess() == null) {
+			if (resp.getError() != null) {
+				throw new ProviderOperationException(resp.getError());
+			} else {
+				throw new ProviderOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSuccess();
+		}
+	}
+
+
+	@Override
+	public Provider1 updateProvider(Provider1 prov) throws ProviderOperationException {
+
+		StringBuffer provId = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer description = new StringBuffer();	
+		StringBuffer country = new StringBuffer();		
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer homepage = new StringBuffer();
+		StringBuffer datasetType = new StringBuffer();		
+		
+		
+		provId.append("aggregatorId=");
+		provId.append(prov.getId());
+		name.append("name=");
+		name.append(prov.getName().getName());
+		description.append("description=");
+		description.append(prov.getDescription().getDescription());
+		country.append("country=");
+		country.append(prov.getCountry().getCountry());
+		nameCode.append("nameCode=");
+		nameCode.append(prov.getNameCode().getNameCode());
+		homepage.append("url=");
+		homepage.append(prov.getUrl().getUrl());
+		datasetType.append("dataSetType=");
+		datasetType.append(prov.getType().getType());
+		
+		Response resp = invokRestTemplate("/dataProviders/update",Response.class,
+				provId.toString(),name.toString(),description.toString(),
+				country.toString(),nameCode.toString(),homepage.toString(),datasetType.toString());
+		
+		
+		if (resp.getProvider() == null) {
+			if (resp.getError() != null) {
+				throw new ProviderOperationException(resp.getError());
+			} else {
+				throw new ProviderOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getProvider();
+		}
+			
+	}
+
+
+	@Override
+	public DataProviders retrieveProviders() throws ProviderOperationException {
+		Response resp = invokRestTemplate("/dataProviders/list",Response.class);
+		return resp.getDataProviders();
+	}
+	
+	
 	
 	/**
 	 * 
@@ -224,6 +358,46 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		return null;
 	}
 
+	
+	@Override
+	public void cancelHarvesting(DataSource ds)
+			throws HarvestingOperationException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public Success getHarvestingStatus(DataSource ds)
+			throws HarvestingOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public RunningTasks getActiveHarvestingSessions()
+			throws HarvestingOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public ScheduleTasks getScheduledHarvestingSessions()
+			throws HarvestingOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Log getHarvestLog(DataSource ds)
+			throws HarvestingOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 
 
 	// Private Methods
@@ -294,79 +468,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 
-	@Override
-	public void createProvider(Provider prov, Aggregator agr)
-			throws ProviderOperationException {
-		// TODO Auto-generated method stub
-		
-	}
 
 
-	@Override
-	public void createProvider(Provider prov) throws ProviderOperationException {
-		// TODO Auto-generated method stub
-		
-	}
 
 
-	@Override
-	public void deleteProvider(Provider prov) throws ProviderOperationException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void updateProvider(Provider prov) throws ProviderOperationException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public DataProviders retrieveProviders() throws ProviderOperationException {
-		Response resp = invokRestTemplate("/dataProviders/list",Response.class);
-		return resp.getDataProviders();
-	}
-
-
-	@Override
-	public void cancelHarvesting(DataSource ds)
-			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public Success getHarvestingStatus(DataSource ds)
-			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public RunningTasks getActiveHarvestingSessions()
-			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public ScheduleTasks getScheduledHarvestingSessions()
-			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public Log getHarvestLog(DataSource ds)
-			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }
