@@ -58,7 +58,7 @@ public interface RepoxRestClient {
 	 * @param aggregator an Aggregator object 
 	 * @throws AggregatorOperationException
 	 */
-	public void createAggregator(Aggregator aggregator) throws AggregatorOperationException;
+	public Aggregator createAggregator(Aggregator aggregator) throws AggregatorOperationException;
 	
 	
 	/**
@@ -66,7 +66,7 @@ public interface RepoxRestClient {
 	 * @param aggregator a reference to the Aggregator object
 	 * @throws AggregatorOperationException
 	 */
-	public void deleteAggregator(Aggregator aggregator)throws AggregatorOperationException;	
+	public Success deleteAggregator(String aggregatorId)throws AggregatorOperationException;	
 	
 	
 	/**
@@ -74,7 +74,7 @@ public interface RepoxRestClient {
 	 * @param aggregator the Aggregator object to update
 	 * @throws AggregatorOperationException
 	 */
-	public void updateAggregator(Aggregator aggregator)throws AggregatorOperationException;	
+	public Aggregator updateAggregator(Aggregator aggregator)throws AggregatorOperationException;	
 	
 	
 	/**
