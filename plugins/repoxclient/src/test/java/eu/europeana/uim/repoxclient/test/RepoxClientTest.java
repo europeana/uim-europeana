@@ -20,6 +20,9 @@
  */
 package eu.europeana.uim.repoxclient.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.StringWriter;
 
 import javax.annotation.Resource;
@@ -96,18 +99,31 @@ public void testCreateAggregator() throws Exception{
 	namecode.setNameCode("05523");
 	aggr.setNameCode(namecode );
 	Url url = new Url();
-	url.setUrl("www.tvxs.gr");
+	url.setUrl("http://www.tvxs.gr");
 	aggr.setUrl(url);
 	//Create the aggregator
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);
-	
+	assertNotNull(rtAggr);
+	assertEquals(aggr.getName().getName(),rtAggr.getName().getName());
+	assertEquals(aggr.getNameCode().getNameCode(),rtAggr.getNameCode().getNameCode());
+	assertEquals(aggr.getUrl().getUrl(),rtAggr.getUrl().getUrl());
+
 	logMarshalledObject(rtAggr);	
 	
 	//Update the Aggregator
+	NameCode upnamecode = new NameCode();
+	upnamecode.setNameCode("7777");
+	rtAggr.setNameCode(upnamecode);
 	Aggregator upAggr =  repoxRestClient.updateAggregator(rtAggr);
+	assertNotNull(upAggr);
+	assertEquals(rtAggr.getId(),upAggr.getId());
+	assertEquals(rtAggr.getName().getName(),upAggr.getName().getName());
+	assertEquals(rtAggr.getNameCode().getNameCode(),upAggr.getNameCode().getNameCode());
+	assertEquals(rtAggr.getUrl().getUrl(),upAggr.getUrl().getUrl());
 	
 	//Delete the Aggregator
 	Success res = repoxRestClient.deleteAggregator(rtAggr.getId());
+	assertNotNull(res);
 	
 	logMarshalledObject(res);	
 	
