@@ -30,6 +30,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.Provider;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
+import eu.europeana.uim.repoxclient.jibxbindings.Provider1;
 
 import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
@@ -91,17 +92,8 @@ public interface RepoxRestClient {
 	 * @param agr the Aggregator reference
 	 * @throws ProviderOperationException
 	 */
-	public void createProvider(Provider prov,Aggregator agr) throws ProviderOperationException;
-	
-	
-	/**
-	 * Creates a provider in Repox
-	 * 
-	 * @param prov the Provider definition
-	 * @throws ProviderOperationException
-	 */
-	public void createProvider(Provider prov) throws ProviderOperationException;
-	
+	public Provider1 createProvider(Provider1 prov,Aggregator agr) throws ProviderOperationException;
+		
 	
 	/**
 	 * Deletes a provider from Repox
@@ -109,7 +101,7 @@ public interface RepoxRestClient {
 	 * @param prov the Provider reference
 	 * @throws ProviderOperationException
 	 */
-	public void deleteProvider(Provider prov) throws ProviderOperationException;
+	public Success deleteProvider(Provider1 prov) throws ProviderOperationException;
 	
 	
 	/**
@@ -118,7 +110,7 @@ public interface RepoxRestClient {
 	 * @param the Provider object to update
 	 * @throws ProviderOperationException
 	 */
-	public void updateProvider(Provider prov) throws ProviderOperationException;
+	public Provider1 updateProvider(Provider1 prov) throws ProviderOperationException;
 	
 	
 	/**
