@@ -61,38 +61,99 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	private String defaultURI;
 
 	
-	
+	///rest/aggregators/create?name=Judaica&nameCode=093&homepage=http://repox.ist.utl.pt
 	@Override
-	public void createAggregator(Aggregator aggregator)
+	public Aggregator createAggregator(Aggregator aggregator)
 			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
+		
+		StringBuffer name = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer homepage = new StringBuffer();
+
+		name.append("name=");
+		name.append(aggregator.getName().getName());
+		nameCode.append("nameCode=");
+		nameCode.append(aggregator.getNameCode().getNameCode());
+		homepage.append("homepage=");
+		homepage.append(aggregator.getUrl().getUrl());
+		
+		Response resp = invokRestTemplate("/aggregators/create",Response.class,
+				name.toString(),nameCode.toString(),homepage.toString());
+		
+		if (resp.getAggregator() == null) {
+			if (resp.getError() != null) {
+				throw new AggregatorOperationException(resp.getError());
+			} else {
+				throw new AggregatorOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getAggregator();
+		}
+	}
+
+
+	@Override
+	public Success deleteAggregator(String aggregatorId)
+			throws AggregatorOperationException {
+
+		StringBuffer id = new StringBuffer();
+		id.append("id=");
+		id.append(aggregatorId);
+		
+		Response resp = invokRestTemplate("/aggregators/delete",Response.class,id.toString());
+		
+		if (resp.getSuccess() == null) {
+			if (resp.getError() != null) {
+				throw new AggregatorOperationException(resp.getError());
+			} else {
+				throw new AggregatorOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSuccess();
+		}
 		
 	}
 
 
 	@Override
-	public void deleteAggregator(Aggregator aggregator)
+	public Aggregator updateAggregator(Aggregator aggregator)
 			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
+		StringBuffer id = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer homepage = new StringBuffer();
+
+		id.append("id=");
+		id.append(aggregator.getId());
+		name.append("name=");
+		name.append(aggregator.getName().getName());
+		nameCode.append("nameCode=");
+		nameCode.append(aggregator.getNameCode().getNameCode());
+		homepage.append("homepage=");
+		homepage.append(aggregator.getUrl().getUrl());
 		
-	}
+		Response resp = invokRestTemplate("/aggregators/update",Response.class,
+				id.toString(),name.toString(),nameCode.toString(),homepage.toString());
+		
+		if (resp.getAggregator() == null) {
+			if (resp.getError() != null) {
+				throw new AggregatorOperationException(resp.getError());
+			} else {
+				throw new AggregatorOperationException("Unidentified Repox Error");
+			}
+		} else {
 
-
-	@Override
-	public void updateAggregator(Aggregator aggregator)
-			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
+			return resp.getAggregator();
+		}
 		
 	}
 
 
 	@Override
 	public Aggregators retrieveAggregators() throws AggregatorOperationException {
-
-		Response resp = invokRestTemplate("/aggregators/list", "listDataSources",
-				Response.class);
-		///rest/aggregators/list
-		
+		Response resp = invokRestTemplate("/aggregators/list",Response.class);
 		return resp.getAggregators();
 	}
 
@@ -104,8 +165,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 */
 	public DataSources retrieveDataSources() throws DataSourceOperationException {
 
-		Response resp = invokRestTemplate("/dataSources/list", "listDataSources",
-				Response.class);
+		Response resp = invokRestTemplate("/dataSources/list",Response.class);
 
 		if (resp.getDataSources() == null) {
 			if (resp.getError() != null) {
@@ -176,25 +236,43 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @param wsOperation
 	 * @return
 	 */
-	private <S> S invokRestTemplate(String restOperation, String param,
-			Class<S> responseClass) {
+	private <S> S invokRestTemplate(String restOperation,Class<S> responseClass) {
 
 		StringBuffer operation = new StringBuffer();
 		operation.append(defaultURI);
 		operation.append(restOperation);
-		//operation.append("?operation={param}");
-
-		//String restResponseObj = restTemplate.getForObject(
-		//operation.toString(), String.class, restOperation);
-		
 		S restResponse = restTemplate.getForObject(operation.toString(), responseClass);
-		
-		//S restResponse = (S) restTemplate.getForObject(operation.toString(),
-		//		responseClass, restOperation);
 
 		return restResponse;
 	}
 
+	/**
+	 * Auxiliary method for invoking a REST operation with parameters
+	 * 
+	 * @param <S>
+	 *            the return type
+	 * @param wsOperation
+	 * @return
+	 */
+	private <S> S invokRestTemplate(String restOperation,Class<S> responseClass,String... params) {
+
+		StringBuffer operation = new StringBuffer();
+		operation.append(defaultURI);
+		operation.append(restOperation);
+		operation.append("?");
+		
+		for (int i=0; i< params.length; i++){
+			if (i != 0){
+				operation.append("&");
+			}
+			operation.append(params[i]);
+		}
+		
+		
+		S restResponse = restTemplate.getForObject(operation.toString(), responseClass);
+
+		return restResponse;
+	}
 	// Getters & Setters
 
 	public void setRestTemplate(RestTemplate restTemplate) {
@@ -247,10 +325,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 	@Override
 	public DataProviders retrieveProviders() throws ProviderOperationException {
-		Response resp = invokRestTemplate("/dataProviders/list", "listDataSources",
-				Response.class);
-		///rest/aggregators/list
-		
+		Response resp = invokRestTemplate("/dataProviders/list",Response.class);
 		return resp.getDataProviders();
 	}
 
