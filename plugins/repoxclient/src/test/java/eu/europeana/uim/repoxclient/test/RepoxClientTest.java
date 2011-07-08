@@ -34,9 +34,14 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
+import eu.europeana.uim.repoxclient.jibxbindings.Name;
+import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
+import eu.europeana.uim.repoxclient.jibxbindings.Success;
+import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 
 
@@ -53,7 +58,10 @@ public class RepoxClientTest {
 RepoxRestClient repoxRestClient;	
 	
 private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepoxClientTest.class);	
-	
+
+/*
+ * Retrieval operations
+ */
 @Test
 public void testGetDatasources() throws Exception{
 	DataSources ds =repoxRestClient.retrieveDataSources();
@@ -62,15 +70,49 @@ public void testGetDatasources() throws Exception{
 
 @Test
 public void testGetAggregators() throws Exception{
-	Aggregators ds =repoxRestClient.retrieveAggregators();
-	logMarshalledObject(ds);	
+	Aggregators aggrs =repoxRestClient.retrieveAggregators();
+	logMarshalledObject(aggrs);	
 }
 	
 @Test
 public void testGetProviders() throws Exception{
-	DataProviders ds =repoxRestClient.retrieveProviders();
-	logMarshalledObject(ds);	
+	DataProviders prov =repoxRestClient.retrieveProviders();
+	logMarshalledObject(prov);	
 }
+
+
+/*
+ * Creation operations Tests
+ */
+
+@Test
+public void testCreateAggregator() throws Exception{
+	Aggregator aggr = new Aggregator();
+	
+    Name name = new Name();
+    name.setName("ExampleAggrX");
+	aggr.setName(name);
+	NameCode namecode = new NameCode();
+	namecode.setNameCode("05523");
+	aggr.setNameCode(namecode );
+	Url url = new Url();
+	url.setUrl("www.tvxs.gr");
+	aggr.setUrl(url);
+	//Create the aggregator
+	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);
+	
+	logMarshalledObject(rtAggr);	
+	
+	//Update the Aggregator
+	Aggregator upAggr =  repoxRestClient.updateAggregator(rtAggr);
+	
+	//Delete the Aggregator
+	Success res = repoxRestClient.deleteAggregator(rtAggr.getId());
+	
+	logMarshalledObject(res);	
+	
+}
+
 
 /**
  * This method marshals the contents of a  JIBX Element and outputs the results to the
