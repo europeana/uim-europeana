@@ -89,7 +89,7 @@ public void testGetProviders() throws Exception{
  */
 
 @Test
-public void testCreateAggregator() throws Exception{
+public void testCreateUpdateDeleteAggregator() throws Exception{
 	Aggregator aggr = new Aggregator();
 	
     Name name = new Name();
