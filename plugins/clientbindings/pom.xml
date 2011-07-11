@@ -41,7 +41,7 @@
 							<directory>src/main/resources/repox</directory>
 							<targetDirectory>target/generated-sources/repox</targetDirectory>
 							<includes>
-								<include>*.xsd</include>
+								<include>response.xsd</include>
 							</includes>
 							<options>
 								<package>eu.europeana.uim.repoxclient.jibxbindings</package>

@@ -3,18 +3,18 @@
   <xs:element name="response">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="recordResult"/>
-        <xs:element ref="source"/>
-        <xs:element ref="dataSources"/>
-        <xs:element ref="aggregator"/>
-        <xs:element ref="aggregators"/>
-        <xs:element ref="provider"/>
-        <xs:element ref="dataProviders"/>
-        <xs:element ref="scheduleTasks"/>
-        <xs:element ref="runningTasks"/>
-        <xs:element ref="log"/>
-        <xs:element ref="success"/>
-        <xs:element ref="error"/>
+        <xs:element ref="recordResult" minOccurs="0" maxOccurs="1" />
+        <xs:element ref="source" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="dataSources" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="aggregator" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="aggregators" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="provider" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="dataProviders" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="scheduleTasks" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="runningTasks" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="log" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="success" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="error" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
