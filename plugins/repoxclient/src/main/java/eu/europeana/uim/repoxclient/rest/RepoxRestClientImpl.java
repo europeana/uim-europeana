@@ -31,7 +31,6 @@ import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
-import eu.europeana.uim.repoxclient.jibxbindings.Provider1;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Response;
 import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
@@ -170,7 +169,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 	
 	@Override
-	public Provider1 createProvider(Provider1 prov,Aggregator agr) throws ProviderOperationException {
+	public Provider createProvider(Provider prov,Aggregator agr) throws ProviderOperationException {
 		//http://bd2.inesc-id.pt:8080/repox2/rest/dataProviders/create?aggregatorId=AGGREGATOR_ID&
 		//	name=NAME&description=DESCRIPTION&country=2_LETTERS_COUNTRY&nameCode=NAME_CODE&url=URL&dataSetType=DATA_SET_TYPE
 		
@@ -217,7 +216,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	@Override
-	public Success deleteProvider(Provider1 prov) throws ProviderOperationException {
+	public Success deleteProvider(Provider prov) throws ProviderOperationException {
 		StringBuffer providerId = new StringBuffer();
 		providerId.append("providerId=");
 		providerId.append(prov.getId());
@@ -239,7 +238,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	@Override
-	public Provider1 updateProvider(Provider1 prov) throws ProviderOperationException {
+	public Provider updateProvider(Provider prov) throws ProviderOperationException {
 
 		StringBuffer provId = new StringBuffer();
 		StringBuffer name = new StringBuffer();
