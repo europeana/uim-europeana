@@ -168,6 +168,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 	
+	
 	@Override
 	public Provider createProvider(Provider prov,Aggregator agr) throws ProviderOperationException {
 		//http://bd2.inesc-id.pt:8080/repox2/rest/dataProviders/create?aggregatorId=AGGREGATOR_ID&
@@ -215,10 +216,11 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 
+	
 	@Override
 	public Success deleteProvider(Provider prov) throws ProviderOperationException {
 		StringBuffer providerId = new StringBuffer();
-		providerId.append("providerId=");
+		providerId.append("id=");
 		providerId.append(prov.getId());
 		
 		Response resp = invokRestTemplate("/dataProviders/delete",Response.class,
@@ -237,6 +239,11 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#updateProvider(eu.europeana.uim.repoxclient.jibxbindings.Provider)
+	 */
 	@Override
 	public Provider updateProvider(Provider prov) throws ProviderOperationException {
 
@@ -249,7 +256,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer datasetType = new StringBuffer();		
 		
 		
-		provId.append("aggregatorId=");
+		provId.append("id=");
 		provId.append(prov.getId());
 		name.append("name=");
 		name.append(prov.getName().getName());
