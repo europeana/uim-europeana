@@ -87,9 +87,9 @@
   <xs:element name="success" type="xs:NCName"/>
   <xs:element name="error">
     <xs:complexType>
-      <xs:attribute name="cause" use="required"/>
-      <xs:attribute name="requestURI" use="required" type="xs:anyURI"/>
-      <xs:attribute name="type" use="required" type="xs:NCName"/>
+      <xs:attribute name="cause" use="optional"/>
+      <xs:attribute name="requestURI" use="optional" type="xs:anyURI"/>
+      <xs:attribute name="type" use="optional" type="xs:NCName"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="source">
@@ -113,7 +113,7 @@
         </xs:choice>
         <xs:element ref="metadataTransformations"/>
       </xs:sequence>
-      <xs:attribute name="exportPath" use="required" type="xs:anyURI"/>
+      <xs:attribute name="exportPath" use="optional" type="xs:anyURI"/>
       <xs:attribute name="id" use="required" type="xs:NCName"/>
       <xs:attribute name="lastIngest" use="required"/>
       <xs:attribute name="metadataFormat" use="required" type="xs:NCName"/>
