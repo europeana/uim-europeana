@@ -29,8 +29,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
-import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
-import eu.europeana.uim.repoxclient.jibxbindings.Provider;
+import eu.europeana.uim.repoxclient.jibxbindings.Source;
 
 
 
@@ -138,7 +137,7 @@ public interface RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void createDatasource(DataSource ds) throws DataSourceOperationException;
+	public Source createDatasource(Source ds,Provider prov) throws DataSourceOperationException;
 	
 	/**
 	 * Delete a Repox DataSource
@@ -147,7 +146,7 @@ public interface RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void deleteDatasource(DataSource ds) throws DataSourceOperationException;
+	public Success deleteDatasource(Source ds) throws DataSourceOperationException;
 
 	/**
 	 * Update an existing DataSource
@@ -156,7 +155,7 @@ public interface RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void updateDatasource(DataSource ds) throws DataSourceOperationException;
+	public Source updateDatasource(Source ds) throws DataSourceOperationException;
 	
 
 	/**
@@ -167,7 +166,41 @@ public interface RepoxRestClient {
 	 * @throws RecordOperationException
 	 * @throws RepoxException
 	 */
-	public RecordResult retrieveRecord(String recordString) throws RecordOperationException;
+	public RecordResult retrieveRecord(String recordID) throws RecordOperationException;
+	
+	
+	
+	/**
+	 * Retrieve a specific Record
+	 * 
+	 * @param recordID
+	 * @param ds
+	 * @param recordXML
+	 * @return
+	 * @throws RecordOperationException
+	 */
+	public Success saveRecord(String recordID,Source ds,String recordXML) throws RecordOperationException;
+	
+	
+	/**
+	 * Marks a Record as eligible for deletion
+	 * 
+	 * @param recordID
+	 * @return
+	 * @throws RecordOperationException
+	 */
+	public Success markRecordAsDeleted(String recordID) throws RecordOperationException;
+	
+	
+	/**
+	 * Erases a Record
+	 * 
+	 * @param recordID
+	 * @return
+	 * @throws RecordOperationException
+	 */
+	public Success eraseRecord(String recordID) throws RecordOperationException;
+	
 	
 	/**
 	 * Starts a remote harvesting process  
@@ -178,7 +211,7 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public String initiateHarvesting(HarvestingType type,DataSource ds) throws HarvestingOperationException;
+	public Success initiateHarvesting(Source ds) throws HarvestingOperationException;
 	
 	/**
 	 * Starts a remote harvesting process at a specific Date (scheduling) 
@@ -190,7 +223,7 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public String initiateHarvesting(HarvestingType type,DataSource ds,DateTime ingestionDate) throws HarvestingOperationException;
+	public Success initiateHarvesting(Source ds,DateTime ingestionDate) throws HarvestingOperationException;
 	
 	
 	
@@ -198,7 +231,7 @@ public interface RepoxRestClient {
 	 * @param ds
 	 * @throws HarvestingOperationException
 	 */
-	public void cancelHarvesting(DataSource ds) throws HarvestingOperationException;
+	public Success cancelHarvesting(Source ds) throws HarvestingOperationException;
 	
 	/**
 	 * Check the status of an existing harvesting job 
@@ -206,7 +239,7 @@ public interface RepoxRestClient {
 	 * @return the status
 	 * @throws RepoxException
 	 */
-	public Success getHarvestingStatus(DataSource ds) throws HarvestingOperationException;
+	public Success getHarvestingStatus(Source ds) throws HarvestingOperationException;
 	
 
 
@@ -233,5 +266,5 @@ public interface RepoxRestClient {
 	 * @return the HarvestLog
 	 * @throws HarvestingOperationException
 	 */
-	public Log getHarvestLog(DataSource ds) throws HarvestingOperationException;
+	public Log getHarvestLog(Source ds) throws HarvestingOperationException;
 }

@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
-import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
@@ -35,10 +34,10 @@ import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Response;
 import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
+import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
-//import eu.europeana.uim.repoxclient.jibxbindings.Status;
 
-import eu.europeana.uim.repoxclient.objects.HarvestingType;
+
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
@@ -61,10 +60,20 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	private String defaultURI;
 
 	
-	///rest/aggregators/create?name=Judaica&nameCode=093&homepage=http://repox.ist.utl.pt
+	
+	/*
+	 * Aggregator related operations
+	 */
+	
+
+	/**
+	 * 
+	 */
 	@Override
 	public Aggregator createAggregator(Aggregator aggregator)
 			throws AggregatorOperationException {
+		
+		///rest/aggregators/create?name=Judaica&nameCode=093&homepage=http://repox.ist.utl.pt
 		
 		StringBuffer name = new StringBuffer();
 		StringBuffer nameCode = new StringBuffer();
@@ -169,6 +178,12 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 	
 	
+	
+	/*
+	 * Provider related operations
+	 */
+	
+	
 	@Override
 	public Provider createProvider(Provider prov,Aggregator agr) throws ProviderOperationException {
 		//http://bd2.inesc-id.pt:8080/repox2/rest/dataProviders/create?aggregatorId=AGGREGATOR_ID&
@@ -240,10 +255,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#updateProvider(eu.europeana.uim.repoxclient.jibxbindings.Provider)
-	 */
+
 	@Override
 	public Provider updateProvider(Provider prov) throws ProviderOperationException {
 
@@ -298,6 +310,11 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	
 	
 	
+	/*
+	 * Datasources related operations
+	 */
+	
+	
 	/**
 	 * 
 	 * @return DataSources the available datasources
@@ -322,59 +339,160 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	
 	// Public methods exposed by the service
 	
-	public void createDatasource(DataSource ds)
+	public Source createDatasource(Source ds,Provider prov)
 			throws DataSourceOperationException {
 
-
+		///rest/dataSources/createOai?dataProviderId=DPRestr0&id=bdaSet&description=Biblioteca Digital Do Alentejo&
+		//nameCode=00123&name=Alentejo&exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
+		
+		
+		///rest/dataSources/createZ3950Timestamp?dataProviderId=DPRestr0&id=z3950TimeTest&description=test Z39.50 with time stamp&nameCode=00130&
+		//name=Z3950-TimeStamp&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&
+		//namespace=info:lc/xmlns/marcxchange-v1&address=193.6.201.205&port=1616&database=B1&user=&password=&
+		//recordSyntax=usmarc&charset=UTF-8&earliestTimestamp=20110301&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
+		
+		///rest/dataSources/createZ3950IdSequence?dataProviderId=DPRestr0&id=z3950IdSeqTest&description=test%20Z39.50%20with%20id%20sequence&nameCode=00129&
+		//name=Z3950-IdSeq&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&
+		//address=aleph.lbfl.li&port=9909&database=LLB_IDS&user=&password=&recordSyntax=usmarc&charset=UTF-8&maximumId=6000&
+		//recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
+		
+		///rest/dataSources/createFtp?dataProviderId=DPRestr0&id=ftpTest&description=test FTP data source&nameCode=00124&name=FTP&
+		//exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&
+		//namespaceUri=&recordXPath=record&server=bd1.inesc-id.pt&user=ftp&password=pmath2010.&ftpPath=/Lizbeth
+		
+		///rest/dataSources/createHttp?dataProviderId=DPRestr0&id=httpTest&description=test HTTP data source&nameCode=00124&name=HTTP&
+		//exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&
+		//namespaceUri=&recordXPath=record&url=http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip
+		
+		///rest/dataSources/createFolder?dataProviderId=DPRestr0&id=folderTest&description=test%20Folder%20data%20source&nameCode=00124&
+		//name=Folder&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&metadataFormat=ISO2709&
+		//isoFormat=pt.utl.ist.marc.iso2709.IteratorIso2709&charset=UTF-8&recordIdPolicy=IdExtracted&idXpath=/mx:record/mx:controlfield[@tag=%22001%22]&
+		//namespacePrefix=mx&namespaceUri=info:lc/xmlns/marcxchange-v1&recordXPath=&folder=C:\folder
+		
+		return ds;
 	}
 
-	public void deleteDatasource(DataSource ds)
+	
+	
+	public Success deleteDatasource(Source ds)
 			throws DataSourceOperationException {
-
-
+		///rest/dataSources/delete?id=ftpTest
+		
+				return null;
 	}
 
-	public void updateDatasource(DataSource ds)
+	
+	public Source updateDatasource(Source ds)
 			throws DataSourceOperationException {
-
-
+		///rest/dataSources/updateOai?id=bdaSet&description=222Biblioteca Digital Do Alentejo&nameCode=333300123&name=4444Alentejo&
+		//exportPath=D:/Projectos/repoxdata_new2&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&
+		//oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
+		
+		///rest/dataSources/updateZ3950Timestamp?id=z3950TimeTest&description=new test Z39.50 with time stamp&nameCode=99900130&name=Z3950-TimeStampWorking&
+		//exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=193.6.201.205&
+		//port=1616&database=B1&user=&password=&recordSyntax=usmarc&charset=UTF-8&earliestTimestamp=20110301&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
+		
+		///rest/dataSources/updateZ3950IdList?id=z3950IdFile&description=new test Z39.50 with id list&nameCode=001245555&name=Z3950-IdFilenew&exportPath=D:/Projectos/repoxdata_new1&
+		//schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=aleph.lbfl.li&port=9909&database=LLB_IDS&user=&password=&
+		//recordSyntax=usmarc&charset=UTF-8&filePath=C:\folderZ3950\newFile.txt&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
+		
+		///rest/dataSources/updateZ3950IdSequence?id=z3950IdSeqTest&description=newtest Z39.50 with id sequence&nameCode=222200129&name=NEWZ3950-IdSeq&
+		//exportPath=D:/Projectos/repoxdata_new21&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=aleph.lbfl.li&port=9909&
+		//database=LLB_IDS&user=&password=&recordSyntax=usmarc&charset=UTF-8&maximumId=300&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
+		
+		///rest/dataSources/updateFtp?id=ftpTest&description=newtest FTP data source&nameCode=555555500124&name=FTP&exportPath=D:/Projectos/repoxdata_new21212121&
+		//schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&
+		//recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=&recordXPath=record&server=bd1.inesc-id.pt&user=ftp&password=pmath2010.&ftpPath=/Lizbeth
+		
+		///rest/dataSources/updateHttp?id=httpTest&description=NEWWWWtest HTTP data source&nameCode=999900124&name=HTTP111&exportPath=D:/Projectos/repoxdata_new&
+		//schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&
+		//idXpath=&namespacePrefix=&namespaceUri=&recordXPath=record&url=http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip
+		
+		///rest/dataSources/updateFolder?id=folderTest&description=test%20Folder%20data%20source3333333&nameCode=4444444444400124&name=Folder&exportPath=D:/Projectos/repoxdata_new&
+		//schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&metadataFormat=ISO2709&isoFormat=pt.utl.ist.marc.iso2709.IteratorIso2709&charset=UTF-8&
+		//recordIdPolicy=IdExtracted&idXpath=/mx:record/mx:controlfield[@tag=%22001%22]&namespacePrefix=mx&namespaceUri=info:lc/xmlns/marcxchange-v1&recordXPath=&folder=C:\folderNew
+		
+		return ds;
 	}
 
+	
+	
+	/*
+	 * Record related operations
+	 */
+	
+	
+	
 	public RecordResult retrieveRecord(String recordString)
 			throws RecordOperationException{
 
 		return null;
 	}
 
-	public String initiateHarvesting(HarvestingType type, DataSource ds)
+	
+	@Override
+	public Success saveRecord(String recordID, Source ds, String recordXML)
+			throws RecordOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Success markRecordAsDeleted(String recordID)
+			throws RecordOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Success eraseRecord(String recordID) throws RecordOperationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	
+	
+	/*
+	 * Harvest Control/Monitoring operations
+	 */
+	
+	@Override
+	public Success initiateHarvesting(Source ds)
 			throws HarvestingOperationException{
 
+		///rest/dataSources/startIngest?id=bmfinancas
+		
 		return null;
 	}
 
-	public String initiateHarvesting(HarvestingType type, DataSource ds,
-			DateTime ingestionDate) throws HarvestingOperationException{
+	@Override
+	public Success initiateHarvesting(Source ds,DateTime ingestionDate) 
+	       throws HarvestingOperationException{
 
-		return null;
-	}
-
-	public String harvestingStatus(String ingestionProcessId)
-			throws RepoxException {
-
+		///rest/dataSources/scheduleIngest?id=bmfinancas&firstRunDate=06-07-2011&firstRunHour=17:43&frequency=Daily&xmonths=&fullIngest=true
 		return null;
 	}
 
 	
+	
 	@Override
-	public void cancelHarvesting(DataSource ds)
+	public Success cancelHarvesting(Source ds)
 			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
 		
+		///rest/dataSources/stopIngest?id=bmfinancas
+
+		return null;
 	}
 
 
 	@Override
-	public Success getHarvestingStatus(DataSource ds)
+	public Success getHarvestingStatus(Source ds)
 			throws HarvestingOperationException {
 		// TODO Auto-generated method stub
 		return null;
@@ -384,7 +502,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public RunningTasks getActiveHarvestingSessions()
 			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
+		////rest/dataSources/harvesting
 		return null;
 	}
 
@@ -392,15 +510,18 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public ScheduleTasks getScheduledHarvestingSessions()
 			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
+
+		///rest/dataSources/scheduleList?id=bmfinancas
+
 		return null;
 	}
 
 
 	@Override
-	public Log getHarvestLog(DataSource ds)
+	public Log getHarvestLog(Source ds)
 			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
+		///rest/dataSources/log?id=httpTest
+		
 		return null;
 	}
 	
@@ -470,6 +591,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public String getDefaultURI() {
 		return defaultURI;
 	}
+
+
+
 
 
 

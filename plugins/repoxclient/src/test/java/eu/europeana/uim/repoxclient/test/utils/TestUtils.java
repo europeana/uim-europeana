@@ -33,7 +33,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.Description;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
-import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
+
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
@@ -115,6 +115,10 @@ public class TestUtils {
 		ds.getRecordIdPolicy().setType("IdGenerated");
 		ds.getSequence().getRetrieveStrategy().setType("pt.utl.ist.repox.http.DataSourceHttp");
 		
+		Url url = new Url();
+		url.setUrl("http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda");
+		
+		ds.getSequence().getRetrieveStrategy().setUrl(url);		
 		return null;
 	}
 	
