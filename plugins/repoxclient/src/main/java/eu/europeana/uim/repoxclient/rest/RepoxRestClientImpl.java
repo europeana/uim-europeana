@@ -337,40 +337,78 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 	
 	
-	// Public methods exposed by the service
+
 	
 	public Source createDatasource(Source ds,Provider prov)
 			throws DataSourceOperationException {
 
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer description = new StringBuffer();		
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();	
+		
 		///rest/dataSources/createOai?dataProviderId=DPRestr0&id=bdaSet&description=Biblioteca Digital Do Alentejo&
 		//nameCode=00123&name=Alentejo&exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
 		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
 		
+		StringBuffer oaiURL = new StringBuffer();
 		
 		///rest/dataSources/createZ3950Timestamp?dataProviderId=DPRestr0&id=z3950TimeTest&description=test Z39.50 with time stamp&nameCode=00130&
 		//name=Z3950-TimeStamp&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&
 		//namespace=info:lc/xmlns/marcxchange-v1&address=193.6.201.205&port=1616&database=B1&user=&password=&
 		//recordSyntax=usmarc&charset=UTF-8&earliestTimestamp=20110301&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
 		
+		StringBuffer address = new StringBuffer();
+		StringBuffer port = new StringBuffer();
+		StringBuffer database = new StringBuffer();
+		StringBuffer user = new StringBuffer();
+		StringBuffer password = new StringBuffer();
+		StringBuffer recordSyntax = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		StringBuffer earliestTimestamp  = new StringBuffer();
+		StringBuffer recordIdPolicy  = new StringBuffer();
+		StringBuffer idXpath  = new StringBuffer();
+		StringBuffer namespacePrefix  = new StringBuffer();
+		StringBuffer namespaceUri  = new StringBuffer();
+		StringBuffer metadataFormat  = new StringBuffer();
+		
 		///rest/dataSources/createZ3950IdSequence?dataProviderId=DPRestr0&id=z3950IdSeqTest&description=test%20Z39.50%20with%20id%20sequence&nameCode=00129&
 		//name=Z3950-IdSeq&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&
 		//address=aleph.lbfl.li&port=9909&database=LLB_IDS&user=&password=&recordSyntax=usmarc&charset=UTF-8&maximumId=6000&
 		//recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
+		StringBuffer maximumId  = new StringBuffer();
+		
 		
 		///rest/dataSources/createFtp?dataProviderId=DPRestr0&id=ftpTest&description=test FTP data source&nameCode=00124&name=FTP&
 		//exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
 		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&
 		//namespaceUri=&recordXPath=record&server=bd1.inesc-id.pt&user=ftp&password=pmath2010.&ftpPath=/Lizbeth
 		
+		StringBuffer recordXPath  = new StringBuffer();
+		StringBuffer server  = new StringBuffer();
+		StringBuffer ftpPath  = new StringBuffer();
+		StringBuffer isoFormat  = new StringBuffer();
+		
+		
+		
 		///rest/dataSources/createHttp?dataProviderId=DPRestr0&id=httpTest&description=test HTTP data source&nameCode=00124&name=HTTP&
 		//exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
 		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&
 		//namespaceUri=&recordXPath=record&url=http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip
+		StringBuffer url  = new StringBuffer();
+		
 		
 		///rest/dataSources/createFolder?dataProviderId=DPRestr0&id=folderTest&description=test%20Folder%20data%20source&nameCode=00124&
 		//name=Folder&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&metadataFormat=ISO2709&
 		//isoFormat=pt.utl.ist.marc.iso2709.IteratorIso2709&charset=UTF-8&recordIdPolicy=IdExtracted&idXpath=/mx:record/mx:controlfield[@tag=%22001%22]&
 		//namespacePrefix=mx&namespaceUri=info:lc/xmlns/marcxchange-v1&recordXPath=&folder=C:\folder
+		StringBuffer folder  = new StringBuffer();
+		
 		
 		return ds;
 	}
