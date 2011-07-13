@@ -130,14 +130,144 @@ public interface RepoxRestClient {
 	 */
 	public DataSources retrieveDataSources() throws DataSourceOperationException;
 	
+
 	/**
-	 * Create a Repox DataSource 
+	 * Creates a OAI-PMH Datasource
+	 * 
+	 * @param ds
+	 * @param prov
+	 * @return
+	 * @throws DataSourceOperationException
+	 */
+	public Source createDatasourceOAI(Source ds,Provider prov) throws DataSourceOperationException;
+	
+	
+	/**
+	 * Creates a Z3950Timestamp Datasource
+	 * 
+	 * @param ds
+	 * @param prov
+	 * @return
+	 * @throws DataSourceOperationException
+	 */
+	public Source createDatasourceZ3950Timestamp(Source ds,Provider prov) throws DataSourceOperationException;
+	
+	
+	/**
+	 * Creates a Z3950IdFile Datasource
+	 * 
+	 * @param ds
+	 * @param prov
+	 * @return
+	 * @throws DataSourceOperationException
+	 */
+	public Source createDatasourceZ3950IdFile(Source ds,Provider prov) throws DataSourceOperationException;
+	
+	
+	
+	/**
+	 * Creates a Z3950IdSequence Datasource
+	 * 
+	 * @param ds
+	 * @param prov
+	 * @return
+	 * @throws DataSourceOperationException
+	 */
+	public Source createDatasourceZ3950IdSequence(Source ds,Provider prov) throws DataSourceOperationException;	
+	
+	
+	/**
+	 * Creates an FTP Datasource
+	 * 
+	 * @param ds
+	 * @param prov
+	 * @return
+	 * @throws DataSourceOperationException
+	 */
+	public Source createDatasourceFtp(Source ds,Provider prov) throws DataSourceOperationException;		
+	
+	
+	/**
+	 * Creates an HTTP Datasource
+	 * 
+	 * @param ds
+	 * @param prov
+	 * @return
+	 * @throws DataSourceOperationException
+	 */
+	public Source createDatasourceHttp(Source ds,Provider prov) throws DataSourceOperationException;		
+	
+	
+	/**
+	 * Creates a Folder Datasource
+	 * 
+	 * @param ds
+	 * @param prov
+	 * @return
+	 * @throws DataSourceOperationException
+	 */
+	public Source createDatasourceFolder(Source ds,Provider prov) throws DataSourceOperationException;
+	
+	
+	/**
+	 * Update an existing OAI DataSource
 	 * 
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
-	 * @throws RepoxException
 	 */
-	public Source createDatasource(Source ds,Provider prov) throws DataSourceOperationException;
+	public Source updateDatasourceOAI(Source ds) throws DataSourceOperationException;
+	
+	
+	/**
+	 * Update an existing Z3950Timestamp DataSource
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	public Source updateDatasourceZ3950Timestamp(Source ds) throws DataSourceOperationException;
+	
+	
+	/**
+	 * Update an existing Z3950IdFile DataSource
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	public Source updateDatasourceZ3950IdFile(Source ds,Provider prov) throws DataSourceOperationException;
+	
+	/**
+	 * Update an existing Z3950IdSequence DataSource
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	public Source updateDatasourceZ3950IdSequence(Source ds) throws DataSourceOperationException;
+	
+	/**
+	 * Update an existing Ftp DataSource
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	public Source updateDatasourceFtp(Source ds) throws DataSourceOperationException;
+	
+	/**
+	 * Update an existing Http DataSource
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	public Source updateDatasourceHttp(Source ds) throws DataSourceOperationException;
+	
+	
+	/**
+	 * Update an existing Folder DataSource
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	public Source updateDatasourceFolder(Source ds) throws DataSourceOperationException;
+	
 	
 	/**
 	 * Delete a Repox DataSource
@@ -148,14 +278,7 @@ public interface RepoxRestClient {
 	 */
 	public Success deleteDatasource(Source ds) throws DataSourceOperationException;
 
-	/**
-	 * Update an existing DataSource
-	 * 
-	 * @param ds a DataSource object
-	 * @throws DataSourceOperationException
-	 * @throws RepoxException
-	 */
-	public Source updateDatasource(Source ds) throws DataSourceOperationException;
+
 	
 
 	/**

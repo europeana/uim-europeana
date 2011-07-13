@@ -320,6 +320,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @return DataSources the available datasources
 	 * @throws RepoxException
 	 */
+	@Override
 	public DataSources retrieveDataSources() throws DataSourceOperationException {
 
 		Response resp = invokRestTemplate("/dataSources/list",Response.class);
@@ -339,30 +340,114 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	
 
 	
-	public Source createDatasource(Source ds,Provider prov)
+	/**
+	 * Creates an OAI DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+	 *    /rest/dataSources/createOai?
+	 *    dataProviderId=DPRestr0&
+	 *    id=bdaSet&
+	 *    description=Biblioteca Digital Do Alentejo&
+	 *    nameCode=00123&
+	 *    name=Alentejo&
+	 *    exportPath=D:/Projectos/repoxdata_new&
+	 *    schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+	 *    namespace=http://www.europeana.eu/schemas/ese/&
+	 *    metadataFormat=ese&
+	 *    oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
+	 *  </code>
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+
+	@Override
+	public Source createDatasourceOAI(Source ds, Provider prov)
+			throws DataSourceOperationException {
+		
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();			
+		StringBuffer oaiURL = new StringBuffer();		
+		
+		
+		dataProviderId.append("dataProviderId=");
+		dataProviderId.append(prov.getId());
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		metadataFormat.append("metadataFormat=");
+		metadataFormat.append(ds.getMetadataFormat());
+		oaiURL.append("oaiURL=");
+		oaiURL.append(ds.g);
+		
+		
+		return null;
+	}
+
+
+	/**
+	 * Creates a Z3950Timestamp DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+	 *  /rest/dataSources/createZ3950Timestamp?
+     *   dataProviderId=DPRestr0&
+	 *   id=z3950TimeTest&
+	 *   description=test Z39.50 with time stamp&nameCode=00130&
+	 *   name=Z3950-TimeStamp&
+	 *   exportPath=D:/Projectos/repoxdata_new&
+	 *   schema=info:lc/xmlns/marcxchange-v1.xsd&
+	 *   namespace=info:lc/xmlns/marcxchange-v1&
+	 *   address=193.6.201.205&
+	 *   port=1616&
+	 *   database=B1&
+	 *   user=&
+	 *   password=&
+	 *   recordSyntax=usmarc&
+	 *   charset=UTF-8&
+	 *   earliestTimestamp=20110301&
+	 *   recordIdPolicy=IdGenerated&
+	 *   idXpath=&
+	 *   namespacePrefix=&
+	 *   namespaceUri=
+	 *  </code>
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source createDatasourceZ3950Timestamp(Source ds, Provider prov)
 			throws DataSourceOperationException {
 
 		StringBuffer dataProviderId = new StringBuffer();
 		StringBuffer id = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer description = new StringBuffer();		
+		StringBuffer description = new StringBuffer();
 		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
 		StringBuffer exportPath = new StringBuffer();
-		
 		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
 		
-		///rest/dataSources/createOai?dataProviderId=DPRestr0&id=bdaSet&description=Biblioteca Digital Do Alentejo&
-		//nameCode=00123&name=Alentejo&exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
-		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
-		
-		StringBuffer oaiURL = new StringBuffer();
-		
-		///rest/dataSources/createZ3950Timestamp?dataProviderId=DPRestr0&id=z3950TimeTest&description=test Z39.50 with time stamp&nameCode=00130&
-		//name=Z3950-TimeStamp&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&
-		//namespace=info:lc/xmlns/marcxchange-v1&address=193.6.201.205&port=1616&database=B1&user=&password=&
-		//recordSyntax=usmarc&charset=UTF-8&earliestTimestamp=20110301&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
-		
+		//Method specific
 		StringBuffer address = new StringBuffer();
 		StringBuffer port = new StringBuffer();
 		StringBuffer database = new StringBuffer();
@@ -375,86 +460,726 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer idXpath  = new StringBuffer();
 		StringBuffer namespacePrefix  = new StringBuffer();
 		StringBuffer namespaceUri  = new StringBuffer();
-		StringBuffer metadataFormat  = new StringBuffer();
+
 		
-		///rest/dataSources/createZ3950IdSequence?dataProviderId=DPRestr0&id=z3950IdSeqTest&description=test%20Z39.50%20with%20id%20sequence&nameCode=00129&
-		//name=Z3950-IdSeq&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&
-		//address=aleph.lbfl.li&port=9909&database=LLB_IDS&user=&password=&recordSyntax=usmarc&charset=UTF-8&maximumId=6000&
-		//recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
-		StringBuffer maximumId  = new StringBuffer();
-		
-		
-		///rest/dataSources/createFtp?dataProviderId=DPRestr0&id=ftpTest&description=test FTP data source&nameCode=00124&name=FTP&
-		//exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
-		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&
-		//namespaceUri=&recordXPath=record&server=bd1.inesc-id.pt&user=ftp&password=pmath2010.&ftpPath=/Lizbeth
-		
-		StringBuffer recordXPath  = new StringBuffer();
-		StringBuffer server  = new StringBuffer();
-		StringBuffer ftpPath  = new StringBuffer();
-		StringBuffer isoFormat  = new StringBuffer();
-		
-		
-		
-		///rest/dataSources/createHttp?dataProviderId=DPRestr0&id=httpTest&description=test HTTP data source&nameCode=00124&name=HTTP&
-		//exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
-		//namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&
-		//namespaceUri=&recordXPath=record&url=http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip
-		StringBuffer url  = new StringBuffer();
-		
-		
-		///rest/dataSources/createFolder?dataProviderId=DPRestr0&id=folderTest&description=test%20Folder%20data%20source&nameCode=00124&
-		//name=Folder&exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&metadataFormat=ISO2709&
-		//isoFormat=pt.utl.ist.marc.iso2709.IteratorIso2709&charset=UTF-8&recordIdPolicy=IdExtracted&idXpath=/mx:record/mx:controlfield[@tag=%22001%22]&
-		//namespacePrefix=mx&namespaceUri=info:lc/xmlns/marcxchange-v1&recordXPath=&folder=C:\folder
-		StringBuffer folder  = new StringBuffer();
-		
-		
-		return ds;
+		return null;
 	}
 
+
+	
+	/**
+	 * Creates a Z3950IdFile DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *    /rest/dataSources/createZ3950IdList?
+     *    dataProviderId=DPRestr0&
+     *    id=z3950IdFile&
+     *    description=test Z39.50 with id list&
+     *    nameCode=00124&
+     *    name=Z3950-IdFile&
+     *    exportPath=D:/Projectos/repoxdata_new&
+     *    schema=info:lc/xmlns/marcxchange-v1.xsd&
+     *    namespace=info:lc/xmlns/marcxchange-v1&
+     *    address=aleph.lbfl.li&
+     *    port=9909&
+     *    database=LLB_IDS&
+     *    user=&
+     *    password=&
+     *    recordSyntax=usmarc&
+     *    charset=UTF-8&
+     *    filePath=C:\folderZ3950\1900028192z3960idList.txt&
+     *    recordIdPolicy=IdGenerated&
+     *    idXpath=&
+     *    namespacePrefix=&
+     *    namespaceUri=
+	 *  </code>
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source createDatasourceZ3950IdFile(Source ds, Provider prov)
+			throws DataSourceOperationException {
+
+
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer address = new StringBuffer();
+		StringBuffer port = new StringBuffer();
+		StringBuffer database = new StringBuffer();
+		StringBuffer user = new StringBuffer();
+		StringBuffer password = new StringBuffer();
+		StringBuffer recordSyntax = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		
+		
+		StringBuffer filePath  = new StringBuffer();
+		StringBuffer recordIdPolicy  = new StringBuffer();
+		StringBuffer idXpath  = new StringBuffer();
+		StringBuffer namespacePrefix  = new StringBuffer();
+		StringBuffer namespaceUri  = new StringBuffer();
+		
+		return null;
+	}
+
+
+	/**
+	 * Creates a Z3950Timestamp DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+	 *   /rest/dataSources/createZ3950IdSequence?
+	 *   dataProviderId=DPRestr0&
+	 *   id=z3950IdSeqTest&
+	 *   description=test%20Z39.50%20with%20id%20sequence&
+	 *   nameCode=00129&
+	 *   name=Z3950-IdSeq&
+	 *   exportPath=D:/Projectos/repoxdata_new&
+	 *   schema=info:lc/xmlns/marcxchange-v1.xsd&
+	 *   namespace=info:lc/xmlns/marcxchange-v1&
+	 *   address=aleph.lbfl.li&
+	 *   port=9909&
+	 *   database=LLB_IDS&
+	 *   user=&
+	 *   password=&
+	 *   recordSyntax=usmarc&
+	 *   charset=UTF-8&
+	 *   maximumId=6000&
+	 *   recordIdPolicy=IdGenerated&
+	 *   idXpath=&
+	 *   namespacePrefix=&
+	 *   namespaceUri=
+	 *  </code>
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source createDatasourceZ3950IdSequence(Source ds, Provider prov)
+			throws DataSourceOperationException {
+
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer address = new StringBuffer();
+		StringBuffer port = new StringBuffer();
+		StringBuffer database = new StringBuffer();
+		StringBuffer user = new StringBuffer();
+		StringBuffer password = new StringBuffer();
+		StringBuffer recordSyntax = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		
+		
+		StringBuffer maximumId  = new StringBuffer();
+		
+		StringBuffer recordIdPolicy  = new StringBuffer();
+		StringBuffer idXpath  = new StringBuffer();
+		StringBuffer namespacePrefix  = new StringBuffer();
+		StringBuffer namespaceUri  = new StringBuffer();
+		
+
+		return null;
+	}
+
+
+	/**
+	 * Creates an Ftp DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *   /rest/dataSources/createFtp?
+     *   dataProviderId=DPRestr0&
+     *   id=ftpTest&
+     *   description=test FTP data source&
+     *   nameCode=00124&
+     *   name=FTP&
+     *   exportPath=D:/Projectos/repoxdata_new&
+     *   schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+     *   namespace=http://www.europeana.eu/schemas/ese/&
+     *   metadataFormat=ese&
+     *   isoFormat=&
+     *   charset=&
+     *   recordIdPolicy=IdGenerated&
+     *   idXpath=&
+     *   namespacePrefix=&
+     *   namespaceUri=&
+     *   recordXPath=record&
+     *   server=bd1.inesc-id.pt&
+     *   user=ftp&
+     *   password=pmath2010.&
+     *   ftpPath=/Lizbeth
+	 *  </code>
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source createDatasourceFtp(Source ds, Provider prov)
+			throws DataSourceOperationException {
+
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();
+		StringBuffer isoFormat = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		StringBuffer recordIdPolicy = new StringBuffer();
+		StringBuffer idXpath = new StringBuffer();
+		StringBuffer namespacePrefix = new StringBuffer();
+		StringBuffer namespaceUri = new StringBuffer();
+		StringBuffer recordXPath  = new StringBuffer();		
+		StringBuffer server  = new StringBuffer();
+		StringBuffer user  = new StringBuffer();
+		StringBuffer password  = new StringBuffer();
+		StringBuffer ftpPath  = new StringBuffer();
+		
+		return null;
+	}
+
+
+	/**
+	 * Creates an Http DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *     /rest/dataSources/createHttp?
+     *     dataProviderId=DPRestr0&
+     *     id=httpTest&
+     *     description=test HTTP data source&
+     *     nameCode=00124&
+     *     name=HTTP&
+     *     exportPath=D:/Projectos/repoxdata_new&
+     *     schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+     *     namespace=http://www.europeana.eu/schemas/ese/&
+     *     metadataFormat=ese&
+     *     isoFormat=&
+     *     charset=&
+     *     recordIdPolicy=IdGenerated&
+     *     idXpath=&
+     *     namespacePrefix=&
+     *     namespaceUri=&
+     *     recordXPath=record&
+     *     url=http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip
+	 *  </code>
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source createDatasourceHttp(Source ds, Provider prov)
+			throws DataSourceOperationException {
+
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();
+		StringBuffer isoFormat = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		StringBuffer recordIdPolicy = new StringBuffer();
+		StringBuffer idXpath = new StringBuffer();
+		StringBuffer namespacePrefix = new StringBuffer();
+		StringBuffer namespaceUri = new StringBuffer();
+		StringBuffer recordXPath  = new StringBuffer();
+		
+		
+		StringBuffer url  = new StringBuffer();
+		
+		return null;
+	}
+
+
+	/**
+	 * Creates an Folder DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *     /rest/dataSources/updateFolder?
+     *     id=folderTest&
+     *     description=test%20Folder%20data%20source3333333&
+     *     nameCode=4444444444400124&
+     *     name=Folder&
+     *     exportPath=D:/Projectos/repoxdata_new&
+     *     schema=info:lc/xmlns/marcxchange-v1.xsd&
+     *     namespace=info:lc/xmlns/marcxchange-v1&
+     *     metadataFormat=ISO2709&
+     *     isoFormat=pt.utl.ist.marc.iso2709.IteratorIso2709&
+     *     charset=UTF-8&
+     *     recordIdPolicy=IdExtracted&
+     *     idXpath=/mx:record/mx:controlfield[@tag=%22001%22]&
+     *     namespacePrefix=mx&
+     *     namespaceUri=info:lc/xmlns/marcxchange-v1&
+     *     recordXPath=&
+     *     folder=C:\folderNew
+	 *  </code>
+	 * 
+	 * @param ds a DataSource object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source createDatasourceFolder(Source ds, Provider prov)
+			throws DataSourceOperationException {
+		
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();
+		StringBuffer isoFormat = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		StringBuffer recordIdPolicy = new StringBuffer();
+		StringBuffer idXpath = new StringBuffer();
+		StringBuffer namespacePrefix = new StringBuffer();
+		StringBuffer namespaceUri = new StringBuffer();
+		StringBuffer recordXPath  = new StringBuffer();
+		
+		
+		StringBuffer folder  = new StringBuffer();
+		
+		return null;
+	}
+
+
+	/**
+	 * Updates an OAI DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *     /rest/dataSources/updateOai?
+     *     id=bdaSet&
+     *     description=222Biblioteca Digital Do Alentejo&
+     *     nameCode=333300123&
+     *     name=4444Alentejo&
+     *     exportPath=D:/Projectos/repoxdata_new2&
+     *     schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+     *     namespace=http://www.europeana.eu/schemas/ese/&
+     *     metadataFormat=ese&
+     *     oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&
+     *     oaiSet=bda
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source updateDatasourceOAI(Source ds)
+			throws DataSourceOperationException {
+
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();
+		StringBuffer oaiURL = new StringBuffer();
+		StringBuffer oaiSet = new StringBuffer();
+		
+		return null;
+	}
+
+
+	/**
+	 * Updates a Z3950Timestamp DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *     /rest/dataSources/updateZ3950Timestamp?
+     *     id=z3950TimeTest&
+     *     description=new test Z39.50 with time stamp&
+     *     nameCode=99900130&
+     *     name=Z3950-TimeStampWorking&
+     *     exportPath=D:/Projectos/repoxdata_new&
+     *     schema=info:lc/xmlns/marcxchange-v1.xsd&
+     *     namespace=info:lc/xmlns/marcxchange-v1&
+     *     address=193.6.201.205&
+     *     port=1616&
+     *     database=B1&
+     *     user=&
+     *     password=&
+     *     recordSyntax=usmarc&
+     *     charset=UTF-8&
+     *     earliestTimestamp=20110301&
+     *     recordIdPolicy=IdGenerated&
+     *     idXpath=&
+     *     namespacePrefix=&
+     *     namespaceUri=
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source updateDatasourceZ3950Timestamp(Source ds)
+			throws DataSourceOperationException {
+
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer address = new StringBuffer();
+		StringBuffer port = new StringBuffer();
+		StringBuffer database = new StringBuffer();
+		StringBuffer user = new StringBuffer();
+		StringBuffer password = new StringBuffer();
+		StringBuffer recordSyntax = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		StringBuffer earliestTimestamp  = new StringBuffer();
+		StringBuffer recordIdPolicy  = new StringBuffer();
+		StringBuffer idXpath  = new StringBuffer();
+		StringBuffer namespacePrefix  = new StringBuffer();
+		StringBuffer namespaceUri  = new StringBuffer();
+		
+		
+		return null;
+	}
+
+
+	/**
+	 * Updates a Z3950IdFile DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *      /rest/dataSources/updateZ3950IdList?
+     *      id=z3950IdFile&
+     *      description=new test Z39.50 with id list&
+     *      nameCode=001245555&
+     *      name=Z3950-IdFilenew&
+     *      exportPath=D:/Projectos/repoxdata_new1&
+     *      schema=info:lc/xmlns/marcxchange-v1.xsd&
+     *      namespace=info:lc/xmlns/marcxchange-v1&
+     *      address=aleph.lbfl.li&port=9909&
+     *      database=LLB_IDS&
+     *      user=&
+     *      password=&
+     *      recordSyntax=usmarc&
+     *      charset=UTF-8&
+     *      filePath=C:\folderZ3950\newFile.txt&
+     *      recordIdPolicy=IdGenerated&
+     *      idXpath=&
+     *      namespacePrefix=&
+     *      namespaceUri=
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source updateDatasourceZ3950IdFile(Source ds, Provider prov)
+			throws DataSourceOperationException {
+
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer address = new StringBuffer();
+		StringBuffer port = new StringBuffer();
+		StringBuffer database = new StringBuffer();
+		StringBuffer user = new StringBuffer();
+		StringBuffer password = new StringBuffer();
+		StringBuffer recordSyntax = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		
+		
+		StringBuffer filePath  = new StringBuffer();
+		StringBuffer recordIdPolicy  = new StringBuffer();
+		StringBuffer idXpath  = new StringBuffer();
+		StringBuffer namespacePrefix  = new StringBuffer();
+		StringBuffer namespaceUri  = new StringBuffer();
+		
+		return null;
+	}
+
+
+	/**
+	 * Updates a Z3950IdSequence DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *    /rest/dataSources/updateZ3950IdSequence?
+     *    id=z3950IdSeqTest&
+     *    description=newtest Z39.50 with id sequence&
+     *    nameCode=222200129&
+     *    name=NEWZ3950-IdSeq&
+     *    exportPath=D:/Projectos/repoxdata_new21&
+     *    schema=info:lc/xmlns/marcxchange-v1.xsd&
+     *    namespace=info:lc/xmlns/marcxchange-v1&
+     *    address=aleph.lbfl.li&port=9909&
+     *    database=LLB_IDS&
+     *    user=&
+     *    password=&
+     *    recordSyntax=usmarc&
+     *    charset=UTF-8&
+     *    maximumId=300&
+     *    recordIdPolicy=IdGenerated&
+     *    idXpath=&
+     *    namespacePrefix=&
+     *    namespaceUri=
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source updateDatasourceZ3950IdSequence(Source ds)
+			throws DataSourceOperationException {
+
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer address = new StringBuffer();
+		StringBuffer port = new StringBuffer();
+		StringBuffer database = new StringBuffer();
+		StringBuffer user = new StringBuffer();
+		StringBuffer password = new StringBuffer();
+		StringBuffer recordSyntax = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		
+		
+		StringBuffer maximumId  = new StringBuffer();
+		
+		StringBuffer recordIdPolicy  = new StringBuffer();
+		StringBuffer idXpath  = new StringBuffer();
+		StringBuffer namespacePrefix  = new StringBuffer();
+		StringBuffer namespaceUri  = new StringBuffer();
+		
+		return null;
+	}
+
+
+	
+	/**
+	 * Updates a Ftp DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+	 *     /rest/dataSources/updateFtp?
+	 *     id=ftpTest&
+	 *     description=newtest FTP data source&
+	 *     nameCode=555555500124&
+	 *     name=FTP&
+	 *     exportPath=D:/Projectos/repoxdata_new21212121&
+	 *     schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+	 *     namespace=http://www.europeana.eu/schemas/ese/&
+	 *     metadataFormat=ese&
+	 *     isoFormat=&
+	 *     charset=&
+	 *     recordIdPolicy=IdGenerated&
+	 *     idXpath=&
+	 *     namespacePrefix=&
+	 *     namespaceUri=&
+	 *     recordXPath=record&
+	 *     server=bd1.inesc-id.pt&
+	 *     user=ftp&
+	 *     password=pmath2010.&
+	 *     ftpPath=/Lizbeth
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source updateDatasourceFtp(Source ds)
+			throws DataSourceOperationException {
+
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();
+		StringBuffer isoFormat = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		StringBuffer recordIdPolicy = new StringBuffer();
+		StringBuffer idXpath = new StringBuffer();
+		StringBuffer namespacePrefix = new StringBuffer();
+		StringBuffer namespaceUri = new StringBuffer();
+		StringBuffer recordXPath  = new StringBuffer();		
+		StringBuffer server  = new StringBuffer();
+		StringBuffer user  = new StringBuffer();
+		StringBuffer password  = new StringBuffer();
+		StringBuffer ftpPath  = new StringBuffer();
+		
+		return null;
+	}
+
+
+	/**
+	 * Updates an Http DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+	 *     /rest/dataSources/updateFtp?
+	 *     id=ftpTest&
+	 *     description=newtest FTP data source&
+	 *     nameCode=555555500124&
+	 *     name=FTP&
+	 *     exportPath=D:/Projectos/repoxdata_new21212121&
+	 *     schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+	 *     namespace=http://www.europeana.eu/schemas/ese/&
+	 *     metadataFormat=ese&
+	 *     isoFormat=&
+	 *     charset=&
+	 *     recordIdPolicy=IdGenerated&
+	 *     idXpath=&
+	 *     namespacePrefix=&
+	 *     namespaceUri=&
+	 *     recordXPath=record&
+	 *     server=bd1.inesc-id.pt&
+	 *     user=ftp&
+	 *     password=pmath2010.&
+	 *     ftpPath=/Lizbeth
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source updateDatasourceHttp(Source ds)
+			throws DataSourceOperationException {
+
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();
+		StringBuffer isoFormat = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		StringBuffer recordIdPolicy = new StringBuffer();
+		StringBuffer idXpath = new StringBuffer();
+		StringBuffer namespacePrefix = new StringBuffer();
+		StringBuffer namespaceUri = new StringBuffer();
+		StringBuffer recordXPath  = new StringBuffer();
+		
+		
+		StringBuffer url  = new StringBuffer();
+		
+		return null;
+	}
+
+
+	/**
+	 * Updates a Folder DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *     /rest/dataSources/updateFolder?
+     *     id=folderTest&
+     *     description=test%20Folder%20data%20source3333333&
+     *     nameCode=4444444444400124&
+     *     name=Folder&
+     *     exportPath=D:/Projectos/repoxdata_new&
+     *     schema=info:lc/xmlns/marcxchange-v1.xsd&
+     *     namespace=info:lc/xmlns/marcxchange-v1&
+     *     metadataFormat=ISO2709&
+     *     isoFormat=pt.utl.ist.marc.iso2709.IteratorIso2709&
+     *     charset=UTF-8&
+     *     recordIdPolicy=IdExtracted&
+     *     idXpath=/mx:record/mx:controlfield[@tag=%22001%22]&
+     *     namespacePrefix=mx&
+     *     namespaceUri=info:lc/xmlns/marcxchange-v1&
+     *     recordXPath=&
+     *     folder=C:\folderNew
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Source updateDatasourceFolder(Source ds)
+			throws DataSourceOperationException {
+
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();
+		StringBuffer isoFormat = new StringBuffer();
+		StringBuffer charset = new StringBuffer();
+		StringBuffer recordIdPolicy = new StringBuffer();
+		StringBuffer idXpath = new StringBuffer();
+		StringBuffer namespacePrefix = new StringBuffer();
+		StringBuffer namespaceUri = new StringBuffer();
+		StringBuffer recordXPath  = new StringBuffer();
+		
+		
+		StringBuffer folder = new StringBuffer();
+		
+		return null;
+	}
 	
 	
+	
+	
+	@Override
 	public Success deleteDatasource(Source ds)
 			throws DataSourceOperationException {
-		///rest/dataSources/delete?id=ftpTest
+
 		
 				return null;
 	}
 
-	
-	public Source updateDatasource(Source ds)
-			throws DataSourceOperationException {
-		///rest/dataSources/updateOai?id=bdaSet&description=222Biblioteca Digital Do Alentejo&nameCode=333300123&name=4444Alentejo&
-		//exportPath=D:/Projectos/repoxdata_new2&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&
-		//oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
-		
-		///rest/dataSources/updateZ3950Timestamp?id=z3950TimeTest&description=new test Z39.50 with time stamp&nameCode=99900130&name=Z3950-TimeStampWorking&
-		//exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=193.6.201.205&
-		//port=1616&database=B1&user=&password=&recordSyntax=usmarc&charset=UTF-8&earliestTimestamp=20110301&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
-		
-		///rest/dataSources/updateZ3950IdList?id=z3950IdFile&description=new test Z39.50 with id list&nameCode=001245555&name=Z3950-IdFilenew&exportPath=D:/Projectos/repoxdata_new1&
-		//schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=aleph.lbfl.li&port=9909&database=LLB_IDS&user=&password=&
-		//recordSyntax=usmarc&charset=UTF-8&filePath=C:\folderZ3950\newFile.txt&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
-		
-		///rest/dataSources/updateZ3950IdSequence?id=z3950IdSeqTest&description=newtest Z39.50 with id sequence&nameCode=222200129&name=NEWZ3950-IdSeq&
-		//exportPath=D:/Projectos/repoxdata_new21&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=aleph.lbfl.li&port=9909&
-		//database=LLB_IDS&user=&password=&recordSyntax=usmarc&charset=UTF-8&maximumId=300&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
-		
-		///rest/dataSources/updateFtp?id=ftpTest&description=newtest FTP data source&nameCode=555555500124&name=FTP&exportPath=D:/Projectos/repoxdata_new21212121&
-		//schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&
-		//recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=&recordXPath=record&server=bd1.inesc-id.pt&user=ftp&password=pmath2010.&ftpPath=/Lizbeth
-		
-		///rest/dataSources/updateHttp?id=httpTest&description=NEWWWWtest HTTP data source&nameCode=999900124&name=HTTP111&exportPath=D:/Projectos/repoxdata_new&
-		//schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&
-		//idXpath=&namespacePrefix=&namespaceUri=&recordXPath=record&url=http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip
-		
-		///rest/dataSources/updateFolder?id=folderTest&description=test%20Folder%20data%20source3333333&nameCode=4444444444400124&name=Folder&exportPath=D:/Projectos/repoxdata_new&
-		//schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&metadataFormat=ISO2709&isoFormat=pt.utl.ist.marc.iso2709.IteratorIso2709&charset=UTF-8&
-		//recordIdPolicy=IdExtracted&idXpath=/mx:record/mx:controlfield[@tag=%22001%22]&namespacePrefix=mx&namespaceUri=info:lc/xmlns/marcxchange-v1&recordXPath=&folder=C:\folderNew
-		
-		return ds;
-	}
 
 	
 	
@@ -629,6 +1354,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public String getDefaultURI() {
 		return defaultURI;
 	}
+
+
+
 
 
 
