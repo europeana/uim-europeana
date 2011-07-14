@@ -24,6 +24,60 @@
 	</source>
 
 	<dataSources>
+
+		<source id="bdaSet" metadataFormat="ese"
+			schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"
+			namespace="http://www.europeana.eu/schemas/ese/" lastIngest="" sample="-1" status=""
+			type="DataSourceOai" name="Alentejo" nameCode="00123"
+			exportPath="D:/Projectos/repoxdata_new">
+			<description>Biblioteca Digital Do Alentejo</description>
+			<recordIdPolicy type="IdGenerated"/>
+			<oai-source>http://bd1.inesc-id.pt:8080/repoxel/OAIHandler</oai-source>
+			<oai-set>bda</oai-set>
+			<metadataTransformations/>
+		</source>
+
+		<source id="z3950IdSeqTest" metadataFormat="MarcXchange"
+			schema="info:lc/xmlns/marcxchange-v1.xsd" namespace="info:lc/xmlns/marcxchange-v1"
+			lastIngest="" sample="-1" status="" type="DataSourceZ3950" name="Z3950-IdSeq"
+			nameCode="00129" exportPath="D:/Projectos/repoxdata_new">
+			<description>test Z39.50 with id sequence</description>
+			<recordIdPolicy type="IdGenerated"/>
+			<target>
+				<address>aleph.lbfl.li</address>
+				<port>9909</port>
+				<database>LLB_IDS</database>
+				<user/>
+				<password/>
+				<charset>UTF-8</charset>
+				<recordSyntax>usmarc</recordSyntax>
+			</target>
+			<harvestMethod>IdSequenceHarvester</harvestMethod>
+			<maximumId>6000</maximumId>
+			<metadataTransformations/>
+		</source>
+
+
+		<source id="z3950TimeTest" metadataFormat="MarcXchange"
+			schema="info:lc/xmlns/marcxchange-v1.xsd" namespace="info:lc/xmlns/marcxchange-v1"
+			lastIngest="" sample="-1" status="" type="DataSourceZ3950" name="Z3950-TimeStamp"
+			nameCode="00130" exportPath="D:/Projectos/repoxdata_new">
+			<description>test Z39.50 with time stamp</description>
+			<recordIdPolicy type="IdGenerated"/>
+			<target>
+				<address>193.6.201.205</address>
+				<port>1616</port>
+				<database>B1</database>
+				<user/>
+				<password/>
+				<charset>UTF-8</charset>
+				<recordSyntax>usmarc</recordSyntax>
+			</target>
+			<harvestMethod>TimestampHarvester</harvestMethod>
+			<earliestTimestamp>20110301</earliestTimestamp>
+			<metadataTransformations/>
+		</source>
+
 		<source id="z3950IdFile" metadataFormat="MarcXchange"
 			schema="info:lc/xmlns/marcxchange-v1.xsd" namespace="info:lc/xmlns/marcxchange-v1"
 			lastIngest="" sample="-1" status="" type="DataSourceZ3950" name="Z3950-IdFile"
@@ -43,6 +97,19 @@
 			<idListFile>C:\folderZ3950\1900028192z3960idList.txt</idListFile>
 			<metadataTransformations/>
 		</source>
+
+		<source id="figueirovinhosSet" metadataFormat="ese"
+			schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"
+			namespace="http://www.europeana.eu/schemas/ese/" lastIngest="" sample="-1" status=""
+			type="DataSourceOai" name="Vinhos" nameCode="00123"
+			exportPath="D:/Projectos/repoxdata_new">
+			<description>Biblioteca1 Municipal de Figueiro dos Vinhos</description>
+			<recordIdPolicy type="IdGenerated"/>
+			<oai-source>http://bd1.inesc-id.pt:8080/repoxel/OAIHandler</oai-source>
+			<oai-set>figueirovinhos</oai-set>
+			<metadataTransformations/>
+		</source>
+
 		<source id="httpTest" metadataFormat="ese"
 			schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"
 			namespace="http://www.europeana.eu/schemas/ese/" lastIngest="" sample="-1" status=""
@@ -66,6 +133,56 @@
 			</splitRecords>
 			<metadataTransformations/>
 		</source>
+
+		<source id="ftpTest" metadataFormat="ese"
+			schema="http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd"
+			namespace="http://www.europeana.eu/schemas/ese/" lastIngest="" sample="-1" status=""
+			type="DataSourceDirectoryImporter" name="FTP" nameCode="00124"
+			exportPath="D:/Projectos/repoxdata_new">
+			<description>test FTP data source</description>
+			<recordIdPolicy type="IdGenerated"/>
+			<sourcesDirPath>D:/Projectos/repoxdata_new/[temp]FTP_Requests\bd1.inesc-id.pt-ftpTest</sourcesDirPath>
+			<retrieveStrategy type="pt.utl.ist.repox.ftp.DataSourceFtp">
+				<server>bd1.inesc-id.pt</server>
+				<user>ftp</user>
+				<password>pmath2010.</password>
+				<folderPath>/Lizbeth</folderPath>
+			</retrieveStrategy>
+			<fileExtract>SimpleFileExtract</fileExtract>
+			<splitRecords>
+				<recordXPath>record</recordXPath>
+				<namespaces>
+					<namespace>
+						<namespacePrefix/>
+						<namespaceUri/>
+					</namespace>
+				</namespaces>
+			</splitRecords>
+			<metadataTransformations/>
+		</source>
+
+		<source id="folderTest" metadataFormat="ISO2709" schema="info:lc/xmlns/marcxchange-v1.xsd"
+			namespace="info:lc/xmlns/marcxchange-v1" lastIngest="" sample="-1" status=""
+			type="DataSourceDirectoryImporter"
+			isoImplementationClass="pt.utl.ist.marc.iso2709.IteratorIso2709"
+			characterEncoding="UTF-8" name="Folder" nameCode="00124"
+			exportPath="D:/Projectos/repoxdata_new">
+			<description>test Folder data source</description>
+			<recordIdPolicy type="IdExtracted">
+				<idXpath>/mx:record/mx:controlfield[@tag="001"]</idXpath>
+				<namespaces>
+					<namespace>
+						<namespacePrefix>mx</namespacePrefix>
+						<namespaceUri>info:lc/xmlns/marcxchange-v1</namespaceUri>
+					</namespace>
+				</namespaces>
+			</recordIdPolicy>
+			<sourcesDirPath>C:\folder</sourcesDirPath>
+			<retrieveStrategy type="pt.utl.ist.repox.marc.DataSourceFolder"/>
+			<fileExtract>Iso2709FileExtract</fileExtract>
+			<metadataTransformations/>
+		</source>
+
 	</dataSources>
 
 
