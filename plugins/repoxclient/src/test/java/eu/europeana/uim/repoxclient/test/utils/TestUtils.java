@@ -21,6 +21,7 @@
 package eu.europeana.uim.repoxclient.test.utils;
 
 import java.io.StringWriter;
+import java.math.BigInteger;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -32,7 +33,10 @@ import eu.europeana.uim.repoxclient.jibxbindings.Country;
 import eu.europeana.uim.repoxclient.jibxbindings.Description;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
+import eu.europeana.uim.repoxclient.jibxbindings.OaiSet;
+import eu.europeana.uim.repoxclient.jibxbindings.OaiSource;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
+import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
 
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
@@ -52,7 +56,7 @@ public class TestUtils {
 		Aggregator aggr = new Aggregator();
 		
 	    Name name = new Name();
-	    name.setName("JunitContainerAggregator");
+	    name.setName("JunitContainerAggregator2");
 		aggr.setName(name);
 		NameCode namecode = new NameCode();
 		namecode.setNameCode("77777");
@@ -99,27 +103,37 @@ public class TestUtils {
 	}
 	
 	
+
 	
-	
-	public static Source createDataSource(){
+		
+	public static Source createOAIDataSource(){
 	 	// /rest/dataSources/createOai?dataProviderId=DPRestr0&id=bdaSet&description=Biblioteca Digital Do Alentejo&nameCode=00123&name=Alentejo&
 		// exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&
 		//metadataFormat=ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
 
 		Source ds = new Source();
-		
+		ds.setId("DPRestr0");
+		Description des = new Description();
+		des.setDescription("Biblioteca Digital Do Alentejo");
+		ds.setDescription(des);
+		ds.setNameCode(new BigInteger("00123"));
+		ds.setName("Alentejo");
 		ds.setExportPath("D:/Projectos/repoxdata_new");
 		ds.setSchema("http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd");
 		ds.setNamespace("http://www.europeana.eu/schemas/ese/");
-		ds.setMetadataFormat("ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda");
-		ds.getRecordIdPolicy().setType("IdGenerated");
-		ds.getSequence().getRetrieveStrategy().setType("pt.utl.ist.repox.http.DataSourceHttp");
+		ds.setMetadataFormat("ese");
 		
-		Url url = new Url();
-		url.setUrl("http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda");
+		Sequence seq = new Sequence();
+		OaiSet oaiSet = new OaiSet();
+		oaiSet.setOaiSet("bda");
+		seq.setOaiSet(oaiSet);
+		OaiSource oaiSource = new OaiSource();
+		oaiSource.setOaiSource("http://bd1.inesc-id.pt:8080/repoxel/OAIHandler");
+		seq.setOaiSource(oaiSource);
+		ds.setSequence(seq);
 		
-		ds.getSequence().getRetrieveStrategy().setUrl(url);		
-		return null;
+
+		return ds;
 	}
 	
 	

@@ -46,10 +46,12 @@ import eu.europeana.uim.repoxclient.jibxbindings.Description;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
+import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
+import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
 import eu.europeana.uim.repoxclient.test.utils.TestUtils;
 
 
@@ -188,6 +190,54 @@ public void testCreateUpdateDeleteProvider() throws Exception{
 	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
 	assertNotNull(aggres);
 	TestUtils.logMarshalledObject(aggres,LOGGER);
+}
+
+
+/**
+ * Creates an OAI DataSource. It accesses the following REST Interface:
+ * 
+ *  <code>
+ *    /rest/dataSources/createOai?
+ *    dataProviderId=DPRestr0&
+ *    id=bdaSet&
+ *    description=Biblioteca Digital Do Alentejo&
+ *    nameCode=00123&
+ *    name=Alentejo&
+ *    exportPath=D:/Projectos/repoxdata_new&
+ *    schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+ *    namespace=http://www.europeana.eu/schemas/ese/&
+ *    metadataFormat=ese&
+ *    oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&
+ *    oaiSet=bda
+ *  </code>
+ * 
+ * @param ds a DataSource object
+ * @throws DataSourceOperationException
+ */
+@Test
+public void testCreateUpdateDeleteOAIDataSource() throws Exception{
+	
+	//Create an Aggregator for testing purposes
+	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
+	assertNotNull(rtAggr);
+	TestUtils.logMarshalledObject(rtAggr,LOGGER);
+	
+	//Create a Provider
+	Provider prov = TestUtils.createProviderObj();	
+	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
+	assertNotNull(respprov);
+	TestUtils.logMarshalledObject(respprov,LOGGER);
+	
+	
+	Source oaids = TestUtils.createOAIDataSource();
+	
+	Source respOaids = repoxRestClient.createDatasourceOAI(oaids, respprov);
+	
+	TestUtils.logMarshalledObject(respOaids,LOGGER);
+
+	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
+	
 }
 
 

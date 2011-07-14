@@ -354,7 +354,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 *    schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
 	 *    namespace=http://www.europeana.eu/schemas/ese/&
 	 *    metadataFormat=ese&
-	 *    oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
+	 *    oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&
+	 *    oaiSet=bda
 	 *  </code>
 	 * 
 	 * @param ds a DataSource object
@@ -376,7 +377,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		//Method specific
 		StringBuffer metadataFormat = new StringBuffer();			
-		StringBuffer oaiURL = new StringBuffer();		
+		StringBuffer oaiURL = new StringBuffer();
+		StringBuffer oaiSet = new StringBuffer();
 		
 		
 		dataProviderId.append("dataProviderId=");
@@ -398,10 +400,35 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		metadataFormat.append("metadataFormat=");
 		metadataFormat.append(ds.getMetadataFormat());
 		oaiURL.append("oaiURL=");
-		oaiURL.append(ds.g);
+		oaiURL.append(ds.getSequence().getOaiSource().getOaiSource());
+		oaiSet.append("oaiSet=");
+		oaiSet.append(ds.getSequence().getOaiSet().getOaiSet());
 		
 		
-		return null;
+		Response resp = invokRestTemplate("/dataSources/createOai",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				oaiURL.toString(),
+				oaiSet.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
+
 	}
 
 
@@ -461,8 +488,85 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer namespacePrefix  = new StringBuffer();
 		StringBuffer namespaceUri  = new StringBuffer();
 
+		dataProviderId.append("dataProviderId=");
+		dataProviderId.append(prov.getId());
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
 		
-		return null;
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		address.append("address=");
+		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
+		port.append("port=");
+		port.append(ds.getSequence2().getTarget().getPort().getPort());
+		database.append("database=");
+		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
+		
+		user.append("user=");
+		user.append(ds.getSequence2().getTarget().getUser().getUser());
+		password.append("password=");
+		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+		recordSyntax.append("recordSyntax=");
+		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+		
+		charset.append("charset=");
+		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+		earliestTimestamp.append("earliestTimestamp=");
+		earliestTimestamp.append(ds.getChoice().getEarliestTimestamp().getEarliestTimestamp());
+		recordIdPolicy.append("recordIdPolicy=");
+		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+		
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		
+		
+		Response resp = invokRestTemplate("/dataSources/createZ3950Timestamp",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				earliestTimestamp.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 
 
@@ -1172,12 +1276,39 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	
 	
 	
+	/**
+	 * Deletes a DataSource of any Type. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *    /rest/dataSources/delete?id=ftpTest
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
 	@Override
 	public Success deleteDatasource(Source ds)
 			throws DataSourceOperationException {
 
+		StringBuffer id = new StringBuffer();
 		
-				return null;
+		id.append("Id=");
+		id.append(ds.getId());
+
+		Response resp = invokRestTemplate("/dataSources/delete",Response.class,
+				id.toString());
+		
+		if (resp.getSuccess() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSuccess();
+		}
+
 	}
 
 
@@ -1225,35 +1356,83 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * Harvest Control/Monitoring operations
 	 */
 	
+
+	/**
+	 * Initializes a Harvesting Session. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+	 *	 /rest/dataSources/startIngest?id=bmfinancas
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
 	@Override
 	public Success initiateHarvesting(Source ds)
 			throws HarvestingOperationException{
 
-		///rest/dataSources/startIngest?id=bmfinancas
+
 		
 		return null;
 	}
 
-	@Override
-	public Success initiateHarvesting(Source ds,DateTime ingestionDate) 
-	       throws HarvestingOperationException{
-
-		///rest/dataSources/scheduleIngest?id=bmfinancas&firstRunDate=06-07-2011&firstRunHour=17:43&frequency=Daily&xmonths=&fullIngest=true
-		return null;
-	}
-
 	
 	
+	/**
+	 * Cancels an existing Harvesting Session. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+	 *	 /rest/dataSources/stopIngest?id=bmfinancas
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
 	@Override
 	public Success cancelHarvesting(Source ds)
 			throws HarvestingOperationException {
 		
-		///rest/dataSources/stopIngest?id=bmfinancas
+		
+
+		return null;
+	}
+	
+	
+	/**
+	 * Initializes a Harvesting Session. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+	 *	    /rest/dataSources/scheduleIngest?id=bmfinancas&
+	 *      firstRunDate=06-07-2011&
+	 *      firstRunHour=17:43&
+	 *      frequency=Daily&
+	 *      xmonths=&
+	 *      fullIngest=true
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
+	@Override
+	public Success initiateHarvesting(Source ds,DateTime ingestionDate) 
+	       throws HarvestingOperationException{
+
 
 		return null;
 	}
 
-
+	
+	
+	/**
+	 * Gets the status for a Harvesting Session. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *    /rest/dataSources/harvestStatus?id=httpTest
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
 	@Override
 	public Success getHarvestingStatus(Source ds)
 			throws HarvestingOperationException {
@@ -1262,19 +1441,40 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 
+	/**
+	 * Gets the Active Harvesting Sessions. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *    /rest/dataSources/harvesting
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
 	@Override
 	public RunningTasks getActiveHarvestingSessions()
 			throws HarvestingOperationException {
-		////rest/dataSources/harvesting
+
 		return null;
 	}
 
 
+	
+	/**
+	 * Gets the Scheduled Harvesting Sessions for a DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *    /rest/dataSources/scheduleList?id=bmfinancas
+	 *  </code>
+	 * 
+	 * @param ds a Source object
+	 * @throws DataSourceOperationException
+	 */
 	@Override
 	public ScheduleTasks getScheduledHarvestingSessions()
 			throws HarvestingOperationException {
 
-		///rest/dataSources/scheduleList?id=bmfinancas
+
 
 		return null;
 	}
@@ -1331,7 +1531,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 			}
 			operation.append(params[i]);
 		}
-		
+
 		
 		S restResponse = restTemplate.getForObject(operation.toString(), responseClass);
 
