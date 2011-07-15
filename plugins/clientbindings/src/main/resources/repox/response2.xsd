@@ -125,7 +125,7 @@
       <xs:attribute name="lastIngest" use="required"/>
       <xs:attribute name="metadataFormat" use="required" type="xs:NCName"/>
       <xs:attribute name="name" use="required" type="xs:NCName"/>
-      <xs:attribute name="nameCode" use="required" type="xs:integer"/>
+      <xs:attribute name="nameCode" use="optional" type="xs:integer"/>
       <xs:attribute name="namespace" use="required" type="xs:anyURI"/>
       <xs:attribute name="sample" use="required" type="xs:integer"/>
       <xs:attribute name="schema" use="required" type="xs:anyURI"/>
@@ -201,7 +201,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element ref="name"/>
-        <xs:element ref="nameCode"/>
+        <xs:element minOccurs="0" ref="nameCode"/>
         <xs:element minOccurs="0" ref="url"/>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:NCName"/>
@@ -212,9 +212,9 @@
       <xs:sequence>
         <xs:element ref="name"/>
         <xs:element ref="country"/>
-        <xs:element ref="description"/>
+        <xs:element minOccurs="0" ref="description"/>
         <xs:element ref="type"/>
-        <xs:element ref="nameCode"/>
+        <xs:element minOccurs="0" ref="nameCode" />
         <xs:element minOccurs="0" ref="url"/>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:NCName"/>
