@@ -918,7 +918,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		id.append("id=");
 		id.append(ds.getId());
 		description.append("description=");
-		description.append(ds.getDescription());
+		description.append(ds.getDescription().getDescription());
 		nameCode.append("nameCode=");
 		nameCode.append(ds.getNameCode().toString());
 		name.append("name=");
@@ -1336,7 +1336,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 		StringBuffer id = new StringBuffer();
 		
-		id.append("Id=");
+		id.append("id=");
 		id.append(ds.getId());
 
 		Response resp = invokRestTemplate("/dataSources/delete",Response.class,
@@ -1421,7 +1421,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		id.append("id=");
 		id.append(ds.getId());
 
-		Response resp = invokRestTemplate("/rest/dataSources/startIngest",Response.class,
+		Response resp = invokRestTemplate("/dataSources/startIngest",Response.class,
 				id.toString());
 		
 		if (resp.getSuccess() == null) {
@@ -1458,7 +1458,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		id.append("id=");
 		id.append(ds.getId());
 
-		Response resp = invokRestTemplate("/rest/dataSources/stopIngest",Response.class,
+		Response resp = invokRestTemplate("/dataSources/stopIngest",Response.class,
 				id.toString());
 		
 		if (resp.getSuccess() == null) {
@@ -1494,8 +1494,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Success initiateHarvesting(Source ds,DateTime ingestionDate) 
 	       throws HarvestingOperationException{
 
-
-		return null;
+		throw new UnsupportedOperationException("Not implemented yet...");
 	}
 
 	
@@ -1513,8 +1512,24 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Success getHarvestingStatus(Source ds)
 			throws HarvestingOperationException {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuffer id = new StringBuffer();
+		
+		id.append("id=");
+		id.append(ds.getId());
+
+		Response resp = invokRestTemplate("/dataSources/harvestStatus",Response.class,
+				id.toString());
+		
+		if (resp.getSuccess() == null) {
+			if (resp.getError() != null) {
+				throw new HarvestingOperationException(resp.getError());
+			} else {
+				throw new HarvestingOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSuccess();
+		}
 	}
 
 
@@ -1532,7 +1547,18 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public RunningTasks getActiveHarvestingSessions()
 			throws HarvestingOperationException {
 
-		return null;
+		Response resp = invokRestTemplate("/dataSources/harvesting",Response.class);
+		
+		if (resp.getRunningTasks() == null) {
+			if (resp.getError() != null) {
+				throw new HarvestingOperationException(resp.getError());
+			} else {
+				throw new HarvestingOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getRunningTasks();
+		}
 	}
 
 

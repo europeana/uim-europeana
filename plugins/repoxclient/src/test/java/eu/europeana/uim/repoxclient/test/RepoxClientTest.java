@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 import javax.annotation.Resource;
 
@@ -40,12 +41,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
 import eu.europeana.uim.repoxclient.jibxbindings.Country;
+import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.Description;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
+import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
@@ -217,6 +220,10 @@ public void testCreateUpdateDeleteProvider() throws Exception{
 @Test
 public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	
+
+	try{
+		
+
 	//Create an Aggregator for testing purposes
 	Aggregator aggr = 	TestUtils.createAggregatorObj();
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
@@ -229,15 +236,65 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	assertNotNull(respprov);
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
-	
+	//Create an OAI PMH Datasource
 	Source oaids = TestUtils.createOAIDataSource();
 	
 	Source respOaids = repoxRestClient.createDatasourceOAI(oaids, respprov);
-	
 	TestUtils.logMarshalledObject(respOaids,LOGGER);
 
+	//Update an OAI PMH Datasource
+	Description description = new Description();
+	description.setDescription("altered!@#$%");
+	respOaids.setDescription(description );
+	
+	Source updOaids = repoxRestClient.updateDatasourceOAI(respOaids);
+	assertNotNull(updOaids);
+	assertEquals("altered!@#$%",updOaids.getDescription().getDescription());
+	
+	//Initialize a harvesting session
+	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids);
+	assertNotNull(harvestRes);
+	TestUtils.logMarshalledObject(harvestRes,LOGGER);
+
+	
+	RunningTasks rt = repoxRestClient.getActiveHarvestingSessions();
+	assertNotNull(rt);
+	TestUtils.logMarshalledObject(rt,LOGGER);
+	ArrayList<DataSource> dslist =  (ArrayList<DataSource>) rt.getDataSourceList();
+	DataSource dsisregistered = null;
+
+	for(DataSource ds : dslist){
+	    if(ds.getDataSource().equals(updOaids.getId())){	
+	    	dsisregistered = ds;
+	    }
+	}
+	
+	//assertNotNull(dsisregistered);
+	
+	//Gets the Harvesting Status for the created datasource
+	Success status =repoxRestClient.getHarvestingStatus(updOaids);
+	assertNotNull(status);
+	TestUtils.logMarshalledObject(status,LOGGER);
+	
+	Success cancelled = repoxRestClient.cancelHarvesting(updOaids);
+    assertNotNull(cancelled);
+	TestUtils.logMarshalledObject(cancelled,LOGGER);
+	
+	
+	Success deleted = repoxRestClient.deleteDatasource(updOaids);
+    assertNotNull(deleted);
+	TestUtils.logMarshalledObject(deleted,LOGGER);
+	
 	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
 	assertNotNull(aggres);
+	
+	}
+	catch(Exception ex){
+		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		
+		throw ex;
+	}
+	
 }
 
 
