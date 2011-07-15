@@ -237,7 +237,7 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	TestUtils.logMarshalledObject(respOaids,LOGGER);
 
 	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
-	
+	assertNotNull(aggres);
 }
 
 

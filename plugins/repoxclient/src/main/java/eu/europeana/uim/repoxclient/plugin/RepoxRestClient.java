@@ -38,7 +38,6 @@ import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
-import eu.europeana.uim.repoxclient.objects.HarvestingType;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;

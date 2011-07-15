@@ -899,7 +899,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Source updateDatasourceOAI(Source ds)
 			throws DataSourceOperationException {
 
-		StringBuffer dataProviderId = new StringBuffer();
+
 		StringBuffer id = new StringBuffer();
 		StringBuffer description = new StringBuffer();
 		StringBuffer nameCode = new StringBuffer();
@@ -907,14 +907,58 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer exportPath = new StringBuffer();
 		StringBuffer schema = new StringBuffer();	
 		StringBuffer namespace = new StringBuffer();
-
 		
 		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();
+		StringBuffer metadataFormat = new StringBuffer();			
 		StringBuffer oaiURL = new StringBuffer();
 		StringBuffer oaiSet = new StringBuffer();
 		
-		return null;
+		
+
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		metadataFormat.append("metadataFormat=");
+		metadataFormat.append(ds.getMetadataFormat());
+		oaiURL.append("oaiURL=");
+		oaiURL.append(ds.getSequence().getOaiSource().getOaiSource());
+		oaiSet.append("oaiSet=");
+		oaiSet.append(ds.getSequence().getOaiSet().getOaiSet());
+		
+		
+		Response resp = invokRestTemplate("/dataSources/updateOai",Response.class,
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				oaiURL.toString(),
+				oaiSet.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 
 
@@ -1322,31 +1366,32 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	
 	public RecordResult retrieveRecord(String recordString)
 			throws RecordOperationException{
-
-		return null;
+		
+		throw new UnsupportedOperationException("Not implemented yet...");
 	}
 
 	
 	@Override
 	public Success saveRecord(String recordID, Source ds, String recordXML)
 			throws RecordOperationException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		throw new UnsupportedOperationException("Not implemented yet...");
 	}
 
 
 	@Override
 	public Success markRecordAsDeleted(String recordID)
 			throws RecordOperationException {
-		// TODO Auto-generated method stub
-		return null;
+
+		throw new UnsupportedOperationException("Not implemented yet...");
+		
 	}
 
 
 	@Override
 	public Success eraseRecord(String recordID) throws RecordOperationException {
-		// TODO Auto-generated method stub
-		return null;
+
+		throw new UnsupportedOperationException("Not implemented yet...");
 	}
 	
 	
@@ -1371,9 +1416,25 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Success initiateHarvesting(Source ds)
 			throws HarvestingOperationException{
 
-
+		StringBuffer id = new StringBuffer();
 		
-		return null;
+		id.append("id=");
+		id.append(ds.getId());
+
+		Response resp = invokRestTemplate("/rest/dataSources/startIngest",Response.class,
+				id.toString());
+		
+		if (resp.getSuccess() == null) {
+			if (resp.getError() != null) {
+				throw new HarvestingOperationException(resp.getError());
+			} else {
+				throw new HarvestingOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSuccess();
+		}
+
 	}
 
 	
@@ -1392,9 +1453,25 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Success cancelHarvesting(Source ds)
 			throws HarvestingOperationException {
 		
+		StringBuffer id = new StringBuffer();
 		
+		id.append("id=");
+		id.append(ds.getId());
 
-		return null;
+		Response resp = invokRestTemplate("/rest/dataSources/stopIngest",Response.class,
+				id.toString());
+		
+		if (resp.getSuccess() == null) {
+			if (resp.getError() != null) {
+				throw new HarvestingOperationException(resp.getError());
+			} else {
+				throw new HarvestingOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSuccess();
+		}
+
 	}
 	
 	
