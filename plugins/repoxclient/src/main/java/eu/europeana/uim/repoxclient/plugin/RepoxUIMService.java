@@ -21,6 +21,7 @@
 package eu.europeana.uim.repoxclient.plugin;
 
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 
@@ -60,8 +61,9 @@ public interface RepoxUIMService {
 	 * 
 	 * @param aggregator an Aggregator object 
 	 * @throws AggregatorOperationException
+	 * @throws ProviderOperationException 
 	 */
-	public void createAggregatorfromUIMObj(Provider provider,boolean isRecursive) throws AggregatorOperationException;
+	public void createAggregatorfromUIMObj(Provider provider,boolean isRecursive) throws AggregatorOperationException, ProviderOperationException;
 	
 	
 	/**
@@ -81,31 +83,14 @@ public interface RepoxUIMService {
 	
 	
 	/**
-	 * Retrieves all the available Aggregators from Repox
-	 * @return an object containing all available Aggregators 
-	 * @throws AggregatorOperationException
-	 */
-	public List<Provider> retrieveAggregators() throws AggregatorOperationException;	
-	
-	
-	/**
 	 * Checks if a UIM provider instance already exists in Repox
 	 * 
 	 * @param prov a UIM Provider Object
 	 * @throws ProviderOperationException
 	 */
-	public void providerExists(Provider prov) throws ProviderOperationException;
+	public boolean providerExists(Provider prov) throws ProviderOperationException;
 	
-	
-	/**
-	 * Creates a provider in Repox and assigns it to the specific Aggregator
-	 * 
-	 * @param prov a UIM Provider Object
-	 * @param agr a UIM Provider Object (should be an Aggregator type)
-	 * @throws ProviderOperationException
-	 */
-	public void createProviderfromUIMObj(Provider prov,Provider agr,boolean isRecursive) throws ProviderOperationException;
-	
+		
 	
 	/**
 	 * Creates a provider in Repox
@@ -133,13 +118,21 @@ public interface RepoxUIMService {
 	 */
 	public void updateProviderfromUIMObj(Provider prov) throws ProviderOperationException;
 	
+
+	/**
+	 * Retrieves all the available Aggregators from Repox
+	 * @return an object containing all available Aggregators 
+	 * @throws AggregatorOperationException
+	 */
+	public Set<Provider> retrieveAggregators() throws AggregatorOperationException;	
+	
 	
 	/**
 	 * Retrieves all available providers within Repox
 	 * @return a List of UIM Provider objects
 	 * @throws ProviderOperationException
 	 */
-	public List<Provider> retrieveProviders() throws ProviderOperationException;	
+	public Set<Provider> retrieveProviders() throws ProviderOperationException;	
 	
 	
 	/**
@@ -149,7 +142,7 @@ public interface RepoxUIMService {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public List<Collection> retrieveDataSources() throws DataSourceOperationException;
+	public Set<Collection> retrieveDataSources() throws DataSourceOperationException;
 	
 	
 	/**
@@ -159,7 +152,7 @@ public interface RepoxUIMService {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public void datasourceExists(Collection col) throws DataSourceOperationException;
+	public boolean datasourceExists(Collection col) throws DataSourceOperationException;
 
 	
 	

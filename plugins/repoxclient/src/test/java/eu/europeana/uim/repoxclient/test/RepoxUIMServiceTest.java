@@ -61,7 +61,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
-import eu.europeana.uim.clientbindings.utils.Utils;
+
 import org.apache.karaf.testing.AbstractIntegrationTest;
 import org.apache.log4j.Logger;
 

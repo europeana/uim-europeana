@@ -20,15 +20,25 @@
  */
 package eu.europeana.uim.repoxclient.rest;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.joda.time.DateTime;
 
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
+import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
 import eu.europeana.uim.repoxclient.jibxbindings.Log;
+import eu.europeana.uim.repoxclient.jibxbindings.Name;
+import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
+import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
@@ -51,53 +61,165 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	private Orchestrator orchestrator;
 	private Registry registry;
 	
+	
+	
 	@Override
 	public boolean aggregatorExists(Provider provider)
 			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void createAggregatorfromUIMObj(Provider provider,
-			boolean isRecursive) throws AggregatorOperationException {
-		// TODO Auto-generated method stub
+		
+		if(!provider.isAggregator()){
+			throw new AggregatorOperationException("The requested object is not of Aggregator type");
+		}
+		
+		String id = provider.getValue("repoxID");
+		
+		if(id == null){
+			throw new AggregatorOperationException("Missing repoxID element from Agregator object");
+		}
+		
+		HashSet<Provider> prov = retrieveAggregators();
+		
+		return prov.contains(provider);
 		
 	}
 
+	
+	
 	@Override
-	public void deleteAggregatorfromUIMObj(Provider provider)
+	public void createAggregatorfromUIMObj(Provider aggregator,
+			boolean isRecursive) throws AggregatorOperationException, ProviderOperationException {
+
+		if(!aggregator.isAggregator()){
+			throw new AggregatorOperationException("The requested object is not of Aggregator type");
+		}
+		
+		Aggregator aggr = new Aggregator();
+		
+	    Name name = new Name();
+	    name.setName(aggregator.getName());
+		aggr.setName(name);
+		NameCode namecode = new NameCode();
+		namecode.setNameCode(aggregator.getMnemonic());
+		aggr.setNameCode(namecode);
+		Url url = new Url();
+		url.setUrl(aggregator.getOaiBaseUrl());
+		aggr.setUrl(url);
+		
+		Aggregator createdAggregator = repoxRestClient.createAggregator(aggr);
+		
+		aggregator.putValue("repoxID", createdAggregator.getId());
+		
+		if(isRecursive == true)
+		{
+			HashSet<Provider> provset =  (HashSet<Provider>)aggregator.getRelatedIn();
+			
+			Iterator<Provider> it = provset.iterator();
+			
+			while(it.hasNext()){
+				createProviderfromUIMObj(it.next(),true);
+			}
+			
+		}
+		
+	}
+
+	
+	
+	@Override
+	public void deleteAggregatorfromUIMObj(Provider aggregator)
 			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
+
+		if(!aggregator.isAggregator()){
+			throw new AggregatorOperationException("The requested object is not of Aggregator type");
+		}
 		
+		String id = aggregator.getValue("repoxID");
+		
+		if(id == null){
+			throw new AggregatorOperationException("Missing repoxID element from Agregator object");
+		}
+		
+		repoxRestClient.deleteAggregator(id);
 	}
 
+	
+	
 	@Override
-	public void updateAggregatorfromUIMObj(Provider provider)
+	public void updateAggregatorfromUIMObj(Provider aggregator)
 			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
+
+		if(!aggregator.isAggregator()){
+			throw new AggregatorOperationException("The requested object is not of Aggregator type");
+		}
 		
+		String id = aggregator.getValue("repoxID");
+		
+		if(id == null){
+			throw new AggregatorOperationException("Missing repoxID element from Agregator object");
+		}
+		
+		Aggregator aggr = new Aggregator();
+		
+	    Name name = new Name();
+	    name.setName(aggregator.getName());
+		aggr.setName(name);
+		NameCode namecode = new NameCode();
+		namecode.setNameCode(aggregator.getMnemonic());
+		aggr.setNameCode(namecode);
+		Url url = new Url();
+		url.setUrl(aggregator.getOaiBaseUrl());
+		aggr.setUrl(url);
+		
+		repoxRestClient.updateAggregator(aggr);
 	}
 
+
 	@Override
-	public List<Provider> retrieveAggregators()
+	public HashSet<Provider> retrieveAggregators()
 			throws AggregatorOperationException {
-		// TODO Auto-generated method stub
-		return null;
+
+		StorageEngine<?> engine = registry.getStorageEngine();
+		
+		HashSet<Provider> uimAggregators = new HashSet<Provider>();
+		
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		
+		ArrayList<Aggregator> aggrList =  (ArrayList<Aggregator>) aggrs.getAggregatorList();
+
+		for(Aggregator agg:aggrList){
+			
+			String id =  agg.getNameCode().getNameCode();
+			
+			try {
+				Provider prov = engine.findProvider(id);
+				uimAggregators.add(prov);
+			} catch (StorageEngineException e) {
+				// TODO Decide what to do here
+			}
+		
+			}
+		
+		return uimAggregators;
 	}
 
 	@Override
-	public void providerExists(Provider prov) throws ProviderOperationException {
-		// TODO Auto-generated method stub
+	public boolean providerExists(Provider provider) throws ProviderOperationException {
+		if(provider.isAggregator()){
+			throw new ProviderOperationException("The requested object is not a Provider");
+		}
+		
+		String id = provider.getValue("repoxID");
+		
+		if(id == null){
+			throw new ProviderOperationException("Missing repoxID element from Agregator object");
+		}
+		
+		HashSet<Provider> prov = retrieveProviders();
+		
+		return prov.contains(provider);
 		
 	}
 
-	@Override
-	public void createProviderfromUIMObj(Provider prov, Provider agr,
-			boolean isRecursive) throws ProviderOperationException {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void createProviderfromUIMObj(Provider prov, boolean isRecursive)
@@ -121,21 +243,22 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	}
 
 	@Override
-	public List<Provider> retrieveProviders() throws ProviderOperationException {
+	public HashSet<Provider> retrieveProviders() throws ProviderOperationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Collection> retrieveDataSources()
+	public HashSet<Collection> retrieveDataSources()
 			throws DataSourceOperationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void datasourceExists(Collection col)
+	public boolean datasourceExists(Collection col)
 			throws DataSourceOperationException {
+				return false;
 		// TODO Auto-generated method stub
 		
 	}
@@ -164,8 +287,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	@Override
 	public RecordResult retrieveRecord(String recordString)
 			throws RecordOperationException {
-		// TODO Auto-generated method stub
-		return null;
+
+            throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 	@Override
