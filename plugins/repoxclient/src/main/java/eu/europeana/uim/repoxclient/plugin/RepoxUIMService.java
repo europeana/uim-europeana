@@ -247,7 +247,7 @@ public interface RepoxUIMService {
 	 * @return an object containing a reference to all DataSources
 	 * @throws HarvestingOperationException
 	 */
-	public List<Collection> getActiveHarvestingSessions() throws HarvestingOperationException;
+	public Set<Collection> getActiveHarvestingSessions() throws HarvestingOperationException;
 	
 	
 	/**
@@ -255,7 +255,7 @@ public interface RepoxUIMService {
 	 * @return a List of UIM Collection object references
 	 * @throws HarvestingOperationException
 	 */
-	public List<Collection> getScheduledHarvestingSessions() throws HarvestingOperationException;
+	public Set<Collection> getScheduledHarvestingSessions() throws HarvestingOperationException;
 	
 	
 	

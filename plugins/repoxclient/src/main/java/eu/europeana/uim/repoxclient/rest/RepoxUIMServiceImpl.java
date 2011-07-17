@@ -35,16 +35,21 @@ import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
+import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.Description;
+import eu.europeana.uim.repoxclient.jibxbindings.Line;
 import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
 import eu.europeana.uim.repoxclient.jibxbindings.OaiSet;
 import eu.europeana.uim.repoxclient.jibxbindings.OaiSource;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
+import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
+import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
+import eu.europeana.uim.repoxclient.jibxbindings.Task;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
@@ -59,7 +64,8 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 
 /**
- * 
+ * This Class implements the functionality exposed by the
+ * OSGI service.
  * 
  * @author Georgios Markakis
  */
@@ -69,6 +75,10 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	private Orchestrator orchestrator;
 	private Registry registry;
 
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#aggregatorExists(eu.europeana.uim.store.Provider)
+	 */
 	@Override
 	public boolean aggregatorExists(Provider provider)
 			throws AggregatorOperationException {
@@ -578,24 +588,81 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	@Override
-	public List<Collection> getActiveHarvestingSessions()
+	public HashSet<Collection> getActiveHarvestingSessions()
 			throws HarvestingOperationException {
-		repoxRestClient.getActiveHarvestingSessions();
-		return null;
+		
+		StorageEngine<?> engine = registry.getStorageEngine();
+
+		HashSet<Collection> uimCollections = new HashSet<Collection>();
+
+		RunningTasks rTasks = repoxRestClient.getActiveHarvestingSessions();
+
+		ArrayList<DataSource> sourceList = (ArrayList<DataSource>) rTasks.getDataSourceList();
+
+		for (DataSource src : sourceList) {
+
+			String id = src.getDataSource();
+
+			try {
+				Collection coll = engine.findCollection(id);
+				uimCollections.add(coll);
+			} catch (StorageEngineException e) {
+				// TODO Decide what to do here
+			}
+
+		}
+		
+		return uimCollections;
 	}
 
 	@Override
-	public List<Collection> getScheduledHarvestingSessions()
+	public HashSet<Collection> getScheduledHarvestingSessions()
 			throws HarvestingOperationException {
-		repoxRestClient.getScheduledHarvestingSessions();
-		return null;
+		StorageEngine<?> engine = registry.getStorageEngine();
+
+		HashSet<Collection> uimCollections = new HashSet<Collection>();
+
+		ScheduleTasks sTasks = repoxRestClient.getScheduledHarvestingSessions();
+
+		ArrayList<Task> taskList = (ArrayList<Task>) sTasks.getTaskList();
+
+		for (Task tsk : taskList) {
+
+			String id = tsk.getId();
+
+			try {
+				Collection coll = engine.findCollection(id);
+				uimCollections.add(coll);
+			} catch (StorageEngineException e) {
+				// TODO Decide what to do here
+			}
+
+		}
+		
+		return uimCollections;
 	}
 
+	
 	@Override
 	public String getHarvestLog(Collection col)
 			throws HarvestingOperationException {
-		//repoxRestClient.getHarvestLog(ds);
-		return null;
+
+		StringBuffer sb = new StringBuffer();
+		
+		String id = col.getValue("repoxID");
+
+		if (id == null) {
+			throw new HarvestingOperationException(
+					"Missing repoxID element from Collection object");
+		}
+		Log harvestLog = repoxRestClient.getHarvestLog(id);
+		
+		ArrayList<Line> linelist = (ArrayList<Line>) harvestLog.getLineList();
+		
+		for(Line ln:linelist){
+			sb.append(ln.getLine());
+		}
+		return sb.toString();
 	}
 
 	/*
