@@ -206,7 +206,7 @@ public interface RepoxUIMService {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public String initiateHarvestingfromUIMObj(HarvestingType type,Collection col) throws HarvestingOperationException;
+	public void initiateHarvestingfromUIMObj(Collection col) throws HarvestingOperationException;
 	
 	
 	/**
@@ -219,7 +219,7 @@ public interface RepoxUIMService {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public String initiateHarvestingfromUIMObj(HarvestingType type,Collection col,DateTime ingestionDate) throws HarvestingOperationException;
+	public void initiateHarvestingfromUIMObj(Collection col,DateTime ingestionDate) throws HarvestingOperationException;
 	
 	
 	
@@ -265,6 +265,6 @@ public interface RepoxUIMService {
 	 * @return the HarvestLog
 	 * @throws HarvestingOperationException
 	 */
-	public Log getHarvestLog(Collection col) throws HarvestingOperationException;
+	public String getHarvestLog(Collection col) throws HarvestingOperationException;
 
 }
