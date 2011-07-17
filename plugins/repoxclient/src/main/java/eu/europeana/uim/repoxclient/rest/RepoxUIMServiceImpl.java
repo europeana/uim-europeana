@@ -34,6 +34,7 @@ import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
+import eu.europeana.uim.repoxclient.jibxbindings.Country;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
@@ -50,6 +51,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.jibxbindings.Task;
+import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
 import eu.europeana.uim.repoxclient.objects.HarvestingType;
@@ -130,6 +132,14 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		aggregator.putValue("repoxID", createdAggregator.getId());
 
+		StorageEngine<?> engine = registry.getStorageEngine();
+		try {
+			engine.updateProvider(aggregator);
+			engine.checkpoint();
+		} catch (StorageEngineException e) {
+			throw new AggregatorOperationException("Updating UIM Aggregator object failed");
+		}
+		
 		if (isRecursive == true) {
 			HashSet<Provider> provset = (HashSet<Provider>) aggregator
 					.getRelatedIn();
@@ -262,12 +272,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"The requested object is not a Provider");
 		}
 
-		String id = uimProv.getValue("repoxID");
-
-		if (id == null) {
-			throw new ProviderOperationException(
-					"Missing repoxID element from Agregator object");
-		}
 
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
 
@@ -281,26 +285,37 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		url.setUrl(uimProv.getOaiBaseUrl());
 		jibxProv.setUrl(url);
 
+		Description description = new Description();
+		description.setDescription(uimProv.getValue("repoxDescription"));
+		jibxProv.setDescription(description);
+		
+		Country country =  new Country();
+		country.setCountry(uimProv.getValue("repoxCountry"));
+		jibxProv.setCountry(country);
+		
+		Type type = new Type();
+		type.setType(uimProv.getValue("repoxProvType"));
+		
+		jibxProv.setType(type );
+		
+		Provider uimAggr = (Provider)uimProv.getRelatedOut().toArray()[0];
+		
 		Aggregator aggr = new Aggregator();
-		aggr.setId("");
+		aggr.setId(uimAggr.getValue("repoxID"));
 
 		eu.europeana.uim.repoxclient.jibxbindings.Provider createdProv = repoxRestClient
 				.createProvider(jibxProv, aggr);
 
 		uimProv.putValue("repoxID", createdProv.getId());
 
-		if (isRecursive == true) {
-
-			HashSet<Provider> provset = (HashSet<Provider>) uimProv
-					.getRelatedIn();
-
-			Iterator<Provider> it = provset.iterator();
-
-			while (it.hasNext()) {
-				createProviderfromUIMObj(it.next(), true);
-			}
-
+		StorageEngine<?> engine = registry.getStorageEngine();
+		try {
+			engine.updateProvider(uimProv);
+			engine.checkpoint();
+		} catch (StorageEngineException e) {
+			throw new ProviderOperationException("Updating UIM Provider object failed");
 		}
+		
 
 	}
 
@@ -400,13 +415,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	@Override
 	public void createDatasourcefromUIMObj(Collection col, Provider prov)
 			throws DataSourceOperationException {
-
-		String id = col.getValue("repoxID");
-
-		if (id == null) {
-			throw new DataSourceOperationException(
-					"Missing repoxID element from Collection object");
-		}
 
 		Source ds = new Source();
 

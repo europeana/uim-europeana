@@ -142,7 +142,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		nameCode.append(aggregator.getNameCode().getNameCode());
 		homepage.append("homepage=");
 		homepage.append(aggregator.getUrl().getUrl());
-		
+
 		Response resp = invokRestTemplate("/aggregators/update",Response.class,
 				id.toString(),name.toString(),nameCode.toString(),homepage.toString());
 		
@@ -270,18 +270,35 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		provId.append("id=");
 		provId.append(prov.getId());
-		name.append("name=");
-		name.append(prov.getName().getName());
-		description.append("description=");
-		description.append(prov.getDescription().getDescription());
-		country.append("country=");
-		country.append(prov.getCountry().getCountry());
-		nameCode.append("nameCode=");
-		nameCode.append(prov.getNameCode().getNameCode());
-		homepage.append("url=");
-		homepage.append(prov.getUrl().getUrl());
-		datasetType.append("dataSetType=");
-		datasetType.append(prov.getType().getType());
+		if(prov.getName() != null){
+			name.append("name=");
+			name.append(prov.getName().getName());
+		}
+
+		if(prov.getDescription()!= null){
+			description.append("description=");
+			description.append(prov.getDescription().getDescription());
+		}
+
+		if(prov.getCountry() != null){
+			country.append("country=");
+			country.append(prov.getCountry().getCountry());
+		}
+
+		if(prov.getNameCode() != null){
+			nameCode.append("nameCode=");
+			nameCode.append(prov.getNameCode().getNameCode());
+		}
+		
+		if(prov.getUrl() != null){
+			homepage.append("url=");
+			homepage.append(prov.getUrl().getUrl());
+		}
+
+		if(prov.getType() != null){
+			datasetType.append("dataSetType=");
+			datasetType.append(prov.getType().getType());
+		}
 		
 		Response resp = invokRestTemplate("/dataProviders/update",Response.class,
 				provId.toString(),name.toString(),description.toString(),
