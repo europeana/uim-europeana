@@ -47,7 +47,7 @@
   <xs:element name="scheduleTasks">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="task"/>
+        <xs:element maxOccurs="unbounded" ref="task"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
