@@ -365,13 +365,15 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		for (eu.europeana.uim.repoxclient.jibxbindings.Provider prov : provList) {
 
-			String id = prov.getNameCode().getNameCode();
+			if (prov.getNameCode() != null){
+				String id = prov.getNameCode().getNameCode();
 
-			try {
-				Provider uimprov = engine.findProvider(id);
-				uimProviders.add(uimprov);
-			} catch (StorageEngineException e) {
-				// TODO Decide what to do here
+				try {
+					Provider uimprov = engine.findProvider(id);
+					uimProviders.add(uimprov);
+				} catch (StorageEngineException e) {
+					// TODO Decide what to do here
+				}	
 			}
 
 		}
@@ -504,13 +506,16 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		for (Source src : sourceList) {
 
-			String id = src.getNameCode().toString();
+			if(src.getNameCode() != null)
+			{
+				String id = src.getNameCode().toString();
 
-			try {
-				Collection coll = engine.findCollection(id);
-				uimCollections.add(coll);
-			} catch (StorageEngineException e) {
-				// TODO Decide what to do here
+				try {
+					Collection coll = engine.findCollection(id);
+					uimCollections.add(coll);
+				} catch (StorageEngineException e) {
+					// TODO Decide what to do here
+				}
 			}
 
 		}

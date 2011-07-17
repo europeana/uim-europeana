@@ -21,6 +21,7 @@
 package eu.europeana.uim.repoxclient.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.maven;
@@ -29,6 +30,8 @@ import static org.ops4j.pax.exam.CoreOptions.systemPackage;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
 import java.io.StringWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
@@ -79,6 +82,15 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepoxUIMServiceTest.class);
+	
+	private final static String aggregatorName = "TestOSGIAggregator";
+	private final static String aggregatorNameCode = "1742";
+	
+	private final static String providerName = "TestOSGIProvider";
+	private final static String providerNameCode = "76341";
+	
+	private final static String collectionName = "TestOSGICollection";
+	private final static String collectionNameCode = "89543";
 	
     /**
      * This is the configuration section of the "virtual" Karaf container during the tests execution. It sets 
@@ -143,44 +155,301 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	
     
     
+    
+	/**
+	 * @throws Exception
+	 */
 	@Test
-	public void testRetrieveDataSourcesService() throws Exception{
+	public void testCreateAggregator() throws Exception{
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
+		    Registry registry = getOsgiService(Registry.class);
+		    
+			StorageEngine<?> engine = registry.getStorageEngine();
+			
+			Provider provider = engine.createProvider();
+			
+			provider.setAggregator(true);
+			provider.setMnemonic(aggregatorNameCode);
+			provider.setName(aggregatorName);
+			provider.setOaiBaseUrl("asdsad");
+			provider.putValue("sugarID", "123213123231");
+			provider.setOaiMetadataPrefix("ese");   
+
+        	engine.updateProvider(provider);
+        	engine.checkpoint();
+        	
+		    repoxservice.createAggregatorfromUIMObj(provider, false);
 			assertNotNull(repoxservice);
 	
 	}
 	
 	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testCreateProvider() throws Exception{
+
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+			
+		    Registry registry = getOsgiService(Registry.class);
+		    
+			StorageEngine<?> engine = registry.getStorageEngine();
+			
+			Provider provider = engine.createProvider();
+			
+			provider.setAggregator(false);
+			provider.setMnemonic(providerNameCode);
+			provider.setName(providerName);
+			provider.setOaiBaseUrl("asdsad");
+			provider.putValue("sugarID", "123213123231");
+			provider.setOaiMetadataPrefix("ese");   
+
+        	engine.updateProvider(provider);
+        	engine.checkpoint();
+        	
+		    repoxservice.createAggregatorfromUIMObj(provider, false);
+			assertNotNull(repoxservice);
+	
+	}
+    
 	
 	/**
-	 * This method marshals the contents of a  JIBX Element and outputs the results to the
-	 * Logger.  
-	 * @param jaxbObject A JIBX representation of a SugarCRM SOAP Element. 
+	 * @throws Exception
 	 */
-	private  void logMarshalledObject(Object jibxObject){		
-		IBindingFactory context;
+	@Test
+	public void testCreateDatasource() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+	
+		    Registry registry = getOsgiService(Registry.class);
+		    
+			StorageEngine<?> engine = registry.getStorageEngine();
+			
+			Provider provider = engine.findProvider("asd");
+			
+		    Collection collection = engine.createCollection(provider);
 
-		try {
-			context = BindingDirectory.getFactory(jibxObject.getClass());
+		    collection.setLanguage("FR");
+		    collection.setMnemonic(collectionNameCode);
+		    collection.setName(collectionName);
+		    collection.setOaiBaseUrl("asdasd");
+		    collection.setOaiMetadataPrefix("ese");
+        	
+			engine.updateCollection(collection);
+			engine.checkpoint();
+        	
+			repoxservice.createDatasourcefromUIMObj(collection, provider);
+			
+			assertNotNull(repoxservice);
+	
+	}
+    
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testUpdateAggregator() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+	
+		    Registry registry = getOsgiService(Registry.class);
+		    
+			StorageEngine<?> engine = registry.getStorageEngine();
+			
+			Provider provider = engine.findProvider(aggregatorNameCode);
+			
+			provider.setName("updatedAggr");
+        	engine.updateProvider(provider);
+        	engine.checkpoint();
+        	
+        	
+		    repoxservice.updateAggregatorfromUIMObj(provider);
+		    
+		    
+			assertNotNull(repoxservice);
+	
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testUpdateProvider() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 
-			IMarshallingContext mctx = context.createMarshallingContext();
-			mctx.setIndent(2);
-			StringWriter stringWriter = new StringWriter();
-			mctx.setOutput(stringWriter);
-			mctx.marshalDocument(jibxObject);
-			LOGGER.info("===========================================");
-			StringBuffer sb = new StringBuffer("Soap Ouput for Class: ");
-			sb.append(jibxObject.getClass().getSimpleName());
-			LOGGER.info(sb.toString());
-			LOGGER.info(stringWriter.toString());
-			LOGGER.info("===========================================");
-		} catch (JiBXException e) {
+		    Registry registry = getOsgiService(Registry.class);
+		    
+			StorageEngine<?> engine = registry.getStorageEngine();
+			
+			Provider provider = engine.findProvider(providerNameCode);
+			
+			provider.setName("updatedProv");
+        	engine.updateProvider(provider);
+        	engine.checkpoint();
+        	
+		    repoxservice.updateProviderfromUIMObj(provider);
 
-			e.printStackTrace();
-		}
+	
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testUpdateDatasource() throws Exception{
+	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 
+	    Registry registry = getOsgiService(Registry.class);
+	    
+		StorageEngine<?> engine = registry.getStorageEngine();
 		
+		Collection collection = engine.findCollection(collectionNameCode);
+		
+		collection.setName("updatedCollection");
+		
+		repoxservice.updateDatasourcefromUIMObj(collection);
+		
+		assertNotNull(repoxservice);
+	
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testHarvestingOperations() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+	
+		    Registry registry = getOsgiService(Registry.class);
+		    
+			StorageEngine<?> engine = registry.getStorageEngine();
+			Collection coll =engine.findCollection(collectionNameCode);
+			
+		    repoxservice.initiateHarvestingfromUIMObj(coll);
+		  
+		    repoxservice.getHarvestingStatus(coll);
+		    
+		    repoxservice.getActiveHarvestingSessions();
+		    
+		    repoxservice.cancelHarvesting(coll);
+		    
+		    repoxservice.getHarvestLog(coll);
+		    
+		    
+			assertNotNull(repoxservice);
+	
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testRetrieveAggregatorsService() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+	
+		    HashSet<Provider> aggr = (HashSet<Provider>) repoxservice.retrieveAggregators();
+
+		    assertNotNull(aggr);
+			assertFalse(aggr.isEmpty());
+	
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testRetrieveProvidersService() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+	
+		    HashSet<Provider> prov = (HashSet<Provider>) repoxservice.retrieveProviders();
+
+		    assertNotNull(prov);
+			assertFalse(prov.isEmpty());
+	
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testRetrieveDataSourcesService() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+	
+		    HashSet<Collection> coll = (HashSet<Collection>) repoxservice.retrieveDataSources();
+
+		    assertNotNull(coll);
+			assertFalse(coll.isEmpty());
+	
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testDeleteDatasource() throws Exception{
+	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+		
+	    Registry registry = getOsgiService(Registry.class);
+	    
+		StorageEngine<?> engine = registry.getStorageEngine();
+		
+		Collection coll =engine.findCollection(collectionNameCode);
+		
+		repoxservice.deleteDatasourcefromUIMObj(coll);
+		
+		boolean exists = repoxservice.datasourceExists(coll);
+		
+		assertFalse(exists);
+	
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testDeleteProvider() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+			
+		    Registry registry = getOsgiService(Registry.class);
+		    
+			StorageEngine<?> engine = registry.getStorageEngine();
+			
+			Provider prov = engine.findProvider(providerNameCode);
+			
+			repoxservice.deleteProviderfromUIMObj(prov);
+			
+			boolean exists = repoxservice.providerExists(prov);
+			
+			assertFalse(exists);
+	
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testDeleteAggregator() throws Exception{
+	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+		
+	    Registry registry = getOsgiService(Registry.class);
+	    
+		StorageEngine<?> engine = registry.getStorageEngine();
+		
+		Provider aggr = engine.findProvider(aggregatorNameCode);
+		
+		repoxservice.deleteAggregatorfromUIMObj(aggr);
+		
+		boolean exists = repoxservice.aggregatorExists(aggr);
+		
+		assertFalse(exists);
+	
 	}
 
 }
