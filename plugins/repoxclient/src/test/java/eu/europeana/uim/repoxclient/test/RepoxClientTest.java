@@ -185,7 +185,7 @@ public void testCreateUpdateDeleteProvider() throws Exception{
 	TestUtils.logMarshalledObject(upprov,LOGGER);
 	
 	//Delete the Provider
-	Success res = repoxRestClient.deleteProvider(upprov);
+	Success res = repoxRestClient.deleteProvider(upprov.getId());
 	assertNotNull(res);
 	TestUtils.logMarshalledObject(res,LOGGER);
 	
@@ -252,7 +252,7 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	assertEquals("altered!@#$%",updOaids.getDescription().getDescription());
 	
 	//Initialize a harvesting session
-	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids);
+	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids.getId());
 	assertNotNull(harvestRes);
 	TestUtils.logMarshalledObject(harvestRes,LOGGER);
 
@@ -272,16 +272,16 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	//assertNotNull(dsisregistered);
 	
 	//Gets the Harvesting Status for the created datasource
-	Success status =repoxRestClient.getHarvestingStatus(updOaids);
+	Success status =repoxRestClient.getHarvestingStatus(updOaids.getId());
 	assertNotNull(status);
 	TestUtils.logMarshalledObject(status,LOGGER);
 	
-	Success cancelled = repoxRestClient.cancelHarvesting(updOaids);
+	Success cancelled = repoxRestClient.cancelHarvesting(updOaids.getId());
     assertNotNull(cancelled);
 	TestUtils.logMarshalledObject(cancelled,LOGGER);
 	
 	
-	Success deleted = repoxRestClient.deleteDatasource(updOaids);
+	Success deleted = repoxRestClient.deleteDatasource(updOaids.getId());
     assertNotNull(deleted);
 	TestUtils.logMarshalledObject(deleted,LOGGER);
 	

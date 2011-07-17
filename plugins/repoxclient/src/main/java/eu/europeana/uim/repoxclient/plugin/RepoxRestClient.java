@@ -101,7 +101,7 @@ public interface RepoxRestClient {
 	 * @param prov the Provider reference
 	 * @throws ProviderOperationException
 	 */
-	public Success deleteProvider(Provider prov) throws ProviderOperationException;
+	public Success deleteProvider(String provID) throws ProviderOperationException;
 	
 	
 	/**
@@ -275,7 +275,7 @@ public interface RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public Success deleteDatasource(Source ds) throws DataSourceOperationException;
+	public Success deleteDatasource(String dsID) throws DataSourceOperationException;
 
 
 	
@@ -333,7 +333,7 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public Success initiateHarvesting(Source ds) throws HarvestingOperationException;
+	public Success initiateHarvesting(String dsID) throws HarvestingOperationException;
 	
 	/**
 	 * Starts a remote harvesting process at a specific Date (scheduling) 
@@ -345,7 +345,7 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public Success initiateHarvesting(Source ds,DateTime ingestionDate) throws HarvestingOperationException;
+	public Success initiateHarvesting(String dsID,DateTime ingestionDate) throws HarvestingOperationException;
 	
 	
 	
@@ -353,7 +353,7 @@ public interface RepoxRestClient {
 	 * @param ds
 	 * @throws HarvestingOperationException
 	 */
-	public Success cancelHarvesting(Source ds) throws HarvestingOperationException;
+	public Success cancelHarvesting(String dsID) throws HarvestingOperationException;
 	
 	/**
 	 * Check the status of an existing harvesting job 
@@ -361,7 +361,7 @@ public interface RepoxRestClient {
 	 * @return the status
 	 * @throws RepoxException
 	 */
-	public Success getHarvestingStatus(Source ds) throws HarvestingOperationException;
+	public Success getHarvestingStatus(String dsID) throws HarvestingOperationException;
 	
 
 
@@ -388,5 +388,5 @@ public interface RepoxRestClient {
 	 * @return the HarvestLog
 	 * @throws HarvestingOperationException
 	 */
-	public Log getHarvestLog(Source ds) throws HarvestingOperationException;
+	public Log getHarvestLog(String dsID) throws HarvestingOperationException;
 }

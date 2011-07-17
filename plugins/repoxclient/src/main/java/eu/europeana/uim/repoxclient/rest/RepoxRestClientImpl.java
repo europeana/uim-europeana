@@ -233,10 +233,10 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 	
 	@Override
-	public Success deleteProvider(Provider prov) throws ProviderOperationException {
+	public Success deleteProvider(String provID) throws ProviderOperationException {
 		StringBuffer providerId = new StringBuffer();
 		providerId.append("id=");
-		providerId.append(prov.getId());
+		providerId.append(provID);
 		
 		Response resp = invokRestTemplate("/dataProviders/delete",Response.class,
 				providerId.toString());
@@ -1331,13 +1331,13 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Success deleteDatasource(Source ds)
+	public Success deleteDatasource(String dsID)
 			throws DataSourceOperationException {
 
 		StringBuffer id = new StringBuffer();
 		
 		id.append("id=");
-		id.append(ds.getId());
+		id.append(dsID);
 
 		Response resp = invokRestTemplate("/dataSources/delete",Response.class,
 				id.toString());
@@ -1413,13 +1413,13 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Success initiateHarvesting(Source ds)
+	public Success initiateHarvesting(String dsID)
 			throws HarvestingOperationException{
 
 		StringBuffer id = new StringBuffer();
 		
 		id.append("id=");
-		id.append(ds.getId());
+		id.append(dsID);
 
 		Response resp = invokRestTemplate("/dataSources/startIngest",Response.class,
 				id.toString());
@@ -1450,13 +1450,13 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Success cancelHarvesting(Source ds)
+	public Success cancelHarvesting(String dsID)
 			throws HarvestingOperationException {
 		
 		StringBuffer id = new StringBuffer();
 		
 		id.append("id=");
-		id.append(ds.getId());
+		id.append(dsID);
 
 		Response resp = invokRestTemplate("/dataSources/stopIngest",Response.class,
 				id.toString());
@@ -1491,7 +1491,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Success initiateHarvesting(Source ds,DateTime ingestionDate) 
+	public Success initiateHarvesting(String dsID,DateTime ingestionDate) 
 	       throws HarvestingOperationException{
 
 		throw new UnsupportedOperationException("Not implemented yet...");
@@ -1510,12 +1510,12 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Success getHarvestingStatus(Source ds)
+	public Success getHarvestingStatus(String dsID)
 			throws HarvestingOperationException {
 		StringBuffer id = new StringBuffer();
 		
 		id.append("id=");
-		id.append(ds.getId());
+		id.append(dsID);
 
 		Response resp = invokRestTemplate("/dataSources/harvestStatus",Response.class,
 				id.toString());
@@ -1584,7 +1584,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	@Override
-	public Log getHarvestLog(Source ds)
+	public Log getHarvestLog(String dsID)
 			throws HarvestingOperationException {
 		///rest/dataSources/log?id=httpTest
 		

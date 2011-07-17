@@ -305,11 +305,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"Missing repoxID element from Agregator object");
 		}
 
-		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
 
-		jibxProv.setId(id);
-
-		repoxRestClient.deleteProvider(jibxProv);
+		repoxRestClient.deleteProvider(id);
 
 	}
 
@@ -441,9 +438,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"Missing repoxID element from Collection object");
 		}
 
-		Source ds = new Source();
-		ds.setId(id);
-		repoxRestClient.deleteDatasource(ds);
+
+		repoxRestClient.deleteDatasource(id);
 	}
 
 	@Override
@@ -530,9 +526,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"Missing repoxID element from Collection object");
 		}
 
-		Source ds = new Source();
-		ds.setId(id);
-		repoxRestClient.initiateHarvesting(ds);
+
+		repoxRestClient.initiateHarvesting(id);
 	}
 
 	
@@ -549,7 +544,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		Source ds = new Source();
 		ds.setId(id);
-		repoxRestClient.initiateHarvesting(ds);
+		repoxRestClient.initiateHarvesting(id);
 
 	}
 
@@ -563,19 +558,21 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"Missing repoxID element from Collection object");
 		}
 
-		Source ds = new Source();
-		ds.setId(id);
-		repoxRestClient.cancelHarvesting(ds);
+		repoxRestClient.cancelHarvesting(id);
 	}
 
 	
 	@Override
 	public Success getHarvestingStatus(Collection col)
 			throws HarvestingOperationException {
-		
-		Source ds = new Source();
-		ds.setId(col.getValue("repoxID"));
-		return repoxRestClient.getHarvestingStatus(ds );
+		String id = col.getValue("repoxID");
+
+		if (id == null) {
+			throw new HarvestingOperationException(
+					"Missing repoxID element from Collection object");
+		}
+
+		return repoxRestClient.getHarvestingStatus(id);
 
 	}
 
