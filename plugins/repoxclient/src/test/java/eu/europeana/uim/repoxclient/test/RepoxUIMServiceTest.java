@@ -321,7 +321,6 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 			provider.setOaiBaseUrl(providerURI);
 			provider.putValue("repoxDescription", "Blablah...");
 			provider.putValue("repoxCountry", "it");
-			provider.putValue("sugarID", "123213123231");
 			provider.putValue("repoxProvType", "ARCHIVE");
 			provider.setOaiMetadataPrefix("ese");   
 			
@@ -398,7 +397,8 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 		    
 		    repoxservice.cancelHarvesting(coll);
 		    
-		    repoxservice.getHarvestLog(coll);
+			//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
+		    //String log = repoxservice.getHarvestLog(coll);
 		    
 		    
 			assertNotNull(repoxservice);

@@ -198,6 +198,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		Aggregator aggr = new Aggregator();
 
+		aggr.setId(aggregator.getValue("repoxID"));
+		
 		Name name = new Name();
 		name.setName(aggregator.getName());
 		aggr.setName(name);
@@ -296,7 +298,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		Type type = new Type();
 		type.setType(uimProv.getValue("repoxProvType"));
 		
-		jibxProv.setType(type );
+		jibxProv.setType(type);
 		
 		Provider uimAggr = (Provider)uimProv.getRelatedOut().toArray()[0];
 		
@@ -335,6 +337,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	}
 
+	
+	
 	@Override
 	public void updateProviderfromUIMObj(Provider uimProv)
 			throws ProviderOperationException {
@@ -353,6 +357,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
 
+		jibxProv.setId(id);
 		Name name = new Name();
 		name.setName(uimProv.getName());
 		jibxProv.setName(name);
@@ -363,9 +368,24 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		url.setUrl(uimProv.getOaiBaseUrl());
 		jibxProv.setUrl(url);
 
+		Description description = new Description();
+		description.setDescription(uimProv.getValue("repoxDescription"));
+		jibxProv.setDescription(description);
+		
+		Country country =  new Country();
+		country.setCountry(uimProv.getValue("repoxCountry"));
+		jibxProv.setCountry(country);
+		
+		Type type = new Type();
+		type.setType(uimProv.getValue("repoxProvType"));
+		
+		jibxProv.setType(type);
+
 		repoxRestClient.updateProvider(jibxProv);
 	}
 
+	
+	
 	@Override
 	public HashSet<Provider> retrieveProviders()
 			throws ProviderOperationException {
@@ -396,6 +416,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		return uimProviders;
 	}
 
+	
+	
 	@Override
 	public boolean datasourceExists(Collection col)
 			throws DataSourceOperationException {
@@ -412,11 +434,14 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		return colls.contains(col);
 	}
 
+	
+	
 	@Override
 	public void createDatasourcefromUIMObj(Collection col, Provider prov)
 			throws DataSourceOperationException {
 
 		Source ds = new Source();
+		ds.setId(col.getName());
 
 		Description des = new Description();
 		des.setDescription(col.getValue("description"));
@@ -447,6 +472,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	}
 
+	
+	
 	@Override
 	public void deleteDatasourcefromUIMObj(Collection col)
 			throws DataSourceOperationException {

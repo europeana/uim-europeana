@@ -1587,25 +1587,53 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
      *    /rest/dataSources/scheduleList?id=bmfinancas
 	 *  </code>
 	 * 
-	 * @param ds a Source object
-	 * @throws DataSourceOperationException
+	 * @throws HarvestingOperationException
 	 */
 	@Override
 	public ScheduleTasks getScheduledHarvestingSessions()
 			throws HarvestingOperationException {
 
+		
 
 
 		return null;
 	}
 
 
+	
+	/**
+	 * Gets the latest Harvesting Log record for a DataSource. It accesses the following REST Interface:
+	 * 
+	 *  <code>
+     *    /rest/dataSources/log?id=httpTest
+	 *  </code>
+	 * 
+	 * @param dsID a Source object
+	 * @throws DataSourceOperationException
+	 */
 	@Override
 	public Log getHarvestLog(String dsID)
 			throws HarvestingOperationException {
-		///rest/dataSources/log?id=httpTest
+
+		StringBuffer id = new StringBuffer();
 		
-		return null;
+		id.append("id=");
+		id.append(dsID);
+
+		Response resp = invokRestTemplate("/dataSources/log",Response.class,
+				id.toString());
+		
+		if (resp.getLog() == null) {
+			if (resp.getError() != null) {
+				throw new HarvestingOperationException(resp.getError());
+			} else {
+				throw new HarvestingOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getLog();
+		}
+
 	}
 	
 

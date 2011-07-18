@@ -22,12 +22,9 @@ package eu.europeana.uim.repoxclient.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import java.io.StringWriter;
 import java.util.ArrayList;
-
 import javax.annotation.Resource;
-
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -45,6 +42,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.Description;
+import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
@@ -197,25 +195,8 @@ public void testCreateUpdateDeleteProvider() throws Exception{
 
 
 /**
- * Creates an OAI DataSource. It accesses the following REST Interface:
+ * Tests a series of OAIPMH functionalities
  * 
- *  <code>
- *    /rest/dataSources/createOai?
- *    dataProviderId=DPRestr0&
- *    id=bdaSet&
- *    description=Biblioteca Digital Do Alentejo&
- *    nameCode=00123&
- *    name=Alentejo&
- *    exportPath=D:/Projectos/repoxdata_new&
- *    schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
- *    namespace=http://www.europeana.eu/schemas/ese/&
- *    metadataFormat=ese&
- *    oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&
- *    oaiSet=bda
- *  </code>
- * 
- * @param ds a DataSource object
- * @throws DataSourceOperationException
  */
 @Test
 public void testCreateUpdateDeleteOAIDataSource() throws Exception{
@@ -271,6 +252,8 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	
 	//assertNotNull(dsisregistered);
 	
+	
+	
 	//Gets the Harvesting Status for the created datasource
 	Success status =repoxRestClient.getHarvestingStatus(updOaids.getId());
 	assertNotNull(status);
@@ -280,6 +263,10 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
     assertNotNull(cancelled);
 	TestUtils.logMarshalledObject(cancelled,LOGGER);
 	
+	//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
+	//Log harvestLog = repoxRestClient.getHarvestLog(updOaids.getId());
+    //assertNotNull(harvestLog);
+	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
 	
 	Success deleted = repoxRestClient.deleteDatasource(updOaids.getId());
     assertNotNull(deleted);
