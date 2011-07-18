@@ -34,11 +34,15 @@ public class CacheItem extends CheckUrl{
     
     public boolean createCacheFiles() throws HttpAccessException, FileStorageException {
 
+    	/*
+
         if (state == LinkStatus.UNKNOWN) {
             if (!isResponding(true))  // linkcheck hasnt been done, do it now
                 return false;
         }
-
+    	 * 
+    	 */
+    	
         // ok now uri should be valid, try to use orgFile
         hashGenByContent();
         saveOrigFile();
@@ -103,7 +107,10 @@ public class CacheItem extends CheckUrl{
 
 
     protected boolean setState(LinkStatus state, String msg){
-        boolean b = super.setState(state, msg);
+		return false;
+       /*
+
+       boolean b = super.setState(state, msg);
         if ((!b) && (!(createdFiles == null))) {
             // an issue occured remove generated files
             for(File f : createdFiles) {
@@ -111,6 +118,8 @@ public class CacheItem extends CheckUrl{
             }
         }
         return b;
+                * 	
+        */
     }
 
 }

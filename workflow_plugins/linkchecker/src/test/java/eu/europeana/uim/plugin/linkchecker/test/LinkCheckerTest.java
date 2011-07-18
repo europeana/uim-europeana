@@ -51,9 +51,9 @@ public class LinkCheckerTest {
                 msg = "ok";
             }
             else {
-                msg = ci.getState().toString();
+               // msg = ci.getState().toString();
             }
-            System.out.println(s + "\t" + msg);
+            //System.out.println(s + "\t" + msg);
         }
 		
 	}
