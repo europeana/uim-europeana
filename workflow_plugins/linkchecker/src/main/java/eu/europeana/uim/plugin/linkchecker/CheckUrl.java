@@ -14,13 +14,11 @@ import eu.europeana.uim.plugin.linkchecker.exceptions.HttpAccessException;
 public class CheckUrl {
     protected String uri;
     private Integer redirectDepth;
-    protected LinkStatus state;
-    private String ErrorMsg;
     protected ByteArrayOutputStream orgFileConent = null; // storage for downloaded item, not used when just linkchecking
 
 
     /**
-     * @param uri
+     * @param uri - link to check
      */
     public CheckUrl(String uri) {
         this.uri = uri;
@@ -28,8 +26,8 @@ public class CheckUrl {
     }
 
     /**
-     * @param uri
-     * @param redirectDepth
+     * @param uri - link to check
+     * @param redirectDepth   - to avoid endless redirect loops...
      */
     public CheckUrl(String uri, Integer redirectDepth) {
         this.uri = uri;
@@ -39,23 +37,23 @@ public class CheckUrl {
 
     
 
-    public boolean isResponding() throws HttpAccessException, FileStorageException {
-        return doConnection(this.redirectDepth, false);
+    public void isResponding() throws HttpAccessException, FileStorageException {
+        doConnection(this.redirectDepth, false);
     }
     
     
-    public boolean isResponding(boolean saveItem) throws HttpAccessException, FileStorageException {
-        return doConnection(this.redirectDepth, saveItem);
+    public void isResponding(boolean saveItem) throws HttpAccessException, FileStorageException {
+        doConnection(this.redirectDepth, saveItem);
     }
     
     
-    public boolean isResponding(Integer redirectDepth) throws HttpAccessException, FileStorageException {
-        return doConnection(redirectDepth, false);
+    public void isResponding(Integer redirectDepth) throws HttpAccessException, FileStorageException {
+        doConnection(redirectDepth, false);
     }
 
 
 
-    private boolean doConnection(Integer redirectDepth, boolean saveItem) throws HttpAccessException, FileStorageException{
+    private void doConnection(Integer redirectDepth, boolean saveItem) throws HttpAccessException, FileStorageException{
         HttpURLConnection urlConnection;
         URL url;
         BufferedInputStream in;
@@ -89,7 +87,7 @@ public class CheckUrl {
 
         String redirectLink = urlConnection.getHeaderField("Location");
         if (redirectLink != null && !uri.equals(redirectLink)) {
-            return isResponding(redirectDepth - 1);
+            isResponding(redirectDepth - 1);
         }
 
         Integer respCode;
@@ -124,32 +122,11 @@ public class CheckUrl {
             }
         }
         urlConnection.disconnect();
-        return true; // we just checked the link
-    }
-
-
-    public LinkStatus getState() {
-        return state;
-    }
-
-    public String getErrorMessage() {
-        return ErrorMsg; // might be empty if no specific info was available
     }
 
 
 
     private void initiateParams(Integer redirectDepth) {
         this.redirectDepth = redirectDepth;
-        setState(LinkStatus.UNKNOWN);
-    }
-
-    protected boolean setState(LinkStatus state){  // param lazy shorthand
-        return setState(state,"");
-    }
-    protected boolean setState(LinkStatus state, String msg){
-        boolean b =  true;///(state == LinkStatus.CACHE_OK || state == LinkStatus.LINK_OK);
-        this.state = state;
-        ErrorMsg = msg;
-        return b;
     }
 }
