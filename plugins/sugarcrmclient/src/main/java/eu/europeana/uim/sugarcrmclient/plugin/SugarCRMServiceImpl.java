@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import eu.europeana.uim.store.Collection;
@@ -335,7 +336,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 		
-	    String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
+	    //String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
 	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
 	    String providerAcronymName = record.getItemValue(RetrievableField.ACRONYM); //"name_acronym_c"
 	    String mnemonicCode = record.getItemValue(RetrievableField.ID);  //"id"
@@ -345,8 +346,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	    Provider cuurprovider = engine.findProvider(mnemonicCode);
 	    
         if (cuurprovider == null){
-
         	cuurprovider = engine.createProvider();
+        }
         	cuurprovider.setAggregator(false);
         	cuurprovider.setMnemonic(mnemonicCode);
         	cuurprovider.setName(providerName);
@@ -356,7 +357,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 
         	engine.updateProvider(cuurprovider);
         	engine.checkpoint();
-        }
+
         
         return cuurprovider;
 	}
@@ -364,6 +365,11 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	
 	
 	
+	/**
+	 * @param recordID
+	 * @return
+	 * @throws QueryResultException
+	 */
 	private HashMap<String,String> getProviderInfoMap(String recordID) throws QueryResultException{
 		
 		GetRelationships request =  new GetRelationships();
@@ -378,18 +384,40 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		
 		GetRelationshipsResponse resp = sugarwsClient.get_relationships(request);
 		
+		if (resp.getReturn().getIds().getArray() == null){
+			throw new QueryResultException("Could not retrieve related provider information from 'Accounts module' ");
+		}
 		
 		List<Element>el = resp.getReturn().getIds().getArray().getAnyList();
+
+
 		
+		NodeList idFieldList = el.get(0).getElementsByTagName("id");
 		
-		//el.get(0).getElementsByTagName(arg0)
+		Node node = idFieldList.item(0);
 		
-		return null;
+		if (node == null){
+			throw new QueryResultException("Could not retrieve related provider information from 'Accounts module' ");
+		}
+		
+		String provideriD = node.getTextContent();
+		
+		HashMap<String,String> providerInfo = retrieveproviderinfo(provideriD);
+		
+		return providerInfo;
 		
 	}
 	
 	
-	private HashMap<String,String> retrieveprovider(String providerID) throws QueryResultException{
+	
+	
+	
+	/**
+	 * @param providerID
+	 * @return
+	 * @throws QueryResultException
+	 */
+	private HashMap<String,String> retrieveproviderinfo(String providerID) throws QueryResultException{
 	
 		GetEntry request = new GetEntry();
 		request.setId(providerID);

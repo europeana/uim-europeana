@@ -24,4 +24,8 @@ public class QueryResultException extends GenericSugarCRMException {
 		super(generateMessageFromObject(err));
 
 	}
+
+	public QueryResultException(String string) {
+		super(string);
+	}
 }
