@@ -141,6 +141,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		}
 		
 		if (isRecursive == true) {
+			@SuppressWarnings("unchecked")
 			HashSet<Provider> provset = (HashSet<Provider>) aggregator
 					.getRelatedIn();
 
@@ -244,6 +245,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		return uimAggregators;
 	}
 
+	
+	
 	@Override
 	public boolean providerExists(Provider provider)
 			throws ProviderOperationException {
@@ -265,6 +268,10 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	}
 
+	
+	
+	
+	
 	@Override
 	public void createProviderfromUIMObj(Provider uimProv, boolean isRecursive)
 			throws ProviderOperationException {
@@ -318,9 +325,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			throw new ProviderOperationException("Updating UIM Provider object failed");
 		}
 		
-
 	}
 
+	
+	
+	
+	
 	@Override
 	public void deleteProviderfromUIMObj(Provider prov)
 			throws ProviderOperationException {

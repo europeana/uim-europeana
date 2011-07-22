@@ -336,13 +336,43 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 		
-	    //String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
+
+	    HashMap<String,String> providerInfo = new HashMap<String,String>();
+	    
+	    try {
+			providerInfo = getProviderInfoMap(record.getItemValue(RetrievableField.ID).toString());
+
+		} catch (QueryResultException e) {
+			e.printStackTrace();
+		}
+	    
+	    String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
 	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
 	    String providerAcronymName = record.getItemValue(RetrievableField.ACRONYM); //"name_acronym_c"
-	    String mnemonicCode = record.getItemValue(RetrievableField.ID);  //"id"
+	    String mnemonicCode = providerInfo.get("identifier");  //"id"
 	    String countryCode = record.getItemValue(RetrievableField.COUNTRY); //"country_c"
 	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
+		
+	    
+	    //We create a Dummy aggregator dependency here 
+	    Provider dummyAggrgator = engine.findProvider(countryCode + "aggregator");
+	    if(dummyAggrgator == null){
+	       dummyAggrgator =  engine.createProvider();
+	       dummyAggrgator.setAggregator(true);
+	       if(countryCode == null){
+		       dummyAggrgator.setMnemonic("EUaggregator");
+	       }
+	       else{
+		       dummyAggrgator.setMnemonic(countryCode + "aggregator");
+	       }
 
+	       dummyAggrgator.setName(countryCode + "aggregator");
+	       dummyAggrgator.setOaiBaseUrl(harvestUrl);
+       	   engine.updateProvider(dummyAggrgator);
+    	   engine.checkpoint();
+	    }
+	    
+	    
 	    Provider cuurprovider = engine.findProvider(mnemonicCode);
 	    
         if (cuurprovider == null){
@@ -355,9 +385,9 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         	//TODO: Meta data prefix is hardwired to ese. Fix this as soon as the field is available in SugarCRM 
         	cuurprovider.setOaiMetadataPrefix("ese");   
 
+        	cuurprovider.getRelatedOut().add(dummyAggrgator);	
         	engine.updateProvider(cuurprovider);
         	engine.checkpoint();
-
         
         return cuurprovider;
 	}
@@ -419,6 +449,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	 */
 	private HashMap<String,String> retrieveproviderinfo(String providerID) throws QueryResultException{
 	
+		HashMap<String,String> returnInfo = new HashMap<String,String>();
+		
 		GetEntry request = new GetEntry();
 		request.setId(providerID);
 		request.setModuleName("Accounts");
@@ -428,11 +460,41 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 
 		GetEntryResponse response = sugarwsClient.get_entry(request);
 		
+		Element el = response.getReturn().getEntryList().getArray().getAnyList().get(0);
 		
-		return null;
+		String identifier = extractFromElement("name_id_c",  el);
+		String description = extractFromElement("description",  el);
+		String name = extractFromElement("name",  el);
+		String website = extractFromElement("website",  el);
+		String type = extractFromElement("account_type",  el);
+		String country = extractFromElement("country_c",  el);
+
+		returnInfo.put("identifier", identifier);
+		returnInfo.put("description", description);
+		returnInfo.put("name", name);
+		returnInfo.put("website", website);
+		returnInfo.put("type", type);
+		returnInfo.put("country", country);
 		
-		
+		return returnInfo;
 	}
+	
+	
+	
+	private String extractFromElement(String value, Element el){
+		NodeList nl =el.getElementsByTagName("item");
+		
+		for (int i =0; i<nl.getLength(); i++){
+			Node nd = nl.item(i);
+			String textcontent = nd.getChildNodes().item(0).getTextContent(); 
+			if (value.equals(textcontent)){
+				return nd.getChildNodes().item(1).getTextContent();
+			}
+			
+		}
+		return null;
+	}
+	
 	
 	
 

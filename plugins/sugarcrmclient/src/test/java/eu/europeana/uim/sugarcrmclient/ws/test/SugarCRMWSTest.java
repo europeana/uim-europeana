@@ -279,7 +279,7 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testGetEntry() throws QueryResultException{
 		GetEntry request = new GetEntry();
-		request.setId("99d2439f-05f3-af5b-0d4c-4d53f081ba9b");
+		request.setId("ca410eea-d4fb-0829-aa25-4c585fbb1136");
 		request.setModuleName("Accounts");
 		request.setSession(sessionID);	
 		SelectFields selectFields = new SelectFields();
