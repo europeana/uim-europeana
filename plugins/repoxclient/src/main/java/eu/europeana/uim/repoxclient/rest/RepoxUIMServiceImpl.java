@@ -93,8 +93,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		String id = provider.getValue("repoxID");
 
 		if (id == null) {
-			throw new AggregatorOperationException(
-					"Missing repoxID element from Agregator object");
+			return false;
 		}
 
 		HashSet<Provider> prov = retrieveAggregators();
@@ -258,8 +257,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		String id = provider.getValue("repoxID");
 
 		if (id == null) {
-			throw new ProviderOperationException(
-					"Missing repoxID element from Agregator object");
+			return false;
 		}
 
 		HashSet<Provider> prov = retrieveProviders();
@@ -435,8 +433,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		String id = col.getValue("repoxID");
 
 		if (id == null) {
-			throw new DataSourceOperationException(
-					"Missing repoxID element from Collection object");
+			return false;
 		}
 
 		HashSet<Collection> colls = retrieveDataSources();
