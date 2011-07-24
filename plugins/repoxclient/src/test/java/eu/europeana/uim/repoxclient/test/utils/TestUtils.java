@@ -116,7 +116,7 @@ public class TestUtils {
 		Description des = new Description();
 		des.setDescription("Biblioteca Digital Do Alentejo");
 		ds.setDescription(des);
-		ds.setNameCode(new BigInteger("00123"));
+		ds.setNameCode("00123");
 		ds.setName("Alentejo");
 		ds.setExportPath("D:/Projectos/repoxdata_new");
 		ds.setSchema("http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd");

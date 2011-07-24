@@ -453,7 +453,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		Description des = new Description();
 		des.setDescription(col.getValue("description"));
 		ds.setDescription(des);
-		ds.setNameCode(new BigInteger(col.getMnemonic()));
+		ds.setNameCode(col.getMnemonic());
 		ds.setName(col.getName());
 		ds.setExportPath(col.getValue("exportpath"));
 		ds.setSchema(col.getValue("schema"));
@@ -512,7 +512,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		Description des = new Description();
 		des.setDescription(col.getValue("description"));
 		ds.setDescription(des);
-		ds.setNameCode(new BigInteger(col.getMnemonic()));
+		ds.setNameCode(col.getMnemonic());
 		ds.setName(col.getName());
 		ds.setExportPath(col.getValue("exportpath"));
 		ds.setSchema(col.getValue("schema"));
