@@ -385,6 +385,16 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         	//TODO: Meta data prefix is hardwired to ese. Fix this as soon as the field is available in SugarCRM 
         	cuurprovider.setOaiMetadataPrefix("ese");   
 
+        	cuurprovider.putValue("identifier", providerInfo.get("identifier"));
+    		cuurprovider.putValue("repoxDescription", providerInfo.get("description"));
+    		cuurprovider.putValue("name", providerInfo.get("name"));
+    		cuurprovider.putValue("website", providerInfo.get("website"));
+    		//FIXME:Handle Repox Datatypes
+    		//cuurprovider.putValue("type", providerInfo.get("type"));
+    		cuurprovider.putValue("repoxProvType", "ARCHIVE");
+    		cuurprovider.putValue("repoxCountry", providerInfo.get("country"));
+        	
+        	
         	cuurprovider.getRelatedOut().add(dummyAggrgator);	
         	engine.updateProvider(cuurprovider);
         	engine.checkpoint();
