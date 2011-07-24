@@ -20,11 +20,10 @@
  */
 package eu.europeana.uim.repoxclient.rest;
 
-import java.math.BigInteger;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 
 import org.joda.time.DateTime;
 
@@ -97,6 +96,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		}
 
 		HashSet<Provider> prov = retrieveAggregators();
+		
+		
 
 		return prov.contains(provider);
 
@@ -297,7 +298,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		jibxProv.setDescription(description);
 		
 		Country country =  new Country();
-		country.setCountry(uimProv.getValue("repoxCountry"));
+		country.setCountry(uimProv.getValue("repoxCountry").toLowerCase());
 		jibxProv.setCountry(country);
 		
 		Type type = new Type();
@@ -381,7 +382,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		jibxProv.setDescription(description);
 		
 		Country country =  new Country();
-		country.setCountry(uimProv.getValue("repoxCountry"));
+		country.setCountry(uimProv.getValue("repoxCountry").toLowerCase());
 		jibxProv.setCountry(country);
 		
 		Type type = new Type();
@@ -448,17 +449,25 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			throws DataSourceOperationException {
 
 		Source ds = new Source();
-		ds.setId(col.getName());
+		ds.setId(col.getValue("collectionID"));
 
 		Description des = new Description();
 		des.setDescription(col.getValue("description"));
 		ds.setDescription(des);
 		ds.setNameCode(col.getMnemonic());
 		ds.setName(col.getName());
-		ds.setExportPath(col.getValue("exportpath"));
-		ds.setSchema(col.getValue("schema"));
-		ds.setNamespace(col.getValue("namespace"));
-		ds.setMetadataFormat(col.getValue("metadataformat"));
+		//TODO: link this to a sugarCRM field
+		//ds.setExportPath(col.getValue("exportpath"));
+		ds.setExportPath("");
+		//TODO: link this to a sugarCRM field
+		//ds.setSchema(col.getValue("schema"));
+		ds.setSchema("http://www.europeana.eu/schemas/ese/");
+		//TODO: link this to a sugarCRM field
+		//ds.setNamespace(col.getValue("namespace"));
+		ds.setNamespace("http://www.europeana.eu/schemas/ese/");
+		//TODO: link this to a sugarCRM field
+		//ds.setMetadataFormat(col.getValue("metadataformat"));
+		ds.setMetadataFormat("ese");
 
 		Sequence seq = new Sequence();
 		OaiSet oaiSet = new OaiSet();
