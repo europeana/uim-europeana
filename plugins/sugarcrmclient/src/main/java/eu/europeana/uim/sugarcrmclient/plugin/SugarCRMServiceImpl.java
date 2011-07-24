@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;  
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -526,12 +527,35 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 		
-	    String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
-	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
-	    String providerAcronymName = record.getItemValue(RetrievableField.ACRONYM); //"name_acronym_c"
-	    String mnemonicCode = record.getItemValue(RetrievableField.ID);  //"id"
-	    String countryCode = record.getItemValue(RetrievableField.COUNTRY).toLowerCase(); //"country_c"
-	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
+		String collectionName = null;
+		String collectionID = null;
+		String mnemonicCode = null;
+		String countryCode = null;
+		String harvestUrl =	null;
+		String set = null;
+		StringBuffer buffername = new StringBuffer();
+		
+		
+		String[] fulname = record.getItemValue(RetrievableField.NAME).split("_");
+		
+		List<String> list = Arrays.asList(fulname);
+		
+		for(int i=0;i<list.size();i++){
+			if(i==0){
+				mnemonicCode = list.get(i);
+			}
+			else if (i>3){
+				buffername.append(list.get(i));
+				buffername.append(" ");
+			}
+		}
+		
+		collectionName = buffername.toString();
+	    collectionID = record.getItemValue(RetrievableField.NAME);  //"name"
+	    countryCode = record.getItemValue(RetrievableField.COUNTRY).toLowerCase(); //"country_c"
+	    harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
+	    set = record.getItemValue(RetrievableField.SETSPEC);
+	    
 	    
 	    Collection currcollection = engine.findCollection(mnemonicCode);
 	    
@@ -543,7 +567,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         	currcollection.setName(collectionName);
         	currcollection.setOaiBaseUrl(harvestUrl);
         	currcollection.setOaiMetadataPrefix("ese");
-        	
+        	currcollection.setOaiSet(set);
+        	currcollection.putValue("collectionID", collectionID);
 			engine.updateCollection(currcollection);
 			engine.checkpoint();
         }
