@@ -22,6 +22,8 @@
 package eu.europeana.uim.sugarcrmclient.plugin;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -350,7 +352,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
 	    String providerAcronymName = record.getItemValue(RetrievableField.ACRONYM); //"name_acronym_c"
 	    String mnemonicCode = providerInfo.get("identifier");  //"id"
-	    String countryCode = record.getItemValue(RetrievableField.COUNTRY); //"country_c"
+	    String countryCode = record.getItemValue(RetrievableField.COUNTRY).toLowerCase(); //"country_c"
 	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
 		
 	    
@@ -386,7 +388,14 @@ public class SugarCRMServiceImpl implements SugarCRMService{
         	cuurprovider.setOaiMetadataPrefix("ese");   
 
         	cuurprovider.putValue("identifier", providerInfo.get("identifier"));
-    		cuurprovider.putValue("repoxDescription", providerInfo.get("description"));
+        	String encodedDescription = null;
+        	try {
+				encodedDescription = URLEncoder.encode(providerInfo.get("description"), "UTF8");
+			} catch (UnsupportedEncodingException e) {
+				encodedDescription = "None";
+				e.printStackTrace();
+			}
+    		cuurprovider.putValue("repoxDescription", encodedDescription);
     		cuurprovider.putValue("name", providerInfo.get("name"));
     		cuurprovider.putValue("website", providerInfo.get("website"));
     		//FIXME:Handle Repox Datatypes
@@ -521,7 +530,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
 	    String providerAcronymName = record.getItemValue(RetrievableField.ACRONYM); //"name_acronym_c"
 	    String mnemonicCode = record.getItemValue(RetrievableField.ID);  //"id"
-	    String countryCode = record.getItemValue(RetrievableField.COUNTRY); //"country_c"
+	    String countryCode = record.getItemValue(RetrievableField.COUNTRY).toLowerCase(); //"country_c"
 	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
 	    
 	    Collection currcollection = engine.findCollection(mnemonicCode);
