@@ -358,6 +358,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 		
 	    
 	    //We create a Dummy aggregator dependency here 
+	    /*
+
 	    Provider dummyAggrgator = engine.findProvider(countryCode + "aggregator");
 	    if(dummyAggrgator == null){
 	       dummyAggrgator =  engine.createProvider();
@@ -374,7 +376,8 @@ public class SugarCRMServiceImpl implements SugarCRMService{
        	   engine.updateProvider(dummyAggrgator);
     	   engine.checkpoint();
 	    }
-	    
+	     * 
+	     */
 	    
 	    Provider cuurprovider = engine.findProvider(mnemonicCode);
 	    
@@ -405,7 +408,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
     		cuurprovider.putValue("repoxCountry", providerInfo.get("country"));
         	
         	
-        	cuurprovider.getRelatedOut().add(dummyAggrgator);	
+        	//cuurprovider.getRelatedOut().add(dummyAggrgator);	
         	engine.updateProvider(cuurprovider);
         	engine.checkpoint();
         

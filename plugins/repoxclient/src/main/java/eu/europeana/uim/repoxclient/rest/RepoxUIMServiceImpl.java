@@ -24,6 +24,7 @@ package eu.europeana.uim.repoxclient.rest;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.joda.time.DateTime;
 
@@ -97,12 +98,72 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		HashSet<Provider> prov = retrieveAggregators();
 		
+
+		boolean isContained = prov.contains(provider);
 		
 
-		return prov.contains(provider);
+		return isContained;
 
 	}
 
+	
+	@Override
+	public boolean aggregatorExists(String countrycode)
+			throws AggregatorOperationException {
+		
+		if(countrycode.equals("")){
+			countrycode ="eu";
+		}
+		
+		String aggrID = countrycode + "aggregatorr0";
+		
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		
+		List<Aggregator> aggregatorList = aggrs.getAggregatorList();
+		
+		
+		for(Aggregator aggr: aggregatorList){
+		
+			if(aggrID.equals(aggr.getId())){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	
+	
+	
+	
+	@Override
+	public void createAggregator(String countryCode)
+			throws AggregatorOperationException, ProviderOperationException {
+		
+		if(countryCode.equals("")){
+			countryCode ="eu";
+		}
+		
+		String aggrName = countryCode + "aggregator";
+		
+
+		
+		
+		Aggregator aggr = new Aggregator();
+
+		Name name = new Name();
+		name.setName(aggrName);
+		aggr.setName(name);
+		NameCode namecode = new NameCode();
+		namecode.setNameCode(aggrName);
+		aggr.setNameCode(namecode);
+		Url url = new Url();
+		url.setUrl("www.tvxs.gr");
+		aggr.setUrl(url);
+
+		Aggregator createdAggregator = repoxRestClient.createAggregator(aggr);
+		
+	}
 	
 	
 	
@@ -306,10 +367,17 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		jibxProv.setType(type);
 		
-		Provider uimAggr = (Provider)uimProv.getRelatedOut().toArray()[0];
 		
 		Aggregator aggr = new Aggregator();
-		aggr.setId(uimAggr.getValue("repoxID"));
+		
+		if(country.getCountry() == null){
+			aggr.setId("euaggregatorr0");
+		}
+		else{
+			aggr.setId(country.getCountry() + "aggregatorr0");
+		}
+		
+
 
 		eu.europeana.uim.repoxclient.jibxbindings.Provider createdProv = repoxRestClient
 				.createProvider(jibxProv, aggr);
@@ -447,7 +515,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	@Override
 	public void createDatasourcefromUIMObj(Collection col, Provider prov)
 			throws DataSourceOperationException {
-
+		
 		Source ds = new Source();
 		ds.setId(col.getValue("collectionID"));
 
@@ -748,5 +816,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public Registry getRegistry() {
 		return registry;
 	}
+
+
+
+
+
+
+
 
 }

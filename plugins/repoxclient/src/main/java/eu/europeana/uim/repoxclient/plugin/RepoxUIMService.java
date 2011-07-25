@@ -57,6 +57,15 @@ public interface RepoxUIMService {
 	
 	
 	/**
+	 * Checks if an aggregator instance in UIM also exists in Repox 
+	 * 
+	 * @param aggregator an Aggregator object 
+	 * @throws AggregatorOperationException
+	 */
+	public boolean aggregatorExists(String countrycode) throws AggregatorOperationException;
+	
+	
+	/**
 	 * Creates an Aggregator in Repox
 	 * 
 	 * @param aggregator an Aggregator object 
@@ -65,6 +74,8 @@ public interface RepoxUIMService {
 	 */
 	public void createAggregatorfromUIMObj(Provider provider,boolean isRecursive) throws AggregatorOperationException, ProviderOperationException;
 	
+	
+	public void createAggregator(String countryCode) throws AggregatorOperationException, ProviderOperationException;
 	
 	/**
 	 * Deletes an existing Aggregator from Repox
