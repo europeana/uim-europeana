@@ -356,29 +356,7 @@ public class SugarCRMServiceImpl implements SugarCRMService{
 	    String countryCode = record.getItemValue(RetrievableField.COUNTRY).toLowerCase(); //"country_c"
 	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
 		
-	    
-	    //We create a Dummy aggregator dependency here 
-	    /*
-
-	    Provider dummyAggrgator = engine.findProvider(countryCode + "aggregator");
-	    if(dummyAggrgator == null){
-	       dummyAggrgator =  engine.createProvider();
-	       dummyAggrgator.setAggregator(true);
-	       if(countryCode == null){
-		       dummyAggrgator.setMnemonic("EUaggregator");
-	       }
-	       else{
-		       dummyAggrgator.setMnemonic(countryCode + "aggregator");
-	       }
-
-	       dummyAggrgator.setName(countryCode + "aggregator");
-	       dummyAggrgator.setOaiBaseUrl(harvestUrl);
-       	   engine.updateProvider(dummyAggrgator);
-    	   engine.checkpoint();
-	    }
-	     * 
-	     */
-	    
+	    	    
 	    Provider cuurprovider = engine.findProvider(mnemonicCode);
 	    
         if (cuurprovider == null){
