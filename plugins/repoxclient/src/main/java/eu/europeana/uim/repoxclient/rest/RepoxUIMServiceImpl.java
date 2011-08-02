@@ -90,11 +90,13 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"The requested object is not of Aggregator type");
 		}
 
+		/*
 		String id = provider.getValue("repoxID");
 
 		if (id == null) {
 			return false;
 		}
+		*/
 
 		HashSet<Provider> prov = retrieveAggregators();
 		
@@ -316,11 +318,13 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"The requested object is not a Provider");
 		}
 
+		/*
 		String id = provider.getValue("repoxID");
 
 		if (id == null) {
 			return false;
 		}
+		*/
 
 		HashSet<Provider> prov = retrieveProviders();
 
@@ -499,11 +503,13 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public boolean datasourceExists(Collection col)
 			throws DataSourceOperationException {
 
+		/*
 		String id = col.getValue("repoxID");
 
 		if (id == null) {
 			return false;
 		}
+		*/
 
 		HashSet<Collection> colls = retrieveDataSources();
 
@@ -682,6 +688,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	}
 
+	
+	
 	@Override
 	public void cancelHarvesting(Collection col)
 			throws HarvestingOperationException {
@@ -695,6 +703,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		repoxRestClient.cancelHarvesting(id);
 	}
 
+	
 	
 	@Override
 	public Success getHarvestingStatus(Collection col)
@@ -710,6 +719,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	}
 
+	
+	
 	
 	@Override
 	public HashSet<Collection> getActiveHarvestingSessions()
@@ -739,6 +750,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		return uimCollections;
 	}
 
+	
+	
 	@Override
 	public HashSet<Collection> getScheduledHarvestingSessions()
 			throws HarvestingOperationException {
@@ -767,6 +780,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	}
 
 	
+	
 	@Override
 	public String getHarvestLog(Collection col)
 			throws HarvestingOperationException {
@@ -779,6 +793,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			throw new HarvestingOperationException(
 					"Missing repoxID element from Collection object");
 		}
+		
 		Log harvestLog = repoxRestClient.getHarvestLog(id);
 		
 		ArrayList<Line> linelist = (ArrayList<Line>) harvestLog.getLineList();
@@ -789,6 +804,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		return sb.toString();
 	}
 
+	
 	/*
 	 * Getters & Setters
 	 */
