@@ -40,7 +40,7 @@ public enum RetrievableField implements SugarCrmField{
 	ORGANIZATION_NAME("account_name","Organisation Name"),
 	CAMPAIGN_NAME("campaign_name","Campaign Name"),
 	EXPECTED_INGESTION_DATE("date_closed","Expected ingestion date"),
-	NOTES("notes_c","Expected ingestion date"),
+	NOTES("notes_c","Notes"),
 	HARVEST_URL("harvest_url_c","Harvest URL"),
 	PLANNED_TOTAL("planned_total_c","Ingested Total"),
 	PLANNED_SOUND("planned_sound_c","Ingested Sound"),
