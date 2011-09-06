@@ -30,12 +30,12 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientImpl;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.FileAttachmentException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.LogoutFailureException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBFileAttachmentException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLoginFailureException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLogoutFailureException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBQueryResultException;
 
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
@@ -69,6 +69,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
 
 
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+
 import org.apache.log4j.Logger;
 
 
@@ -94,10 +95,10 @@ public final class SugarCRMWSTest {
 	/**
 	 *  Method invoked before each test execution. It performs the initial login in order for allow permission to the 
 	 *  subsequent web service calls. It also sets the session id for this test run. 
-	 * @throws LoginFailureException 
+	 * @throws JIXBLoginFailureException 
 	 */
 	@Before
-	public void setupSession() throws LoginFailureException{
+	public void setupSession() throws JIXBLoginFailureException{
 		LoginResponse lresponse;
 		lresponse = sugarWsClientImpl.login2(ClientUtils.createStandardLoginObject("test", "test"));
 		assertNotNull(lresponse);
@@ -107,10 +108,10 @@ public final class SugarCRMWSTest {
 	
 	/**
 	 * Method invoked after each test has been executed. It destroys the current session. 
-	 * @throws LogoutFailureException 
+	 * @throws JIXBLogoutFailureException 
 	 */
 	@After
-	public void destroySession() throws LogoutFailureException{
+	public void destroySession() throws JIXBLogoutFailureException{
 		
 		Logout request = new Logout();
 		request.setSession(sessionID);
@@ -139,10 +140,10 @@ public final class SugarCRMWSTest {
 	
 	/**
 	 * Is User Admin Test: Checks if the user has admin rights.
-	 * @throws GenericSugarCRMException 
+	 * @throws GenericSugarCrmException 
 	 */
 	@Test
-	public void testIsUserAdmin() throws GenericSugarCRMException{	
+	public void testIsUserAdmin() throws GenericSugarCrmException{	
 		IsUserAdmin user = new IsUserAdmin();		
 		user.setSession(sessionID);
 		IsUserAdminResponse response;
@@ -154,10 +155,10 @@ public final class SugarCRMWSTest {
 	
 	/**
 	 * Get User ID Test: Retrieves a user id for a session.
-	 * @throws GenericSugarCRMException 
+	 * @throws GenericSugarCrmException 
 	 */
 	@Test
-	public void testGetUserID() throws GenericSugarCRMException{	 
+	public void testGetUserID() throws GenericSugarCrmException{	 
 		GetUserId request = new GetUserId();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
@@ -170,10 +171,10 @@ public final class SugarCRMWSTest {
 	
 	/**
 	 * Get Available Modules: Gets the available modules for a specific SugarCRM installation.
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
 	@Test
-	public void testGetAvailableModules() throws QueryResultException{	 	
+	public void testGetAvailableModules() throws JIXBQueryResultException{	 	
 		GetAvailableModules request = new GetAvailableModules();
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
@@ -236,7 +237,7 @@ public final class SugarCRMWSTest {
 			response = sugarWsClientImpl.get_entry_list(request);
 			assertNotNull(response);
 			ClientUtils.logMarshalledObject(response);
-		} catch (QueryResultException e) {
+		} catch (JIXBQueryResultException e) {
 			e.printStackTrace();
 		}
 
@@ -246,10 +247,10 @@ public final class SugarCRMWSTest {
 	
 	/**
 	 * Get Entry Test: Retrieves all fields from a specific module. 
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
 	@Test
-	public void testGetEntries() throws QueryResultException{	 		
+	public void testGetEntries() throws JIXBQueryResultException{	 		
 		GetEntries request = new GetEntries();
 		ArrayList <String> fieldnames = new  ArrayList<String>();
 		fieldnames.add("id");
@@ -274,10 +275,10 @@ public final class SugarCRMWSTest {
 	
 	/**
 	 * Get Entry Test: Get a test entry for a specific ID.
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
 	@Test
-	public void testGetEntry() throws QueryResultException{
+	public void testGetEntry() throws JIXBQueryResultException{
 		GetEntry request = new GetEntry();
 		request.setId("ca410eea-d4fb-0829-aa25-4c585fbb1136");
 		request.setModuleName("Accounts");
@@ -295,10 +296,10 @@ public final class SugarCRMWSTest {
 	/**
 	 * Set Entry Test: Create an entry with the specified ID and the declared 
 	 * name-value pairs and update it if it already exists. 
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
 	@Test
-	public void testSetEntry() throws QueryResultException{
+	public void testSetEntry() throws JIXBQueryResultException{
 		SetEntry request = new SetEntry();
 		
 		NameValue nv1 = new NameValue();
@@ -331,11 +332,11 @@ public final class SugarCRMWSTest {
 	
 	/**
 	 * Set Attachment Test: Create an attachment for a specific entry 
-	 * @throws FileAttachmentException 
+	 * @throws JIXBFileAttachmentException 
 	 * 
 	 */
 	@Test
-	public void testSetAttachment() throws FileAttachmentException{
+	public void testSetAttachment() throws JIXBFileAttachmentException{
 		
 		SetNoteAttachment request = new SetNoteAttachment();
 	    NoteAttachment note = new NoteAttachment();

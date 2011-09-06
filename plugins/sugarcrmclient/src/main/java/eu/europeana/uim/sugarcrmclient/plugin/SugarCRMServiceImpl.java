@@ -21,29 +21,42 @@
 
 package eu.europeana.uim.sugarcrmclient.plugin;
 
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;  
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import eu.europeana.uim.api.ActiveExecution;
+import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.sugarcrm.ConnectionStatus;
+import eu.europeana.uim.sugarcrm.FileAttachmentException;
+import eu.europeana.uim.sugarcrm.LoginFailureException;
+import eu.europeana.uim.sugarcrm.PollingListener;
+import eu.europeana.uim.sugarcrm.QueryResultException;
+import eu.europeana.uim.sugarcrm.SugarCrmQuery;
+import eu.europeana.uim.sugarcrm.SugarCrmRecord;
+import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.sugarcrm.model.DatasetStates;
+import eu.europeana.uim.sugarcrm.model.UpdatableField;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
-
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationships;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationshipsResponse;
@@ -56,687 +69,649 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.ConnectionStatus;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaRetrievableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaUpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientImpl;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.FileAttachmentException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBQueryResultException;
 import eu.europeana.uim.workflow.Workflow;
-import eu.europeana.uim.api.ActiveExecution;
-import eu.europeana.uim.api.Orchestrator;
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
-
-
 
 /**
  * This is the implementing class for the OSGI based SugarCrm plugin OSGI service.
  * 
  * @author Georgios Markakis
  */
-public class SugarCRMServiceImpl implements SugarCRMService{
+public class SugarCRMServiceImpl implements SugarCrmService {
 
-	private SugarWsClientImpl sugarwsClient;
-	private Orchestrator orchestrator;
-	private Registry registry;
-	private LinkedHashMap<String,PollingListener> pollingListeners;
-	private static final String DSMODULENAME = "Opportunities";
-	
-	
-	
-	/**
-	 * Default Constructor
-	 */
-	public SugarCRMServiceImpl(){
-		this.pollingListeners = new  LinkedHashMap<String,PollingListener>();
-	}
-	
+    private SugarWsClientImpl                      sugarwsClient;
+    private Orchestrator                           orchestrator;
+    private Registry                               registry;
+    private LinkedHashMap<String, PollingListener> pollingListeners;
+    private static final String                    DSMODULENAME = "Opportunities";
 
+    /**
+     * Default Constructor
+     */
+    public SugarCRMServiceImpl() {
+        this.pollingListeners = new LinkedHashMap<String, PollingListener>();
+    }
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#showConnectionStatus()
-	 */
-	@Override
-	public ConnectionStatus showConnectionStatus() {
-		
-		ConnectionStatus cstatus = new ConnectionStatus();
-		
-		cstatus.setDefaultURI(sugarwsClient.getDefaultUri());
-		cstatus.setSessionID(sugarwsClient.getSessionID());
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#showConnectionStatus()
+     */
+    @Override
+    public ConnectionStatus showConnectionStatus() {
 
-		return cstatus;
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateSession()
-	 */
-	@Override
-	public String updateSession(String username, String password) throws LoginFailureException {
-		StringBuffer connectionInfo = new StringBuffer();
-		Login login = ClientUtils.createStandardLoginObject(username, password);
-		String newsessionID = sugarwsClient.login(login);
-		sugarwsClient.setSessionID(newsessionID);
+        ConnectionStatus cstatus = new ConnectionStatus();
+
+        cstatus.setDefaultURI(sugarwsClient.getDefaultUri());
+        cstatus.setSessionID(sugarwsClient.getSessionID());
+
+        return cstatus;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateSession()
+     */
+    @Override
+    public String updateSession(String username, String password) throws LoginFailureException {
+        StringBuffer connectionInfo = new StringBuffer();
+        Login login = ClientUtils.createStandardLoginObject(username, password);
+        String newsessionID = sugarwsClient.login(login);
+        sugarwsClient.setSessionID(newsessionID);
         connectionInfo.append(sugarwsClient.login(login));
-		return connectionInfo.toString();
-	}
- 
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#changeEntryStatus(java.lang.String, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates)
-	 */
-	@Override
-	public void changeEntryStatus(String recordId, DatasetStates state)
-			throws QueryResultException {
-		alterSugarCRMItemStatus(recordId, state.getSysId());
-	}
+        return connectionInfo.toString();
+    }
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateRecordData(java.lang.String, java.util.HashMap)
-	 */
-	@Override
-	public void updateRecordData(String recordID,
-			HashMap<UpdatableField, String> values) throws QueryResultException {
-		
-		SetEntry request = new SetEntry();
-		ArrayList <NameValue> nvList = new  ArrayList <NameValue>();
-		Iterator<?> it = values.entrySet().iterator();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#changeEntryStatus(java.lang.String,
+     * eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates)
+     */
+    @Override
+    public void changeEntryStatus(String recordId, DatasetStates state) throws QueryResultException {
+        alterSugarCRMItemStatus(recordId, state.getSysId());
+    }
 
-		//First add the id name\value pair
-		NameValue nvid = new NameValue();
-		nvid.setName("id");
-		nvid.setValue(recordID);
-		nvList.add(nvid);
-		
-		
-	    while (it.hasNext()) {
-	        @SuppressWarnings("unchecked")
-			Map.Entry<UpdatableField, String> pairs = (Map.Entry<UpdatableField, String>)it.next();
-			NameValue nv = new NameValue();
-			nv.setName(pairs.getKey().getFieldId());
-			nv.setValue(pairs.getValue());
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateRecordData(java.lang.String,
+     * java.util.HashMap)
+     */
+    @Override
+    public void updateRecordData(String recordID, HashMap<UpdatableField, String> values)
+            throws QueryResultException {
 
-			nvList.add(nv);
-	    }
-	    
-		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
-		
-		request.setNameValueList(valueList);
-		request.setModuleName("Opportunities");
-		request.setSession(sugarwsClient.getSessionID());	
-		
-		sugarwsClient.set_entry(request);		
-	}
+        SetEntry request = new SetEntry();
+        ArrayList<NameValue> nvList = new ArrayList<NameValue>();
+        Iterator<?> it = values.entrySet().iterator();
 
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateRecordData(eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord)
-	 */
-	@Override
-	public void updateRecordData(SugarCrmRecord record) throws QueryResultException {
-		HashMap<UpdatableField, String> values = new HashMap<UpdatableField, String>();
-		
-		String recordId = record.getItemValue(RetrievableField.ID);
+        // First add the id name\value pair
+        NameValue nvid = new NameValue();
+        nvid.setName("id");
+        nvid.setValue(recordID);
+        nvList.add(nvid);
 
-		values.put(UpdatableField.AMOUNT, record.getItemValue(UpdatableField.AMOUNT));
-		values.put(UpdatableField.INGESTED_IMAGE, record.getItemValue(UpdatableField.INGESTED_IMAGE));
-		values.put(UpdatableField.INGESTED_SOUND, record.getItemValue(UpdatableField.INGESTED_SOUND));
-		values.put(UpdatableField.INGESTED_TEXT, record.getItemValue(UpdatableField.INGESTED_TEXT));
-		values.put(UpdatableField.INGESTED_VIDEO, record.getItemValue(UpdatableField.INGESTED_VIDEO));
-		values.put(UpdatableField.NEXT_STEP, record.getItemValue(UpdatableField.NEXT_STEP));
-		values.put(UpdatableField.TOTAL_INGESTED, record.getItemValue(UpdatableField.TOTAL_INGESTED));
+        while (it.hasNext()) {
+            @SuppressWarnings("unchecked")
+            Map.Entry<EuropeanaUpdatableField, String> pairs = (Map.Entry<EuropeanaUpdatableField, String>)it.next();
+            NameValue nv = new NameValue();
+            nv.setName(pairs.getKey().getFieldId());
+            nv.setValue(pairs.getValue());
 
-		updateRecordData(recordId,values);
-	}
-	
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#retrieveRecord(java.lang.String)
-	 */
-	@Override
-	public SugarCrmRecord retrieveRecord(String id) throws QueryResultException {
-		GetEntryList request = new GetEntryList();
-		
-		SelectFields fields = new SelectFields(); //We want to retrieve all fields
-		request.setSelectFields(fields); 
-  		request.setModuleName(DSMODULENAME);	
-		request.setSession(sugarwsClient.getSessionID());
-		request.setOrderBy(RetrievableField.DATE_ENTERED.getFieldId());
-		request.setMaxResults(1);
-		request.setOffset(0);
-		
-		request.setQuery("(opportunities.id LIKE '" + id +"')");
-
-		GetEntryListResponse response =  sugarwsClient.get_entry_list(request);
-
-		ArrayList<Element> list = (ArrayList<Element>) response.getReturn().getEntryList().getArray().getAnyList();
-
-		Element record = list.get(0);
-			
-		if (record != null){
-			
-			return SugarCrmRecord.getInstance(record);
-		}
-		else
-		{
-			return null;
-		}
-
-	}
-	
-	
-
-
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#retrieveRecords(eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery)
-	 */
-	@Override
-	public List<SugarCrmRecord> retrieveRecords(SugarCrmQuery query)
-			throws QueryResultException {
-		
-		GetEntryList request = new GetEntryList();
-		
-		SelectFields fields = new SelectFields(); //We want to retrieve all fields
-		request.setSelectFields(fields); 
-  		request.setModuleName(DSMODULENAME);	
-		request.setSession(sugarwsClient.getSessionID());
-		request.setOrderBy(query.getOrderBy().getFieldId());
-		request.setMaxResults(query.getMaxResults());
-		request.setOffset(query.getOffset());
-		
-		request.setQuery(query.toString());
-
-		GetEntryListResponse response =  sugarwsClient.get_entry_list(request);
-
-		ArrayList<Element> list = null;
-		
-		if(response.getReturn().getEntryList().getArray() != null)
-		{
-		  list = (ArrayList<Element>) response.getReturn().getEntryList().getArray().getAnyList();
-		}
-		else{
-			list = new ArrayList<Element>();
-		}
-		ArrayList<SugarCrmRecord> returnList = wrapDomElements2Objects(list);
-
-		return returnList;
-	}
-	
-	
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#initWorkflowFromRecord(java.lang.String, eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates)
-	 */
-	@Override
-	public Workflow initWorkflowFromRecord(String worklfowName,SugarCrmRecord record,DatasetStates endstate) throws QueryResultException,StorageEngineException {
-
-			StorageEngine<?> engine = registry.getStorageEngine();
-			Workflow w = registry.getWorkflow(worklfowName);
-			
-			Collection<?> dataset = inferCollection(engine,record);
-			
-			ActiveExecution<?> execution = orchestrator.executeWorkflow(w, dataset);
-			alterSugarCRMItemStatus(dataset.getMnemonic(), endstate.getSysId());	
-		
-			execution.waitUntilFinished();		
-			
-			return w;
-	}
-	
-	
-	
-
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#initWorkflowsFromRecords(java.lang.String, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates, eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates)
-	 */
-	@Override
-	public List<Workflow>  initWorkflowsFromRecords(String worklfowName,
-			DatasetStates currentstate, DatasetStates endstate)
-			throws QueryResultException, StorageEngineException {
-
-
-		ArrayList<Workflow> wfs = new ArrayList<Workflow>();
-		
-		SimpleSugarCrmQuery query = new SimpleSugarCrmQuery(currentstate);
-		query.setMaxResults(1000);
-		query.setOffset(0);
-		query.setOrderBy(RetrievableField.DATE_ENTERED);
-		
-		List<SugarCrmRecord> relevantRecords = retrieveRecords(query);
-		
-		for(SugarCrmRecord record : relevantRecords){
-			Workflow ws =initWorkflowFromRecord(worklfowName,record,endstate);
-			wfs.add(ws);
-		}
-		
-		return wfs;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#createProviderFromRecord(eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord)
-	 */
-	@Override
-	public Provider<?> createProviderFromRecord(SugarCrmRecord record)
-			throws StorageEngineException {
-		
-		StorageEngine<?> engine = registry.getStorageEngine();
-		
-
-	    HashMap<String,String> providerInfo = new HashMap<String,String>();
-	    
-	    try {
-			providerInfo = getProviderInfoMap(record.getItemValue(RetrievableField.ID).toString());
-
-		} catch (QueryResultException e) {
-			e.printStackTrace();
-		}
-	    
-	    String collectionName = record.getItemValue(RetrievableField.NAME);  //"name"
-	    String providerName = record.getItemValue(RetrievableField.ORGANIZATION_NAME); //"account_name"
-	    String providerAcronymName = record.getItemValue(RetrievableField.ACRONYM); //"name_acronym_c"
-	    String mnemonicCode = providerInfo.get("identifier");  //"id"
-	    String countryCode = record.getItemValue(RetrievableField.COUNTRY).toLowerCase(); //"country_c"
-	    String harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
-		
-	    	    
-	    Provider cuurprovider = engine.findProvider(mnemonicCode);
-	    
-        if (cuurprovider == null){
-        	cuurprovider = engine.createProvider();
+            nvList.add(nv);
         }
-        	cuurprovider.setAggregator(false);
-        	cuurprovider.setMnemonic(mnemonicCode);
-        	cuurprovider.setName(providerName);
-        	cuurprovider.setOaiBaseUrl(harvestUrl);
-        	//TODO: Meta data prefix is hardwired to ese. Fix this as soon as the field is available in SugarCRM 
-        	cuurprovider.setOaiMetadataPrefix("ese");   
 
-        	cuurprovider.putValue("identifier", providerInfo.get("identifier"));
-        	String encodedDescription = null;
-        	try {
-				encodedDescription = URLEncoder.encode(providerInfo.get("description"), "UTF8");
-			} catch (UnsupportedEncodingException e) {
-				encodedDescription = "None";
-				e.printStackTrace();
-			}
-    		cuurprovider.putValue("repoxDescription", encodedDescription);
-    		cuurprovider.putValue("name", providerInfo.get("name"));
-    		cuurprovider.putValue("website", providerInfo.get("website"));
-    		//FIXME:Handle Repox Datatypes
-    		//cuurprovider.putValue("type", providerInfo.get("type"));
-    		cuurprovider.putValue("repoxProvType", "ARCHIVE");
-    		cuurprovider.putValue("repoxCountry", providerInfo.get("country"));
-        	
-        	
-        	//cuurprovider.getRelatedOut().add(dummyAggrgator);	
-        	engine.updateProvider(cuurprovider);
-        	engine.checkpoint();
-        
+        NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
+
+        request.setNameValueList(valueList);
+        request.setModuleName("Opportunities");
+        request.setSession(sugarwsClient.getSessionID());
+
+        sugarwsClient.set_entry(request);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#updateRecordData(eu.europeana.uim.
+     * sugarcrmclient.plugin.objects.SugarCrmRecordImpl)
+     */
+    @Override
+    public void updateRecordData(SugarCrmRecord record) throws QueryResultException {
+        HashMap<UpdatableField, String> values = new HashMap<UpdatableField, String>();
+
+        String recordId = record.getItemValue(EuropeanaRetrievableField.ID);
+
+        values.put(EuropeanaUpdatableField.AMOUNT,
+                record.getItemValue(EuropeanaUpdatableField.AMOUNT));
+        values.put(EuropeanaUpdatableField.INGESTED_IMAGE,
+                record.getItemValue(EuropeanaUpdatableField.INGESTED_IMAGE));
+        values.put(EuropeanaUpdatableField.INGESTED_SOUND,
+                record.getItemValue(EuropeanaUpdatableField.INGESTED_SOUND));
+        values.put(EuropeanaUpdatableField.INGESTED_TEXT,
+                record.getItemValue(EuropeanaUpdatableField.INGESTED_TEXT));
+        values.put(EuropeanaUpdatableField.INGESTED_VIDEO,
+                record.getItemValue(EuropeanaUpdatableField.INGESTED_VIDEO));
+        values.put(EuropeanaUpdatableField.NEXT_STEP,
+                record.getItemValue(EuropeanaUpdatableField.NEXT_STEP));
+        values.put(EuropeanaUpdatableField.TOTAL_INGESTED,
+                record.getItemValue(EuropeanaUpdatableField.TOTAL_INGESTED));
+
+        updateRecordData(recordId, values);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#retrieveRecord(java.lang.String)
+     */
+    @Override
+    public SugarCrmRecord retrieveRecord(String id) throws QueryResultException {
+        GetEntryList request = new GetEntryList();
+
+        SelectFields fields = new SelectFields(); // We want to retrieve all fields
+        request.setSelectFields(fields);
+        request.setModuleName(DSMODULENAME);
+        request.setSession(sugarwsClient.getSessionID());
+        request.setOrderBy(EuropeanaRetrievableField.DATE_ENTERED.getFieldId());
+        request.setMaxResults(1);
+        request.setOffset(0);
+
+        request.setQuery("(opportunities.id LIKE '" + id + "')");
+
+        GetEntryListResponse response = sugarwsClient.get_entry_list(request);
+
+        ArrayList<Element> list = (ArrayList<Element>)response.getReturn().getEntryList().getArray().getAnyList();
+
+        Element record = list.get(0);
+
+        if (record != null) {
+
+            return SugarCrmRecordImpl.getInstance(record);
+        } else {
+            return null;
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#retrieveRecords(eu.europeana.uim.
+     * sugarcrmclient.plugin.objects.queries.SugarCrmQuery)
+     */
+    @Override
+    public List<SugarCrmRecord> retrieveRecords(SugarCrmQuery query) throws QueryResultException {
+
+        GetEntryList request = new GetEntryList();
+
+        SelectFields fields = new SelectFields(); // We want to retrieve all fields
+        request.setSelectFields(fields);
+        request.setModuleName(DSMODULENAME);
+        request.setSession(sugarwsClient.getSessionID());
+        request.setOrderBy(query.getOrderBy().getFieldId());
+        request.setMaxResults(query.getMaxResults());
+        request.setOffset(query.getOffset());
+
+        request.setQuery(query.toString());
+
+        GetEntryListResponse response = sugarwsClient.get_entry_list(request);
+
+        ArrayList<Element> list = null;
+
+        if (response.getReturn().getEntryList().getArray() != null) {
+            list = (ArrayList<Element>)response.getReturn().getEntryList().getArray().getAnyList();
+        } else {
+            list = new ArrayList<Element>();
+        }
+        ArrayList<SugarCrmRecord> returnList = wrapDomElements2Objects(list);
+
+        return returnList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#initWorkflowFromRecord(java.lang.String
+     * , eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl,
+     * eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates)
+     */
+    @Override
+    public Workflow initWorkflowFromRecord(String worklfowName, SugarCrmRecord record,
+            DatasetStates endstate) throws QueryResultException, StorageEngineException {
+
+        StorageEngine<?> engine = registry.getStorageEngine();
+        Workflow w = registry.getWorkflow(worklfowName);
+
+        Collection<?> dataset = inferCollection(engine, record);
+
+        ActiveExecution<?> execution = orchestrator.executeWorkflow(w, dataset);
+        alterSugarCRMItemStatus(dataset.getMnemonic(), endstate.getSysId());
+
+        execution.waitUntilFinished();
+
+        return w;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#initWorkflowsFromRecords(java.lang
+     * .String, eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates,
+     * eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates)
+     */
+    @Override
+    public List<Workflow> initWorkflowsFromRecords(String worklfowName, DatasetStates currentstate,
+            DatasetStates endstate) throws QueryResultException, StorageEngineException {
+
+        ArrayList<Workflow> wfs = new ArrayList<Workflow>();
+
+        SimpleSugarCrmQuery query = new SimpleSugarCrmQuery(currentstate);
+        query.setMaxResults(1000);
+        query.setOffset(0);
+        query.setOrderBy(EuropeanaRetrievableField.DATE_ENTERED);
+
+        List<SugarCrmRecord> relevantRecords = retrieveRecords(query);
+
+        for (SugarCrmRecord record : relevantRecords) {
+            Workflow ws = initWorkflowFromRecord(worklfowName, record, endstate);
+            wfs.add(ws);
+        }
+
+        return wfs;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#createProviderFromRecord(eu.europeana
+     * .uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl)
+     */
+    @Override
+    public Provider<?> updateProviderFromRecord(SugarCrmRecord record)
+            throws StorageEngineException {
+
+        StorageEngine<?> engine = registry.getStorageEngine();
+
+        HashMap<String, String> providerInfo = new HashMap<String, String>();
+
+        try {
+            providerInfo = getProviderInfoMap(record.getItemValue(EuropeanaRetrievableField.ID).toString());
+
+        } catch (QueryResultException e) {
+            e.printStackTrace();
+        }
+
+        String collectionName = record.getItemValue(EuropeanaRetrievableField.NAME); // "name"
+        String providerName = record.getItemValue(EuropeanaRetrievableField.ORGANIZATION_NAME); // "account_name"
+        String providerAcronymName = record.getItemValue(EuropeanaRetrievableField.ACRONYM); // "name_acronym_c"
+        String mnemonicCode = providerInfo.get("identifier"); // "id"
+        String countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); // "country_c"
+        String harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); // "harvest_url_c"
+
+        Provider cuurprovider = engine.findProvider(mnemonicCode);
+
+        if (cuurprovider == null) {
+            cuurprovider = engine.createProvider();
+        }
+        cuurprovider.setAggregator(false);
+        cuurprovider.setMnemonic(mnemonicCode);
+        cuurprovider.setName(providerName);
+        cuurprovider.setOaiBaseUrl(harvestUrl);
+        // TODO: Meta data prefix is hardwired to ese. Fix this as soon as the field is available in
+// SugarCRM
+        cuurprovider.setOaiMetadataPrefix("ese");
+
+        cuurprovider.putValue("identifier", providerInfo.get("identifier"));
+        String encodedDescription = null;
+        try {
+            encodedDescription = URLEncoder.encode(providerInfo.get("description"), "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            encodedDescription = "None";
+            e.printStackTrace();
+        }
+        cuurprovider.putValue("repoxDescription", encodedDescription);
+        cuurprovider.putValue("name", providerInfo.get("name"));
+        cuurprovider.putValue("website", providerInfo.get("website"));
+        // FIXME:Handle Repox Datatypes
+        // cuurprovider.putValue("type", providerInfo.get("type"));
+        cuurprovider.putValue("repoxProvType", "ARCHIVE");
+        cuurprovider.putValue("repoxCountry", providerInfo.get("country"));
+
+        // cuurprovider.getRelatedOut().add(dummyAggrgator);
+        engine.updateProvider(cuurprovider);
+        engine.checkpoint();
+
         return cuurprovider;
-	}
+    }
 
-	
-	
-	
-	/**
-	 * @param recordID
-	 * @return
-	 * @throws QueryResultException
-	 */
-	private HashMap<String,String> getProviderInfoMap(String recordID) throws QueryResultException{
-		
-		GetRelationships request =  new GetRelationships();
-		
-		request.setDeleted(0);
-		request.setModuleId(recordID);
-		request.setModuleName("Opportunities");
-		request.setRelatedModule("Accounts");
-		request.setRelatedModuleQuery("");
-		request.setSession(sugarwsClient.getSessionID());
-		
-		
-		GetRelationshipsResponse resp = sugarwsClient.get_relationships(request);
-		
-		if (resp.getReturn().getIds().getArray() == null){
-			throw new QueryResultException("Could not retrieve related provider information from 'Accounts module' ");
-		}
-		
-		List<Element>el = resp.getReturn().getIds().getArray().getAnyList();
+    /**
+     * @param recordID
+     * @return
+     * @throws JIXBQueryResultException
+     */
+    private HashMap<String, String> getProviderInfoMap(String recordID) throws QueryResultException {
 
+        GetRelationships request = new GetRelationships();
 
-		
-		NodeList idFieldList = el.get(0).getElementsByTagName("id");
-		
-		Node node = idFieldList.item(0);
-		
-		if (node == null){
-			throw new QueryResultException("Could not retrieve related provider information from 'Accounts module' ");
-		}
-		
-		String provideriD = node.getTextContent();
-		
-		HashMap<String,String> providerInfo = retrieveproviderinfo(provideriD);
-		
-		return providerInfo;
-		
-	}
-	
-	
-	
-	
-	
-	/**
-	 * @param providerID
-	 * @return
-	 * @throws QueryResultException
-	 */
-	private HashMap<String,String> retrieveproviderinfo(String providerID) throws QueryResultException{
-	
-		HashMap<String,String> returnInfo = new HashMap<String,String>();
-		
-		GetEntry request = new GetEntry();
-		request.setId(providerID);
-		request.setModuleName("Accounts");
-		request.setSession(sugarwsClient.getSessionID());	
-		SelectFields selectFields = new SelectFields();
-		request.setSelectFields(selectFields );
+        request.setDeleted(0);
+        request.setModuleId(recordID);
+        request.setModuleName("Opportunities");
+        request.setRelatedModule("Accounts");
+        request.setRelatedModuleQuery("");
+        request.setSession(sugarwsClient.getSessionID());
 
-		GetEntryResponse response = sugarwsClient.get_entry(request);
-		
-		Element el = response.getReturn().getEntryList().getArray().getAnyList().get(0);
-		
-		String identifier = extractFromElement("name_id_c",  el);
-		String description = extractFromElement("description",  el);
-		String name = extractFromElement("name",  el);
-		String website = extractFromElement("website",  el);
-		String type = extractFromElement("account_type",  el);
-		String country = extractFromElement("country_c",  el);
+        GetRelationshipsResponse resp = sugarwsClient.get_relationships(request);
 
-		returnInfo.put("identifier", identifier);
-		returnInfo.put("description", description);
-		returnInfo.put("name", name);
-		returnInfo.put("website", website);
-		returnInfo.put("type", type);
-		returnInfo.put("country", country);
-		
-		return returnInfo;
-	}
-	
-	
-	
-	private String extractFromElement(String value, Element el){
-		NodeList nl =el.getElementsByTagName("item");
-		
-		for (int i =0; i<nl.getLength(); i++){
-			Node nd = nl.item(i);
-			String textcontent = nd.getChildNodes().item(0).getTextContent(); 
-			if (value.equals(textcontent)){
-				return nd.getChildNodes().item(1).getTextContent();
-			}
-			
-		}
-		return null;
-	}
-	
-	
-	
+        if (resp.getReturn().getIds().getArray() == null) { throw new JIXBQueryResultException(
+                "Could not retrieve related provider information from 'Accounts module' "); }
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#createCollectionFromRecord(eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord, eu.europeana.uim.store.Provider)
-	 */
-	@Override
-	public Collection<?> createCollectionFromRecord(SugarCrmRecord record,
-			Provider provider) throws StorageEngineException {
-		
-		StorageEngine<?> engine = registry.getStorageEngine();
-		
-		String collectionName = null;
-		String collectionID = null;
-		String mnemonicCode = null;
-		String countryCode = null;
-		String harvestUrl =	null;
-		String set = null;
-		StringBuffer buffername = new StringBuffer();
-		
-		
-		String[] fulname = record.getItemValue(RetrievableField.NAME).split("_");
-		
-		List<String> list = Arrays.asList(fulname);
-		
-		for(int i=0;i<list.size();i++){
-			if(i==0){
-				mnemonicCode = list.get(i);
-			}
-			else if (i>3){
-				buffername.append(list.get(i));
-				buffername.append(" ");
-			}
-		}
-		
-		collectionName = buffername.toString();
-	    collectionID = record.getItemValue(RetrievableField.NAME);  //"name"
-	    countryCode = record.getItemValue(RetrievableField.COUNTRY).toLowerCase(); //"country_c"
-	    harvestUrl = record.getItemValue(RetrievableField.HARVEST_URL); //"harvest_url_c"
-	    set = record.getItemValue(RetrievableField.SETSPEC);
-	    
-	    
-	    Collection currcollection = engine.findCollection(mnemonicCode);
-	    
-        if(currcollection == null){
-        	
-        	currcollection = engine.createCollection(provider);
-        	currcollection.setLanguage(countryCode);
-        	currcollection.setMnemonic(mnemonicCode);
-        	currcollection.setName(collectionName);
-        	currcollection.setOaiBaseUrl(harvestUrl);
-        	currcollection.setOaiMetadataPrefix("ese");
-        	currcollection.setOaiSet(set);
-        	currcollection.putValue("collectionID", collectionID);
-			engine.updateCollection(currcollection);
-			engine.checkpoint();
+        List<Element> el = resp.getReturn().getIds().getArray().getAnyList();
+
+        NodeList idFieldList = el.get(0).getElementsByTagName("id");
+
+        Node node = idFieldList.item(0);
+
+        if (node == null) { throw new JIXBQueryResultException(
+                "Could not retrieve related provider information from 'Accounts module' "); }
+
+        String provideriD = node.getTextContent();
+
+        HashMap<String, String> providerInfo = retrieveproviderinfo(provideriD);
+
+        return providerInfo;
+
+    }
+
+    /**
+     * @param providerID
+     * @return
+     * @throws JIXBQueryResultException
+     */
+    private HashMap<String, String> retrieveproviderinfo(String providerID)
+            throws QueryResultException {
+
+        HashMap<String, String> returnInfo = new HashMap<String, String>();
+
+        GetEntry request = new GetEntry();
+        request.setId(providerID);
+        request.setModuleName("Accounts");
+        request.setSession(sugarwsClient.getSessionID());
+        SelectFields selectFields = new SelectFields();
+        request.setSelectFields(selectFields);
+
+        GetEntryResponse response = sugarwsClient.get_entry(request);
+
+        Element el = response.getReturn().getEntryList().getArray().getAnyList().get(0);
+
+        String identifier = extractFromElement("name_id_c", el);
+        String description = extractFromElement("description", el);
+        String name = extractFromElement("name", el);
+        String website = extractFromElement("website", el);
+        String type = extractFromElement("account_type", el);
+        String country = extractFromElement("country_c", el);
+
+        returnInfo.put("identifier", identifier);
+        returnInfo.put("description", description);
+        returnInfo.put("name", name);
+        returnInfo.put("website", website);
+        returnInfo.put("type", type);
+        returnInfo.put("country", country);
+
+        return returnInfo;
+    }
+
+    private String extractFromElement(String value, Element el) {
+        NodeList nl = el.getElementsByTagName("item");
+
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node nd = nl.item(i);
+            String textcontent = nd.getChildNodes().item(0).getTextContent();
+            if (value.equals(textcontent)) { return nd.getChildNodes().item(1).getTextContent(); }
+
         }
-		
-	    return currcollection;	
-	}
+        return null;
+    }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#createCollectionFromRecord(eu.europeana
+     * .uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl, eu.europeana.uim.store.Provider)
+     */
+    @Override
+    public Collection<?> updateCollectionFromRecord(SugarCrmRecord record, Provider provider)
+            throws StorageEngineException {
 
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#addNoteAttachmentToRecord(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void addNoteAttachmentToRecord(String recordId, String message)
-			throws FileAttachmentException {
-		SetNoteAttachment request = new SetNoteAttachment();
-	    NoteAttachment note = new NoteAttachment();
-	    
-	    note.setId(recordId);
-	    note.setFile(message);
-	    
-	    Date date = new Date();
-	    
-	    note.setFilename(date.toString() + ".txt");
+        StorageEngine<?> engine = registry.getStorageEngine();
 
-		request.setNote(note);
-		request.setSession(sugarwsClient.getSessionID());
-		ClientUtils.logMarshalledObject(request);
-		SetNoteAttachmentResponse resp = sugarwsClient.set_note_attachment(request);
-		
-	}
+        String collectionName = null;
+        String collectionID = null;
+        String mnemonicCode = null;
+        String countryCode = null;
+        String harvestUrl = null;
+        String set = null;
+        StringBuffer buffername = new StringBuffer();
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#addPollingListener(eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener)
-	 */
-	@Override
-	public synchronized void addPollingListener(String id,PollingListener listener) {
-		pollingListeners.put(id,listener);		
-	}
+        String[] fulname = record.getItemValue(EuropeanaRetrievableField.NAME).split("_");
 
+        List<String> list = Arrays.asList(fulname);
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#removePollingListener(eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener)
-	 */
-	@Override
-	public synchronized void removePollingListener(String  id) {
-		pollingListeners.remove(id);
-		
-	}
+        for (int i = 0; i < list.size(); i++) {
+            if (i == 0) {
+                mnemonicCode = list.get(i);
+            } else if (i > 3) {
+                buffername.append(list.get(i));
+                buffername.append(" ");
+            }
+        }
 
+        collectionName = buffername.toString();
+        collectionID = record.getItemValue(EuropeanaRetrievableField.NAME); // "name"
+        countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); // "country_c"
+        harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); // "harvest_url_c"
+        set = record.getItemValue(EuropeanaRetrievableField.SETSPEC);
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#getPollingListeners()
-	 */
-	@Override
-	public LinkedHashMap<String,PollingListener>  getPollingListeners() {
-		
-		return pollingListeners;
-	}
+        Collection currcollection = engine.findCollection(mnemonicCode);
 
+        if (currcollection == null) {
+            currcollection = engine.createCollection(provider);
+        }
+        currcollection.setLanguage(countryCode);
+        currcollection.setMnemonic(mnemonicCode);
+        currcollection.setName(collectionName);
+        currcollection.setOaiBaseUrl(harvestUrl);
+        currcollection.setOaiMetadataPrefix("ese");
+        currcollection.setOaiSet(set);
+        currcollection.putValue("collectionID", collectionID);
+        engine.updateCollection(currcollection);
+        engine.checkpoint();
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#setPollingListeners(java.util.List)
-	 */
-	@Override
-	public void setPollingListeners(LinkedHashMap<String,PollingListener>  listeners) {
-		this.pollingListeners = listeners;
-		
-	}
-	
-	
-	/*
-	 * Private methods
-	 */
-	
-	/**
-	 * @param list
-	 * @return
-	 */
-	private ArrayList<SugarCrmRecord>  wrapDomElements2Objects(ArrayList<Element> list){
-		
-		ArrayList<SugarCrmRecord> returnList = new ArrayList<SugarCrmRecord>();
-		
-		for (int i=0; i < list.size(); i++){
-			
-			SugarCrmRecord record = SugarCrmRecord.getInstance(list.get(i));
-			returnList.add(record);
-		}
-		
-		return returnList;
-	}
-	
-	
+        return currcollection;
+    }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#addNoteAttachmentToRecord(java.lang
+     * .String, java.lang.String)
+     */
+    @Override
+    public void addNoteAttachmentToRecord(String recordId, String message)
+            throws FileAttachmentException {
+        SetNoteAttachment request = new SetNoteAttachment();
+        NoteAttachment note = new NoteAttachment();
 
-	
-	
+        note.setId(recordId);
+        note.setFile(message);
 
-	/**
-	 * @param engine
-	 * @param trigger
-	 * @return
-	 * @throws StorageEngineException
-	 */
-	private Collection inferCollection(StorageEngine engine, SugarCrmRecord trigger) throws StorageEngineException{
-		    
-		Provider prov =  createProviderFromRecord(trigger);
-		Collection currcollection  = createCollectionFromRecord(trigger, prov);
-		return currcollection;	
-	}	
+        Date date = new Date();
 
-	
-	/**
-	 * @param id
-	 * @param status
-	 * @throws QueryResultException 
-	 */
-	protected void alterSugarCRMItemStatus(String id, String status) throws QueryResultException{
-		SetEntry request = new SetEntry();
-		
-		
-		NameValue nv0 = new NameValue();
-		nv0.setName("sales_stage");
-		nv0.setValue(status);
-		
-		NameValue nv1 = new NameValue();
-		nv1.setName("id");
-		nv1.setValue(id);
-		
-		ArrayList <NameValue> nvList = new  ArrayList <NameValue>();
-		
-		nvList.add(nv0);
-		nvList.add(nv1);
-		
-		NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
-		
-		request.setNameValueList(valueList);
-		request.setModuleName(DSMODULENAME);
-		request.setSession(sugarwsClient.getSessionID());	
-		
-		SetEntryResponse response =  sugarwsClient.set_entry(request);
+        note.setFilename(date.toString() + ".txt");
 
-				
-	}
+        request.setNote(note);
+        request.setSession(sugarwsClient.getSessionID());
+        ClientUtils.logMarshalledObject(request);
+        SetNoteAttachmentResponse resp = sugarwsClient.set_note_attachment(request);
 
-	
-	
-	/*
-	 * Getters & Setters
-	 */
-	
-	
-	public void setSugarwsClient(SugarWsClientImpl sugarwsClient) {
-		this.sugarwsClient = sugarwsClient;
-	}
+    }
 
-	public SugarWsClientImpl getSugarwsClient() {
-		return sugarwsClient;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#addPollingListener(eu.europeana.uim
+     * .sugarcrmclient.plugin.objects.listeners.PollingListener)
+     */
+    @Override
+    public synchronized void addPollingListener(String id, PollingListener listener) {
+        pollingListeners.put(id, listener);
+    }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#removePollingListener(eu.europeana
+     * .uim.sugarcrmclient.plugin.objects.listeners.PollingListener)
+     */
+    @Override
+    public synchronized void removePollingListener(String id) {
+        pollingListeners.remove(id);
 
+    }
 
-	public void setOrchestrator(Orchestrator orchestrator) {
-		this.orchestrator = orchestrator;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#getPollingListeners()
+     */
+    @Override
+    public LinkedHashMap<String, PollingListener> getPollingListeners() {
 
+        return pollingListeners;
+    }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService#setPollingListeners(java.util.List)
+     */
+    @Override
+    public void setPollingListeners(LinkedHashMap<String, PollingListener> listeners) {
+        this.pollingListeners = listeners;
 
-	public Orchestrator getOrchestrator() {
-		return orchestrator;
-	}
+    }
 
+    /*
+     * Private methods
+     */
 
+    /**
+     * @param list
+     * @return
+     */
+    private ArrayList<SugarCrmRecord> wrapDomElements2Objects(ArrayList<Element> list) {
 
-	public void setRegistry(Registry registry) {
-		this.registry = registry;
-	}
+        ArrayList<SugarCrmRecord> returnList = new ArrayList<SugarCrmRecord>();
 
+        for (int i = 0; i < list.size(); i++) {
 
+            SugarCrmRecordImpl record = SugarCrmRecordImpl.getInstance(list.get(i));
+            returnList.add(record);
+        }
 
-	public Registry getRegistry() {
-		return registry;
-	}
+        return returnList;
+    }
 
+    /**
+     * @param engine
+     * @param trigger
+     * @return
+     * @throws StorageEngineException
+     */
+    private Collection inferCollection(StorageEngine engine, SugarCrmRecord trigger)
+            throws StorageEngineException {
 
+        Provider prov = updateProviderFromRecord(trigger);
+        Collection currcollection = updateCollectionFromRecord(trigger, prov);
+        return currcollection;
+    }
 
+    /**
+     * @param id
+     * @param status
+     * @throws JIXBQueryResultException
+     */
+    protected void alterSugarCRMItemStatus(String id, String status) throws eu.europeana.uim.sugarcrm.QueryResultException {
+        SetEntry request = new SetEntry();
+
+        NameValue nv0 = new NameValue();
+        nv0.setName("sales_stage");
+        nv0.setValue(status);
+
+        NameValue nv1 = new NameValue();
+        nv1.setName("id");
+        nv1.setValue(id);
+
+        ArrayList<NameValue> nvList = new ArrayList<NameValue>();
+
+        nvList.add(nv0);
+        nvList.add(nv1);
+
+        NameValueList valueList = ClientUtils.generatePopulatedNameValueList(nvList);
+
+        request.setNameValueList(valueList);
+        request.setModuleName(DSMODULENAME);
+        request.setSession(sugarwsClient.getSessionID());
+
+        SetEntryResponse response = sugarwsClient.set_entry(request);
+
+    }
+
+    /*
+     * Getters & Setters
+     */
+
+    public void setSugarwsClient(SugarWsClientImpl sugarwsClient) {
+        this.sugarwsClient = sugarwsClient;
+    }
+
+    public SugarWsClientImpl getSugarwsClient() {
+        return sugarwsClient;
+    }
+
+    public void setOrchestrator(Orchestrator orchestrator) {
+        this.orchestrator = orchestrator;
+    }
+
+    public Orchestrator getOrchestrator() {
+        return orchestrator;
+    }
+
+    public void setRegistry(Registry registry) {
+        this.registry = registry;
+    }
+
+    public Registry getRegistry() {
+        return registry;
+    }
 
 }

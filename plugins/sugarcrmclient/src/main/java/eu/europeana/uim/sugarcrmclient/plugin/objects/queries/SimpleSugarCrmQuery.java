@@ -21,9 +21,11 @@
 
 package eu.europeana.uim.sugarcrmclient.plugin.objects.queries;
 
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
+import eu.europeana.uim.sugarcrm.SugarCrmQuery;
+import eu.europeana.uim.sugarcrm.model.SugarCrmField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaRetrievableField;
+import eu.europeana.uim.sugarcrm.model.DatasetStates;
 
 
 /**
@@ -48,8 +50,8 @@ public class SimpleSugarCrmQuery implements SugarCrmQuery{
 	 */
 	public SimpleSugarCrmQuery(){
 		//Initialize fields to default values
-		this.status = DatasetStates.HARVESTING_PENDING;
-		this.orderBy = RetrievableField.DATE_ENTERED;
+		this.status = EuropeanaDatasetStates.HARVESTING_PENDING;
+		this.orderBy = EuropeanaRetrievableField.DATE_ENTERED;
 		this.maxResults = 100;
 		this.offset =0 ;
 	}
@@ -63,7 +65,7 @@ public class SimpleSugarCrmQuery implements SugarCrmQuery{
 	public SimpleSugarCrmQuery(DatasetStates status){
 		//Initialize fields to default values
 		this.status = status;
-		this.orderBy = RetrievableField.DATE_ENTERED;
+		this.orderBy = EuropeanaRetrievableField.DATE_ENTERED;
 		this.maxResults = 100;
 		this.offset =0 ;
 	}

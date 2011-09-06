@@ -4,28 +4,32 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Function;
+
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.DatasetStates;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener;
+import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
+import eu.europeana.uim.sugarcrm.PollingListener;
+import eu.europeana.uim.sugarcrm.QueryResultException;
+import eu.europeana.uim.sugarcrm.SugarCrmQuery;
+import eu.europeana.uim.sugarcrm.SugarCrmRecord;
+import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.sugarcrm.model.DatasetStates;
+import eu.europeana.uim.sugarcrm.model.UpdatableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaRetrievableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaUpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBQueryResultException;
 import eu.europeana.uim.workflow.Workflow;
 
 
@@ -37,7 +41,7 @@ public class SugarCrmCommand implements Function, Action {
 		changeRecordStatus,populateUIMfromRecord,addNotetoRecord,
 		addpollinglistener,removepollinglisteners}
 	
-	private SugarCRMService sugarcrmPlugin;
+	private SugarCrmService sugarcrmPlugin;
 	
 	@Option(name = "-o", aliases = {"--operation"}, required = false)
 	private Operation operation;
@@ -52,7 +56,7 @@ public class SugarCrmCommand implements Function, Action {
 	private String argument2;
 	
 	
-	public SugarCrmCommand (SugarCRMService sugarcrmPlugin ){
+	public SugarCrmCommand (SugarCrmService sugarcrmPlugin ){
 		this.sugarcrmPlugin = sugarcrmPlugin;
 	}
 	
@@ -79,8 +83,7 @@ public class SugarCrmCommand implements Function, Action {
 			out.println("populateUIMfromRecord <recordID>                           \t\t\t\t Creates Collection/Providers objects from a record");
 			out.println("addNotetoRecord <recordID,message>                         \t\t\t\t Adds a note attachment to a specific record");
 			out.println("addpollinglistener                                         \t\t\t\t Adds a sample polling listener to UIM");
-			out.println("removepollinglisteners                                     \t\t\t\t Removes all polling Listeners");
-			
+			out.println("removepollinglisteners                                     \t\t\t\t Removes all polling Listeners");		
 			return null;
 		}
 		
@@ -140,8 +143,8 @@ public class SugarCrmCommand implements Function, Action {
 			SugarCrmRecord re = sugarcrmPlugin.retrieveRecord(poprecID);
 			if(re != null)
 			{
-				Provider prov = sugarcrmPlugin.createProviderFromRecord(re);
-				Collection coll = sugarcrmPlugin.createCollectionFromRecord(re, prov);
+				Provider prov = sugarcrmPlugin.updateProviderFromRecord(re);
+				Collection coll = sugarcrmPlugin.updateCollectionFromRecord(re, prov);
 				out.println("Provider/Collection created successfully");
 			}
 			else{
@@ -160,15 +163,15 @@ public class SugarCrmCommand implements Function, Action {
 
 				@Override
 				public SugarCrmQuery getTrigger() {
-					DatasetStates status = DatasetStates.INGESTION_COMPLETE;
+					DatasetStates status = EuropeanaDatasetStates.INGESTION_COMPLETE;
 					SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery(status);			
 					return query;
 				}
 
 				@Override
-				public void performAction(SugarCRMService pluginReference,
+				public void performAction(SugarCrmService pluginReference,
 						List<SugarCrmRecord> retrievedRecords)
-						throws GenericSugarCRMException {
+						throws GenericSugarCrmException {
 					System.out.println("Invoking Poller...");
 					
 				}
@@ -208,7 +211,7 @@ public class SugarCrmCommand implements Function, Action {
 	/**
 	 * @param out
 	 * @param in
-	 * @throws QueryResultException
+	 * @throws JIXBQueryResultException
 	 * @throws IOException
 	 */
 	private void retrieverecordsCMD(PrintStream out,BufferedReader in) throws QueryResultException, IOException{
@@ -216,15 +219,15 @@ public class SugarCrmCommand implements Function, Action {
 		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery(status);
 		query.setMaxResults(1000);
 		query.setOffset(0);
-		query.setOrderBy(RetrievableField.DATE_ENTERED);
+		query.setOrderBy(EuropeanaRetrievableField.DATE_ENTERED);
 
 		List<SugarCrmRecord> records = sugarcrmPlugin.retrieveRecords(query);
 		out.println("Number of Records retrieved: " + records.size());
 		out.println("NO | RECORD ID                          | COLLECTION NAME");
 
 		for(int i=0; i< records.size(); i++){
-			out.println( (i+1) + " : " + records.get(i).getItemValue(RetrievableField.ID) + " | " +
-					records.get(i).getItemValue(RetrievableField.NAME)	) ;
+			out.println( (i+1) + " : " + records.get(i).getItemValue(EuropeanaRetrievableField.ID) + " | " +
+					records.get(i).getItemValue(EuropeanaRetrievableField.NAME)	) ;
 		}
 	}
 	
@@ -234,7 +237,7 @@ public class SugarCrmCommand implements Function, Action {
 	 * @param out
 	 * @param in
 	 * @throws IOException
-	 * @throws QueryResultException
+	 * @throws JIXBQueryResultException
 	 */
 	private void updaterecordCMD(PrintStream out,BufferedReader in  ) throws IOException, QueryResultException{
 		String recordID = assignvalue("Record ID", argument0,out,in);
@@ -245,11 +248,11 @@ public class SugarCrmCommand implements Function, Action {
 		String hsound = assignvalue("Total Harvested Sound",out,in);
 		
 		HashMap<UpdatableField, String> values  = new HashMap<UpdatableField, String>();
-		values.put(UpdatableField.TOTAL_INGESTED, threcords);
-		values.put(UpdatableField.INGESTED_IMAGE, himages);
-		values.put(UpdatableField.INGESTED_TEXT, htetx);			
-		values.put(UpdatableField.INGESTED_VIDEO, hvideo);
-		values.put(UpdatableField.INGESTED_SOUND, hsound);
+		values.put(EuropeanaUpdatableField.TOTAL_INGESTED, threcords);
+		values.put(EuropeanaUpdatableField.INGESTED_IMAGE, himages);
+		values.put(EuropeanaUpdatableField.INGESTED_TEXT, htetx);			
+		values.put(EuropeanaUpdatableField.INGESTED_VIDEO, hvideo);
+		values.put(EuropeanaUpdatableField.INGESTED_SOUND, hsound);
 		
 		sugarcrmPlugin.updateRecordData(recordID, values);
 	}
@@ -316,20 +319,20 @@ public class SugarCrmCommand implements Function, Action {
 	private DatasetStates extractDSfromString(String argument,PrintStream out){
 		try
         {
-            return DatasetStates.valueOf(argument);
+            return EuropeanaDatasetStates.valueOf(argument);
         }
         catch(IllegalArgumentException ex)
         {
         	out.println("Please select one of the following:");
         	
-        	DatasetStates[] values = DatasetStates.values();
+        	DatasetStates[] values = EuropeanaDatasetStates.values();
 
         	for(int i=0;i<values.length;i++){
 
         		out.println(values[i].toString());
         	}
         	
-        	out.println(DatasetStates.values());
+        	out.println(EuropeanaDatasetStates.values());
         	
         	return null;
         }

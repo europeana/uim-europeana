@@ -28,17 +28,10 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
-import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMServiceImpl;
-import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecord;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.listeners.PollingListener;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SugarCrmQuery;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
+import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
+import eu.europeana.uim.sugarcrm.PollingListener;
+import eu.europeana.uim.sugarcrm.SugarCrmRecord;
+import eu.europeana.uim.sugarcrm.SugarCrmService;
 
 
 /**
@@ -49,12 +42,12 @@ import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
  */
 public class PollingBean extends QuartzJobBean {
 
-	  private SugarCRMService sugarcrmPlugin;
+	  private SugarCrmService sugarcrmPlugin;
 	  
 	  /**
 	   * Setter for sugarcrmPlugin spring injected property
 	   */ 
-	  public void setSugarcrmPlugin(SugarCRMService sugarcrmPlugin) {
+	  public void setSugarcrmPlugin(SugarCrmService sugarcrmPlugin) {
 	    this.sugarcrmPlugin = sugarcrmPlugin;
 	  }	
 	
@@ -79,7 +72,7 @@ public class PollingBean extends QuartzJobBean {
 						
 						listener.performAction(sugarcrmPlugin, results);
 						
-					} catch (GenericSugarCRMException e) {
+					} catch (GenericSugarCrmException e) {
 
 						e.printStackTrace();
 					}

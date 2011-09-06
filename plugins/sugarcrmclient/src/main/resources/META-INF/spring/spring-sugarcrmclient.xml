@@ -91,7 +91,7 @@
    </bean>
 
     <!--Expose the SugarCRM plugin functionality as a service -->  
-   <osgi:service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMService"/>
+   <osgi:service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.util.sugarcrm.SugarCRMService"/>
    
    <osgi:reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator"/>
    <osgi:reference id="registry" interface="eu.europeana.uim.api.Registry"/>

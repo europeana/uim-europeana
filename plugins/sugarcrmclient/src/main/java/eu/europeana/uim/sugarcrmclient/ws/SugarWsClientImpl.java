@@ -22,6 +22,7 @@ package eu.europeana.uim.sugarcrmclient.ws;
 
 import org.springframework.ws.client.core.WebServiceTemplate;
 
+import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
@@ -49,8 +50,6 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetNoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetNoteAttachmentResponse;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.GenericSugarCRMException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.QueryResultException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.*;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationships;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetRelationshipsResponse;
@@ -95,16 +94,16 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * 
 	 * @param login the Login object
 	 * @return a String containing the current Session id
-	 * @throws LoginFailureException when login credentials are incorrect
-	 * @throws GenericSugarCRMException 
+	 * @throws JIXBLoginFailureException when login credentials are incorrect
+	 * @throws GenericSugarCrmException 
 	 */
-	public String login(Login login) throws LoginFailureException{
+	public String login(Login login) throws JIXBLoginFailureException{
 		
 
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		String sessionID = response.getReturn().getId();
 		if("-1".equals(sessionID)){			
-			throw new LoginFailureException(response.getReturn().getError());
+			throw new JIXBLoginFailureException(response.getReturn().getError());
 		}
 		  return sessionID;
 	}
@@ -116,15 +115,15 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * 
 	 * @param login
 	 * @return a LoginResponse object
-	 * @throws LoginFailureException when login credentials are incorrect
-	 * @throws GenericSugarCRMException
+	 * @throws JIXBLoginFailureException when login credentials are incorrect
+	 * @throws GenericSugarCrmException
 	 */
-	public LoginResponse login2(Login login) throws LoginFailureException{
+	public LoginResponse login2(Login login) throws JIXBLoginFailureException{
 		
 		LoginResponse response =  invokeWSTemplate(login,LoginResponse.class);
 		
 		if("-1".equals(response.getReturn().getId())){			
-			throw new LoginFailureException(response.getReturn().getError());
+			throw new JIXBLoginFailureException(response.getReturn().getError());
 		}
 		return response;
 
@@ -138,10 +137,10 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * 
 	 * @param a logout request object
 	 * @return a LogoutResponse object
-	 * @throws LogoutFailureException when logout fails
-	 * @throws GenericSugarCRMException
+	 * @throws JIXBLogoutFailureException when logout fails
+	 * @throws GenericSugarCrmException
 	 */
-	public LogoutResponse logout(Logout request) throws LogoutFailureException{
+	public LogoutResponse logout(Logout request) throws JIXBLogoutFailureException{
 
 		LogoutResponse response =  invokeWSTemplate(request,LogoutResponse.class);
 		
@@ -149,7 +148,7 @@ public class SugarWsClientImpl implements SugarWsClient{
 		
 		if (!"0".equals(returnvalue)){
 			
-			throw new LogoutFailureException(response.getReturn().getDescription());
+			throw new JIXBLogoutFailureException(response.getReturn().getDescription());
 		}
 		return response;
 	}
@@ -159,9 +158,10 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * This method returns an object indicating that the current user has admin privileges or not.
 	 * @param request
 	 * @return
-	 * @throws GenericSugarCRMException 
+	 * @throws GenericSugarCrmException 
 	 */
-	public IsUserAdminResponse is_user_admin(IsUserAdmin request) throws GenericSugarCRMException{
+	@Override
+    public IsUserAdminResponse is_user_admin(IsUserAdmin request) throws GenericSugarCrmException{
 
 		try{
 		IsUserAdminResponse response = invokeWSTemplate(request,IsUserAdminResponse.class);
@@ -169,7 +169,7 @@ public class SugarWsClientImpl implements SugarWsClient{
 		return response;
 		}
 		catch (Exception e){
-			throw new GenericSugarCRMException();
+			throw new GenericSugarCrmException();
 		}
 	}
 	
@@ -179,9 +179,9 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * 
 	 * @param request
 	 * @return
-	 * @throws GenericSugarCRMException 
+	 * @throws GenericSugarCrmException 
 	 */
-	public GetUserIdResponse get_user_id(GetUserId request) throws GenericSugarCRMException{
+	public GetUserIdResponse get_user_id(GetUserId request) throws GenericSugarCrmException{
 		
 		try{
 		GetUserIdResponse response = invokeWSTemplate(request,GetUserIdResponse.class);
@@ -189,7 +189,7 @@ public class SugarWsClientImpl implements SugarWsClient{
 		return response;
 		}
 		catch (Exception e){
-			throw new GenericSugarCRMException();
+			throw new GenericSugarCrmException();
 		}
 	}
 	
@@ -198,15 +198,15 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * 
 	 * @param request
 	 * @return
-	 * @throws QueryResultException 
-	 * @throws GenericSugarCRMException 
+	 * @throws JIXBQueryResultException 
+	 * @throws GenericSugarCrmException 
 	 */
-	public GetAvailableModulesResponse get_available_modules(GetAvailableModules request) throws QueryResultException  {
+	public GetAvailableModulesResponse get_available_modules(GetAvailableModules request) throws JIXBQueryResultException  {
 
 		GetAvailableModulesResponse response = invokeWSTemplate(request,GetAvailableModulesResponse.class);
 		
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new QueryResultException(response.getReturn().getError());
+			throw new JIXBQueryResultException(response.getReturn().getError());
 		}
 		return response;
 	}
@@ -218,14 +218,14 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * 
 	 * @param request 
 	 * @return a GetModuleFieldsResponse containing a list of module fields
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
-	public GetModuleFieldsResponse get_module_fields(GetModuleFields request) throws QueryResultException{
+	public GetModuleFieldsResponse get_module_fields(GetModuleFields request) throws JIXBQueryResultException{
 
 		GetModuleFieldsResponse response = invokeWSTemplate(request,GetModuleFieldsResponse.class);
 		/*
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new QueryResultException(response.getReturn().getError());
+			throw new JIXBQueryResultException(response.getReturn().getError());
 		}
 		*/
 		return response;
@@ -237,14 +237,14 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 *  
 	 * @param request
 	 * @return
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
-	public GetEntryListResponse get_entry_list(GetEntryList request) throws QueryResultException{
+	public GetEntryListResponse get_entry_list(GetEntryList request) throws JIXBQueryResultException{
 		
 		GetEntryListResponse response = invokeWSTemplate(request,GetEntryListResponse.class);
 		
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new QueryResultException(response.getReturn().getError());
+			throw new JIXBQueryResultException(response.getReturn().getError());
 		}
 		
 		return response;
@@ -255,14 +255,14 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * Gets a specific entry
 	 * @param request
 	 * @return
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
-	public GetEntryResponse get_entry(GetEntry request) throws QueryResultException{
+	public GetEntryResponse get_entry(GetEntry request) throws JIXBQueryResultException{
 		
 		GetEntryResponse response = invokeWSTemplate(request,GetEntryResponse.class);
 		
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new QueryResultException(response.getReturn().getError());
+			throw new JIXBQueryResultException(response.getReturn().getError());
 		}
 		
 		return response;
@@ -274,14 +274,14 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * 
 	 * @param request
 	 * @return 
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
-	public SetEntryResponse set_entry(SetEntry request) throws QueryResultException{
+	public SetEntryResponse set_entry(SetEntry request) throws JIXBQueryResultException{
 		
 		SetEntryResponse response = invokeWSTemplate(request,SetEntryResponse.class);
 		
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new QueryResultException(response.getReturn().getError());
+			throw new JIXBQueryResultException(response.getReturn().getError());
 		}
 		
 		return response;
@@ -294,14 +294,14 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * 
 	 * @param request
 	 * @return
-	 * @throws QueryResultException 
+	 * @throws JIXBQueryResultException 
 	 */
-	public GetEntriesResponse get_entries(GetEntries request) throws QueryResultException{
+	public GetEntriesResponse get_entries(GetEntries request) throws JIXBQueryResultException{
 		
 		GetEntriesResponse response = invokeWSTemplate(request,GetEntriesResponse.class);
 		
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new QueryResultException(response.getReturn().getError());
+			throw new JIXBQueryResultException(response.getReturn().getError());
 		}
 		
 		return response;
@@ -314,7 +314,7 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * @param request
 	 * @return
 	 */
-	public ContactByEmailResponse contact_by_email(ContactByEmail request) throws FileAttachmentException{
+	public ContactByEmailResponse contact_by_email(ContactByEmail request) throws JIXBFileAttachmentException{
 		
 		ContactByEmailResponse response = invokeWSTemplate(request,ContactByEmailResponse.class);
 		
@@ -329,12 +329,13 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * @param request
 	 * @return
 	 */
-	public SetNoteAttachmentResponse set_note_attachment(SetNoteAttachment request) throws FileAttachmentException{
+	@Override
+    public SetNoteAttachmentResponse set_note_attachment(SetNoteAttachment request) throws JIXBFileAttachmentException{
 		
 		SetNoteAttachmentResponse response = invokeWSTemplate(request,SetNoteAttachmentResponse.class);
 	
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new FileAttachmentException(response.getReturn().getError());
+			throw new JIXBFileAttachmentException(response.getReturn().getError());
 		}
 		
 		return response;
@@ -348,12 +349,12 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * @param request
 	 * @return
 	 */
-	public GetNoteAttachmentResponse get_note_attachment(GetNoteAttachment request) throws FileAttachmentException{
+	public GetNoteAttachmentResponse get_note_attachment(GetNoteAttachment request) throws JIXBFileAttachmentException{
 		
 		GetNoteAttachmentResponse response = invokeWSTemplate(request,GetNoteAttachmentResponse.class);
 		
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new FileAttachmentException(response.getReturn().getError());
+			throw new JIXBFileAttachmentException(response.getReturn().getError());
 		}
 		
 		return response;
@@ -367,14 +368,14 @@ public class SugarWsClientImpl implements SugarWsClient{
 	 * Gets the Relationships for a specific module
 	 * @param request
 	 * @return
-	 * @throws QueryResultException
+	 * @throws JIXBQueryResultException
 	 */
-	public GetRelationshipsResponse get_relationships(GetRelationships request) throws QueryResultException{
+	public GetRelationshipsResponse get_relationships(GetRelationships request) throws JIXBQueryResultException{
 
 		GetRelationshipsResponse response = invokeWSTemplate(request,GetRelationshipsResponse.class);
 		
 		if(!"0".equals(response.getReturn().getError().getNumber())){			
-			throw new QueryResultException(response.getReturn().getError());
+			throw new JIXBQueryResultException(response.getReturn().getError());
 		}
 		
 		return response;

@@ -3,7 +3,7 @@ package eu.europeana.uim.sugarcrmclient.ws;
 import org.springframework.ws.client.core.WebServiceTemplate;
 
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.LoginFailureException;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLoginFailureException;
 
 /**
  * 
@@ -29,7 +29,7 @@ public class ClientFactory {
 		
 		try {
 			client.setSessionID(client.login(ClientUtils.createStandardLoginObject(userName,password)));
-		} catch (LoginFailureException e) {
+		} catch (JIXBLoginFailureException e) {
 			client.setSessionID("-1");
 			e.printStackTrace();
 		}
