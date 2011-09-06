@@ -18,27 +18,37 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
+package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
 
-package eu.europeana.uim.sugarcrmclient.ws.exceptions;
-
-import eu.europeana.uim.sugarcrmclient.jibxbindings.ErrorValue;
+import eu.europeana.uim.sugarcrm.model.Datasets;
 
 /**
- * Exception thrown for File Attachment Errors
+ * Enumerations holding the names of the system modules in sugarCRM currently being used
+ * 
  * @author Georgios Markakis
- *
  */
-public class FileAttachmentException extends GenericSugarCRMException {
-
-	private static final long serialVersionUID = 1L;
-
+public enum EuropeanaDatasets implements Datasets {
+	ORGANIZATIONS("Accounts"),
+	DATASETS("Opportunities");
+	
+	private final String sysId;
+	
+	
 	/**
-	 * This constructor takes as an argument an ErrorValue object
-	 * @param err the ErrorValue message
+	 * @param sysId
 	 */
-	public FileAttachmentException(ErrorValue err) {
-		
-		super(generateMessageFromObject(err));
+	EuropeanaDatasets(String sysId){
+		this.sysId = sysId;
 
 	}
+
+
+	/**
+	 * @return
+	 */
+	@Override
+    public String getSysId() {
+		return sysId;
+	}
+
 }

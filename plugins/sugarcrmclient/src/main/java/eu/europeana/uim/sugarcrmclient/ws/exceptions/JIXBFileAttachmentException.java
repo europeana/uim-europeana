@@ -18,30 +18,28 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
+
 package eu.europeana.uim.sugarcrmclient.ws.exceptions;
 
-
+import eu.europeana.uim.sugarcrm.FileAttachmentException;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.ErrorValue;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
 
 /**
- * Exception thrown in case of Authentication Error.
- * 
+ * Exception thrown for File Attachment Errors
  * @author Georgios Markakis
+ *
  */
-public class LoginFailureException extends GenericSugarCRMException {
+public class JIXBFileAttachmentException extends FileAttachmentException {
 
 	private static final long serialVersionUID = 1L;
 
-	
 	/**
 	 * This constructor takes as an argument an ErrorValue object
 	 * @param err the ErrorValue message
 	 */
-	public LoginFailureException(ErrorValue err) {
+	public JIXBFileAttachmentException(ErrorValue err) {
 		
-		super(generateMessageFromObject(err));
+		super(JIXBUtil.generateMessageFromObject(err));
 
 	}
-	
 }

@@ -20,11 +20,13 @@
  */
 package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
 
+import eu.europeana.uim.sugarcrm.model.DatasetStates;
+
 /**
- * This enumeration holds the State Descriptions for Datasets in Sugar CRM
+ * This enumeration holds the State Descriptions for EuropeanaDatasets in Sugar CRM
  * @author Georgios Markakis
  */
-public enum DatasetStates {
+public enum EuropeanaDatasetStates implements DatasetStates {
 
 	OAI_PMH_TESTING("Prospecting","OAI-PHM testing"),
 	OAI_PMH_SENT_TO_ORG("Qualification","OAI-PHM test sent to Organisation"),
@@ -40,16 +42,18 @@ public enum DatasetStates {
 	private final String sysId;
 	private final String description;	
 	
-	DatasetStates(String sysId, String description){
+	EuropeanaDatasetStates(String sysId, String description){
 		this.sysId = sysId;
 		this.description = description;
 	}
 
-	public String getSysId() {
+	@Override
+    public String getSysId() {
 		return sysId;
 	}
 
-	public String getDescription() {
+	@Override
+    public String getDescription() {
 		return description;
 	}
 	

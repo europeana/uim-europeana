@@ -3,6 +3,8 @@
  */
 package eu.europeana.uim.sugarcrmclient.ws.exceptions;
 
+
+import eu.europeana.uim.sugarcrm.QueryResultException;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.ErrorValue;
 
 /**
@@ -11,7 +13,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.ErrorValue;
  * 
  * @author Georgios Markakis
  */
-public class QueryResultException extends GenericSugarCRMException {
+public class JIXBQueryResultException extends QueryResultException {
 
 	private static final long serialVersionUID = 1L;
 
@@ -19,13 +21,17 @@ public class QueryResultException extends GenericSugarCRMException {
 	 * This constructor takes as an argument an ErrorValue object
 	 * @param err the ErrorValue message
 	 */
-	public QueryResultException(ErrorValue err) {
+	public JIXBQueryResultException(ErrorValue err) {
 		
-		super(generateMessageFromObject(err));
+		super(JIXBUtil.generateMessageFromObject(err));
 
 	}
 
-	public QueryResultException(String string) {
+	/**
+	 * Creates a new instance of this class.
+	 * @param string
+	 */
+	public JIXBQueryResultException(String string) {
 		super(string);
 	}
 }

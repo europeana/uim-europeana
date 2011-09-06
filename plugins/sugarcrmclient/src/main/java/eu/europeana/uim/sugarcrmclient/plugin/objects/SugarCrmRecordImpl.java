@@ -20,12 +20,17 @@
  */
 package eu.europeana.uim.sugarcrmclient.plugin.objects;
 
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.UserDataHandler;
 
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.SugarCrmField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
+import eu.europeana.uim.sugarcrm.SugarCrmRecord;
+import eu.europeana.uim.sugarcrm.model.SugarCrmField;
+import eu.europeana.uim.sugarcrm.model.UpdatableField;
 
 /**
  * This class essentially acts as a wrapper from the response
@@ -35,7 +40,7 @@ import eu.europeana.uim.sugarcrmclient.plugin.objects.data.UpdatableField;
  * 
  * @author Georgios Markakis
  */
-public class SugarCrmRecord {
+public class SugarCrmRecordImpl implements SugarCrmRecord {
 	
 	//The wrapped result element
 	private Element record;
@@ -44,7 +49,7 @@ public class SugarCrmRecord {
 	/**
 	 * Private constructor
 	 */
-	private SugarCrmRecord(){
+	private SugarCrmRecordImpl(){
 	}
 	
 	
@@ -52,23 +57,21 @@ public class SugarCrmRecord {
 	 * Static factory method
 	 * 
 	 * @param el a DOM element
-	 * @return a SugarCrmRecord object
+	 * @return a SugarCrmRecordImpl object
 	 */
-	public static SugarCrmRecord getInstance(Element el){
-		SugarCrmRecord obj = new SugarCrmRecord();
+	public static SugarCrmRecordImpl getInstance(Element el){
+		SugarCrmRecordImpl obj = new SugarCrmRecordImpl();
 		obj.setRecord(el);
 		return obj;
-	}
-
-	
-	
+	}	
 	/**
 	 * Updates 
 	 * 
 	 * @param field
 	 */
-	public void setItemValue(UpdatableField field){
-		modifyElement(field.getFieldId(), record);
+	@Override
+    public void setItemValue(UpdatableField field,String value){
+		modifyElement(field.getFieldId(), value, record);
 	}
 	
 	
@@ -76,26 +79,38 @@ public class SugarCrmRecord {
 	 * @param field
 	 * @return
 	 */
-	public String getItemValue(SugarCrmField field){
+	@Override
+    public String getItemValue(SugarCrmField field){
 		return extractFromElement(field.getFieldId(), record);
 	}
 	
 	
-	private void modifyElement(String value, Element el){
-		NodeList nl =el.getElementsByTagName(value);
-		
-		if(nl.getLength() != 0){
-			 nl.item(0).setTextContent(value);
-		}	
+	private void modifyElement(String field, String value, Element el){
+		NodeList nl =el.getElementsByTagName("item");
+		  
+		  boolean found=false;
+		  for (int i =0; i<nl.getLength(); i++){
+	            Node nd = nl.item(i);
+	            String textcontent = nd.getChildNodes().item(0).getTextContent(); 
+	            if (field.equals(textcontent)){
+	                nd.getChildNodes().item(1).setTextContent(value);
+	                found=true;
+	            }   
+	        }
+		  
+		  if (!found) {
+		     //TODO: create a new node   
+		  }
+		  
 	}
 	
-	private String extractFromElement(String value, Element el){
+	private String extractFromElement(String field, Element el){
 		NodeList nl =el.getElementsByTagName("item");
 		
 		for (int i =0; i<nl.getLength(); i++){
 			Node nd = nl.item(i);
 			String textcontent = nd.getChildNodes().item(0).getTextContent(); 
-			if (value.equals(textcontent)){
+			if (field.equals(textcontent)){
 				return nd.getChildNodes().item(1).getTextContent();
 			}
 			

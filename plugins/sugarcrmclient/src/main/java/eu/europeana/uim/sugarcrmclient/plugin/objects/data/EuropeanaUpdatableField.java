@@ -20,6 +20,8 @@
  */
 package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
 
+import eu.europeana.uim.sugarcrm.model.UpdatableField;
+
 
 /**
  *  This enumeration indicates the Fields that can be updated
@@ -27,31 +29,40 @@ package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
  *  
  * @author Georgios Markakis
  */
-public enum UpdatableField implements SugarCrmField{
-	AMOUNT("amount","Amount"),
-	TOTAL_INGESTED("ingested_total_c","Ingested Total"),
-	INGESTED_SOUND("ingested_sound_c","Ingested Sound"),
-	INGESTED_VIDEO("ingested_video_c","Ingested Video"),
-	INGESTED_TEXT("ingested_text_c","Ingested Text"),
-	INGESTED_IMAGE("ingested_image_c","Ingested Images"),
-	NEXT_STEP("next_step","Next Step"),
-	STATUS("sales_stage","sales_stage"),
-	TYPE("opportunity_type","Type"),
+public enum EuropeanaUpdatableField implements UpdatableField{
+	AMOUNT("amount","amount","Amount"),
+	TOTAL_INGESTED("ingested_total_c","ingested_total_c","Ingested Total"),
+	INGESTED_SOUND("ingested_sound_c","ingested_sound_c","Ingested Sound"),
+	INGESTED_VIDEO("ingested_video_c","ingested_video_c","Ingested Video"),
+	INGESTED_TEXT("ingested_text_c","ingested_text_c","Ingested Text"),
+	INGESTED_IMAGE("ingested_image_c","ingested_image_c","Ingested Images"),
+	NEXT_STEP("next_step","next_step","Next Step"),
+	STATUS("sales_stage","sales_stage","sales_stage"),
+	TYPE("opportunity_type","opportunity_type","Type"),
 	;
 	
 	private final String fieldId;
+	private final String qualifiedFieldId;
 	private final String description;	
 	
-	UpdatableField(String fieldId,String description ){
+	EuropeanaUpdatableField(String fieldId,String qualifiedFieldId, String description ){
 		this.fieldId = fieldId;
+		this.qualifiedFieldId=qualifiedFieldId;
 		this.description = description;
 	}
 
-	public String getFieldId() {
+	@Override
+    public String getFieldId() {
 		return fieldId;
 	}
 
-	public String getDescription() {
+	@Override
+    public String getDescription() {
 		return description;
 	}
+
+    @Override
+    public String getQualifiedFieldId() {
+      return qualifiedFieldId;
+    }
 }

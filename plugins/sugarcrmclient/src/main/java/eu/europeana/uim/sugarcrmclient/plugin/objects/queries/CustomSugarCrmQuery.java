@@ -3,7 +3,7 @@
  */
 package eu.europeana.uim.sugarcrmclient.plugin.objects.queries;
 
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.RetrievableField;
+import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaRetrievableField;
 
 /**
  * @author Georgios Markakis
