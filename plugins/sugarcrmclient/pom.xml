@@ -67,7 +67,7 @@
 							org.xmlpull.v1,
 							org.quartz,
 							org.springframework.transaction,
-							eu.europeana.uim.util.sugarcrm,
+							eu.europeana.uim.sugarcrm,
 							*
 						</Import-Package>
 
