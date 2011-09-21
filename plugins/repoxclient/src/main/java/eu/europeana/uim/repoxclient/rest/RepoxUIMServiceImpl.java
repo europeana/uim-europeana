@@ -160,7 +160,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		namecode.setNameCode(aggrName);
 		aggr.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl("www.tvxs.gr");
+		url.setUrl("http://repox.ist.utl.pt");
 		aggr.setUrl(url);
 
 		Aggregator createdAggregator = repoxRestClient.createAggregator(aggr);
@@ -386,6 +386,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		eu.europeana.uim.repoxclient.jibxbindings.Provider createdProv = repoxRestClient
 				.createProvider(jibxProv, aggr);
 
+		
 		uimProv.putValue("repoxID", createdProv.getId());
 
 		StorageEngine<?> engine = registry.getStorageEngine();
