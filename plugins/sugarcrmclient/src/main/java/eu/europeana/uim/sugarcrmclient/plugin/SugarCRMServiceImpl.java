@@ -373,7 +373,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         cuurprovider.setName(providerName);
         cuurprovider.setOaiBaseUrl(harvestUrl);
         // TODO: Meta data prefix is hardwired to ese. Fix this as soon as the field is available in
-// SugarCRM
+
         cuurprovider.setOaiMetadataPrefix("ese");
 
         cuurprovider.putValue("identifier", providerInfo.get("identifier"));
@@ -387,11 +387,13 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         cuurprovider.putValue("repoxDescription", encodedDescription);
         cuurprovider.putValue("name", providerInfo.get("name"));
         cuurprovider.putValue("website", providerInfo.get("website"));
+        cuurprovider.putValue("sugarCRMID", providerInfo.get("sugarCRMID"));
         // FIXME:Handle Repox Datatypes
         // cuurprovider.putValue("type", providerInfo.get("type"));
         cuurprovider.putValue("repoxProvType", "ARCHIVE");
         cuurprovider.putValue("repoxCountry", providerInfo.get("country"));
-
+        
+        
         // cuurprovider.getRelatedOut().add(dummyAggrgator);
         engine.updateProvider(cuurprovider);
         engine.checkpoint();
@@ -465,6 +467,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         String type = extractFromElement("account_type", el);
         String country = extractFromElement("country_c", el);
 
+        returnInfo.put("sugarCRMID", providerID);
         returnInfo.put("identifier", identifier);
         returnInfo.put("description", description);
         returnInfo.put("name", name);
@@ -506,6 +509,8 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         String countryCode = null;
         String harvestUrl = null;
         String set = null;
+        String sugarCRMID = null;
+        
         StringBuffer buffername = new StringBuffer();
 
         String[] fulname = record.getItemValue(EuropeanaRetrievableField.NAME).split("_");
@@ -526,6 +531,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); // "country_c"
         harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); // "harvest_url_c"
         set = record.getItemValue(EuropeanaRetrievableField.SETSPEC);
+        sugarCRMID = record.getItemValue(EuropeanaRetrievableField.ID);
 
         Collection currcollection = engine.findCollection(mnemonicCode);
 
@@ -539,6 +545,8 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         currcollection.setOaiMetadataPrefix("ese");
         currcollection.setOaiSet(set);
         currcollection.putValue("collectionID", collectionID);
+        currcollection.putValue("sugarCRMID", sugarCRMID);
+        
         engine.updateCollection(currcollection);
         engine.checkpoint();
 
