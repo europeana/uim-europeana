@@ -47,9 +47,8 @@ public class LinkCheckerPlugin extends AbstractIngestionPlugin {
 
 
 
-	public boolean processRecord(MetaDataRecord<?> mdr, ExecutionContext context)
-	throws IngestionPluginFailedException,
-	CorruptedMetadataRecordException {
+	public   <I> boolean processRecord(MetaDataRecord<I> mdr, ExecutionContext<I> context)	
+    throws IngestionPluginFailedException, CorruptedMetadataRecordException{
 		
 		//First check if link exists
 		
@@ -58,8 +57,12 @@ public class LinkCheckerPlugin extends AbstractIngestionPlugin {
 		
 		//If everything was ok then Log the outcome 
 		
-       return false;
-    }
+		return false;
+	}
+		
+
+		
+
 	
 
 
