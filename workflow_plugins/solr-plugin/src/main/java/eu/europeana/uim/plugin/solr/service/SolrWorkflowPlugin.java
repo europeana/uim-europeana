@@ -56,9 +56,8 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
 	 */
-	public boolean processRecord(MetaDataRecord<?> mdr, ExecutionContext context)
-			throws IngestionPluginFailedException,
-			CorruptedMetadataRecordException {
+	public   <I> boolean processRecord(MetaDataRecord<I> mdr, ExecutionContext<I> context)	
+    throws IngestionPluginFailedException, CorruptedMetadataRecordException{
 
 		//mdr.getQField(GlobalModelRegistry.AGENT, ConceptLevel.AGGREGATION);
 
