@@ -577,7 +577,7 @@
 	<xsd:complexType name="get_entry_list_result">
 		<xsd:all>
 			<xsd:element name="result_count" type="xsd:int" />
-			<xsd:element name="next_offset" type="xsd:int" />
+			<xsd:element name="next_offset" type="xsd:int" minOccurs="0"/>
 			<xsd:element name="field_list" type="tns:field_list" />
 			<xsd:element name="entry_list" type="tns:entry_list" />
 			<xsd:element name="error" type="tns:error_value" />
@@ -586,7 +586,7 @@
 	<xsd:complexType name="get_entry_list_result_version2">
 		<xsd:all>
 			<xsd:element name="result_count" type="xsd:int" />
-			<xsd:element name="next_offset" type="xsd:int" />
+			<xsd:element name="next_offset" type="xsd:int" minOccurs="0"/>
 			<xsd:element name="entry_list" type="tns:entry_list" />
 			<xsd:element name="relationship_list" type="tns:link_lists" />
 		</xsd:all>
@@ -697,7 +697,7 @@
 	<xsd:complexType name="get_entry_list_result_encoded">
 		<xsd:all>
 			<xsd:element name="result_count" type="xsd:int" />
-			<xsd:element name="next_offset" type="xsd:int" />
+			<xsd:element name="next_offset" type="xsd:int" minOccurs="0"/>
 			<xsd:element name="total_count" type="xsd:int" />
 			<xsd:element name="field_list" type="tns:select_fields" />
 			<xsd:element name="entry_list" type="xsd:string" />
@@ -714,7 +714,7 @@
 		<xsd:all>
 			<xsd:element name="result" type="xsd:string" />
 			<xsd:element name="result_count" type="xsd:int" />
-			<xsd:element name="next_offset" type="xsd:int" />
+			<xsd:element name="next_offset" type="xsd:int" minOccurs="0"/>
 			<xsd:element name="total_count" type="xsd:int" />
 			<xsd:element name="error" type="tns:error_value" />
 		</xsd:all>
