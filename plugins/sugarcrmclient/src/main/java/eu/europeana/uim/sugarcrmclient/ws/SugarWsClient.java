@@ -190,5 +190,12 @@ public interface SugarWsClient {
 	 * @throws JIXBQueryResultException
 	 */
 	public GetRelationshipsResponse get_relationships(GetRelationships request) throws JIXBQueryResultException;
+
+
 	
+	/**
+	 * Get the current session id
+	 * @return
+	 */
+	public String getSessionID(); 
 }

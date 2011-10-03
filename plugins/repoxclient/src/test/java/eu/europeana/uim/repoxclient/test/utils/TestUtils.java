@@ -62,7 +62,7 @@ public class TestUtils {
 		namecode.setNameCode("77777");
 		aggr.setNameCode(namecode );
 		Url url = new Url();
-		url.setUrl("http://www.tvxs.gr");
+		url.setUrl("http://europeana.eu");
 		aggr.setUrl(url);
 		
 		return aggr;

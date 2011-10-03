@@ -57,6 +57,7 @@ import eu.europeana.uim.repoxclient.test.utils.TestUtils;
 
 
 /**
+ * Core Repox connectivity unite testing
  * 
  * @author Georgios Markakis
  */
