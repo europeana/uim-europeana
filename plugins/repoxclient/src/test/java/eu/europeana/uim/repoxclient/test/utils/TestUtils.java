@@ -60,9 +60,9 @@ public class TestUtils {
 		aggr.setName(name);
 		NameCode namecode = new NameCode();
 		namecode.setNameCode("77777");
-		aggr.setNameCode(namecode );
+		aggr.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl("http://europeana.eu");
+		url.setUrl("in.gr");
 		aggr.setUrl(url);
 		
 		return aggr;

@@ -8,10 +8,7 @@
 
     <bean id="repoxRestClient" class="eu.europeana.uim.repoxclient.rest.RepoxRestClientImpl">
         <property name="restTemplate" ref="restTemplate"/>
-        <property name="defaultURI" value="http://sip-manager.isti.cnr.it:8080/repox2/rest/"/>
-        <!-- 
-        <property name="defaultURI" value="http://bd2.inesc-id.pt:8080/repox2/rest"/>
-         -->
+        <property name="defaultURI" value="${host}"/>
     </bean>
 
 
@@ -41,6 +38,12 @@
        <property name="orchestrator" ref="orchestrator"/>  
        <property name="registry" ref="registry"/>  
    </bean>
+   
+   	<!--Inject defined properties into Spring -->  
+   <bean id="propertiesPlaceholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">    
+       <property name="location" value="classpath:/META-INF/config.properties"/>  
+   </bean>
+   
    
    <osgi:service id="repoxAgentService" ref="repoxAgent" interface="eu.europeana.uim.repoxclient.plugin.RepoxUIMService"/>
    
