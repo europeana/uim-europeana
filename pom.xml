@@ -16,10 +16,13 @@
     <name>Unified Ingestion Manager: Europeana Specific Modules</name>
 
 	<modules>
-
-	<module>plugins</module>
-		
-	<module>integration_tests</module>
+	  <module>plugins</module>
+	  <module>misc/europeana-uim-definitions</module>
+	  <module>misc/europeana-uim-workflows-startups</module>
+	  <module>workflows/workflow-basic</module>
+	  <module>workflow_plugins/europeana-normalizer</module>
+	  <module>workflow_plugins/linkchecker</module>
+	  <module>workflow_plugins/solr-plugin</module>
 	</modules>
 	
 	
@@ -51,9 +54,6 @@
         </dependency>
     </dependencies>
 	
-
-
-
 
 
    	<repositories>
