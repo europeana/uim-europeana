@@ -53,7 +53,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
-import eu.europeana.uim.repoxclient.test.utils.TestUtils;
+import eu.europeana.uim.repoxclient.utils.TestUtils;
 
 
 /**
