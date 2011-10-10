@@ -115,7 +115,7 @@ public void testGetProviders() throws Exception{
 /**
  * @throws Exception
  */
-@Test
+//@Test
 public void testCreateUpdateDeleteAggregator() throws Exception{
 
 	//Initialize the Aggregator Object
@@ -157,7 +157,7 @@ public void testCreateUpdateDeleteAggregator() throws Exception{
  *  
  * @throws Exception
  */
-@Test
+//@Test
 public void testCreateUpdateDeleteProvider() throws Exception{
 	
 	//Create an Aggregator for testing purposes
@@ -199,7 +199,7 @@ public void testCreateUpdateDeleteProvider() throws Exception{
  * Tests a series of OAIPMH functionalities
  * 
  */
-@Test
+//@Test
 public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	
 
