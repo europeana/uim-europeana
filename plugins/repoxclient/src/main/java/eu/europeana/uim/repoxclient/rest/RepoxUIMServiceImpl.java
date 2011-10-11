@@ -45,6 +45,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
 import eu.europeana.uim.repoxclient.jibxbindings.OaiSet;
 import eu.europeana.uim.repoxclient.jibxbindings.OaiSource;
+import eu.europeana.uim.repoxclient.jibxbindings.RecordIdPolicy;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
@@ -73,41 +74,13 @@ import eu.europeana.uim.store.Provider;
  */
 public class RepoxUIMServiceImpl implements RepoxUIMService {
 
+	private static final String defaultAggrgatorURL = "http://repox.ist.utl.pt";
+	private static final String defaultAggrgatorIDPostfix = "aggregatorr0";
 	private RepoxRestClient repoxRestClient;
-	private Orchestrator orchestrator;
 	private Registry registry;
 
+
 	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#aggregatorExists(eu.europeana.uim.store.Provider)
-	 */
-	@Override
-	public boolean aggregatorExists(Provider provider)
-			throws AggregatorOperationException {
-
-		if (!provider.isAggregator()) {
-			throw new AggregatorOperationException(
-					"The requested object is not of Aggregator type");
-		}
-
-		/*
-		String id = provider.getValue("repoxID");
-
-		if (id == null) {
-			return false;
-		}
-		*/
-
-		HashSet<Provider> prov = retrieveAggregators();
-		
-
-		boolean isContained = prov.contains(provider);
-		
-
-		return isContained;
-
-	}
-
 	
 	@Override
 	public boolean aggregatorExists(String countrycode)
@@ -117,40 +90,31 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			countrycode ="eu";
 		}
 		
-		String aggrID = countrycode + "aggregatorr0";
-		
+		String aggrID = countrycode + defaultAggrgatorIDPostfix;
 		Aggregators aggrs = repoxRestClient.retrieveAggregators();
 		
 		List<Aggregator> aggregatorList = aggrs.getAggregatorList();
-		
-		
+				
 		for(Aggregator aggr: aggregatorList){
 		
 			if(aggrID.equals(aggr.getId())){
 				return true;
 			}
-		}
-		
+		}		
 		return false;
 	}
 
-	
-	
-	
+
 	
 	@Override
-	public void createAggregator(String countryCode)
-			throws AggregatorOperationException, ProviderOperationException {
+	public void createAggregator(String countryCode,String urlString)
+			throws AggregatorOperationException {
 		
 		if(countryCode.equals("")){
 			countryCode ="eu";
 		}
 		
 		String aggrName = countryCode + "aggregator";
-		
-
-		
-		
 		Aggregator aggr = new Aggregator();
 
 		Name name = new Name();
@@ -160,118 +124,54 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		namecode.setNameCode(aggrName);
 		aggr.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl("http://repox.ist.utl.pt");
+		
+		if(urlString == null){
+			url.setUrl(defaultAggrgatorURL);
+		}
+		else{
+			url.setUrl(urlString);
+		}
+		
 		aggr.setUrl(url);
-
 		Aggregator createdAggregator = repoxRestClient.createAggregator(aggr);
 		
 	}
 	
 	
+		
 	
 	@Override
-	public void createAggregatorfromUIMObj(Provider aggregator,
-			boolean isRecursive) throws AggregatorOperationException,
-			ProviderOperationException {
-
-		if (!aggregator.isAggregator()) {
-			throw new AggregatorOperationException(
-					"The requested object is not of Aggregator type");
-		}
-
-		Aggregator aggr = new Aggregator();
-
-		Name name = new Name();
-		name.setName(aggregator.getName());
-		aggr.setName(name);
-		NameCode namecode = new NameCode();
-		namecode.setNameCode(aggregator.getMnemonic());
-		aggr.setNameCode(namecode);
-		Url url = new Url();
-		url.setUrl(aggregator.getOaiBaseUrl());
-		aggr.setUrl(url);
-
-		Aggregator createdAggregator = repoxRestClient.createAggregator(aggr);
-
-		aggregator.putValue("repoxID", createdAggregator.getId());
-
-		StorageEngine<?> engine = registry.getStorageEngine();
-		try {
-			engine.updateProvider(aggregator);
-			engine.checkpoint();
-		} catch (StorageEngineException e) {
-			throw new AggregatorOperationException("Updating UIM Aggregator object failed");
-		}
-		
-		if (isRecursive == true) {
-			@SuppressWarnings("unchecked")
-			HashSet<Provider> provset = (HashSet<Provider>) aggregator
-					.getRelatedIn();
-
-			Iterator<Provider> it = provset.iterator();
-
-			while (it.hasNext()) {
-				createProviderfromUIMObj(it.next(), true);
-			}
-
-		}
-
+	public void deleteAggregator(String countryCode)
+			throws AggregatorOperationException {
+		String aggrID = countryCode + defaultAggrgatorIDPostfix;
+		repoxRestClient.deleteAggregator(aggrID);
 	}
 
 	
 	
-	
-	
 	@Override
-	public void deleteAggregatorfromUIMObj(Provider aggregator)
+	public void updateAggregator(String countryCode,String aggrname,String aggrNameCode, String urlString)
 			throws AggregatorOperationException {
-
-		if (!aggregator.isAggregator()) {
-			throw new AggregatorOperationException(
-					"The requested object is not of Aggregator type");
-		}
-
-		String id = aggregator.getValue("repoxID");
-
-		if (id == null) {
-			throw new AggregatorOperationException(
-					"Missing repoxID element from Agregator object");
-		}
-
-		repoxRestClient.deleteAggregator(id);
-	}
-
-	
-	
-	
-	@Override
-	public void updateAggregatorfromUIMObj(Provider aggregator)
-			throws AggregatorOperationException {
-
-		if (!aggregator.isAggregator()) {
-			throw new AggregatorOperationException(
-					"The requested object is not of Aggregator type");
-		}
-
-		String id = aggregator.getValue("repoxID");
-
-		if (id == null) {
-			throw new AggregatorOperationException(
-					"Missing repoxID element from Agregator object");
-		}
-
-		Aggregator aggr = new Aggregator();
-
-		aggr.setId(aggregator.getValue("repoxID"));
 		
+		String aggrID = countryCode + defaultAggrgatorIDPostfix;		
+		Aggregator aggr = new Aggregator();
+		aggr.setId(aggrID);
 		Name name = new Name();
-		name.setName(aggregator.getName());
+		
+		name.setName(aggrname);
 		aggr.setName(name);
 		NameCode namecode = new NameCode();
-		namecode.setNameCode(aggregator.getMnemonic());
+		namecode.setNameCode(aggrNameCode);
 		aggr.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl(aggregator.getOaiBaseUrl());
+		
+		if(urlString == null){
+			url.setUrl(defaultAggrgatorURL);
+		}
+		else{
+			url.setUrl(urlString);
+		}
+		
 		aggr.setUrl(url);
 
 		repoxRestClient.updateAggregator(aggr);
@@ -280,12 +180,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public HashSet<Provider> retrieveAggregators()
+	public HashSet<Provider<?>> retrieveAggregators()
 			throws AggregatorOperationException {
 
 		StorageEngine<?> engine = registry.getStorageEngine();
 
-		HashSet<Provider> uimAggregators = new HashSet<Provider>();
+		HashSet<Provider<?>> uimAggregators = new HashSet<Provider<?>>();
 
 		Aggregators aggrs = repoxRestClient.retrieveAggregators();
 
@@ -297,12 +197,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			String id = agg.getNameCode().getNameCode();
 
 			try {
-				Provider prov = engine.findProvider(id);
+				Provider<?> prov = engine.findProvider(id);
 				uimAggregators.add(prov);
 			} catch (StorageEngineException e) {
 				// TODO Decide what to do here
 			}
-
 		}
 
 		return uimAggregators;
@@ -310,23 +209,17 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	
+	
 	@Override
-	public boolean providerExists(Provider provider)
+	public boolean providerExists(Provider<?> provider)
 			throws ProviderOperationException {
 		if (provider.isAggregator()) {
 			throw new ProviderOperationException(
 					"The requested object is not a Provider");
 		}
 
-		/*
-		String id = provider.getValue("repoxID");
-
-		if (id == null) {
-			return false;
-		}
-		*/
-
-		HashSet<Provider> prov = retrieveProviders();
+		HashSet<Provider<?>> prov = retrieveProviders();
 
 		return prov.contains(provider);
 
@@ -337,7 +230,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public void createProviderfromUIMObj(Provider uimProv, boolean isRecursive)
+	public void createProviderfromUIMObj(Provider uimProv)
 			throws ProviderOperationException {
 
 		if (uimProv.isAggregator()) {
@@ -378,7 +271,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			aggr.setId("euaggregatorr0");
 		}
 		else{
-			aggr.setId(country.getCountry() + "aggregatorr0");
+			aggr.setId(country.getCountry() + defaultAggrgatorIDPostfix);
 		}
 		
 
@@ -404,14 +297,14 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public void deleteProviderfromUIMObj(Provider prov)
+	public void deleteProviderfromUIMObj(Provider<?> prov)
 			throws ProviderOperationException {
 
 		String id = prov.getValue("repoxID");
 
 		if (id == null) {
 			throw new ProviderOperationException(
-					"Missing repoxID element from Agregator object");
+					"Missing repoxID element from Provider object");
 		}
 
 
@@ -422,7 +315,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public void updateProviderfromUIMObj(Provider uimProv)
+	public void updateProviderfromUIMObj(Provider<?> uimProv)
 			throws ProviderOperationException {
 
 		if (uimProv.isAggregator()) {
@@ -434,7 +327,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		if (id == null) {
 			throw new ProviderOperationException(
-					"Missing repoxID element from Agregator object");
+					"Missing repoxID element from Provider object");
 		}
 
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
@@ -469,11 +362,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public HashSet<Provider> retrieveProviders()
+	public HashSet<Provider<?>> retrieveProviders()
 			throws ProviderOperationException {
 		StorageEngine<?> engine = registry.getStorageEngine();
 
-		HashSet<Provider> uimProviders = new HashSet<Provider>();
+		HashSet<Provider<?>> uimProviders = new HashSet<Provider<?>>();
 
 		DataProviders provs = repoxRestClient.retrieveProviders();
 
@@ -486,7 +379,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 				String id = prov.getNameCode().getNameCode();
 
 				try {
-					Provider uimprov = engine.findProvider(id);
+					Provider<?> uimprov = engine.findProvider(id);
 					uimProviders.add(uimprov);
 				} catch (StorageEngineException e) {
 					// TODO Decide what to do here
@@ -501,7 +394,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public boolean datasourceExists(Collection col)
+	public boolean datasourceExists(Collection<?>col)
 			throws DataSourceOperationException {
 
 		/*
@@ -512,7 +405,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		}
 		*/
 
-		HashSet<Collection> colls = retrieveDataSources();
+		HashSet<Collection<?>> colls = retrieveDataSources();
 
 		return colls.contains(col);
 	}
@@ -553,6 +446,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		seq.setOaiSource(oaiSource);
 		ds.setSequence(seq);
 
+		RecordIdPolicy recordIdPolicy = new RecordIdPolicy();
+		recordIdPolicy.setType("IdGenerated");
+		
+		ds.setRecordIdPolicy(recordIdPolicy );
+		
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
 
 		jibxProv.setId(col.getProvider().getValue("repoxID"));
@@ -575,11 +473,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			throw new DataSourceOperationException(
 					"Missing repoxID element from Collection object");
 		}
-
-
 		repoxRestClient.deleteDatasource(id);
 	}
 
+	
+	
 	@Override
 	public void updateDatasourcefromUIMObj(Collection col)
 			throws DataSourceOperationException {
@@ -619,12 +517,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public HashSet<Collection> retrieveDataSources()
+	public HashSet<Collection<?>> retrieveDataSources()
 			throws DataSourceOperationException {
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 
-		HashSet<Collection> uimCollections = new HashSet<Collection>();
+		HashSet<Collection<?>> uimCollections = new HashSet<Collection<?>>();
 
 		DataSources datasources = repoxRestClient.retrieveDataSources();
 
@@ -637,7 +535,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 				String id = src.getNameCode().toString();
 
 				try {
-					Collection coll = engine.findCollection(id);
+					Collection<?> coll = engine.findCollection(id);
 					uimCollections.add(coll);
 				} catch (StorageEngineException e) {
 					// TODO Decide what to do here
@@ -658,7 +556,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	@Override
-	public void initiateHarvestingfromUIMObj(Collection col) throws HarvestingOperationException {
+	public void initiateHarvestingfromUIMObj(Collection<?> col) throws HarvestingOperationException {
 
 		String id = col.getValue("repoxID");
 
@@ -673,7 +571,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	@Override
-	public void initiateHarvestingfromUIMObj(Collection col, DateTime ingestionDate)
+	public void initiateHarvestingfromUIMObj(Collection<?> col, DateTime ingestionDate)
 			throws HarvestingOperationException {
 
 		String id = col.getValue("repoxID");
@@ -692,7 +590,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public void cancelHarvesting(Collection col)
+	public void cancelHarvesting(Collection<?> col)
 			throws HarvestingOperationException {
 		String id = col.getValue("repoxID");
 
@@ -707,7 +605,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public Success getHarvestingStatus(Collection col)
+	public Success getHarvestingStatus(Collection<?> col)
 			throws HarvestingOperationException {
 		String id = col.getValue("repoxID");
 
@@ -724,12 +622,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public HashSet<Collection> getActiveHarvestingSessions()
+	public HashSet<Collection<?>> getActiveHarvestingSessions()
 			throws HarvestingOperationException {
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 
-		HashSet<Collection> uimCollections = new HashSet<Collection>();
+		HashSet<Collection<?>> uimCollections = new HashSet<Collection<?>>();
 
 		RunningTasks rTasks = repoxRestClient.getActiveHarvestingSessions();
 
@@ -740,7 +638,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			String id = src.getDataSource();
 
 			try {
-				Collection coll = engine.findCollection(id);
+				Collection<?> coll = engine.findCollection(id);
 				uimCollections.add(coll);
 			} catch (StorageEngineException e) {
 				// TODO Decide what to do here
@@ -754,11 +652,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public HashSet<Collection> getScheduledHarvestingSessions()
+	public HashSet<Collection<?>> getScheduledHarvestingSessions()
 			throws HarvestingOperationException {
 		StorageEngine<?> engine = registry.getStorageEngine();
 
-		HashSet<Collection> uimCollections = new HashSet<Collection>();
+		HashSet<Collection<?>> uimCollections = new HashSet<Collection<?>>();
 
 		ScheduleTasks sTasks = repoxRestClient.getScheduledHarvestingSessions();
 
@@ -769,7 +667,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			String id = tsk.getId();
 
 			try {
-				Collection coll = engine.findCollection(id);
+				Collection<?> coll = engine.findCollection(id);
 				uimCollections.add(coll);
 			} catch (StorageEngineException e) {
 				// TODO Decide what to do here
@@ -783,7 +681,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	@Override
-	public String getHarvestLog(Collection col)
+	public String getHarvestLog(Collection<?> col)
 			throws HarvestingOperationException {
 
 		StringBuffer sb = new StringBuffer();
@@ -816,14 +714,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	public RepoxRestClient getRepoxRestClient() {
 		return repoxRestClient;
-	}
-
-	public void setOrchestrator(Orchestrator orchestrator) {
-		this.orchestrator = orchestrator;
-	}
-
-	public Orchestrator getOrchestrator() {
-		return orchestrator;
 	}
 
 	public void setRegistry(Registry registry) {

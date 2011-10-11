@@ -62,7 +62,7 @@ public class TestUtils {
 		namecode.setNameCode("77777");
 		aggr.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl("in.gr");
+		url.setUrl("http://www.in.gr");
 		aggr.setUrl(url);
 		
 		return aggr;
@@ -87,7 +87,7 @@ public class TestUtils {
 		Type type = new Type();
 		type.setType("ARCHIVE");
 		Url url = new Url();
-		url.setUrl("http://www.tvxs.gr");
+		url.setUrl("http://www.in.gr");
 		
 		
 		prov.setCountry(country );

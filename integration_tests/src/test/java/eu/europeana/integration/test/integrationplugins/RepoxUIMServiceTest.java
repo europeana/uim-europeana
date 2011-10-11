@@ -84,13 +84,13 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepoxUIMServiceTest.class);
 	
-	private final static String aggregatorName = "TestOSGIAggregator";
-	private final static String aggregatorNameCode = "1742";
-	private final static String aggregatorURI = "http://www.bbc.co.uk/";
+	private final static String aggregatorCountryName = "al";
+	private final static String aggregatorCountryNameCode = "1742";
+	private final static String aggregatorURI = "http://www.in.gr";
 	
 	private final static String providerName = "TestOSGIProvider";
 	private final static String providerNameCode = "76341";
-	private final static String providerURI = "http://www.bbc.co.uk/";
+	private final static String providerURI = "http://www.in.gr";
 	
 	private final static String collectionName = "TestOSGICollection";
 	private final static String collectionNameCode = "89543";
@@ -165,31 +165,12 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	 */
 	@Test
 	public void testCreateAggregator() throws Exception{
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-	
-		    Registry registry = getOsgiService(Registry.class);
-		    
-			StorageEngine<?> engine = registry.getStorageEngine();
-			
-			Provider aggregator = engine.createProvider();
-			
-			aggregator.setAggregator(true);
-			aggregator.setMnemonic(aggregatorNameCode);
-			aggregator.setName(aggregatorName);
-			aggregator.setOaiBaseUrl(aggregatorURI);
-			aggregator.putValue("sugarID", "123213123231");
-			aggregator.setOaiMetadataPrefix("ese");   
-
-        	engine.updateProvider(aggregator);
-        	engine.checkpoint();
-        	
-		    repoxservice.createAggregatorfromUIMObj(aggregator, false);
-
-		    boolean exists = repoxservice.aggregatorExists(aggregator);
-		    
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);        	
+		    repoxservice.createAggregator(aggregatorCountryName,null);
+		    boolean exists = repoxservice.aggregatorExists(aggregatorCountryName);
 		    assertTrue(exists);
-	
 	}
+	
 	
 	
 	/**
@@ -198,40 +179,27 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	@Test
 	public void testCreateProvider() throws Exception{
 
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-			
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);			
 		    Registry registry = getOsgiService(Registry.class);
-		    
 			StorageEngine<?> engine = registry.getStorageEngine();
-			
 			Provider provider = engine.createProvider();
-			
-			Provider aggregator = engine.createProvider();
-			aggregator.setName(aggregatorName);
-			aggregator.setMnemonic(aggregatorNameCode);
-			aggregator.putValue("repoxID", aggregatorName +"r0");
-			
-			assertNotNull(aggregator);	
-			
-			provider.getRelatedOut().add(aggregator);
 			
 			provider.setAggregator(false);
 			provider.setMnemonic(providerNameCode);
 			provider.setName(providerName);
 			provider.setOaiBaseUrl(providerURI);
 			provider.putValue("repoxDescription", "Blablah...");
-			provider.putValue("repoxCountry", "fr");
+			provider.putValue("repoxCountry", aggregatorCountryName);
 			provider.putValue("sugarID", "123213123231");
 			provider.putValue("repoxProvType", "ARCHIVE");
 			provider.setOaiMetadataPrefix("ese");   
 
-			
-			
         	engine.updateProvider(provider);
         	engine.checkpoint();
         	
-		    repoxservice.createProviderfromUIMObj(provider, false);
-			assertNotNull(repoxservice);
+		    repoxservice.createProviderfromUIMObj(provider);
+		    
+			assertTrue( repoxservice.providerExists(provider));
 	
 	}
     
@@ -254,7 +222,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 			
 		    Collection collection = engine.createCollection(provider);
 
-		    collection.setLanguage("FR");
+		    collection.setLanguage("fr");
 		    collection.setMnemonic(collectionNameCode);
 		    collection.setName(collectionName);
 		    collection.setOaiBaseUrl(collectionOAIPMHURI);
@@ -265,7 +233,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
         	
 			repoxservice.createDatasourcefromUIMObj(collection, provider);
 			
-			assertNotNull(repoxservice);
+			assertTrue(repoxservice.datasourceExists(collection));
 	
 	}
     
@@ -275,31 +243,9 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	 */
 	@Test
 	public void testUpdateAggregator() throws Exception{
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-	
-		    Registry registry = getOsgiService(Registry.class);
-		    
-			StorageEngine<?> engine = registry.getStorageEngine();
-			
-			Provider aggregator = engine.createProvider();
-			aggregator.setName(aggregatorName);
-			aggregator.setMnemonic(aggregatorNameCode);
-			aggregator.putValue("repoxID", aggregatorName +"r0");
-			aggregator.setOaiBaseUrl(aggregatorURI);
-			aggregator.putValue("sugarID", "123213123231");
-			aggregator.setOaiMetadataPrefix("ese");   
-			aggregator.setAggregator(true);
-			
-			aggregator.setName("updatedAggr");
-        	engine.updateProvider(aggregator);
-        	engine.checkpoint();
-        	
-        	
-		    repoxservice.updateAggregatorfromUIMObj(aggregator);
-		    
-		    
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class); 	
+		    repoxservice.updateAggregator(aggregatorCountryName,"ChangedName",aggregatorCountryNameCode,aggregatorURI);
 			assertNotNull(repoxservice);
-	
 	}
 	
 	
@@ -350,10 +296,10 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 		provider.setMnemonic(providerNameCode);
 		provider.putValue("repoxID", providerName + "r0");
 		
-	    Collection collection = engine.createCollection(provider);
+	    Collection<?> collection = engine.createCollection(provider);
 	    collection.setName(collectionName);
 	    collection.setMnemonic(collectionNameCode);
-	    collection.putValue("repoxID", collectionName);
+	    collection.putValue("repoxID", collectionName + "rr0");
 	    collection.setLanguage("it");
 	    collection.setOaiBaseUrl(collectionOAIPMHURI);
 	    collection.setOaiMetadataPrefix("ese");
@@ -383,10 +329,10 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 			provider.setMnemonic(providerNameCode);
 			provider.putValue("repoxID", providerName + "r0");
 			
-		    Collection coll = engine.createCollection(provider);
+		    Collection<?> coll = engine.createCollection(provider);
 		    coll.setName(collectionName);
 		    coll.setMnemonic(collectionNameCode);
-		    coll.putValue("repoxID", collectionName);
+		    coll.putValue("repoxID", collectionName + "r0");
 			
 
 		    repoxservice.initiateHarvestingfromUIMObj(coll);
@@ -413,7 +359,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	public void testRetrieveAggregatorsService() throws Exception{
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
-		    HashSet<Provider> aggr = (HashSet<Provider>) repoxservice.retrieveAggregators();
+		    HashSet<Provider<?>> aggr =  (HashSet<Provider<?>>) repoxservice.retrieveAggregators();
 
 		    assertNotNull(aggr);
 			assertFalse(aggr.isEmpty());
@@ -427,7 +373,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	public void testRetrieveProvidersService() throws Exception{
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
-		    HashSet<Provider> prov = (HashSet<Provider>) repoxservice.retrieveProviders();
+		    HashSet<Provider<?>> prov = (HashSet<Provider<?>>) repoxservice.retrieveProviders();
 
 		    assertNotNull(prov);
 			assertFalse(prov.isEmpty());
@@ -441,7 +387,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	public void testRetrieveDataSourcesService() throws Exception{
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
-		    HashSet<Collection> coll = (HashSet<Collection>) repoxservice.retrieveDataSources();
+		    HashSet<Collection<?>> coll = (HashSet<Collection<?>>) repoxservice.retrieveDataSources();
 
 		    assertNotNull(coll);
 			assertFalse(coll.isEmpty());
@@ -465,10 +411,10 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 		provider.setMnemonic(providerNameCode);
 		provider.putValue("repoxID", providerName + "r0");
 		
-	    Collection coll = engine.createCollection(provider);
+	    Collection<?> coll = engine.createCollection(provider);
 	    coll.setName(collectionName);
 	    coll.setMnemonic(collectionNameCode);
-	    coll.putValue("repoxID", collectionName);
+	    coll.putValue("repoxID", collectionName + "rr0");
 		
 		repoxservice.deleteDatasourcefromUIMObj(coll);
 		
@@ -509,20 +455,10 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	@Test
 	public void testDeleteAggregator() throws Exception{
 	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+				
+		repoxservice.deleteAggregator(aggregatorCountryName);
 		
-	    Registry registry = getOsgiService(Registry.class);
-	    
-		StorageEngine<?> engine = registry.getStorageEngine();
-		
-		Provider aggregator = engine.createProvider();
-		aggregator.setName(aggregatorName);
-		aggregator.setMnemonic(aggregatorNameCode);
-		aggregator.putValue("repoxID", aggregatorName +"r0");
-		aggregator.setAggregator(true);
-		
-		repoxservice.deleteAggregatorfromUIMObj(aggregator);
-		
-		boolean exists = repoxservice.aggregatorExists(aggregator);
+		boolean exists = repoxservice.aggregatorExists(aggregatorCountryName);
 		
 		assertFalse(exists);
 	
