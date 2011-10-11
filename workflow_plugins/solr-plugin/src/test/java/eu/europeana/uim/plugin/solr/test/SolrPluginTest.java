@@ -5,8 +5,9 @@ package eu.europeana.uim.plugin.solr.test;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.Test;
-
 import eu.europeana.uim.plugin.solr.client.SolrClient;
+
+
 
 /**
  * 
@@ -14,6 +15,7 @@ import eu.europeana.uim.plugin.solr.client.SolrClient;
  * 
  * @author Georgios Markakis
  */
+
 public class SolrPluginTest {
 
 	SolrClient client;
@@ -34,7 +36,7 @@ public class SolrPluginTest {
 		solrDocument.addField("identifier", "xxxxxxxxxx1");
 		//solrDocument.addField("europeana_edm_class", "class");
 		
-		client.importRecord(solrDocument);
+		//client.importRecord(solrDocument);
 		
 	}
 	
