@@ -23,11 +23,6 @@ package eu.europeana.uim.plugin.solr.service;
 
 import java.util.Collections;
 import java.util.List;
-
-
-import eu.europeana.uim.model.GlobalModelRegistry;
-import eu.europeana.uim.model.qualifier.AgentRelation;
-import eu.europeana.uim.model.qualifier.ConceptLevel;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.api.AbstractIngestionPlugin;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
