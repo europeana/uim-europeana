@@ -62,6 +62,7 @@ import eu.europeana.uim.store.Provider;
 
 
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
+import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
@@ -95,6 +96,8 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	private final static String collectionName = "TestOSGICollection";
 	private final static String collectionNameCode = "89543";
 	private final static String collectionOAIPMHURI = "http://bd1.inesc-id.pt:8080/repoxel/OAIHandler";
+	
+	private final static long time2w84service = 10000;
 	
     /**
      * This is the configuration section of the "virtual" Karaf container during the tests execution. It sets 
@@ -161,6 +164,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
     
     
 	/**
+	 * Create a (dummy) aggregator in Repox.
 	 * @throws Exception
 	 */
 	@Test
@@ -174,11 +178,12 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	
 	
 	/**
+	 * Create a Repox Provider from an UIM provider.
 	 * @throws Exception
 	 */
 	@Test
 	public void testCreateProvider() throws Exception{
-
+            Thread.sleep(time2w84service);
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);			
 		    Registry registry = getOsgiService(Registry.class);
 			StorageEngine<?> engine = registry.getStorageEngine();
@@ -205,6 +210,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
     
 	
 	/**
+	 * Create a Repox Datasource from a UIM collection.
 	 * @throws Exception
 	 */
 	@Test
@@ -227,6 +233,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 		    collection.setName(collectionName);
 		    collection.setOaiBaseUrl(collectionOAIPMHURI);
 		    collection.setOaiMetadataPrefix("ese");
+		    collection.putValue("collectionID", collectionName + "r0");
         	
 			engine.updateCollection(collection);
 			engine.checkpoint();
@@ -239,10 +246,12 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
     
 	
 	/**
+	 * Update an existing (pseudo)aggregator
 	 * @throws Exception
 	 */
 	@Test
 	public void testUpdateAggregator() throws Exception{
+            Thread.sleep(time2w84service);
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class); 	
 		    repoxservice.updateAggregator(aggregatorCountryName,"ChangedName",aggregatorCountryNameCode,aggregatorURI);
 			assertNotNull(repoxservice);
@@ -250,10 +259,12 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	
 	
 	/**
+	 * Update a Repox Provider from a UIM provider.
 	 * @throws Exception
 	 */
 	@Test
 	public void testUpdateProvider() throws Exception{
+            Thread.sleep(time2w84service);
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 
 		    Registry registry = getOsgiService(Registry.class);
@@ -281,10 +292,12 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	
 	
 	/**
+	 * Update a Repox Datasource from a UIM collection.
 	 * @throws Exception
 	 */
 	@Test
 	public void testUpdateDatasource() throws Exception{
+        Thread.sleep(time2w84service);
 	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 
 	    Registry registry = getOsgiService(Registry.class);
@@ -299,7 +312,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	    Collection<?> collection = engine.createCollection(provider);
 	    collection.setName(collectionName);
 	    collection.setMnemonic(collectionNameCode);
-	    collection.putValue("repoxID", collectionName + "rr0");
+	    collection.putValue("repoxID", collectionName + collectionNameCode + "r0");
 	    collection.setLanguage("it");
 	    collection.setOaiBaseUrl(collectionOAIPMHURI);
 	    collection.setOaiMetadataPrefix("ese");
@@ -314,10 +327,12 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	
 	
 	/**
+	 * Test various REPOX Operations
 	 * @throws Exception
 	 */
 	@Test
 	public void testHarvestingOperations() throws Exception{
+            Thread.sleep(time2w84service);
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
 		    Registry registry = getOsgiService(Registry.class);
@@ -332,31 +347,32 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 		    Collection<?> coll = engine.createCollection(provider);
 		    coll.setName(collectionName);
 		    coll.setMnemonic(collectionNameCode);
-		    coll.putValue("repoxID", collectionName + "r0");
+		    coll.putValue("repoxID", collectionName + collectionNameCode + "r0");
 			
-
 		    repoxservice.initiateHarvestingfromUIMObj(coll);
 		  
-		    repoxservice.getHarvestingStatus(coll);
-		    
+		    Success result =repoxservice.getHarvestingStatus(coll);
+			assertNotNull(result);
 		    repoxservice.getActiveHarvestingSessions();
 		    
+		    Thread.sleep(time2w84service);
+		    String log = repoxservice.getHarvestLog(coll);	
+			assertNotNull(log);
+			 
 		    repoxservice.cancelHarvesting(coll);
-		    
-			//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
-		    //String log = repoxservice.getHarvestLog(coll);
-		    
-		    
-			assertNotNull(repoxservice);
+	    
+
 	
 	}
 	
 	
 	/**
+	 * 
 	 * @throws Exception
 	 */
 	@Test
 	public void testRetrieveAggregatorsService() throws Exception{
+            Thread.sleep(time2w84service);
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
 		    HashSet<Provider<?>> aggr =  (HashSet<Provider<?>>) repoxservice.retrieveAggregators();
@@ -371,6 +387,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	 */
 	@Test
 	public void testRetrieveProvidersService() throws Exception{
+            Thread.sleep(time2w84service);
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
 		    HashSet<Provider<?>> prov = (HashSet<Provider<?>>) repoxservice.retrieveProviders();
@@ -385,6 +402,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	 */
 	@Test
 	public void testRetrieveDataSourcesService() throws Exception{
+		    Thread.sleep(time2w84service); 
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 	
 		    HashSet<Collection<?>> coll = (HashSet<Collection<?>>) repoxservice.retrieveDataSources();
@@ -400,6 +418,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	 */
 	@Test
 	public void testDeleteDatasource() throws Exception{
+		Thread.sleep(time2w84service);
 	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 		
 	    Registry registry = getOsgiService(Registry.class);
@@ -414,7 +433,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	    Collection<?> coll = engine.createCollection(provider);
 	    coll.setName(collectionName);
 	    coll.setMnemonic(collectionNameCode);
-	    coll.putValue("repoxID", collectionName + "rr0");
+	    coll.putValue("repoxID", collectionName + collectionNameCode + "r0");
 		
 		repoxservice.deleteDatasourcefromUIMObj(coll);
 		
@@ -430,6 +449,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	 */
 	@Test
 	public void testDeleteProvider() throws Exception{
+		    Thread.sleep(time2w84service);
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 			
 		    Registry registry = getOsgiService(Registry.class);
@@ -454,6 +474,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 	 */
 	@Test
 	public void testDeleteAggregator() throws Exception{
+		Thread.sleep(time2w84service);
 	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 				
 		repoxservice.deleteAggregator(aggregatorCountryName);
