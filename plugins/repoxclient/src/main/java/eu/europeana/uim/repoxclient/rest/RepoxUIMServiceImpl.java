@@ -412,12 +412,17 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createDatasourcefromUIMObj(eu.europeana.uim.store.Collection, eu.europeana.uim.store.Provider)
+	 */
 	@Override
 	public void createDatasourcefromUIMObj(Collection col, Provider prov)
 			throws DataSourceOperationException {
 		
+		
+		//Create Id from Collection name and mnemonic
 		Source ds = new Source();
-		ds.setId(col.getValue("collectionID"));
+		ds.setId(col.getName()+col.getMnemonic()+"r0");
 
 		Description des = new Description();
 		des.setDescription(col.getValue("description"));
