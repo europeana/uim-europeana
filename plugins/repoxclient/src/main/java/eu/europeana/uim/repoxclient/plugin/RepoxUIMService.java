@@ -156,7 +156,7 @@ public interface RepoxUIMService {
 	
 	
 	/**
-	 * Create a Repox DataSource 
+	 * Create a Repox DataSource from an UIM object. The uim object is also assigned a "repoxid" attribute
 	 * 
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
