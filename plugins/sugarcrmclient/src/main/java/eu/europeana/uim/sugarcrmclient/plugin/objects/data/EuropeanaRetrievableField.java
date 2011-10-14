@@ -42,13 +42,13 @@ public enum EuropeanaRetrievableField implements RetrievableField{
 	CAMPAIGN_NAME("campaign_name","campaign_name","Campaign Name"),
 	EXPECTED_INGESTION_DATE("date_closed","date_closed","Expected ingestion date"),
 	NOTES("notes_c","notes_c","Notes"),
-	HARVEST_URL("harvest_url_c","harvest_url_c","Harvest URL"),
+
 	PLANNED_TOTAL("planned_total_c","planned_total_c","Ingested Total"),
 	PLANNED_SOUND("planned_sound_c","planned_sound_c","Ingested Sound"),
 	PLANNED_VIDEO("planned_video_c","planned_video_c","Ingested Video"),
 	PLANNED_TEXT("planned_text_c","planned_text_c","Ingested Text"),
 	PLANNED_IMAGE("planned_image_c","planned_image_c","Ingested Images"),
-	SETSPEC("setspec_c","setspec_c","Setspec"),
+
 	COUNTRY("country_c","country_c","Country"),
 	ACRONYM("name_acronym_c","name_acronym_c","Acronym"),
 	IDENTIFIER("name_id_c","name_id_c","Identifier"),
@@ -56,6 +56,12 @@ public enum EuropeanaRetrievableField implements RetrievableField{
 	DATASET_COUNTRY("language_c","language_c","Dataset Country"),
 	ACCESS_TO_CONTENT_CHECKER("access_to_content_checker_c","access_to_content_checker_c","Access To Content Checker"),
 	DATE_OF_REPLICATION("actual_ingestion_date_c","actual_ingestion_date_c","Date of Replication"),
+	
+	HARVEST_URL("harvest_url_c","harvest_url_c","Harvest URL"),
+	SETSPEC("setspec_c","setspec_c","Setspec"),
+	METADATA_FORMAT("metadata_format_c","metadata_format_c","Metadata Format"),
+	METADATA_SCHEMA("metadata_schema_c","metadata_schema_c","Metadata Schema"),
+	METADATA_NAMESPACE("metadata_namespace_c","metadata_namespace_c","Metadata Namespace")
 	;
 	
 	private final String fieldId;
