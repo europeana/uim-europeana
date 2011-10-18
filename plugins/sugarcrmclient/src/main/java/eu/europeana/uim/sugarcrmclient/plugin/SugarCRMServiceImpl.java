@@ -91,7 +91,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
     private static final String                    DSMODULENAME = "Opportunities";
 
     /**
-     * Default Constructor
+     * Constructor
      */
     public SugarCRMServiceImpl() {
         this.pollingListeners = new LinkedHashMap<String, PollingListener>();
@@ -356,14 +356,18 @@ public class SugarCRMServiceImpl implements SugarCrmService {
             e.printStackTrace();
         }
 
-        String collectionName = record.getItemValue(EuropeanaRetrievableField.NAME); // "name"
-        String providerName = record.getItemValue(EuropeanaRetrievableField.ORGANIZATION_NAME); // "account_name"
-        String providerAcronymName = record.getItemValue(EuropeanaRetrievableField.ACRONYM); // "name_acronym_c"
-        String mnemonicCode = providerInfo.get("identifier"); // "id"
-        String countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); // "country_c"
-        String harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); // "harvest_url_c"
+        String collectionName = record.getItemValue(EuropeanaRetrievableField.NAME); 
+        String providerName = record.getItemValue(EuropeanaRetrievableField.ORGANIZATION_NAME); 
+        String providerAcronymName = record.getItemValue(EuropeanaRetrievableField.ACRONYM); 
+        String mnemonicCode = providerInfo.get("identifier"); 
+        String countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); 
+        String harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); 
+        String metadataformat = record.getItemValue(EuropeanaRetrievableField.METADATA_FORMAT); 
 
+        
+        
         Provider cuurprovider = engine.findProvider(mnemonicCode);
+        
 
         if (cuurprovider == null) {
             cuurprovider = engine.createProvider();
@@ -372,11 +376,10 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         cuurprovider.setMnemonic(mnemonicCode);
         cuurprovider.setName(providerName);
         cuurprovider.setOaiBaseUrl(harvestUrl);
-        // TODO: Meta data prefix is hardwired to ese. Fix this as soon as the field is available in
+        cuurprovider.setOaiMetadataPrefix(metadataformat);
 
-        cuurprovider.setOaiMetadataPrefix("ese");
-
-        cuurprovider.putValue("identifier", providerInfo.get("identifier"));
+        cuurprovider.putValue("providerIdentifier", providerInfo.get("identifier"));
+        
         String encodedDescription = null;
         try {
             encodedDescription = URLEncoder.encode(providerInfo.get("description"), "UTF8");
@@ -384,17 +387,14 @@ public class SugarCRMServiceImpl implements SugarCrmService {
             encodedDescription = "None";
             e.printStackTrace();
         }
-        cuurprovider.putValue("repoxDescription", encodedDescription);
-        cuurprovider.putValue("name", providerInfo.get("name"));
-        cuurprovider.putValue("website", providerInfo.get("website"));
+        cuurprovider.putValue("providerDescription", encodedDescription);
+        cuurprovider.putValue("providerName", providerInfo.get("name"));
+        cuurprovider.putValue("providerWebsite", providerInfo.get("website"));
         cuurprovider.putValue("sugarCRMID", providerInfo.get("sugarCRMID"));
         // FIXME:Handle Repox Datatypes
         // cuurprovider.putValue("type", providerInfo.get("type"));
-        cuurprovider.putValue("repoxProvType", "ARCHIVE");
-        cuurprovider.putValue("repoxCountry", providerInfo.get("country"));
-        
-        
-        // cuurprovider.getRelatedOut().add(dummyAggrgator);
+        cuurprovider.putValue("providerType", "ARCHIVE");
+        cuurprovider.putValue("providerCountry", providerInfo.get("country"));
         engine.updateProvider(cuurprovider);
         engine.checkpoint();
 
@@ -467,6 +467,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         String type = extractFromElement("account_type", el);
         String country = extractFromElement("country_c", el);
 
+        //Insert values in Provider Object
         returnInfo.put("sugarCRMID", providerID);
         returnInfo.put("identifier", identifier);
         returnInfo.put("description", description);
@@ -478,6 +479,13 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         return returnInfo;
     }
 
+    
+    
+    /**
+     * @param value
+     * @param el
+     * @return
+     */
     private String extractFromElement(String value, Element el) {
         NodeList nl = el.getElementsByTagName("item");
 
@@ -490,6 +498,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         return null;
     }
 
+    
     /*
      * (non-Javadoc)
      * 
@@ -503,14 +512,9 @@ public class SugarCRMServiceImpl implements SugarCrmService {
 
         StorageEngine<?> engine = registry.getStorageEngine();
 
-        String collectionName = null;
-        String collectionID = null;
+
         String mnemonicCode = null;
-        String countryCode = null;
-        String harvestUrl = null;
-        String set = null;
-        String sugarCRMID = null;
-        
+
         StringBuffer buffername = new StringBuffer();
 
         String[] fulname = record.getItemValue(EuropeanaRetrievableField.NAME).split("_");
@@ -526,13 +530,19 @@ public class SugarCRMServiceImpl implements SugarCrmService {
             }
         }
 
-        collectionName = buffername.toString();
-        collectionID = record.getItemValue(EuropeanaRetrievableField.NAME); // "name"
-        countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); // "country_c"
-        harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); // "harvest_url_c"
-        set = record.getItemValue(EuropeanaRetrievableField.SETSPEC);
-        sugarCRMID = record.getItemValue(EuropeanaRetrievableField.ID);
-
+        String collectionName = buffername.toString();
+        String collectionID = record.getItemValue(EuropeanaRetrievableField.NAME); // "name"
+        String countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); // "country_c"
+        String harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); // "harvest_url_c"
+        String set = record.getItemValue(EuropeanaRetrievableField.SETSPEC);
+        String sugarCRMID = record.getItemValue(EuropeanaRetrievableField.ID);
+        
+        String metadataformat = record.getItemValue(EuropeanaRetrievableField.METADATA_FORMAT); 
+        String metadatanamespace = record.getItemValue(EuropeanaRetrievableField.METADATA_NAMESPACE);      
+        String metadataschema = record.getItemValue(EuropeanaRetrievableField.METADATA_SCHEMA); 
+        
+        
+        
         Collection currcollection = engine.findCollection(mnemonicCode);
 
         if (currcollection == null) {
@@ -542,10 +552,13 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         currcollection.setMnemonic(mnemonicCode);
         currcollection.setName(collectionName);
         currcollection.setOaiBaseUrl(harvestUrl);
-        currcollection.setOaiMetadataPrefix("ese");
+        currcollection.setOaiMetadataPrefix(metadataformat);
         currcollection.setOaiSet(set);
         currcollection.putValue("collectionID", collectionID);
         currcollection.putValue("sugarCRMID", sugarCRMID);
+        currcollection.putValue("metadatanamespace", metadatanamespace);
+        currcollection.putValue("metadataschema", metadataschema);
+        
         
         engine.updateCollection(currcollection);
         engine.checkpoint();
