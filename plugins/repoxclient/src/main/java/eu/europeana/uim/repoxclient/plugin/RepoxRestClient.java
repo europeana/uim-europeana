@@ -38,6 +38,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
+import eu.europeana.uim.repoxclient.objects.IngestFrequency;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
@@ -333,7 +334,7 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public Success initiateHarvesting(String dsID) throws HarvestingOperationException;
+	public Success initiateHarvesting(String dsID,boolean isfull) throws HarvestingOperationException;
 	
 	/**
 	 * Starts a remote harvesting process at a specific Date (scheduling) 
@@ -345,7 +346,7 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public Success initiateHarvesting(String dsID,DateTime ingestionDate) throws HarvestingOperationException;
+	public Success scheduleHarvesting(String dsID,DateTime ingestionDate,IngestFrequency frequency, boolean isfull) throws HarvestingOperationException;
 	
 	
 	
@@ -378,7 +379,7 @@ public interface RepoxRestClient {
 	 * @return an object containing a reference to all DataSources
 	 * @throws HarvestingOperationException
 	 */
-	public ScheduleTasks getScheduledHarvestingSessions() throws HarvestingOperationException;
+	public ScheduleTasks getScheduledHarvestingSessions(String dsID) throws HarvestingOperationException;
 	
 	
 	
@@ -389,4 +390,14 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 */
 	public Log getHarvestLog(String dsID) throws HarvestingOperationException;
+	
+	
+	
+	/**
+	 * Initializes the export of records
+	 * 
+	 * @param dsID the DataSource reference
+	 * @param records no of records per file
+	 */
+	public Success initializeExport(String dsID,int records) throws HarvestingOperationException;
 }

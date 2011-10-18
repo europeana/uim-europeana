@@ -38,6 +38,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 
 
+import eu.europeana.uim.repoxclient.objects.IngestFrequency;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
@@ -1430,16 +1431,19 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Success initiateHarvesting(String dsID)
+	public Success initiateHarvesting(String dsID, boolean isfull)
 			throws HarvestingOperationException{
 
 		StringBuffer id = new StringBuffer();
+		StringBuffer fullIngest = new StringBuffer();
 		
 		id.append("id=");
 		id.append(dsID);
+		fullIngest.append("fullIngest=");
+		fullIngest.append(isfull);
 
 		Response resp = invokRestTemplate("/dataSources/startIngest",Response.class,
-				id.toString());
+				id.toString(),fullIngest.toString());
 		
 		if (resp.getSuccess() == null) {
 			if (resp.getError() != null) {
@@ -1447,7 +1451,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
-		} else {
+		} else {	
 
 			return resp.getSuccess();
 		}
@@ -1508,10 +1512,50 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Success initiateHarvesting(String dsID,DateTime ingestionDate) 
+	public Success scheduleHarvesting(String dsID,DateTime ingestionDate,IngestFrequency frequencyobj, boolean isfull) 
 	       throws HarvestingOperationException{
 
-		throw new UnsupportedOperationException("Not implemented yet...");
+		StringBuffer id = new StringBuffer();
+		StringBuffer firstRunDate = new StringBuffer();
+		StringBuffer firstRunHour = new StringBuffer();
+		StringBuffer frequency = new StringBuffer();
+		StringBuffer xmonths = new StringBuffer();
+		StringBuffer fullIngest = new StringBuffer();
+		
+		id.append("id=");
+		id.append(dsID);
+		
+		firstRunDate.append("firstRunDate=");
+		firstRunDate.append(ingestionDate.getDayOfMonth() +"-"+ ingestionDate.getMonthOfYear() +"-"+ ingestionDate.getYear());
+		
+		firstRunHour.append("firstRunHour=");
+		firstRunHour.append(ingestionDate.getHourOfDay() +":"+ ingestionDate.getMinuteOfHour());
+		
+		frequency.append("frequency=");
+		frequency.append(frequencyobj.toString());
+		
+		xmonths.append("xmonths=");
+		//xmonths.append(frequencyobj.toString());
+		
+		frequency.append("fullIngest=");
+		frequency.append(fullIngest.toString());
+		
+		
+		Response resp = invokRestTemplate("/dataSources/scheduleIngest",Response.class,
+				id.toString(),firstRunDate.toString(),firstRunHour.toString(),frequency.toString(),xmonths.toString(),fullIngest.toString());
+		
+		if (resp.getSuccess() == null) {
+			if (resp.getError() != null) {
+				throw new HarvestingOperationException(resp.getError());
+			} else {
+				throw new HarvestingOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSuccess();
+		}
+		
+		
 	}
 
 	
@@ -1590,13 +1634,28 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 */
 	@Override
-	public ScheduleTasks getScheduledHarvestingSessions()
+	public ScheduleTasks getScheduledHarvestingSessions(String dsID)
 			throws HarvestingOperationException {
 
+		StringBuffer id = new StringBuffer();
 		
+		id.append("id=");
+		id.append(dsID);
 
+		Response resp = invokRestTemplate("/dataSources/scheduleList",Response.class,
+				id.toString());
 
-		return null;
+		if (resp.getScheduleTasks() == null) {
+			if (resp.getError() != null) {
+				throw new HarvestingOperationException(resp.getError());
+			} else {
+				throw new HarvestingOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getScheduleTasks();
+		}
+
 	}
 
 
@@ -1635,6 +1694,54 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		}
 
 	}
+	
+	
+	/**
+	 * Initializes the export of records
+	 * 
+	 *  <code>
+     *    /rest/dataSources/startExport?id=bmfinancas&recordsPerFile=1000
+	 *  </code>
+	 *  
+	 * @param dsID the DataSource reference
+	 * @param records no of records per file
+	 */
+	@Override
+	public Success initializeExport(String dsID, int records)  throws HarvestingOperationException{
+		
+		
+		StringBuffer id = new StringBuffer();
+		StringBuffer recordsPerFile = new StringBuffer();
+		
+		id.append("id=");
+		id.append(dsID);
+		
+		recordsPerFile.append("recordsPerFile=");
+		
+		if(records == 0){
+		   recordsPerFile.append("ALL");
+		}
+		else{
+		   recordsPerFile.append(records);
+		}
+		
+
+		Response resp = invokRestTemplate("/dataSources/startExport",Response.class,
+				id.toString(),recordsPerFile.toString());
+		
+		if (resp.getSuccess() == null) {
+			if (resp.getError() != null) {
+				throw new HarvestingOperationException(resp.getError());
+			} else {
+				throw new HarvestingOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSuccess();
+		}
+		
+	}
+	
 	
 
 
@@ -1702,6 +1809,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public String getDefaultURI() {
 		return defaultURI;
 	}
+
+
+
 
 
 

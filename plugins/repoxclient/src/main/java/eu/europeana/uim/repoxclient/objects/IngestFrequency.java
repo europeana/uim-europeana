@@ -21,32 +21,9 @@
 package eu.europeana.uim.repoxclient.objects;
 
 /**
- * This Enumeration holds the default values for the type 
- * of an Ingestion
- * 
- * @author Georgios Markakis
+ * @author georgiosmarkakis
+ *
  */
-public enum HarvestingType {
-  INCREMENTAL("Incremental Harvesting"),
-  FULL("Full Harvesting"),
-  SAMPLE("Sample Harvesting");
-
-
-private final String description;
-
-/**
- * The Enum Constructor
- * @param description
- */
-HarvestingType(String description){
-	this.description = description;
-}
-
-
-//Getter
-public String getDescription() {
-	return description;
-}
-
+public enum IngestFrequency {
 
 }

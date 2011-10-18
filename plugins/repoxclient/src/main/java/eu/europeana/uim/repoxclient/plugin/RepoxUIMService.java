@@ -27,10 +27,10 @@ import org.joda.time.DateTime;
 
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.repoxclient.jibxbindings.Log;
+
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
-import eu.europeana.uim.repoxclient.objects.HarvestingType;
+import eu.europeana.uim.repoxclient.objects.ScheduleInfo;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
@@ -205,7 +205,7 @@ public interface RepoxUIMService {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public void initiateHarvestingfromUIMObj(Collection<?> col) throws HarvestingOperationException;
+	public void initiateHarvestingfromUIMObj(Collection<?> col,boolean isfull) throws HarvestingOperationException;
 	
 	
 	/**
@@ -218,7 +218,7 @@ public interface RepoxUIMService {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public void initiateHarvestingfromUIMObj(Collection<?> col,DateTime ingestionDate) throws HarvestingOperationException;
+	public void scheduleHarvestingfromUIMObj(Collection<?> col,ScheduleInfo info) throws HarvestingOperationException;
 	
 	
 	
@@ -254,7 +254,7 @@ public interface RepoxUIMService {
 	 * @return a List of UIM Collection object references
 	 * @throws HarvestingOperationException
 	 */
-	public Set<Collection<?>> getScheduledHarvestingSessions() throws HarvestingOperationException;
+	public Set<ScheduleInfo> getScheduledHarvestingSessions(Collection<?> coll) throws HarvestingOperationException;
 	
 	
 	
@@ -265,5 +265,17 @@ public interface RepoxUIMService {
 	 * @throws HarvestingOperationException
 	 */
 	public String getHarvestLog(Collection<?> col) throws HarvestingOperationException;
+	
+	
+	
+	/**
+	 * Initialize the export of Repox files
+	 * 
+	 * @param col the UIM collection
+	 * @param numberOfRecords the number of records per file
+	 * @throws HarvestingOperationException
+	 */
+	public void initializeExport(Collection<?> col, int numberOfRecords) throws HarvestingOperationException;
+	
 
 }

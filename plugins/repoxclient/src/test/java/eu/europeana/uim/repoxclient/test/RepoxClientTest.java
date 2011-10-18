@@ -234,7 +234,7 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	assertEquals("altered!@#$%",updOaids.getDescription().getDescription());
 	
 	//Initialize a harvesting session
-	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids.getId());
+	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids.getId(),true);
 	assertNotNull(harvestRes);
 	TestUtils.logMarshalledObject(harvestRes,LOGGER);
 

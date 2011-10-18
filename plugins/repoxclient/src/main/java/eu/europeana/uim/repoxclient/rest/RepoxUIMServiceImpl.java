@@ -55,7 +55,8 @@ import eu.europeana.uim.repoxclient.jibxbindings.Task;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
-import eu.europeana.uim.repoxclient.objects.HarvestingType;
+import eu.europeana.uim.repoxclient.objects.IngestFrequency;
+import eu.europeana.uim.repoxclient.objects.ScheduleInfo;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
@@ -483,6 +484,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
+	 */
 	@Override
 	public void updateDatasourcefromUIMObj(Collection col)
 			throws DataSourceOperationException {
@@ -521,6 +525,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveDataSources()
+	 */
 	@Override
 	public HashSet<Collection<?>> retrieveDataSources()
 			throws DataSourceOperationException {
@@ -552,6 +559,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		return uimCollections;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveRecord(java.lang.String)
+	 */
 	@Override
 	public RecordResult retrieveRecord(String recordString)
 			throws RecordOperationException {
@@ -560,8 +570,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#initiateHarvestingfromUIMObj(eu.europeana.uim.store.Collection, boolean)
+	 */
 	@Override
-	public void initiateHarvestingfromUIMObj(Collection<?> col) throws HarvestingOperationException {
+	public void initiateHarvestingfromUIMObj(Collection<?> col,boolean isfull) throws HarvestingOperationException {
 
 		String id = col.getValue("repoxID");
 
@@ -571,12 +584,15 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		}
 
 
-		repoxRestClient.initiateHarvesting(id);
+		repoxRestClient.initiateHarvesting(id,isfull);
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#scheduleHarvestingfromUIMObj(eu.europeana.uim.store.Collection, eu.europeana.uim.repoxclient.objects.ScheduleInfo)
+	 */
 	@Override
-	public void initiateHarvestingfromUIMObj(Collection<?> col, DateTime ingestionDate)
+	public void scheduleHarvestingfromUIMObj(Collection<?> col, ScheduleInfo info)
 			throws HarvestingOperationException {
 
 		String id = col.getValue("repoxID");
@@ -588,12 +604,15 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		Source ds = new Source();
 		ds.setId(id);
-		repoxRestClient.initiateHarvesting(id);
+		repoxRestClient.scheduleHarvesting(id, info.getDatetime(), info.getFrequency(), info.isFullingest());
 
 	}
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#cancelHarvesting(eu.europeana.uim.store.Collection)
+	 */
 	@Override
 	public void cancelHarvesting(Collection<?> col)
 			throws HarvestingOperationException {
@@ -609,6 +628,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getHarvestingStatus(eu.europeana.uim.store.Collection)
+	 */
 	@Override
 	public Success getHarvestingStatus(Collection<?> col)
 			throws HarvestingOperationException {
@@ -626,6 +648,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getActiveHarvestingSessions()
+	 */
 	@Override
 	public HashSet<Collection<?>> getActiveHarvestingSessions()
 			throws HarvestingOperationException {
@@ -656,35 +681,67 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getScheduledHarvestingSessions()
+	 */
 	@Override
-	public HashSet<Collection<?>> getScheduledHarvestingSessions()
+	public HashSet<ScheduleInfo> getScheduledHarvestingSessions(Collection<?> col)
 			throws HarvestingOperationException {
-		StorageEngine<?> engine = registry.getStorageEngine();
 
-		HashSet<Collection<?>> uimCollections = new HashSet<Collection<?>>();
+		String id = col.getValue("repoxID");
+		
+		if (id == null) {
+			throw new HarvestingOperationException(
+					"Missing repoxID element from Collection object");
+		}
+		
+		HashSet<ScheduleInfo> schinfos = new HashSet<ScheduleInfo>();
 
-		ScheduleTasks sTasks = repoxRestClient.getScheduledHarvestingSessions();
+
+		ScheduleTasks sTasks = repoxRestClient.getScheduledHarvestingSessions(id);
 
 		ArrayList<Task> taskList = (ArrayList<Task>) sTasks.getTaskList();
 
 		for (Task tsk : taskList) {
 
-			String id = tsk.getId();
-
-			try {
-				Collection<?> coll = engine.findCollection(id);
-				uimCollections.add(coll);
-			} catch (StorageEngineException e) {
-				// TODO Decide what to do here
-			}
+			ScheduleInfo schinfo =  new ScheduleInfo();
+			
+			String ingTypeStr = tsk.getFrequency().getType();
+			
+			IngestFrequency ingTypeEnum  = IngestFrequency.valueOf(ingTypeStr);
+			
+			boolean isfull = tsk.getFullIngest().isFullIngest();
+			
+			String time = tsk.getTime().getTime();
+			String[] datetimeArray = time.split(" ");
+			String[] dateArray = datetimeArray[0].split("-");
+			String[] timeArray = datetimeArray[1].split(":");
+			
+			
+			int year = new Integer(dateArray[0]);
+			int monthOfYear = new Integer(dateArray[1]);
+			int dayOfMonth = new Integer(dateArray[2]);
+			int hourOfDay = new Integer(timeArray[0]);
+			int minuteOfHour = new Integer(timeArray[1]);
+			
+			DateTime dt = new DateTime( year,  monthOfYear,  dayOfMonth,  hourOfDay,  minuteOfHour, 0, 0);
+			
+			schinfo.setDatetime(dt);
+			schinfo.setFullingest(isfull);
+			schinfo.setFrequency(ingTypeEnum);
+			
+			schinfos.add(schinfo);
 
 		}
 		
-		return uimCollections;
+		return schinfos;
 	}
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getHarvestLog(eu.europeana.uim.store.Collection)
+	 */
 	@Override
 	public String getHarvestLog(Collection<?> col)
 			throws HarvestingOperationException {
@@ -709,6 +766,28 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	}
 
 	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#initializeExport(eu.europeana.uim.store.Collection, int)
+	 */
+	@Override
+	public void initializeExport(Collection<?> col, int numberOfRecords)
+			throws HarvestingOperationException {
+
+		StringBuffer sb = new StringBuffer();
+		
+		String id = col.getValue("repoxID");
+
+		if (id == null) {
+			throw new HarvestingOperationException(
+					"Missing repoxID element from Collection object");
+		}
+		
+		repoxRestClient.initializeExport(id, numberOfRecords);
+		
+	}
+	
+	
 	/*
 	 * Getters & Setters
 	 */
@@ -728,6 +807,14 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public Registry getRegistry() {
 		return registry;
 	}
+
+
+
+
+
+
+
+
 
 
 
