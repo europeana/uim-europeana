@@ -249,19 +249,19 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		namecode.setNameCode(uimProv.getMnemonic());
 		jibxProv.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl(uimProv.getOaiBaseUrl());
+		url.setUrl(uimProv.getValue("providerWebsite"));
 		jibxProv.setUrl(url);
-
+		
 		Description description = new Description();
-		description.setDescription(uimProv.getValue("repoxDescription"));
+		description.setDescription(uimProv.getValue("providerDescription"));
 		jibxProv.setDescription(description);
 		
 		Country country =  new Country();
-		country.setCountry(uimProv.getValue("repoxCountry").toLowerCase());
+		country.setCountry(uimProv.getValue("providerCountry").toLowerCase());
 		jibxProv.setCountry(country);
 		
 		Type type = new Type();
-		type.setType(uimProv.getValue("repoxProvType"));
+		type.setType(uimProv.getValue("providerType"));
 		
 		jibxProv.setType(type);
 		
@@ -341,19 +341,19 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		namecode.setNameCode(uimProv.getMnemonic());
 		jibxProv.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl(uimProv.getOaiBaseUrl());
+		url.setUrl(uimProv.getValue("providerWebsite"));
 		jibxProv.setUrl(url);
 
 		Description description = new Description();
-		description.setDescription(uimProv.getValue("repoxDescription"));
+		description.setDescription(uimProv.getValue("providerDescription"));
 		jibxProv.setDescription(description);
 		
 		Country country =  new Country();
-		country.setCountry(uimProv.getValue("repoxCountry").toLowerCase());
+		country.setCountry(uimProv.getValue("providerCountry").toLowerCase());
 		jibxProv.setCountry(country);
 		
 		Type type = new Type();
-		type.setType(uimProv.getValue("repoxProvType"));
+		type.setType(uimProv.getValue("providerType"));
 		
 		jibxProv.setType(type);
 
@@ -430,18 +430,10 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		ds.setDescription(des);
 		ds.setNameCode(col.getMnemonic());
 		ds.setName(col.getName());
-		//TODO: link this to a sugarCRM field
-		//ds.setExportPath(col.getValue("exportpath"));
 		ds.setExportPath("");
-		//TODO: link this to a sugarCRM field
-		//ds.setSchema(col.getValue("schema"));
-		ds.setSchema("http://www.europeana.eu/schemas/ese/");
-		//TODO: link this to a sugarCRM field
-		//ds.setNamespace(col.getValue("namespace"));
-		ds.setNamespace("http://www.europeana.eu/schemas/ese/");
-		//TODO: link this to a sugarCRM field
-		//ds.setMetadataFormat(col.getValue("metadataformat"));
-		ds.setMetadataFormat("ese");
+		ds.setSchema(col.getValue("metadataschema"));
+		ds.setNamespace(col.getValue("metadatanamespace"));
+		ds.setMetadataFormat(col.getOaiMetadataPrefix(false));
 
 		Sequence seq = new Sequence();
 		OaiSet oaiSet = new OaiSet();
@@ -456,13 +448,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		recordIdPolicy.setType("IdGenerated");
 		
 		ds.setRecordIdPolicy(recordIdPolicy );
-		
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
-
 		jibxProv.setId(col.getProvider().getValue("repoxID"));
-
 		Source retsource = repoxRestClient.createDatasourceOAI(ds, jibxProv);
-
 		col.putValue("repoxID", retsource.getId());
 
 	}
