@@ -349,7 +349,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 		    coll.setMnemonic(collectionNameCode);
 		    coll.putValue("repoxID", collectionName + collectionNameCode + "r0");
 			
-		    repoxservice.initiateHarvestingfromUIMObj(coll);
+		    repoxservice.initiateHarvestingfromUIMObj(coll,true);
 		  
 		    Success result =repoxservice.getHarvestingStatus(coll);
 			assertNotNull(result);
