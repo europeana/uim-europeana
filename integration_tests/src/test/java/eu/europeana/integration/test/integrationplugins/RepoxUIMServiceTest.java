@@ -193,10 +193,12 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 			provider.setMnemonic(providerNameCode);
 			provider.setName(providerName);
 			provider.setOaiBaseUrl(providerURI);
-			provider.putValue("repoxDescription", "Blablah...");
-			provider.putValue("repoxCountry", aggregatorCountryName);
+			provider.putValue("providerDescription", "Blablah...");
+			provider.putValue("providerCountry", aggregatorCountryName);
+			provider.putValue("providerWebsite", providerURI);
+			
 			provider.putValue("sugarID", "123213123231");
-			provider.putValue("repoxProvType", "ARCHIVE");
+			provider.putValue("providerType", "ARCHIVE");
 			provider.setOaiMetadataPrefix("ese");   
 
         	engine.updateProvider(provider);
@@ -271,15 +273,18 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 		    
 			StorageEngine<?> engine = registry.getStorageEngine();
 			
-			Provider provider = engine.createProvider();
-			provider.setName(providerName);
+			Provider provider = engine.createProvider();			
+			provider.setAggregator(false);
 			provider.setMnemonic(providerNameCode);
-			provider.putValue("repoxID", providerName + "r0");
+			provider.setName(providerName);
 			provider.setOaiBaseUrl(providerURI);
-			provider.putValue("repoxDescription", "Blablah...");
-			provider.putValue("repoxCountry", "it");
-			provider.putValue("repoxProvType", "ARCHIVE");
-			provider.setOaiMetadataPrefix("ese");   
+			provider.putValue("providerDescription", "Blablah...");
+			provider.putValue("providerCountry", aggregatorCountryName);
+			provider.putValue("providerWebsite", providerURI);
+			
+			provider.putValue("repoxID", providerName + "r0");
+			provider.putValue("sugarID", "123213123231");
+			provider.putValue("providerType", "ARCHIVE");
 			
 			provider.setName("updatedProv");
         	engine.updateProvider(provider);
@@ -287,7 +292,6 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
         	
 		    repoxservice.updateProviderfromUIMObj(provider);
 
-	
 	}
 	
 	
