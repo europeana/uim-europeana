@@ -14,6 +14,11 @@ INDEX
 Follow steps 1-2 as described in the /europeana-uim/README.txt in order to install 
 karaf and compile and install the core UIM modules.
 
+1.1 Compile extra UIM modules (these will NOT be compiled after issuing mvn install
+in the uim parent folder):
+/europeana-uim/plugins/solr3
+/extra/SourceCode/uim/trunk/uim/gui/common
+/extra/SourceCode/uim/trunk/uim/gui/controlpanel
 
 1.2.  Install the Europeana specific Sugarcrm server:
 ----------------------------------------------------
@@ -42,28 +47,19 @@ SugarCRM running on your machine.
 1.3. Compile the sugarcrm modules
 -----------------------------------
 1.3.1. Checkout everything in: 
-svn co https://europeanalabs.eu/svn/europeana/trunk/uim/plugins/ 
+svn co https://europeanalabs.eu/svn/europeana/trunk/uim/
 
-1.3.2. Change to directory 
-cd sugarclientbindings
-mvn  install
-to install the JIBX bindings
+mvn clean install -DskipTests=true
 
-1.3.3.  Change to directory 
-cd sugarcrmclient
-mvn install
-
-(If the unit tests fail, this means that the SugarCRM server running in the background is
-either down or improperly configured).
 
 1.4. Configure Karaf and install dependencies
 --------------------------------------------
-1.4.1. Before starting Karaf: 
-Edit <karaf_installation_folder>\etc\jre.properties and comment out the following elements
-
- #javax.xml.stream, \
- #javax.xml.stream.events, \
- #javax.xml.stream.util, \
+	1.4.1. Before starting Karaf: 
+	Edit <karaf_installation_folder>\etc\jre.properties and comment out the following elements
+	
+	 #javax.xml.stream, \
+	 #javax.xml.stream.events, \
+	 #javax.xml.stream.util, \
 
 1.4.2 Start Karaf (<karaf_installation_folder>\etc\ sh karaf)
 
@@ -71,18 +67,10 @@ Edit <karaf_installation_folder>\etc\jre.properties and comment out the followin
 'features:addurl file://<uim-project-path>/etc/uim-features.xml'
 'features:addurl file://<uim-project-path>/etc/spring-features.xml'
 
-1.4.4 Install the following features:
-features:install spring-ws
-features:install spring-dm
-features:install spring-quartz
+1.4.4 Issue the following command:
+features:install uim-europeana-complete
 
-features:install uim-core
-features:install war
-features:install webconsole
-features:install uim-core-gui
 
-1.4.5 Manually install the sugarcrm plugin within UIM:
-osgi:install -s mvn:eu.europeana/europeana-uim-plugin-sugarcrmclient/1.2.0-SNAPSHOT
 
 
 2. Usage Instructions.
