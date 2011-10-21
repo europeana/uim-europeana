@@ -423,8 +423,13 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		//Create Id from Collection name and mnemonic
 		Source ds = new Source();
-		ds.setId(col.getName()+col.getMnemonic()+"r0");
+		
+		String id = (col.getName()+col.getMnemonic()).replace(" ","_");
+		
+		//ds.setId(col.getName()+col.getMnemonic()+"r0");
 
+		ds.setId(id);
+		
 		Description des = new Description();
 		des.setDescription(col.getValue("description"));
 		ds.setDescription(des);

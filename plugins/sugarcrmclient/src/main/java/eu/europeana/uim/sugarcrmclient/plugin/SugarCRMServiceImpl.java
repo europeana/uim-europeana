@@ -394,7 +394,8 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         // FIXME:Handle Repox Datatypes
         // cuurprovider.putValue("type", providerInfo.get("type"));
         cuurprovider.putValue("providerType", "ARCHIVE");
-        cuurprovider.putValue("providerCountry", providerInfo.get("country"));
+        //cuurprovider.putValue("providerCountry", providerInfo.get("country"));
+        cuurprovider.putValue("providerCountry", countryCode);
         engine.updateProvider(cuurprovider);
         engine.checkpoint();
 
