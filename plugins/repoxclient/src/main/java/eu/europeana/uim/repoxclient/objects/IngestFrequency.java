@@ -25,5 +25,8 @@ package eu.europeana.uim.repoxclient.objects;
  *
  */
 public enum IngestFrequency {
-
+	ONCE,
+	DAILY,
+	WEEKLY,
+	XMONTHLY
 }
