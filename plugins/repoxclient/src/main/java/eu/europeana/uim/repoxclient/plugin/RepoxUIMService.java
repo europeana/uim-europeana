@@ -20,16 +20,13 @@
  */
 package eu.europeana.uim.repoxclient.plugin;
 
-import java.util.List;
+
 import java.util.Set;
-
-import org.joda.time.DateTime;
-
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.Collection;
-
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
+import eu.europeana.uim.repoxclient.objects.RepoxConnectionStatus;
 import eu.europeana.uim.repoxclient.objects.ScheduleInfo;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
@@ -46,6 +43,16 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
  * @author Georgios Markakis
  */
 public interface RepoxUIMService {
+	
+	
+    /**
+     * This method shows the current connection status of the plugin instance.
+     * 
+     * @return a ConnectionStatus object
+     */
+    public RepoxConnectionStatus showConnectionStatus();
+	
+	
 	
 	/**
 	 * Checks if an aggregator instance in UIM also exists in Repox 

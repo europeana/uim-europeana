@@ -54,6 +54,15 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 public interface RepoxRestClient {
 
 	
+	
+	/**
+	 * Gets the default URI for the client.
+	 * 
+	 * @return the http address where REPOX resides
+	 */
+	public String getDefaultURI();
+	
+	
 	/**
 	 * Creates an Aggregator in Repox
 	 * 

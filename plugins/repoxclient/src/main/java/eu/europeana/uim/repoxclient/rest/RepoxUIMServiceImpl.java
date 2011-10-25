@@ -56,6 +56,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
 import eu.europeana.uim.repoxclient.objects.IngestFrequency;
+import eu.europeana.uim.repoxclient.objects.RepoxConnectionStatus;
 import eu.europeana.uim.repoxclient.objects.ScheduleInfo;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
@@ -81,8 +82,28 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	private Registry registry;
 
 
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#showConnectionStatus()
+	 */
+	@Override
+	public RepoxConnectionStatus showConnectionStatus() {
+		
+		String defaultURL = repoxRestClient.getDefaultURI();
+		
+		RepoxConnectionStatus status = new RepoxConnectionStatus();
+		
+		status.setDefaultURI(defaultURL);
+		
+		return status;
+	}
+
 	
 	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#aggregatorExists(java.lang.String)
+	 */
 	@Override
 	public boolean aggregatorExists(String countrycode)
 			throws AggregatorOperationException {
@@ -107,6 +128,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createAggregator(java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void createAggregator(String countryCode,String urlString)
 			throws AggregatorOperationException {
@@ -141,6 +165,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 		
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteAggregator(java.lang.String)
+	 */
 	@Override
 	public void deleteAggregator(String countryCode)
 			throws AggregatorOperationException {
@@ -150,6 +177,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateAggregator(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void updateAggregator(String countryCode,String aggrname,String aggrNameCode, String urlString)
 			throws AggregatorOperationException {
@@ -180,6 +210,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveAggregators()
+	 */
 	@Override
 	public HashSet<Provider<?>> retrieveAggregators()
 			throws AggregatorOperationException {
@@ -212,6 +245,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#providerExists(eu.europeana.uim.store.Provider)
+	 */
 	@Override
 	public boolean providerExists(Provider<?> provider)
 			throws ProviderOperationException {
@@ -230,6 +266,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createProviderfromUIMObj(eu.europeana.uim.store.Provider)
+	 */
 	@Override
 	public void createProviderfromUIMObj(Provider uimProv)
 			throws ProviderOperationException {
@@ -297,6 +336,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteProviderfromUIMObj(eu.europeana.uim.store.Provider)
+	 */
 	@Override
 	public void deleteProviderfromUIMObj(Provider<?> prov)
 			throws ProviderOperationException {
@@ -315,6 +357,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateProviderfromUIMObj(eu.europeana.uim.store.Provider)
+	 */
 	@Override
 	public void updateProviderfromUIMObj(Provider<?> uimProv)
 			throws ProviderOperationException {
@@ -362,6 +407,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveProviders()
+	 */
 	@Override
 	public HashSet<Provider<?>> retrieveProviders()
 			throws ProviderOperationException {
@@ -394,17 +444,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#datasourceExists(eu.europeana.uim.store.Collection)
+	 */
 	@Override
 	public boolean datasourceExists(Collection<?>col)
 			throws DataSourceOperationException {
-
-		/*
-		String id = col.getValue("repoxID");
-
-		if (id == null) {
-			return false;
-		}
-		*/
 
 		HashSet<Collection<?>> colls = retrieveDataSources();
 
@@ -462,6 +507,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
+	 */
 	@Override
 	public void deleteDatasourcefromUIMObj(Collection col)
 			throws DataSourceOperationException {
@@ -552,6 +600,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		return uimCollections;
 	}
 
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveRecord(java.lang.String)
 	 */
@@ -562,6 +613,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
+	
+	
+	
 	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#initiateHarvestingfromUIMObj(eu.europeana.uim.store.Collection, boolean)
@@ -575,11 +629,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			throw new HarvestingOperationException(
 					"Missing repoxID element from Collection object");
 		}
-
-
 		repoxRestClient.initiateHarvesting(id,isfull);
 	}
 
+	
+	
 	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#scheduleHarvestingfromUIMObj(eu.europeana.uim.store.Collection, eu.europeana.uim.repoxclient.objects.ScheduleInfo)
@@ -777,8 +831,10 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		}
 		
 		repoxRestClient.initializeExport(id, numberOfRecords);
-		
 	}
+	
+	
+	
 	
 	
 	/*
@@ -800,6 +856,10 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public Registry getRegistry() {
 		return registry;
 	}
+
+
+
+
 
 
 
