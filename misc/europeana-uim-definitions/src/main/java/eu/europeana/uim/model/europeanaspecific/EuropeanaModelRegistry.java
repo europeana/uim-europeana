@@ -21,10 +21,15 @@
 package eu.europeana.uim.model.europeanaspecific;
 
 import eu.europeana.uim.common.TKey;
+import eu.europeana.uim.edmcore.definitions.RDF;
+import eu.europeana.uim.edmcore.definitions.ProvidedCHOType;
+import eu.europeana.uim.edmcore.definitions.AgentType;
+import eu.europeana.uim.edmcore.definitions.PlaceType;
+import eu.europeana.uim.edmcore.definitions.TimeSpanType;
 
 
 /**
- * 
+ * TKeys Definitions for the Europeana Data Model
  * 
  * @author Georgios Markakis
  */
@@ -36,5 +41,45 @@ public final class EuropeanaModelRegistry {
     		                                                                 EuropeanaModelRegistry.class,
                                                                              "concept",
                                                                              String.class);
+    /** The key for a full EDM Record representation
+     */
+    public static final TKey<EuropeanaModelRegistry, RDF>  EDMRECORD  = TKey.register(
+    		                                                                 EuropeanaModelRegistry.class,
+                                                                             "edmrecord",
+                                                                             RDF.class);
+    
+    /** The key for the EDM Cultural Heritage Object Type
+     */
+    public static final TKey<EuropeanaModelRegistry, ProvidedCHOType>  PROVIDEDCHO  = TKey.register(
+    		                                                                 EuropeanaModelRegistry.class,
+                                                                             "providedcho",
+                                                                             ProvidedCHOType.class);
+    
+    
+    /** The key for the EDM Agent Type
+     */
+    public static final TKey<EuropeanaModelRegistry, AgentType>  AGENT  = TKey.register(
+    		                                                                 EuropeanaModelRegistry.class,
+                                                                             "agent",
+                                                                             AgentType.class);
+    
+    
+    /** The key for the EDM Place Type
+     */
+    public static final TKey<EuropeanaModelRegistry, PlaceType>  PLACE  = TKey.register(
+    		                                                                 EuropeanaModelRegistry.class,
+                                                                             "place",
+                                                                             PlaceType.class);
+    
+    
+    
+    /** The key for the EDM TimeSpan Type
+     */
+    public static final TKey<EuropeanaModelRegistry, TimeSpanType>  TIMESPAN  = TKey.register(
+    		                                                                 EuropeanaModelRegistry.class,
+                                                                             "timespan",
+                                                                             TimeSpanType.class);
+    
+    
 	
 }
