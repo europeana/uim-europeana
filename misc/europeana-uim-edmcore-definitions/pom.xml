@@ -10,7 +10,7 @@
 
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
     <jibx.version>1.2.3</jibx.version>
   </properties>
 
@@ -21,6 +21,19 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    
+            <!-- JIBX dependencies -->
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-run</artifactId>
+			<version>${jibx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-extras</artifactId>
+			<version>${jibx.version}</version>
+		</dependency>
+    
   </dependencies>
   
   	<build>
@@ -36,41 +49,40 @@
 				<artifactId>maven-jibx-plugin</artifactId>
 				<version>${jibx.version}</version>
 				<executions>
-	
 					<execution>
 						<id>generate-java-code-from-schema (EDM)</id>
 						<goals>
 							<goal>schema-codegen</goal>
 						</goals>
 						<configuration>
-							<directory>src/main/resources/sugarcrm</directory>
-							<targetDirectory>target/generated-sources/sugarcrm</targetDirectory>
+							<directory>src/main/resources/edm/</directory>
+							<targetDirectory>target/generated-sources/edm</targetDirectory>
 							<includes>
-								<include>*.xsd</include>
+								<include>EDM.xsd</include>
 							</includes>
 							<options>
 								<package>eu.europeana.uim.edmcore.definitions</package>
 							</options>
 						</configuration>
 					</execution>
-					
 				
+ 
 					<execution>
 						<id>compile-binding (EDM)</id>
 						<goals>
 							<goal>bind</goal>
 						</goals>
 						<configuration>
-							<directory>target/generated-sources/EDM</directory>
+							<directory>target/generated-sources/edm</directory>
 							<load>true</load>
 							<validate>true</validate>
 							<verify>false</verify>
 						</configuration>
 					</execution>
-					
-					
+					<!-- -->
 				</executions>
 			</plugin>
+			
 			<plugin>
 				<inherited>true</inherited>
 				<groupId>org.apache.maven.plugins</groupId>
