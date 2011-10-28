@@ -1,0 +1,165 @@
+<!doctype html>
+<html
+lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Europeana - Europeana Data Model</title>
+<link rel="shortcut icon" href="/portal/favicon.ico"/>
+<link rel="search" type="application/opensearchdescription+xml" href="http://api.europeana.eu/api/opensearch.xml" title="Europeana Search"/>
+<link rel="stylesheet" href="/portal/branding/portal2/css/min/core.min.css"/>
+<link rel="stylesheet" href="/portal/branding/portal2/css/min/staticpages.min.css"/>
+<!--[if IE]><link rel="stylesheet" href="/portal/branding/portal2/css/min/ie.min.css"/><![endif]-->
+<!--[if lte IE 7]><link rel="stylesheet" href="/portal/branding/portal2/css/min/ie7.min.css"/><![endif]-->
+<!--[if lte IE 8]><link rel="stylesheet" href="/portal/branding/portal2/css/min/ie8.min.css"/><![endif]-->
+<noscript><link rel="stylesheet" href="/portal/branding/portal2/css/min/noscript.min.css"/></noscript>
+<meta name="description" content="Europeana - Europeana Data Model"/>
+<link rel="canonical" href="http://www.europeana.eu/schemas/edm/" />
+<link rel="author" href="/humans.txt" />
+</head>
+<body class="locale-en">
+<div id="header" class="notranslate">
+<ul id="menu-main" class="notranslate">
+<li><a href="/portal/" target="_self" title="Home" class="menu-tab">Home</a></li>
+<li>
+<a href="/portal/explore.html" target="_self" title="Explore" class="dropdown menu-tab">Explore</a>
+<ul>
+<li><a href="http://remix.europeana.eu" target="_self" title="Europeana Remix" class="menu-sub-tab">Europeana Remix</a></li>
+<li><a href="http://exhibitions.europeana.eu" target="_self" title="Exhibitions" class="menu-sub-tab">Exhibitions</a></li>
+<li><a href="/portal/newcontent.html" target="_self" title="New content" class="menu-sub-tab">New content</a></li>
+<li><a href="/portal/europeana-providers.html" target="_self" title="By provider" class="menu-sub-tab">By provider</a></li>
+<li><a href="/portal/timeline.html?query=*:*&amp;format=simile" target="_self" title="Timeline" class="menu-sub-tab">Timeline</a></li>
+</ul>
+</li>
+<li>
+<a href="/portal/usingeuropeana.html" target="_self" title="Help" class="dropdown menu-tab">Help</a>
+<ul>
+<li><a href="/portal/usingeuropeana_search.html" target="_self" title="Searching Europeana" class="menu-sub-tab">Searching Europeana</a></li>
+<li><a href="/portal/usingeuropeana_explore.html" target="_self" title="Exploring Europeana" class="menu-sub-tab">Exploring Europeana</a></li>
+<li><a href="/portal/usingeuropeana_results.html" target="_self" title="Results in Europeana" class="menu-sub-tab">Results in Europeana</a></li>
+<li><a href="/portal/usingeuropeana_myeuropeana.html" target="_self" title="Using My Europeana" class="menu-sub-tab">Using My Europeana</a></li>
+</ul>
+</li>
+<li>
+<a href="/portal/aboutus.html" target="_self" title="About Us" class="dropdown menu-tab">About Us</a>
+<ul>
+<li><a href="/portal/aboutus_background.html" target="_self" title="Background" class="menu-sub-tab">Background</a></li>
+<li><a href="/portal/aboutus_press.html" target="_self" title="Press Room" class="menu-sub-tab">Press Room</a></li>
+<li><a href="/portal/aboutus_jobs.html" target="_self" title="Job opportunities" class="menu-sub-tab">Job opportunities</a></li>
+<li><a href="/portal/partners.html" target="_self" title="Partners" class="menu-sub-tab">Partners</a></li>
+<li><a href="/portal/thoughtlab.html" target="_self" title="ThoughtLab" class="menu-sub-tab">ThoughtLab</a></li>
+<li><a href="/portal/aboutus_faqs.html" target="_self" title="FAQs" class="menu-sub-tab">FAQs</a></li>
+</ul>
+</li>
+<li>
+<a href="/portal/followus.html" target="_self" title="Follow Us" class="dropdown menu-tab">Follow Us</a>
+<ul>
+<li><a href="http://blog.europeana.eu/" target="_self" title="Blog" class="menu-sub-tab">Blog</a></li>
+<li><a href="/portal/aboutus_enews.html" target="_self" title="Newsletter" class="menu-sub-tab">Newsletter</a></li>
+<li><a href="http://www.facebook.com/Europeana" target="_blank" title="Facebook" class="menu-sub-tab external">Facebook</a></li>
+<li><a href="http://www.twitter.com/EuropeanaEU" target="_blank" title="Twitter" class="menu-sub-tab external">Twitter</a></li>
+</ul>
+</li>
+<li><a href="/portal/myeuropeana.html" target="_self" title="My Europeana" class="menu-tab">My Europeana</a></li>
+<li>
+<form method="post" action="/portal/rr-r.html" id="language-selector">
+<select id="embeddedlang" name="embeddedlang" title="Choose a language">
+<option value="Choose language" selected="selected">Choose a language</option>
+<option value="eu">Basque (eus)</option>
+<option value="bg">&#x0411;&#x044a;&#x043b;&#x0433;&#x0430;&#x0440;&#x0441;&#x043a;&#x0438; (bul)</option>
+<option value="ca">Catal&#224; (ca)</option>
+<option value="cs">&#268;e&#353;tina (cze/cse)</option>
+<option value="da">Dansk (dan)</option>
+<option value="de">Deutsch (deu)</option>
+<option value="el">&#917;&#955;&#955;&#951;&#957;&#953;&#954;&#940; (ell/gre)</option>
+<option value="en">English (eng)</option>
+<option value="es">Espa&#241;ol (esp)</option>
+<option value="et">Eesti (est)</option>
+<option value="fi">Suomi (fin)</option>
+<option value="fr">Fran&#231;ais (fre)</option>
+<option value="ga">Irish (gle)</option>
+<option value="hu">Magyar (hun)</option>
+<option value="is">&#205;slenska (ice)</option>
+<option value="it">Italiano (ita)</option>
+<option value="lt">Lietuvi&#371; (lit)</option>
+<option value="lv">Latvie&#353;u (lav)</option>
+<option value="mt">Malti (mlt)</option>
+<option value="nl">Nederlands (dut)</option>
+<option value="no">Norsk (nor)</option>
+<option value="pl">Polski (pol)</option>
+<option value="pt">Portugu&#234;s (por)</option>
+<option value="ro">Rom&#226;n&#259; (rom)</option>
+<option value="ru">Russian (rus)</option>
+<option value="sk">Slovensk&#253; (slo)</option>
+<option value="sl">Sloven&#353;&#269;ina (slv)</option>
+<option value="sv">Svenska (sve/swe)</option>
+<option value="uk">Ukrainian (ukr)</option>
+</select>
+<noscript><input type="submit" /></noscript>
+</form>
+</li>
+</ul>
+<h1 id="logo">
+<a href="/portal/" title="Europeana Think Culture">
+<span id="beta-icon"></span>
+<img src="/portal/sp/img/europeana-logo-en.png" alt="Europeana Think Culture" width="206" height="123"/>
+</a>
+</h1>
+<div id="query">
+<h3>Explore Europe's cultural collections</h3>
+<form id="query-search" method="get" action="/portal/search.html">
+<fieldset>
+<input type="text" name="query" id="query-input" title="Search term(s)" maxlength="175"/>
+<input type="submit" class="submit-button" value="Search"/>
+</fieldset>
+<a href="/portal/usingeuropeana.html" id="search-help">Help</a>
+</form>
+</div>
+</div>
+<div id="content">
+<div id="content-main">
+<h1><span rel="dc:creator" resource="http://europeana.eu">Europeana</span>: <span property="dc:title" xml:lang="en">Europeana Data Model (EDM) - disclaimer</span></h1>
+<p>The latest EDM specifications v5.2.2 and the EDM Primer are available at <a href="http://version1.europeana.eu/web/europeana-project/technicaldocuments/
+">http://version1.europeana.eu/web/europeana-project/technicaldocuments/</a>. </p>
+<p>Any provider who wishes to resubmit data to Europeana in EDM or map their data to EDM, in order to increase its richness within Europeana, can refer to the <a href="http://version1.europeana.eu/web/europeana-project/technicaldocuments/
+">EDM Mapping Guidelines</a>. It contains definitions of the properties, information about the data types that can be used as values and the obligation level of each property. 
+The mapping rules are defined against the EDM <a href="http://europeanalabs.eu/svn/europeana/trunk/ROOT/src/main/webapp/schemas/edm/">XML schema</a>.</p> 
+<p>For further information, 
+please contact info@europeana.eu (using &ldquo;EDM&rdquo; as subject) or look for more technical details on the 
+EDM Prototyping Wiki at <a href="http://www.europeanalabs.eu/wiki/EDMPrototyping">http://www.europeanalabs.eu/wiki/EDMPrototyping</a>.</p>
+</div>
+</div>
+</div><div id="footer" class="notranslate">
+<ul id="menu-footer">
+<li><a href="/portal/accessibility.html" target="_self" title="Accessibility" >Accessibility</a></li>
+<li><a href="/portal/sitemap.html" target="_self" title="Sitemap" >Sitemap</a></li>
+<li><a href="/portal/termsofservice.html" target="_self" title="Terms of use" >Terms of use</a></li>
+<li><a href="/portal/privacy.html" target="_self" title="Privacy" >Privacy</a></li>
+<li><a href="/portal/languagepolicy.html" target="_self" title="Language Policy" >Language Policy</a></li>
+<li><a href="/portal/contact.html" target="_self" title="Contact" >Contact</a></li>
+<li class="separator">co-funded by the European Union</li>
+<li>
+<span title="" class="icons eu"></span>
+</li>
+</ul>
+</div>
+<noscript>
+<div id="noscript-msg">
+To make optimal use of this website you need to have JavaScript activated. <a href="http://www.google.com/adsense/support/bin/answer.py?hl=en&amp;answer=12654" target="_blank">Find out more ...</a>
+</div>
+</noscript>
+<script>
+window.eu = { europeana : { vars : { msg : {}, item : {}, mapview : {} } } };
+window.js = { min_suffix : '.min', min_directory : 'min/', cache_helper : '', empty_console : { log : function() {}, error : function() {}, info : function() {} } };
+if ( !window.console ) { window.console = js.empty_console; }
+js.console = js.empty_console;
+eu.europeana.vars.portal_name = 'portal';
+eu.europeana.vars.page_name = 'staticpage.html';
+eu.europeana.vars.branding = '/portal/branding/portal2';
+eu.europeana.vars.gaId = 'UA-12776629-1';
+eu.europeana.vars.locale = 'en';
+eu.europeana.vars.msg.search_error = 'Please try another search';
+eu.europeana.vars.addthis_pubid = 'xa-4b4f08de468caf36';
+</script>
+<script src="/portal/branding/portal2/js/eu/europeana/bootstrap/min/bootstrap.min.js"></script>
+</body>
+</html>
