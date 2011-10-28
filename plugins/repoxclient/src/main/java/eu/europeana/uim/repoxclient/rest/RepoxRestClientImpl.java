@@ -648,13 +648,92 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer idXpath  = new StringBuffer();
 		StringBuffer namespacePrefix  = new StringBuffer();
 		StringBuffer namespaceUri  = new StringBuffer();
+		dataProviderId.append("dataProviderId=");
+		dataProviderId.append(prov.getId());
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		address.append("address=");
+		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
+		port.append("port=");
+		port.append(ds.getSequence2().getTarget().getPort().getPort());
+		database.append("database=");
+		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
 		
-		return null;
+		user.append("user=");
+		user.append(ds.getSequence2().getTarget().getUser().getUser());
+		password.append("password=");
+		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+		recordSyntax.append("recordSyntax=");
+		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+		
+		charset.append("charset=");
+		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+		
+		//todo:What about the filePath, it is only required here
+		
+		/*filePath.append("filePath");
+		filePath.append(ds.getSequence1().)*/
+		
+		recordIdPolicy.append("recordIdPolicy=");
+		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+		
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		Response resp = invokRestTemplate("/dataSources/createZ3950IdList",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				filePath.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 
+	//TODO: fix from this point on
 
 	/**
-	 * Creates a Z3950Timestamp DataSource. It accesses the following REST Interface:
+	 * Creates a Z3950IdSequence DataSource. It accesses the following REST Interface:
 	 * 
 	 *  <code>
 	 *   /rest/dataSources/createZ3950IdSequence?
