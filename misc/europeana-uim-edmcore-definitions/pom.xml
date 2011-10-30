@@ -22,7 +22,7 @@
       <scope>test</scope>
     </dependency>
     
-            <!-- JIBX dependencies -->
+    <!-- JIBX dependencies -->
 		<dependency>
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-run</artifactId>

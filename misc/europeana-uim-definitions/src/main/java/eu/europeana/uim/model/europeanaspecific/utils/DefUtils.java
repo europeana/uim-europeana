@@ -20,11 +20,13 @@
  */
 package eu.europeana.uim.model.europeanaspecific.utils;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
 /**
@@ -42,7 +44,7 @@ public class DefUtils {
 	 * @return
 	 * @throws JiBXException
 	 */
-	public static String unmarshallObject(Object jibxObject) throws JiBXException{
+	public static String marshallObject(Object jibxObject) throws JiBXException{
 		IBindingFactory context;
 		context = BindingDirectory.getFactory(jibxObject.getClass());
 
@@ -58,6 +60,24 @@ public class DefUtils {
 	}
 	
 	
+	 /**
+	 * @param <T>
+	 * @param xml
+	 * @param type
+	 * @return
+	 * @throws JiBXException
+	 */
+	public static <T> T unmarshallObject(String xml,T type) throws JiBXException{
+		 IBindingFactory bfactory = BindingDirectory.getFactory(type.getClass());
+		 IUnmarshallingContext context = bfactory.createUnmarshallingContext();
+		 
+		 StringReader reader = new StringReader(xml);
+
+		 @SuppressWarnings("unchecked")
+		T object = (T) context.unmarshalDocument(reader);
+		 
+		 return object;
+	 }
 	
 	
 }
