@@ -15,6 +15,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jibx.version>1.2.3</jibx.version>
   </properties>
 
   <dependencies>
@@ -22,6 +23,18 @@
 	  <groupId>junit</groupId>
 	  <artifactId>junit</artifactId>
       <scope>test</scope>
+	</dependency>
+    
+    <dependency>
+		<groupId>org.jibx</groupId>
+		<artifactId>jibx-run</artifactId>
+		<version>${jibx.version}</version>
+	</dependency>
+
+	<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-extras</artifactId>
+			<version>${jibx.version}</version>
 	</dependency>
     
     <dependency>
