@@ -50,6 +50,7 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
  * Interface declaration of the Repox REST client OSGI service 
  * 
  * @author Georgios Markakis
+ * @author Yorgos Mamakis
  */
 public interface RepoxRestClient {
 
@@ -242,7 +243,7 @@ public interface RepoxRestClient {
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 */
-	public Source updateDatasourceZ3950IdFile(Source ds,Provider prov) throws DataSourceOperationException;
+	public Source updateDatasourceZ3950IdFile(Source ds) throws DataSourceOperationException;
 	
 	/**
 	 * Update an existing Z3950IdSequence DataSource
