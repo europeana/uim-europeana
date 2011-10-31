@@ -384,6 +384,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Source createDatasourceOAI(Source ds, Provider prov)
 			throws DataSourceOperationException {
 		
+		
 		StringBuffer dataProviderId = new StringBuffer();
 		StringBuffer id = new StringBuffer();
 		StringBuffer description = new StringBuffer();
@@ -824,9 +825,10 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		charset.append("charset=");
 		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		//todo: where is maximumId
+		
 		maximumId.append("maximumId=");
-		//maximumId.append()
+		maximumId.append(ds.getChoice().getMaximumId());
+		
 		
 		recordIdPolicy.append("recordIdPolicy=");
 		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
@@ -1712,9 +1714,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		charset.append("charset=");
 		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		//todo: where is maximumId
 		maximumId.append("maximumId=");
-		//maximumId.append()
+		maximumId.append(ds.getChoice().getMaximumId());
 		
 		recordIdPolicy.append("recordIdPolicy=");
 		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
