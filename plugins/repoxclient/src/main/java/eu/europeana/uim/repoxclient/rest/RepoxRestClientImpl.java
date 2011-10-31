@@ -53,6 +53,7 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
  * Class implementing REST functionality for accessing the REPOX repository.
  * 
  * @author Georgios Markakis
+ * @author Yorgos Mamakis
  */
 public class RepoxRestClientImpl  implements RepoxRestClient {
 
@@ -384,58 +385,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Source createDatasourceOAI(Source ds, Provider prov)
 			throws DataSourceOperationException {
 		
+		Response resp = createUpdateDSOAI("create", ds, prov);
 		
-		StringBuffer dataProviderId = new StringBuffer();
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-		
-		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();			
-		StringBuffer oaiURL = new StringBuffer();
-		StringBuffer oaiSet = new StringBuffer();
-		
-		
-		dataProviderId.append("dataProviderId=");
-		dataProviderId.append(prov.getId());
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		metadataFormat.append("metadataFormat=");
-		metadataFormat.append(ds.getMetadataFormat());
-		oaiURL.append("oaiURL=");
-		oaiURL.append(ds.getSequence().getOaiSource().getOaiSource());
-		oaiSet.append("oaiSet=");
-		oaiSet.append(ds.getSequence().getOaiSet().getOaiSet());
-		
-		
-		Response resp = invokRestTemplate("/dataSources/createOai",Response.class,
-				dataProviderId.toString(),
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				metadataFormat.toString(),
-				oaiURL.toString(),
-				oaiSet.toString());
 
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
@@ -450,7 +401,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 	}
 
-
+	
 	/**
 	 * Creates a Z3950Timestamp DataSource. It accesses the following REST Interface:
 	 * 
@@ -484,97 +435,10 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Source createDatasourceZ3950Timestamp(Source ds, Provider prov)
 			throws DataSourceOperationException {
 
-		StringBuffer dataProviderId = new StringBuffer();
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-		
-		//Method specific
-		StringBuffer address = new StringBuffer();
-		StringBuffer port = new StringBuffer();
-		StringBuffer database = new StringBuffer();
-		StringBuffer user = new StringBuffer();
-		StringBuffer password = new StringBuffer();
-		StringBuffer recordSyntax = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		StringBuffer earliestTimestamp  = new StringBuffer();
-		StringBuffer recordIdPolicy  = new StringBuffer();
-		StringBuffer idXpath  = new StringBuffer();
-		StringBuffer namespacePrefix  = new StringBuffer();
-		StringBuffer namespaceUri  = new StringBuffer();
-
-		dataProviderId.append("dataProviderId=");
-		dataProviderId.append(prov.getId());
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		address.append("address=");
-		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
-		port.append("port=");
-		port.append(ds.getSequence2().getTarget().getPort().getPort());
-		database.append("database=");
-		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
-		
-		user.append("user=");
-		user.append(ds.getSequence2().getTarget().getUser().getUser());
-		password.append("password=");
-		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
-		recordSyntax.append("recordSyntax=");
-		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
-		
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		earliestTimestamp.append("earliestTimestamp=");
-		earliestTimestamp.append(ds.getChoice().getEarliestTimestamp().getEarliestTimestamp());
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		Response resp = createUpdateZ3950Timestamp("create", ds, prov);
 		
 		
-		Response resp = invokRestTemplate("/dataSources/createZ3950Timestamp",Response.class,
-				dataProviderId.toString(),
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				address.toString(),
-				port.toString(),
-				database.toString(),
-				user.toString(),
-				password.toString(),
-				recordSyntax.toString(),
-				charset.toString(),
-				earliestTimestamp.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString());
+		
 
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
@@ -589,6 +453,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 
+	
 	
 	/**
 	 * Creates a Z3950IdFile DataSource. It accesses the following REST Interface:
@@ -624,100 +489,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Source createDatasourceZ3950IdFile(Source ds, Provider prov)
 			throws DataSourceOperationException {
 
-
-		StringBuffer dataProviderId = new StringBuffer();
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
+		Response resp = createUpdateDSZ3950IdFile("create", ds, prov);
 		
-		//Method specific
-		StringBuffer address = new StringBuffer();
-		StringBuffer port = new StringBuffer();
-		StringBuffer database = new StringBuffer();
-		StringBuffer user = new StringBuffer();
-		StringBuffer password = new StringBuffer();
-		StringBuffer recordSyntax = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		
-		
-		StringBuffer filePath  = new StringBuffer();
-		StringBuffer recordIdPolicy  = new StringBuffer();
-		StringBuffer idXpath  = new StringBuffer();
-		StringBuffer namespacePrefix  = new StringBuffer();
-		StringBuffer namespaceUri  = new StringBuffer();
-		dataProviderId.append("dataProviderId=");
-		dataProviderId.append(prov.getId());
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		address.append("address=");
-		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
-		port.append("port=");
-		port.append(ds.getSequence2().getTarget().getPort().getPort());
-		database.append("database=");
-		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
-		
-		user.append("user=");
-		user.append(ds.getSequence2().getTarget().getUser().getUser());
-		password.append("password=");
-		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
-		recordSyntax.append("recordSyntax=");
-		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
-		
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		
-		//todo:What about the filePath, it is only required here
-		
-		/*filePath.append("filePath");
-		filePath.append(ds.getSequence1().)*/
-		
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		Response resp = invokRestTemplate("/dataSources/createZ3950IdList",Response.class,
-				dataProviderId.toString(),
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				address.toString(),
-				port.toString(),
-				database.toString(),
-				user.toString(),
-				password.toString(),
-				recordSyntax.toString(),
-				charset.toString(),
-				filePath.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString());
 
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
@@ -733,6 +506,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 	
 
+	
 	/**
 	 * Creates a Z3950IdSequence DataSource. It accesses the following REST Interface:
 	 *
@@ -766,101 +540,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Source createDatasourceZ3950IdSequence(Source ds, Provider prov)
 			throws DataSourceOperationException {
-
-		StringBuffer dataProviderId = new StringBuffer();
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-		
-		//Method specific
-		StringBuffer address = new StringBuffer();
-		StringBuffer port = new StringBuffer();
-		StringBuffer database = new StringBuffer();
-		StringBuffer user = new StringBuffer();
-		StringBuffer password = new StringBuffer();
-		StringBuffer recordSyntax = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
+		Response resp = createUpdateDSZ3950IdSequence("create", ds, prov);
 		
 		
-		StringBuffer maximumId  = new StringBuffer();
-		
-		StringBuffer recordIdPolicy  = new StringBuffer();
-		StringBuffer idXpath  = new StringBuffer();
-		StringBuffer namespacePrefix  = new StringBuffer();
-		StringBuffer namespaceUri  = new StringBuffer();
-		
-		dataProviderId.append("dataProviderId=");
-		dataProviderId.append(prov.getId());
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		address.append("address=");
-		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
-		port.append("port=");
-		port.append(ds.getSequence2().getTarget().getPort().getPort());
-		database.append("database=");
-		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
-		
-		user.append("user=");
-		user.append(ds.getSequence2().getTarget().getUser().getUser());
-		password.append("password=");
-		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
-		recordSyntax.append("recordSyntax=");
-		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
-		
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		
-		maximumId.append("maximumId=");
-		maximumId.append(ds.getChoice().getMaximumId());
-		
-		
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		Response resp = invokRestTemplate("/dataSources/createZ3950IdSequence",Response.class,
-				dataProviderId.toString(),
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				address.toString(),
-				port.toString(),
-				database.toString(),
-				user.toString(),
-				password.toString(),
-				recordSyntax.toString(),
-				charset.toString(),
-				maximumId.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString());
 
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
@@ -874,7 +556,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		}
 	}
 
-
+	
+	
 	/**
 	 * Creates an Ftp DataSource. It accesses the following REST Interface:
 	 * 
@@ -908,101 +591,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Source createDatasourceFtp(Source ds, Provider prov)
 			throws DataSourceOperationException {
-
-		StringBuffer dataProviderId = new StringBuffer();
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
+		Response resp = createUpdateDSFtp("create",ds,prov);
 		
-		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();
-		StringBuffer isoFormat = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		StringBuffer recordIdPolicy = new StringBuffer();
-		StringBuffer idXpath = new StringBuffer();
-		StringBuffer namespacePrefix = new StringBuffer();
-		StringBuffer namespaceUri = new StringBuffer();
-		StringBuffer recordXPath  = new StringBuffer();		
-		StringBuffer server  = new StringBuffer();
-		StringBuffer user  = new StringBuffer();
-		StringBuffer password  = new StringBuffer();
-		StringBuffer ftpPath  = new StringBuffer();
-		
-		dataProviderId.append("dataProviderId=");
-		dataProviderId.append(prov.getId());
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		metadataFormat.append("address=");
-		metadataFormat.append(ds.getMetadataFormat());
-		//todo: check that the iso format is acquired by this
-		isoFormat.append("isoFormat=");
-		isoFormat.append(ds.getIsoImplementationClass());
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		
-		recordXPath.append("recordXPath=");
-		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
-		
-		server.append("server=");
-		server.append(ds.getSequence1().getRetrieveStrategy().getChoice().getServer().getServer());
-		user.append("user=");
-		user.append(ds.getSequence2().getTarget().getUser().getUser());
-		password.append("password=");
-		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
-		//todo:where ftpPath is retrieved
-		ftpPath.append("ftpPath=");
-		//recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
-		
-		
-		
-		
-		
-		Response resp = invokRestTemplate("/dataSources/createFtp",Response.class,
-				dataProviderId.toString(),
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				metadataFormat.toString(),
-				isoFormat.toString(),
-				charset.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString(),
-				recordXPath.toString(),
-				server.toString(),
-				user.toString(),
-				password.toString(),
-				ftpPath.toString());
-
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
 				throw new DataSourceOperationException(resp.getError());
@@ -1015,6 +605,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		}
 	}
 
+	
 
 	/**
 	 * Creates an Http DataSource. It accesses the following REST Interface:
@@ -1047,88 +638,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Source createDatasourceHttp(Source ds, Provider prov)
 			throws DataSourceOperationException {
 
-		StringBuffer dataProviderId = new StringBuffer();
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
+		Response resp = createUpdateDSHttp("create", ds, prov);
 		
-		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();
-		StringBuffer isoFormat = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		StringBuffer recordIdPolicy = new StringBuffer();
-		StringBuffer idXpath = new StringBuffer();
-		StringBuffer namespacePrefix = new StringBuffer();
-		StringBuffer namespaceUri = new StringBuffer();
-		StringBuffer recordXPath  = new StringBuffer();
-		
-		
-		StringBuffer url  = new StringBuffer();
-		
-		dataProviderId.append("dataProviderId=");
-		dataProviderId.append(prov.getId());
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		metadataFormat.append("address=");
-		metadataFormat.append(ds.getMetadataFormat());
-		//todo: check that the iso format is acquired by this
-		isoFormat.append("isoFormat=");
-		isoFormat.append(ds.getIsoImplementationClass());
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		recordXPath.append("recordXPath=");
-		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
-		
-		url.append("url=");
-		url.append(ds.getSequence1().getRetrieveStrategy().getChoice().getUrl().getUrl());
-		
-		
-		
-		
-		
-		Response resp = invokRestTemplate("/dataSources/createHttp",Response.class,
-				dataProviderId.toString(),
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				metadataFormat.toString(),
-				isoFormat.toString(),
-				charset.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString(),
-				recordXPath.toString(),
-				url.toString());
-
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
 				throw new DataSourceOperationException(resp.getError());
@@ -1171,90 +682,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Source createDatasourceFolder(Source ds, Provider prov)
 			throws DataSourceOperationException {
+		Response resp = createUpdateDSFolder("create",ds,prov);
 		
-		StringBuffer dataProviderId = new StringBuffer();
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-
-		
-		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();
-		StringBuffer isoFormat = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		StringBuffer recordIdPolicy = new StringBuffer();
-		StringBuffer idXpath = new StringBuffer();
-		StringBuffer namespacePrefix = new StringBuffer();
-		StringBuffer namespaceUri = new StringBuffer();
-		StringBuffer recordXPath  = new StringBuffer();
-		
-		
-		StringBuffer folder  = new StringBuffer();
-		
-		dataProviderId.append("dataProviderId=");
-		dataProviderId.append(prov.getId());
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		metadataFormat.append("address=");
-		metadataFormat.append(ds.getMetadataFormat());
-		//todo: check that the iso format is acquired by this
-		isoFormat.append("isoFormat=");
-		isoFormat.append(ds.getIsoImplementationClass());
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-
-		recordXPath.append("recordXPath=");
-		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
-		//todo:is folder==folderPath?
-		folder.append("folder=");
-		folder.append(ds.getSequence1().getRetrieveStrategy().getChoice().getFolderPath());
-		
-		
-		
-		
-		
-		Response resp = invokRestTemplate("/dataSources/createFolder",Response.class,
-				dataProviderId.toString(),
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				metadataFormat.toString(),
-				isoFormat.toString(),
-				charset.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString(),
-				recordXPath.toString(),
-				folder.toString());
 
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
@@ -1293,56 +722,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Source updateDatasourceOAI(Source ds)
 			throws DataSourceOperationException {
 
-
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-		
-		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();			
-		StringBuffer oaiURL = new StringBuffer();
-		StringBuffer oaiSet = new StringBuffer();
-		
-		
-
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription().getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		metadataFormat.append("metadataFormat=");
-		metadataFormat.append(ds.getMetadataFormat());
-		oaiURL.append("oaiURL=");
-		oaiURL.append(ds.getSequence().getOaiSource().getOaiSource());
-		oaiSet.append("oaiSet=");
-		oaiSet.append(ds.getSequence().getOaiSet().getOaiSet());
-		
-		
-		Response resp = invokRestTemplate("/dataSources/updateOai",Response.class,
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				metadataFormat.toString(),
-				oaiURL.toString(),
-				oaiSet.toString());
-
+		Response resp = createUpdateDSOAI("update", ds, null);
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
 				throw new DataSourceOperationException(resp.getError());
@@ -1387,94 +767,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Source updateDatasourceZ3950Timestamp(Source ds)
 			throws DataSourceOperationException {
-
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-		
-		//Method specific
-		StringBuffer address = new StringBuffer();
-		StringBuffer port = new StringBuffer();
-		StringBuffer database = new StringBuffer();
-		StringBuffer user = new StringBuffer();
-		StringBuffer password = new StringBuffer();
-		StringBuffer recordSyntax = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		StringBuffer earliestTimestamp  = new StringBuffer();
-		StringBuffer recordIdPolicy  = new StringBuffer();
-		StringBuffer idXpath  = new StringBuffer();
-		StringBuffer namespacePrefix  = new StringBuffer();
-		StringBuffer namespaceUri  = new StringBuffer();
-		
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		address.append("address=");
-		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
-		port.append("port=");
-		port.append(ds.getSequence2().getTarget().getPort().getPort());
-		database.append("database=");
-		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
-		
-		user.append("user=");
-		user.append(ds.getSequence2().getTarget().getUser().getUser());
-		password.append("password=");
-		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
-		recordSyntax.append("recordSyntax=");
-		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
-		
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		earliestTimestamp.append("earliestTimestamp=");
-		earliestTimestamp.append(ds.getChoice().getEarliestTimestamp().getEarliestTimestamp());
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		
-		
-		Response resp = invokRestTemplate("/dataSources/updateZ3950Timestamp",Response.class,			
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				address.toString(),
-				port.toString(),
-				database.toString(),
-				user.toString(),
-				password.toString(),
-				recordSyntax.toString(),
-				charset.toString(),
-				earliestTimestamp.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString());
+		Response resp = createUpdateZ3950Timestamp("update", ds, null);
 
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
@@ -1518,101 +811,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Source updateDatasourceZ3950IdFile(Source ds, Provider prov)
+	public Source updateDatasourceZ3950IdFile(Source ds)
 			throws DataSourceOperationException {
-
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-		
-		//Method specific
-		StringBuffer address = new StringBuffer();
-		StringBuffer port = new StringBuffer();
-		StringBuffer database = new StringBuffer();
-		StringBuffer user = new StringBuffer();
-		StringBuffer password = new StringBuffer();
-		StringBuffer recordSyntax = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		
-		
-		StringBuffer filePath  = new StringBuffer();
-		StringBuffer recordIdPolicy  = new StringBuffer();
-		StringBuffer idXpath  = new StringBuffer();
-		StringBuffer namespacePrefix  = new StringBuffer();
-		StringBuffer namespaceUri  = new StringBuffer();
-		
-	
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		address.append("address=");
-		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
-		port.append("port=");
-		port.append(ds.getSequence2().getTarget().getPort().getPort());
-		database.append("database=");
-		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
-		
-		user.append("user=");
-		user.append(ds.getSequence2().getTarget().getUser().getUser());
-		password.append("password=");
-		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
-		recordSyntax.append("recordSyntax=");
-		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
-		
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		
-		//todo:What about the filePath, it is only required here
-		
-		/*filePath.append("filePath");
-		filePath.append(ds.getSequence1().)*/
-		
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		Response resp = invokRestTemplate("/dataSources/updateZ3950IdList",Response.class,
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				address.toString(),
-				port.toString(),
-				database.toString(),
-				user.toString(),
-				password.toString(),
-				recordSyntax.toString(),
-				charset.toString(),
-				filePath.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString());
-
+		Response resp = createUpdateDSZ3950IdFile("update", ds, null);
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
 				throw new DataSourceOperationException(resp.getError());
@@ -1657,97 +858,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Source updateDatasourceZ3950IdSequence(Source ds)
 			throws DataSourceOperationException {
-
-		
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-		
-		//Method specific
-		StringBuffer address = new StringBuffer();
-		StringBuffer port = new StringBuffer();
-		StringBuffer database = new StringBuffer();
-		StringBuffer user = new StringBuffer();
-		StringBuffer password = new StringBuffer();
-		StringBuffer recordSyntax = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
+		Response resp = createUpdateDSZ3950IdSequence("update", ds, null);
 		
 		
-		StringBuffer maximumId  = new StringBuffer();
-		
-		StringBuffer recordIdPolicy  = new StringBuffer();
-		StringBuffer idXpath  = new StringBuffer();
-		StringBuffer namespacePrefix  = new StringBuffer();
-		StringBuffer namespaceUri  = new StringBuffer();
-		
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		address.append("address=");
-		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
-		port.append("port=");
-		port.append(ds.getSequence2().getTarget().getPort().getPort());
-		database.append("database=");
-		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
-		
-		user.append("user=");
-		user.append(ds.getSequence2().getTarget().getUser().getUser());
-		password.append("password=");
-		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
-		recordSyntax.append("recordSyntax=");
-		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
-		
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		maximumId.append("maximumId=");
-		maximumId.append(ds.getChoice().getMaximumId());
-		
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		Response resp = invokRestTemplate("/dataSources/updateZ3950IdSequence",Response.class,
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				address.toString(),
-				port.toString(),
-				database.toString(),
-				user.toString(),
-				password.toString(),
-				recordSyntax.toString(),
-				charset.toString(),
-				maximumId.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString());
-
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
 				throw new DataSourceOperationException(resp.getError());
@@ -1794,97 +907,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Source updateDatasourceFtp(Source ds)
 			throws DataSourceOperationException {
-
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
+		Response resp= createUpdateDSFtp("update", ds, null);
 		
-		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();
-		StringBuffer isoFormat = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		StringBuffer recordIdPolicy = new StringBuffer();
-		StringBuffer idXpath = new StringBuffer();
-		StringBuffer namespacePrefix = new StringBuffer();
-		StringBuffer namespaceUri = new StringBuffer();
-		StringBuffer recordXPath  = new StringBuffer();		
-		StringBuffer server  = new StringBuffer();
-		StringBuffer user  = new StringBuffer();
-		StringBuffer password  = new StringBuffer();
-		StringBuffer ftpPath  = new StringBuffer();
-		
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		metadataFormat.append("address=");
-		metadataFormat.append(ds.getMetadataFormat());
-		//todo: check that the iso format is acquired by this
-		isoFormat.append("isoFormat=");
-		isoFormat.append(ds.getIsoImplementationClass());
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		
-		recordXPath.append("recordXPath=");
-		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
-		
-		server.append("server=");
-		server.append(ds.getSequence1().getRetrieveStrategy().getChoice().getServer().getServer());
-		user.append("user=");
-		user.append(ds.getSequence2().getTarget().getUser().getUser());
-		password.append("password=");
-		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
-		//todo:where ftpPath is retrieved
-		ftpPath.append("ftpPath=");
-		//recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
-		
-		
-		
-		
-		
-		Response resp = invokRestTemplate("/dataSources/updateFtp",Response.class,
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				metadataFormat.toString(),
-				isoFormat.toString(),
-				charset.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString(),
-				recordXPath.toString(),
-				server.toString(),
-				user.toString(),
-				password.toString(),
-				ftpPath.toString());
-
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
 				throw new DataSourceOperationException(resp.getError());
@@ -1930,86 +954,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Source updateDatasourceHttp(Source ds)
 			throws DataSourceOperationException {
-
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
+		Response resp = createUpdateDSHttp("update", ds, null);
 		
-		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();
-		StringBuffer isoFormat = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		StringBuffer recordIdPolicy = new StringBuffer();
-		StringBuffer idXpath = new StringBuffer();
-		StringBuffer namespacePrefix = new StringBuffer();
-		StringBuffer namespaceUri = new StringBuffer();
-		StringBuffer recordXPath  = new StringBuffer();
-		
-		
-		StringBuffer url  = new StringBuffer();
-	
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		metadataFormat.append("address=");
-		metadataFormat.append(ds.getMetadataFormat());
-		//todo: check that the iso format is acquired by this
-		isoFormat.append("isoFormat=");
-		isoFormat.append(ds.getIsoImplementationClass());
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-		recordXPath.append("recordXPath=");
-		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
-		
-		url.append("url=");
-		url.append(ds.getSequence1().getRetrieveStrategy().getChoice().getUrl().getUrl());
-		
-		
-		
-		
-		
-		Response resp = invokRestTemplate("/dataSources/updateHttp",Response.class,
-				
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				metadataFormat.toString(),
-				isoFormat.toString(),
-				charset.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString(),
-				recordXPath.toString(),
-				url.toString());
-
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
 				throw new DataSourceOperationException(resp.getError());
@@ -2052,87 +998,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	@Override
 	public Source updateDatasourceFolder(Source ds)
 			throws DataSourceOperationException {
-
-		StringBuffer id = new StringBuffer();
-		StringBuffer description = new StringBuffer();
-		StringBuffer nameCode = new StringBuffer();
-		StringBuffer name = new StringBuffer();
-		StringBuffer exportPath = new StringBuffer();
-		StringBuffer schema = new StringBuffer();	
-		StringBuffer namespace = new StringBuffer();
-
+		Response resp = createUpdateDSFolder("update", ds, null);
 		
-		//Method specific
-		StringBuffer metadataFormat = new StringBuffer();
-		StringBuffer isoFormat = new StringBuffer();
-		StringBuffer charset = new StringBuffer();
-		StringBuffer recordIdPolicy = new StringBuffer();
-		StringBuffer idXpath = new StringBuffer();
-		StringBuffer namespacePrefix = new StringBuffer();
-		StringBuffer namespaceUri = new StringBuffer();
-		StringBuffer recordXPath  = new StringBuffer();
-		
-		
-		StringBuffer folder = new StringBuffer();
-
-		id.append("id=");
-		id.append(ds.getId());
-		description.append("description=");
-		description.append(ds.getDescription());
-		nameCode.append("nameCode=");
-		nameCode.append(ds.getNameCode().toString());
-		name.append("name=");
-		name.append(ds.getName());
-		exportPath.append("exportPath=");
-		exportPath.append(ds.getExportPath());
-		schema.append("schema=");
-		schema.append(ds.getSchema());
-		namespace.append("namespace=");
-		namespace.append(ds.getNamespace());
-		metadataFormat.append("address=");
-		metadataFormat.append(ds.getMetadataFormat());
-		//todo: check that the iso format is acquired by this
-		isoFormat.append("isoFormat=");
-		isoFormat.append(ds.getIsoImplementationClass());
-		charset.append("charset=");
-		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
-		recordIdPolicy.append("recordIdPolicy=");
-		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-		idXpath.append("idXpath=");
-		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-		namespacePrefix.append("namespacePrefix=");
-		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-		namespaceUri.append("namespaceUri=");
-		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-
-		recordXPath.append("recordXPath=");
-		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
-		//todo:is folder==folderPath?
-		folder.append("folder=");
-		folder.append(ds.getSequence1().getRetrieveStrategy().getChoice().getFolderPath());
-		
-		
-		
-		
-		
-		Response resp = invokRestTemplate("/dataSources/createFolder",Response.class,
-				id.toString(),
-				description.toString(),
-				nameCode.toString(),
-				name.toString(),
-				exportPath.toString(),
-				schema.toString(),
-				namespace.toString(),
-				metadataFormat.toString(),
-				isoFormat.toString(),
-				charset.toString(),
-				recordIdPolicy.toString(),
-				idXpath.toString(),
-				namespacePrefix.toString(),
-				namespaceUri.toString(),
-				recordXPath.toString(),
-				folder.toString());
-
 		if (resp.getSource() == null) {
 			if (resp.getError() != null) {
 				throw new DataSourceOperationException(resp.getError());
@@ -2622,19 +1489,772 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 
+private Response createUpdateDSOAI(String action, Source ds, Provider prov){
+		
+		
+		StringBuffer dataProviderId = new StringBuffer();
+		StringBuffer id = new StringBuffer();
+		StringBuffer description = new StringBuffer();
+		StringBuffer nameCode = new StringBuffer();
+		StringBuffer name = new StringBuffer();
+		StringBuffer exportPath = new StringBuffer();
+		StringBuffer schema = new StringBuffer();	
+		StringBuffer namespace = new StringBuffer();
+		
+		//Method specific
+		StringBuffer metadataFormat = new StringBuffer();			
+		StringBuffer oaiURL = new StringBuffer();
+		StringBuffer oaiSet = new StringBuffer();
+		
+		if (action.equals("create")){
+		dataProviderId.append("dataProviderId=");
+		dataProviderId.append(prov.getId());
+		}
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		metadataFormat.append("metadataFormat=");
+		metadataFormat.append(ds.getMetadataFormat());
+		oaiURL.append("oaiURL=");
+		oaiURL.append(ds.getSequence().getOaiSource().getOaiSource());
+		oaiSet.append("oaiSet=");
+		oaiSet.append(ds.getSequence().getOaiSet().getOaiSet());
+		if (action.equals("create")){
+		return invokRestTemplate("/dataSources/createOai",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				oaiURL.toString(),
+				oaiSet.toString());
+		}
+		else {
+			return invokRestTemplate("/dataSources/updateOai",Response.class,
+					
+					id.toString(),
+					description.toString(),
+					nameCode.toString(),
+					name.toString(),
+					exportPath.toString(),
+					schema.toString(),
+					namespace.toString(),
+					metadataFormat.toString(),
+					oaiURL.toString(),
+					oaiSet.toString());
+		}
+	}
+	
+private Response createUpdateZ3950Timestamp(String action, Source ds, Provider prov){
+	
+	StringBuffer dataProviderId = new StringBuffer();
+	StringBuffer id = new StringBuffer();
+	StringBuffer description = new StringBuffer();
+	StringBuffer nameCode = new StringBuffer();
+	StringBuffer name = new StringBuffer();
+	StringBuffer exportPath = new StringBuffer();
+	StringBuffer schema = new StringBuffer();	
+	StringBuffer namespace = new StringBuffer();
+	
+	//Method specific
+	StringBuffer address = new StringBuffer();
+	StringBuffer port = new StringBuffer();
+	StringBuffer database = new StringBuffer();
+	StringBuffer user = new StringBuffer();
+	StringBuffer password = new StringBuffer();
+	StringBuffer recordSyntax = new StringBuffer();
+	StringBuffer charset = new StringBuffer();
+	StringBuffer earliestTimestamp  = new StringBuffer();
+	StringBuffer recordIdPolicy  = new StringBuffer();
+	StringBuffer idXpath  = new StringBuffer();
+	StringBuffer namespacePrefix  = new StringBuffer();
+	StringBuffer namespaceUri  = new StringBuffer();
+
+	if (action.equals("create")){
+	dataProviderId.append("dataProviderId=");
+	dataProviderId.append(prov.getId());
+	}
+	id.append("id=");
+	id.append(ds.getId());
+	description.append("description=");
+	description.append(ds.getDescription());
+	nameCode.append("nameCode=");
+	nameCode.append(ds.getNameCode().toString());
+	name.append("name=");
+	name.append(ds.getName());
+	exportPath.append("exportPath=");
+	exportPath.append(ds.getExportPath());
+	schema.append("schema=");
+	schema.append(ds.getSchema());
+	
+	namespace.append("namespace=");
+	namespace.append(ds.getNamespace());
+	address.append("address=");
+	address.append(ds.getSequence2().getTarget().getAddress().getAddress());
+	port.append("port=");
+	port.append(ds.getSequence2().getTarget().getPort().getPort());
+	database.append("database=");
+	database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
+	
+	user.append("user=");
+	user.append(ds.getSequence2().getTarget().getUser().getUser());
+	password.append("password=");
+	password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+	recordSyntax.append("recordSyntax=");
+	recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+	
+	charset.append("charset=");
+	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	earliestTimestamp.append("earliestTimestamp=");
+	earliestTimestamp.append(ds.getChoice().getEarliestTimestamp().getEarliestTimestamp());
+	recordIdPolicy.append("recordIdPolicy=");
+	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	
+	idXpath.append("idXpath=");
+	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+	
+	namespacePrefix.append("namespacePrefix=");
+	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+	namespaceUri.append("namespaceUri=");
+	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+	if (action.equals("create")){
+		return invokRestTemplate("/dataSources/createZ3950Timestamp",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				earliestTimestamp.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+	}
+	else{
+		return invokRestTemplate("/dataSources/updateZ3950Timestamp",Response.class,
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				earliestTimestamp.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+	}
+}
+
+
+private Response createUpdateDSZ3950IdFile(String action, Source ds, Provider prov){
+	
+	StringBuffer dataProviderId = new StringBuffer();
+	StringBuffer id = new StringBuffer();
+	StringBuffer description = new StringBuffer();
+	StringBuffer nameCode = new StringBuffer();
+	StringBuffer name = new StringBuffer();
+	StringBuffer exportPath = new StringBuffer();
+	StringBuffer schema = new StringBuffer();	
+	StringBuffer namespace = new StringBuffer();
+	
+	//Method specific
+	StringBuffer address = new StringBuffer();
+	StringBuffer port = new StringBuffer();
+	StringBuffer database = new StringBuffer();
+	StringBuffer user = new StringBuffer();
+	StringBuffer password = new StringBuffer();
+	StringBuffer recordSyntax = new StringBuffer();
+	StringBuffer charset = new StringBuffer();
+	
+	
+	StringBuffer filePath  = new StringBuffer();
+	StringBuffer recordIdPolicy  = new StringBuffer();
+	StringBuffer idXpath  = new StringBuffer();
+	StringBuffer namespacePrefix  = new StringBuffer();
+	StringBuffer namespaceUri  = new StringBuffer();
+	if (action.equals("create")){
+	dataProviderId.append("dataProviderId=");
+	dataProviderId.append(prov.getId());
+	}
+	id.append("id=");
+	id.append(ds.getId());
+	description.append("description=");
+	description.append(ds.getDescription());
+	nameCode.append("nameCode=");
+	nameCode.append(ds.getNameCode().toString());
+	name.append("name=");
+	name.append(ds.getName());
+	exportPath.append("exportPath=");
+	exportPath.append(ds.getExportPath());
+	schema.append("schema=");
+	schema.append(ds.getSchema());
+	namespace.append("namespace=");
+	namespace.append(ds.getNamespace());
+	address.append("address=");
+	address.append(ds.getSequence2().getTarget().getAddress().getAddress());
+	port.append("port=");
+	port.append(ds.getSequence2().getTarget().getPort().getPort());
+	database.append("database=");
+	database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
+	
+	user.append("user=");
+	user.append(ds.getSequence2().getTarget().getUser().getUser());
+	password.append("password=");
+	password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+	recordSyntax.append("recordSyntax=");
+	recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+	
+	charset.append("charset=");
+	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	filePath.append("filePath=");
+	filePath.append(ds.getChoice().getFilePath());
+	recordIdPolicy.append("recordIdPolicy=");
+	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	
+	idXpath.append("idXpath=");
+	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+	
+	namespacePrefix.append("namespacePrefix=");
+	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+	namespaceUri.append("namespaceUri=");
+	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+
+	if (action.equals("create")){
+		return invokRestTemplate("/dataSources/createZ3950IdList",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				filePath.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+	}
+	else
+	{
+		return invokRestTemplate("/dataSources/updateZ3950IdList",Response.class,
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				filePath.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+	}
+}
+
+private Response createUpdateDSZ3950IdSequence(String action, Source ds, Provider prov){
+	StringBuffer dataProviderId = new StringBuffer();
+	StringBuffer id = new StringBuffer();
+	StringBuffer description = new StringBuffer();
+	StringBuffer nameCode = new StringBuffer();
+	StringBuffer name = new StringBuffer();
+	StringBuffer exportPath = new StringBuffer();
+	StringBuffer schema = new StringBuffer();	
+	StringBuffer namespace = new StringBuffer();
+	
+	//Method specific
+	StringBuffer address = new StringBuffer();
+	StringBuffer port = new StringBuffer();
+	StringBuffer database = new StringBuffer();
+	StringBuffer user = new StringBuffer();
+	StringBuffer password = new StringBuffer();
+	StringBuffer recordSyntax = new StringBuffer();
+	StringBuffer charset = new StringBuffer();
+	
+	
+	StringBuffer maximumId  = new StringBuffer();
+	
+	StringBuffer recordIdPolicy  = new StringBuffer();
+	StringBuffer idXpath  = new StringBuffer();
+	StringBuffer namespacePrefix  = new StringBuffer();
+	StringBuffer namespaceUri  = new StringBuffer();
+	if (action.equals("create")){
+	dataProviderId.append("dataProviderId=");
+	dataProviderId.append(prov.getId());
+	}
+	id.append("id=");
+	id.append(ds.getId());
+	description.append("description=");
+	description.append(ds.getDescription());
+	nameCode.append("nameCode=");
+	nameCode.append(ds.getNameCode().toString());
+	name.append("name=");
+	name.append(ds.getName());
+	exportPath.append("exportPath=");
+	exportPath.append(ds.getExportPath());
+	schema.append("schema=");
+	schema.append(ds.getSchema());
+	namespace.append("namespace=");
+	namespace.append(ds.getNamespace());
+	address.append("address=");
+	address.append(ds.getSequence2().getTarget().getAddress().getAddress());
+	port.append("port=");
+	port.append(ds.getSequence2().getTarget().getPort().getPort());
+	database.append("database=");
+	database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
+	
+	user.append("user=");
+	user.append(ds.getSequence2().getTarget().getUser().getUser());
+	password.append("password=");
+	password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+	recordSyntax.append("recordSyntax=");
+	recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+	
+	charset.append("charset=");
+	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	
+	maximumId.append("maximumId=");
+	maximumId.append(ds.getChoice().getMaximumId());
+	
+	
+	recordIdPolicy.append("recordIdPolicy=");
+	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	
+	idXpath.append("idXpath=");
+	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+	
+	namespacePrefix.append("namespacePrefix=");
+	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+	namespaceUri.append("namespaceUri=");
+	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+	if (action.equals("create")){
+		return invokRestTemplate("/dataSources/createZ3950IdSequence",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				maximumId.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+	}
+	else
+	{
+		return invokRestTemplate("/dataSources/updateZ3950IdSequence",Response.class,
+				
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				maximumId.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+	}
+}
+
+
+private Response createUpdateDSFtp(String action, Source ds, Provider prov){
+	StringBuffer dataProviderId = new StringBuffer();
+	StringBuffer id = new StringBuffer();
+	StringBuffer description = new StringBuffer();
+	StringBuffer nameCode = new StringBuffer();
+	StringBuffer name = new StringBuffer();
+	StringBuffer exportPath = new StringBuffer();
+	StringBuffer schema = new StringBuffer();	
+	StringBuffer namespace = new StringBuffer();
+	
+	//Method specific
+	StringBuffer metadataFormat = new StringBuffer();
+	StringBuffer isoFormat = new StringBuffer();
+	StringBuffer charset = new StringBuffer();
+	StringBuffer recordIdPolicy = new StringBuffer();
+	StringBuffer idXpath = new StringBuffer();
+	StringBuffer namespacePrefix = new StringBuffer();
+	StringBuffer namespaceUri = new StringBuffer();
+	StringBuffer recordXPath  = new StringBuffer();		
+	StringBuffer server  = new StringBuffer();
+	StringBuffer user  = new StringBuffer();
+	StringBuffer password  = new StringBuffer();
+	StringBuffer ftpPath  = new StringBuffer();
+	
+	if (action.equals("create")){
+	dataProviderId.append("dataProviderId=");
+	dataProviderId.append(prov.getId());
+	}
+	id.append("id=");
+	id.append(ds.getId());
+	description.append("description=");
+	description.append(ds.getDescription());
+	nameCode.append("nameCode=");
+	nameCode.append(ds.getNameCode().toString());
+	name.append("name=");
+	name.append(ds.getName());
+	exportPath.append("exportPath=");
+	exportPath.append(ds.getExportPath());
+	schema.append("schema=");
+	schema.append(ds.getSchema());
+	namespace.append("namespace=");
+	namespace.append(ds.getNamespace());
+	metadataFormat.append("address=");
+	metadataFormat.append(ds.getMetadataFormat());
+	
+	isoFormat.append("isoFormat=");
+	isoFormat.append(ds.getChoice().getIsoFormat());
+	charset.append("charset=");
+	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	recordIdPolicy.append("recordIdPolicy=");
+	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	idXpath.append("idXpath=");
+	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+	namespacePrefix.append("namespacePrefix=");
+	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+	namespaceUri.append("namespaceUri=");
+	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+	
+	recordXPath.append("recordXPath=");
+	recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
+	
+	server.append("server=");
+	server.append(ds.getSequence1().getRetrieveStrategy().getChoice().getServer().getServer());
+	user.append("user=");
+	user.append(ds.getSequence2().getTarget().getUser().getUser());
+	password.append("password=");
+	password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+	
+	ftpPath.append("ftpPath=");
+	ftpPath.append(ds.getChoice().getFtpPath());
+	if (action.equals("create")){
+		return invokRestTemplate("/dataSources/createFtp",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				server.toString(),
+				user.toString(),
+				password.toString(),
+				ftpPath.toString());
+	}
+	else
+	{
+		return invokRestTemplate("/dataSources/updateFtp",Response.class,
+				
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				server.toString(),
+				user.toString(),
+				password.toString(),
+				ftpPath.toString());
+	}
+}
+
+private Response createUpdateDSHttp(String action, Source ds, Provider prov){
+	StringBuffer dataProviderId = new StringBuffer();
+	StringBuffer id = new StringBuffer();
+	StringBuffer description = new StringBuffer();
+	StringBuffer nameCode = new StringBuffer();
+	StringBuffer name = new StringBuffer();
+	StringBuffer exportPath = new StringBuffer();
+	StringBuffer schema = new StringBuffer();	
+	StringBuffer namespace = new StringBuffer();
+	
+	//Method specific
+	StringBuffer metadataFormat = new StringBuffer();
+	StringBuffer isoFormat = new StringBuffer();
+	StringBuffer charset = new StringBuffer();
+	StringBuffer recordIdPolicy = new StringBuffer();
+	StringBuffer idXpath = new StringBuffer();
+	StringBuffer namespacePrefix = new StringBuffer();
+	StringBuffer namespaceUri = new StringBuffer();
+	StringBuffer recordXPath  = new StringBuffer();
+	
+	
+	StringBuffer url  = new StringBuffer();
+	if (action.equals("create")){
+	dataProviderId.append("dataProviderId=");
+	dataProviderId.append(prov.getId());
+	}
+	id.append("id=");
+	id.append(ds.getId());
+	description.append("description=");
+	description.append(ds.getDescription());
+	nameCode.append("nameCode=");
+	nameCode.append(ds.getNameCode().toString());
+	name.append("name=");
+	name.append(ds.getName());
+	exportPath.append("exportPath=");
+	exportPath.append(ds.getExportPath());
+	schema.append("schema=");
+	schema.append(ds.getSchema());
+	namespace.append("namespace=");
+	namespace.append(ds.getNamespace());
+	metadataFormat.append("address=");
+	metadataFormat.append(ds.getMetadataFormat());
+	
+	isoFormat.append("isoFormat=");
+	isoFormat.append(ds.getChoice().getIsoFormat());
+	charset.append("charset=");
+	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	recordIdPolicy.append("recordIdPolicy=");
+	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	idXpath.append("idXpath=");
+	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+	namespacePrefix.append("namespacePrefix=");
+	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+	namespaceUri.append("namespaceUri=");
+	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+	recordXPath.append("recordXPath=");
+	recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
+	
+	url.append("url=");
+	url.append(ds.getSequence1().getRetrieveStrategy().getChoice().getUrl().getUrl());
+	
+	if (action.equals("create")){
+		return invokRestTemplate("/dataSources/createHttp",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				url.toString());
+	}
+	else{
+		return invokRestTemplate("/dataSources/updateHttp",Response.class,
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				url.toString());
+	}
+	
+}
 
 
 
+private Response createUpdateDSFolder(String action, Source ds, Provider prov){
+	StringBuffer dataProviderId = new StringBuffer();
+	StringBuffer id = new StringBuffer();
+	StringBuffer description = new StringBuffer();
+	StringBuffer nameCode = new StringBuffer();
+	StringBuffer name = new StringBuffer();
+	StringBuffer exportPath = new StringBuffer();
+	StringBuffer schema = new StringBuffer();	
+	StringBuffer namespace = new StringBuffer();
 
+	
+	//Method specific
+	StringBuffer metadataFormat = new StringBuffer();
+	StringBuffer isoFormat = new StringBuffer();
+	StringBuffer charset = new StringBuffer();
+	StringBuffer recordIdPolicy = new StringBuffer();
+	StringBuffer idXpath = new StringBuffer();
+	StringBuffer namespacePrefix = new StringBuffer();
+	StringBuffer namespaceUri = new StringBuffer();
+	StringBuffer recordXPath  = new StringBuffer();
+	
+	
+	StringBuffer folder  = new StringBuffer();
+	if (action.equals("create")){
+	dataProviderId.append("dataProviderId=");
+	dataProviderId.append(prov.getId());
+	}
+	id.append("id=");
+	id.append(ds.getId());
+	description.append("description=");
+	description.append(ds.getDescription());
+	nameCode.append("nameCode=");
+	nameCode.append(ds.getNameCode().toString());
+	name.append("name=");
+	name.append(ds.getName());
+	exportPath.append("exportPath=");
+	exportPath.append(ds.getExportPath());
+	schema.append("schema=");
+	schema.append(ds.getSchema());
+	namespace.append("namespace=");
+	namespace.append(ds.getNamespace());
+	metadataFormat.append("address=");
+	metadataFormat.append(ds.getMetadataFormat());
+	
+	isoFormat.append("isoFormat=");
+	isoFormat.append(ds.getChoice().getIsoFormat());
+	charset.append("charset=");
+	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	recordIdPolicy.append("recordIdPolicy=");
+	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	idXpath.append("idXpath=");
+	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+	namespacePrefix.append("namespacePrefix=");
+	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+	namespaceUri.append("namespaceUri=");
+	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
 
-
-
-
-
-
-
-
-
-
+	recordXPath.append("recordXPath=");
+	recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
+	
+	folder.append("folder=");
+	folder.append(ds.getChoice().getFolder());
+	
+	if (action.equals("create")){
+		return invokRestTemplate("/dataSources/createFolder",Response.class,
+				dataProviderId.toString(),
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				folder.toString());
+	}
+	else
+	{
+		return invokRestTemplate("/dataSources/updateFolder",Response.class,
+				
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				folder.toString());
+	}
+	
+}
 
 }
