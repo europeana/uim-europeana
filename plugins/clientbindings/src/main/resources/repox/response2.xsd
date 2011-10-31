@@ -115,6 +115,10 @@
           <xs:element ref="earliestTimestamp"/>
           <xs:element ref="idListFile"/>
           <xs:element ref="maximumId"/>
+          <xs:element ref="filePath"/>
+          <xs:element ref="ftpPath"/>
+          <xs:element ref="isoFormat"/>
+          <xs:element ref="folder"/>
         </xs:choice>
         <xs:element ref="metadataTransformations" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
@@ -194,6 +198,10 @@
   <xs:element name="earliestTimestamp" type="xs:integer"/>
   <xs:element name="idListFile" type="xs:string"/>
   <xs:element name="maximumId" type="xs:integer"/>
+  <xs:element name="filePath" type="xs:string"/>
+  <xs:element name="ftpPath" type="xs:string"/>
+  <xs:element name="isoFormat" type="xs:NCName"/>
+  <xs:element name="folder" type="xs:string"/>
   <xs:element name="metadataTransformations">
     <xs:complexType/>
   </xs:element>
