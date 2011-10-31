@@ -1353,7 +1353,6 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		}
 	}
 
-	//TODO: fix from this point on
 	/**
 	 * Updates a Z3950Timestamp DataSource. It accesses the following REST Interface:
 	 * 
@@ -1409,8 +1408,82 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer namespacePrefix  = new StringBuffer();
 		StringBuffer namespaceUri  = new StringBuffer();
 		
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
 		
-		return null;
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		address.append("address=");
+		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
+		port.append("port=");
+		port.append(ds.getSequence2().getTarget().getPort().getPort());
+		database.append("database=");
+		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
+		
+		user.append("user=");
+		user.append(ds.getSequence2().getTarget().getUser().getUser());
+		password.append("password=");
+		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+		recordSyntax.append("recordSyntax=");
+		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+		
+		charset.append("charset=");
+		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+		earliestTimestamp.append("earliestTimestamp=");
+		earliestTimestamp.append(ds.getChoice().getEarliestTimestamp().getEarliestTimestamp());
+		recordIdPolicy.append("recordIdPolicy=");
+		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+		
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		
+		
+		Response resp = invokRestTemplate("/dataSources/updateZ3950Timestamp",Response.class,			
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				earliestTimestamp.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 
 
@@ -1470,7 +1543,84 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer namespacePrefix  = new StringBuffer();
 		StringBuffer namespaceUri  = new StringBuffer();
 		
-		return null;
+	
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		address.append("address=");
+		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
+		port.append("port=");
+		port.append(ds.getSequence2().getTarget().getPort().getPort());
+		database.append("database=");
+		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
+		
+		user.append("user=");
+		user.append(ds.getSequence2().getTarget().getUser().getUser());
+		password.append("password=");
+		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+		recordSyntax.append("recordSyntax=");
+		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+		
+		charset.append("charset=");
+		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+		
+		//todo:What about the filePath, it is only required here
+		
+		/*filePath.append("filePath");
+		filePath.append(ds.getSequence1().)*/
+		
+		recordIdPolicy.append("recordIdPolicy=");
+		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+		
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		Response resp = invokRestTemplate("/dataSources/updateZ3950IdList",Response.class,
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				filePath.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 
 
@@ -1506,7 +1656,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Source updateDatasourceZ3950IdSequence(Source ds)
 			throws DataSourceOperationException {
 
-		StringBuffer dataProviderId = new StringBuffer();
+		
 		StringBuffer id = new StringBuffer();
 		StringBuffer description = new StringBuffer();
 		StringBuffer nameCode = new StringBuffer();
@@ -1532,7 +1682,81 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer namespacePrefix  = new StringBuffer();
 		StringBuffer namespaceUri  = new StringBuffer();
 		
-		return null;
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		address.append("address=");
+		address.append(ds.getSequence2().getTarget().getAddress().getAddress());
+		port.append("port=");
+		port.append(ds.getSequence2().getTarget().getPort().getPort());
+		database.append("database=");
+		database.append(ds.getSequence2().getTarget().getDatabase().getDatabase());
+		
+		user.append("user=");
+		user.append(ds.getSequence2().getTarget().getUser().getUser());
+		password.append("password=");
+		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+		recordSyntax.append("recordSyntax=");
+		recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+		
+		charset.append("charset=");
+		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+		//todo: where is maximumId
+		maximumId.append("maximumId=");
+		//maximumId.append()
+		
+		recordIdPolicy.append("recordIdPolicy=");
+		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+		
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		Response resp = invokRestTemplate("/dataSources/updateZ3950IdSequence",Response.class,
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				address.toString(),
+				port.toString(),
+				database.toString(),
+				user.toString(),
+				password.toString(),
+				recordSyntax.toString(),
+				charset.toString(),
+				maximumId.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 
 
@@ -1592,7 +1816,84 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		StringBuffer password  = new StringBuffer();
 		StringBuffer ftpPath  = new StringBuffer();
 		
-		return null;
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		metadataFormat.append("address=");
+		metadataFormat.append(ds.getMetadataFormat());
+		//todo: check that the iso format is acquired by this
+		isoFormat.append("isoFormat=");
+		isoFormat.append(ds.getIsoImplementationClass());
+		charset.append("charset=");
+		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+		recordIdPolicy.append("recordIdPolicy=");
+		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		
+		recordXPath.append("recordXPath=");
+		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
+		
+		server.append("server=");
+		server.append(ds.getSequence1().getRetrieveStrategy().getChoice().getServer().getServer());
+		user.append("user=");
+		user.append(ds.getSequence2().getTarget().getUser().getUser());
+		password.append("password=");
+		password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+		//todo:where ftpPath is retrieved
+		ftpPath.append("ftpPath=");
+		//recordSyntax.append(ds.getSequence2().getTarget().getRecordSyntax().getRecordSyntax());
+		
+		
+		
+		
+		
+		Response resp = invokRestTemplate("/dataSources/updateFtp",Response.class,
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				server.toString(),
+				user.toString(),
+				password.toString(),
+				ftpPath.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 
 
@@ -1600,7 +1901,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * Updates an Http DataSource. It accesses the following REST Interface:
 	 * 
 	 *  <code>
-	 *     /rest/dataSources/updateFtp?
+	 *     /rest/dataSources/updateHttp?
 	 *     id=ftpTest&
 	 *     description=newtest FTP data source&
 	 *     nameCode=555555500124&
@@ -1649,8 +1950,75 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		
 		StringBuffer url  = new StringBuffer();
+	
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		metadataFormat.append("address=");
+		metadataFormat.append(ds.getMetadataFormat());
+		//todo: check that the iso format is acquired by this
+		isoFormat.append("isoFormat=");
+		isoFormat.append(ds.getIsoImplementationClass());
+		charset.append("charset=");
+		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+		recordIdPolicy.append("recordIdPolicy=");
+		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		recordXPath.append("recordXPath=");
+		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
 		
-		return null;
+		url.append("url=");
+		url.append(ds.getSequence1().getRetrieveStrategy().getChoice().getUrl().getUrl());
+		
+		
+		
+		
+		
+		Response resp = invokRestTemplate("/dataSources/updateHttp",Response.class,
+				
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				url.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 
 
@@ -1705,8 +2073,75 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		
 		StringBuffer folder = new StringBuffer();
+
+		id.append("id=");
+		id.append(ds.getId());
+		description.append("description=");
+		description.append(ds.getDescription());
+		nameCode.append("nameCode=");
+		nameCode.append(ds.getNameCode().toString());
+		name.append("name=");
+		name.append(ds.getName());
+		exportPath.append("exportPath=");
+		exportPath.append(ds.getExportPath());
+		schema.append("schema=");
+		schema.append(ds.getSchema());
+		namespace.append("namespace=");
+		namespace.append(ds.getNamespace());
+		metadataFormat.append("address=");
+		metadataFormat.append(ds.getMetadataFormat());
+		//todo: check that the iso format is acquired by this
+		isoFormat.append("isoFormat=");
+		isoFormat.append(ds.getIsoImplementationClass());
+		charset.append("charset=");
+		charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+		recordIdPolicy.append("recordIdPolicy=");
+		recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+
+		recordXPath.append("recordXPath=");
+		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
+		//todo:is folder==folderPath?
+		folder.append("folder=");
+		folder.append(ds.getSequence1().getRetrieveStrategy().getChoice().getFolderPath());
 		
-		return null;
+		
+		
+		
+		
+		Response resp = invokRestTemplate("/dataSources/createFolder",Response.class,
+				id.toString(),
+				description.toString(),
+				nameCode.toString(),
+				name.toString(),
+				exportPath.toString(),
+				schema.toString(),
+				namespace.toString(),
+				metadataFormat.toString(),
+				isoFormat.toString(),
+				charset.toString(),
+				recordIdPolicy.toString(),
+				idXpath.toString(),
+				namespacePrefix.toString(),
+				namespaceUri.toString(),
+				recordXPath.toString(),
+				folder.toString());
+
+		if (resp.getSource() == null) {
+			if (resp.getError() != null) {
+				throw new DataSourceOperationException(resp.getError());
+			} else {
+				throw new DataSourceOperationException("Unidentified Repox Error");
+			}
+		} else {
+
+			return resp.getSource();
+		}
 	}
 	
 	
