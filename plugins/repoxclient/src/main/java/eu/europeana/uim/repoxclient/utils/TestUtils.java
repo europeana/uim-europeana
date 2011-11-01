@@ -37,6 +37,8 @@ import eu.europeana.uim.repoxclient.jibxbindings.OaiSet;
 import eu.europeana.uim.repoxclient.jibxbindings.OaiSource;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
+import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence1;
+import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence2;
 
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
@@ -46,17 +48,16 @@ import eu.europeana.uim.repoxclient.jibxbindings.Url;
  * 
  * 
  * @author Georgios Markakis
+ * @author Yorgos Mamakis
  */
 public class TestUtils {
 
-	
-	
-	public static Aggregator createAggregatorObj(){
+	public static Aggregator createAggregatorObj() {
 
 		Aggregator aggr = new Aggregator();
-		
-	    Name name = new Name();
-	    name.setName("JunitContainerAggregator2");
+
+		Name name = new Name();
+		name.setName("JunitContainerAggregator2");
 		aggr.setName(name);
 		NameCode namecode = new NameCode();
 		namecode.setNameCode("77777");
@@ -64,20 +65,18 @@ public class TestUtils {
 		Url url = new Url();
 		url.setUrl("http://www.in.gr");
 		aggr.setUrl(url);
-		
+
 		return aggr;
-		
+
 	}
-	
-	
-	
-	public static Provider createProviderObj(){
-		
+
+	public static Provider createProviderObj() {
+
 		Provider prov = new Provider();
-		
-	    Name name2 = new Name();
-	    name2.setName("JunitContainerProvider");
-		
+
+		Name name2 = new Name();
+		name2.setName("JunitContainerProvider");
+
 		Country country = new Country();
 		country.setCountry("gr");
 		Description description = new Description();
@@ -88,28 +87,23 @@ public class TestUtils {
 		type.setType("ARCHIVE");
 		Url url = new Url();
 		url.setUrl("http://www.in.gr");
-		
-		
-		prov.setCountry(country );
+
+		prov.setCountry(country);
 		prov.setDescription(description);
 		prov.setName(name2);
 		prov.setNameCode(nameCode);
-		prov.setType(type );
+		prov.setType(type);
 		prov.setUrl(url);
-		
-		
-		return prov;
-		
-	}
-	
-	
 
-	
-		
-	public static Source createOAIDataSource(){
-	 	// /rest/dataSources/createOai?dataProviderId=DPRestr0&id=bdaSet&description=Biblioteca Digital Do Alentejo&nameCode=00123&name=Alentejo&
+		return prov;
+
+	}
+
+	public static Source createOAIDataSource() {
+		// /rest/dataSources/createOai?dataProviderId=DPRestr0&id=bdaSet&description=Biblioteca
+		// Digital Do Alentejo&nameCode=00123&name=Alentejo&
 		// exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&
-		//metadataFormat=ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
+		// metadataFormat=ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
 
 		Source ds = new Source();
 		ds.setId("DPRestr0");
@@ -122,27 +116,48 @@ public class TestUtils {
 		ds.setSchema("http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd");
 		ds.setNamespace("http://www.europeana.eu/schemas/ese/");
 		ds.setMetadataFormat("ese");
-		
+
 		Sequence seq = new Sequence();
 		OaiSet oaiSet = new OaiSet();
 		oaiSet.setOaiSet("bda");
 		seq.setOaiSet(oaiSet);
 		OaiSource oaiSource = new OaiSource();
-		oaiSource.setOaiSource("http://bd1.inesc-id.pt:8080/repoxel/OAIHandler");
+		oaiSource
+				.setOaiSource("http://bd1.inesc-id.pt:8080/repoxel/OAIHandler");
 		seq.setOaiSource(oaiSource);
 		ds.setSequence(seq);
-		
 
 		return ds;
 	}
-	
-	
+/*
+	public static Source createZ3950TimestampDataSource() {
+		///rest/dataSources/createZ3950Timestamp?dataProviderId=DPRestr0&id=z3950TimeTest&description=test Z39.50 with time stamp&nameCode=00130&name=Z3950-TimeStamp&
+		//exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=193.6.201.205&port=1616&database=B1&
+		//user=&password=&recordSyntax=usmarc&charset=UTF-8&earliestTimestamp=20110301&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
+		Source ds = new Source();
+		ds.setId("z3950TimeTest");
+		Description des = new Description();
+		des.setDescription("test Z39.50 with time stamp");
+		ds.setDescription(des);
+		ds.setNameCode("00130");
+		ds.setName("Z3950-TimeStamp");
+		ds.setExportPath("D:/Projectos/repoxdata_new");
+		ds.setSchema("info:lc/xmlns/marcxchange-v1.xsd");
+		ds.setNamespace("info:lc/xmlns/marcxchange-v1");
+		Sequence2 seq = new Sequence2();
+		seq.
+		return ds;
+	}
+*/
 	/**
-	 * This method marshals the contents of a  JIBX Element and outputs the results to the
-	 * Logger.  
-	 * @param jaxbObject A JIBX representation of a SugarCRM SOAP Element. 
+	 * This method marshals the contents of a JIBX Element and outputs the
+	 * results to the Logger.
+	 * 
+	 * @param jaxbObject
+	 *            A JIBX representation of a SugarCRM SOAP Element.
 	 */
-	public static  void logMarshalledObject(Object jibxObject,org.apache.log4j.Logger LOGGER){		
+	public static void logMarshalledObject(Object jibxObject,
+			org.apache.log4j.Logger LOGGER) {
 		IBindingFactory context;
 
 		try {
