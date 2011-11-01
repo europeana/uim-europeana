@@ -60,6 +60,7 @@ import eu.europeana.uim.repoxclient.utils.TestUtils;
  * Core Repox connectivity unite testing
  * 
  * @author Georgios Markakis
+ * @author Yorgos Mamakis
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -285,5 +286,93 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	
 }
 
+/**
+ * Tests Z3950Timestamp operations 
+ * 
+ * @throws Exception
+ */
+@Test
+public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
+	
+
+	try{
+	//Create an Aggregator for testing purposes
+	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
+	assertNotNull(rtAggr);
+	TestUtils.logMarshalledObject(rtAggr,LOGGER);
+	
+	//Create a Provider
+	Provider prov = TestUtils.createProviderObj();	
+	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
+	assertNotNull(respprov);
+	TestUtils.logMarshalledObject(respprov,LOGGER);
+	
+	//Create an OAI PMH Datasource
+	Source oaids = TestUtils.createOAIDataSource();
+	
+	Source respOaids = repoxRestClient.createDatasourceOAI(oaids, respprov);
+	TestUtils.logMarshalledObject(respOaids,LOGGER);
+
+	//Update an OAI PMH Datasource
+	Description description = new Description();
+	description.setDescription("altered!@#$%");
+	respOaids.setDescription(description );
+	
+	Source updOaids = repoxRestClient.updateDatasourceOAI(respOaids);
+	assertNotNull(updOaids);
+	assertEquals("altered!@#$%",updOaids.getDescription().getDescription());
+	
+	//Initialize a harvesting session
+	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids.getId(),true);
+	assertNotNull(harvestRes);
+	TestUtils.logMarshalledObject(harvestRes,LOGGER);
+
+	
+	RunningTasks rt = repoxRestClient.getActiveHarvestingSessions();
+	assertNotNull(rt);
+	TestUtils.logMarshalledObject(rt,LOGGER);
+	ArrayList<DataSource> dslist =  (ArrayList<DataSource>) rt.getDataSourceList();
+	DataSource dsisregistered = null;
+
+	for(DataSource ds : dslist){
+	    if(ds.getDataSource().equals(updOaids.getId())){	
+	    	dsisregistered = ds;
+	    }
+	}
+	
+	//assertNotNull(dsisregistered);
+	
+	
+	
+	//Gets the Harvesting Status for the created datasource
+	Success status =repoxRestClient.getHarvestingStatus(updOaids.getId());
+	assertNotNull(status);
+	TestUtils.logMarshalledObject(status,LOGGER);
+	
+	Success cancelled = repoxRestClient.cancelHarvesting(updOaids.getId());
+    assertNotNull(cancelled);
+	TestUtils.logMarshalledObject(cancelled,LOGGER);
+	
+	//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
+	//Log harvestLog = repoxRestClient.getHarvestLog(updOaids.getId());
+    //assertNotNull(harvestLog);
+	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
+	
+	Success deleted = repoxRestClient.deleteDatasource(updOaids.getId());
+    assertNotNull(deleted);
+	TestUtils.logMarshalledObject(deleted,LOGGER);
+	
+	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
+	assertNotNull(aggres);
+	
+	}
+	catch(Exception ex){
+		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		
+		throw ex;
+	}
+	
+}
 
 }
