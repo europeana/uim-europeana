@@ -95,6 +95,7 @@ public class OaiPmhLoader {
         }
     }
 
+    
     /**
      * Creates a new instance of this class.
      * 
@@ -104,21 +105,7 @@ public class OaiPmhLoader {
      * @param request
      * @param monitor
      * @param harvest
-     * @param processor
      * @param loggingEngine
-
-    @SuppressWarnings("rawtypes")
-    public <I> OaiPmhLoader(Iterator<OaiPmhRecord> harvest, FieldProcessor processor,
-                            StorageEngine<I> storage, Request<I> request, ProgressMonitor monitor,
-                            LoggingEngine<I> loggingEngine) {
-        super();
-        this.harvest = harvest;
-        this.processor = processor;
-        this.storage = storage;
-        this.request = request;
-        this.monitor = monitor;
-        this.loggingEngine = loggingEngine;
-    }
     */
     
     
