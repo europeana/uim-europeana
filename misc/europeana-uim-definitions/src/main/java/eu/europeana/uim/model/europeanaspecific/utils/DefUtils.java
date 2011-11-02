@@ -28,6 +28,10 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.jibx.extras.DomElementMapper;
+
+
+import org.w3c.dom.Element;
 
 /**
  * 
@@ -70,6 +74,7 @@ public class DefUtils {
 	public static <T> T unmarshallObject(String xml,T type) throws JiBXException{
 		 IBindingFactory bfactory = BindingDirectory.getFactory(type.getClass());
 		 IUnmarshallingContext context = bfactory.createUnmarshallingContext();
+		 		 
 		 
 		 StringReader reader = new StringReader(xml);
 
@@ -80,4 +85,26 @@ public class DefUtils {
 	 }
 	
 	
+	
+	 /**
+	  * Unmarshalls and returns a JIBX object from a DOM element
+	  * 
+	 * @param <T>
+	 * @param xml
+	 * @param type
+	 * @return
+	 * @throws JiBXException
+	 */
+	public static <T> T unmarshallObjectFromElement(Element element,T type) throws JiBXException{
+		 IBindingFactory bfactory = BindingDirectory.getFactory(type.getClass());
+		 IUnmarshallingContext context = bfactory.createUnmarshallingContext();
+		 
+
+		 DomElementMapper mapper = new DomElementMapper();
+		 
+		 @SuppressWarnings("unchecked")
+		 T object =  (T) mapper.unmarshal(element, context);
+		 
+		 return object;
+	 }
 }

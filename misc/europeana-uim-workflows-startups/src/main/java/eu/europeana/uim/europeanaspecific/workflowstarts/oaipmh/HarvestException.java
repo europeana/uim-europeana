@@ -18,7 +18,7 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package eu.europeana.uim.europeanaspecific.workflowstarts;
+package eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh;
 
 /**
  * A typed exception thrown during OAI-PMH harvesting

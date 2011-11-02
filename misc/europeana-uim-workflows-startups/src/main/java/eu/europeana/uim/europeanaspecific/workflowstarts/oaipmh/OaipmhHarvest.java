@@ -1,4 +1,4 @@
-package eu.europeana.uim.europeanaspecific.workflowstarts;
+package eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh;
 
 import java.io.IOException;
 import java.net.URLEncoder;

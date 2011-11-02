@@ -1,4 +1,4 @@
-package eu.europeana.uim.europeanaspecific.workflowstarts;
+package eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh;
 
 import java.io.StringReader;
 import java.text.DateFormat;
@@ -25,8 +25,12 @@ import org.theeuropeanlibrary.model.common.time.InstantGranularity;
 import org.theeuropeanlibrary.model.tel.Metadata;
 import org.theeuropeanlibrary.model.tel.ObjectModelRegistry;
 import org.theeuropeanlibrary.model.tel.qualifier.FieldSource;
-//import org.theeuropeanlibrary.model.tel.Identifier;
-//import org.theeuropeanlibrary.model.tel.IdentifierType;
+import org.theeuropeanlibrary.model.common.Identifier;
+import org.theeuropeanlibrary.model.common.qualifier.IdentifierType;
+import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
+import eu.europeana.uim.edmcore.definitions.RDF;
+import eu.europeana.uim.model.europeanaspecific.utils.DefUtils;
+
 //import org.theeuropeanlibrary.model.xml.XmlUtil;
 //import org.theeuropeanlibrary.uim.load.metadata.FieldProcessor;
 import org.w3c.dom.DOMException;
@@ -181,10 +185,10 @@ public class OaiPmhLoader {
                 
                 
                 
-                //mdr.addValue(ObjectModelRegistry.IDENTIFIER, new Identifier(identifier),
-                //        IdentifierType.LOCAL_IDENTIFIER);
-                //mdr.addValue(ObjectModelRegistry.INSTANT, new Instant(new Date(),
-                //        InstantGranularity.SECOND), TemporalRelation.OP_LOADED);
+                mdr.addValue(ObjectModelRegistry.IDENTIFIER, new Identifier(identifier),
+                        IdentifierType.LOCAL_IDENTIFIER);
+                mdr.addValue(ObjectModelRegistry.INSTANT, new Instant(new Date(),
+                        InstantGranularity.SECOND), TemporalRelation.OP_LOADED);
 
                 if (record.getProvenance() != null) {
                     Node originDescription = record.getProvenance().getFirstChild();
@@ -223,14 +227,15 @@ public class OaiPmhLoader {
                     mdr.addValue(ObjectModelRegistry.STATUS, Status.ACTIVE);
 
                     String oaiidentifier = record.getIdentifier();
-                    /*
+
                     if (oaiidentifier != null && oaiidentifier.trim().length() > 0) {
                         mdr.addValue(ObjectModelRegistry.IDENTIFIER,
                                 new Identifier(record.getIdentifier()), IdentifierType.OAIPMH);
                     } else {
-                        log.warning("No identifier (" + mdr.getId() + "):\n" +
-                                    XmlUtil.writeDomToString(record.getMetadata()));
+                        log.warning("No identifier (" + mdr.getId() + "):\n");   //+ XmlUtil.writeDomToString(record.getMetadata()));
+                                    
                     }
+                    /*
                     */
                 }
 
@@ -244,8 +249,9 @@ public class OaiPmhLoader {
                     mdr.addValue(ObjectModelRegistry.COLLECTION,
                             request.getCollection().getMnemonic());
 
-                    //Object precord = processor.createRecordFromDom(record.getMetadata());
-                    //processor.processFields(precord, mdr, request.getCollection());
+                    RDF validedmrecord = DefUtils.unmarshallObjectFromElement(record.getMetadata(), new RDF());
+                    mdr.addValue(EuropeanaModelRegistry.EDMRECORD,validedmrecord);
+                    
                 }
 
                 if (save) {

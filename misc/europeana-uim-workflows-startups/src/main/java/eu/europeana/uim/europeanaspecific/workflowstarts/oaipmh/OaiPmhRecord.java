@@ -1,4 +1,4 @@
-package eu.europeana.uim.europeanaspecific.workflowstarts;
+package eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh;
 
 import org.w3c.dom.Element;
 

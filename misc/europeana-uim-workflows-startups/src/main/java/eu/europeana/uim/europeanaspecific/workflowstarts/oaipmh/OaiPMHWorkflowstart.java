@@ -18,7 +18,7 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package eu.europeana.uim.europeanaspecific.workflowstarts;
+package eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh;
 
 import java.io.Serializable;
 import java.util.List;
@@ -55,7 +55,7 @@ public class OaiPMHWorkflowstart extends AbstractWorkflowStart{
 	       public OaiPmhLoader loader;
 		        public Request<?>   request;
 		
-	        public int          maxrecords = 0;
+	            public int          maxrecords = 0;
 		        public int          expected   = 0;
 		    }
 	
