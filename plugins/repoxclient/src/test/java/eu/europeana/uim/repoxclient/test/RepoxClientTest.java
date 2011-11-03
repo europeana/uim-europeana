@@ -227,11 +227,14 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 
 	//Update an OAI PMH Datasource
 	Description description = new Description();
+	
 	description.setDescription("altered!@#$%");
-	respOaids.setDescription(description );
+	respOaids.setDescription(description);
 	
 	Source updOaids = repoxRestClient.updateDatasourceOAI(respOaids);
+	
 	assertNotNull(updOaids);
+	
 	assertEquals("altered!@#$%",updOaids.getDescription().getDescription());
 	
 	//Initialize a harvesting session
@@ -584,7 +587,7 @@ public void testCreateUpdateDeleteFtpDataSource() throws Exception{
 	//Update an FTP Datasource
 	Description description = new Description();
 	description.setDescription("altered!@#$%");
-	respFtpds.setDescription(description );
+	respFtpds.setDescription(description);
 	
 	Source updFtpds = repoxRestClient.updateDatasourceOAI(respFtpds);
 	assertNotNull(updFtpds);
