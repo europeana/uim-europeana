@@ -308,23 +308,23 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 	assertNotNull(respprov);
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
-	//Create an OAI PMH Datasource
-	Source oaids = TestUtils.createOAIDataSource();
+	//Create an Z3950Timestamp Datasource
+	Source z3950TSds = TestUtils.createZ3950TimestampDataSource();
 	
-	Source respOaids = repoxRestClient.createDatasourceOAI(oaids, respprov);
-	TestUtils.logMarshalledObject(respOaids,LOGGER);
+	Source respz3950TSds = repoxRestClient.createDatasourceZ3950Timestamp(z3950TSds, respprov);
+	TestUtils.logMarshalledObject(respz3950TSds,LOGGER);
 
-	//Update an OAI PMH Datasource
+	//Update an Z3950Timestamp Datasource
 	Description description = new Description();
 	description.setDescription("altered!@#$%");
-	respOaids.setDescription(description );
+	respz3950TSds.setDescription(description );
 	
-	Source updOaids = repoxRestClient.updateDatasourceOAI(respOaids);
-	assertNotNull(updOaids);
-	assertEquals("altered!@#$%",updOaids.getDescription().getDescription());
+	Source updz3950TSds = repoxRestClient.updateDatasourceZ3950Timestamp(respz3950TSds);
+	assertNotNull(updz3950TSds);
+	assertEquals("altered!@#$%",updz3950TSds.getDescription().getDescription());
 	
 	//Initialize a harvesting session
-	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids.getId(),true);
+	Success harvestRes = repoxRestClient.initiateHarvesting(updz3950TSds.getId(),true);
 	assertNotNull(harvestRes);
 	TestUtils.logMarshalledObject(harvestRes,LOGGER);
 
@@ -336,7 +336,7 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 	DataSource dsisregistered = null;
 
 	for(DataSource ds : dslist){
-	    if(ds.getDataSource().equals(updOaids.getId())){	
+	    if(ds.getDataSource().equals(updz3950TSds.getId())){	
 	    	dsisregistered = ds;
 	    }
 	}
@@ -346,11 +346,11 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 	
 	
 	//Gets the Harvesting Status for the created datasource
-	Success status =repoxRestClient.getHarvestingStatus(updOaids.getId());
+	Success status =repoxRestClient.getHarvestingStatus(updz3950TSds.getId());
 	assertNotNull(status);
 	TestUtils.logMarshalledObject(status,LOGGER);
 	
-	Success cancelled = repoxRestClient.cancelHarvesting(updOaids.getId());
+	Success cancelled = repoxRestClient.cancelHarvesting(updz3950TSds.getId());
     assertNotNull(cancelled);
 	TestUtils.logMarshalledObject(cancelled,LOGGER);
 	
@@ -359,7 +359,454 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
     //assertNotNull(harvestLog);
 	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
 	
-	Success deleted = repoxRestClient.deleteDatasource(updOaids.getId());
+	Success deleted = repoxRestClient.deleteDatasource(updz3950TSds.getId());
+    assertNotNull(deleted);
+	TestUtils.logMarshalledObject(deleted,LOGGER);
+	
+	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
+	assertNotNull(aggres);
+	
+	}
+	catch(Exception ex){
+		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		
+		throw ex;
+	}
+	
+}
+
+/**
+ * Tests Z3950IDFile operations 
+ * 
+ * @throws Exception
+ */
+@Test
+public void testCreateUpdateDeleteZ3950IDFileDataSource() throws Exception{
+	
+
+	try{
+	//Create an Aggregator for testing purposes
+	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
+	assertNotNull(rtAggr);
+	TestUtils.logMarshalledObject(rtAggr,LOGGER);
+	
+	//Create a Provider
+	Provider prov = TestUtils.createProviderObj();	
+	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
+	assertNotNull(respprov);
+	TestUtils.logMarshalledObject(respprov,LOGGER);
+	
+	//Create an Z3950OIdFile Datasource
+	Source Z3950IDFileds = TestUtils.createZ3950IdFileDataSource();
+	
+	Source respZ3950IDFileds = repoxRestClient.createDatasourceZ3950IdFile(Z3950IDFileds, respprov);
+	TestUtils.logMarshalledObject(respZ3950IDFileds,LOGGER);
+
+	//Update an Z3950OIdFile Datasource
+	Description description = new Description();
+	description.setDescription("altered!@#$%");
+	respZ3950IDFileds.setDescription(description );
+	
+	Source updZ3950IDFileds = repoxRestClient.updateDatasourceZ3950IdFile(respZ3950IDFileds);
+	assertNotNull(updZ3950IDFileds);
+	assertEquals("altered!@#$%",updZ3950IDFileds.getDescription().getDescription());
+	
+	//Initialize a harvesting session
+	Success harvestRes = repoxRestClient.initiateHarvesting(updZ3950IDFileds.getId(),true);
+	assertNotNull(harvestRes);
+	TestUtils.logMarshalledObject(harvestRes,LOGGER);
+
+	
+	RunningTasks rt = repoxRestClient.getActiveHarvestingSessions();
+	assertNotNull(rt);
+	TestUtils.logMarshalledObject(rt,LOGGER);
+	ArrayList<DataSource> dslist =  (ArrayList<DataSource>) rt.getDataSourceList();
+	DataSource dsisregistered = null;
+
+	for(DataSource ds : dslist){
+	    if(ds.getDataSource().equals(updZ3950IDFileds.getId())){	
+	    	dsisregistered = ds;
+	    }
+	}
+	
+	//assertNotNull(dsisregistered);
+	
+	
+	
+	//Gets the Harvesting Status for the created datasource
+	Success status =repoxRestClient.getHarvestingStatus(updZ3950IDFileds.getId());
+	assertNotNull(status);
+	TestUtils.logMarshalledObject(status,LOGGER);
+	
+	Success cancelled = repoxRestClient.cancelHarvesting(updZ3950IDFileds.getId());
+    assertNotNull(cancelled);
+	TestUtils.logMarshalledObject(cancelled,LOGGER);
+	
+	//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
+	//Log harvestLog = repoxRestClient.getHarvestLog(updOaids.getId());
+    //assertNotNull(harvestLog);
+	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
+	
+	Success deleted = repoxRestClient.deleteDatasource(updZ3950IDFileds.getId());
+    assertNotNull(deleted);
+	TestUtils.logMarshalledObject(deleted,LOGGER);
+	
+	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
+	assertNotNull(aggres);
+	
+	}
+	catch(Exception ex){
+		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		
+		throw ex;
+	}
+	
+}
+//todo refactor here on 
+/**
+ * Tests Z3950IdSequence operations 
+ * 
+ * @throws Exception
+ */
+@Test
+public void testCreateUpdateDeleteZ3950IdSequenceDataSource() throws Exception{
+	
+
+	try{
+	//Create an Aggregator for testing purposes
+	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
+	assertNotNull(rtAggr);
+	TestUtils.logMarshalledObject(rtAggr,LOGGER);
+	
+	//Create a Provider
+	Provider prov = TestUtils.createProviderObj();	
+	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
+	assertNotNull(respprov);
+	TestUtils.logMarshalledObject(respprov,LOGGER);
+	
+	//Create an Z3950OIdSequence Datasource
+	Source Z3950IdSeqds = TestUtils.createZ3950IdSequenceDataSource();
+	
+	Source respZ3950IdSeqds = repoxRestClient.createDatasourceOAI(Z3950IdSeqds, respprov);
+	TestUtils.logMarshalledObject(respZ3950IdSeqds,LOGGER);
+
+	//Update an Z3950OIdSequence Datasource
+	Description description = new Description();
+	description.setDescription("altered!@#$%");
+	respZ3950IdSeqds.setDescription(description );
+	
+	Source updZ3950IdSeqds = repoxRestClient.updateDatasourceZ3950IdSequence(respZ3950IdSeqds);
+	assertNotNull(updZ3950IdSeqds);
+	assertEquals("altered!@#$%",updZ3950IdSeqds.getDescription().getDescription());
+	
+	//Initialize a harvesting session
+	Success harvestRes = repoxRestClient.initiateHarvesting(updZ3950IdSeqds.getId(),true);
+	assertNotNull(harvestRes);
+	TestUtils.logMarshalledObject(harvestRes,LOGGER);
+
+	
+	RunningTasks rt = repoxRestClient.getActiveHarvestingSessions();
+	assertNotNull(rt);
+	TestUtils.logMarshalledObject(rt,LOGGER);
+	ArrayList<DataSource> dslist =  (ArrayList<DataSource>) rt.getDataSourceList();
+	DataSource dsisregistered = null;
+
+	for(DataSource ds : dslist){
+	    if(ds.getDataSource().equals(updZ3950IdSeqds.getId())){	
+	    	dsisregistered = ds;
+	    }
+	}
+	
+	//assertNotNull(dsisregistered);
+	
+	
+	
+	//Gets the Harvesting Status for the created datasource
+	Success status =repoxRestClient.getHarvestingStatus(updZ3950IdSeqds.getId());
+	assertNotNull(status);
+	TestUtils.logMarshalledObject(status,LOGGER);
+	
+	Success cancelled = repoxRestClient.cancelHarvesting(updZ3950IdSeqds.getId());
+    assertNotNull(cancelled);
+	TestUtils.logMarshalledObject(cancelled,LOGGER);
+	
+	//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
+	//Log harvestLog = repoxRestClient.getHarvestLog(updOaids.getId());
+    //assertNotNull(harvestLog);
+	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
+	
+	Success deleted = repoxRestClient.deleteDatasource(updZ3950IdSeqds.getId());
+    assertNotNull(deleted);
+	TestUtils.logMarshalledObject(deleted,LOGGER);
+	
+	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
+	assertNotNull(aggres);
+	
+	}
+	catch(Exception ex){
+		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		
+		throw ex;
+	}
+	
+}
+
+/**
+ * Tests FTP operations 
+ * 
+ * @throws Exception
+ */
+@Test
+public void testCreateUpdateDeleteFtpDataSource() throws Exception{
+	
+
+	try{
+	//Create an Aggregator for testing purposes
+	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
+	assertNotNull(rtAggr);
+	TestUtils.logMarshalledObject(rtAggr,LOGGER);
+	
+	//Create a Provider
+	Provider prov = TestUtils.createProviderObj();	
+	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
+	assertNotNull(respprov);
+	TestUtils.logMarshalledObject(respprov,LOGGER);
+	
+	//Create an FTP Datasource
+	Source Ftpds = TestUtils.createFtpDataSource();
+	
+	Source respFtpds = repoxRestClient.createDatasourceFtp(Ftpds, respprov);
+	TestUtils.logMarshalledObject(respFtpds,LOGGER);
+
+	//Update an FTP Datasource
+	Description description = new Description();
+	description.setDescription("altered!@#$%");
+	respFtpds.setDescription(description );
+	
+	Source updFtpds = repoxRestClient.updateDatasourceOAI(respFtpds);
+	assertNotNull(updFtpds);
+	assertEquals("altered!@#$%",updFtpds.getDescription().getDescription());
+	
+	//Initialize a harvesting session
+	Success harvestRes = repoxRestClient.initiateHarvesting(updFtpds.getId(),true);
+	assertNotNull(harvestRes);
+	TestUtils.logMarshalledObject(harvestRes,LOGGER);
+
+	
+	RunningTasks rt = repoxRestClient.getActiveHarvestingSessions();
+	assertNotNull(rt);
+	TestUtils.logMarshalledObject(rt,LOGGER);
+	ArrayList<DataSource> dslist =  (ArrayList<DataSource>) rt.getDataSourceList();
+	DataSource dsisregistered = null;
+
+	for(DataSource ds : dslist){
+	    if(ds.getDataSource().equals(updFtpds.getId())){	
+	    	dsisregistered = ds;
+	    }
+	}
+	
+	//assertNotNull(dsisregistered);
+	
+	
+	
+	//Gets the Harvesting Status for the created datasource
+	Success status =repoxRestClient.getHarvestingStatus(updFtpds.getId());
+	assertNotNull(status);
+	TestUtils.logMarshalledObject(status,LOGGER);
+	
+	Success cancelled = repoxRestClient.cancelHarvesting(updFtpds.getId());
+    assertNotNull(cancelled);
+	TestUtils.logMarshalledObject(cancelled,LOGGER);
+	
+	//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
+	//Log harvestLog = repoxRestClient.getHarvestLog(updOaids.getId());
+    //assertNotNull(harvestLog);
+	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
+	
+	Success deleted = repoxRestClient.deleteDatasource(updFtpds.getId());
+    assertNotNull(deleted);
+	TestUtils.logMarshalledObject(deleted,LOGGER);
+	
+	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
+	assertNotNull(aggres);
+	
+	}
+	catch(Exception ex){
+		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		
+		throw ex;
+	}
+	
+}
+
+
+/**
+ * Tests Http operations 
+ * 
+ * @throws Exception
+ */
+@Test
+public void testCreateUpdateDeleteHttpDataSource() throws Exception{
+	
+
+	try{
+	//Create an Aggregator for testing purposes
+	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
+	assertNotNull(rtAggr);
+	TestUtils.logMarshalledObject(rtAggr,LOGGER);
+	
+	//Create a Provider
+	Provider prov = TestUtils.createProviderObj();	
+	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
+	assertNotNull(respprov);
+	TestUtils.logMarshalledObject(respprov,LOGGER);
+	
+	//Create an HTTP Datasource
+	Source Httpds = TestUtils.createHttpDataSource();
+	
+	Source respHttpds = repoxRestClient.createDatasourceOAI(Httpds, respprov);
+	TestUtils.logMarshalledObject(respHttpds,LOGGER);
+
+	//Update an HTTP Datasource
+	Description description = new Description();
+	description.setDescription("altered!@#$%");
+	respHttpds.setDescription(description );
+	
+	Source updHttpds = repoxRestClient.updateDatasourceOAI(respHttpds);
+	assertNotNull(updHttpds);
+	assertEquals("altered!@#$%",updHttpds.getDescription().getDescription());
+	
+	//Initialize a harvesting session
+	Success harvestRes = repoxRestClient.initiateHarvesting(updHttpds.getId(),true);
+	assertNotNull(harvestRes);
+	TestUtils.logMarshalledObject(harvestRes,LOGGER);
+
+	
+	RunningTasks rt = repoxRestClient.getActiveHarvestingSessions();
+	assertNotNull(rt);
+	TestUtils.logMarshalledObject(rt,LOGGER);
+	ArrayList<DataSource> dslist =  (ArrayList<DataSource>) rt.getDataSourceList();
+	DataSource dsisregistered = null;
+
+	for(DataSource ds : dslist){
+	    if(ds.getDataSource().equals(updHttpds.getId())){	
+	    	dsisregistered = ds;
+	    }
+	}
+	
+	//assertNotNull(dsisregistered);
+	
+	
+	
+	//Gets the Harvesting Status for the created datasource
+	Success status =repoxRestClient.getHarvestingStatus(updHttpds.getId());
+	assertNotNull(status);
+	TestUtils.logMarshalledObject(status,LOGGER);
+	
+	Success cancelled = repoxRestClient.cancelHarvesting(updHttpds.getId());
+    assertNotNull(cancelled);
+	TestUtils.logMarshalledObject(cancelled,LOGGER);
+	
+	//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
+	//Log harvestLog = repoxRestClient.getHarvestLog(updOaids.getId());
+    //assertNotNull(harvestLog);
+	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
+	
+	Success deleted = repoxRestClient.deleteDatasource(updHttpds.getId());
+    assertNotNull(deleted);
+	TestUtils.logMarshalledObject(deleted,LOGGER);
+	
+	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
+	assertNotNull(aggres);
+	
+	}
+	catch(Exception ex){
+		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		
+		throw ex;
+	}
+	
+}
+
+
+/**
+ * Tests Folder operations 
+ * 
+ * @throws Exception
+ */
+@Test
+public void testCreateUpdateDeleteFolderDataSource() throws Exception{
+	
+
+	try{
+	//Create an Aggregator for testing purposes
+	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
+	assertNotNull(rtAggr);
+	TestUtils.logMarshalledObject(rtAggr,LOGGER);
+	
+	//Create a Provider
+	Provider prov = TestUtils.createProviderObj();	
+	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
+	assertNotNull(respprov);
+	TestUtils.logMarshalledObject(respprov,LOGGER);
+	
+	//Create an Folder Datasource
+	Source folderds = TestUtils.createFolderDataSource();
+	
+	Source respfolderds = repoxRestClient.createDatasourceOAI(folderds, respprov);
+	TestUtils.logMarshalledObject(respfolderds,LOGGER);
+
+	//Update an Folder Datasource
+	Description description = new Description();
+	description.setDescription("altered!@#$%");
+	respfolderds.setDescription(description );
+	
+	Source updfolderds = repoxRestClient.updateDatasourceOAI(respfolderds);
+	assertNotNull(updfolderds);
+	assertEquals("altered!@#$%",updfolderds.getDescription().getDescription());
+	
+	//Initialize a harvesting session
+	Success harvestRes = repoxRestClient.initiateHarvesting(updfolderds.getId(),true);
+	assertNotNull(harvestRes);
+	TestUtils.logMarshalledObject(harvestRes,LOGGER);
+
+	
+	RunningTasks rt = repoxRestClient.getActiveHarvestingSessions();
+	assertNotNull(rt);
+	TestUtils.logMarshalledObject(rt,LOGGER);
+	ArrayList<DataSource> dslist =  (ArrayList<DataSource>) rt.getDataSourceList();
+	DataSource dsisregistered = null;
+
+	for(DataSource ds : dslist){
+	    if(ds.getDataSource().equals(updfolderds.getId())){	
+	    	dsisregistered = ds;
+	    }
+	}
+	
+	//assertNotNull(dsisregistered);
+	
+	
+	
+	//Gets the Harvesting Status for the created datasource
+	Success status =repoxRestClient.getHarvestingStatus(updfolderds.getId());
+	assertNotNull(status);
+	TestUtils.logMarshalledObject(status,LOGGER);
+	
+	Success cancelled = repoxRestClient.cancelHarvesting(updfolderds.getId());
+    assertNotNull(cancelled);
+	TestUtils.logMarshalledObject(cancelled,LOGGER);
+	
+	//TODO:Harvest Logs are not generated if harvesting is not complete. How to test this?
+	//Log harvestLog = repoxRestClient.getHarvestLog(updOaids.getId());
+    //assertNotNull(harvestLog);
+	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
+	
+	Success deleted = repoxRestClient.deleteDatasource(updfolderds.getId());
     assertNotNull(deleted);
 	TestUtils.logMarshalledObject(deleted,LOGGER);
 	
