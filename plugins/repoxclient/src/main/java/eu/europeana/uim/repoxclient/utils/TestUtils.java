@@ -28,17 +28,42 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 
+import eu.europeana.uim.repoxclient.jibxbindings.Address;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
+import eu.europeana.uim.repoxclient.jibxbindings.Charset;
 import eu.europeana.uim.repoxclient.jibxbindings.Country;
+import eu.europeana.uim.repoxclient.jibxbindings.Database;
 import eu.europeana.uim.repoxclient.jibxbindings.Description;
+import eu.europeana.uim.repoxclient.jibxbindings.EarliestTimestamp;
+import eu.europeana.uim.repoxclient.jibxbindings.FilePath;
+import eu.europeana.uim.repoxclient.jibxbindings.Folder;
+import eu.europeana.uim.repoxclient.jibxbindings.FtpPath;
+import eu.europeana.uim.repoxclient.jibxbindings.IdXpath;
+import eu.europeana.uim.repoxclient.jibxbindings.IsoFormat;
+import eu.europeana.uim.repoxclient.jibxbindings.MaximumId;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
+import eu.europeana.uim.repoxclient.jibxbindings.Namespace;
+import eu.europeana.uim.repoxclient.jibxbindings.NamespacePrefix;
+import eu.europeana.uim.repoxclient.jibxbindings.NamespaceUri;
+import eu.europeana.uim.repoxclient.jibxbindings.Namespaces;
 import eu.europeana.uim.repoxclient.jibxbindings.OaiSet;
 import eu.europeana.uim.repoxclient.jibxbindings.OaiSource;
+import eu.europeana.uim.repoxclient.jibxbindings.Password;
+import eu.europeana.uim.repoxclient.jibxbindings.Port;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
+import eu.europeana.uim.repoxclient.jibxbindings.RecordIdPolicy;
+import eu.europeana.uim.repoxclient.jibxbindings.RecordSyntax;
+import eu.europeana.uim.repoxclient.jibxbindings.RecordXPath;
+import eu.europeana.uim.repoxclient.jibxbindings.RetrieveStrategy;
+import eu.europeana.uim.repoxclient.jibxbindings.Server;
+import eu.europeana.uim.repoxclient.jibxbindings.Source.Choice;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence1;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence2;
+import eu.europeana.uim.repoxclient.jibxbindings.SplitRecords;
+import eu.europeana.uim.repoxclient.jibxbindings.Target;
+import eu.europeana.uim.repoxclient.jibxbindings.User;
 
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
@@ -106,7 +131,7 @@ public class TestUtils {
 		// metadataFormat=ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
 
 		Source ds = new Source();
-		ds.setId("DPRestr0");
+		ds.setId("bdaSet");
 		Description des = new Description();
 		des.setDescription("Biblioteca Digital Do Alentejo");
 		ds.setDescription(des);
@@ -129,7 +154,7 @@ public class TestUtils {
 
 		return ds;
 	}
-/*
+
 	public static Source createZ3950TimestampDataSource() {
 		///rest/dataSources/createZ3950Timestamp?dataProviderId=DPRestr0&id=z3950TimeTest&description=test Z39.50 with time stamp&nameCode=00130&name=Z3950-TimeStamp&
 		//exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=193.6.201.205&port=1616&database=B1&
@@ -145,10 +170,394 @@ public class TestUtils {
 		ds.setSchema("info:lc/xmlns/marcxchange-v1.xsd");
 		ds.setNamespace("info:lc/xmlns/marcxchange-v1");
 		Sequence2 seq = new Sequence2();
-		seq.
+		Target target = new Target();
+		Address address = new Address();
+		address.setAddress("193.6.201.205");
+		target.setAddress(address);
+		Port port = new Port();
+		port.setPort(BigInteger.valueOf(1616));
+		target.setPort(port);
+		Database database = new Database();
+		database.setDatabase("B1");
+		target.setDatabase(database);
+		User user = new User();
+		user.setUser("");
+		target.setUser(user);
+		Password password = new Password();
+		password.setPassword("");
+		target.setPassword(password);
+		RecordSyntax recordSyntax = new RecordSyntax();
+		recordSyntax.setRecordSyntax("usmarc");
+		target.setRecordSyntax(recordSyntax);
+		Charset charset = new Charset();
+		charset.setCharset("UTF-8");
+		seq.setTarget(target);
+		ds.setSequence2(seq);
+		Choice choice = new Choice();
+		EarliestTimestamp earliestTimestamp = new EarliestTimestamp();
+		earliestTimestamp.setEarliestTimestamp(BigInteger.valueOf(20110301));
+		choice.setEarliestTimestamp(earliestTimestamp);
+		ds.setChoice(choice);
+		RecordIdPolicy recordIdPolicy = new RecordIdPolicy();
+		recordIdPolicy.setType("IdGenerated");
+		
+		RecordIdPolicy.Sequence idPolicySequence = new RecordIdPolicy.Sequence();
+		IdXpath idXpath = new IdXpath();
+		idXpath.setIdXpath("");
+		idPolicySequence.setIdXpath(idXpath);
+		Namespaces namespaces = new Namespaces();
+		Namespace namespace = new Namespace();
+		NamespacePrefix namespacePrefix = new NamespacePrefix();
+		namespacePrefix.setNamespacePrefix("");
+		namespace.setNamespacePrefix(namespacePrefix);
+		NamespaceUri namespaceUri = new NamespaceUri();
+		namespaceUri.setNamespaceUri("");
+		namespace.setNamespaceUri(namespaceUri);
+		namespaces.setNamespace(namespace);
+		idPolicySequence.setNamespaces(namespaces);
+		recordIdPolicy.setSequence(idPolicySequence);
+		ds.setRecordIdPolicy(recordIdPolicy);
+		
+		
 		return ds;
 	}
-*/
+
+	public static Source createZ3950IdFileDataSource() {
+		///rest/dataSources/createZ3950IdList?dataProviderId=DPRestr0&id=z3950IdFile&description=test Z39.50 with id list&nameCode=00124&name=Z3950-IdFile&
+		//exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=aleph.lbfl.li&port=9909&
+		//database=LLB_IDS&user=&password=&recordSyntax=usmarc&charset=UTF-8&filePath=C:\folderZ3950\1900028192z3960idList.txt&recordIdPolicy=IdGenerated&idXpath=&
+		//namespacePrefix=&namespaceUri=
+		Source ds = new Source();
+		ds.setId("z3950IdFileTest");
+		Description des = new Description();
+		des.setDescription("test Z39.50 with id list");
+		ds.setDescription(des);
+		ds.setNameCode("00124");
+		ds.setName("Z3950-IdFile");
+		ds.setExportPath("D:/Projectos/repoxdata_new");
+		ds.setSchema("info:lc/xmlns/marcxchange-v1.xsd");
+		ds.setNamespace("info:lc/xmlns/marcxchange-v1");
+		Sequence2 seq = new Sequence2();
+		Target target = new Target();
+		Address address = new Address();
+		address.setAddress("aleph.lbfl.li");
+		target.setAddress(address);
+		Port port = new Port();
+		port.setPort(BigInteger.valueOf(9909));
+		target.setPort(port);
+		Database database = new Database();
+		database.setDatabase("LLB_IDS");
+		target.setDatabase(database);
+		User user = new User();
+		user.setUser("");
+		target.setUser(user);
+		Password password = new Password();
+		password.setPassword("");
+		target.setPassword(password);
+		RecordSyntax recordSyntax = new RecordSyntax();
+		recordSyntax.setRecordSyntax("usmarc");
+		target.setRecordSyntax(recordSyntax);
+		Charset charset = new Charset();
+		charset.setCharset("UTF-8");
+		seq.setTarget(target);
+		ds.setSequence2(seq);
+		Choice choice = new Choice();
+		FilePath filePath = new FilePath();
+		filePath.setFilePath("C:\folderZ3950\1900028192z3960idList.txt");
+		choice.setFilePath(filePath);
+		ds.setChoice(choice);
+		RecordIdPolicy recordIdPolicy = new RecordIdPolicy();
+		recordIdPolicy.setType("IdGenerated");
+		RecordIdPolicy.Sequence idPolicySequence = new RecordIdPolicy.Sequence();
+		IdXpath idXpath = new IdXpath();
+		idXpath.setIdXpath("");
+		idPolicySequence.setIdXpath(idXpath);
+		Namespaces namespaces = new Namespaces();
+		Namespace namespace = new Namespace();
+		NamespacePrefix namespacePrefix = new NamespacePrefix();
+		namespacePrefix.setNamespacePrefix("");
+		namespace.setNamespacePrefix(namespacePrefix);
+		NamespaceUri namespaceUri = new NamespaceUri();
+		namespaceUri.setNamespaceUri("");
+		namespace.setNamespaceUri(namespaceUri);
+		namespaces.setNamespace(namespace);
+		idPolicySequence.setNamespaces(namespaces);
+		recordIdPolicy.setSequence(idPolicySequence);
+		ds.setRecordIdPolicy(recordIdPolicy);
+		
+		
+		return ds;
+	}
+	
+	public static Source createZ3950IdSequenceDataSource() {
+		///rest/dataSources/createZ3950IdSequence?dataProviderId=DPRestr0&id=z3950IdSeqTest&description=test%20Z39.50%20with%20id%20sequence&nameCode=00129&name=Z3950-IdSeq&
+		//exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&address=aleph.lbfl.li&port=9909&database=LLB_IDS&
+		//user=&password=&recordSyntax=usmarc&charset=UTF-8&maximumId=6000&recordIdPolicy=IdGenerated&idXpath=&namespacePrefix=&namespaceUri=
+		Source ds = new Source();
+		ds.setId("z3950IdSeqTest");
+		Description des = new Description();
+		des.setDescription("test Z39.50 with id sequence");
+		ds.setDescription(des);
+		ds.setNameCode("00129");
+		ds.setName("Z3950-Idseq");
+		ds.setExportPath("D:/Projectos/repoxdata_new");
+		ds.setSchema("info:lc/xmlns/marcxchange-v1.xsd");
+		ds.setNamespace("info:lc/xmlns/marcxchange-v1");
+		Sequence2 seq = new Sequence2();
+		Target target = new Target();
+		Address address = new Address();
+		address.setAddress("aleph.lbfl.li");
+		target.setAddress(address);
+		Port port = new Port();
+		port.setPort(BigInteger.valueOf(9909));
+		target.setPort(port);
+		Database database = new Database();
+		database.setDatabase("LLB_IDS");
+		target.setDatabase(database);
+		User user = new User();
+		user.setUser("");
+		target.setUser(user);
+		Password password = new Password();
+		password.setPassword("");
+		target.setPassword(password);
+		RecordSyntax recordSyntax = new RecordSyntax();
+		recordSyntax.setRecordSyntax("usmarc");
+		target.setRecordSyntax(recordSyntax);
+		Charset charset = new Charset();
+		charset.setCharset("UTF-8");
+		seq.setTarget(target);
+		ds.setSequence2(seq);
+		Choice choice = new Choice();
+		MaximumId maximumId = new MaximumId();
+		maximumId.setMaximumId(BigInteger.valueOf(6000));
+		choice.setMaximumId(maximumId);
+		ds.setChoice(choice);
+		RecordIdPolicy recordIdPolicy = new RecordIdPolicy();
+		recordIdPolicy.setType("IdGenerated");
+		RecordIdPolicy.Sequence idPolicySequence = new RecordIdPolicy.Sequence();
+		IdXpath idXpath = new IdXpath();
+		idXpath.setIdXpath("");
+		idPolicySequence.setIdXpath(idXpath);
+		Namespaces namespaces = new Namespaces();
+		Namespace namespace = new Namespace();
+		NamespacePrefix namespacePrefix = new NamespacePrefix();
+		namespacePrefix.setNamespacePrefix("");
+		namespace.setNamespacePrefix(namespacePrefix);
+		NamespaceUri namespaceUri = new NamespaceUri();
+		namespaceUri.setNamespaceUri("");
+		namespace.setNamespaceUri(namespaceUri);
+		namespaces.setNamespace(namespace);
+		idPolicySequence.setNamespaces(namespaces);
+		recordIdPolicy.setSequence(idPolicySequence);
+		ds.setRecordIdPolicy(recordIdPolicy);
+		
+		
+		return ds;
+	}
+	
+	
+	public static Source createFtpDataSource() {
+		///rest/dataSources/createFtp?dataProviderId=DPRestr0&id=ftpTest&description=test FTP data source&nameCode=00124&name=FTP&exportPath=D:/Projectos/repoxdata_new&
+		//schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&
+		//idXpath=&namespacePrefix=&namespaceUri=&recordXPath=record&server=bd1.inesc-id.pt&user=ftp&password=pmath2010.&ftpPath=/Lizbeth
+		Source ds = new Source();
+		ds.setId("ftpTest");
+		Description des = new Description();
+		des.setDescription("test ftp Data source");
+		ds.setDescription(des);
+		ds.setNameCode("00124");
+		ds.setName("FTP");
+		ds.setExportPath("D:/Projectos/repoxdata_new");
+		ds.setSchema("http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd");
+		ds.setNamespace("http://www.europeana.eu/schemas/ese/");
+		Sequence2 seq = new Sequence2();
+		Target target = new Target();
+		User user = new User();
+		user.setUser("ftp");
+		target.setUser(user);
+		Password password = new Password();
+		password.setPassword("password");
+		target.setPassword(password);
+		Charset charset = new Charset();
+		charset.setCharset("UTF-8");
+		seq.setTarget(target);
+		ds.setSequence2(seq);
+		ds.setMetadataFormat("ese");
+		Choice choice = new Choice();
+		IsoFormat isoFormat = new IsoFormat();
+		isoFormat.setIsoFormat("");
+		choice.setIsoFormat(isoFormat);
+		FtpPath ftpPath = new FtpPath();
+		ftpPath.setFtpPath("/Lizbeth");
+		choice.setFtpPath(ftpPath);
+		ds.setChoice(choice);
+		SplitRecords splitRecords = new SplitRecords();
+		RecordXPath recordXPath = new RecordXPath();
+		recordXPath.setRecordXPath("record");
+		splitRecords.setRecordXPath(recordXPath);
+		ds.setSplitRecords(splitRecords);
+		Sequence1 seq1 = new Sequence1();
+		RetrieveStrategy retrieveStrategy = new RetrieveStrategy();
+		RetrieveStrategy.Choice choiceRetStr = new RetrieveStrategy.Choice();
+		
+		Server server = new Server();
+		server.setServer("bd1.inesc-id.pt");
+		choiceRetStr.setServer(server);
+		retrieveStrategy.setChoice(choiceRetStr);
+		seq1.setRetrieveStrategy(retrieveStrategy);
+		ds.setSequence1(seq1);
+		
+		RecordIdPolicy recordIdPolicy = new RecordIdPolicy();
+		recordIdPolicy.setType("IdGenerated");
+		RecordIdPolicy.Sequence idPolicySequence = new RecordIdPolicy.Sequence();
+		IdXpath idXpath = new IdXpath();
+		idXpath.setIdXpath("");
+		idPolicySequence.setIdXpath(idXpath);
+		Namespaces namespaces = new Namespaces();
+		Namespace namespace = new Namespace();
+		NamespacePrefix namespacePrefix = new NamespacePrefix();
+		namespacePrefix.setNamespacePrefix("");
+		namespace.setNamespacePrefix(namespacePrefix);
+		NamespaceUri namespaceUri = new NamespaceUri();
+		namespaceUri.setNamespaceUri("");
+		namespace.setNamespaceUri(namespaceUri);
+		namespaces.setNamespace(namespace);
+		idPolicySequence.setNamespaces(namespaces);
+		recordIdPolicy.setSequence(idPolicySequence);
+		ds.setRecordIdPolicy(recordIdPolicy);
+		
+		
+		return ds;
+	}
+	
+	public static Source createHttpDataSource() {
+		///rest/dataSources/createHttp?dataProviderId=DPRestr0&id=httpTest&description=test HTTP data source&nameCode=00124&name=HTTP&exportPath=D:/Projectos/repoxdata_new&
+		//schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&metadataFormat=ese&isoFormat=&charset=&recordIdPolicy=IdGenerated&
+		//idXpath=&namespacePrefix=&namespaceUri=&recordXPath=record&url=http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip
+		Source ds = new Source();
+		ds.setId("httpTest");
+		Description des = new Description();
+		des.setDescription("test http Data source");
+		ds.setDescription(des);
+		ds.setNameCode("00124");
+		ds.setName("HTTP");
+		ds.setExportPath("D:/Projectos/repoxdata_new");
+		ds.setSchema("http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd");
+		ds.setNamespace("http://www.europeana.eu/schemas/ese/");
+		Sequence2 seq = new Sequence2();
+		Target target = new Target();
+		
+		Charset charset = new Charset();
+		charset.setCharset("UTF-8");
+		seq.setTarget(target);
+		ds.setSequence2(seq);
+		ds.setMetadataFormat("ese");
+		Choice choice = new Choice();
+		IsoFormat isoFormat = new IsoFormat();
+		isoFormat.setIsoFormat("");
+		choice.setIsoFormat(isoFormat);
+		
+		ds.setChoice(choice);
+		SplitRecords splitRecords = new SplitRecords();
+		RecordXPath recordXPath = new RecordXPath();
+		recordXPath.setRecordXPath("record");
+		splitRecords.setRecordXPath(recordXPath);
+		ds.setSplitRecords(splitRecords);
+		Sequence1 seq1 = new Sequence1();
+		RetrieveStrategy retrieveStrategy = new RetrieveStrategy();
+		RetrieveStrategy.Choice choiceRetStr = new RetrieveStrategy.Choice();
+		
+		Url url = new Url();
+		url.setUrl("http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip");
+		choiceRetStr.setUrl(url);
+		retrieveStrategy.setChoice(choiceRetStr);
+		seq1.setRetrieveStrategy(retrieveStrategy);
+		ds.setSequence1(seq1);
+		
+		RecordIdPolicy recordIdPolicy = new RecordIdPolicy();
+		recordIdPolicy.setType("IdGenerated");
+		RecordIdPolicy.Sequence idPolicySequence = new RecordIdPolicy.Sequence();
+		IdXpath idXpath = new IdXpath();
+		idXpath.setIdXpath("");
+		idPolicySequence.setIdXpath(idXpath);
+		Namespaces namespaces = new Namespaces();
+		Namespace namespace = new Namespace();
+		NamespacePrefix namespacePrefix = new NamespacePrefix();
+		namespacePrefix.setNamespacePrefix("");
+		namespace.setNamespacePrefix(namespacePrefix);
+		NamespaceUri namespaceUri = new NamespaceUri();
+		namespaceUri.setNamespaceUri("");
+		namespace.setNamespaceUri(namespaceUri);
+		namespaces.setNamespace(namespace);
+		idPolicySequence.setNamespaces(namespaces);
+		recordIdPolicy.setSequence(idPolicySequence);
+		ds.setRecordIdPolicy(recordIdPolicy);
+		
+		
+		return ds;
+	}
+	
+	public static Source createFolderDataSource() {
+		///rest/dataSources/createFolder?dataProviderId=DPRestr0&id=folderTest&description=test%20Folder%20data%20source&nameCode=00124&name=Folder&
+		//exportPath=D:/Projectos/repoxdata_new&schema=info:lc/xmlns/marcxchange-v1.xsd&namespace=info:lc/xmlns/marcxchange-v1&metadataFormat=ISO2709&
+		//isoFormat=pt.utl.ist.marc.iso2709.IteratorIso2709&charset=UTF-8&recordIdPolicy=IdExtracted&idXpath=/mx:record/mx:controlfield[@tag=%22001%22]&namespacePrefix=mx&
+		//namespaceUri=info:lc/xmlns/marcxchange-v1&recordXPath=&folder=C:\folder
+		Source ds = new Source();
+		ds.setId("FolderTest");
+		Description des = new Description();
+		des.setDescription("test Folder source");
+		ds.setDescription(des);
+		ds.setNameCode("00124");
+		ds.setName("Folder");
+		ds.setExportPath("D:/Projectos/repoxdata_new");
+		ds.setSchema("http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd");
+		ds.setNamespace("http://www.europeana.eu/schemas/ese/");
+		Sequence2 seq = new Sequence2();
+		Target target = new Target();
+		
+		Charset charset = new Charset();
+		charset.setCharset("UTF-8");
+		seq.setTarget(target);
+		ds.setSequence2(seq);
+		ds.setMetadataFormat("ese");
+		Choice choice = new Choice();
+		IsoFormat isoFormat = new IsoFormat();
+		isoFormat.setIsoFormat("");
+		choice.setIsoFormat(isoFormat);
+		Folder folder = new Folder();
+		folder.setFolder("C:\folder");
+		choice.setFolder(folder);
+		ds.setChoice(choice);
+		SplitRecords splitRecords = new SplitRecords();
+		RecordXPath recordXPath = new RecordXPath();
+		recordXPath.setRecordXPath("record");
+		splitRecords.setRecordXPath(recordXPath);
+		ds.setSplitRecords(splitRecords);
+		
+		
+		RecordIdPolicy recordIdPolicy = new RecordIdPolicy();
+		recordIdPolicy.setType("IdGenerated");
+		RecordIdPolicy.Sequence idPolicySequence = new RecordIdPolicy.Sequence();
+		IdXpath idXpath = new IdXpath();
+		idXpath.setIdXpath("");
+		idPolicySequence.setIdXpath(idXpath);
+		Namespaces namespaces = new Namespaces();
+		Namespace namespace = new Namespace();
+		NamespacePrefix namespacePrefix = new NamespacePrefix();
+		namespacePrefix.setNamespacePrefix("");
+		namespace.setNamespacePrefix(namespacePrefix);
+		NamespaceUri namespaceUri = new NamespaceUri();
+		namespaceUri.setNamespaceUri("");
+		namespace.setNamespaceUri(namespaceUri);
+		namespaces.setNamespace(namespace);
+		idPolicySequence.setNamespaces(namespaces);
+		recordIdPolicy.setSequence(idPolicySequence);
+		ds.setRecordIdPolicy(recordIdPolicy);
+		
+		
+		return ds;
+	}
+	
 	/**
 	 * This method marshals the contents of a JIBX Element and outputs the
 	 * results to the Logger.
