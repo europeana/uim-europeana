@@ -228,6 +228,7 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	//Update an OAI PMH Datasource
 	Description description = new Description();
 	
+	
 	description.setDescription("altered!@#$%");
 	respOaids.setDescription(description);
 	
@@ -236,6 +237,8 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	assertNotNull(updOaids);
 	
 	assertEquals("altered!@#$%",updOaids.getDescription().getDescription());
+	
+
 	
 	//Initialize a harvesting session
 	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids.getId(),true);
@@ -589,7 +592,7 @@ public void testCreateUpdateDeleteFtpDataSource() throws Exception{
 	description.setDescription("altered!@#$%");
 	respFtpds.setDescription(description);
 	
-	Source updFtpds = repoxRestClient.updateDatasourceOAI(respFtpds);
+	Source updFtpds = repoxRestClient.updateDatasourceFtp(respFtpds);
 	assertNotNull(updFtpds);
 	assertEquals("altered!@#$%",updFtpds.getDescription().getDescription());
 	
@@ -671,7 +674,7 @@ public void testCreateUpdateDeleteHttpDataSource() throws Exception{
 	//Create an HTTP Datasource
 	Source Httpds = TestUtils.createHttpDataSource();
 	
-	Source respHttpds = repoxRestClient.createDatasourceOAI(Httpds, respprov);
+	Source respHttpds = repoxRestClient.createDatasourceHttp(Httpds, respprov);
 	TestUtils.logMarshalledObject(respHttpds,LOGGER);
 
 	//Update an HTTP Datasource
@@ -679,7 +682,7 @@ public void testCreateUpdateDeleteHttpDataSource() throws Exception{
 	description.setDescription("altered!@#$%");
 	respHttpds.setDescription(description );
 	
-	Source updHttpds = repoxRestClient.updateDatasourceOAI(respHttpds);
+	Source updHttpds = repoxRestClient.updateDatasourceHttp(respHttpds);
 	assertNotNull(updHttpds);
 	assertEquals("altered!@#$%",updHttpds.getDescription().getDescription());
 	
@@ -761,7 +764,7 @@ public void testCreateUpdateDeleteFolderDataSource() throws Exception{
 	//Create an Folder Datasource
 	Source folderds = TestUtils.createFolderDataSource();
 	
-	Source respfolderds = repoxRestClient.createDatasourceOAI(folderds, respprov);
+	Source respfolderds = repoxRestClient.createDatasourceFolder(folderds, respprov);
 	TestUtils.logMarshalledObject(respfolderds,LOGGER);
 
 	//Update an Folder Datasource
@@ -769,7 +772,7 @@ public void testCreateUpdateDeleteFolderDataSource() throws Exception{
 	description.setDescription("altered!@#$%");
 	respfolderds.setDescription(description );
 	
-	Source updfolderds = repoxRestClient.updateDatasourceOAI(respfolderds);
+	Source updfolderds = repoxRestClient.updateDatasourceFolder(respfolderds);
 	assertNotNull(updfolderds);
 	assertEquals("altered!@#$%",updfolderds.getDescription().getDescription());
 	
