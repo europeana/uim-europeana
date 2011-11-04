@@ -191,6 +191,7 @@ public class TestUtils {
 		target.setRecordSyntax(recordSyntax);
 		Charset charset = new Charset();
 		charset.setCharset("UTF-8");
+		target.setCharset(charset);
 		seq.setTarget(target);
 		ds.setSequence2(seq);
 		Choice choice = new Choice();
@@ -259,6 +260,7 @@ public class TestUtils {
 		target.setRecordSyntax(recordSyntax);
 		Charset charset = new Charset();
 		charset.setCharset("UTF-8");
+		target.setCharset(charset);
 		seq.setTarget(target);
 		ds.setSequence2(seq);
 		Choice choice = new Choice();
@@ -325,6 +327,7 @@ public class TestUtils {
 		target.setRecordSyntax(recordSyntax);
 		Charset charset = new Charset();
 		charset.setCharset("UTF-8");
+		target.setCharset(charset);
 		seq.setTarget(target);
 		ds.setSequence2(seq);
 		Choice choice = new Choice();
@@ -517,6 +520,7 @@ public class TestUtils {
 		
 		Charset charset = new Charset();
 		charset.setCharset("UTF-8");
+		target.setCharset(charset);
 		seq.setTarget(target);
 		ds.setSequence2(seq);
 		ds.setMetadataFormat("ese");
