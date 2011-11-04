@@ -34,7 +34,9 @@
 			<recordIdPolicy type="IdGenerated"/>
 			<oai-source>http://bd1.inesc-id.pt:8080/repoxel/OAIHandler</oai-source>
 			<oai-set>bda</oai-set>
-			<metadataTransformations/>
+			<metadataTransformations>
+               <metadataTransformation>ese-edm 2</metadataTransformation>
+            </metadataTransformations>
 		</source>
 
 		<source id="z3950IdSeqTest" metadataFormat="MarcXchange"
@@ -54,7 +56,9 @@
 			</target>
 			<harvestMethod>IdSequenceHarvester</harvestMethod>
 			<maximumId>6000</maximumId>
-			<metadataTransformations/>
+			<metadataTransformations>
+               <metadataTransformation>ese-edm 2</metadataTransformation>
+            </metadataTransformations>
 		</source>
 
 
@@ -75,7 +79,9 @@
 			</target>
 			<harvestMethod>TimestampHarvester</harvestMethod>
 			<earliestTimestamp>20110301</earliestTimestamp>
-			<metadataTransformations/>
+			<metadataTransformations>
+               <metadataTransformation>ese-edm 2</metadataTransformation>
+            </metadataTransformations>
 		</source>
 
 		<source id="z3950IdFile" metadataFormat="MarcXchange"
@@ -95,7 +101,9 @@
 			</target>
 			<harvestMethod>IdListHarvester</harvestMethod>
 			<idListFile>C:\folderZ3950\1900028192z3960idList.txt</idListFile>
-			<metadataTransformations/>
+			<metadataTransformations>
+               <metadataTransformation>ese-edm 2</metadataTransformation>
+            </metadataTransformations>
 		</source>
 
 		<source id="figueirovinhosSet" metadataFormat="ese"
@@ -107,7 +115,9 @@
 			<recordIdPolicy type="IdGenerated"/>
 			<oai-source>http://bd1.inesc-id.pt:8080/repoxel/OAIHandler</oai-source>
 			<oai-set>figueirovinhos</oai-set>
-			<metadataTransformations/>
+			<metadataTransformations>
+               <metadataTransformation>ese-edm 2</metadataTransformation>
+            </metadataTransformations>
 		</source>
 
 		<source id="httpTest" metadataFormat="ese"
@@ -131,7 +141,9 @@
 					</namespace>
 				</namespaces>
 			</splitRecords>
-			<metadataTransformations/>
+			<metadataTransformations>
+               <metadataTransformation>ese-edm 2</metadataTransformation>
+            </metadataTransformations>
 		</source>
 
 		<source id="ftpTest" metadataFormat="ese"
@@ -158,7 +170,9 @@
 					</namespace>
 				</namespaces>
 			</splitRecords>
-			<metadataTransformations/>
+			<metadataTransformations>
+               <metadataTransformation>ese-edm 2</metadataTransformation>
+            </metadataTransformations>
 		</source>
 
 		<source id="folderTest" metadataFormat="ISO2709" schema="info:lc/xmlns/marcxchange-v1.xsd"
@@ -180,7 +194,9 @@
 			<sourcesDirPath>C:\folder</sourcesDirPath>
 			<retrieveStrategy type="pt.utl.ist.repox.marc.DataSourceFolder"/>
 			<fileExtract>Iso2709FileExtract</fileExtract>
-			<metadataTransformations/>
+			<metadataTransformations>
+               <metadataTransformation>ese-edm 2</metadataTransformation>
+            </metadataTransformations>
 		</source>
 
 	</dataSources>

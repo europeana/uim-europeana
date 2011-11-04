@@ -198,9 +198,19 @@
   <xs:element name="harvestMethod" type="xs:NCName"/>
   <xs:element name="earliestTimestamp" type="xs:integer"/>
   <xs:element name="idListFile" type="xs:string"/>
+
   <xs:element name="metadataTransformations">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="metadataTransformation" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="metadataTransformation">
     <xs:complexType/>
   </xs:element>
+
   <xs:element name="aggregator">
     <xs:complexType>
       <xs:sequence>
@@ -211,6 +221,7 @@
       <xs:attribute name="id" use="required" type="xs:NCName"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="provider">
     <xs:complexType>
       <xs:sequence>
@@ -224,6 +235,7 @@
       <xs:attribute name="id" use="required" type="xs:NCName"/>
     </xs:complexType>
   </xs:element>
+
   <xs:element name="country" type="xs:NCName"/>
   <xs:element name="type" type="xs:NCName"/>
   <xs:element name="description" type="xs:string"/>

@@ -191,18 +191,25 @@
   </xs:element>
   <xs:element name="address" type="xs:NMTOKEN"/>
   <xs:element name="port" type="xs:integer"/>
-  <xs:element name="database" type="xs:NCName"/>
-  <xs:element name="charset" type="xs:NCName"/>
-  <xs:element name="recordSyntax" type="xs:NCName"/>
-  <xs:element name="harvestMethod" type="xs:NCName"/>
+  <xs:element name="database" type="xs:string"/>
+  <xs:element name="charset" type="xs:string"/>
+  <xs:element name="recordSyntax" type="xs:string"/>
+  <xs:element name="harvestMethod" type="xs:string"/>
   <xs:element name="earliestTimestamp" type="xs:integer"/>
   <xs:element name="idListFile" type="xs:string"/>
   <xs:element name="maximumId" type="xs:integer"/>
   <xs:element name="filePath" type="xs:string"/>
   <xs:element name="ftpPath" type="xs:string"/>
-  <xs:element name="isoFormat" type="xs:NCName"/>
+  <xs:element name="isoFormat" type="xs:string"/>
   <xs:element name="folder" type="xs:string"/>
   <xs:element name="metadataTransformations">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="metadataTransformation" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="metadataTransformation">
     <xs:complexType/>
   </xs:element>
   <xs:element name="aggregator">
