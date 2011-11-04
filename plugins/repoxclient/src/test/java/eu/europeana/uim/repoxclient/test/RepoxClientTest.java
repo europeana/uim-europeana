@@ -285,7 +285,7 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
 		
 		throw ex;
 	}
@@ -304,6 +304,7 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 	try{
 	//Create an Aggregator for testing purposes
 	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	//AggregatorExist????
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
@@ -374,7 +375,7 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
 		
 		throw ex;
 	}
@@ -404,6 +405,8 @@ public void testCreateUpdateDeleteZ3950IDFileDataSource() throws Exception{
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
 	//Create an Z3950OIdFile Datasource
+	
+	//Null Pointer Exception
 	Source Z3950IDFileds = TestUtils.createZ3950IdFileDataSource();
 	
 	Source respZ3950IDFileds = repoxRestClient.createDatasourceZ3950IdFile(Z3950IDFileds, respprov);
@@ -463,7 +466,7 @@ public void testCreateUpdateDeleteZ3950IDFileDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
 		
 		throw ex;
 	}
@@ -493,9 +496,11 @@ public void testCreateUpdateDeleteZ3950IdSequenceDataSource() throws Exception{
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
 	//Create an Z3950OIdSequence Datasource
+	
+	//NPE
 	Source Z3950IdSeqds = TestUtils.createZ3950IdSequenceDataSource();
 	
-	Source respZ3950IdSeqds = repoxRestClient.createDatasourceOAI(Z3950IdSeqds, respprov);
+	Source respZ3950IdSeqds = repoxRestClient.createDatasourceZ3950IdSequence(Z3950IdSeqds, respprov);
 	TestUtils.logMarshalledObject(respZ3950IdSeqds,LOGGER);
 
 	//Update an Z3950OIdSequence Datasource
@@ -552,7 +557,7 @@ public void testCreateUpdateDeleteZ3950IdSequenceDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
 		
 		throw ex;
 	}
@@ -577,6 +582,7 @@ public void testCreateUpdateDeleteFtpDataSource() throws Exception{
 	
 	//Create a Provider
 	Provider prov = TestUtils.createProviderObj();	
+	//Order places an important role?
 	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
 	assertNotNull(respprov);
 	TestUtils.logMarshalledObject(respprov,LOGGER);
@@ -641,7 +647,7 @@ public void testCreateUpdateDeleteFtpDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
 		
 		throw ex;
 	}
@@ -671,7 +677,7 @@ public void testCreateUpdateDeleteHttpDataSource() throws Exception{
 	assertNotNull(respprov);
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
-	//Create an HTTP Datasource
+	//Create an HTTP Datasource - NPE????
 	Source Httpds = TestUtils.createHttpDataSource();
 	
 	Source respHttpds = repoxRestClient.createDatasourceHttp(Httpds, respprov);
@@ -731,7 +737,7 @@ public void testCreateUpdateDeleteHttpDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
 		
 		throw ex;
 	}
@@ -757,6 +763,7 @@ public void testCreateUpdateDeleteFolderDataSource() throws Exception{
 	
 	//Create a Provider
 	Provider prov = TestUtils.createProviderObj();	
+//Order plays an important role????§
 	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
 	assertNotNull(respprov);
 	TestUtils.logMarshalledObject(respprov,LOGGER);
@@ -821,7 +828,7 @@ public void testCreateUpdateDeleteFolderDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregatorr0");
+		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
 		
 		throw ex;
 	}
