@@ -120,9 +120,10 @@ public void testGetProviders() throws Exception{
 public void testCreateUpdateDeleteAggregator() throws Exception{
 
 	//Initialize the Aggregator Object
-	Aggregator aggr = TestUtils.createAggregatorObj();
+	Aggregator aggr = TestUtils.createAggregatorObj("aggr10", "7777", "http://www.in.gr");
 
 	//Create the Aggregator
+	
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);
 	assertNotNull(rtAggr);
 	assertEquals(aggr.getName().getName(),rtAggr.getName().getName());
@@ -130,9 +131,10 @@ public void testCreateUpdateDeleteAggregator() throws Exception{
 	assertEquals(aggr.getUrl().getUrl(),rtAggr.getUrl().getUrl());
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
 	
+	
 	//Update the Aggregator
 	NameCode upnamecode = new NameCode();
-	upnamecode.setNameCode("7777");
+	upnamecode.setNameCode("77777");
 	rtAggr.setNameCode(upnamecode);
 	Aggregator upAggr =  repoxRestClient.updateAggregator(rtAggr);
 	assertNotNull(upAggr);
@@ -146,6 +148,9 @@ public void testCreateUpdateDeleteAggregator() throws Exception{
 	Success res = repoxRestClient.deleteAggregator(rtAggr.getId());
 	assertNotNull(res);
 	TestUtils.logMarshalledObject(res,LOGGER);
+
+	
+	
 	
 }
 
@@ -162,7 +167,7 @@ public void testCreateUpdateDeleteAggregator() throws Exception{
 public void testCreateUpdateDeleteProvider() throws Exception{
 	
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr0","7777","http://www.in.gr");
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
@@ -205,10 +210,10 @@ public void testCreateUpdateDeleteProvider() throws Exception{
 @Test
 public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	
-
+	
 	try{
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr1","7777","http://www.in.gr");
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
@@ -220,7 +225,7 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
 	//Create an OAI PMH Datasource
-	Source oaids = TestUtils.createOAIDataSource();
+	Source oaids = TestUtils.createOAIDataSource("bdaSet0");
 	
 	Source respOaids = repoxRestClient.createDatasourceOAI(oaids, respprov);
 	TestUtils.logMarshalledObject(respOaids,LOGGER);
@@ -285,9 +290,15 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		for (Aggregator aggr : aggrs.getAggregatorList()){
+			if (aggr.getName().getName().equals("aggr1") && aggr.getNameCode().getNameCode().equals("7777")){
+				repoxRestClient.deleteAggregator(aggr.getId());
+			}
+		}
 		
 		throw ex;
+	
 	}
 	
 }
@@ -303,7 +314,7 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 
 	try{
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr2","7777","http://www.in.gr");
 	//AggregatorExist????
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
@@ -316,7 +327,7 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
 	//Create an Z3950Timestamp Datasource
-	Source z3950TSds = TestUtils.createZ3950TimestampDataSource();
+	Source z3950TSds = TestUtils.createZ3950TimestampDataSource("bdaSet1");
 	
 	Source respz3950TSds = repoxRestClient.createDatasourceZ3950Timestamp(z3950TSds, respprov);
 	TestUtils.logMarshalledObject(respz3950TSds,LOGGER);
@@ -375,11 +386,16 @@ public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		for (Aggregator aggr : aggrs.getAggregatorList()){
+			if (aggr.getName().getName().equals("aggr2") && aggr.getNameCode().getNameCode().equals("7777")){
+				repoxRestClient.deleteAggregator(aggr.getId());
+			}
+		}
 		
 		throw ex;
-	}
 	
+	}
 }
 
 /**
@@ -393,7 +409,7 @@ public void testCreateUpdateDeleteZ3950IDFileDataSource() throws Exception{
 
 	try{
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr3", "7777", "http://www.in.gr");
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
@@ -407,7 +423,7 @@ public void testCreateUpdateDeleteZ3950IDFileDataSource() throws Exception{
 	//Create an Z3950OIdFile Datasource
 	
 	//Null Pointer Exception
-	Source Z3950IDFileds = TestUtils.createZ3950IdFileDataSource();
+	Source Z3950IDFileds = TestUtils.createZ3950IdFileDataSource("bdaSet2");
 	
 	Source respZ3950IDFileds = repoxRestClient.createDatasourceZ3950IdFile(Z3950IDFileds, respprov);
 	TestUtils.logMarshalledObject(respZ3950IDFileds,LOGGER);
@@ -466,9 +482,15 @@ public void testCreateUpdateDeleteZ3950IDFileDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		for (Aggregator aggr : aggrs.getAggregatorList()){
+			if (aggr.getName().getName().equals("aggr3") && aggr.getNameCode().getNameCode().equals("7777")){
+				repoxRestClient.deleteAggregator(aggr.getId());
+			}
+		}
 		
 		throw ex;
+	
 	}
 	
 }
@@ -484,7 +506,7 @@ public void testCreateUpdateDeleteZ3950IdSequenceDataSource() throws Exception{
 
 	try{
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr4","7777","http://www.in.gr");
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
@@ -498,7 +520,7 @@ public void testCreateUpdateDeleteZ3950IdSequenceDataSource() throws Exception{
 	//Create an Z3950OIdSequence Datasource
 	
 	//NPE
-	Source Z3950IdSeqds = TestUtils.createZ3950IdSequenceDataSource();
+	Source Z3950IdSeqds = TestUtils.createZ3950IdSequenceDataSource("bdaSet3");
 	
 	Source respZ3950IdSeqds = repoxRestClient.createDatasourceZ3950IdSequence(Z3950IdSeqds, respprov);
 	TestUtils.logMarshalledObject(respZ3950IdSeqds,LOGGER);
@@ -557,9 +579,15 @@ public void testCreateUpdateDeleteZ3950IdSequenceDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		for (Aggregator aggr : aggrs.getAggregatorList()){
+			if (aggr.getName().getName().equals("aggr4") && aggr.getNameCode().getNameCode().equals("7777")){
+				repoxRestClient.deleteAggregator(aggr.getId());
+			}
+		}
 		
 		throw ex;
+	
 	}
 	
 }
@@ -575,7 +603,7 @@ public void testCreateUpdateDeleteFtpDataSource() throws Exception{
 
 	try{
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr5", "7777", "http://www.in.gr");
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
@@ -588,7 +616,7 @@ public void testCreateUpdateDeleteFtpDataSource() throws Exception{
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
 	//Create an FTP Datasource
-	Source Ftpds = TestUtils.createFtpDataSource();
+	Source Ftpds = TestUtils.createFtpDataSource("bdaSet4");
 	
 	Source respFtpds = repoxRestClient.createDatasourceFtp(Ftpds, respprov);
 	TestUtils.logMarshalledObject(respFtpds,LOGGER);
@@ -647,11 +675,16 @@ public void testCreateUpdateDeleteFtpDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		for (Aggregator aggr : aggrs.getAggregatorList()){
+			if (aggr.getName().getName().equals("aggr5") && aggr.getNameCode().getNameCode().equals("7777")){
+				repoxRestClient.deleteAggregator(aggr.getId());
+			}
+		}
 		
 		throw ex;
-	}
 	
+	}
 }
 
 
@@ -666,7 +699,7 @@ public void testCreateUpdateDeleteHttpDataSource() throws Exception{
 
 	try{
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr6", "7777", "http://www.in.gr");
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
@@ -678,7 +711,7 @@ public void testCreateUpdateDeleteHttpDataSource() throws Exception{
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
 	//Create an HTTP Datasource - NPE????
-	Source Httpds = TestUtils.createHttpDataSource();
+	Source Httpds = TestUtils.createHttpDataSource("bdaSet5");
 	
 	Source respHttpds = repoxRestClient.createDatasourceHttp(Httpds, respprov);
 	TestUtils.logMarshalledObject(respHttpds,LOGGER);
@@ -737,11 +770,16 @@ public void testCreateUpdateDeleteHttpDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		for (Aggregator aggr : aggrs.getAggregatorList()){
+			if (aggr.getName().getName().equals("aggr6") && aggr.getNameCode().getNameCode().equals("7777")){
+				repoxRestClient.deleteAggregator(aggr.getId());
+			}
+		}
 		
 		throw ex;
-	}
 	
+	}
 }
 
 
@@ -756,7 +794,7 @@ public void testCreateUpdateDeleteFolderDataSource() throws Exception{
 
 	try{
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj();
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr7", "7777", "http://www.in.gr");
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);
@@ -769,7 +807,7 @@ public void testCreateUpdateDeleteFolderDataSource() throws Exception{
 	TestUtils.logMarshalledObject(respprov,LOGGER);
 	
 	//Create an Folder Datasource
-	Source folderds = TestUtils.createFolderDataSource();
+	Source folderds = TestUtils.createFolderDataSource("bdaSet6");
 	
 	Source respfolderds = repoxRestClient.createDatasourceFolder(folderds, respprov);
 	TestUtils.logMarshalledObject(respfolderds,LOGGER);
@@ -828,9 +866,15 @@ public void testCreateUpdateDeleteFolderDataSource() throws Exception{
 	
 	}
 	catch(Exception ex){
-		repoxRestClient.deleteAggregator("JunitContainerAggregator1");
+		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		for (Aggregator aggr : aggrs.getAggregatorList()){
+			if (aggr.getName().getName().equals("aggr7") && aggr.getNameCode().getNameCode().equals("7777")){
+				repoxRestClient.deleteAggregator(aggr.getId());
+			}
+		}
 		
 		throw ex;
+	
 	}
 	
 }
