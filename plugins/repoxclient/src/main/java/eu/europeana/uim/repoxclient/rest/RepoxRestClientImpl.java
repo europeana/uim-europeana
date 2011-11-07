@@ -1513,7 +1513,7 @@ private Response createUpdateDSOAI(String action, Source ds, Provider prov){
 		id.append("id=");
 		id.append(ds.getId());
 		description.append("description=");
-		description.append(ds.getDescription());
+		description.append(ds.getDescription().getDescription());
 		nameCode.append("nameCode=");
 		nameCode.append(ds.getNameCode().toString());
 		name.append("name=");
@@ -1581,6 +1581,7 @@ private Response createUpdateZ3950Timestamp(String action, Source ds, Provider p
 	StringBuffer charset = new StringBuffer();
 	StringBuffer earliestTimestamp  = new StringBuffer();
 	StringBuffer recordIdPolicy  = new StringBuffer();
+	
 	StringBuffer idXpath  = new StringBuffer();
 	StringBuffer namespacePrefix  = new StringBuffer();
 	StringBuffer namespaceUri  = new StringBuffer();
@@ -1592,7 +1593,7 @@ private Response createUpdateZ3950Timestamp(String action, Source ds, Provider p
 	id.append("id=");
 	id.append(ds.getId());
 	description.append("description=");
-	description.append(ds.getDescription());
+	description.append(ds.getDescription().getDescription());
 	nameCode.append("nameCode=");
 	nameCode.append(ds.getNameCode().toString());
 	name.append("name=");
@@ -1624,14 +1625,15 @@ private Response createUpdateZ3950Timestamp(String action, Source ds, Provider p
 	earliestTimestamp.append(ds.getChoice().getEarliestTimestamp().getEarliestTimestamp());
 	recordIdPolicy.append("recordIdPolicy=");
 	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	if (ds.getRecordIdPolicy().getType().equals("idExported")){
+		idXpath.append("idXpath=");
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
 	
-	idXpath.append("idXpath=");
-	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-	
-	namespacePrefix.append("namespacePrefix=");
-	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-	namespaceUri.append("namespaceUri=");
-	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+	}
 	if (action.equals("create")){
 		return invokRestTemplate("/dataSources/createZ3950Timestamp",Response.class,
 				dataProviderId.toString(),
@@ -1713,7 +1715,7 @@ private Response createUpdateDSZ3950IdFile(String action, Source ds, Provider pr
 	id.append("id=");
 	id.append(ds.getId());
 	description.append("description=");
-	description.append(ds.getDescription());
+	description.append(ds.getDescription().getDescription());
 	nameCode.append("nameCode=");
 	nameCode.append(ds.getNameCode().toString());
 	name.append("name=");
@@ -1744,7 +1746,7 @@ private Response createUpdateDSZ3950IdFile(String action, Source ds, Provider pr
 	filePath.append(ds.getChoice().getFilePath());
 	recordIdPolicy.append("recordIdPolicy=");
 	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-	
+	if (ds.getRecordIdPolicy().getType().equals("idExported")){
 	idXpath.append("idXpath=");
 	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
 	
@@ -1752,7 +1754,7 @@ private Response createUpdateDSZ3950IdFile(String action, Source ds, Provider pr
 	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
 	namespaceUri.append("namespaceUri=");
 	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-
+	}
 	if (action.equals("create")){
 		return invokRestTemplate("/dataSources/createZ3950IdList",Response.class,
 				dataProviderId.toString(),
@@ -1834,7 +1836,7 @@ private Response createUpdateDSZ3950IdSequence(String action, Source ds, Provide
 	id.append("id=");
 	id.append(ds.getId());
 	description.append("description=");
-	description.append(ds.getDescription());
+	description.append(ds.getDescription().getDescription());
 	nameCode.append("nameCode=");
 	nameCode.append(ds.getNameCode().toString());
 	name.append("name=");
@@ -1868,7 +1870,7 @@ private Response createUpdateDSZ3950IdSequence(String action, Source ds, Provide
 	
 	recordIdPolicy.append("recordIdPolicy=");
 	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-	
+	if (ds.getRecordIdPolicy().getType().equals("idExported")){
 	idXpath.append("idXpath=");
 	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
 	
@@ -1876,6 +1878,7 @@ private Response createUpdateDSZ3950IdSequence(String action, Source ds, Provide
 	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
 	namespaceUri.append("namespaceUri=");
 	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+	}
 	if (action.equals("create")){
 		return invokRestTemplate("/dataSources/createZ3950IdSequence",Response.class,
 				dataProviderId.toString(),
@@ -1957,7 +1960,7 @@ private Response createUpdateDSFtp(String action, Source ds, Provider prov){
 	id.append("id=");
 	id.append(ds.getId());
 	description.append("description=");
-	description.append(ds.getDescription());
+	description.append(ds.getDescription().getDescription());
 	nameCode.append("nameCode=");
 	nameCode.append(ds.getNameCode().toString());
 	name.append("name=");
@@ -1968,34 +1971,35 @@ private Response createUpdateDSFtp(String action, Source ds, Provider prov){
 	schema.append(ds.getSchema());
 	namespace.append("namespace=");
 	namespace.append(ds.getNamespace());
-	metadataFormat.append("address=");
+	metadataFormat.append("metadataFormat=");
 	metadataFormat.append(ds.getMetadataFormat());
 	
-	isoFormat.append("isoFormat=");
-	isoFormat.append(ds.getChoice().getIsoFormat());
+	//isoFormat.append("isoFormat=");
+	//isoFormat.append(ds.getChoice().getIsoFormat().getIsoFormat());
 	charset.append("charset=");
 	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
 	recordIdPolicy.append("recordIdPolicy=");
 	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	if (ds.getRecordIdPolicy().getType().equals("idExported")){
 	idXpath.append("idXpath=");
 	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
 	namespacePrefix.append("namespacePrefix=");
 	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
 	namespaceUri.append("namespaceUri=");
 	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-	
+	}
 	recordXPath.append("recordXPath=");
 	recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
 	
 	server.append("server=");
 	server.append(ds.getSequence1().getRetrieveStrategy().getChoice().getServer().getServer());
 	user.append("user=");
-	user.append(ds.getSequence2().getTarget().getUser().getUser());
+	user.append(ds.getSequence1().getRetrieveStrategy().getChoice().getUser().getUser());
 	password.append("password=");
-	password.append(ds.getSequence2().getTarget().getPassword().getPassword());
+	password.append(ds.getSequence1().getRetrieveStrategy().getChoice().getPassword().getPassword());
 	
 	ftpPath.append("ftpPath=");
-	ftpPath.append(ds.getChoice().getFtpPath());
+	ftpPath.append(ds.getChoice().getFtpPath().getFtpPath());
 	if (action.equals("create")){
 		return invokRestTemplate("/dataSources/createFtp",Response.class,
 				dataProviderId.toString(),
@@ -2074,7 +2078,7 @@ private Response createUpdateDSHttp(String action, Source ds, Provider prov){
 	id.append("id=");
 	id.append(ds.getId());
 	description.append("description=");
-	description.append(ds.getDescription());
+	description.append(ds.getDescription().getDescription());
 	nameCode.append("nameCode=");
 	nameCode.append(ds.getNameCode().toString());
 	name.append("name=");
@@ -2085,24 +2089,26 @@ private Response createUpdateDSHttp(String action, Source ds, Provider prov){
 	schema.append(ds.getSchema());
 	namespace.append("namespace=");
 	namespace.append(ds.getNamespace());
-	metadataFormat.append("address=");
+	metadataFormat.append("metadataFormat=");
 	metadataFormat.append(ds.getMetadataFormat());
-	
-	isoFormat.append("isoFormat=");
-	isoFormat.append(ds.getChoice().getIsoFormat());
-	charset.append("charset=");
-	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	//TODO: not supported
+	//isoFormat.append("isoFormat=");
+	//isoFormat.append(ds.getChoice().getIsoFormat().getIsoFormat());
+	//charset.append("charset=");
+	//charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
 	recordIdPolicy.append("recordIdPolicy=");
 	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
+	if (ds.getRecordIdPolicy().getType().equals("idExported")){
 	idXpath.append("idXpath=");
 	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
 	namespacePrefix.append("namespacePrefix=");
 	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
 	namespaceUri.append("namespaceUri=");
 	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+	
 	recordXPath.append("recordXPath=");
 	recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
-	
+	}
 	url.append("url=");
 	url.append(ds.getSequence1().getRetrieveStrategy().getChoice().getUrl().getUrl());
 	
@@ -2180,7 +2186,7 @@ private Response createUpdateDSFolder(String action, Source ds, Provider prov){
 	id.append("id=");
 	id.append(ds.getId());
 	description.append("description=");
-	description.append(ds.getDescription());
+	description.append(ds.getDescription().getDescription());
 	nameCode.append("nameCode=");
 	nameCode.append(ds.getNameCode().toString());
 	name.append("name=");
@@ -2191,11 +2197,11 @@ private Response createUpdateDSFolder(String action, Source ds, Provider prov){
 	schema.append(ds.getSchema());
 	namespace.append("namespace=");
 	namespace.append(ds.getNamespace());
-	metadataFormat.append("address=");
+	metadataFormat.append("metadataFormat=");
 	metadataFormat.append(ds.getMetadataFormat());
 	
-	isoFormat.append("isoFormat=");
-	isoFormat.append(ds.getChoice().getIsoFormat());
+	//isoFormat.append("isoFormat=");
+	//isoFormat.append(ds.getChoice().getIsoFormat().getIsoFormat());
 	charset.append("charset=");
 	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
 	recordIdPolicy.append("recordIdPolicy=");
