@@ -293,6 +293,11 @@
 	</log>
 
 
+    <status>RUNNING</status>
+    <timeLeft>-868</timeLeft>
+    <percentage>2.0</percentage>
+    <records>2400/89259.0</records>
+    
 	<success>OK</success>
 	<error type="invalidRequest"
 		requestURI="http://sip-manager.isti.cnr.it:8080/repoxbeta/rest/records/operation=listDataSources"
