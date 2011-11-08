@@ -801,7 +801,7 @@ public void testCreateUpdateDeleteFolderDataSource() throws Exception{
 	
 	//Create a Provider
 	Provider prov = TestUtils.createProviderObj();	
-//Order plays an important role????§
+    //Order plays an important role????
 	Provider respprov =  repoxRestClient.createProvider(prov, rtAggr);
 	assertNotNull(respprov);
 	TestUtils.logMarshalledObject(respprov,LOGGER);
