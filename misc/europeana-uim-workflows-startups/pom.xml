@@ -1,71 +1,122 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <parent>
+	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana</groupId>
 		<version>1.3.0-SNAPSHOT</version>
-  </parent>
+	</parent>
 
 
-  <modelVersion>4.0.0</modelVersion>	
-  <artifactId>europeana-workflows-startups</artifactId>
-  <version>1.3.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>Unified Ingestion Manager: Workflows Startups</name>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>europeana-workflows-startups</artifactId>
+	<version>1.3.0-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+	<name>Unified Ingestion Manager: Workflows Startups</name>
 
 
 
 
 	<dependencies>
 
-       <dependency>
-        <groupId>org.dspace</groupId>
-        <artifactId>oclc-harvester2</artifactId>
-        <version>0.1.12</version>
-      </dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>oclc-harvester2</artifactId>
+			<version>0.1.12</version>
+		</dependency>
 
-       <dependency>
-        <groupId>eu.europeana</groupId>
-        <artifactId>europeana-uim-model-tel</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
-      </dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.4</version>
+		</dependency>
 
-       <dependency>
-        <groupId>eu.europeana</groupId>
-        <artifactId>europeana-uim-model-tel</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
-      </dependency>
+<dependency>
+   <groupId>xalan</groupId>
+   <artifactId>xalan</artifactId>
+   <version>2.7.1</version>
+</dependency>
 
-       <dependency>
-        <groupId>eu.europeana</groupId>
-        <artifactId>europeana-datamodel-definitions</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
-      </dependency>
 
-       <dependency>
-        <groupId>eu.europeana</groupId>
-        <artifactId>europeana-uim-edmcore-definitions</artifactId>
-        <version>1.0-SNAPSHOT</version>
-      </dependency>
 
-    </dependencies>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-model-tel</artifactId>
+			<version>1.3.0-SNAPSHOT</version>
+		</dependency>
 
-  
-  <build>
-    <defaultGoal>install</defaultGoal>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-datamodel-definitions</artifactId>
+			<version>1.3.0-SNAPSHOT</version>
+		</dependency>
 
-    <plugins>
-     <plugin>
-	   <inherited>true</inherited>
-	   <groupId>org.apache.maven.plugins</groupId>
-	   <artifactId>maven-compiler-plugin</artifactId>
-	   <configuration>
-	    	<source>1.6</source>
-			<target>1.6</target>
-		</configuration>
-	 </plugin>
-    </plugins>
-  </build>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-edmcore-definitions</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+	</dependencies>
+
+
+	<build>
+		<defaultGoal>install</defaultGoal>
+
+
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.2.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Import-Package>
+							eu.europeana.uim.api,
+							eu.europeana.uim.common,
+							eu.europeana.uim.store,
+							eu.europeana.uim.util,
+							eu.europeana.uim.workflow,
+							org.osgi.service.blueprint,
+							org.apache.commons.lang,
+							org.apache.commons.io,
+							org.w3c.dom,
+							org.w3c.dom.traversal,
+							org.w3c.dom.ls,
+							org.xml.sax,
+							org.xml.sax.helpers,
+							org.xml.sax.ext,
+							javax.xml.*,
+							javax.management,
+							javax.naming,
+							eu.europeana.uim.model.europeanaspecific.*,
+							org.xmlpull.v1,
+							org.jibx.runtime,
+							org.jibx.runtime.impl,
+							org.jibx.extras,
+							!*
+                            </Import-Package>
+						<Export-Package>
+							eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh
+						</Export-Package>
+						<Embed-Dependency>oclc-harvester2,log4j,xalan,europeana-uim-edmcore-definitions</Embed-Dependency>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

@@ -31,8 +31,7 @@ import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
 import eu.europeana.uim.edmcore.definitions.RDF;
 import eu.europeana.uim.model.europeanaspecific.utils.DefUtils;
 
-//import org.theeuropeanlibrary.model.xml.XmlUtil;
-//import org.theeuropeanlibrary.uim.load.metadata.FieldProcessor;
+
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -171,7 +170,8 @@ public class OaiPmhLoader {
                         identifier);
                 
                 
-                
+                /*
+
                 mdr.addValue(ObjectModelRegistry.IDENTIFIER, new Identifier(identifier),
                         IdentifierType.LOCAL_IDENTIFIER);
                 mdr.addValue(ObjectModelRegistry.INSTANT, new Instant(new Date(),
@@ -222,12 +222,15 @@ public class OaiPmhLoader {
                         log.warning("No identifier (" + mdr.getId() + "):\n");   //+ XmlUtil.writeDomToString(record.getMetadata()));
                                     
                     }
+
+                }
                     /*
                     */
-                }
-
                 if (request != null) {
                     String language = request.getCollection().getLanguage();
+                    
+                    /*
+                    
                     if (language != null && Language.lookupLanguage(language) != null) {
                         mdr.addValue(ObjectModelRegistry.LANGUAGE,
                                 Language.lookupLanguage(language),
@@ -235,6 +238,7 @@ public class OaiPmhLoader {
                     }
                     mdr.addValue(ObjectModelRegistry.COLLECTION,
                             request.getCollection().getMnemonic());
+                    */        
 
                     RDF validedmrecord = DefUtils.unmarshallObjectFromElement(record.getMetadata(), new RDF());
                     mdr.addValue(EuropeanaModelRegistry.EDMRECORD,validedmrecord);

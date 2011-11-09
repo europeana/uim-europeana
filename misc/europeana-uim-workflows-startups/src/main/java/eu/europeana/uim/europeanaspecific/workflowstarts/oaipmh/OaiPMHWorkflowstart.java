@@ -140,7 +140,6 @@ public class OaiPMHWorkflowstart extends AbstractWorkflowStart{
     
 	public OaiPMHWorkflowstart(String name, String description) {
 		super(name, description);
-		// TODO Auto-generated constructor stub
 	}
 
 	

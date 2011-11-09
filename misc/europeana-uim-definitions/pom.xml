@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>europeana-datamodel-definitions</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
 
   <name>Europeana Data Model Definitions</name>
 
@@ -37,10 +37,62 @@
 	</dependency>
     
     <dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-model-tel</artifactId>
+			<version>1.3.0-SNAPSHOT</version>
+	</dependency>
+    
+    <dependency>
       <groupId>eu.europeana</groupId>
       <artifactId>europeana-uim-edmcore-definitions</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+    
   </dependencies>
+
+
+    
+    <build>
+		<defaultGoal>install</defaultGoal>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.2.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Import-Package>
+							eu.europeana.uim.api,
+							eu.europeana.uim.common,
+							eu.europeana.uim.store,
+							eu.europeana.uim.util,
+							eu.europeana.uim.workflow,
+							org.xmlpull.v1,
+							org.jibx.runtime,
+							org.jibx.runtime.impl,
+							org.jibx.extras,
+							!*
+                            </Import-Package>
+						<Export-Package>
+							eu.europeana.uim.model.europeanaspecific.*,org.theeuropeanlibrary.model.tel.*,eu.europeana.uim.edmcore.definitions.*
+						</Export-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 
 </project>

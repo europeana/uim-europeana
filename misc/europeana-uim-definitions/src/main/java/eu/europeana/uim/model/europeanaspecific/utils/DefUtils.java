@@ -85,7 +85,7 @@ public class DefUtils {
 	 }
 	
 	
-	
+
 	 /**
 	  * Unmarshalls and returns a JIBX object from a DOM element
 	  * 
@@ -101,6 +101,7 @@ public class DefUtils {
 		 
 
 		 DomElementMapper mapper = new DomElementMapper();
+
 		 
 		 @SuppressWarnings("unchecked")
 		 T object =  (T) mapper.unmarshal(element, context);

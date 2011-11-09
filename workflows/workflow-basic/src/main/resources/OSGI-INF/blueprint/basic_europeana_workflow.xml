@@ -9,8 +9,11 @@
 
     <bean id="iiwClient" class="eu.europeana.uim.europeanaspecific.workflows.InitialIngestionWorkflow">
     </bean>
+    
+    <bean id="basicClient" class="eu.europeana.uim.europeanaspecific.workflows.TestWorkflow">
+    </bean>
 
     <service id="initialIngestionWorkflow" ref="iiwClient" interface="eu.europeana.uim.workflow.Workflow"/>
-
+    <service id="testWorkflow" ref="basicClient" interface="eu.europeana.uim.workflow.Workflow"/>
 
 </blueprint>
