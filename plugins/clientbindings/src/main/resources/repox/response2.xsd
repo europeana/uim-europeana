@@ -15,9 +15,30 @@
         <xs:element ref="log" minOccurs="0" maxOccurs="1"/>
         <xs:element ref="success" minOccurs="0" maxOccurs="1"/>
         <xs:element ref="error" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="harvestingStatus" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+
+  </xs:element>
+    <xs:element name="harvestingStatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="1" ref="status"/>
+        <xs:element minOccurs="0" ref="timeLeft"/>
+        <xs:element minOccurs="0" ref="percentage"/>
+        <xs:element minOccurs="0" ref="records"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  
+  <xs:element name="status" type="xs:string"/>
+  <xs:element name="timeLeft" type="xs:string"/>
+  <xs:element name="percentage" type="xs:string"/>
+  <xs:element name="records" type="xs:string"/>
+  
+  
+  
+  
   <xs:element name="recordResult">
     <xs:complexType>
       <xs:attribute name="urn" use="required" type="xs:anyURI"/>
@@ -99,7 +120,7 @@
         <xs:element ref="recordIdPolicy"/>
         <xs:sequence minOccurs="0">
           <xs:element ref="oai-source"/>
-          <xs:element ref="oai-set"/>
+          <xs:element ref="oai-set" minOccurs="0"/>
         </xs:sequence>
         <xs:sequence minOccurs="0">
           <xs:element ref="sourcesDirPath"/>
@@ -170,8 +191,8 @@
   <xs:element name="splitRecords">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="recordXPath"/>
-        <xs:element ref="namespaces"/>
+        <xs:element ref="recordXPath" minOccurs="0"/>
+        <xs:element ref="namespaces" minOccurs="0"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
