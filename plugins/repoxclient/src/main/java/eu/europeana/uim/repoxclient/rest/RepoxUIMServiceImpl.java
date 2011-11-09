@@ -39,6 +39,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.Description;
+import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
 import eu.europeana.uim.repoxclient.jibxbindings.Line;
 import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
@@ -55,8 +56,10 @@ import eu.europeana.uim.repoxclient.jibxbindings.Task;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
+import eu.europeana.uim.repoxclient.objects.HarvestingState;
 import eu.europeana.uim.repoxclient.objects.IngestFrequency;
 import eu.europeana.uim.repoxclient.objects.RepoxConnectionStatus;
+import eu.europeana.uim.repoxclient.objects.RepoxHarvestingStatus;
 import eu.europeana.uim.repoxclient.objects.ScheduleInfo;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
@@ -679,7 +682,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getHarvestingStatus(eu.europeana.uim.store.Collection)
 	 */
 	@Override
-	public Success getHarvestingStatus(Collection<?> col)
+	public RepoxHarvestingStatus getHarvestingStatus(Collection<?> col)
 			throws HarvestingOperationException {
 		String id = col.getValue("repoxID");
 
@@ -687,8 +690,27 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			throw new HarvestingOperationException(
 					"Missing repoxID element from Collection object");
 		}
-
-		return repoxRestClient.getHarvestingStatus(id);
+		 HarvestingStatus jibxstatus =   repoxRestClient.getHarvestingStatus(id);
+		 
+		 RepoxHarvestingStatus returnStatus = new RepoxHarvestingStatus();
+		 
+		 returnStatus.setStatus(HarvestingState.valueOf(jibxstatus.getStatus().getStatus()));
+		 
+		 if(jibxstatus.getPercentage() != null){
+			 returnStatus.setPercentage(jibxstatus.getPercentage().getPercentage());
+		 }
+		 
+		 if(jibxstatus.getRecords() != null){
+			 
+			 returnStatus.setRecords(jibxstatus.getRecords().getRecords());
+		 }
+		 
+		 if(jibxstatus.getTimeLeft() != null){
+			 returnStatus.setTimeLeft(jibxstatus.getRecords().getRecords());
+		 }
+		 
+		 
+		return returnStatus;
 
 	}
 

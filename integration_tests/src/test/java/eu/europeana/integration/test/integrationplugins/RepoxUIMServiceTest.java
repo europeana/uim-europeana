@@ -63,6 +63,7 @@ import eu.europeana.uim.store.Provider;
 
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
+import eu.europeana.uim.repoxclient.objects.RepoxHarvestingStatus;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
 import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
@@ -355,7 +356,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 			
 		    repoxservice.initiateHarvestingfromUIMObj(coll,true);
 		  
-		    Success result =repoxservice.getHarvestingStatus(coll);
+		    RepoxHarvestingStatus result =repoxservice.getHarvestingStatus(coll);
 			assertNotNull(result);
 		    repoxservice.getActiveHarvestingSessions();
 		    

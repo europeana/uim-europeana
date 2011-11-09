@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
+import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
 import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Provider;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
@@ -372,7 +373,7 @@ public interface RepoxRestClient {
 	 * @return the status
 	 * @throws RepoxException
 	 */
-	public Success getHarvestingStatus(String dsID) throws HarvestingOperationException;
+	public HarvestingStatus getHarvestingStatus(String dsID) throws HarvestingOperationException;
 	
 
 

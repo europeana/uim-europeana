@@ -36,7 +36,7 @@ import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
-
+import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
 
 import eu.europeana.uim.repoxclient.objects.IngestFrequency;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
@@ -68,8 +68,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 */
 	
 
-	/**
-	 * 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#createAggregator(eu.europeana.uim.repoxclient.jibxbindings.Aggregator)
 	 */
 	@Override
 	public Aggregator createAggregator(Aggregator aggregator)
@@ -104,6 +104,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#deleteAggregator(java.lang.String)
+	 */
 	@Override
 	public Success deleteAggregator(String aggregatorId)
 			throws AggregatorOperationException {
@@ -162,6 +165,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#retrieveAggregators()
+	 */
 	@Override
 	public Aggregators retrieveAggregators() throws AggregatorOperationException {
 		Response resp = invokRestTemplate("/aggregators/list",Response.class);
@@ -234,6 +240,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#deleteProvider(java.lang.String)
+	 */
 	@Override
 	public Success deleteProvider(String provID) throws ProviderOperationException {
 		StringBuffer providerId = new StringBuffer();
@@ -258,6 +267,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 	
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#updateProvider(eu.europeana.uim.repoxclient.jibxbindings.Provider)
+	 */
 	@Override
 	public Provider updateProvider(Provider prov) throws ProviderOperationException {
 
@@ -321,6 +333,9 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#retrieveProviders()
+	 */
 	@Override
 	public DataProviders retrieveProviders() throws ProviderOperationException {
 		Response resp = invokRestTemplate("/dataProviders/list",Response.class);
@@ -1248,7 +1263,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 */
 	@Override
-	public Success getHarvestingStatus(String dsID)
+	public HarvestingStatus getHarvestingStatus(String dsID)
 			throws HarvestingOperationException {
 		StringBuffer id = new StringBuffer();
 		
@@ -1258,7 +1273,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = invokRestTemplate("/dataSources/harvestStatus",Response.class,
 				id.toString());
 		
-		if (resp.getSuccess() == null) {
+		if (resp.getHarvestingStatus() == null) {
 			if (resp.getError() != null) {
 				throw new HarvestingOperationException(resp.getError());
 			} else {
@@ -1266,7 +1281,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 			}
 		} else {
 
-			return resp.getSuccess();
+			return resp.getHarvestingStatus();
 		}
 	}
 
@@ -1635,7 +1650,8 @@ private Response createUpdateZ3950Timestamp(String action, Source ds, Provider p
 		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
 	}
 	if (action.equals("create")){
-		return invokRestTemplate("/dataSources/createZ3950Timestamp",Response.class,
+		
+		Response resp = invokRestTemplate("/dataSources/createZ3950Timestamp",Response.class,
 				dataProviderId.toString(),
 				id.toString(),
 				description.toString(),
@@ -1656,9 +1672,11 @@ private Response createUpdateZ3950Timestamp(String action, Source ds, Provider p
 				idXpath.toString(),
 				namespacePrefix.toString(),
 				namespaceUri.toString());
+		
+		return resp;
 	}
 	else{
-		return invokRestTemplate("/dataSources/updateZ3950Timestamp",Response.class,
+		Response resp = invokRestTemplate("/dataSources/updateZ3950Timestamp",Response.class,
 				id.toString(),
 				description.toString(),
 				nameCode.toString(),
@@ -1678,6 +1696,8 @@ private Response createUpdateZ3950Timestamp(String action, Source ds, Provider p
 				idXpath.toString(),
 				namespacePrefix.toString(),
 				namespaceUri.toString());
+		
+		return resp;
 	}
 }
 
@@ -1743,7 +1763,7 @@ private Response createUpdateDSZ3950IdFile(String action, Source ds, Provider pr
 	charset.append("charset=");
 	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
 	filePath.append("filePath=");
-	filePath.append(ds.getChoice().getFilePath());
+	filePath.append(ds.getChoice().getFilePath().getFilePath());
 	recordIdPolicy.append("recordIdPolicy=");
 	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
 	if (ds.getRecordIdPolicy().getType().equals("idExported")){
@@ -1756,7 +1776,8 @@ private Response createUpdateDSZ3950IdFile(String action, Source ds, Provider pr
 	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
 	}
 	if (action.equals("create")){
-		return invokRestTemplate("/dataSources/createZ3950IdList",Response.class,
+		
+		Response resp =  invokRestTemplate("/dataSources/createZ3950IdList",Response.class,
 				dataProviderId.toString(),
 				id.toString(),
 				description.toString(),
@@ -1777,10 +1798,13 @@ private Response createUpdateDSZ3950IdFile(String action, Source ds, Provider pr
 				idXpath.toString(),
 				namespacePrefix.toString(),
 				namespaceUri.toString());
+		
+		return resp;
 	}
 	else
 	{
-		return invokRestTemplate("/dataSources/updateZ3950IdList",Response.class,
+		
+		Response resp = invokRestTemplate("/dataSources/updateZ3950IdList",Response.class,
 				id.toString(),
 				description.toString(),
 				nameCode.toString(),
@@ -1800,6 +1824,8 @@ private Response createUpdateDSZ3950IdFile(String action, Source ds, Provider pr
 				idXpath.toString(),
 				namespacePrefix.toString(),
 				namespaceUri.toString());
+		
+		return resp;
 	}
 }
 
@@ -1962,7 +1988,7 @@ private Response createUpdateDSFtp(String action, Source ds, Provider prov){
 	description.append("description=");
 	description.append(ds.getDescription().getDescription());
 	nameCode.append("nameCode=");
-	nameCode.append(ds.getNameCode().toString());
+	nameCode.append(ds.getNameCode());
 	name.append("name=");
 	name.append(ds.getName());
 	exportPath.append("exportPath=");

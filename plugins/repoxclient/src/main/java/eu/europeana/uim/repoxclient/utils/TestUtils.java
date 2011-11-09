@@ -232,7 +232,7 @@ public class TestUtils {
 		Source ds = new Source();
 		ds.setId(id);
 		Description des = new Description();
-		des.setDescription("test Z39.50 with id list");
+		des.setDescription("test");
 		ds.setDescription(des);
 		ds.setNameCode("00124");
 		ds.setName("Z3950-IdFile");

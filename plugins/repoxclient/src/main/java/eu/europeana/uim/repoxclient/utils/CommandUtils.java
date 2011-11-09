@@ -30,7 +30,9 @@ import eu.europeana.uim.api.StorageEngine;
 
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
+import eu.europeana.uim.repoxclient.objects.RepoxHarvestingStatus;
 import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
@@ -549,8 +551,8 @@ public class CommandUtils {
 			coll.setName(dsName);
 			coll.setMnemonic(dsMnemonic);
 			coll.putValue("repoxID", dsName + dsMnemonic + "r0");
-			Success res = repoxservice.getHarvestingStatus(coll);
-			return "Result \n" + res.getSuccess();
+			RepoxHarvestingStatus res = repoxservice.getHarvestingStatus(coll);
+			return "Status \n" + res.getStatus();
 		} catch (HarvestingOperationException e) {
 			return "Error in getting harvest status for collection "
 					+ dsName + ". " + e.getMessage();

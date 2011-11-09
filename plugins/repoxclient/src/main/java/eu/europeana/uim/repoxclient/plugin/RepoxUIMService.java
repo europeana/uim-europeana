@@ -27,6 +27,7 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.objects.RepoxConnectionStatus;
+import eu.europeana.uim.repoxclient.objects.RepoxHarvestingStatus;
 import eu.europeana.uim.repoxclient.objects.ScheduleInfo;
 import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
@@ -244,7 +245,7 @@ public interface RepoxUIMService {
 	 * @return the status
 	 * @throws RepoxException
 	 */
-	public Success getHarvestingStatus(Collection<?> col) throws HarvestingOperationException;
+	public RepoxHarvestingStatus getHarvestingStatus(Collection<?> col) throws HarvestingOperationException;
 	
 
 
