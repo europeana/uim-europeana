@@ -1999,11 +1999,14 @@ private Response createUpdateDSFtp(String action, Source ds, Provider prov){
 	namespace.append(ds.getNamespace());
 	metadataFormat.append("metadataFormat=");
 	metadataFormat.append(ds.getMetadataFormat());
-	
-	//isoFormat.append("isoFormat=");
+	//TODO: isoFormat and charset and ftpPath are missing
+	isoFormat.append("isoFormat=");
 	//isoFormat.append(ds.getChoice().getIsoFormat().getIsoFormat());
+	isoFormat.append("test");
+	
 	charset.append("charset=");
-	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	//charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	charset.append("test");
 	recordIdPolicy.append("recordIdPolicy=");
 	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
 	if (ds.getRecordIdPolicy().getType().equals("idExported")){
@@ -2025,7 +2028,8 @@ private Response createUpdateDSFtp(String action, Source ds, Provider prov){
 	password.append(ds.getSequence1().getRetrieveStrategy().getChoice().getPassword().getPassword());
 	
 	ftpPath.append("ftpPath=");
-	ftpPath.append(ds.getChoice().getFtpPath().getFtpPath());
+	ftpPath.append("/test");
+	//ftpPath.append(ds.getChoice().getFtpPath().getFtpPath());
 	if (action.equals("create")){
 		return invokRestTemplate("/dataSources/createFtp",Response.class,
 				dataProviderId.toString(),
@@ -2225,25 +2229,30 @@ private Response createUpdateDSFolder(String action, Source ds, Provider prov){
 	namespace.append(ds.getNamespace());
 	metadataFormat.append("metadataFormat=");
 	metadataFormat.append(ds.getMetadataFormat());
-	
-	//isoFormat.append("isoFormat=");
+	//todo: isoFormat charset folder are missing
+	isoFormat.append("isoFormat=");
 	//isoFormat.append(ds.getChoice().getIsoFormat().getIsoFormat());
+	isoFormat.append("test");
 	charset.append("charset=");
-	charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
+	charset.append("test");
+	//charset.append(ds.getSequence2().getTarget().getCharset().getCharset());
 	recordIdPolicy.append("recordIdPolicy=");
 	recordIdPolicy.append(ds.getRecordIdPolicy().getType());
-	idXpath.append("idXpath=");
-	idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
-	namespacePrefix.append("namespacePrefix=");
-	namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
-	namespaceUri.append("namespaceUri=");
-	namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
-
-	recordXPath.append("recordXPath=");
-	recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
+	if (ds.getRecordIdPolicy().getType().equals("idExported")){
+		idXpath.append("idXpath=");
 	
+		idXpath.append(ds.getRecordIdPolicy().getSequence().getIdXpath().getIdXpath());
+		namespacePrefix.append("namespacePrefix=");
+		namespacePrefix.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespacePrefix().getNamespacePrefix());
+		namespaceUri.append("namespaceUri=");
+		namespaceUri.append(ds.getRecordIdPolicy().getSequence().getNamespaces().getNamespace().getNamespaceUri().getNamespaceUri());
+
+		recordXPath.append("recordXPath=");
+		recordXPath.append(ds.getSplitRecords().getRecordXPath().getRecordXPath());
+	}
 	folder.append("folder=");
-	folder.append(ds.getChoice().getFolder());
+	folder.append("/tmp");
+	//folder.append(ds.getChoice().getFolder());
 	
 	if (action.equals("create")){
 		return invokRestTemplate("/dataSources/createFolder",Response.class,
