@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
@@ -7,18 +8,13 @@
 		<version>1.3.0-SNAPSHOT</version>
 	</parent>
 
-
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>europeana-workflows-startups</artifactId>
 	<version>1.3.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
-	<name>Unified Ingestion Manager: Workflows Startups</name>
-
-
-
+	<name>Unified Ingestion Manager: Workflows Startup Plugins</name>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>oclc-harvester2</artifactId>
@@ -31,13 +27,11 @@
 			<version>1.2.4</version>
 		</dependency>
 
-<dependency>
-   <groupId>xalan</groupId>
-   <artifactId>xalan</artifactId>
-   <version>2.7.1</version>
-</dependency>
-
-
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<version>2.7.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>eu.europeana</groupId>
@@ -62,9 +56,6 @@
 
 	<build>
 		<defaultGoal>install</defaultGoal>
-
-
-
 		<plugins>
 
 			<plugin>
@@ -98,7 +89,7 @@
 							org.jibx.runtime.impl,
 							org.jibx.extras,
 							!*
-                            </Import-Package>
+						</Import-Package>
 						<Export-Package>
 							eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh
 						</Export-Package>

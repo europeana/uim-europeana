@@ -1,159 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    
-     
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>eu.europeana</groupId>
-    <artifactId>europeana-uim-plugin-solrosgi</artifactId>
-    <packaging>bundle</packaging>
-    <name>Unified Ingestion Manager: Solr Workflow Plugin</name>
-    <version>1.3.0-SNAPSHOT</version>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>europeana-uim-europeanaspecific</artifactId>
+		<groupId>eu.europeana</groupId>
+		<version>1.3.0-SNAPSHOT</version>
+	</parent>
 
-	<properties>
-        <junit-version>4.5</junit-version>
-    </properties>
-
+	<artifactId>europeana-uim-plugin-solrosgi</artifactId>
+	<packaging>bundle</packaging>
+	<name>Unified Ingestion Manager: Solr Workflow Plugin</name>
 
 	<dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>europeana-uim-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>1.4.1</version>
+		</dependency>
 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>europeana-uim-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-core</artifactId>
+			<version>1.4.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
 
-        <dependency>
-           <groupId>org.apache.solr</groupId>
-           <artifactId>solr-solrj</artifactId>
-           <version>1.4.1</version>
-        </dependency>
-	
-        <dependency>
-               <groupId>org.apache.solr</groupId>
-               <artifactId>solr-core</artifactId>
-               <version>1.4.1</version>
-               <type>jar</type>
-               <scope>compile</scope>
-        </dependency>        
-        
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.5.5</version>
-        </dependency> 
-        
-        <!-- JUnit dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit-version}</version>
-            <scope>test</scope>
-        </dependency>
-        
-        
-     </dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.5.5</version>
+		</dependency>
 
-    
-    <build>
-        <resources>
-            <!-- standard Maven folder -->
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <!-- plus root folder -->
-            <resource>
-                 <directory>.</directory>
-                <includes>
-                    <include>solrplugin.xml</include>
-                    <include>OSGI-INF/*</include>
-                </includes>
-            </resource>
-        </resources>
-        
-        <plugins>
+		<!-- JUnit dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit-version}</version>
+			<scope>test</scope>
+		</dependency>
 
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.1.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <obrRepository>NONE</obrRepository>
-                    <manifestLocation>META-INF</manifestLocation>
-                    <instructions>
-                        <Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
-                        <Import-Package>
-                        !COM.jrockit.reflect,
-                        !javax.portlet,
-                        !jrockit.vm,
-                        !org.apache.log,
-                        !sun.reflect,
-                        !org.apache.tools.ant.*,
-                        !com.sun.msv.*,
-                        !org.mortbay.*,
-                        !org.relaxng.datatype.*,
-                        !org.apache.avalon.framework.logger,
-                        !org.apache.felix.gogo.commands,
-                        !org.apache.felix.service.command,
-                        *
-                        </Import-Package>
-                        <Include-Resource>src/main/resources</Include-Resource>
-                    </instructions>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
-            <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-compiler-plugin</artifactId>
-                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                 </configuration>
-            </plugin>
-            
+	</dependencies>
 
-        </plugins>
-    </build>
 
-    <!-- ================================================ -->
-    <!--            Repository Configuration              -->
-    <!-- ================================================ -->
+	<build>
+		<resources>
+			<!-- standard Maven folder -->
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<!-- plus root folder -->
+			<resource>
+				<directory>.</directory>
+				<includes>
+					<include>solrplugin.xml</include>
+					<include>OSGI-INF/*</include>
+				</includes>
+			</resource>
+		</resources>
 
-    <repositories>        
-        <repository>
-            <id>eclipse-repository</id>
-            <name>Eclipse Repository</name>
-            <url>http://repo1.maven.org/eclipse/</url>
-        </repository>
-    </repositories>
+		<plugins>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>maven-repo</id>
-            <name>maven repo</name>
-            <url>http://repo1.maven.org/maven2/</url>
-        </pluginRepository>
-    </pluginRepositories>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.1.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<obrRepository>NONE</obrRepository>
+					<manifestLocation>META-INF</manifestLocation>
+					<instructions>
+						<Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
+						<Import-Package>
+							!COM.jrockit.reflect,
+							!javax.portlet,
+							!jrockit.vm,
+							!org.apache.log,
+							!sun.reflect,
+							!org.apache.tools.ant.*,
+							!com.sun.msv.*,
+							!org.mortbay.*,
+							!org.relaxng.datatype.*,
+							!org.apache.avalon.framework.logger,
+							!org.apache.felix.gogo.commands,
+							!org.apache.felix.service.command,
+							*
+						</Import-Package>
+						<Include-Resource>src/main/resources</Include-Resource>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+
+		</plugins>
+	</build>
+
+	<!-- ================================================ -->
+	<!-- Repository Configuration -->
+	<!-- ================================================ -->
+
+	<repositories>
+		<repository>
+			<id>eclipse-repository</id>
+			<name>Eclipse Repository</name>
+			<url>http://repo1.maven.org/eclipse/</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>maven-repo</id>
+			<name>maven repo</name>
+			<url>http://repo1.maven.org/maven2/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 </project>

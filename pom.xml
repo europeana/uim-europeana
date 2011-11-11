@@ -10,19 +10,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>europeana-uim-europeanaspecific</artifactId>
-    <groupId>eu.europeana</groupId>
-    <version>1.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Unified Ingestion Manager: Europeana Specific Modules</name>
 
 	<modules>
 	  <module>plugins</module>
+	  <module>misc/europeana-uim-edmcore-definitions</module>
 	  <module>misc/europeana-uim-definitions</module>
-	  <module>misc/europeana-uim-workflows-startups</module>
-	  <module>workflows/workflow-basic</module>
-	  <module>workflow_plugins/europeana-normalizer</module>
 	  <module>workflow_plugins/linkchecker</module>
 	  <module>workflow_plugins/solr-plugin</module>
+	  <module>misc/europeana-uim-workflows-startups</module>
+	  <module>workflows/workflow-basic</module>
+	  <module>webapp/controlpanel</module>
 	</modules>
 	
 	
@@ -54,23 +53,20 @@
         </dependency>
     </dependencies>
 	
-
-
    	<repositories>
-
 		<repository>
-			<id>europeana-labs-artifactory</id>
-			<name>Europeana Labs Arifactory</name>
+			<id>uim-releases-local</id>
+			<name>UIM Releases Repository</name>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-			<url>http://europeanalabs.eu/artifactory</url>
+			<url>http://europeanalabs.eu/artifactory/uim-releases-local</url>
 		</repository>
 		
 		<repository>
 			<id>spring-ext</id>
 			<name>Spring External Dependencies Repository</name>
-			<url>
+				<url>
 				https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/
 			</url>
 		</repository>
@@ -92,28 +88,21 @@
           <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
           <url>http://repository.springsource.com/maven/bundles/external</url>
 	   </repository>
-	   
 	</repositories>
 	
 	
-	
-	
-	
 	<distributionManagement>
-	
      <repository>
         <id>europeanalabs.eu</id>
         <name>europeanalabs.eu-releases</name>
-        <url>http://europeanalabs.eu/artifactory/libs-releases-local</url>
+        <url>http://europeanalabs.eu/artifactory/plugins-releases-local</url>
      </repository>
      
      <snapshotRepository>
         <id>europeanalabs.eu</id>
         <name>europeanalabs.eu-snapshots</name>
-        <url>http://europeanalabs.eu/artifactory/libs-snapshots-local</url>
-     </snapshotRepository>
-     
+        <url>http://europeanalabs.eu/artifactory/plugins-snapshots-local</url>
+     </snapshotRepository> 
    </distributionManagement>
 	
-		
 </project>
