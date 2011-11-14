@@ -56,8 +56,8 @@ import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrm.LoginFailureException;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 import eu.europeana.uim.sugarcrm.SugarCrmRecord;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaRetrievableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaUpdatableField;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaUpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.CustomSugarCrmQuery;
 import eu.europeana.uim.sugarcrm.QueryResultException;
 

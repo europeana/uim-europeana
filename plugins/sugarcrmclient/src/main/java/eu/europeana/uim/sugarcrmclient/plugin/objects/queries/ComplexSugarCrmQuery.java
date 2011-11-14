@@ -22,7 +22,7 @@
 package eu.europeana.uim.sugarcrmclient.plugin.objects.queries;
 
 import eu.europeana.uim.sugarcrm.model.SugarCrmField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaRetrievableField;
+
 
 /**
  * 

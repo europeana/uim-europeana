@@ -18,8 +18,9 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
+package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
+import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.sugarcrm.model.UpdatableField;
 
 
@@ -30,7 +31,7 @@ import eu.europeana.uim.sugarcrm.model.UpdatableField;
  * @author Georgios Markakis
  * @author Yorgos Mamakis
  */
-public enum EuropeanaUpdatableField implements UpdatableField{
+public enum EuropeanaUpdatableField implements UpdatableField,ControlledVocabularyKeyValue{
 	AMOUNT("amount","amount","Amount"),
 	TOTAL_INGESTED("ingested_total_c","ingested_total_c","Ingested Total"),
 	INGESTED_SOUND("ingested_sound_c","ingested_sound_c","Ingested Sound"),

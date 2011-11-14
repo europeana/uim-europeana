@@ -18,8 +18,9 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
+package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
+import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.sugarcrm.model.Datasets;
 
 /**
@@ -27,7 +28,7 @@ import eu.europeana.uim.sugarcrm.model.Datasets;
  * 
  * @author Georgios Markakis
  */
-public enum EuropeanaDatasets implements Datasets {
+public enum EuropeanaDatasets implements Datasets,ControlledVocabularyKeyValue {
 	ORGANIZATIONS("Accounts"),
 	DATASETS("Opportunities");
 	
@@ -48,6 +49,12 @@ public enum EuropeanaDatasets implements Datasets {
 	 */
 	@Override
     public String getSysId() {
+		return sysId;
+	}
+
+
+	@Override
+	public String getFieldId() {
 		return sysId;
 	}
 

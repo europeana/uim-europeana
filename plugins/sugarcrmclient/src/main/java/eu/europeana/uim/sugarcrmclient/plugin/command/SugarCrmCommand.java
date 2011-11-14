@@ -25,9 +25,10 @@ import eu.europeana.uim.sugarcrm.SugarCrmRecord;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 import eu.europeana.uim.sugarcrm.model.DatasetStates;
 import eu.europeana.uim.sugarcrm.model.UpdatableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaRetrievableField;
-import eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaUpdatableField;
+
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaUpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBQueryResultException;
 import eu.europeana.uim.workflow.Workflow;

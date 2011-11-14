@@ -18,7 +18,8 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
+package eu.europeana.uim.model.europeanaspecific.fieldvalues;
+import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.sugarcrm.model.RetrievableField;
 
 
@@ -27,7 +28,7 @@ import eu.europeana.uim.sugarcrm.model.RetrievableField;
  *  by the SugarCRM client. 
  * @author Georgios Markakis
  */
-public enum EuropeanaRetrievableField implements RetrievableField{
+public enum EuropeanaRetrievableField implements RetrievableField,ControlledVocabularyKeyValue{
 	ID("id","id","ID"),
 	NAME("name","name","Name"),
 	DATE_ENTERED("date_entered","date_entered","Date Entered"),

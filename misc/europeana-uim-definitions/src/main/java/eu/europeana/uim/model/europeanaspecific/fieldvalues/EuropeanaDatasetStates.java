@@ -18,15 +18,16 @@
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
  */
-package eu.europeana.uim.sugarcrmclient.plugin.objects.data;
+package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
+import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.sugarcrm.model.DatasetStates;
 
 /**
  * This enumeration holds the State Descriptions for EuropeanaDatasets in Sugar CRM
  * @author Georgios Markakis
  */
-public enum EuropeanaDatasetStates implements DatasetStates {
+public enum EuropeanaDatasetStates implements DatasetStates,ControlledVocabularyKeyValue {
 
 	OAI_PMH_TESTING("Prospecting","OAI-PHM testing"),
 	OAI_PMH_SENT_TO_ORG("Qualification","OAI-PHM test sent to Organisation"),
@@ -55,6 +56,11 @@ public enum EuropeanaDatasetStates implements DatasetStates {
 	@Override
     public String getDescription() {
 		return description;
+	}
+
+	@Override
+	public String getFieldId() {
+		return sysId;
 	}
 	
 	
