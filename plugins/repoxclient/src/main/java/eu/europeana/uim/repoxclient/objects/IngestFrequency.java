@@ -21,7 +21,9 @@
 package eu.europeana.uim.repoxclient.objects;
 
 /**
- * @author georgiosmarkakis
+ * Ingestion Frequency (used in schedule Service)
+ * 
+ * @author Georgios Markakis
  *
  */
 public enum IngestFrequency {
