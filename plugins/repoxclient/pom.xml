@@ -22,6 +22,12 @@
 			<artifactId>europeana-uim-plugin-clientbindings</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-datamodel-definitions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
     </dependencies>
 
     

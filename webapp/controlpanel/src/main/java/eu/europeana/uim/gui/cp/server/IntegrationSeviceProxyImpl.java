@@ -235,9 +235,6 @@ public class IntegrationSeviceProxyImpl extends
 			guirecord
 					.setAccess_to_content_checker(originalrecord
 							.getItemValue(EuropeanaRetrievableField.ACCESS_TO_CONTENT_CHECKER));
-			guirecord
-					.setActual_ingestion_date_(originalrecord
-							.getItemValue(EuropeanaRetrievableField.DATE_OF_REPLICATION));
 			guirecord.setAssigned_user_id(originalrecord
 					.getItemValue(EuropeanaRetrievableField.ASSIGNED_USER_ID));
 			guirecord
@@ -255,17 +252,11 @@ public class IntegrationSeviceProxyImpl extends
 					.getItemValue(EuropeanaRetrievableField.DATE_ENTERED));
 			guirecord.setDate_modified(originalrecord
 					.getItemValue(EuropeanaRetrievableField.DATE_MODIFIED));
-			guirecord.setDeleted(originalrecord
-					.getItemValue(EuropeanaRetrievableField.DELETED));
 			guirecord.setDescription(originalrecord
 					.getItemValue(EuropeanaRetrievableField.DESCRIPTION));
-			guirecord.setEnabled_c(originalrecord
-					.getItemValue(EuropeanaRetrievableField.ENABLED));
 			guirecord
 					.setExpected_ingestion_date(originalrecord
 							.getItemValue(EuropeanaRetrievableField.EXPECTED_INGESTION_DATE));
-			guirecord.setHarvest_url(originalrecord
-					.getItemValue(EuropeanaRetrievableField.HARVEST_URL));
 			guirecord.setIdentifier(originalrecord
 					.getItemValue(EuropeanaRetrievableField.IDENTIFIER));
 			guirecord.setIngested_image_c(originalrecord
@@ -290,18 +281,6 @@ public class IntegrationSeviceProxyImpl extends
 					.getItemValue(EuropeanaRetrievableField.NOTES));
 			guirecord.setOrganization_name(originalrecord
 					.getItemValue(EuropeanaRetrievableField.ORGANIZATION_NAME));
-			guirecord.setPlanned_image_c(originalrecord
-					.getItemValue(EuropeanaRetrievableField.PLANNED_IMAGE));
-			guirecord.setPlanned_sound_c(originalrecord
-					.getItemValue(EuropeanaRetrievableField.PLANNED_SOUND));
-			guirecord.setPlanned_text_c(originalrecord
-					.getItemValue(EuropeanaRetrievableField.PLANNED_TEXT));
-			guirecord.setPlanned_total_c(originalrecord
-					.getItemValue(EuropeanaRetrievableField.PLANNED_TOTAL));
-			guirecord.setPlanned_video_c(originalrecord
-					.getItemValue(EuropeanaRetrievableField.PLANNED_VIDEO));
-			guirecord.setSetspec_c(originalrecord
-					.getItemValue(EuropeanaRetrievableField.SETSPEC));
 			guirecord.setStatus(originalrecord
 					.getItemValue(EuropeanaUpdatableField.STATUS));
 			guirecord.setType(originalrecord

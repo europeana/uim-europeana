@@ -70,12 +70,15 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaUpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientImpl;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBQueryResultException;
 import eu.europeana.uim.workflow.Workflow;
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * This is the implementing class for the OSGI based SugarCrm plugin OSGI service.
@@ -356,16 +359,12 @@ public class SugarCRMServiceImpl implements SugarCrmService {
             e.printStackTrace();
         }
 
-        String collectionName = record.getItemValue(EuropeanaRetrievableField.NAME); 
         String providerName = record.getItemValue(EuropeanaRetrievableField.ORGANIZATION_NAME); 
-        String providerAcronymName = record.getItemValue(EuropeanaRetrievableField.ACRONYM); 
         String mnemonicCode = providerInfo.get("identifier"); 
         String countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); 
-        String harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); 
-        String metadataformat = record.getItemValue(EuropeanaRetrievableField.METADATA_FORMAT); 
-
-        
-        
+        String harvestUrl = record.getItemValue(EuropeanaUpdatableField.HARVEST_URL); 
+        String metadataformat = record.getItemValue(EuropeanaUpdatableField.METADATA_FORMAT); 
+       
         Provider cuurprovider = engine.findProvider(mnemonicCode);
         
 
@@ -377,8 +376,6 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         cuurprovider.setName(providerName);
         cuurprovider.setOaiBaseUrl(harvestUrl);
         cuurprovider.setOaiMetadataPrefix(metadataformat);
-
-        cuurprovider.putValue("providerIdentifier", providerInfo.get("identifier"));
         
         String encodedDescription = null;
         try {
@@ -387,15 +384,11 @@ public class SugarCRMServiceImpl implements SugarCrmService {
             encodedDescription = "None";
             e.printStackTrace();
         }
-        cuurprovider.putValue("providerDescription", encodedDescription);
-        cuurprovider.putValue("providerName", providerInfo.get("name"));
-        cuurprovider.putValue("providerWebsite", providerInfo.get("website"));
-        cuurprovider.putValue("sugarCRMID", providerInfo.get("sugarCRMID"));
-        // FIXME:Handle Repox Datatypes
-        // cuurprovider.putValue("type", providerInfo.get("type"));
-        cuurprovider.putValue("providerType", "ARCHIVE");
-        //cuurprovider.putValue("providerCountry", providerInfo.get("country"));
-        cuurprovider.putValue("providerCountry", countryCode);
+        cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, encodedDescription);
+        cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, providerInfo.get("website"));
+        cuurprovider.putValue(ControlledVocabularyProxy.SUGARCRMID, providerInfo.get("sugarCRMID"));
+        cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, providerInfo.get("type"));
+        cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, countryCode);
         engine.updateProvider(cuurprovider);
         engine.checkpoint();
 
@@ -514,34 +507,47 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         StorageEngine<?> engine = registry.getStorageEngine();
 
 
-        String mnemonicCode = null;
+        String mnemonicCode = record.getItemValue(EuropeanaRetrievableField.NAME).split("_")[0];
+        String fulname = record.getItemValue(EuropeanaRetrievableField.NAME);
+        StringUtils.replaceChars(fulname, "_", " ");
+        StringUtils.replace(fulname, mnemonicCode, "");
 
-        StringBuffer buffername = new StringBuffer();
-
-        String[] fulname = record.getItemValue(EuropeanaRetrievableField.NAME).split("_");
-
-        List<String> list = Arrays.asList(fulname);
-
-        for (int i = 0; i < list.size(); i++) {
-            if (i == 0) {
-                mnemonicCode = list.get(i);
-            } else if (i > 3) {
-                buffername.append(list.get(i));
-                buffername.append(" ");
-            }
-        }
-
-        String collectionName = buffername.toString();
-        String collectionID = record.getItemValue(EuropeanaRetrievableField.NAME); // "name"
-        String countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); // "country_c"
-        String harvestUrl = record.getItemValue(EuropeanaRetrievableField.HARVEST_URL); // "harvest_url_c"
-        String set = record.getItemValue(EuropeanaRetrievableField.SETSPEC);
+        String collectionName = fulname;
+        String collectionID = record.getItemValue(EuropeanaRetrievableField.NAME); 
+        String countryCode = record.getItemValue(EuropeanaRetrievableField.COUNTRY).toLowerCase(); 
+        String harvestUrl = record.getItemValue(EuropeanaUpdatableField.HARVEST_URL);
+        String set = record.getItemValue(EuropeanaUpdatableField.SETSPEC);
         String sugarCRMID = record.getItemValue(EuropeanaRetrievableField.ID);
+        String collectionDescription = record.getItemValue(EuropeanaRetrievableField.DESCRIPTION); 
+        String ingestionDate = record.getItemValue(EuropeanaRetrievableField.EXPECTED_INGESTION_DATE);
+        String collectionStatus = record.getItemValue(EuropeanaUpdatableField.STATUS); 
+        String metadataformat = record.getItemValue(EuropeanaUpdatableField.METADATA_FORMAT); 
+        String metadatanamespace = record.getItemValue(EuropeanaUpdatableField.METADATA_NAMESPACE);      
+        String metadataschema = record.getItemValue(EuropeanaUpdatableField.METADATA_SCHEMA);  
+       
+        String Z3950ADDRESS = record.getItemValue(EuropeanaUpdatableField.Z3950ADDRESS);  
+        String Z3950PORT = record.getItemValue(EuropeanaUpdatableField.Z3950PORT);  
+        String Z3950DATABASE = record.getItemValue(EuropeanaUpdatableField.Z3950DATABASE);  
+        String FTP_Z3950_USER = record.getItemValue(EuropeanaUpdatableField.FTP_Z3950_USER);  
+        String FTP_Z3950_PASSWORD = record.getItemValue(EuropeanaUpdatableField.FTP_Z3950_PASSWORD);  
+        String Z3950RECORD_SYNTAX = record.getItemValue(EuropeanaUpdatableField.Z3950RECORD_SYNTAX);  
+        String Z3950CHARSET = record.getItemValue(EuropeanaUpdatableField.Z3950CHARSET);  
+        String Z3950METHOD = record.getItemValue(EuropeanaUpdatableField.Z3950METHOD);  
+        String Z3950FILEPATH = record.getItemValue(EuropeanaUpdatableField.Z3950FILEPATH);  
+        String Z3950MAXIMUMID = record.getItemValue(EuropeanaUpdatableField.Z3950MAXIMUMID);  
         
-        String metadataformat = record.getItemValue(EuropeanaRetrievableField.METADATA_FORMAT); 
-        String metadatanamespace = record.getItemValue(EuropeanaRetrievableField.METADATA_NAMESPACE);      
-        String metadataschema = record.getItemValue(EuropeanaRetrievableField.METADATA_SCHEMA); 
-        
+        String Z3950EARLIEST_TIMESTAMP = record.getItemValue(EuropeanaUpdatableField.Z3950EARLIEST_TIMESTAMP);  
+        String FTPPATH = record.getItemValue(EuropeanaUpdatableField.FTPPATH); 
+        String FTP_HTTP_ISOFORMAT = record.getItemValue(EuropeanaUpdatableField.FTP_HTTP_ISOFORMAT); 
+        String FTPSERVER = record.getItemValue(EuropeanaUpdatableField.FTPSERVER); 
+        String HTTPURL = record.getItemValue(EuropeanaUpdatableField.HTTPURL); 
+        String FOLDER = record.getItemValue(EuropeanaUpdatableField.FOLDER); 
+        String HARVESTING_TYPE = record.getItemValue(EuropeanaRetrievableField.HARVESTING_TYPE); 
+        String DATE_ENTERED = record.getItemValue(EuropeanaRetrievableField.DATE_ENTERED);      
+        String CREATED_BY_USER = record.getItemValue(EuropeanaRetrievableField.CREATED_BY_USER); 
+        String DELETED = record.getItemValue(EuropeanaUpdatableField.DELETED); 
+        String ACRONYM = record.getItemValue(EuropeanaRetrievableField.ACRONYM); 
+        String ENABLED = record.getItemValue(EuropeanaUpdatableField.ENABLED); 
         
         
         Collection currcollection = engine.findCollection(mnemonicCode);
@@ -555,11 +561,35 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         currcollection.setOaiBaseUrl(harvestUrl);
         currcollection.setOaiMetadataPrefix(metadataformat);
         currcollection.setOaiSet(set);
-        currcollection.putValue("collectionID", collectionID);
-        currcollection.putValue("sugarCRMID", sugarCRMID);
-        currcollection.putValue("metadatanamespace", metadatanamespace);
-        currcollection.putValue("metadataschema", metadataschema);
-        
+        currcollection.putValue(ControlledVocabularyProxy.STATUS, collectionStatus);
+        currcollection.putValue(ControlledVocabularyProxy.NAME, collectionID);
+        currcollection.putValue(ControlledVocabularyProxy.SUGARCRMID, sugarCRMID);
+        currcollection.putValue(ControlledVocabularyProxy.DESCRIPTION, collectionDescription);
+        currcollection.putValue(ControlledVocabularyProxy.EXPECTED_INGESTION_DATE, ingestionDate);
+        currcollection.putValue(ControlledVocabularyProxy.DATE_ENTERED, DATE_ENTERED);
+        currcollection.putValue(ControlledVocabularyProxy.METADATA_NAMESPACE, metadatanamespace);
+        currcollection.putValue(ControlledVocabularyProxy.METADATA_SCHEMA, metadataschema);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950ADDRESS, Z3950ADDRESS);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950PORT, Z3950PORT);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950DATABASE, Z3950DATABASE);
+        currcollection.putValue(ControlledVocabularyProxy.FTP_Z3950_USER, FTP_Z3950_USER);
+        currcollection.putValue(ControlledVocabularyProxy.FTP_Z3950_PASSWORD, FTP_Z3950_PASSWORD);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950RECORD_SYNTAX, Z3950RECORD_SYNTAX);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950CHARSET, Z3950CHARSET);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950METHOD, Z3950METHOD);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950FILEPATH, Z3950FILEPATH);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950MAXIMUMID, Z3950MAXIMUMID);
+        currcollection.putValue(ControlledVocabularyProxy.Z3950EARLIEST_TIMESTAMP, Z3950EARLIEST_TIMESTAMP);
+        currcollection.putValue(ControlledVocabularyProxy.FTPPATH, FTPPATH);
+        currcollection.putValue(ControlledVocabularyProxy.FTP_HTTP_ISOFORMAT, FTP_HTTP_ISOFORMAT);
+        currcollection.putValue(ControlledVocabularyProxy.FTPSERVER, FTPSERVER);
+        currcollection.putValue(ControlledVocabularyProxy.HTTPURL, HTTPURL);
+        currcollection.putValue(ControlledVocabularyProxy.FOLDER, FOLDER);
+        currcollection.putValue(ControlledVocabularyProxy.HARVESTING_TYPE, HARVESTING_TYPE);      
+        currcollection.putValue(ControlledVocabularyProxy.CREATED_BY_USER, CREATED_BY_USER);
+        currcollection.putValue(ControlledVocabularyProxy.DELETED, DELETED);
+        currcollection.putValue(ControlledVocabularyProxy.ACRONYM, ACRONYM);
+        currcollection.putValue(ControlledVocabularyProxy.ENABLED, ENABLED);        
         
         engine.updateCollection(currcollection);
         engine.checkpoint();

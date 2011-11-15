@@ -19,7 +19,7 @@
  * permissions and limitations under the Licence.
  */
 package eu.europeana.uim.model.europeanaspecific.fieldvalues;
-import eu.europeana.uim.store.ControlledVocabularyKeyValue;
+
 import eu.europeana.uim.sugarcrm.model.RetrievableField;
 
 
@@ -30,39 +30,24 @@ import eu.europeana.uim.sugarcrm.model.RetrievableField;
  */
 public enum EuropeanaRetrievableField implements RetrievableField{
 	ID("id","id","ID"),
-	NAME("name","name","Name"),
+	NAME("name","collectionID","Name"),
 	DATE_ENTERED("date_entered","date_entered","Date Entered"),
 	DATE_MODIFIED("date_modified","date_modified","Date Modified"),
 	MODIFIED_BY_USER("modified_user_id","modified_user_id","Modified by ID"),
 	CREATED_BY_USER("created_by","created_by","sales_stage"),
 	DESCRIPTION("description","description","Description"),
-	DELETED("deleted","deleted","Deleted"),
 	ASSIGNED_USER_ID("assigned_user_id","assigned_user_id","Assigned User Id"),
 	ASSIGNED_USER_NAME("assigned_user_name","assigned_user_name","Assigned User Name"),
 	ORGANIZATION_NAME("account_name","account_name","Organisation Name"),
 	CAMPAIGN_NAME("campaign_name","campaign_name","Campaign Name"),
 	EXPECTED_INGESTION_DATE("date_closed","date_closed","Expected ingestion date"),
 	NOTES("notes_c","notes_c","Notes"),
-
-	PLANNED_TOTAL("planned_total_c","planned_total_c","Ingested Total"),
-	PLANNED_SOUND("planned_sound_c","planned_sound_c","Ingested Sound"),
-	PLANNED_VIDEO("planned_video_c","planned_video_c","Ingested Video"),
-	PLANNED_TEXT("planned_text_c","planned_text_c","Ingested Text"),
-	PLANNED_IMAGE("planned_image_c","planned_image_c","Ingested Images"),
-
 	COUNTRY("country_c","country_c","Country"),
 	ACRONYM("name_acronym_c","name_acronym_c","Acronym"),
 	IDENTIFIER("name_id_c","name_id_c","Identifier"),
-	ENABLED("enabled_c","enabled_c","Enabled"),
 	DATASET_COUNTRY("language_c","language_c","Dataset Country"),
 	ACCESS_TO_CONTENT_CHECKER("access_to_content_checker_c","access_to_content_checker_c","Access To Content Checker"),
-	DATE_OF_REPLICATION("actual_ingestion_date_c","actual_ingestion_date_c","Date of Replication"),
-	
-	HARVEST_URL("harvest_url_c","harvest_url_c","Harvest URL"),
-	SETSPEC("setspec_c","setspec_c","Setspec"),
-	METADATA_FORMAT("metadata_format_c","metadata_format_c","Metadata Format"),
-	METADATA_SCHEMA("metadata_schema_c","metadata_schema_c","Metadata Schema"),
-	METADATA_NAMESPACE("metadata_namespace_c","metadata_namespace_c","Metadata Namespace")
+	HARVESTING_TYPE("harvesting_type_list_c","harvesting_type_list_c","Harvesting Type")
 	;
 	
 	private final String fieldId;

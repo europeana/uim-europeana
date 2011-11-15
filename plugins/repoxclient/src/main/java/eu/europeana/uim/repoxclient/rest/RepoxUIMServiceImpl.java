@@ -70,6 +70,7 @@ import eu.europeana.uim.repoxclient.rest.exceptions.ProviderOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 
 /**
  * This Class implements the functionality exposed by the
@@ -291,23 +292,22 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		namecode.setNameCode(uimProv.getMnemonic());
 		jibxProv.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl(uimProv.getValue("providerWebsite"));
+		url.setUrl(uimProv.getValue(ControlledVocabularyProxy.PROVIDERWEBSITE));
 		jibxProv.setUrl(url);
 		
 		Description description = new Description();
-		description.setDescription(uimProv.getValue("providerDescription"));
+		description.setDescription(uimProv.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION));
 		jibxProv.setDescription(description);
 		
 		Country country =  new Country();
-		country.setCountry(uimProv.getValue("providerCountry").toLowerCase());
+		country.setCountry(uimProv.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION).toLowerCase());
 		jibxProv.setCountry(country);
 		
 		Type type = new Type();
-		type.setType(uimProv.getValue("providerType"));
+		type.setType(uimProv.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
 		
 		jibxProv.setType(type);
-		
-		
+				
 		Aggregator aggr = new Aggregator();
 		
 		if(country.getCountry() == null){
@@ -316,14 +316,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		else{
 			aggr.setId(country.getCountry() + defaultAggrgatorIDPostfix);
 		}
-		
-
 
 		eu.europeana.uim.repoxclient.jibxbindings.Provider createdProv = repoxRestClient
 				.createProvider(jibxProv, aggr);
 
 		
-		uimProv.putValue("repoxID", createdProv.getId());
+		uimProv.putValue(ControlledVocabularyProxy.REPOXID, createdProv.getId());
 
 		StorageEngine<?> engine = registry.getStorageEngine();
 		try {
@@ -346,7 +344,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public void deleteProviderfromUIMObj(Provider<?> prov)
 			throws ProviderOperationException {
 
-		String id = prov.getValue("repoxID");
+		String id = prov.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new ProviderOperationException(
