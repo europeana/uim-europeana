@@ -27,7 +27,7 @@ import eu.europeana.uim.sugarcrm.model.DatasetStates;
  * This enumeration holds the State Descriptions for EuropeanaDatasets in Sugar CRM
  * @author Georgios Markakis
  */
-public enum EuropeanaDatasetStates implements DatasetStates,ControlledVocabularyKeyValue {
+public enum EuropeanaDatasetStates implements DatasetStates{
 
 	OAI_PMH_TESTING("Prospecting","OAI-PHM testing"),
 	OAI_PMH_SENT_TO_ORG("Qualification","OAI-PHM test sent to Organisation"),
@@ -58,10 +58,7 @@ public enum EuropeanaDatasetStates implements DatasetStates,ControlledVocabulary
 		return description;
 	}
 
-	@Override
-	public String getFieldId() {
-		return sysId;
-	}
+
 	
 	
 }

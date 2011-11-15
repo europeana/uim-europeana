@@ -20,7 +20,6 @@
  */
 package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
-import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.sugarcrm.model.Datasets;
 
 /**
@@ -28,7 +27,7 @@ import eu.europeana.uim.sugarcrm.model.Datasets;
  * 
  * @author Georgios Markakis
  */
-public enum EuropeanaDatasets implements Datasets,ControlledVocabularyKeyValue {
+public enum EuropeanaDatasets implements Datasets {
 	ORGANIZATIONS("Accounts"),
 	DATASETS("Opportunities");
 	
@@ -53,9 +52,5 @@ public enum EuropeanaDatasets implements Datasets,ControlledVocabularyKeyValue {
 	}
 
 
-	@Override
-	public String getFieldId() {
-		return sysId;
-	}
 
 }

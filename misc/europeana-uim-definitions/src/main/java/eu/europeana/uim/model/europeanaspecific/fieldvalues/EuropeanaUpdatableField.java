@@ -31,7 +31,7 @@ import eu.europeana.uim.sugarcrm.model.UpdatableField;
  * @author Georgios Markakis
  * @author Yorgos Mamakis
  */
-public enum EuropeanaUpdatableField implements UpdatableField,ControlledVocabularyKeyValue{
+public enum EuropeanaUpdatableField implements UpdatableField{
 	AMOUNT("amount","amount","Amount"),
 	TOTAL_INGESTED("ingested_total_c","ingested_total_c","Ingested Total"),
 	INGESTED_SOUND("ingested_sound_c","ingested_sound_c","Ingested Sound"),

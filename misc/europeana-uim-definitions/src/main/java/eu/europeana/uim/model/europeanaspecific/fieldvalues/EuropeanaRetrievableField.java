@@ -28,7 +28,7 @@ import eu.europeana.uim.sugarcrm.model.RetrievableField;
  *  by the SugarCRM client. 
  * @author Georgios Markakis
  */
-public enum EuropeanaRetrievableField implements RetrievableField,ControlledVocabularyKeyValue{
+public enum EuropeanaRetrievableField implements RetrievableField{
 	ID("id","id","ID"),
 	NAME("name","name","Name"),
 	DATE_ENTERED("date_entered","date_entered","Date Entered"),
