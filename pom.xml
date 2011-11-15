@@ -63,6 +63,12 @@
 			<url>http://europeanalabs.eu/artifactory/uim-releases-local</url>
 		</repository>
 		
+	  <repository>
+          <id>europeanalabs.eu</id>
+          <name>europeanalabs.eu-releases</name>
+          <url>http://europeanalabs.eu/artifactory/ext-releases-local</url>
+      </repository>  
+      
 		<repository>
 			<id>spring-ext</id>
 			<name>Spring External Dependencies Repository</name>
