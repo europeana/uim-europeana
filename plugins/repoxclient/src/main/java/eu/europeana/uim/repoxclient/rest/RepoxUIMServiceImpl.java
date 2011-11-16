@@ -370,7 +370,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"The requested object is not a Provider");
 		}
 
-		String id = uimProv.getValue("repoxID");
+		String id = uimProv.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new ProviderOperationException(
@@ -387,19 +387,19 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		namecode.setNameCode(uimProv.getMnemonic());
 		jibxProv.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl(uimProv.getValue("providerWebsite"));
+		url.setUrl(uimProv.getValue(ControlledVocabularyProxy.PROVIDERWEBSITE));
 		jibxProv.setUrl(url);
 
 		Description description = new Description();
-		description.setDescription(uimProv.getValue("providerDescription"));
+		description.setDescription(uimProv.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION));
 		jibxProv.setDescription(description);
 		
 		Country country =  new Country();
-		country.setCountry(uimProv.getValue("providerCountry").toLowerCase());
+		country.setCountry(uimProv.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY).toLowerCase());
 		jibxProv.setCountry(country);
 		
 		Type type = new Type();
-		type.setType(uimProv.getValue("providerType"));
+		type.setType(uimProv.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
 		
 		jibxProv.setType(type);
 
@@ -477,13 +477,13 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		ds.setId(id);
 		
 		Description des = new Description();
-		des.setDescription(col.getValue("description"));
+		des.setDescription(col.getValue(ControlledVocabularyProxy.DESCRIPTION));
 		ds.setDescription(des);
 		ds.setNameCode(col.getMnemonic());
 		ds.setName(col.getName());
 		ds.setExportPath("");
-		ds.setSchema(col.getValue("metadataschema"));
-		ds.setNamespace(col.getValue("metadatanamespace"));
+		ds.setSchema(col.getValue(ControlledVocabularyProxy.METADATA_SCHEMA));
+		ds.setNamespace(col.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE));
 		ds.setMetadataFormat(col.getOaiMetadataPrefix(false));
 
 		Sequence seq = new Sequence();
@@ -500,9 +500,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		ds.setRecordIdPolicy(recordIdPolicy );
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
-		jibxProv.setId(col.getProvider().getValue("repoxID"));
+		jibxProv.setId(col.getProvider().getValue(ControlledVocabularyProxy.REPOXID));
 		Source retsource = repoxRestClient.createDatasourceOAI(ds, jibxProv);
-		col.putValue("repoxID", retsource.getId());
+		col.putValue(ControlledVocabularyProxy.REPOXID, retsource.getId());
 
 	}
 
@@ -515,7 +515,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public void deleteDatasourcefromUIMObj(Collection col)
 			throws DataSourceOperationException {
 
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new DataSourceOperationException(
@@ -533,7 +533,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public void updateDatasourcefromUIMObj(Collection col)
 			throws DataSourceOperationException {
 
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new DataSourceOperationException(
@@ -541,16 +541,16 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		}
 
 		Source ds = new Source();
-		ds.setId(col.getValue("repoxID"));
+		ds.setId(col.getValue(ControlledVocabularyProxy.REPOXID));
 		Description des = new Description();
-		des.setDescription(col.getValue("description"));
+		des.setDescription(col.getValue(ControlledVocabularyProxy.DESCRIPTION));
 		ds.setDescription(des);
 		ds.setNameCode(col.getMnemonic());
 		ds.setName(col.getName());
-		ds.setExportPath(col.getValue("exportpath"));
-		ds.setSchema(col.getValue("schema"));
-		ds.setNamespace(col.getValue("namespace"));
-		ds.setMetadataFormat(col.getValue("metadataformat"));
+		ds.setExportPath("");
+		ds.setSchema(col.getValue(ControlledVocabularyProxy.METADATA_SCHEMA));
+		ds.setNamespace(col.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE));
+		ds.setMetadataFormat(col.getOaiMetadataPrefix(true));
 
 		Sequence seq = new Sequence();
 		OaiSet oaiSet = new OaiSet();
@@ -624,7 +624,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	@Override
 	public void initiateHarvestingfromUIMObj(Collection<?> col,boolean isfull) throws HarvestingOperationException {
 
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new HarvestingOperationException(
@@ -643,7 +643,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public void scheduleHarvestingfromUIMObj(Collection<?> col, ScheduleInfo info)
 			throws HarvestingOperationException {
 
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new HarvestingOperationException(
@@ -664,7 +664,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	@Override
 	public void cancelHarvesting(Collection<?> col)
 			throws HarvestingOperationException {
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new HarvestingOperationException(
@@ -682,7 +682,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	@Override
 	public RepoxHarvestingStatus getHarvestingStatus(Collection<?> col)
 			throws HarvestingOperationException {
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new HarvestingOperationException(
@@ -755,7 +755,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public HashSet<ScheduleInfo> getScheduledHarvestingSessions(Collection<?> col)
 			throws HarvestingOperationException {
 
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 		
 		if (id == null) {
 			throw new HarvestingOperationException(
@@ -815,7 +815,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		StringBuffer sb = new StringBuffer();
 		
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new HarvestingOperationException(
@@ -843,7 +843,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		StringBuffer sb = new StringBuffer();
 		
-		String id = col.getValue("repoxID");
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
 
 		if (id == null) {
 			throw new HarvestingOperationException(
