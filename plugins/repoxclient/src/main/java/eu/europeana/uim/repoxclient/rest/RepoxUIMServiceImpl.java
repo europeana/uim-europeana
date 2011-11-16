@@ -23,12 +23,9 @@ package eu.europeana.uim.repoxclient.rest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.joda.time.DateTime;
-
-import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -51,7 +48,6 @@ import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
-import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.jibxbindings.Task;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
@@ -68,6 +64,8 @@ import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException
 import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.ProviderOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
+import eu.europeana.uim.repoxclient.utils.DataSetType;
+import eu.europeana.uim.repoxclient.utils.JibxObjectProvider;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
@@ -139,30 +137,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public void createAggregator(String countryCode,String urlString)
 			throws AggregatorOperationException {
 		
-		if(countryCode.equals("")){
-			countryCode ="eu";
-		}
-		
-		String aggrName = countryCode + "aggregator";
-		Aggregator aggr = new Aggregator();
+		Aggregator aggr = JibxObjectProvider.createAggregator(countryCode, urlString);
 
-		Name name = new Name();
-		name.setName(aggrName);
-		aggr.setName(name);
-		NameCode namecode = new NameCode();
-		namecode.setNameCode(aggrName);
-		aggr.setNameCode(namecode);
-		Url url = new Url();
-		
-		if(urlString == null){
-			url.setUrl(defaultAggrgatorURL);
-		}
-		else{
-			url.setUrl(urlString);
-		}
-		
-		aggr.setUrl(url);
-		Aggregator createdAggregator = repoxRestClient.createAggregator(aggr);
+		repoxRestClient.createAggregator(aggr);
 		
 	}
 	
@@ -283,38 +260,15 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		}
 
 
-		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
-
-		Name name = new Name();
-		name.setName(uimProv.getName());
-		jibxProv.setName(name);
-		NameCode namecode = new NameCode();
-		namecode.setNameCode(uimProv.getMnemonic());
-		jibxProv.setNameCode(namecode);
-		Url url = new Url();
-		url.setUrl(uimProv.getValue(ControlledVocabularyProxy.PROVIDERWEBSITE));
-		jibxProv.setUrl(url);
-		
-		Description description = new Description();
-		description.setDescription(uimProv.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION));
-		jibxProv.setDescription(description);
-		
-		Country country =  new Country();
-		country.setCountry(uimProv.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION).toLowerCase());
-		jibxProv.setCountry(country);
-		
-		Type type = new Type();
-		type.setType(uimProv.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
-		
-		jibxProv.setType(type);
+		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = JibxObjectProvider.createProvider(uimProv);
 				
 		Aggregator aggr = new Aggregator();
 		
-		if(country.getCountry() == null){
+		if(jibxProv.getCountry().getCountry() == null){
 			aggr.setId("euaggregatorr0");
 		}
 		else{
-			aggr.setId(country.getCountry() + defaultAggrgatorIDPostfix);
+			aggr.setId(jibxProv.getCountry().getCountry() + defaultAggrgatorIDPostfix);
 		}
 
 		eu.europeana.uim.repoxclient.jibxbindings.Provider createdProv = repoxRestClient
@@ -324,6 +278,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		uimProv.putValue(ControlledVocabularyProxy.REPOXID, createdProv.getId());
 
 		StorageEngine<?> engine = registry.getStorageEngine();
+		
+		//Store the created RepoxID into the UIM object 
 		try {
 			engine.updateProvider(uimProv);
 			engine.checkpoint();
@@ -333,6 +289,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 	}
 
+	
 	
 	
 	
@@ -377,31 +334,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"Missing repoxID element from Provider object");
 		}
 
-		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
+		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv =JibxObjectProvider.createProvider(uimProv);
 
 		jibxProv.setId(id);
-		Name name = new Name();
-		name.setName(uimProv.getName());
-		jibxProv.setName(name);
-		NameCode namecode = new NameCode();
-		namecode.setNameCode(uimProv.getMnemonic());
-		jibxProv.setNameCode(namecode);
-		Url url = new Url();
-		url.setUrl(uimProv.getValue(ControlledVocabularyProxy.PROVIDERWEBSITE));
-		jibxProv.setUrl(url);
-
-		Description description = new Description();
-		description.setDescription(uimProv.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION));
-		jibxProv.setDescription(description);
-		
-		Country country =  new Country();
-		country.setCountry(uimProv.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY).toLowerCase());
-		jibxProv.setCountry(country);
-		
-		Type type = new Type();
-		type.setType(uimProv.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
-		
-		jibxProv.setType(type);
 
 		repoxRestClient.updateProvider(jibxProv);
 	}
@@ -468,41 +403,21 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		
 		//Create Id from Collection name and mnemonic
-		Source ds = new Source();
-		
-		String id = (col.getName()+col.getMnemonic()).replace(" ","_");
-		
-		//ds.setId(col.getName()+col.getMnemonic()+"r0");
-
-		ds.setId(id);
-		
-		Description des = new Description();
-		des.setDescription(col.getValue(ControlledVocabularyProxy.DESCRIPTION));
-		ds.setDescription(des);
-		ds.setNameCode(col.getMnemonic());
-		ds.setName(col.getName());
-		ds.setExportPath("");
-		ds.setSchema(col.getValue(ControlledVocabularyProxy.METADATA_SCHEMA));
-		ds.setNamespace(col.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE));
-		ds.setMetadataFormat(col.getOaiMetadataPrefix(false));
-
-		Sequence seq = new Sequence();
-		OaiSet oaiSet = new OaiSet();
-		oaiSet.setOaiSet(col.getOaiSet());
-		seq.setOaiSet(oaiSet);
-		OaiSource oaiSource = new OaiSource();
-		oaiSource.setOaiSource(col.getOaiBaseUrl(true));
-		seq.setOaiSource(oaiSource);
-		ds.setSequence(seq);
-
-		RecordIdPolicy recordIdPolicy = new RecordIdPolicy();
-		recordIdPolicy.setType("IdGenerated");
-		
-		ds.setRecordIdPolicy(recordIdPolicy );
+		Source ds = JibxObjectProvider.createDataSource(col);
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
 		jibxProv.setId(col.getProvider().getValue(ControlledVocabularyProxy.REPOXID));
 		Source retsource = repoxRestClient.createDatasourceOAI(ds, jibxProv);
 		col.putValue(ControlledVocabularyProxy.REPOXID, retsource.getId());
+		
+		StorageEngine<?> engine = registry.getStorageEngine();
+		
+		//Store the created RepoxID into the UIM object 
+		try {
+			engine.updateCollection(col);
+			engine.checkpoint();
+		} catch (StorageEngineException e) {
+			throw new DataSourceOperationException("Updating UIM Collection object failed");
+		}
 
 	}
 
@@ -540,26 +455,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"Missing repoxID element from Collection object");
 		}
 
-		Source ds = new Source();
+		Source ds = JibxObjectProvider.createDataSource(col);
 		ds.setId(col.getValue(ControlledVocabularyProxy.REPOXID));
-		Description des = new Description();
-		des.setDescription(col.getValue(ControlledVocabularyProxy.DESCRIPTION));
-		ds.setDescription(des);
-		ds.setNameCode(col.getMnemonic());
-		ds.setName(col.getName());
-		ds.setExportPath("");
-		ds.setSchema(col.getValue(ControlledVocabularyProxy.METADATA_SCHEMA));
-		ds.setNamespace(col.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE));
-		ds.setMetadataFormat(col.getOaiMetadataPrefix(true));
-
-		Sequence seq = new Sequence();
-		OaiSet oaiSet = new OaiSet();
-		oaiSet.setOaiSet(col.getOaiSet());
-		seq.setOaiSet(oaiSet);
-		OaiSource oaiSource = new OaiSource();
-		oaiSource.setOaiSource(col.getOaiBaseUrl(true));
-		seq.setOaiSource(oaiSource);
-		ds.setSequence(seq);
 		
 		repoxRestClient.updateDatasourceOAI(ds);
 

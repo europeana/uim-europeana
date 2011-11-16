@@ -561,6 +561,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         currcollection.setOaiBaseUrl(harvestUrl);
         currcollection.setOaiMetadataPrefix(metadataformat);
         currcollection.setOaiSet(set);
+        currcollection.putValue(ControlledVocabularyProxy.METADATA_FORMAT, metadataformat);
         currcollection.putValue(ControlledVocabularyProxy.STATUS, collectionStatus);
         currcollection.putValue(ControlledVocabularyProxy.NAME, collectionID);
         currcollection.putValue(ControlledVocabularyProxy.SUGARCRMID, sugarCRMID);

@@ -232,9 +232,6 @@ public class IntegrationSeviceProxyImpl extends
 
 			guirecord.setId(originalrecord
 					.getItemValue(EuropeanaRetrievableField.ID));
-			guirecord
-					.setAccess_to_content_checker(originalrecord
-							.getItemValue(EuropeanaRetrievableField.ACCESS_TO_CONTENT_CHECKER));
 			guirecord.setAssigned_user_id(originalrecord
 					.getItemValue(EuropeanaRetrievableField.ASSIGNED_USER_ID));
 			guirecord
