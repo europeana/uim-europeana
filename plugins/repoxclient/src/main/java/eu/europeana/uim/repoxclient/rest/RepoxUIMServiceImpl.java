@@ -64,8 +64,10 @@ import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException
 import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.ProviderOperationException;
 import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
+import eu.europeana.uim.repoxclient.utils.DSType;
 import eu.europeana.uim.repoxclient.utils.DataSetType;
 import eu.europeana.uim.repoxclient.utils.JibxObjectProvider;
+import eu.europeana.uim.repoxclient.utils.Z3950Methods;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
@@ -401,26 +403,141 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public void createDatasourcefromUIMObj(Collection col, Provider prov)
 			throws DataSourceOperationException {
 		
+
+		String htypeString = col.getValue(ControlledVocabularyProxy.HARVESTING_TYPE);
 		
-		//Create Id from Collection name and mnemonic
-		Source ds = JibxObjectProvider.createDataSource(col);
+		if(htypeString == null){
+			throw new DataSourceOperationException("Error during the creation of a Datasource: " +
+					"HARVESTING_TYPE information not available in UIM for the specific object.");
+		}
+		
+		DSType harvestingtype =   DSType.valueOf(htypeString);
+		
+		if(harvestingtype == null){
+			throw new DataSourceOperationException("Error during the creation of a Datasource: " +
+					"HARVESTING_TYPE for the specific object does not match the predefined acceptable values.");
+		}
+		
+		
+		Source ds = JibxObjectProvider.createDataSource(col,harvestingtype);
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
 		jibxProv.setId(col.getProvider().getValue(ControlledVocabularyProxy.REPOXID));
-		Source retsource = repoxRestClient.createDatasourceOAI(ds, jibxProv);
+		
+		
+		Source retsource = null;
+		
+		switch(harvestingtype){
+		case oai_pmh:
+			retsource = repoxRestClient.createDatasourceOAI(ds, jibxProv);
+			break;
+			
+		case z39_50:
+			Z3950Methods z3950method = Z3950Methods.valueOf(col.getValue(ControlledVocabularyProxy.Z3950METHOD));
+			switch(z3950method){
+			case timestamp:
+				retsource = repoxRestClient.createDatasourceZ3950Timestamp(ds, jibxProv);
+				break;
+			case filepath:
+				retsource = repoxRestClient.createDatasourceZ3950IdFile(ds, jibxProv);
+				break;				
+			case maximumid:
+				retsource = repoxRestClient.createDatasourceZ3950IdSequence(ds, jibxProv);
+				break;
+			}
+			break;
+			
+		case ftp:
+			retsource = repoxRestClient.createDatasourceFtp(ds, jibxProv);
+			break;
+			
+		case http:
+			retsource = repoxRestClient.createDatasourceHttp(ds, jibxProv);
+			break;
+			
+		case folder:
+			retsource = repoxRestClient.createDatasourceFolder(ds, jibxProv);
+			break;
+		}
+		
+		
 		col.putValue(ControlledVocabularyProxy.REPOXID, retsource.getId());
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 		
-		//Store the created RepoxID into the UIM object 
-		try {
-			engine.updateCollection(col);
-			engine.checkpoint();
-		} catch (StorageEngineException e) {
-			throw new DataSourceOperationException("Updating UIM Collection object failed");
-		}
 
 	}
 
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
+	 */
+	@Override
+	public void updateDatasourcefromUIMObj(Collection col)
+			throws DataSourceOperationException {
+
+		//Create Id from Collection name and mnemonic
+		String htypeString = col.getValue(ControlledVocabularyProxy.HARVESTING_TYPE);
+		
+		if(htypeString == null){
+			throw new DataSourceOperationException("Error during the creation of a Datasource: " +
+					"HARVESTING_TYPE information not available in UIM for the specific object.");
+		}
+		
+		DSType harvestingtype =   DSType.valueOf(htypeString);
+		
+		if(harvestingtype == null){
+			throw new DataSourceOperationException("Error during the creation of a Datasource: " +
+					"HARVESTING_TYPE for the specific object does not match the predefined acceptable values.");
+		}
+		
+		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
+
+		if (id == null) {
+			throw new DataSourceOperationException(
+					"Missing repoxID element from Collection object");
+		}
+
+		Source ds = JibxObjectProvider.createDataSource(col,harvestingtype);
+		ds.setId(col.getValue(ControlledVocabularyProxy.REPOXID));
+		
+		
+		switch(harvestingtype){
+		case oai_pmh:
+			repoxRestClient.updateDatasourceOAI(ds);
+			break;
+			
+		case z39_50:
+			Z3950Methods z3950method = Z3950Methods.valueOf(col.getValue(ControlledVocabularyProxy.Z3950METHOD));
+			switch(z3950method){
+			case timestamp:
+				repoxRestClient.updateDatasourceZ3950Timestamp(ds);
+				break;
+			case filepath:
+				repoxRestClient.updateDatasourceZ3950IdFile(ds);
+				break;				
+			case maximumid:
+				repoxRestClient.updateDatasourceZ3950IdSequence(ds);
+				break;
+			}
+			break;
+			
+		case ftp:
+			repoxRestClient.updateDatasourceFtp(ds);
+			break;
+			
+		case http:
+			repoxRestClient.updateDatasourceHttp(ds);
+			break;
+			
+		case folder:
+			repoxRestClient.updateDatasourceFolder(ds);
+			break;
+		}
+		
+		repoxRestClient.updateDatasourceOAI(ds);
+
+	}
+	
 	
 	
 	/* (non-Javadoc)
@@ -441,26 +558,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
-	 */
-	@Override
-	public void updateDatasourcefromUIMObj(Collection col)
-			throws DataSourceOperationException {
 
-		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
-
-		if (id == null) {
-			throw new DataSourceOperationException(
-					"Missing repoxID element from Collection object");
-		}
-
-		Source ds = JibxObjectProvider.createDataSource(col);
-		ds.setId(col.getValue(ControlledVocabularyProxy.REPOXID));
-		
-		repoxRestClient.updateDatasourceOAI(ds);
-
-	}
 
 	
 	

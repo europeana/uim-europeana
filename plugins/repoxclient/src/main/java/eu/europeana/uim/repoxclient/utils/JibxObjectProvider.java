@@ -134,8 +134,7 @@ public class JibxObjectProvider {
 	}
 	
 	
-	public static Source createDataSource(Collection col){
-		DSType harvestingtype =   DSType.valueOf(col.getValue(ControlledVocabularyProxy.HARVESTING_TYPE));
+	public static Source createDataSource(Collection col,DSType harvestingtype){
 		
 		Source ds = new Source();
 		
