@@ -61,6 +61,7 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 
 
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.objects.RepoxHarvestingStatus;
@@ -198,12 +199,12 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 			provider.setMnemonic(providerNameCode);
 			provider.setName(providerName);
 			provider.setOaiBaseUrl(providerURI);
-			provider.putValue("providerDescription", "Blablah...");
-			provider.putValue("providerCountry", aggregatorCountryName);
-			provider.putValue("providerWebsite", providerURI);
+			provider.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, "Blablah...");
+			provider.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, aggregatorCountryName);
+			provider.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, providerURI);
 			
-			provider.putValue("sugarID", "123213123231");
-			provider.putValue("providerType", "ARCHIVE");
+			provider.putValue(ControlledVocabularyProxy.SUGARCRMID, "123213123231");
+			provider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, "ARCHIVE");
 			provider.setOaiMetadataPrefix("ese");   
 
         	engine.updateProvider(provider);
@@ -231,7 +232,7 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
 			Provider provider = engine.createProvider();
 			provider.setName(providerName);
 			provider.setMnemonic(providerNameCode);
-			provider.putValue("repoxID", providerName + "r0");
+			provider.putValue(ControlledVocabularyProxy.REPOXID, providerName + "r0");
 			
 		    Collection collection = engine.createCollection(provider);
 
