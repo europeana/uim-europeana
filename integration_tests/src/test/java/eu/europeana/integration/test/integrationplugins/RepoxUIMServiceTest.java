@@ -152,6 +152,10 @@ public class RepoxUIMServiceTest extends AbstractIntegrationTest{
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-common").versionAsInProject(),
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-api").versionAsInProject(),
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-storage-memory").versionAsInProject(),
+                
+                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-edmcore-definitions").versionAsInProject(),
+                mavenBundle().groupId("eu.europeana").artifactId("europeana-datamodel-definitions").versionAsInProject(),
+                
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-basic").versionAsInProject(),
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-repox").versionAsInProject(),
                 
