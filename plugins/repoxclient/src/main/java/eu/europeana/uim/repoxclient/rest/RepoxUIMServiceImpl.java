@@ -234,14 +234,22 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	@Override
 	public boolean providerExists(Provider<?> provider)
 			throws ProviderOperationException {
-		if (provider.isAggregator()) {
-			throw new ProviderOperationException(
-					"The requested object is not a Provider");
+
+		String provId = provider.getValue(ControlledVocabularyProxy.REPOXID);
+		
+		if(provId == null){
+			return false;
 		}
 
 		HashSet<Provider<?>> prov = retrieveProviders();
 
-		return prov.contains(provider);
+		for(Provider<?> p: prov){
+			if(p.getId().equals(provId)){
+				return true;
+			}
+		}
+		
+		return false;
 
 	}
 
@@ -389,9 +397,21 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public boolean datasourceExists(Collection<?>col)
 			throws DataSourceOperationException {
 
+		String colid = col.getValue(ControlledVocabularyProxy.REPOXID);
+		
+		if(colid == null){
+			return false;
+		}
+		
 		HashSet<Collection<?>> colls = retrieveDataSources();
 
-		return colls.contains(col);
+		for(Collection<?> c: colls){
+			if(c.getId().equals(colid)){
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	

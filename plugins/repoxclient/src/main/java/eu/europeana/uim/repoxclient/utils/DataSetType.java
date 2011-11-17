@@ -21,7 +21,7 @@ public enum DataSetType {
 	private String sugarName;
 	
 	DataSetType(String sugarName){
-		
+	   this.sugarName = sugarName;
 	}
 
 	/**

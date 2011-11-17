@@ -71,6 +71,7 @@ public class JibxObjectProvider {
 
 	private static final String defaultAggrgatorURL = "http://repox.ist.utl.pt";
 	private static final String defaultAggrgatorIDPostfix = "aggregatorr0";	
+	private static final String defaultcountry = "eu";	
 	
 	public static Aggregator createAggregator(String countryCode,String urlString){
 		
@@ -97,7 +98,8 @@ public class JibxObjectProvider {
 		}
 		
 		aggr.setUrl(url);
-		return null;	
+		
+		return aggr;	
 	}
 	
 	
@@ -111,15 +113,28 @@ public class JibxObjectProvider {
 		namecode.setNameCode(uimProv.getMnemonic());
 		jibxProv.setNameCode(namecode);
 		Url url = new Url();
-		url.setUrl(uimProv.getValue(ControlledVocabularyProxy.PROVIDERWEBSITE));
+		
+		String urlstr =uimProv.getValue(ControlledVocabularyProxy.PROVIDERWEBSITE);
+			
+		if(urlstr == null){
+			urlstr = defaultAggrgatorURL;
+		}
+		
+		url.setUrl(urlstr);
 		jibxProv.setUrl(url);
 		
 		Description description = new Description();
 		description.setDescription(uimProv.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION));
 		jibxProv.setDescription(description);
 		
+		String countrystr = uimProv.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY).toLowerCase();
+		
+		if(countrystr == null){
+			countrystr = defaultcountry;
+		}
+		
 		Country country =  new Country();
-		country.setCountry(uimProv.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY).toLowerCase());
+		country.setCountry(countrystr);
 		jibxProv.setCountry(country);
 		
 		Type type = new Type();
@@ -321,11 +336,11 @@ public class JibxObjectProvider {
 		DataSetType[] enumvalues =DataSetType.values();
 		
 		for(int i=0; i<enumvalues.length; i++){
-			if(enumvalues[i].getSugarName().equals(sugarvalue)){
+			if(enumvalues[i].toString().equals(sugarvalue)){
 				return enumvalues[i].toString();
 			}
 		}
 		
-		return null;
+		return "OTHER";
 	}
 }
