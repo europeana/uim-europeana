@@ -232,56 +232,24 @@ public class IntegrationSeviceProxyImpl extends
 
 			guirecord.setId(originalrecord
 					.getItemValue(EuropeanaRetrievableField.ID));
-			guirecord.setAssigned_user_id(originalrecord
-					.getItemValue(EuropeanaRetrievableField.ASSIGNED_USER_ID));
+
 			guirecord
 					.setAssigned_user_name(originalrecord
 							.getItemValue(EuropeanaRetrievableField.ASSIGNED_USER_NAME));
-			guirecord.setCampaign_name(originalrecord
-					.getItemValue(EuropeanaRetrievableField.CAMPAIGN_NAME));
 			guirecord.setCountry_c(originalrecord
 					.getItemValue(EuropeanaRetrievableField.COUNTRY));
-			guirecord.setCreated_by(originalrecord
-					.getItemValue(EuropeanaRetrievableField.CREATED_BY_USER));
-			guirecord.setDataset_country(originalrecord
-					.getItemValue(EuropeanaRetrievableField.DATASET_COUNTRY));
-			guirecord.setDate_entered(originalrecord
-					.getItemValue(EuropeanaRetrievableField.DATE_ENTERED));
-			guirecord.setDate_modified(originalrecord
-					.getItemValue(EuropeanaRetrievableField.DATE_MODIFIED));
-			guirecord.setDescription(originalrecord
-					.getItemValue(EuropeanaRetrievableField.DESCRIPTION));
+			
 			guirecord
 					.setExpected_ingestion_date(originalrecord
 							.getItemValue(EuropeanaRetrievableField.EXPECTED_INGESTION_DATE));
-			guirecord.setIdentifier(originalrecord
-					.getItemValue(EuropeanaRetrievableField.IDENTIFIER));
-			guirecord.setIngested_image_c(originalrecord
-					.getItemValue(EuropeanaUpdatableField.INGESTED_IMAGE));
-			guirecord.setIngested_sound_c(originalrecord
-					.getItemValue(EuropeanaUpdatableField.INGESTED_SOUND));
-			guirecord.setIngested_text_c(originalrecord
-					.getItemValue(EuropeanaUpdatableField.INGESTED_TEXT));
 			guirecord.setIngested_total_c(originalrecord
 					.getItemValue(EuropeanaUpdatableField.TOTAL_INGESTED));
-			guirecord.setIngested_video_c(originalrecord
-					.getItemValue(EuropeanaUpdatableField.INGESTED_VIDEO));
-			guirecord.setModified_by_user(originalrecord
-					.getItemValue(EuropeanaRetrievableField.MODIFIED_BY_USER));
 			guirecord.setName(originalrecord
 					.getItemValue(EuropeanaRetrievableField.NAME));
-			guirecord.setName_acronym_c(originalrecord
-					.getItemValue(EuropeanaRetrievableField.ACRONYM));
-			guirecord.setNext_step(originalrecord
-					.getItemValue(EuropeanaUpdatableField.NEXT_STEP));
-			guirecord.setNotes(originalrecord
-					.getItemValue(EuropeanaRetrievableField.NOTES));
 			guirecord.setOrganization_name(originalrecord
 					.getItemValue(EuropeanaRetrievableField.ORGANIZATION_NAME));
 			guirecord.setStatus(originalrecord
 					.getItemValue(EuropeanaUpdatableField.STATUS));
-			guirecord.setType(originalrecord
-					.getItemValue(EuropeanaUpdatableField.TYPE));
 
 			converted.add(guirecord);
 		}
