@@ -405,12 +405,16 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		HashSet<Collection<?>> colls = retrieveDataSources();
 
+		
+		if(!colls.isEmpty()){
+			
 		for(Collection<?> c: colls){
-			if(c.getId().equals(colid)){
+			if(c.getMnemonic().equals(col.getMnemonic())) {
 				return true;
 			}
 		}
 		
+		}
 		return false;
 	}
 
@@ -605,7 +609,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 				try {
 					Collection<?> coll = engine.findCollection(id);
-					uimCollections.add(coll);
+					if(coll != null){
+						uimCollections.add(coll);	
+					}
 				} catch (StorageEngineException e) {
 					// TODO Decide what to do here
 				}

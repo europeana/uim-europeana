@@ -336,7 +336,7 @@ public class JibxObjectProvider {
 		DataSetType[] enumvalues =DataSetType.values();
 		
 		for(int i=0; i<enumvalues.length; i++){
-			if(enumvalues[i].toString().equals(sugarvalue)){
+			if(enumvalues[i].getSugarName().equals(sugarvalue)){
 				return enumvalues[i].toString();
 			}
 		}
