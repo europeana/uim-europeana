@@ -81,7 +81,7 @@ import eu.europeana.uim.gui.cp.shared.SugarCRMRecordDTO;
  * @author Georgios Markakis
  * 
  */
-public class ImportResourcesWidget extends IngestionWidget{
+public class ImportResourcesWidget extends IngestionWidget {
 
 	private final RepositoryServiceAsync repositoryService;
 	private final ResourceServiceAsync resourceService;
@@ -107,7 +107,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 	@UiField(provided = true)
 	VerticalPanel searchPanel;
 
-	@UiField(provided = true)
 	Button importButton;
 
 	DialogBox searchDialog;
@@ -117,11 +116,9 @@ public class ImportResourcesWidget extends IngestionWidget{
 	FlexTable impResultsTable;
 
 	ProgressBar progressBar;
-	
+
 	private ListDataProvider<SugarCRMRecordDTO> dataProvider = new ListDataProvider<SugarCRMRecordDTO>();
-	
-	
-	
+
 	/**
 	 * The key provider that provides the unique ID of a contact.
 	 */
@@ -131,11 +128,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 		}
 	};
 
-	
-	
-
-
-	
 	/**
 	 * Constructor
 	 * 
@@ -154,8 +146,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 
 	}
 
-	
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -163,12 +153,12 @@ public class ImportResourcesWidget extends IngestionWidget{
 	 */
 	@Override
 	public Widget onInitialize() {
-		
+
 		searchPanel = new VerticalPanel();
 		searchPanel.setSpacing(8);
 		searchPanel.setWidth("32em");
 		searchPanel.add(createAdvancedForm());
-		
+
 		impResultsTable = new FlexTable();
 		FlexCellFormatter cellFormatter = impResultsTable
 				.getFlexCellFormatter();
@@ -177,27 +167,14 @@ public class ImportResourcesWidget extends IngestionWidget{
 		impResultsTable.setCellSpacing(5);
 		impResultsTable.setCellPadding(3);
 
-
 		// Add some text
 		cellFormatter.setHorizontalAlignment(0, 1,
 				HasHorizontalAlignment.ALIGN_LEFT);
 
 		cellFormatter.setColSpan(0, 0, 2);
 
-		searchDialog = createSearchDialogBox();
 		importDialog = createImportDialog();
-
-		importButton = new Button();
-		importButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				importDialog.center();
-				performImport();
-			}
-		});
-
-		importButton.setText(EuropeanaClientConstants.IMPORTBUTTONLABEL);
-		importButton.setTitle(EuropeanaClientConstants.IMPORTBUTTONTITLE);
+		searchDialog = createSearchDialogBox();
 
 		// Create a CellTable.
 
@@ -244,9 +221,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 
 	}
 
-	
-	
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -271,14 +245,10 @@ public class ImportResourcesWidget extends IngestionWidget{
 
 	}
 
-	
-	
 	/*
 	 * Private Methods
 	 */
 
-	
-	
 	/**
 	 * Performs an asynchronous import request.
 	 */
@@ -298,33 +268,35 @@ public class ImportResourcesWidget extends IngestionWidget{
 
 		if (!selList.isEmpty()) {
 
-
 			progressBar.setMaxProgress(selList.size());
 			progressBar.setProgress(0);
 			impResultsTable.removeAllRows();
-			
-			for (SugarCRMRecordDTO record : selList) {
-				
 
-				
+			for (SugarCRMRecordDTO record : selList) {
+
 				integrationservice.processSelectedRecord(record,
 						new AsyncCallback<ImportResultDTO>() {
-					
-					  
+
 							@Override
 							public void onFailure(Throwable throwable) {
 								throwable.printStackTrace();
 								int numRows = impResultsTable.getRowCount();
-								
 
-								impResultsTable.setWidget(numRows, 0, new Image(
-										EuropeanaClientConstants.ERRORIMAGELOC));
+								
+								
+								impResultsTable
+										.setWidget(
+												numRows,
+												0,
+												new Image(
+														EuropeanaClientConstants.ERRORIMAGELOC));
 								impResultsTable.setWidget(numRows, 1, new HTML(
 										"A system exception has occured"));
 								impResultsTable.setWidget(numRows, 2, new HTML(
-										throwable.getCause().getStackTrace().toString()));
-								
-								progressBar.setProgress(impResultsTable.getRowCount());
+										throwable.getCause().getLocalizedMessage()));
+
+								progressBar.setProgress(impResultsTable
+										.getRowCount());
 							}
 
 							@Override
@@ -334,16 +306,17 @@ public class ImportResourcesWidget extends IngestionWidget{
 
 								progressBar.setProgress(numRows);
 
-								impResultsTable.setWidget(numRows, 0, new Image(
-										searchresults.getResult()));
+								impResultsTable.setWidget(numRows, 0,
+										new Image(searchresults.getResult()));
 								impResultsTable.setWidget(numRows, 1, new HTML(
 										searchresults.getCollectionName()));
 								impResultsTable.setWidget(numRows, 2, new HTML(
 										searchresults.getDescription()));
 								impResultsTable.setWidget(numRows, 3, new HTML(
 										searchresults.getCause()));
-								
-								progressBar.setProgress(impResultsTable.getRowCount());
+
+								progressBar.setProgress(impResultsTable
+										.getRowCount());
 
 							}
 						});
@@ -353,8 +326,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 
 	}
 
-	
-	
 	/**
 	 * Performs an asynchronous search in SugarCRM.
 	 */
@@ -377,8 +348,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 				});
 	}
 
-	
-	
 	/**
 	 * Generates a query from existing GUI fields.
 	 * 
@@ -387,59 +356,43 @@ public class ImportResourcesWidget extends IngestionWidget{
 	private String generateQuery() {
 
 		StringBuffer querybuffer = new StringBuffer();
-		String dsname = DOM.getElementById("dsnameSearchField").<InputElement>cast().getValue();
-		String type = DOM.getElementById("typeSearchField").<InputElement>cast().getValue();
-		String status = DOM.getElementById("statusSearchField").<InputElement>cast().getValue();
+		String dsname = DOM.getElementById("dsnameSearchField")
+				.<InputElement> cast().getValue();
+		String status = DOM.getElementById("statusSearchField")
+				.<InputElement> cast().getValue();
 
 		ArrayList<StringBuffer> fieldinventory = new ArrayList<StringBuffer>();
-		
-		
-        if(!"".equals(dsname)){
-        	StringBuffer queryitem = new StringBuffer();
-        	queryitem.append("opportunities.name LIKE '");
-        	queryitem.append(dsname);
-        	queryitem.append("'");
-        	fieldinventory.add(queryitem);
-		}
-		
 
-		if(!"".equals(type)){
-        	StringBuffer queryitem = new StringBuffer();
-        	queryitem.append("opportunities.opportunity_type LIKE '");
-        	queryitem.append(type);
-        	queryitem.append("'");
-        	fieldinventory.add(queryitem);
+		if (!"".equals(dsname)) {
+			StringBuffer queryitem = new StringBuffer();
+			queryitem.append("opportunities.name LIKE '");
+			queryitem.append(dsname);
+			queryitem.append("'");
+			fieldinventory.add(queryitem);
 		}
-		
-		if(!"".equals(status)){
-        	StringBuffer queryitem = new StringBuffer();
-        	queryitem.append("opportunities.sales_stage LIKE '");
-        	queryitem.append(status);
-        	queryitem.append("'");
-        	fieldinventory.add(queryitem);
+
+		if (!"".equals(status)) {
+			StringBuffer queryitem = new StringBuffer();
+			queryitem.append("opportunities.sales_stage LIKE '");
+			queryitem.append(status);
+			queryitem.append("'");
+			fieldinventory.add(queryitem);
 		}
-		
-				
-		
-        for(int i=0;i<fieldinventory.size();i++){
-        	if(i==0){
-        		querybuffer.append(fieldinventory.get(i));
-        		
-        	}
-        	else{
-        		querybuffer.append(" AND ");
-        		querybuffer.append(fieldinventory.get(i));
-        	}
-        }
-        
+
+		for (int i = 0; i < fieldinventory.size(); i++) {
+			if (i == 0) {
+				querybuffer.append(fieldinventory.get(i));
+
+			} else {
+				querybuffer.append(" AND ");
+				querybuffer.append(fieldinventory.get(i));
+			}
+		}
+
 		return querybuffer.toString();
 
 	}
 
-	
-	
-	
-	
 	/**
 	 * Add the columns to the table.
 	 */
@@ -464,7 +417,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 				SafeHtmlUtils.fromSafeConstant("<br/>"));
 		cellTable.setColumnWidth(checkColumn, 40, Unit.PX);
 
-		
 		// IsImported column
 		Column<SugarCRMRecordDTO, String> isImportedColumn = new Column<SugarCRMRecordDTO, String>(
 				new ImageCell()) {
@@ -483,7 +435,8 @@ public class ImportResourcesWidget extends IngestionWidget{
 								o2.getImportedIMG());
 					}
 				});
-		cellTable.addColumn(isImportedColumn, EuropeanaClientConstants.UIMSTATELABEL);
+		cellTable.addColumn(isImportedColumn,
+				EuropeanaClientConstants.UIMSTATELABEL);
 		isImportedColumn
 				.setFieldUpdater(new FieldUpdater<SugarCRMRecordDTO, String>() {
 					public void update(int index, SugarCRMRecordDTO object,
@@ -493,10 +446,7 @@ public class ImportResourcesWidget extends IngestionWidget{
 					}
 				});
 		cellTable.setColumnWidth(isImportedColumn, 7, Unit.PCT);
-		
-		
-		
-		
+
 		// Collection Name Column
 		Column<SugarCRMRecordDTO, Anchor> collectionColumn = new Column<SugarCRMRecordDTO, Anchor>(
 				new AnchorCell()) {
@@ -506,9 +456,10 @@ public class ImportResourcesWidget extends IngestionWidget{
 				Anchor hyper = new Anchor();
 				hyper.setName(object.getName());
 				hyper.setText(object.getName());
-				hyper.setHref("http://sip-manager.isti.cnr.it/sugarcrm/index.php?module=Opportunities&action=DetailView&record="+object.getId());
+				hyper.setHref("http://sip-manager.isti.cnr.it/sugarcrm/index.php?module=Opportunities&action=DetailView&record="
+						+ object.getId());
 				hyper.setTarget("TOP");
-				
+
 				return hyper;
 			}
 		};
@@ -521,7 +472,8 @@ public class ImportResourcesWidget extends IngestionWidget{
 						return o1.getName().compareTo(o2.getName());
 					}
 				});
-		cellTable.addColumn(collectionColumn, EuropeanaClientConstants.DSNAMESEARCHLABEL);
+		cellTable.addColumn(collectionColumn,
+				EuropeanaClientConstants.DSNAMESEARCHLABEL);
 		collectionColumn
 				.setFieldUpdater(new FieldUpdater<SugarCRMRecordDTO, Anchor>() {
 					public void update(int index, SugarCRMRecordDTO object,
@@ -532,8 +484,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 				});
 		cellTable.setColumnWidth(collectionColumn, 40, Unit.PCT);
 
-		
-		
 		// Organization Name Column
 		Column<SugarCRMRecordDTO, String> organizationColumn = new Column<SugarCRMRecordDTO, String>(
 				new TextCell()) {
@@ -542,7 +492,7 @@ public class ImportResourcesWidget extends IngestionWidget{
 				return object.getOrganization_name();
 			}
 		};
-		
+
 		collectionColumn.setSortable(true);
 
 		sortHandler.setComparator(organizationColumn,
@@ -553,8 +503,9 @@ public class ImportResourcesWidget extends IngestionWidget{
 								o2.getOrganization_name());
 					}
 				});
-		
-		cellTable.addColumn(organizationColumn,EuropeanaClientConstants.ORGANIZATIONSEARCHLABEL);
+
+		cellTable.addColumn(organizationColumn,
+				EuropeanaClientConstants.ORGANIZATIONSEARCHLABEL);
 		organizationColumn
 				.setFieldUpdater(new FieldUpdater<SugarCRMRecordDTO, String>() {
 					public void update(int index, SugarCRMRecordDTO object,
@@ -583,7 +534,8 @@ public class ImportResourcesWidget extends IngestionWidget{
 						return o1.getCountry_c().compareTo(o2.getCountry_c());
 					}
 				});
-		cellTable.addColumn(countryColumn,EuropeanaClientConstants.COUNTRYSEARCHLABEL);
+		cellTable.addColumn(countryColumn,
+				EuropeanaClientConstants.COUNTRYSEARCHLABEL);
 		countryColumn
 				.setFieldUpdater(new FieldUpdater<SugarCRMRecordDTO, String>() {
 					public void update(int index, SugarCRMRecordDTO object,
@@ -611,7 +563,8 @@ public class ImportResourcesWidget extends IngestionWidget{
 						return o1.getStatus().compareTo(o2.getStatus());
 					}
 				});
-		cellTable.addColumn(statusColumn,EuropeanaClientConstants.STATUSSEARCHLABEL);
+		cellTable.addColumn(statusColumn,
+				EuropeanaClientConstants.STATUSSEARCHLABEL);
 		statusColumn
 				.setFieldUpdater(new FieldUpdater<SugarCRMRecordDTO, String>() {
 					public void update(int index, SugarCRMRecordDTO object,
@@ -641,7 +594,8 @@ public class ImportResourcesWidget extends IngestionWidget{
 								o2.getIngested_total_c());
 					}
 				});
-		cellTable.addColumn(amountColumn,EuropeanaClientConstants.AMOUNTSEARCHLABEL);
+		cellTable.addColumn(amountColumn,
+				EuropeanaClientConstants.AMOUNTSEARCHLABEL);
 		amountColumn
 				.setFieldUpdater(new FieldUpdater<SugarCRMRecordDTO, String>() {
 					public void update(int index, SugarCRMRecordDTO object,
@@ -670,7 +624,8 @@ public class ImportResourcesWidget extends IngestionWidget{
 								o2.getExpected_ingestion_date());
 					}
 				});
-		cellTable.addColumn(ingestionDateColumn,EuropeanaClientConstants.INGESTDATESEARCHLABEL);
+		cellTable.addColumn(ingestionDateColumn,
+				EuropeanaClientConstants.INGESTDATESEARCHLABEL);
 		ingestionDateColumn
 				.setFieldUpdater(new FieldUpdater<SugarCRMRecordDTO, String>() {
 					public void update(int index, SugarCRMRecordDTO object,
@@ -702,7 +657,8 @@ public class ImportResourcesWidget extends IngestionWidget{
 					}
 				});
 
-		cellTable.addColumn(userColumn,EuropeanaClientConstants.USERSEARCHLABEL);
+		cellTable.addColumn(userColumn,
+				EuropeanaClientConstants.USERSEARCHLABEL);
 		userColumn
 				.setFieldUpdater(new FieldUpdater<SugarCRMRecordDTO, String>() {
 					public void update(int index, SugarCRMRecordDTO object,
@@ -715,7 +671,6 @@ public class ImportResourcesWidget extends IngestionWidget{
 
 	}
 
-	
 	/**
 	 * Create the dialog box for this example.
 	 * 
@@ -733,7 +688,7 @@ public class ImportResourcesWidget extends IngestionWidget{
 		dialogContents.setSpacing(0);
 		dialogBox.setWidget(dialogContents);
 		Image activity = new Image(EuropeanaClientConstants.QUERYIMAGELOC);
-		
+
 		// Add some text to the top of the dialog
 
 		dialogContents.add(activity);
@@ -744,12 +699,9 @@ public class ImportResourcesWidget extends IngestionWidget{
 		return dialogBox;
 	}
 
-	
-	
-	
-	
 	/**
 	 * Creates an import dialog
+	 * 
 	 * @return
 	 */
 	private DialogBox createImportDialog() {
@@ -776,22 +728,20 @@ public class ImportResourcesWidget extends IngestionWidget{
 
 		// Create a table to layout the content
 		VerticalPanel dialogContents = new VerticalPanel();
-		
-		
-		
+
 		dialogContents.setSpacing(4);
 		dialogBox.setWidget(dialogContents);
 		dialogContents.add(progressBar);
-		
+
 		ScrollPanel scrollPanel = new ScrollPanel();
-		
+
 		scrollPanel.setWidth("600px");
 		scrollPanel.setHeight("500px");
-		
+
 		scrollPanel.add(impResultsTable);
-		
+
 		dialogContents.add(scrollPanel);
-		
+
 		dialogContents.add(closeButton);
 		HTML details = new HTML("ImportStatus");
 
@@ -799,62 +749,72 @@ public class ImportResourcesWidget extends IngestionWidget{
 				HasHorizontalAlignment.ALIGN_CENTER);
 		return dialogBox;
 	}
-	
-	
-	
-	  /**
-	   * Create a form that contains undisclosed advanced options.
-	   */
-	  private Widget createAdvancedForm() {
-	    // Create a table to layout the form options
-	    FlexTable layout = new FlexTable();
-	    layout.setCellSpacing(6);
-	    layout.setWidth("500px");
-	    FlexCellFormatter cellFormatter = layout.getFlexCellFormatter();
 
-	    // Add a title to the form
-	    layout.setHTML(0, 2, "<b>Search Criteria</b>");
-	    cellFormatter.setColSpan(0, 0, 2);
-	    cellFormatter.setHorizontalAlignment(
-	        0, 0, HasHorizontalAlignment.ALIGN_CENTER);
+	/**
+	 * Creates the Search Criteria Section
+	 */
+	private Widget createAdvancedForm() {
+		// Create a table to layout the form options
+		FlexTable layout = new FlexTable();
+		layout.setCellSpacing(6);
+		layout.setWidth("500px");
+		FlexCellFormatter cellFormatter = layout.getFlexCellFormatter();
 
-	    // Add some standard form options
+		// Add a title to the form
+		layout.setHTML(0, 2, "<b>Search Criteria</b>");
+		cellFormatter.setColSpan(0, 0, 2);
+		cellFormatter.setHorizontalAlignment(0, 0,
+				HasHorizontalAlignment.ALIGN_CENTER);
 
-	    TextBox dsnameSearchField = new TextBox();	
-	    setDOMID(dsnameSearchField,"dsnameSearchField");
+		// Add some standard form options
+
+		TextBox dsnameSearchField = new TextBox();
+		setDOMID(dsnameSearchField, "dsnameSearchField");
+
+		final ListBox statusSearchField = new ListBox(false);
+		statusSearchField.addItem("--", "");
+		statusSearchField.addItem(
+				RecordStates.OAI_PMH_TESTING.getDescription(),
+				RecordStates.OAI_PMH_TESTING.getSysId());
+		statusSearchField.addItem(
+				RecordStates.OAI_PMH_SENT_TO_ORG.getDescription(),
+				RecordStates.OAI_PMH_SENT_TO_ORG.getSysId());
+		statusSearchField.addItem(
+				RecordStates.READY_FOR_HARVESTING.getDescription(),
+				RecordStates.READY_FOR_HARVESTING.getSysId());
+		statusSearchField.addItem(
+				RecordStates.MAPPING_AND_NORMALIZATION.getDescription(),
+				RecordStates.MAPPING_AND_NORMALIZATION.getSysId());
+		statusSearchField.addItem(
+				RecordStates.READY_FOR_REPLICATION.getDescription(),
+				RecordStates.READY_FOR_REPLICATION.getSysId());
+		statusSearchField.addItem(
+				RecordStates.ONGOING_SCHEDULED_UPDATES.getDescription(),
+				RecordStates.ONGOING_SCHEDULED_UPDATES.getSysId());
+		statusSearchField.addItem(
+				RecordStates.INGESTION_COMPLETE.getDescription(),
+				RecordStates.INGESTION_COMPLETE.getSysId());
+		statusSearchField.addItem(
+				RecordStates.DISABLED_AND_REPLACED.getDescription(),
+				RecordStates.DISABLED_AND_REPLACED.getSysId());
+		statusSearchField.addItem(
+				RecordStates.HARVESTING_PENDING.getDescription(),
+				RecordStates.HARVESTING_PENDING.getSysId());
+		setDOMID(statusSearchField, "statusSearchField");
 
 
-	    final ListBox statusSearchField = new ListBox(false);
-	    statusSearchField.addItem("--", "");	    
-	    statusSearchField.addItem(RecordStates.OAI_PMH_TESTING.getDescription(),
-	    		RecordStates.OAI_PMH_TESTING.getSysId());
-	    statusSearchField.addItem(RecordStates.OAI_PMH_SENT_TO_ORG.getDescription(),
-	    		RecordStates.OAI_PMH_SENT_TO_ORG.getSysId());
-	    statusSearchField.addItem(RecordStates.READY_FOR_HARVESTING.getDescription(), 
-	    		RecordStates.READY_FOR_HARVESTING.getSysId());
-	    statusSearchField.addItem(RecordStates.MAPPING_AND_NORMALIZATION.getDescription(), 
-	    		RecordStates.MAPPING_AND_NORMALIZATION.getSysId());
-	    statusSearchField.addItem(RecordStates.READY_FOR_REPLICATION.getDescription(), 
-	    		RecordStates.READY_FOR_REPLICATION.getSysId());
-	    statusSearchField.addItem(RecordStates.ONGOING_SCHEDULED_UPDATES.getDescription(), 
-	    		RecordStates.ONGOING_SCHEDULED_UPDATES.getSysId());
-	    statusSearchField.addItem(RecordStates.INGESTION_COMPLETE.getDescription(), 
-	    		RecordStates.INGESTION_COMPLETE.getSysId());
-	    statusSearchField.addItem(RecordStates.DISABLED_AND_REPLACED.getDescription(), 
-	    		RecordStates.DISABLED_AND_REPLACED.getSysId());
-	    statusSearchField.addItem(RecordStates.HARVESTING_PENDING.getDescription(), 
-	    		RecordStates.HARVESTING_PENDING.getSysId());
-	    setDOMID(statusSearchField,"statusSearchField");
+		importButton = new Button();
+		importButton.setText(EuropeanaClientConstants.IMPORTBUTTONLABEL);
+		importButton.setTitle(EuropeanaClientConstants.IMPORTBUTTONTITLE);
+		
+		importButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				importDialog.center();
+				performImport();
+			}
+		});
 
-	    
-	    final ListBox typeSearchField = new ListBox(false);
-	    typeSearchField.addItem("--", "");	    
-	    typeSearchField.addItem("Update", "Update");
-	    typeSearchField.addItem("New Dataset", "New%Dataset");
-	    setDOMID(typeSearchField,"typeSearchField");
-	    
-	   
-	    
 		searchButton = new Button();
 		searchButton.setText(EuropeanaClientConstants.SEARCHBUTTONLABEL);
 		searchButton.setTitle(EuropeanaClientConstants.SEARCHBUTTONTITLE);
@@ -866,38 +826,30 @@ public class ImportResourcesWidget extends IngestionWidget{
 				performSearch();
 			}
 		});
-	    
-	    
-	    layout.setHTML(1, 0, EuropeanaClientConstants.DSNAMESEARCHLABEL);
-	    layout.setWidget(1, 1, dsnameSearchField);
-	    
-	    layout.setHTML(1, 2, EuropeanaClientConstants.TYPESEARCHLABEL);
-	    layout.setWidget(1, 3, typeSearchField);
-	    
-	    layout.setHTML(1, 4, EuropeanaClientConstants.STATUSSEARCHLABEL);
-	    layout.setWidget(1, 5, statusSearchField);
-	    
 
-	 
-	    layout.setWidget(3, 0, searchButton);
-	    
+		layout.setHTML(1, 0, EuropeanaClientConstants.DSNAMESEARCHLABEL);
+		layout.setWidget(1, 1, dsnameSearchField);
 
-	    // Wrap the contents in a DecoratorPanel
-	    DecoratorPanel decPanel = new DecoratorPanel();
-	    decPanel.setWidget(layout);
-	    return decPanel;
-	  }
-	  
-	  
-	  private void setDOMID(Widget widg,String id){
-		    DOM.setElementProperty(widg.getElement(),"id", id);
-	  }
+		layout.setHTML(1, 2, EuropeanaClientConstants.STATUSSEARCHLABEL);
+		layout.setWidget(1, 3, statusSearchField);
 
-		@Override
-		public void fireEvent(GwtEvent<?> arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-	  
-	
+		layout.setWidget(3, 0, searchButton);
+		layout.setWidget(3, 1, importButton);
+
+		// Wrap the contents in a DecoratorPanel
+		DecoratorPanel decPanel = new DecoratorPanel();
+		decPanel.setWidget(layout);
+		return decPanel;
+	}
+
+	private void setDOMID(Widget widg, String id) {
+		DOM.setElementProperty(widg.getElement(), "id", id);
+	}
+
+	@Override
+	public void fireEvent(GwtEvent<?> arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

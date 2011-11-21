@@ -56,6 +56,7 @@ import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrm.LoginFailureException;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 import eu.europeana.uim.sugarcrm.SugarCrmRecord;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaUpdatableField;
@@ -318,15 +319,15 @@ public class IntegrationSeviceProxyImpl extends
 					ret.setType(TYPE.PROVIDER);
 					ret.setId(provider);
 					ret.setInfo(prov.getName());
-					ret.setSugarCRMID(prov.getValue("sugarCRMID"));
-					ret.setRepoxID(prov.getValue("repoxID"));
+					ret.setSugarCRMID(prov.getValue(ControlledVocabularyProxy.SUGARCRMID));
+					ret.setRepoxID(prov.getValue(ControlledVocabularyProxy.REPOXID));
 					
-					if(prov.getValue("sugarCRMID") != null){
-						ret.setSugarURL(sugarCrmURL.split("/soap.php")[0] + "?module=Accounts&action=DetailView&record=" + prov.getValue("sugarCRMID"));
+					if(prov.getValue(ControlledVocabularyProxy.SUGARCRMID) != null){
+						ret.setSugarURL(sugarCrmURL.split("/soap.php")[0] + "?module=Accounts&action=DetailView&record=" + prov.getValue(ControlledVocabularyProxy.SUGARCRMID));
 					}
 					
-					if(prov.getValue("repoxID") != null){
-						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/#EDIT_DP?id=" + prov.getValue("repoxID") );
+					if(prov.getValue(ControlledVocabularyProxy.REPOXID) != null){
+						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/#EDIT_DP?id=" + prov.getValue(ControlledVocabularyProxy.REPOXID) );
 					}	
 					
 					
@@ -344,16 +345,16 @@ public class IntegrationSeviceProxyImpl extends
 					
 					ret.setState(col.getValue("state"));
 					
-					ret.setSugarCRMID(col.getValue("sugarCRMID"));
+					ret.setSugarCRMID(col.getValue(ControlledVocabularyProxy.SUGARCRMID));
 					
 					
 					
-					ret.setRepoxID(col.getValue("repoxID"));
+					ret.setRepoxID(col.getValue(ControlledVocabularyProxy.REPOXID));
 					ret.setInfo(col.getName());
 					ret.setHarvestingStatus(null);
 
 					
-					if (col.getValue("repoxID") != null) {
+					if (col.getValue(ControlledVocabularyProxy.REPOXID) != null) {
 						try {
 							RepoxHarvestingStatus result = repoxService.getHarvestingStatus(col);
 
@@ -410,12 +411,12 @@ public class IntegrationSeviceProxyImpl extends
 					}
 					
 					
-					if(col.getValue("sugarCRMID") != null){
+					if(col.getValue(ControlledVocabularyProxy.SUGARCRMID) != null){
 						ret.setSugarURL(sugarCrmURL.split("/soap.php")[0] + "?module=Opportunities&action=DetailView&record=" + col.getValue("sugarCRMID") );
 					}
 					
 					
-					if(col.getValue("repoxID") != null){
+					if(col.getValue(ControlledVocabularyProxy.REPOXID) != null){
 						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/#VIEW_DS?id=" + col.getValue("repoxID"));
 					}	
 					

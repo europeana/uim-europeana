@@ -377,7 +377,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 				try {
 					Provider<?> uimprov = engine.findProvider(id);
-					uimProviders.add(uimprov);
+					if(uimprov != null){
+						uimProviders.add(uimprov);
+					}
 				} catch (StorageEngineException e) {
 					// TODO Decide what to do here
 				}	

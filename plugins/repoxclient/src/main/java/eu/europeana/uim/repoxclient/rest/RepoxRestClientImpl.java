@@ -211,15 +211,41 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		name.append("name=");
 		name.append(prov.getName().getName());
 		description.append("description=");
-		description.append(prov.getDescription().getDescription());
+		
+		if(prov.getDescription()!= null){
+			description.append(prov.getDescription().getDescription());
+		}
+		else{
+			description.append("NONE");
+		}
+		
 		country.append("country=");
-		country.append(prov.getCountry().getCountry());
+		if(prov.getCountry() != null){
+			country.append(prov.getCountry().getCountry());
+		}
+		else{
+			country.append("eu");
+		}
+		
 		nameCode.append("nameCode=");
 		nameCode.append(prov.getNameCode().getNameCode());
+		
+		
 		homepage.append("url=");
-		homepage.append(prov.getUrl().getUrl());
+		if(prov.getUrl() != null){
+			homepage.append(prov.getUrl().getUrl());
+		}
+		else{
+			homepage.append("http://europeana.eu");
+		}
+
 		datasetType.append("dataSetType=");
-		datasetType.append(prov.getType().getType());
+		if(prov.getType() != null){
+			datasetType.append(prov.getType().getType());
+		}
+		else{
+			datasetType.append("UNKNOWN");
+		}
 		
 		Response resp = invokRestTemplate("/dataProviders/create",Response.class,
 				aggregatorId.toString(),name.toString(),description.toString(),
@@ -284,34 +310,44 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		provId.append("id=");
 		provId.append(prov.getId());
-		if(prov.getName() != null){
-			name.append("name=");
-			name.append(prov.getName().getName());
-		}
 
+	    name.append("name=");
+		name.append(prov.getName().getName());
+		
+		description.append("description=");
+		
 		if(prov.getDescription()!= null){
-			description.append("description=");
 			description.append(prov.getDescription().getDescription());
 		}
+		else{
+			description.append("NONE");
+		}
 
+		country.append("country=");
 		if(prov.getCountry() != null){
-			country.append("country=");
 			country.append(prov.getCountry().getCountry());
 		}
-
-		if(prov.getNameCode() != null){
-			nameCode.append("nameCode=");
-			nameCode.append(prov.getNameCode().getNameCode());
+		else{
+			country.append("eu");
 		}
-		
+
+		nameCode.append("nameCode=");
+		nameCode.append(prov.getNameCode().getNameCode());
+
+		homepage.append("url=");
 		if(prov.getUrl() != null){
-			homepage.append("url=");
 			homepage.append(prov.getUrl().getUrl());
 		}
+		else{
+			homepage.append("http://europeana.eu");
+		}
 
+		datasetType.append("dataSetType=");
 		if(prov.getType() != null){
-			datasetType.append("dataSetType=");
 			datasetType.append(prov.getType().getType());
+		}
+		else{
+			datasetType.append("UNKNOWN");
 		}
 		
 		Response resp = invokRestTemplate("/dataProviders/update",Response.class,

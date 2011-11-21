@@ -14,11 +14,10 @@
 	<g:HTMLPanel>
 	<g:VerticalPanel ui:field='searchPanel' />
 
-    <g:ScrollPanel>
-	<g:HTMLPanel>
-		<br></br>
 
-		<table cellspacing='0' cellpadding='0' style='width:100%;'>
+	<g:HTMLPanel>
+	    <div style='width:100%;height:100%'> 
+		<table cellspacing='0' cellpadding='0' style='width:100%;height:100%'>
 			<tr>
 				<td valign='top'>
 					<c:CellTable addStyleNames='{style.cellTable}'
@@ -31,11 +30,11 @@
 				</td>
 			</tr>
 		</table>
-		<br></br>
+		</div>
 	</g:HTMLPanel>
-	</g:ScrollPanel>
+
 	
-	<g:Button ui:field='importButton' />
+
 
 	</g:HTMLPanel>
 

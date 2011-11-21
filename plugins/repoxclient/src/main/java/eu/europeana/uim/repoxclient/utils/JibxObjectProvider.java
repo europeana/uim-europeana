@@ -64,8 +64,8 @@ import eu.europeana.uim.store.Provider;
 
 
 /**
- * @author georgiosmarkakis
- *
+ * 
+ * @author Georgios Markakis
  */
 public class JibxObjectProvider {
 
@@ -103,6 +103,12 @@ public class JibxObjectProvider {
 	}
 	
 	
+	
+	
+	/**
+	 * @param uimProv
+	 * @return
+	 */
 	public static eu.europeana.uim.repoxclient.jibxbindings.Provider createProvider(Provider uimProv){
 		eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv = new eu.europeana.uim.repoxclient.jibxbindings.Provider();
 
