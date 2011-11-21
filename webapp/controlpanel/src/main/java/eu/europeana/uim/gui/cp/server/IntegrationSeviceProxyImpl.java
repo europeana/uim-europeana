@@ -56,6 +56,7 @@ import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrm.LoginFailureException;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 import eu.europeana.uim.sugarcrm.SugarCrmRecord;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaUpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.CustomSugarCrmQuery;
@@ -248,8 +249,24 @@ public class IntegrationSeviceProxyImpl extends
 					.getItemValue(EuropeanaRetrievableField.NAME));
 			guirecord.setOrganization_name(originalrecord
 					.getItemValue(EuropeanaRetrievableField.ORGANIZATION_NAME));
-			guirecord.setStatus(originalrecord
-					.getItemValue(EuropeanaUpdatableField.STATUS));
+			
+			
+			//Display the proper dataset name state here
+
+			String sugarcrmStatusStr = originalrecord.getItemValue(EuropeanaUpdatableField.STATUS).replace(" ","%");
+			
+			EuropeanaDatasetStates actualvalue = null;
+			
+		    
+			for(EuropeanaDatasetStates e : EuropeanaDatasetStates.values()){
+				if(e.getSysId().equals(sugarcrmStatusStr)){
+					actualvalue = e;
+				}
+			}
+			
+
+			
+			guirecord.setStatus(actualvalue.getDescription());
 
 			converted.add(guirecord);
 		}
