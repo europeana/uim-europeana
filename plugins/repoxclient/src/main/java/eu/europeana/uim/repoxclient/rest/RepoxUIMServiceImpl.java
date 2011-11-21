@@ -244,7 +244,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		HashSet<Provider<?>> prov = retrieveProviders();
 
 		for(Provider<?> p: prov){
-			if(p.getId().equals(provId)){
+			if(p.getMnemonic().equals(provider.getMnemonic())){
 				return true;
 			}
 		}
