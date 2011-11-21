@@ -32,14 +32,14 @@ public class SugarCRMRecordDTO implements IsSerializable,Comparable<SugarCRMReco
 
 
 	private String id;
-	private String importedIMG; //
-	private String name; //
-	private String assigned_user_name; //
-	private String organization_name; //
-	private String expected_ingestion_date; //
-	private String country_c; //
-	private String ingested_total_c; //
-	private String status; //
+	private String importedIMG;
+	private String name;
+	private String assigned_user_name;
+	private String organization_name;
+	private String expected_ingestion_date;
+	private String country_c;
+	private String ingested_total_c;
+	private String status;
 
 	
 
