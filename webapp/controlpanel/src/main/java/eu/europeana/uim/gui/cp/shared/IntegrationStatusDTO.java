@@ -20,6 +20,8 @@
  */
 package eu.europeana.uim.gui.cp.shared;
 
+import java.util.HashMap;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -55,6 +57,7 @@ public class IntegrationStatusDTO implements IsSerializable {
 	
 	private String sugarURL;
 	
+	private HashMap<String,String> resourceProperties;
 	
 	/**
 	 * @param id the id to set
@@ -180,6 +183,20 @@ public class IntegrationStatusDTO implements IsSerializable {
 	 */
 	public String getSugarURL() {
 		return sugarURL;
+	}
+
+	/**
+	 * @param resourceProperties the resourceProperties to set
+	 */
+	public void setResourceProperties(HashMap<String,String> resourceProperties) {
+		this.resourceProperties = resourceProperties;
+	}
+
+	/**
+	 * @return the resourceProperties
+	 */
+	public HashMap<String,String> getResourceProperties() {
+		return resourceProperties;
 	}
 	
 	

@@ -110,7 +110,7 @@ public class IntegrationSeviceProxyImpl extends
 			Provider prov = sugService.updateProviderFromRecord(originalRec);
 
 			// Get the current coutry for the given provider
-			String aggrID = prov.getValue("providerCountry").toLowerCase();
+			String aggrID = prov.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY).toLowerCase();
 
 			// Create a dummy aggregator that uses the country prefix as an ID
 			if (!repoxService.aggregatorExists(aggrID)) {
@@ -330,6 +330,12 @@ public class IntegrationSeviceProxyImpl extends
 						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/#EDIT_DP?id=" + prov.getValue(ControlledVocabularyProxy.REPOXID) );
 					}	
 					
+					
+					
+					ret.getResourceProperties().put(ControlledVocabularyProxy.PROVIDERCOUNTRY.getFieldId(), prov.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY));
+					ret.getResourceProperties().put(ControlledVocabularyProxy.PROVIDERDESCRIPTION.getFieldId(), prov.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION));
+					ret.getResourceProperties().put(ControlledVocabularyProxy.PROVIDERTYPE.getFieldId(), prov.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
+					ret.getResourceProperties().put(ControlledVocabularyProxy.PROVIDERWEBSITE.getFieldId(), prov.getValue(ControlledVocabularyProxy.PROVIDERWEBSITE));
 					
 				} catch (StorageEngineException e) {
 

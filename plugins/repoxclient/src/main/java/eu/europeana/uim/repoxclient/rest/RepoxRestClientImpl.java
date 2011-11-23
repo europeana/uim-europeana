@@ -50,7 +50,7 @@ import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 
 
 /**
- * Class implementing REST functionality for accessing the REPOX repository.
+ * Class implementing REST functionality for accessing the REPOX repository.uikjul.kcv bnm
  * 
  * @author Georgios Markakis
  * @author Yorgos Mamakis
@@ -1564,7 +1564,8 @@ private Response createUpdateDSOAI(String action, Source ds, Provider prov){
 		id.append("id=");
 		id.append(ds.getId());
 		description.append("description=");
-		description.append(ds.getDescription().getDescription());
+		//description.append(ds.getDescription().getDescription());
+		description.append("NONE");
 		nameCode.append("nameCode=");
 		nameCode.append(ds.getNameCode().toString());
 		name.append("name=");

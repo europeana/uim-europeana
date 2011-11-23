@@ -61,15 +61,12 @@
 								</g:tab>
 								<g:tab>
 									<g:header>
-										Harvesting Session Information
+										Resource Properties
                                     </g:header>
-									<g:HTML>
-										<strong>
-											<i>
-												<u>Harvesting Session Specific Constants</u>
-											</i>
-										</strong>
-									</g:HTML>
+								    <g:ScrollPanel>
+										<g:FlexTable ui:field="resourcePropertiesTable"
+											addStyleNames="{style.cellTable}" />
+									</g:ScrollPanel>
 								</g:tab>
 							</g:TabLayoutPanel>
 

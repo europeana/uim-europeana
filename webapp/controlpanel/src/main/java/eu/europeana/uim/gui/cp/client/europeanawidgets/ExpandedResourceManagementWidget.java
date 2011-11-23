@@ -61,6 +61,11 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 	@UiField(provided = true)
 	public FlexTable integrationTable;
 	
+	
+	@UiField(provided = true)
+	public FlexTable resourcePropertiesTable;
+	
+	
 	@UiField
 	public TabLayoutPanel tabInfoSubPanel;
 	
@@ -107,6 +112,7 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 		tabInfoSubPanel.setVisible(false);
 		
 		integrationTable = new FlexTable();
+		resourcePropertiesTable = new FlexTable();
 		operationDialog = createOperationsDialogBox();
 		operationsListBox = new ListBox(false);
 		
@@ -177,7 +183,7 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 	
 	
 	/**
-	 * 
+	 * Creates the integration info sub panels displaying integration-specific information
 	 * 
 	 * @param status
 	 */
@@ -185,56 +191,67 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 
 		integrationTable.clear();
 		
-		if(!status.getType().equals(TYPE.UNIDENTIFIED)){
 		
+		switch(status.getType()){
 		
-		tabInfoSubPanel.setVisible(true);	
-		tabInfoSubPanel.getTabWidget(1).setVisible(false);	
-		
-    	integrationTable.setWidget(0, 0, new HTML("Type:"));
-    	integrationTable.setWidget(0, 1, new HTML(status.getType().toString()));
-    	
-    	integrationTable.setWidget(1, 0, new HTML("Name:"));          	
-    	integrationTable.setWidget(1, 1, new HTML(status.getInfo()));
-    	
-    	integrationTable.setWidget(2, 0, new HTML("Identifier:"));
-    	integrationTable.setWidget(2, 1, new HTML(status.getId()));
-    	
-    	integrationTable.setWidget(3, 0, new HTML("SugarCRM Link:"));
-    	
-    	if(status.getSugarCRMID() == null){
-    		integrationTable.setWidget(3, 1, new HTML("Not represented in SugarCRM")); 
-    	}
-    	else{
-    		
-			Anchor hyper = new Anchor();
-			hyper.setName("SugarCRMLink");
-			hyper.setText("Click here to edit information in SugarCRM.");
-			hyper.setHref(status.getSugarURL());
-			hyper.setTarget("TOP");
-			integrationTable.setWidget(3, 1, hyper);
-   		
-    	}
-
-    	
-    	integrationTable.setWidget(4, 0, new HTML("Repox Link:"));
-    	
-    	if(status.getRepoxID() == null){
-    		integrationTable.setWidget(4, 1, new HTML("Not represented in Repox")); 
-    	}
-    	else{
-    		
-			Anchor hyper = new Anchor();
-			hyper.setName("RepoxLink");
-			hyper.setText("Click here to edit REPOX configuration.");
-			hyper.setHref(status.getRepoxURL());
-			hyper.setTarget("TOP");
+		default:
 			
-			integrationTable.setWidget(4, 1,hyper);  
+			if(!status.getType().equals(TYPE.UNIDENTIFIED)){
+				
+				
+		    	integrationTable.setWidget(0, 0, new HTML("Type:"));
+		    	integrationTable.setWidget(0, 1, new HTML(status.getType().toString()));
+		    	
+		    	integrationTable.setWidget(1, 0, new HTML("Name:"));          	
+		    	integrationTable.setWidget(1, 1, new HTML(status.getInfo()));
+		    	
+		    	integrationTable.setWidget(2, 0, new HTML("Identifier:"));
+		    	integrationTable.setWidget(2, 1, new HTML(status.getId()));
+		    	
+		    	integrationTable.setWidget(3, 0, new HTML("SugarCRM Link:"));
+		    	
+		    	if(status.getSugarCRMID() == null){
+		    		integrationTable.setWidget(3, 1, new HTML("Not represented in SugarCRM")); 
+		    	}
+		    	else{
+		    		
+					Anchor hyper = new Anchor();
+					hyper.setName("SugarCRMLink");
+					hyper.setText("Click here to edit information in SugarCRM.");
+					hyper.setHref(status.getSugarURL());
+					hyper.setTarget("TOP");
+					integrationTable.setWidget(3, 1, hyper);
+		   		
+		    	}
 
-    	}
-    	
-    	  if(status.getType().equals(TYPE.COLLECTION)  ){
+		    	
+		    	integrationTable.setWidget(4, 0, new HTML("Repox Link:"));
+		    	
+		    	if(status.getRepoxID() == null){
+		    		integrationTable.setWidget(4, 1, new HTML("Not represented in Repox")); 
+		    	}
+		    	else{
+		    		
+					Anchor hyper = new Anchor();
+					hyper.setName("RepoxLink");
+					hyper.setText("Click here to edit REPOX configuration.");
+					hyper.setHref(status.getRepoxURL());
+					hyper.setTarget("TOP");
+					
+					integrationTable.setWidget(4, 1,hyper);  
+
+		    	}
+			
+			
+	    	
+
+		
+	    	}
+			
+			break;
+			
+			
+		case COLLECTION:
     		tabInfoSubPanel.getTabWidget(1).setVisible(true);
           	integrationTable.setWidget(5, 0, new HTML("Harvesting Status:"));
           	integrationTable.setWidget(5, 1, new HTML(status.getHarvestingStatus().getStatus().getDescription()));         	
@@ -242,13 +259,15 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
           	integrationTable.setWidget(7, 0, new HTML("Permitted operations:"));
           	integrationTable.setWidget(7, 1, operationsListBox);
           	integrationTable.setWidget(7, 2, generateRepoxCommandButton());
-          	
-    	  }
+			break;
+			
+		case PROVIDER:
+			
 	
-    	}
-		else{
-			tabInfoSubPanel.setVisible(false);	
+		
 		}
+		
+
 	}
 	
 	
