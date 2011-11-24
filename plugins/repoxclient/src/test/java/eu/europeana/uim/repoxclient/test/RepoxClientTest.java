@@ -233,16 +233,14 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 
 	//Update an OAI PMH Datasource
 	Description description = new Description();
-	
-	
-	description.setDescription("altered!@#$%");
-	respOaids.setDescription(description);
+
+	respOaids.setMetadataFormat("edm");
 	
 	Source updOaids = repoxRestClient.updateDatasourceOAI(respOaids);
 	
 	assertNotNull(updOaids);
 	
-	assertEquals("altered!@#$%",updOaids.getDescription().getDescription());
+	assertEquals("edm",updOaids.getMetadataFormat());
 	
 
 	
