@@ -59,11 +59,18 @@ public class IntegrationStatusDTO implements IsSerializable {
 	
 	private HashMap<String,String> resourceProperties;
 	
+	
+	public IntegrationStatusDTO(){
+		this.resourceProperties = new HashMap<String,String>();
+	}
+	
+	
 	/**
 	 * @param id the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
+		
 	}
 
 	/**

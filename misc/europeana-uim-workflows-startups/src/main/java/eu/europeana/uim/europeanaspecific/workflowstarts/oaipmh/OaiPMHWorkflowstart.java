@@ -294,63 +294,22 @@ public class OaiPMHWorkflowstart extends AbstractWorkflowStart{
 	                property = properties.getProperty(HARVEST_EXPECTED, "0"); //
 	                value.expected = Integer.parseInt(property);
 
-	                String metadataprefix = properties.getProperty(HARVEST_METADATAPREFIX);
-	                if (metadataprefix == null || metadataprefix.trim().isEmpty()) {
-	                    metadataprefix = collection.getOaiMetadataPrefix(true);
-	                }
-
-
+	                String metadataprefix = "edm";
 
 	                String controlFields = properties.getProperty(PROCESSOR_ADDON_CONTROLFIELDS); //
 	                String dataFields = properties.getProperty(PROCESSOR_ADDON_DATAFIELDS); //
 
-	                
-	                /*
-
-	                if (controlFields != null || dataFields != null) {
-	                    String stylesheetPath = properties.getProperty(PROCESSOR_ADDON_XSL); //
-
-	                    try {
-	                        String[] ctrl = new String[] {};
-	                        if (controlFields != null) ctrl = controlFields.split(",");
-
-	                        String[] data = new String[] {};
-	                        if (dataFields != null) data = dataFields.split(",");
-
-	                        File stylesheetFile;
-	                        try {
-	                            stylesheetFile = context.getFileResource(stylesheetPath);
-	                            if (stylesheetFile == null || !stylesheetFile.exists()) {
-	                                stylesheetFile = new File(stylesheetPath);
-	                            }
-	                        } catch (Throwable t) {
-	                            stylesheetFile = new File(stylesheetPath);
-	                        }
-
-	                        String xsl = IOUtils.toString(new FileInputStream(stylesheetFile));
-	                        MarcTransformAndExtractProcessor transform = new MarcTransformAndExtractProcessor(
-	                                ctrl, data, new ObjectModelVisitor(), new TransformAndExtractLinks(
-	                                        xsl));
-	                        processor.addFieldProcessor(transform);
-	                    } catch (Throwable t) {
-	                        throw new IngestionPluginFailedException(
-	                                "Failed to initialize with transformation: " + stylesheetPath, t);
-	                    }
-	                }
-	                 * 
-	                 */
 
 	                String baseURL = properties.getProperty(HARVEST_BASEURL);
 	                if (baseURL == null) {
-	                    baseURL = request.getCollection().getOaiBaseUrl(true);
+	                	
+	                	//TODO: Hardwired for the time being, decide on whether this is going to be a Karaf property set by RepoxPlugin
+	                    baseURL = "http://bd2.inesc-id.pt:8080/repox2/OAIHandler?";
 	                }
 
 	                String setSpec = properties.getProperty(HARVEST_SET);
 	                if (setSpec == null || setSpec.trim().isEmpty()) {
-	                    setSpec = request.getCollection().getOaiSet();
-	                    if (setSpec == null || setSpec.trim().isEmpty()) {
 	                        setSpec = request.getCollection().getMnemonic();
-	                    }
 	                }
 
 	                OaipmhHarvest harvest;

@@ -20,7 +20,16 @@
  */
 package eu.europeana.uim.gui.cp.client.europeanawidgets;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Style.Unit;
@@ -47,6 +56,7 @@ import eu.europeana.uim.gui.cp.shared.IntegrationStatusDTO;
 import eu.europeana.uim.gui.cp.shared.IntegrationStatusDTO.TYPE;
 import eu.europeana.uim.gui.cp.shared.ParameterDTO;
 import eu.europeana.uim.gui.cp.shared.RepoxExecutionStatusDTO;
+
 
 
 /**
@@ -190,67 +200,75 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 	private void generateIntergationInfoPanel(IntegrationStatusDTO status){
 
 		integrationTable.clear();
+		resourcePropertiesTable.clear();
+		
+		
+		if(!status.getType().equals(TYPE.UNIDENTIFIED)){
+			
+			
+	    	integrationTable.setWidget(0, 0, new HTML("Type:"));
+	    	integrationTable.setWidget(0, 1, new HTML(status.getType().toString()));
+	    	
+	    	integrationTable.setWidget(1, 0, new HTML("Name:"));          	
+	    	integrationTable.setWidget(1, 1, new HTML(status.getInfo()));
+	    	
+	    	integrationTable.setWidget(2, 0, new HTML("Identifier:"));
+	    	integrationTable.setWidget(2, 1, new HTML(status.getId()));
+	    	
+	    	integrationTable.setWidget(3, 0, new HTML("SugarCRM Link:"));
+	    	
+	    	if(status.getSugarCRMID() == null){
+	    		integrationTable.setWidget(3, 1, new HTML("Not represented in SugarCRM")); 
+	    	}
+	    	else{
+	    		
+				Anchor hyper = new Anchor();
+				hyper.setName("SugarCRMLink");
+				hyper.setText("Click here to edit information in SugarCRM.");
+				hyper.setHref(status.getSugarURL());
+				hyper.setTarget("TOP");
+				integrationTable.setWidget(3, 1, hyper);
+	   		
+	    	}
+	    	
+	    	integrationTable.setWidget(4, 0, new HTML("Repox Link:"));
+	    	
+	    	if(status.getRepoxID() == null){
+	    		integrationTable.setWidget(4, 1, new HTML("Not represented in Repox")); 
+	    	}
+	    	else{
+	    		
+				Anchor hyper = new Anchor();
+				hyper.setName("RepoxLink");
+				hyper.setText("Click here to edit REPOX configuration.");
+				hyper.setHref(status.getRepoxURL());
+				hyper.setTarget("TOP");
+				
+				integrationTable.setWidget(4, 1,hyper);  
+	    	}
+	    	
+
+	    	
+			HashMap<String,String> propertiesMap =  status.getResourceProperties();
+			int i =0;
+			
+			Iterator it = propertiesMap.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pairs = (Map.Entry)it.next();
+		        
+		        resourcePropertiesTable.setWidget(i, 0, new HTML(pairs.getKey().toString()));
+		        resourcePropertiesTable.setWidget(i, 1, new HTML(pairs.getValue().toString()));
+		   
+		        it.remove(); // avoids a ConcurrentModificationException
+		        i++;
+		    }
+
+
+    	}
 		
 		
 		switch(status.getType()){
-		
-		default:
-			
-			if(!status.getType().equals(TYPE.UNIDENTIFIED)){
-				
-				
-		    	integrationTable.setWidget(0, 0, new HTML("Type:"));
-		    	integrationTable.setWidget(0, 1, new HTML(status.getType().toString()));
-		    	
-		    	integrationTable.setWidget(1, 0, new HTML("Name:"));          	
-		    	integrationTable.setWidget(1, 1, new HTML(status.getInfo()));
-		    	
-		    	integrationTable.setWidget(2, 0, new HTML("Identifier:"));
-		    	integrationTable.setWidget(2, 1, new HTML(status.getId()));
-		    	
-		    	integrationTable.setWidget(3, 0, new HTML("SugarCRM Link:"));
-		    	
-		    	if(status.getSugarCRMID() == null){
-		    		integrationTable.setWidget(3, 1, new HTML("Not represented in SugarCRM")); 
-		    	}
-		    	else{
-		    		
-					Anchor hyper = new Anchor();
-					hyper.setName("SugarCRMLink");
-					hyper.setText("Click here to edit information in SugarCRM.");
-					hyper.setHref(status.getSugarURL());
-					hyper.setTarget("TOP");
-					integrationTable.setWidget(3, 1, hyper);
-		   		
-		    	}
-
-		    	
-		    	integrationTable.setWidget(4, 0, new HTML("Repox Link:"));
-		    	
-		    	if(status.getRepoxID() == null){
-		    		integrationTable.setWidget(4, 1, new HTML("Not represented in Repox")); 
-		    	}
-		    	else{
-		    		
-					Anchor hyper = new Anchor();
-					hyper.setName("RepoxLink");
-					hyper.setText("Click here to edit REPOX configuration.");
-					hyper.setHref(status.getRepoxURL());
-					hyper.setTarget("TOP");
 					
-					integrationTable.setWidget(4, 1,hyper);  
-
-		    	}
-			
-			
-	    	
-
-		
-	    	}
-			
-			break;
-			
-			
 		case COLLECTION:
     		tabInfoSubPanel.getTabWidget(1).setVisible(true);
           	integrationTable.setWidget(5, 0, new HTML("Harvesting Status:"));
@@ -262,13 +280,12 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 			break;
 			
 		case PROVIDER:
-			
-	
-		
+
+		  }
 		}
 		
 
-	}
+	
 	
 	
 	

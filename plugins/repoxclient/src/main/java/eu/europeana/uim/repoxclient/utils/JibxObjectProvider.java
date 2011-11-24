@@ -159,7 +159,7 @@ public class JibxObjectProvider {
 		
 		Source ds = new Source();
 		
-		String id = (col.getName()+col.getMnemonic()).replace(" ","_");
+		String id = (col.getMnemonic());
 		ds.setId(id);
 		Description des = new Description();
 		des.setDescription(col.getValue(ControlledVocabularyProxy.DESCRIPTION));

@@ -437,7 +437,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 					"HARVESTING_TYPE information not available in UIM for the specific object.");
 		}
 		
-		DSType harvestingtype =   DSType.valueOf(htypeString);
+		DSType harvestingtype = DSType.valueOf(htypeString);
 		
 		if(harvestingtype == null){
 			throw new DataSourceOperationException("Error during the creation of a Datasource: " +

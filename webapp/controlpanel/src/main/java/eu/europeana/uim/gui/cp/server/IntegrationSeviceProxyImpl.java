@@ -21,12 +21,16 @@
 package eu.europeana.uim.gui.cp.server;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HTML;
 
 import eu.europeana.uim.api.ResourceEngine;
 import eu.europeana.uim.api.StorageEngine;
@@ -331,11 +335,24 @@ public class IntegrationSeviceProxyImpl extends
 					}	
 					
 					
+				
 					
-					ret.getResourceProperties().put(ControlledVocabularyProxy.PROVIDERCOUNTRY.getFieldId(), prov.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY));
-					ret.getResourceProperties().put(ControlledVocabularyProxy.PROVIDERDESCRIPTION.getFieldId(), prov.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION));
-					ret.getResourceProperties().put(ControlledVocabularyProxy.PROVIDERTYPE.getFieldId(), prov.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
-					ret.getResourceProperties().put(ControlledVocabularyProxy.PROVIDERWEBSITE.getFieldId(), prov.getValue(ControlledVocabularyProxy.PROVIDERWEBSITE));
+					
+					ControlledVocabularyProxy[] values = ControlledVocabularyProxy.values();
+					
+					for(int i=0;i<values.length;i++){
+						
+						String value = prov.getValue(values[i]);
+						
+						if(value != null){
+							
+							ret.getResourceProperties().put(values[i].toString(),value);
+							
+						}
+	
+					}
+					
+
 					
 				} catch (StorageEngineException e) {
 
@@ -359,6 +376,21 @@ public class IntegrationSeviceProxyImpl extends
 					ret.setInfo(col.getName());
 					ret.setHarvestingStatus(null);
 
+					
+					ControlledVocabularyProxy[] values = ControlledVocabularyProxy.values();
+					
+					for(int i=0;i<values.length;i++){
+						
+						String value = col.getValue(values[i]);
+						
+						if(value != null){
+							ret.getResourceProperties().put(values[i].toString(),value);
+							
+						}
+	
+					}
+					
+					
 					
 					if (col.getValue(ControlledVocabularyProxy.REPOXID) != null) {
 						try {
@@ -439,7 +471,9 @@ public class IntegrationSeviceProxyImpl extends
 
 	}
 
+
 	
+
 	
 	
 	/*
