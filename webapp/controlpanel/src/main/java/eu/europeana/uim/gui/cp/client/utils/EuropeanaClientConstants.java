@@ -20,6 +20,8 @@
  */
 package eu.europeana.uim.gui.cp.client.utils;
 
+
+
 /**
  * String constants for GUI labels.
  * 
@@ -33,6 +35,7 @@ public class EuropeanaClientConstants {
 	
 	public final static String ERRORIMAGELOC = "images/no.png" ;
 	public final static String SUCCESSIMAGELOC = "images/ok.png" ;
+	public final static String PROBLEMIMAGELOC = "images/iconQuestionMark.png" ;
 	public final static String QUERYIMAGELOC = "images/network.gif"; 
 	public final static String SEARCHDIALOGMSG = "Searching for SugarCRM entries"; 
 	
@@ -58,4 +61,12 @@ public class EuropeanaClientConstants {
 	
 	//Misc
 	public final static String UIMSTATELABEL = "State:" ;
+	public final static String LEGENDSUCCESSLABEL = "->The current Collection has already been imported " +
+			"into UIM and all its expernal dependencies are functioning normally." ;
+	public final static String LEGENDNALABEL = "-> The current Collection has not been imported " +
+			"and it is not available from within UIM." ;
+	public final static String LEGENDFAILURELABEL = "-> The current Collection defined in SugarCRM " +
+			"has been imported, but some of its external dependencies (ie REPOX) have not been setup proprerly." +
+			"Try modifying the values contained in SugarCRM and importing these values again." ;
+	
 }

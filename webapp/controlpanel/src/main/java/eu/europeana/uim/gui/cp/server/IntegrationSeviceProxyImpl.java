@@ -229,11 +229,18 @@ public class IntegrationSeviceProxyImpl extends
 							EuropeanaRetrievableField.NAME).split("_")[0]);
 
 			if (colexists == null) {
-				guirecord
-						.setImportedIMG(EuropeanaClientConstants.ERRORIMAGELOC);
+				guirecord.setImportedIMG(EuropeanaClientConstants.ERRORIMAGELOC);
 			} else {
-				guirecord
-						.setImportedIMG(EuropeanaClientConstants.SUCCESSIMAGELOC);
+				
+				String sugid =colexists.getValue(ControlledVocabularyProxy.SUGARCRMID);
+				String repoxid = colexists.getValue(ControlledVocabularyProxy.REPOXID);
+				if(sugid == null || repoxid == null){
+					guirecord.setImportedIMG(EuropeanaClientConstants.PROBLEMIMAGELOC);
+				}
+				else{
+					guirecord.setImportedIMG(EuropeanaClientConstants.SUCCESSIMAGELOC);
+				}
+
 			}
 
 			guirecord.setId(originalrecord
@@ -257,12 +264,9 @@ public class IntegrationSeviceProxyImpl extends
 			
 			
 			//Display the proper dataset name state here
-
 			String sugarcrmStatusStr = originalrecord.getItemValue(EuropeanaUpdatableField.STATUS).replace(" ","%");
-			
 			EuropeanaDatasetStates actualvalue = null;
-			
-		    
+		
 			for(EuropeanaDatasetStates e : EuropeanaDatasetStates.values()){
 				if(e.getSysId().equals(sugarcrmStatusStr)){
 					actualvalue = e;
@@ -427,7 +431,7 @@ public class IntegrationSeviceProxyImpl extends
 							
 							//Scheduled Sessions
 							
-							HashSet<ScheduleInfo> scheduled=  (HashSet<ScheduleInfo>) repoxService.getScheduledHarvestingSessions(col);
+							HashSet<ScheduleInfo> scheduled =  (HashSet<ScheduleInfo>) repoxService.getScheduledHarvestingSessions(col);
 							
 							if(!scheduled.isEmpty()){
 								
@@ -450,7 +454,7 @@ public class IntegrationSeviceProxyImpl extends
 					
 					
 					if(col.getValue(ControlledVocabularyProxy.SUGARCRMID) != null){
-						ret.setSugarURL(sugarCrmURL.split("/soap.php")[0] + "?module=Opportunities&action=DetailView&record=" + col.getValue("sugarCRMID") );
+						ret.setSugarURL(sugarCrmURL.split("/soap.php")[0] + "?module=Opportunities&action=DetailView&record=" + col.getValue(ControlledVocabularyProxy.SUGARCRMID) );
 					}
 					
 					

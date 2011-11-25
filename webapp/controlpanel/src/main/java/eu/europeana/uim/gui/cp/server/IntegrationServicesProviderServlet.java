@@ -20,7 +20,6 @@
  */
 package eu.europeana.uim.gui.cp.server;
 
-import eu.europeana.uim.gui.cp.server.engine.Engine;
 import eu.europeana.uim.gui.cp.server.engine.ExpandedOsgiEngine;
 
 /**

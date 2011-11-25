@@ -49,6 +49,8 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.DisclosurePanel;
+import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 import com.google.gwt.user.client.ui.HTML;
@@ -348,6 +350,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 				});
 	}
 
+	
 	/**
 	 * Generates a query from existing GUI fields.
 	 * 
@@ -754,6 +757,9 @@ public class ImportResourcesWidget extends IngestionWidget {
 	 * Creates the Search Criteria Section
 	 */
 	private Widget createAdvancedForm() {
+		
+		DockPanel dock = new DockPanel();
+		
 		// Create a table to layout the form options
 		FlexTable layout = new FlexTable();
 		layout.setCellSpacing(6);
@@ -836,9 +842,31 @@ public class ImportResourcesWidget extends IngestionWidget {
 		layout.setWidget(3, 0, searchButton);
 		layout.setWidget(3, 1, importButton);
 
+		//Put Legend here
+				
+	    DisclosurePanel advancedDisclosure = new DisclosurePanel("Show legend");
+	        advancedDisclosure.setAnimationEnabled(true);
+	        advancedDisclosure.ensureDebugId("cwDisclosurePanel");
+		
+	        FlexTable legendcontents = new FlexTable();
+	        	         
+	        legendcontents.setWidget(0, 0, new Image(EuropeanaClientConstants.SUCCESSIMAGELOC));
+	        legendcontents.setWidget(0, 1, new HTML(EuropeanaClientConstants.LEGENDSUCCESSLABEL));
+	        legendcontents.setWidget(1, 0, new Image(EuropeanaClientConstants.ERRORIMAGELOC));
+	        legendcontents.setWidget(1, 1, new HTML(EuropeanaClientConstants.LEGENDNALABEL));
+	        legendcontents.setWidget(2, 0, new Image(EuropeanaClientConstants.PROBLEMIMAGELOC));
+	        legendcontents.setWidget(2, 1, new HTML(EuropeanaClientConstants.LEGENDFAILURELABEL));
+	        advancedDisclosure.add(legendcontents);
+	        
+	       // layout.setWidget(4, 0, advancedDisclosure);
 		// Wrap the contents in a DecoratorPanel
+	        
+	        dock.add(layout, DockPanel.NORTH);    
+	    
+	        dock.add(advancedDisclosure, DockPanel.NORTH);   
+	        
 		DecoratorPanel decPanel = new DecoratorPanel();
-		decPanel.setWidget(layout);
+		decPanel.setWidget(dock);
 		return decPanel;
 	}
 
