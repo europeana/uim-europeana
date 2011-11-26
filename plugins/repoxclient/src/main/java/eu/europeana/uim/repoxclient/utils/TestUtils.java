@@ -148,7 +148,7 @@ public class TestUtils {
 		seq.setOaiSet(oaiSet);
 		OaiSource oaiSource = new OaiSource();
 		oaiSource
-				.setOaiSource("http://bd1.inesc-id.pt:8080/repoxel/OAIHandler");
+				.setOaiSource("http://bd2.inesc-id.pt:8080/repox2/OAIHandler");
 		seq.setOaiSource(oaiSource);
 		ds.setSequence(seq);
 
