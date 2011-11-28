@@ -226,7 +226,7 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 				hyper.setName("SugarCRMLink");
 				hyper.setText("Click here to edit information in SugarCRM.");
 				hyper.setHref(status.getSugarURL());
-				hyper.setTarget("TOP");
+				hyper.setTarget("NEW");
 				integrationTable.setWidget(3, 1, hyper);
 	   		
 	    	}

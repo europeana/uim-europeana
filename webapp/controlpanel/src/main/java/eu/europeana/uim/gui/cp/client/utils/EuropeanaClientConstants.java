@@ -61,11 +61,11 @@ public class EuropeanaClientConstants {
 	
 	//Misc
 	public final static String UIMSTATELABEL = "State:" ;
-	public final static String LEGENDSUCCESSLABEL = "->The current Collection has already been imported " +
+	public final static String LEGENDSUCCESSLABEL = "The current Collection has already been imported " +
 			"into UIM and all its expernal dependencies are functioning normally." ;
-	public final static String LEGENDNALABEL = "-> The current Collection has not been imported " +
+	public final static String LEGENDNALABEL = "The current Collection has not been imported " +
 			"and it is not available from within UIM." ;
-	public final static String LEGENDFAILURELABEL = "-> The current Collection defined in SugarCRM " +
+	public final static String LEGENDFAILURELABEL = "The current Collection defined in SugarCRM " +
 			"has been imported, but some of its external dependencies (ie REPOX) have not been setup proprerly." +
 			"Try modifying the values contained in SugarCRM and importing these values again." ;
 	

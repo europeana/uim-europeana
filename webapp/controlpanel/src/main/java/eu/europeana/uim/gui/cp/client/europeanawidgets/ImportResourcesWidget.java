@@ -858,7 +858,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 	        legendcontents.setWidget(2, 1, new HTML(EuropeanaClientConstants.LEGENDFAILURELABEL));
 	        advancedDisclosure.add(legendcontents);
 	        
-	       // layout.setWidget(4, 0, advancedDisclosure);
+
 		// Wrap the contents in a DecoratorPanel
 	        
 	        dock.add(layout, DockPanel.NORTH);    
