@@ -48,26 +48,6 @@
 
 							<g:TabLayoutPanel ui:field="tabInfoSubPanel" barUnit="PCT" barHeight="10" width="100%"
 								height="100%">
-								<g:tab>
-									<g:header>
-										Resource Information
-                                    </g:header>
-
-									<g:ScrollPanel>
-										<g:FlexTable ui:field="integrationTable"
-											addStyleNames="{style.cellTable}" />
-									</g:ScrollPanel>
-
-								</g:tab>
-								<g:tab>
-									<g:header>
-										Resource Properties
-                                    </g:header>
-								    <g:ScrollPanel>
-										<g:FlexTable ui:field="resourcePropertiesTable"
-											addStyleNames="{style.cellTable}" />
-									</g:ScrollPanel>
-								</g:tab>
 							</g:TabLayoutPanel>
 
 						</g:south>

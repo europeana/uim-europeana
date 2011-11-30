@@ -20,42 +20,23 @@
  */
 package eu.europeana.uim.gui.cp.client.europeanawidgets;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import eu.europeana.uim.gui.cp.client.management.ResourceManagementWidget;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxyAsync;
 import eu.europeana.uim.gui.cp.client.services.RepositoryServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.ResourceServiceAsync;
-import eu.europeana.uim.gui.cp.client.utils.RepoxOperationType;
 import eu.europeana.uim.gui.cp.shared.IntegrationStatusDTO;
-import eu.europeana.uim.gui.cp.shared.IntegrationStatusDTO.TYPE;
 import eu.europeana.uim.gui.cp.shared.ParameterDTO;
-import eu.europeana.uim.gui.cp.shared.RepoxExecutionStatusDTO;
+
 
 
 
@@ -68,21 +49,10 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 
 	private final IntegrationSeviceProxyAsync integrationservice;
 
-	@UiField(provided = true)
-	public FlexTable integrationTable;
-	
-	
-	@UiField(provided = true)
-	public FlexTable resourcePropertiesTable;
-	
+	private ResourceManagementWidgetFactory wfactory;
 	
 	@UiField
 	public TabLayoutPanel tabInfoSubPanel;
-	
-	public DialogBox operationDialog;
-	
-	public ListBox operationsListBox;
-	
 	
 
 	/**
@@ -105,6 +75,7 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 			IntegrationSeviceProxyAsync integrationservice) {
 		super(repositoryService, resourceService);
 		this.integrationservice = integrationservice;
+		this.wfactory = new ResourceManagementWidgetFactory(integrationservice);
 	
 	}
 	
@@ -121,14 +92,8 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 		tabInfoSubPanel.getElement().getStyle().setMarginBottom(10.0, Unit.PX);
 		tabInfoSubPanel.setVisible(false);
 		
-		integrationTable = new FlexTable();
-		resourcePropertiesTable = new FlexTable();
-		operationDialog = createOperationsDialogBox();
-		operationsListBox = new ListBox(false);
-		
-		operationsListBox.addItem(RepoxOperationType.INITIATE_COMPLETE_HARVESTING.getDescription());   
-		operationsListBox.addItem(RepoxOperationType.INITIATE_INCREMENTAL_HARVESTING.getDescription()); 
-  		operationsListBox.addItem(RepoxOperationType.VIEW_HARVEST_LOG.getDescription());    
+
+
   	    //operationsListBox.addItem(RepoxOperationType.SCHEDULE_HARVESTING.getDescription());   
 		
         Binder uiBinder = GWT.create(Binder.class);
@@ -170,16 +135,14 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
             @Override
             public void onFailure(Throwable throwable) {
             	
-            	integrationTable.setWidget(0, 0, new HTML("An unknown exception has occured:"));
-            	integrationTable.setWidget(0, 1, new HTML(throwable.getMessage()));
+            	//integrationTable.setWidget(0, 0, new HTML("An unknown exception has occured:"));
+            	//integrationTable.setWidget(0, 1, new HTML(throwable.getMessage()));
                 throwable.printStackTrace();
             }
 
             @Override
             public void onSuccess(IntegrationStatusDTO status) {
-
-            	generateIntergationInfoPanel(status);
-
+            	wfactory.generateIntergationInfoPanel(tabInfoSubPanel, status,integrationservice);
             }
         }		
         
@@ -190,220 +153,7 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 	
 	
 	//Private Methods
-	
-	
-	/**
-	 * Creates the integration info sub panels displaying integration-specific information
-	 * 
-	 * @param status
-	 */
-	private void generateIntergationInfoPanel(IntegrationStatusDTO status){
 
-		integrationTable.clear();
-		resourcePropertiesTable.clear();
-		
-		
-		if(!status.getType().equals(TYPE.UNIDENTIFIED)){
-			
-			
-	    	integrationTable.setWidget(0, 0, new HTML("Type:"));
-	    	integrationTable.setWidget(0, 1, new HTML(status.getType().toString()));
-	    	
-	    	integrationTable.setWidget(1, 0, new HTML("Name:"));          	
-	    	integrationTable.setWidget(1, 1, new HTML(status.getInfo()));
-	    	
-	    	integrationTable.setWidget(2, 0, new HTML("Identifier:"));
-	    	integrationTable.setWidget(2, 1, new HTML(status.getId()));
-	    	
-	    	integrationTable.setWidget(3, 0, new HTML("SugarCRM Link:"));
-	    	
-	    	if(status.getSugarCRMID() == null){
-	    		integrationTable.setWidget(3, 1, new HTML("Not represented in SugarCRM")); 
-	    	}
-	    	else{
-	    		
-				Anchor hyper = new Anchor();
-				hyper.setName("SugarCRMLink");
-				hyper.setText("Click here to edit information in SugarCRM.");
-				hyper.setHref(status.getSugarURL());
-				hyper.setTarget("NEW");
-				integrationTable.setWidget(3, 1, hyper);
-	   		
-	    	}
-	    	
-	    	integrationTable.setWidget(4, 0, new HTML("Repox Link:"));
-	    	
-	    	if(status.getRepoxID() == null){
-	    		integrationTable.setWidget(4, 1, new HTML("Not represented in Repox")); 
-	    	}
-	    	else{
-	    		
-				Anchor hyper = new Anchor();
-				hyper.setName("RepoxLink");
-				hyper.setText("Click here to edit REPOX configuration.");
-				hyper.setHref(status.getRepoxURL());
-				hyper.setTarget("TOP");
-				
-				integrationTable.setWidget(4, 1,hyper);  
-	    	}
-	    	
-
-	    	
-			HashMap<String,String> propertiesMap =  status.getResourceProperties();
-			int i =0;
-			
-			Iterator it = propertiesMap.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry pairs = (Map.Entry)it.next();
-		        
-		        resourcePropertiesTable.setWidget(i, 0, new HTML(pairs.getKey().toString()));
-		        resourcePropertiesTable.setWidget(i, 1, new HTML(pairs.getValue().toString()));
-		   
-		        it.remove(); // avoids a ConcurrentModificationException
-		        i++;
-		    }
-
-
-    	}
-		
-		
-		switch(status.getType()){
-					
-		case COLLECTION:
-    		tabInfoSubPanel.getTabWidget(1).setVisible(true);
-          	integrationTable.setWidget(5, 0, new HTML("Harvesting Status:"));
-          	integrationTable.setWidget(5, 1, new HTML(status.getHarvestingStatus().getStatus().getDescription()));         	
-  		    integrationTable.setWidget(6, 0, new HTML("<hr></hr>"));           		    	
-          	integrationTable.setWidget(7, 0, new HTML("Permitted operations:"));
-          	integrationTable.setWidget(7, 1, operationsListBox);
-          	integrationTable.setWidget(7, 2, generateRepoxCommandButton());
-			break;
-			
-		case PROVIDER:
-
-		  }
-		}
-		
-
-	
-	
-	
-	
-	
-	
-	/**
-	 * 
-	 * 
-	 * @return
-	 */
-	private Button generateRepoxCommandButton(){
-		Button actionButton = new Button("Execute");
-		actionButton.addClickHandler(new ClickHandler() {
-		 
-		
-			
-			@Override
-			public void onClick(ClickEvent event) {
-
-				operationDialog.center();
-				
-				int index = operationsListBox.getSelectedIndex();
-				
-				String value = operationsListBox.getValue(index);
-				
-				RepoxOperationType optype = null;
-				
-				if (value.equals(RepoxOperationType.INITIATE_COMPLETE_HARVESTING.getDescription())){
-					optype = RepoxOperationType.INITIATE_COMPLETE_HARVESTING;
-				}
-				else if(value.equals(RepoxOperationType.SCHEDULE_HARVESTING.getDescription())){
-					optype = RepoxOperationType.SCHEDULE_HARVESTING;
-				}
-				else if(value.equals(RepoxOperationType.VIEW_HARVEST_LOG.getDescription())){
-					optype = RepoxOperationType.VIEW_HARVEST_LOG;
-				}
-				
-				
-				if(optype != null){
-				integrationservice.performRepoxRemoteOperation(optype, getCollection().getMnemonic(), new AsyncCallback<RepoxExecutionStatusDTO>(){
-
-					@Override
-					public void onFailure(Throwable caught) {
-						operationDialog.clear();
-						
-						VerticalPanel vp = new VerticalPanel();
-						vp.add(new HTML("<verbatim>"+caught.getMessage()+"</verbatim>"));
-						vp.add(createOperationsCloseButton());
-						operationDialog.setText("An Unclassified Exception Occured (send this to you know whom)");
-						operationDialog.setWidget(vp);
-
-					}
-
-					@Override
-					public void onSuccess(RepoxExecutionStatusDTO result) {
-
-						operationDialog.clear();
-						
-						VerticalPanel vp = new VerticalPanel();
-						vp.add(new HTML("<verbatim>"+result.getLogMessage()+"</verbatim>"));
-						vp.add(createOperationsCloseButton());
-						operationDialog.setWidget(vp);
-						operationDialog.setText(result.getOperationMessage());
-
-					}	
-				});
-				}
-			}
-		});
-		
-		return actionButton;
-	}
-	
-	
-	/**
-	 * Create the dialog box for this example.
-	 * 
-	 * @return the new dialog box
-	 */
-	private DialogBox createOperationsDialogBox() {
-		final DialogBox dialogBox = new DialogBox();
-
-		dialogBox.setModal(true);
-		
-		// Create a table to layout the content
-		VerticalPanel dialogContents = new VerticalPanel();
-		dialogContents.setSpacing(0);
-		dialogBox.setWidget(dialogContents);
-
-
-		return dialogBox;
-	}
-	
-	
-	
-	private Button createOperationsCloseButton(){
-		
-		Button closebutton = new Button("Close");
-		
-
-		closebutton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				operationDialog.hide();
-				
-			}
-			
-		});
-		
-		return closebutton;
-	}
-	
-	
-	
-	
-	
-	
 	
     @Override
     protected void asyncOnInitialize(final AsyncCallback<Widget> callback) {
@@ -421,20 +171,6 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
     }
 
     
-    /**
-	 * @return the integrationTable
-	 */
-	public FlexTable getIntegrationTable() {
-		return integrationTable;
-	}
 
-
-
-	/**
-	 * @param integrationTable the integrationTable to set
-	 */
-	public void setIntegrationTable(FlexTable integrationTable) {
-		this.integrationTable = integrationTable;
-	}
     
 }
