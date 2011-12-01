@@ -21,18 +21,11 @@
 package eu.europeana.uim.gui.cp.server;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
 import org.joda.time.DateTime;
 
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
-
-import eu.europeana.uim.api.ResourceEngine;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxy;
@@ -66,6 +59,9 @@ import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievable
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaUpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.CustomSugarCrmQuery;
 import eu.europeana.uim.sugarcrm.QueryResultException;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * Exposes the "integration plugins" methods to the client.
@@ -204,6 +200,9 @@ public class IntegrationSeviceProxyImpl extends
 		return guiobjs;
 	}
 
+	
+	
+	
 	/**
 	 * Converts a SugarCRM object (query result) into an object suitable for GWT
 	 * visualization purposes.
@@ -263,19 +262,8 @@ public class IntegrationSeviceProxyImpl extends
 					.getItemValue(EuropeanaRetrievableField.ORGANIZATION_NAME));
 			
 			
-			//Display the proper dataset name state here
-			String sugarcrmStatusStr = originalrecord.getItemValue(EuropeanaUpdatableField.STATUS).replace(" ","%");
-			EuropeanaDatasetStates actualvalue = null;
-		
-			for(EuropeanaDatasetStates e : EuropeanaDatasetStates.values()){
-				if(e.getSysId().equals(sugarcrmStatusStr)){
-					actualvalue = e;
-				}
-			}
-			
-
-			
-			guirecord.setStatus(actualvalue.getDescription());
+			//Display the proper dataset name state here			
+			guirecord.setStatus(translateStatus(originalrecord.getItemValue(EuropeanaUpdatableField.STATUS)));
 
 			converted.add(guirecord);
 		}
@@ -284,6 +272,41 @@ public class IntegrationSeviceProxyImpl extends
 
 	}
 
+	
+	
+	
+	/**
+	 * @param sugarcrmStatusStr
+	 * @return
+	 */
+	private String translateStatus(String sugarcrmStatusStr){
+		
+		if(sugarcrmStatusStr != null){
+			
+
+		
+		sugarcrmStatusStr = sugarcrmStatusStr.replace(" ","%");
+		
+		EuropeanaDatasetStates actualvalue = null;
+		
+		for(EuropeanaDatasetStates e : EuropeanaDatasetStates.values()){
+			if(e.getSysId().equals(sugarcrmStatusStr)){
+				actualvalue = e;
+			}
+		}
+		
+		if(actualvalue != null){
+			return actualvalue.getDescription();
+		}
+		else{
+			return "Unknown State";
+		}
+		}
+		else{
+			return "No State Defined";
+		}
+
+	}
 
 	
 	/*
@@ -314,16 +337,28 @@ public class IntegrationSeviceProxyImpl extends
 
 		IntegrationStatusDTO ret = new IntegrationStatusDTO();
 
+		//In case that a Workflow is selected
 		if (provider == null && collection == null) {
 
 			ret.setType(TYPE.UNIDENTIFIED);
 
 		} else {
 
+			//If a Provider is selected
 			if (provider != null && collection == null) {
 				try {
 
 					Provider<?> prov = stengine.findProvider(provider);
+					
+					try {
+						
+						String description =  URLDecoder.decode(prov.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION), "UTF-8");
+						ret.setDescription(description);
+					} catch (UnsupportedEncodingException e) {
+					
+						ret.setDescription("");
+					}
+
 					ret.setType(TYPE.PROVIDER);
 					ret.setId(provider);
 					ret.setInfo(prov.getName());
@@ -363,6 +398,8 @@ public class IntegrationSeviceProxyImpl extends
 					ret.setType(TYPE.UNIDENTIFIED);
 					return ret;
 				}
+				
+			// If a Collection is selected
 			} else if (provider != null && collection != null) {
 				try {
 
@@ -370,7 +407,16 @@ public class IntegrationSeviceProxyImpl extends
 					ret.setType(TYPE.COLLECTION);
 					ret.setId(collection);
 					
-					ret.setState(col.getValue("state"));
+					try {
+						String description =  URLDecoder.decode(col.getValue(ControlledVocabularyProxy.DESCRIPTION), "UTF-8");
+						ret.setDescription(description);
+					} catch (UnsupportedEncodingException e) {
+					
+						ret.setDescription("");
+					}
+					
+					
+					ret.setState(translateStatus(col.getValue(ControlledVocabularyProxy.STATUS)));
 					
 					ret.setSugarCRMID(col.getValue(ControlledVocabularyProxy.SUGARCRMID));
 					

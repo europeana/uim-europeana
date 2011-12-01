@@ -51,6 +51,8 @@ public class IntegrationStatusDTO implements IsSerializable {
 	
 	private String info;
 
+	private String description;
+	
 	private String state;
 	
 	private String repoxURL;
@@ -204,6 +206,22 @@ public class IntegrationStatusDTO implements IsSerializable {
 	 */
 	public HashMap<String,String> getResourceProperties() {
 		return resourceProperties;
+	}
+
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
 	}
 	
 	
