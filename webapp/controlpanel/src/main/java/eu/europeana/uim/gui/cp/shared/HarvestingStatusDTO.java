@@ -50,6 +50,12 @@ public class HarvestingStatusDTO implements IsSerializable {
 	}
 	
 	private STATUS status;
+	
+	private String percentage;
+	
+	private String noRecords;
+	
+	private String timeleft;
 
 	/**
 	 * @param status the status to set
@@ -63,6 +69,30 @@ public class HarvestingStatusDTO implements IsSerializable {
 	 */
 	public STATUS getStatus() {
 		return status;
+	}
+
+	public String getPercentage() {
+		return percentage;
+	}
+
+	public void setPercentage(String percentage) {
+		this.percentage = percentage;
+	}
+
+	public String getNoRecords() {
+		return noRecords;
+	}
+
+	public void setNoRecords(String noRecords) {
+		this.noRecords = noRecords;
+	}
+
+	public String getTimeleft() {
+		return timeleft;
+	}
+
+	public void setTimeleft(String timeleft) {
+		this.timeleft = timeleft;
 	} 
 	
 }

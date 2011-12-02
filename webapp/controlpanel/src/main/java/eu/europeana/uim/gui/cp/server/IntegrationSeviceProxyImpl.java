@@ -448,6 +448,8 @@ public class IntegrationSeviceProxyImpl extends
 
 							HarvestingState status = result.getStatus();
 
+
+							
 							HarvestingStatusDTO statusobj = new HarvestingStatusDTO();
 
 							switch(status){
@@ -471,6 +473,9 @@ public class IntegrationSeviceProxyImpl extends
 								break;
 							}
 							
+							statusobj.setPercentage(result.getPercentage());
+							statusobj.setNoRecords(result.getRecords());
+							statusobj.setTimeleft(result.getTimeLeft());
 
 							ret.setHarvestingStatus(statusobj);
 							

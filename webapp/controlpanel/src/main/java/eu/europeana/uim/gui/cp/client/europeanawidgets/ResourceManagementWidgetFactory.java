@@ -218,9 +218,9 @@ public class ResourceManagementWidgetFactory {
     	}
     	else{
     		
-    		resourcePropertiesTable.setWidget(1, 0, new HTML("SugarCRM ID:"));
+    		resourcePropertiesTable.setWidget(1, 0, new HTML("ID:"));
     		resourcePropertiesTable.setWidget(1, 1, new HTML(status.getSugarCRMID()));
-    		resourcePropertiesTable.setWidget(2, 0, new HTML("Link to SugarCRM specific record:"));
+    		resourcePropertiesTable.setWidget(2, 0, new HTML("Link:"));
     		
 			Anchor hyper = new Anchor();
 			hyper.setName("");
@@ -255,10 +255,10 @@ public class ResourceManagementWidgetFactory {
 		FlexTable resourcePropertiesTable = new FlexTable();
 		container.add(resourcePropertiesTable);
 		
-		resourcePropertiesTable.setWidget(0, 0, new HTML("Repox ID:"));
+		resourcePropertiesTable.setWidget(0, 0, new HTML("ID:"));
 		resourcePropertiesTable.setWidget(0, 1, new HTML(status.getRepoxID()));
 		
-		resourcePropertiesTable.setWidget(4, 0, new HTML("Link to REPOX specific entity:"));
+		resourcePropertiesTable.setWidget(4, 0, new HTML("Link:"));
     	
     	if(status.getRepoxID() == null){
     		resourcePropertiesTable.setWidget(4, 1, new HTML("Not represented in Repox")); 
@@ -279,18 +279,56 @@ public class ResourceManagementWidgetFactory {
 		
 		case COLLECTION:
 
-			resourcePropertiesTable.setWidget(5, 0, new HTML("Harvesting Status:"));
-			resourcePropertiesTable.setWidget(5, 1, new HTML(status.getHarvestingStatus().getStatus().getDescription()));         	
-			resourcePropertiesTable.setWidget(6, 0, new HTML("<hr></hr>"));           		    	
-			resourcePropertiesTable.setWidget(7, 0, new HTML("Permitted operations:"));
+			resourcePropertiesTable.setWidget(5, 0, new HTML("Harvesting Type:"));
+			String htype = status.getResourceProperties().get("HARVESTING_TYPE");
+			resourcePropertiesTable.setWidget(5, 1, new HTML(htype));   
+			
+			resourcePropertiesTable.setWidget(6, 0, new HTML("Harvesting Status:"));
+			resourcePropertiesTable.setWidget(6, 1, new HTML(status.getHarvestingStatus().getStatus().getDescription()));  
+			
+			
+			resourcePropertiesTable.setWidget(7, 0, new HTML("Percentage complete:"));
+			resourcePropertiesTable.setWidget(7, 1, new HTML(status.getHarvestingStatus().getPercentage()));  
+			
+			resourcePropertiesTable.setWidget(8, 0, new HTML("Number of records:"));
+			resourcePropertiesTable.setWidget(8, 1, new HTML(status.getHarvestingStatus().getNoRecords()));  
+			
+			resourcePropertiesTable.setWidget(9, 0, new HTML("Time Left:"));
+			resourcePropertiesTable.setWidget(9, 1, new HTML(status.getHarvestingStatus().getTimeleft()));  
+			
+			if(htype.equals("oai_pmh")){
+				resourcePropertiesTable.setWidget(10, 0, new HTML("Harvest URL:"));
+				resourcePropertiesTable.setWidget(10, 1, new HTML(status.getResourceProperties().get("HARVEST_URL")));   
+				
+				resourcePropertiesTable.setWidget(11, 0, new HTML("Metadata Namespace:"));
+				resourcePropertiesTable.setWidget(11, 1, new HTML(status.getResourceProperties().get("METADATA_SCHEMA")));   
+				
+				resourcePropertiesTable.setWidget(12, 0, new HTML("Metadata Schema:"));
+				resourcePropertiesTable.setWidget(12, 1, new HTML(status.getResourceProperties().get("METADATA_SCHEMAL")));   
+				
+				resourcePropertiesTable.setWidget(13, 0, new HTML("Setspec:"));
+				resourcePropertiesTable.setWidget(13, 1, new HTML(status.getResourceProperties().get("SETSPEC")));   
+			}
+			
+			
+			
+			
+ 
+			
+			
+			
+			
+			
+			resourcePropertiesTable.setWidget(14, 0, new HTML("<hr></hr>"));           		    	
+			resourcePropertiesTable.setWidget(14, 0, new HTML("Permitted operations:"));
 		
 			GeneralInfoCommandMenu command = this.new GeneralInfoCommandMenu(status);
 			
-			resourcePropertiesTable.setWidget(7, 1, command.getOperationsListBox());
+			resourcePropertiesTable.setWidget(14, 1, command.getOperationsListBox());
 			// Create a table to layout the content
 
 			
-			resourcePropertiesTable.setWidget(7, 2, command.generateRepoxCommandButton());
+			resourcePropertiesTable.setWidget(14, 2, command.generateRepoxCommandButton());
 			
 			break;
 			
