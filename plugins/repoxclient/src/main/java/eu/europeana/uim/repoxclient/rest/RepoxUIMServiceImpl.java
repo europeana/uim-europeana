@@ -294,7 +294,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			engine.updateProvider(uimProv);
 			engine.checkpoint();
 		} catch (StorageEngineException e) {
-			throw new ProviderOperationException("Updating UIM Provider object failed");
+			throw new ProviderOperationException("Storing an ID to the UIM Provider object failed");
 		}
 		
 	}
@@ -490,6 +490,13 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 		
+		
+		try {
+			engine.updateCollection(col);
+			engine.checkpoint();
+		} catch (StorageEngineException e) {
+            throw new DataSourceOperationException("Storing the returned Repox id to the UIM collection object failed.");
+		}
 
 	}
 
