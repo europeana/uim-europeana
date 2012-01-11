@@ -62,8 +62,15 @@ public class ResourceManagementWidgetFactory {
 			
 			tabInfoSubPanel.add(createGeneralInfoTabContent(status), new HTML("Resource Info"));
 			tabInfoSubPanel.add(createIntrgrationInfoTabContent(status), new HTML("Integration Info"));
+			
+			if(status.getSugarCRMID() != null){
 			tabInfoSubPanel.add(createSugarCrmTabContent(status), new HTML("SugarCRM"));
-			tabInfoSubPanel.add(createRepoxTabContent(status), new HTML("Repox"));
+			}
+			
+			if(status.getRepoxID() != null){
+				tabInfoSubPanel.add(createRepoxTabContent(status), new HTML("Repox"));
+			}
+
 			tabInfoSubPanel.add(createResourcePropertiesTabContent(status), new HTML("Resource Properties"));
 		}
 
