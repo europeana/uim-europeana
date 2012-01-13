@@ -142,6 +142,7 @@
           <xs:element ref="folder"/>
         </xs:choice>
         <xs:element ref="metadataTransformations" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="restServices" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
       <xs:attribute name="characterEncoding" type="xs:NCName"/>
       <xs:attribute name="exportPath" use="optional" type="xs:anyURI"/>
@@ -223,6 +224,7 @@
   <xs:element name="ftpPath" type="xs:string"/>
   <xs:element name="isoFormat" type="xs:string"/>
   <xs:element name="folder" type="xs:string"/>
+  <xs:element name="restServices" type="xs:string"/>
   <xs:element name="metadataTransformations">
     <xs:complexType>
       <xs:sequence>
