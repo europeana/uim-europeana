@@ -23,7 +23,7 @@ package eu.europeana.uim.gui.cp.server.engine;
 import java.util.logging.Logger;
 
 import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
+import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 
 /**

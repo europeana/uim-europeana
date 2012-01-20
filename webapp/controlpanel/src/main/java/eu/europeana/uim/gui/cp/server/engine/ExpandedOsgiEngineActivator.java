@@ -24,7 +24,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
+import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 
 
