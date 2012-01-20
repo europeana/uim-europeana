@@ -24,48 +24,38 @@ package eu.europeana.uim.repoxclient.rest;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
 import org.joda.time.DateTime;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.repox.AggregatorOperationException;
+import eu.europeana.uim.repox.DataSourceOperationException;
+import eu.europeana.uim.repox.HarvestingOperationException;
+import eu.europeana.uim.repox.ProviderOperationException;
+import eu.europeana.uim.repox.RecordOperationException;
+import eu.europeana.uim.repox.RepoxUIMService;
+import eu.europeana.uim.repox.model.HarvestingState;
+import eu.europeana.uim.repox.model.IngestFrequency;
+import eu.europeana.uim.repox.model.RepoxConnectionStatus;
+import eu.europeana.uim.repox.model.RepoxHarvestingStatus;
+import eu.europeana.uim.repox.model.ScheduleInfo;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
-import eu.europeana.uim.repoxclient.jibxbindings.Country;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSource;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
-import eu.europeana.uim.repoxclient.jibxbindings.Description;
 import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
 import eu.europeana.uim.repoxclient.jibxbindings.Line;
 import eu.europeana.uim.repoxclient.jibxbindings.Log;
 import eu.europeana.uim.repoxclient.jibxbindings.Name;
 import eu.europeana.uim.repoxclient.jibxbindings.NameCode;
-import eu.europeana.uim.repoxclient.jibxbindings.OaiSet;
-import eu.europeana.uim.repoxclient.jibxbindings.OaiSource;
-import eu.europeana.uim.repoxclient.jibxbindings.RecordIdPolicy;
-import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Task;
-import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
-import eu.europeana.uim.repoxclient.jibxbindings.Source.Sequence;
-import eu.europeana.uim.repoxclient.objects.HarvestingState;
-import eu.europeana.uim.repoxclient.objects.IngestFrequency;
-import eu.europeana.uim.repoxclient.objects.RepoxConnectionStatus;
-import eu.europeana.uim.repoxclient.objects.RepoxHarvestingStatus;
-import eu.europeana.uim.repoxclient.objects.ScheduleInfo;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
-import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
-import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.ProviderOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
 import eu.europeana.uim.repoxclient.utils.DSType;
-import eu.europeana.uim.repoxclient.utils.DataSetType;
 import eu.europeana.uim.repoxclient.utils.JibxObjectProvider;
 import eu.europeana.uim.repoxclient.utils.Z3950Methods;
 import eu.europeana.uim.store.Collection;
@@ -294,7 +284,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			engine.updateProvider(uimProv);
 			engine.checkpoint();
 		} catch (StorageEngineException e) {
-			throw new ProviderOperationException("Storing an ID to the UIM Provider object failed");
+			throw new ProviderOperationException("Updating UIM Provider object failed");
 		}
 		
 	}
@@ -490,13 +480,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 		
-		
-		try {
-			engine.updateCollection(col);
-			engine.checkpoint();
-		} catch (StorageEngineException e) {
-            throw new DataSourceOperationException("Storing the returned Repox id to the UIM collection object failed.");
-		}
 
 	}
 
@@ -638,7 +621,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveRecord(java.lang.String)
 	 */
 	@Override
-	public RecordResult retrieveRecord(String recordString)
+	public String retrieveRecord(String recordString)
 			throws RecordOperationException {
 
 		throw new UnsupportedOperationException("Not implemented yet");

@@ -38,13 +38,13 @@ import org.apache.felix.service.command.Function;
 
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.repox.AggregatorOperationException;
+import eu.europeana.uim.repox.DataSourceOperationException;
+import eu.europeana.uim.repox.HarvestingOperationException;
+import eu.europeana.uim.repox.ProviderOperationException;
+import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.utils.CommandUtils;
-import eu.europeana.uim.repoxclient.plugin.RepoxUIMService;
-import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.ProviderOperationException;
 
 import eu.europeana.uim.store.Collection;
 

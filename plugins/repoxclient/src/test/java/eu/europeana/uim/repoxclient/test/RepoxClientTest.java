@@ -35,6 +35,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import eu.europeana.uim.repox.DataSourceOperationException;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
 import eu.europeana.uim.repoxclient.jibxbindings.Country;
@@ -53,7 +54,6 @@ import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
-import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
 import eu.europeana.uim.repoxclient.utils.TestUtils;
 
 

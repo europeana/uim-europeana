@@ -24,6 +24,13 @@ import org.joda.time.DateTime;
 import org.springframework.web.client.RestTemplate;
 
 
+import eu.europeana.uim.repox.AggregatorOperationException;
+import eu.europeana.uim.repox.DataSourceOperationException;
+import eu.europeana.uim.repox.HarvestingOperationException;
+import eu.europeana.uim.repox.ProviderOperationException;
+import eu.europeana.uim.repox.RecordOperationException;
+import eu.europeana.uim.repox.RepoxException;
+import eu.europeana.uim.repox.model.IngestFrequency;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
@@ -37,15 +44,9 @@ import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
+import eu.europeana.uim.repoxclient.jibxbindings._Error;
 
-import eu.europeana.uim.repoxclient.objects.IngestFrequency;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
-import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.ProviderOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 
 
 
@@ -92,8 +93,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				name.toString(),nameCode.toString(),homepage.toString());
 		
 		if (resp.getAggregator() == null) {
-			if (resp.getError() != null) {
-				throw new AggregatorOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new AggregatorOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new AggregatorOperationException("Unidentified Repox Error");
 			}
@@ -118,8 +119,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = invokRestTemplate("/aggregators/delete",Response.class,id.toString());
 		
 		if (resp.getSuccess() == null) {
-			if (resp.getError() != null) {
-				throw new AggregatorOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new AggregatorOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new AggregatorOperationException("Unidentified Repox Error");
 			}
@@ -152,8 +153,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString(),name.toString(),nameCode.toString(),homepage.toString());
 		
 		if (resp.getAggregator() == null) {
-			if (resp.getError() != null) {
-				throw new AggregatorOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new AggregatorOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new AggregatorOperationException("Unidentified Repox Error");
 			}
@@ -173,8 +174,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = invokRestTemplate("/aggregators/list",Response.class);
 		
 		if (resp.getAggregators() == null) {
-			if (resp.getError() != null) {
-				throw new AggregatorOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new AggregatorOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new AggregatorOperationException("Unidentified Repox Error");
 			}
@@ -253,8 +254,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		
 		if (resp.getProvider() == null) {
-			if (resp.getError() != null) {
-				throw new ProviderOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new ProviderOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new ProviderOperationException("Unidentified Repox Error");
 			}
@@ -279,8 +280,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				providerId.toString());
 
 		if (resp.getSuccess() == null) {
-			if (resp.getError() != null) {
-				throw new ProviderOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new ProviderOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new ProviderOperationException("Unidentified Repox Error");
 			}
@@ -356,8 +357,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		
 		if (resp.getProvider() == null) {
-			if (resp.getError() != null) {
-				throw new ProviderOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new ProviderOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new ProviderOperationException("Unidentified Repox Error");
 			}
@@ -396,8 +397,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = invokRestTemplate("/dataSources/list",Response.class);
 
 		if (resp.getDataSources() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -440,8 +441,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -492,8 +493,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -544,8 +545,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -596,8 +597,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -645,8 +646,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = createUpdateDSFtp("create",ds,prov);
 		
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -692,8 +693,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = createUpdateDSHttp("create", ds, prov);
 		
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -737,8 +738,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -775,8 +776,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 		Response resp = createUpdateDSOAI("update", ds, null);
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -821,8 +822,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = createUpdateZ3950Timestamp("update", ds, null);
 
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -866,8 +867,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 			throws DataSourceOperationException {
 		Response resp = createUpdateDSZ3950IdFile("update", ds, null);
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -913,8 +914,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -961,8 +962,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp= createUpdateDSFtp("update", ds, null);
 		
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -1008,8 +1009,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = createUpdateDSHttp("update", ds, null);
 		
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -1052,8 +1053,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = createUpdateDSFolder("update", ds, null);
 		
 		if (resp.getSource() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -1089,8 +1090,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString());
 		
 		if (resp.getSuccess() == null) {
-			if (resp.getError() != null) {
-				throw new DataSourceOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new DataSourceOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new DataSourceOperationException("Unidentified Repox Error");
 			}
@@ -1174,8 +1175,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString(),fullIngest.toString());
 		
 		if (resp.getSuccess() == null) {
-			if (resp.getError() != null) {
-				throw new HarvestingOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new HarvestingOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
@@ -1211,8 +1212,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString());
 		
 		if (resp.getSuccess() == null) {
-			if (resp.getError() != null) {
-				throw new HarvestingOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new HarvestingOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
@@ -1273,8 +1274,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString(),firstRunDate.toString(),firstRunHour.toString(),frequency.toString(),xmonths.toString(),fullIngest.toString());
 		
 		if (resp.getSuccess() == null) {
-			if (resp.getError() != null) {
-				throw new HarvestingOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new HarvestingOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
@@ -1310,8 +1311,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString());
 		
 		if (resp.getHarvestingStatus() == null) {
-			if (resp.getError() != null) {
-				throw new HarvestingOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new HarvestingOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
@@ -1339,8 +1340,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		Response resp = invokRestTemplate("/dataSources/harvesting",Response.class);
 		
 		if (resp.getRunningTasks() == null) {
-			if (resp.getError() != null) {
-				throw new HarvestingOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new HarvestingOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
@@ -1374,8 +1375,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString());
 
 		if (resp.getScheduleTasks() == null) {
-			if (resp.getError() != null) {
-				throw new HarvestingOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new HarvestingOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
@@ -1411,8 +1412,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString());
 		
 		if (resp.getLog() == null) {
-			if (resp.getError() != null) {
-				throw new HarvestingOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new HarvestingOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
@@ -1458,8 +1459,8 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 				id.toString(),recordsPerFile.toString());
 		
 		if (resp.getSuccess() == null) {
-			if (resp.getError() != null) {
-				throw new HarvestingOperationException(resp.getError());
+			if (createRepoxFailureMessage(resp.getError()) != null) {
+				throw new HarvestingOperationException(createRepoxFailureMessage(resp.getError()));
 			} else {
 				throw new HarvestingOperationException("Unidentified Repox Error");
 			}
@@ -2333,6 +2334,27 @@ private Response createUpdateDSFolder(String action, Source ds, Provider prov){
 				folder.toString());
 	}
 	
+}
+
+
+/**
+ * Auxiliary method for extracting error information
+ * from an _Error object
+ * 
+ * @param err the Error object
+ * @return the error description
+ */
+private static String createRepoxFailureMessage(_Error err){
+
+	StringBuffer sb = new StringBuffer();
+	sb.append(" Error Type: ");
+	sb.append(err.getType());
+	sb.append(" Error Cause: ");		
+	sb.append(err.getCause());
+	sb.append(" Request URI: ");		
+	sb.append(err.getRequestURI());		
+	
+	return sb.toString();
 }
 
 }

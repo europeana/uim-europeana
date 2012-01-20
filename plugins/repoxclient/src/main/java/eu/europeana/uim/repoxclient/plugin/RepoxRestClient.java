@@ -23,6 +23,13 @@ package eu.europeana.uim.repoxclient.plugin;
 import org.joda.time.DateTime;
 
 
+import eu.europeana.uim.repox.AggregatorOperationException;
+import eu.europeana.uim.repox.DataSourceOperationException;
+import eu.europeana.uim.repox.HarvestingOperationException;
+import eu.europeana.uim.repox.ProviderOperationException;
+import eu.europeana.uim.repox.RecordOperationException;
+import eu.europeana.uim.repox.RepoxException;
+import eu.europeana.uim.repox.model.IngestFrequency;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
 import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
@@ -39,13 +46,6 @@ import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
 
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
-import eu.europeana.uim.repoxclient.objects.IngestFrequency;
-import eu.europeana.uim.repoxclient.rest.exceptions.AggregatorOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.DataSourceOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.HarvestingOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.ProviderOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.RecordOperationException;
-import eu.europeana.uim.repoxclient.rest.exceptions.RepoxException;
 
 /**
  * Interface declaration of the Repox REST client OSGI service 
