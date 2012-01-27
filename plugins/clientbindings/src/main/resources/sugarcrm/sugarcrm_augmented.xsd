@@ -492,9 +492,9 @@
 	</xsd:complexType>
 	<xsd:complexType name="error_value">
 		<xsd:all>
-			<xsd:element name="number" type="xsd:string" />
-			<xsd:element name="name" type="xsd:string" />
-			<xsd:element name="description" type="xsd:string" />
+			<xsd:element name="number" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="name" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="description" type="xsd:string" minOccurs="0"/>
 		</xsd:all>
 	</xsd:complexType>
 	<xsd:complexType name="entry_value">
