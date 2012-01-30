@@ -58,56 +58,38 @@ public class SugarCRMOSGIServiceTest  extends AbstractEuropeanaIntegrationTest{
 	
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMOSGIServiceTest.class);
 
-	    
-    /**
-     * Tests the GetConnectionInfo functionality
-     * @throws Exception
-     */
-    @Test
-    public void testGetConnectionInfo() throws Exception{
-        Thread.sleep(time2w84service);
-        SugarCrmService service = getOsgiService(SugarCrmService.class);
-		assertNotNull(service);
-		ConnectionStatus status = service.showConnectionStatus();
-		assertNotNull(status.getDefaultURI());
-		assertNotNull(status.getSessionID());
-		LOGGER.debug(status);   	
-    }
 	
-
+	
     /**
-     * Tests the Update Session functionality
+     * Single Unit test testing all available SugarCRM service functionality.
      * 
      * @throws Exception
      */
     @Test
-    public void testUpdateSession() throws Exception{
+    public void testFullSugarCRMServiceFunctionality() throws Exception{
         Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-    	ConnectionStatus statusbefore = service.showConnectionStatus();
-    	String sessionIDbefore = statusbefore.getSessionID();	
+        SugarCrmService service = getOsgiService(SugarCrmService.class);
+		assertNotNull(service);
+		
+		//Get Connection Info
+		ConnectionStatus status = service.showConnectionStatus();
+		assertNotNull(status.getDefaultURI());
+		assertNotNull(status.getSessionID());
+		LOGGER.debug(status);   	
+		
+		//Tests the Update Session functionality
+    	String sessionIDbefore = status.getSessionID();	
     	String username = "test";
 		String password = "test";		
 		String sessionIDafter = service.updateSession(username, password);		
 		assertNotNull(sessionIDbefore);
 		assertNotNull(sessionIDafter);
 		assertTrue(!sessionIDbefore.equals(sessionIDafter));
-    }
-    
-    
-
-    /**
-     * Tests the execution of a Simple Query
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testRetrieveRecordsSimpleQuery() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-    	
-		EuropeanaDatasetStates status = EuropeanaDatasetStates.INGESTION_COMPLETE;
-		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery(status);
+		
+		
+		//Tests the execution of a Simple Query
+		EuropeanaDatasetStates dsstatus = EuropeanaDatasetStates.INGESTION_COMPLETE;
+		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery(dsstatus);
 		query.setMaxResults(1000);
 		query.setOffset(0);
 		query.setOrderBy(EuropeanaRetrievableField.DATE_ENTERED);
@@ -119,82 +101,39 @@ public class SugarCRMOSGIServiceTest  extends AbstractEuropeanaIntegrationTest{
 			LOGGER.debug( (i+1) + " : " + records.get(i).getItemValue(EuropeanaRetrievableField.ID) + " | " +
 					records.get(i).getItemValue(EuropeanaRetrievableField.NAME)	) ;
 		}
-    }
-    
-    
-    
-    /**
-     * Tests the execution of a Complex Query
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testRetrieveRecordsComplexQuery() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-		ComplexSugarCrmQuery query =  new ComplexSugarCrmQuery(EuropeanaRetrievableField.NAME ,EqOp.LIKE,"00101_M_PT_Gulbenkian_biblioteca_digital" );
-		List<SugarCrmRecord> records = service.retrieveRecords(query);
-		System.out.println("Number of Records retrieved: " + records.size());
-		System.out.println("NO | RECORD ID                          | COLLECTION NAME");
-
-		for(int i=0; i< records.size(); i++){
-			LOGGER.debug( (i+1) + " : " + records.get(i).getItemValue(EuropeanaRetrievableField.ID) + " | " +
-					records.get(i).getItemValue(EuropeanaRetrievableField.NAME)	) ;
-		}
-	}
-
-    
-    /**
-     * Tests the execution of a Custom Query
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testRetrieveRecordsCustomQuery() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-    	
-		CustomSugarCrmQuery query =  new CustomSugarCrmQuery("opportunities.sales_stage LIKE 'Needs%Analysis'");
 		
-		List<SugarCrmRecord> records = service.retrieveRecords(query);
-		LOGGER.debug("Number of Records retrieved: " + records.size());
+		//Tests the execution of a Complex Query
+		ComplexSugarCrmQuery cquery =  new ComplexSugarCrmQuery(EuropeanaRetrievableField.NAME ,EqOp.LIKE,"00101_M_PT_Gulbenkian_biblioteca_digital" );
+		List<SugarCrmRecord> cqrecords = service.retrieveRecords(cquery);
+		LOGGER.debug("Number of Records retrieved: " + cqrecords.size());
 		LOGGER.debug("NO | RECORD ID                          | COLLECTION NAME");
 
-		for(int i=0; i< records.size(); i++){
-			LOGGER.debug( (i+1) + " : " + records.get(i).getItemValue(EuropeanaRetrievableField.ID) + " | " +
-					records.get(i).getItemValue(EuropeanaRetrievableField.NAME)	) ;
+		for(int i=0; i< cqrecords.size(); i++){
+			LOGGER.debug( (i+1) + " : " + cqrecords.get(i).getItemValue(EuropeanaRetrievableField.ID) + " | " +
+					cqrecords.get(i).getItemValue(EuropeanaRetrievableField.NAME)	) ;
 		}
-	}
-    
-    
+		
+		
+		//Tests the execution of a Custom Query
+		CustomSugarCrmQuery cusquery =  new CustomSugarCrmQuery("opportunities.sales_stage LIKE 'Needs%Analysis'");
+		
+		List<SugarCrmRecord> cusrecords = service.retrieveRecords(cusquery);
+		LOGGER.debug("Number of Records retrieved: " + cusrecords.size());
+		LOGGER.debug("NO | RECORD ID                          | COLLECTION NAME");
 
-    /**
-     * Tests the fetch Record functionality 
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testfetchRecord() throws Exception{
-        Thread.sleep(time2w84service);
-    	String recId = "a2098f49-37db-2362-3e4b-4c5861d23639";
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-    	
-    	SugarCrmRecord rec = service.retrieveRecord(recId);
+		for(int i=0; i< cusrecords.size(); i++){
+			LOGGER.debug( (i+1) + " : " + cusrecords.get(i).getItemValue(EuropeanaRetrievableField.ID) + " | " +
+					cusrecords.get(i).getItemValue(EuropeanaRetrievableField.NAME)	) ;
+		}
+		
+		
+    	String recordID = "a2098f49-37db-2362-3e4b-4c5861d23639";
+		//Tests the fetch Record functionality 
+    	SugarCrmRecord rec = service.retrieveRecord(recordID);
 		assertNotNull(rec);
-    }
-    
-    
-
-    /**
-     * Tests the Update Record functionality 
-     * @throws Exception
-     */
-    @Test
-    public void testupdateRecord() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-    	
-		String recordID = "a2098f49-37db-2362-3e4b-4c5861d23639";
+		
+		
+		//Tests the Update Record functionality 
 		String threcords = "100";
 		String himages = "50";
 		String htetx = "30";
@@ -207,102 +146,38 @@ public class SugarCRMOSGIServiceTest  extends AbstractEuropeanaIntegrationTest{
 		values.put(EuropeanaUpdatableField.INGESTED_TEXT, htetx);			
 		values.put(EuropeanaUpdatableField.INGESTED_VIDEO, hvideo);
 		values.put(EuropeanaUpdatableField.INGESTED_SOUND, hsound);
-		
 		service.updateRecordData(recordID, values);
-    }
-    
-    
-    
-
-    /**
-     * Tests the Change Record Status functionality 
-     * @throws Exception
-     */
-    @Test
-    public void testChangeRecordStatus() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-    	
-		String recordID = "a2098f49-37db-2362-3e4b-4c5861d23639";
+		
+		//Tests the Change Record Status functionality
 		EuropeanaDatasetStates chstate = EuropeanaDatasetStates.INGESTION_COMPLETE; 
 		service.changeEntryStatus(recordID, chstate);
-    }
-    
-
-    
-    
-    /**
-     * Tests the Populate UIM from Record functionality (automatically infer 
-     * Providers and Collections from a record)
-     * @throws Exception
-     */
-    @Test
-    public void testPopulateUIMfromRecord() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-		SugarCrmRecord re = service.retrieveRecord("a2098f49-37db-2362-3e4b-4c5861d23639");
 		
+		//Tests the Change Record Status functionality 
+		EuropeanaDatasetStates changestate = EuropeanaDatasetStates.INGESTION_COMPLETE; 
+		service.changeEntryStatus(recordID, chstate);
+		
+	    ///Tests the Populate UIM from Record functionality (automatically infer 
+	    //Providers and Collections from a record)
+		SugarCrmRecord re = service.retrieveRecord(recordID);
 		Provider prov = service.updateProviderFromRecord(re);
 		Collection coll = service.updateCollectionFromRecord(re, prov);
 		
-    }
-    
-    
-    
-    /**
-     * Tests the Initialize Workflow from a SugarCRM Record with a specific ID functionality.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testInitWorkflowByID() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-    	
-		String recordID = "a2098f49-37db-2362-3e4b-4c5861d23639";
+	    //Tests the Initialize Workflow from a SugarCRM Record with a specific ID functionality.
 		String worklfowName = "SysoutWorkflow";
 		SugarCrmRecord record = service.retrieveRecord(recordID);
 		assertNotNull(record);
 		EuropeanaDatasetStates endstate = EuropeanaDatasetStates.HARVESTING_PENDING; 
 		Workflow wf = service.initWorkflowFromRecord(worklfowName, record, endstate);
 		assertNotNull(wf);
-    }
-    
-    
-    
-    /**
-     * Tests the Initialize multiple Workflows from many SugarCRM Records having the same state functionality.
-     * @throws Exception
-     */
-    @Test
-    public void testInitWorkflowsByState() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-    	
-		String wfname = "SysoutWorkflow";
+		
+	    //Tests the Initialize multiple Workflows from many SugarCRM Records having the same state functionality.
 		EuropeanaDatasetStates currentstate = EuropeanaDatasetStates.HARVESTING_PENDING;
 		EuropeanaDatasetStates ndstate = EuropeanaDatasetStates.INGESTION_COMPLETE; 
-		List<Workflow> wfs = service.initWorkflowsFromRecords(wfname, currentstate, ndstate);
-
-    }
-    
-    
-    
-    /**
-     * Tests the Add Note Attachment to record functionality
-     * @throws Exception
-     */
-    @Test
-    public void testaddNoteAttachmentToRecord() throws Exception{
-        Thread.sleep(time2w84service);
-    	SugarCrmService service = getOsgiService(SugarCrmService.class);
-		String recordID = "a2098f49-37db-2362-3e4b-4c5861d23639";
+		List<Workflow> wfs = service.initWorkflowsFromRecords(worklfowName, currentstate, ndstate);
+		
+	    //Tests the Add Note Attachment to record functionality
 		String message = "Exception Stacktrace....";
     	service.addNoteAttachmentToRecord(recordID, message);
     }
-
-    
-
-    
     
 }

@@ -69,32 +69,25 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 	private final static String HARVESTING_TYPE_OAI = "oai_pmh";
 	
 	
-	/**
-	 * Create a (dummy) aggregator in Repox.
-	 * @throws Exception
-	 */
+
+    /**
+     * Single Unit test testing all available RepoxUIM service functionality.
+     * 
+     * @throws Exception
+     */
 	@Test
-	public void testCreateAggregator() throws Exception{
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);        	
-		    repoxservice.createAggregator(aggregatorCountryName,null);
-		    boolean exists = repoxservice.aggregatorExists(aggregatorCountryName);
-		    assertTrue(exists);
-	}
-	
-	
-	
-	/**
-	 * Create a Repox Provider from an UIM provider.
-	 * @throws Exception
-	 */
-	@Test
-	public void testCreateProvider() throws Exception{
-            Thread.sleep(time2w84service);
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);			
+	public void testFullRepoxIntegration() throws Exception{
+		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 		    Registry registry = getOsgiService(Registry.class);
 			StorageEngine<?> engine = registry.getStorageEngine();
-			Provider provider = engine.createProvider();
 			
+			//Create an Aggregator
+		    repoxservice.createAggregator(aggregatorCountryName,null);
+		    boolean initaggexists = repoxservice.aggregatorExists(aggregatorCountryName);
+		    assertTrue(initaggexists);
+		    
+			//Create a Provider
+			Provider provider = engine.createProvider();		
 			provider.setAggregator(false);
 			provider.setMnemonic(providerNameCode);
 			provider.setName(providerName);
@@ -102,36 +95,13 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 			provider.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, "Blablah");
 			provider.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, aggregatorCountryName);
 			provider.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, providerURI);
-			
-			provider.putValue(ControlledVocabularyProxy.SUGARCRMID, "123213123231");
+			provider.putValue(ControlledVocabularyProxy.SUGARCRMID, "IRRELEVANT_IN_THIS_OPERATION");
 			provider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, "Library");
 			provider.setOaiMetadataPrefix("ese");   
-
 		    repoxservice.createProviderfromUIMObj(provider);
-		    
-		    
 			assertTrue( repoxservice.providerExists(provider));
-	
-	}
-    
-	
-	/**
-	 * Create a Repox Datasource from a UIM collection.
-	 * @throws Exception
-	 */
-	@Test
-	public void testCreateDatasource() throws Exception{
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-	
-		    Registry registry = getOsgiService(Registry.class);
-		    
-			StorageEngine<?> engine = registry.getStorageEngine();
 			
-			Provider provider = engine.createProvider();
-			provider.setName(providerName);
-			provider.setMnemonic(providerNameCode);
-			provider.putValue(ControlledVocabularyProxy.REPOXID, providerName + "r0");
-			
+			//Create a Collection
 		    Collection collection = engine.createCollection(provider);
 
 		    collection.setLanguage("fr");
@@ -147,243 +117,63 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 			repoxservice.createDatasourcefromUIMObj(collection, provider);
 			
 			assertTrue(repoxservice.datasourceExists(collection));
-	
-	}
-    
-	
-	/**
-	 * Update an existing (pseudo)aggregator
-	 * @throws Exception
-	 */
-	@Test
-	public void testUpdateAggregator() throws Exception{
-            Thread.sleep(time2w84service);
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class); 	
+			
+			//Update the aggregator
 		    repoxservice.updateAggregator(aggregatorCountryName,"ChangedName",aggregatorCountryNameCode,aggregatorURI);
-			assertNotNull(repoxservice);
-	}
-	
-	
-	/**
-	 * Update a Repox Provider from a UIM provider.
-	 * @throws Exception
-	 */
-	@Test
-	public void testUpdateProvider() throws Exception{
-            Thread.sleep(time2w84service);
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-
-		    Registry registry = getOsgiService(Registry.class);
+			
 		    
-			StorageEngine<?> engine = registry.getStorageEngine();
-			
-			Provider provider = engine.createProvider();			
-			provider.setAggregator(false);
-			provider.setMnemonic(providerNameCode);
-			provider.setName(providerName);
-			provider.setOaiBaseUrl(providerURI);
-			provider.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, "Blablah...");
-			provider.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, aggregatorCountryName);
-			provider.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, providerURI);
-			
-			provider.putValue(ControlledVocabularyProxy.REPOXID, providerName + "r0");
-			provider.putValue(ControlledVocabularyProxy.SUGARCRMID, "123213123231");
-			provider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, "Library");
-			
+		    //Update the provider
 			provider.setName("updatedProv");
-        	
 		    repoxservice.updateProviderfromUIMObj(provider);
-
-	}
-	
-	
-	/**
-	 * Update a Repox Datasource from a UIM collection.
-	 * @throws Exception
-	 */
-	@Test
-	public void testUpdateDatasource() throws Exception{
-        Thread.sleep(time2w84service);
-	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-
-	    Registry registry = getOsgiService(Registry.class);
-	    
-		StorageEngine<?> engine = registry.getStorageEngine();
-		
-		Provider provider = engine.createProvider();
-		provider.setName(providerName);
-		provider.setMnemonic(providerNameCode);
-		provider.putValue(ControlledVocabularyProxy.REPOXID, providerName + "r0");
-		
-	    Collection<?> collection = engine.createCollection(provider);
-	    collection.setName(collectionName);
-	    collection.setMnemonic(collectionNameCode);
-	    collection.putValue(ControlledVocabularyProxy.REPOXID, collectionName + collectionNameCode);
-	    collection.setLanguage("it");
-	    collection.setOaiBaseUrl(collectionOAIPMHURI);
-	    collection.setOaiMetadataPrefix("ese");
-	    
-		collection.setName("updatedCollection");
-	    collection.putValue(ControlledVocabularyProxy.METADATA_NAMESPACE, metadatanamespace);
-        collection.putValue(ControlledVocabularyProxy.METADATA_SCHEMA, metadataschema);
-        collection.putValue(ControlledVocabularyProxy.HARVESTING_TYPE, HARVESTING_TYPE_OAI);  
-        
-		repoxservice.updateDatasourcefromUIMObj(collection);
-		
-		assertNotNull(repoxservice);
-	
-	}
-	
-	
-	/**
-	 * Test various REPOX Operations
-	 * @throws Exception
-	 */
-	@Test
-	public void testHarvestingOperations() throws Exception{
-            Thread.sleep(time2w84service);
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-	
-		    Registry registry = getOsgiService(Registry.class);
 		    
-			StorageEngine<?> engine = registry.getStorageEngine();
+		    //Update the datasourve via a collection
+			collection.setName("updatedCollection");
+			repoxservice.updateDatasourcefromUIMObj(collection);
 			
-			Provider provider = engine.createProvider();
-			provider.setName(providerName);
-			provider.setMnemonic(providerNameCode);
-			provider.putValue(ControlledVocabularyProxy.REPOXID, providerName + "r0");
-			
-		    Collection<?> coll = engine.createCollection(provider);
-		    coll.setName(collectionName);
-		    coll.setMnemonic(collectionNameCode);
-		    coll.putValue(ControlledVocabularyProxy.REPOXID, collectionName + collectionNameCode);
-			
-		    repoxservice.initiateHarvestingfromUIMObj(coll,true);
-		  
-		    RepoxHarvestingStatus result =repoxservice.getHarvestingStatus(coll);
+			//Various Repox operations
+		    repoxservice.initiateHarvestingfromUIMObj(collection,true);
+			  
+		    RepoxHarvestingStatus result =repoxservice.getHarvestingStatus(collection);
 			assertNotNull(result);
 		    repoxservice.getActiveHarvestingSessions();
 		    
 		    Thread.sleep(time2w84service);
-		    String log = repoxservice.getHarvestLog(coll);	
+		    String log = repoxservice.getHarvestLog(collection);	
 			assertNotNull(log);
 			 
-		    repoxservice.cancelHarvesting(coll);
-	    
-
-	
-	}
-	
-	
-	/**
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void testRetrieveAggregatorsService() throws Exception{
-            Thread.sleep(time2w84service);
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-	
+		    repoxservice.cancelHarvesting(collection);
+		    
+		    //Get All aggregators
 		    HashSet<Provider<?>> aggr =  (HashSet<Provider<?>>) repoxservice.retrieveAggregators();
 
 		    assertNotNull(aggr);
 			assertFalse(aggr.isEmpty());
-	
-	}
-	
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void testRetrieveProvidersService() throws Exception{
-            Thread.sleep(time2w84service);
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-	
+			
+			
+			//Retrieve All providers
 		    HashSet<Provider<?>> prov = (HashSet<Provider<?>>) repoxservice.retrieveProviders();
-
 		    assertNotNull(prov);
 			assertFalse(prov.isEmpty());
-	
-	}
-	
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void testRetrieveDataSourcesService() throws Exception{
-		    Thread.sleep(time2w84service); 
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-	
+						
+			//Retrieve all datasources
 		    HashSet<Collection<?>> coll = (HashSet<Collection<?>>) repoxservice.retrieveDataSources();
-
 		    assertNotNull(coll);
 			assertFalse(coll.isEmpty());
-	
-	}
-	
-	
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void testDeleteDatasource() throws Exception{
-		Thread.sleep(time2w84service);
-	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-		
-	    Registry registry = getOsgiService(Registry.class);
-	    
-		StorageEngine<?> engine = registry.getStorageEngine();
-		
-		Provider provider = engine.createProvider();
-		provider.setName(providerName);
-		provider.setMnemonic(providerNameCode);
-		provider.putValue(ControlledVocabularyProxy.REPOXID, providerName + "r0");
-		
-	    Collection<?> coll = engine.createCollection(provider);
-	    coll.setName(collectionName);
-	    coll.setMnemonic(collectionNameCode);
-	    coll.putValue(ControlledVocabularyProxy.REPOXID, collectionName +  collectionNameCode);
-		
-		repoxservice.deleteDatasourcefromUIMObj(coll);
-		
-		boolean exists = repoxservice.datasourceExists(coll);
-		
-		assertFalse(exists);
-	
-	}
-	
-	
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void testDeleteProvider() throws Exception{
-		    Thread.sleep(time2w84service);
-		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
-		    Registry registry = getOsgiService(Registry.class);
-			StorageEngine<?> engine = registry.getStorageEngine();
-			Provider<?> provider = engine.createProvider();
-			provider.setName(providerName);
-			provider.setMnemonic(providerNameCode);
-			provider.putValue(ControlledVocabularyProxy.REPOXID, providerName + "r0");
+			
+			//Delete the Repox Datasource via a UIM Collection Reference
+			repoxservice.deleteDatasourcefromUIMObj(collection);
+			boolean dsexists = repoxservice.datasourceExists(collection);
+			assertFalse(dsexists);
+			
+			//Delete the Repox Provider via a UIM Provider Reference
 			repoxservice.deleteProviderfromUIMObj(provider);
-			boolean exists = repoxservice.providerExists(provider);
-			assertFalse(exists);
-	
+			boolean prexists = repoxservice.providerExists(provider);
+			assertFalse(prexists);
+			
+			//Delete the Aggregator
+			repoxservice.deleteAggregator(aggregatorCountryName);
+			boolean aggrexists = repoxservice.aggregatorExists(aggregatorCountryName);
+			assertFalse(aggrexists);
 	}
 	
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void testDeleteAggregator() throws Exception{
-		Thread.sleep(time2w84service);
-	    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);			
-		repoxservice.deleteAggregator(aggregatorCountryName);
-		boolean exists = repoxservice.aggregatorExists(aggregatorCountryName);
-		assertFalse(exists);
-	}
-	
-	
-
 }
