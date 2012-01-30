@@ -62,7 +62,7 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 	
 	private final static String collectionName = "TestOSGICollection";
 	private final static String collectionNameCode = "89543";
-	private final static String collectionOAIPMHURI = "http://bd1.inesc-id.pt:8080/repox2/OAIHandler";
+	private final static String collectionOAIPMHURI = "http://sip-manager.isti.cnr.it:8080/repoxUI_Europeana/OAIHandler";
 	
 	private final static String metadatanamespace = "http://www.europeana.eu/schemas/ese/";
 	private final static String metadataschema = "http://www.europeana.eu/schemas/ese/ESE-V3.4.xsd";
