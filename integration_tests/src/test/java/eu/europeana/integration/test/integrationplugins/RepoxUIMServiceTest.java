@@ -24,6 +24,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import java.util.HashSet;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
@@ -53,23 +56,32 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepoxUIMServiceTest.class);
 	
 	private final static String aggregatorCountryName = "al";
-	private final static String aggregatorCountryNameCode = "1742";
+	private final static String aggregatorCountryNameCode = "17420000";
 	private final static String aggregatorURI = "http://www.in.gr";
 	
 	private final static String providerName = "TestOSGIProvider";
-	private final static String providerNameCode = "76341";
+	private final static String providerNameCode = "763410000";
 	private final static String providerURI = "http://www.in.gr";
 	
 	private final static String collectionName = "TestOSGICollection";
-	private final static String collectionNameCode = "89543";
+	private final static String collectionNameCode = "895430000";
 	private final static String collectionOAIPMHURI = "http://sip-manager.isti.cnr.it:8080/repoxUI_Europeana/OAIHandler";
 	
 	private final static String metadatanamespace = "http://www.europeana.eu/schemas/ese/";
 	private final static String metadataschema = "http://www.europeana.eu/schemas/ese/ESE-V3.4.xsd";
 	private final static String HARVESTING_TYPE_OAI = "oai_pmh";
 	
-	
 
+
+	@After
+	public void postclean() throws Exception{
+		RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
+		if(repoxservice.aggregatorExists(aggregatorCountryName)){
+			repoxservice.deleteAggregator(aggregatorCountryName);
+		}
+	}
+	
+	
     /**
      * Single Unit test testing all available RepoxUIM service functionality.
      * 
@@ -80,7 +92,8 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 		    RepoxUIMService repoxservice = getOsgiService(RepoxUIMService.class);
 		    Registry registry = getOsgiService(Registry.class);
 			StorageEngine<?> engine = registry.getStorageEngine();
-			
+		    Thread.sleep(time2w84service);
+		   
 			//Create an Aggregator
 		    repoxservice.createAggregator(aggregatorCountryName,null);
 		    boolean initaggexists = repoxservice.aggregatorExists(aggregatorCountryName);
@@ -109,7 +122,8 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 		    collection.setName(collectionName);
 		    collection.setOaiBaseUrl(collectionOAIPMHURI);
 		    collection.setOaiMetadataPrefix("ese");
-        	
+		    collection.setMnemonic(collectionNameCode);
+		    
 		    collection.putValue(ControlledVocabularyProxy.METADATA_NAMESPACE, metadatanamespace);
 	        collection.putValue(ControlledVocabularyProxy.METADATA_SCHEMA, metadataschema);
 	        collection.putValue(ControlledVocabularyProxy.HARVESTING_TYPE, HARVESTING_TYPE_OAI);  
@@ -145,7 +159,6 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 		    
 		    //Get All aggregators
 		    HashSet<Provider<?>> aggr =  (HashSet<Provider<?>>) repoxservice.retrieveAggregators();
-
 		    assertNotNull(aggr);
 			assertFalse(aggr.isEmpty());
 			

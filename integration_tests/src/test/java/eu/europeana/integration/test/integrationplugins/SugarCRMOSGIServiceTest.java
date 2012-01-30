@@ -115,7 +115,7 @@ public class SugarCRMOSGIServiceTest  extends AbstractEuropeanaIntegrationTest{
 		
 		
 		//Tests the execution of a Custom Query
-		CustomSugarCrmQuery cusquery =  new CustomSugarCrmQuery("opportunities.sales_stage LIKE 'Needs%Analysis'");
+		CustomSugarCrmQuery cusquery =  new CustomSugarCrmQuery("opportunities.sales_stage LIKE '" + EuropeanaDatasetStates.INGESTION_COMPLETE.getSysId() +"'");
 		
 		List<SugarCrmRecord> cusrecords = service.retrieveRecords(cusquery);
 		LOGGER.debug("Number of Records retrieved: " + cusrecords.size());
