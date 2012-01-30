@@ -204,7 +204,7 @@ public final class SugarCRMWSTest {
 	public void testGetModuleFields() throws Exception{	 		
 		GetModuleFields request = new GetModuleFields();
 		request.setSession(sessionID);
-		request.setModuleName("Contacts");
+		request.setModuleName("Accounts");
 		ClientUtils.logMarshalledObject(request);
 		GetModuleFieldsResponse response;
 		response = sugarWsClient.get_module_fields(request);
