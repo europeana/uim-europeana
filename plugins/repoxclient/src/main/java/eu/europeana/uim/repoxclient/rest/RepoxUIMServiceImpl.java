@@ -481,6 +481,16 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
 		
+		//Store the created RepoxID into the UIM object 
+		try {
+			engine.updateCollection(col);
+			engine.checkpoint();
+		} catch (StorageEngineException e) {
+			throw new DataSourceOperationException("Updating UIM Collection object failed");
+		}
+		
+
+		
 
 	}
 
