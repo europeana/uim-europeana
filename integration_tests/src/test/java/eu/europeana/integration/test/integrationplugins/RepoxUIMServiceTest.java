@@ -62,7 +62,7 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 	
 	private final static String collectionName = "TestOSGICollection";
 	private final static String collectionNameCode = "89543";
-	private final static String collectionOAIPMHURI = "http://bd1.inesc-id.pt:8080/repoxel/OAIHandler";
+	private final static String collectionOAIPMHURI = "http://bd1.inesc-id.pt:8080/repox2/OAIHandler";
 	
 	private final static String metadatanamespace = "http://www.europeana.eu/schemas/ese/";
 	private final static String metadataschema = "http://www.europeana.eu/schemas/ese/ESE-V3.4.xsd";
@@ -99,12 +99,12 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 			provider.setMnemonic(providerNameCode);
 			provider.setName(providerName);
 			provider.setOaiBaseUrl(providerURI);
-			provider.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, "Blablah...");
+			provider.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, "Blablah");
 			provider.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, aggregatorCountryName);
 			provider.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, providerURI);
 			
 			provider.putValue(ControlledVocabularyProxy.SUGARCRMID, "123213123231");
-			provider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, "ARCHIVE");
+			provider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, "Library");
 			provider.setOaiMetadataPrefix("ese");   
 
 		    repoxservice.createProviderfromUIMObj(provider);
@@ -188,7 +188,7 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 			
 			provider.putValue(ControlledVocabularyProxy.REPOXID, providerName + "r0");
 			provider.putValue(ControlledVocabularyProxy.SUGARCRMID, "123213123231");
-			provider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, "ARCHIVE");
+			provider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, "Library");
 			
 			provider.setName("updatedProv");
         	
