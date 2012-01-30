@@ -4,7 +4,7 @@
            xmlns:bp="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0">
 
-   <reference id="repoxPluginService" interface="eu.europeana.uim.repoxclient.plugin.RepoxUIMService" availability="optional"/>
+   <reference id="repoxPluginService" interface="eu.europeana.uim.repox.RepoxUIMService" availability="optional"/>
    <shell:command-bundle>
         <shell:command name="uim/repoxAgent">
             <shell:action class="eu.europeana.uim.repoxclient.command.RepoxPluginCommand">

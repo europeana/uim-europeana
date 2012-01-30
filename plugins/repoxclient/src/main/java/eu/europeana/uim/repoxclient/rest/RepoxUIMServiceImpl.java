@@ -77,8 +77,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 
 
+
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#showConnectionStatus()
+	 * @see eu.europeana.uim.repox.RepoxUIMService#showConnectionStatus()
 	 */
 	@Override
 	public RepoxConnectionStatus showConnectionStatus() {
@@ -96,7 +97,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#aggregatorExists(java.lang.String)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#aggregatorExists(java.lang.String)
 	 */
 	@Override
 	public boolean aggregatorExists(String countrycode)
@@ -123,7 +124,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createAggregator(java.lang.String, java.lang.String)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#createAggregator(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void createAggregator(String countryCode,String urlString)
@@ -139,7 +140,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteAggregator(java.lang.String)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#deleteAggregator(java.lang.String)
 	 */
 	@Override
 	public void deleteAggregator(String countryCode)
@@ -151,7 +152,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateAggregator(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#updateAggregator(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void updateAggregator(String countryCode,String aggrname,String aggrNameCode, String urlString)
@@ -184,7 +185,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveAggregators()
+	 * @see eu.europeana.uim.repox.RepoxUIMService#retrieveAggregators()
 	 */
 	@Override
 	public HashSet<Provider<?>> retrieveAggregators()
@@ -219,7 +220,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#providerExists(eu.europeana.uim.store.Provider)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#providerExists(eu.europeana.uim.store.Provider)
 	 */
 	@Override
 	public boolean providerExists(Provider<?> provider)
@@ -248,7 +249,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createProviderfromUIMObj(eu.europeana.uim.store.Provider)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#createProviderfromUIMObj(eu.europeana.uim.store.Provider)
 	 */
 	@Override
 	public void createProviderfromUIMObj(Provider uimProv)
@@ -295,7 +296,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteProviderfromUIMObj(eu.europeana.uim.store.Provider)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#deleteProviderfromUIMObj(eu.europeana.uim.store.Provider)
 	 */
 	@Override
 	public void deleteProviderfromUIMObj(Provider<?> prov)
@@ -316,7 +317,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateProviderfromUIMObj(eu.europeana.uim.store.Provider)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#updateProviderfromUIMObj(eu.europeana.uim.store.Provider)
 	 */
 	@Override
 	public void updateProviderfromUIMObj(Provider<?> uimProv)
@@ -346,7 +347,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveProviders()
+	 * @see eu.europeana.uim.repox.RepoxUIMService#retrieveProviders()
 	 */
 	@Override
 	public HashSet<Provider<?>> retrieveProviders()
@@ -383,7 +384,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#datasourceExists(eu.europeana.uim.store.Collection)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#datasourceExists(eu.europeana.uim.store.Collection)
 	 */
 	@Override
 	public boolean datasourceExists(Collection<?>col)
@@ -413,7 +414,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#createDatasourcefromUIMObj(eu.europeana.uim.store.Collection, eu.europeana.uim.store.Provider)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#createDatasourcefromUIMObj(eu.europeana.uim.store.Collection, eu.europeana.uim.store.Provider)
 	 */
 	@Override
 	public void createDatasourcefromUIMObj(Collection col, Provider prov)
@@ -485,7 +486,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#updateDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#updateDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
 	 */
 	@Override
 	public void updateDatasourcefromUIMObj(Collection col)
@@ -557,7 +558,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#deleteDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#deleteDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
 	 */
 	@Override
 	public void deleteDatasourcefromUIMObj(Collection col)
@@ -579,7 +580,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveDataSources()
+	 * @see eu.europeana.uim.repox.RepoxUIMService#retrieveDataSources()
 	 */
 	@Override
 	public HashSet<Collection<?>> retrieveDataSources()
@@ -618,7 +619,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#retrieveRecord(java.lang.String)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#retrieveRecord(java.lang.String)
 	 */
 	@Override
 	public String retrieveRecord(String recordString)
@@ -632,7 +633,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#initiateHarvestingfromUIMObj(eu.europeana.uim.store.Collection, boolean)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#initiateHarvestingfromUIMObj(eu.europeana.uim.store.Collection, boolean)
 	 */
 	@Override
 	public void initiateHarvestingfromUIMObj(Collection<?> col,boolean isfull) throws HarvestingOperationException {
@@ -650,7 +651,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#scheduleHarvestingfromUIMObj(eu.europeana.uim.store.Collection, eu.europeana.uim.repoxclient.objects.ScheduleInfo)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#scheduleHarvestingfromUIMObj(eu.europeana.uim.store.Collection, eu.europeana.uim.repoxclient.objects.ScheduleInfo)
 	 */
 	@Override
 	public void scheduleHarvestingfromUIMObj(Collection<?> col, ScheduleInfo info)
@@ -672,7 +673,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#cancelHarvesting(eu.europeana.uim.store.Collection)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#cancelHarvesting(eu.europeana.uim.store.Collection)
 	 */
 	@Override
 	public void cancelHarvesting(Collection<?> col)
@@ -690,7 +691,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getHarvestingStatus(eu.europeana.uim.store.Collection)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#getHarvestingStatus(eu.europeana.uim.store.Collection)
 	 */
 	@Override
 	public RepoxHarvestingStatus getHarvestingStatus(Collection<?> col)
@@ -729,7 +730,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getActiveHarvestingSessions()
+	 * @see eu.europeana.uim.repox.RepoxUIMService#getActiveHarvestingSessions()
 	 */
 	@Override
 	public HashSet<Collection<?>> getActiveHarvestingSessions()
@@ -762,7 +763,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getScheduledHarvestingSessions()
+	 * @see eu.europeana.uim.repox.RepoxUIMService#getScheduledHarvestingSessions()
 	 */
 	@Override
 	public HashSet<ScheduleInfo> getScheduledHarvestingSessions(Collection<?> col)
@@ -820,7 +821,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#getHarvestLog(eu.europeana.uim.store.Collection)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#getHarvestLog(eu.europeana.uim.store.Collection)
 	 */
 	@Override
 	public String getHarvestLog(Collection<?> col)
@@ -848,7 +849,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	
 	
 	/* (non-Javadoc)
-	 * @see eu.europeana.uim.repoxclient.plugin.RepoxUIMService#initializeExport(eu.europeana.uim.store.Collection, int)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#initializeExport(eu.europeana.uim.store.Collection, int)
 	 */
 	@Override
 	public void initializeExport(Collection<?> col, int numberOfRecords)
@@ -865,11 +866,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		repoxRestClient.initializeExport(id, numberOfRecords);
 	}
-	
-	
-	
-	
-	
+
 	/*
 	 * Getters & Setters
 	 */
@@ -889,24 +886,5 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	public Registry getRegistry() {
 		return registry;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

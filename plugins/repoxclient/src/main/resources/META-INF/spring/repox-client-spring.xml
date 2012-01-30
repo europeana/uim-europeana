@@ -44,7 +44,7 @@
    </bean>
    
    
-   <osgi:service id="repoxAgentService" ref="repoxAgent" interface="eu.europeana.uim.repoxclient.plugin.RepoxUIMService"/>
+   <osgi:service id="repoxAgentService" ref="repoxAgent" interface="eu.europeana.uim.repox.RepoxUIMService"/>
    
    <osgi:reference id="registry" interface="eu.europeana.uim.api.Registry"/>
     
