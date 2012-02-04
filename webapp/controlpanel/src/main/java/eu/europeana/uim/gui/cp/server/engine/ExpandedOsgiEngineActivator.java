@@ -66,7 +66,7 @@ public class ExpandedOsgiEngineActivator implements BundleActivator {
         
         
         while (repoxService == null && wait++ < 10) {
-            ServiceReference repoxRef = bundleContext.getServiceReference("eu.europeana.uim.repoxclient.plugin.RepoxUIMService");
+            ServiceReference repoxRef = bundleContext.getServiceReference("eu.europeana.uim.repox.RepoxUIMService");
             if (repoxRef != null) {
             	repoxService = (RepoxUIMService)bundleContext.getService(repoxRef);
             }
