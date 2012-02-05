@@ -76,8 +76,6 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	public Aggregator createAggregator(Aggregator aggregator)
 			throws AggregatorOperationException {
 		
-		///rest/aggregators/create?name=Judaica&nameCode=093&homepage=http://repox.ist.utl.pt
-		
 		StringBuffer name = new StringBuffer();
 		StringBuffer nameCode = new StringBuffer();
 		StringBuffer homepage = new StringBuffer();
@@ -195,8 +193,6 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 	
 	@Override
 	public Provider createProvider(Provider prov,Aggregator agr) throws ProviderOperationException {
-		//http://bd2.inesc-id.pt:8080/repox2/rest/dataProviders/create?aggregatorId=AGGREGATOR_ID&
-		//	name=NAME&description=DESCRIPTION&country=2_LETTERS_COUNTRY&nameCode=NAME_CODE&url=URL&dataSetType=DATA_SET_TYPE
 		
 		StringBuffer aggregatorId = new StringBuffer();
 		StringBuffer name = new StringBuffer();
@@ -234,7 +230,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		homepage.append("url=");
 		if(prov.getUrl() != null){
-			homepage.append(prov.getUrl().getUrl());
+			homepage.append("http://" + prov.getUrl().getUrl().split("/")[0]);
 		}
 		else{
 			homepage.append("http://europeana.eu");
@@ -337,7 +333,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 		homepage.append("url=");
 		if(prov.getUrl() != null){
-			homepage.append(prov.getUrl().getUrl());
+			homepage.append("http://" + prov.getUrl().getUrl().split("/")[0]);
 		}
 		else{
 			homepage.append("http://europeana.eu");
