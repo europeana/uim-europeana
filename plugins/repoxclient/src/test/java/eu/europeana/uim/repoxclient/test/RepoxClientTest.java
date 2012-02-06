@@ -168,7 +168,7 @@ public void testCreateUpdateDeleteAggregator() throws Exception{
 public void testCreateUpdateDeleteProvider() throws Exception{
 	
 	//Create an Aggregator for testing purposes
-	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr0","7777","http://www.in.gr");
+	Aggregator aggr = 	TestUtils.createAggregatorObj("aggr0","7777","www.in.gr");
 	Aggregator rtAggr =  repoxRestClient.createAggregator(aggr);	
 	assertNotNull(rtAggr);
 	TestUtils.logMarshalledObject(rtAggr,LOGGER);

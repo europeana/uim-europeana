@@ -217,6 +217,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		}
 		
 		country.append("country=");
+		
 		if(prov.getCountry() != null){
 			country.append(prov.getCountry().getCountry());
 		}
@@ -226,11 +227,14 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		
 		nameCode.append("nameCode=");
 		nameCode.append(prov.getNameCode().getNameCode());
-		
-		
 		homepage.append("url=");
+		
 		if(prov.getUrl() != null){
-			homepage.append("http://" + prov.getUrl().getUrl().split("/")[0]);
+			if(!prov.getUrl().getUrl().startsWith("http://"))
+			{
+				homepage.append("http://");
+			}
+			homepage.append(prov.getUrl().getUrl().split("/")[0]);
 		}
 		else{
 			homepage.append("http://europeana.eu");
@@ -330,10 +334,18 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 
 		nameCode.append("nameCode=");
 		nameCode.append(prov.getNameCode().getNameCode());
-
 		homepage.append("url=");
+		
 		if(prov.getUrl() != null){
-			homepage.append("http://" + prov.getUrl().getUrl().split("/")[0]);
+			if(!prov.getUrl().getUrl().startsWith("http"))
+			{
+				homepage.append("http://" + prov.getUrl().getUrl().split("/")[0]);
+			}
+			else
+			{
+				homepage.append(prov.getUrl().getUrl());
+			}
+
 		}
 		else{
 			homepage.append("http://europeana.eu");

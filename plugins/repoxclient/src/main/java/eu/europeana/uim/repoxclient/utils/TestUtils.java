@@ -111,7 +111,7 @@ public class TestUtils {
 		Type type = new Type();
 		type.setType("ARCHIVE");
 		Url url = new Url();
-		url.setUrl("http://www.in.gr");
+		url.setUrl("www.europeana.eu");
 
 		prov.setCountry(country);
 		prov.setDescription(description);
