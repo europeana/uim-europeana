@@ -20,6 +20,7 @@
  */
 package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
+import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.sugarcrm.model.UpdatableField;
 
 
@@ -100,4 +101,10 @@ public enum EuropeanaUpdatableField implements UpdatableField{
     public String getQualifiedFieldId() {
       return qualifiedFieldId;
     }
+
+	@Override
+	public ControlledVocabularyKeyValue getMappingField() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
