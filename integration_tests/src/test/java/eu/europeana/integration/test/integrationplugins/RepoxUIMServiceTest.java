@@ -57,11 +57,11 @@ public class RepoxUIMServiceTest extends AbstractEuropeanaIntegrationTest{
 	
 	private final static String aggregatorCountryName = "al";
 	private final static String aggregatorCountryNameCode = "17420000";
-	private final static String aggregatorURI = "http://www.in.gr";
+	private final static String aggregatorURI = "www.in.gr";
 	
 	private final static String providerName = "TestOSGIProvider";
 	private final static String providerNameCode = "763410000";
-	private final static String providerURI = "http://www.in.gr";
+	private final static String providerURI = "www.in.gr";
 	
 	private final static String collectionName = "TestOSGICollection";
 	private final static String collectionNameCode = "895430000";

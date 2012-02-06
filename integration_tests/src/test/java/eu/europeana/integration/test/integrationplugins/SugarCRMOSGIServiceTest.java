@@ -88,7 +88,7 @@ public class SugarCRMOSGIServiceTest  extends AbstractEuropeanaIntegrationTest{
 		
 		
 		//Tests the execution of a Simple Query
-		EuropeanaDatasetStates dsstatus = EuropeanaDatasetStates.INGESTION_COMPLETE;
+		EuropeanaDatasetStates dsstatus = EuropeanaDatasetStates.MAPPING_AND_NORMALIZATION;
 		SimpleSugarCrmQuery query =  new SimpleSugarCrmQuery(dsstatus);
 		query.setMaxResults(1000);
 		query.setOffset(0);
@@ -112,10 +112,10 @@ public class SugarCRMOSGIServiceTest  extends AbstractEuropeanaIntegrationTest{
 			LOGGER.debug( (i+1) + " : " + cqrecords.get(i).getItemValue(EuropeanaRetrievableField.ID) + " | " +
 					cqrecords.get(i).getItemValue(EuropeanaRetrievableField.NAME)	) ;
 		}
-		
+
 		
 		//Tests the execution of a Custom Query
-		CustomSugarCrmQuery cusquery =  new CustomSugarCrmQuery("opportunities.sales_stage LIKE '" + EuropeanaDatasetStates.INGESTION_COMPLETE.getSysId() +"'");
+		CustomSugarCrmQuery cusquery =  new CustomSugarCrmQuery("opportunities.sales_stage LIKE '" + EuropeanaDatasetStates.MAPPING_AND_NORMALIZATION.getSysId() +"'");
 		
 		List<SugarCrmRecord> cusrecords = service.retrieveRecords(cusquery);
 		LOGGER.debug("Number of Records retrieved: " + cusrecords.size());
@@ -125,6 +125,7 @@ public class SugarCRMOSGIServiceTest  extends AbstractEuropeanaIntegrationTest{
 			LOGGER.debug( (i+1) + " : " + cusrecords.get(i).getItemValue(EuropeanaRetrievableField.ID) + " | " +
 					cusrecords.get(i).getItemValue(EuropeanaRetrievableField.NAME)	) ;
 		}
+		
 		
 		
     	String recordID = "a2098f49-37db-2362-3e4b-4c5861d23639";
