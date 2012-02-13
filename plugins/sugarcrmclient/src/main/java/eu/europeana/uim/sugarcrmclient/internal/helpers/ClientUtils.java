@@ -159,7 +159,7 @@ public class ClientUtils {
 	 */
 	public static String md5(String value){
 		
-		StringBuffer md5Password = new StringBuffer("0");
+		StringBuffer md5Password = new StringBuffer();
 		
 		MessageDigest mdEnc;
 		try {
