@@ -33,6 +33,24 @@
 
 					
 					<execution>
+						<id>generate-java-code-from-schema (Mint)</id>
+						<goals>
+							<goal>schema-codegen</goal>
+						</goals>
+						<configuration>
+							<directory>src/main/resources/mint</directory>
+							<targetDirectory>target/generated-sources/mint</targetDirectory>
+							<includes>
+								<include>mintcommands.xsd</include>
+							</includes>
+							<options>
+								<package>eu.europeana.uim.mintclient.jibxbindings</package>
+							</options>
+						</configuration>
+					</execution>
+					
+					
+					<execution>
 						<id>generate-java-code-from-schema (Repox)</id>
 						<goals>
 							<goal>schema-codegen</goal>
@@ -66,6 +84,21 @@
 						</configuration>
 					</execution>
 					
+					
+					
+					<execution>
+						<id>compile-binding (Mint)</id>
+						<goals>
+							<goal>bind</goal>
+						</goals>
+						<configuration>
+							<directory>target/generated-sources/mint</directory>
+							<load>true</load>
+							<validate>true</validate>
+							<!--<verbose>true</verbose> -->
+							<verify>false</verify>
+						</configuration>
+					</execution>
 				
 					<execution>
 						<id>compile-binding (Sugar)</id>

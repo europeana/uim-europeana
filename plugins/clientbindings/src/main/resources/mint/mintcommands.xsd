@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2009 sp1 (http://www.altova.com) by cpard (EMBRACE) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:complexType name="CreateImportResponseComplexType">
+		<xs:sequence>
+			<xs:element name="importId" type="xs:string"/>
+			<xs:element name="correlationId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CreateImportCommandComplexType">
+		<xs:sequence>
+			<xs:element name="organizationId"/>
+			<xs:element name="userId" type="xs:string"/>
+			<xs:element name="jdbcRepoxURL" type="xs:string"/>
+			<xs:element name="repoxTableName" type="xs:string"/>
+			<xs:element name="correlationId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PublicationResponseComplexType">
+		<xs:sequence>
+			<xs:element name="url" type="xs:anyURI"/>
+			<xs:element name="includedImport" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:boolean">
+							<xs:attribute name="importId"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="correlationId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PublicationCommandComplexType">
+		<xs:sequence>
+			<xs:element name="organizationId" type="xs:string"/>
+			<xs:element name="userId" type="xs:string"/>
+			<xs:element name="includedImports">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="importId" type="xs:string" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="correlationId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PublicationComplexType">
+		<xs:choice>
+			<xs:element name="PublicationCommand" type="PublicationCommandComplexType"/>
+			<xs:element name="PublicationResponse" type="PublicationResponseComplexType"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="CreateImportComplexType">
+		<xs:choice>
+			<xs:element name="createImportCommand" type="CreateImportCommandComplexType"/>
+			<xs:element name="createImportResponse" type="CreateImportResponseComplexType"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="CreateOrganizationComplexType">
+		<xs:choice>
+			<xs:element name="CreateOrganizationCommand" type="CreateOrganizationCommandComplexType"/>
+			<xs:element name="CreateOrganizationResponse" type="CreateOrganizationResponseComplexType"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="CreateUserCommandComplexType">
+		<xs:sequence>
+			<xs:element name="userName" type="xs:string"/>
+			<xs:element name="password" type="xs:string"/>
+			<xs:element name="firstName" type="xs:string" minOccurs="0"/>
+			<xs:element name="lastName" type="xs:string" minOccurs="0"/>
+			<xs:element name="email" type="xs:string" minOccurs="0"/>
+			<xs:element name="phone" type="xs:string" minOccurs="0"/>
+			<xs:element name="organization" type="xs:string" minOccurs="0"/>
+			<xs:element name="jobRole" type="xs:string" minOccurs="0"/>
+			<xs:element name="systemRole" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="publisher"/>
+						<xs:enumeration value="annotator"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="correlationId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="createImport" type="CreateImportComplexType"/>
+	<xs:element name="createOrganization" type="CreateOrganizationComplexType"/>
+	<xs:element name="createUser" type="CreateUserComplexType"/>
+	<xs:element name="publication" type="PublicationComplexType"/>
+	<xs:complexType name="CreateUserResponseComplexType">
+		<xs:sequence>
+			<xs:element name="userId" type="xs:string"/>
+			<xs:element name="correlationId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CreateOrganizationResponseComplexType">
+		<xs:sequence>
+			<xs:element name="organizationId" type="xs:string"/>
+			<xs:element name="correlationId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CreateOrganizationCommandComplexType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="userId" type="xs:string"/>
+			<xs:element name="correlationId" type="xs:string"/>
+			<xs:element name="englishName" type="xs:string"/>
+			<xs:element name="type" type="xs:string"/>
+			<xs:element name="country" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CreateUserComplexType">
+		<xs:choice>
+			<xs:element name="CreateUserCommand" type="CreateUserCommandComplexType"/>
+			<xs:element name="CreateUserResponse" type="CreateUserResponseComplexType"/>
+		</xs:choice>
+	</xs:complexType>
+</xs:schema>
