@@ -54,6 +54,7 @@
           <element ref="edm:isShownBy"  maxOccurs="1" minOccurs="0" />
           <element ref="edm:isShownAt"  maxOccurs="1" minOccurs="0" />
           <element ref="edm:object"  maxOccurs="1" minOccurs="0" />
+          <element ref="edm:ugc"  maxOccurs="1" minOccurs="0" />
         </sequence>
       </extension>
     </complexContent>

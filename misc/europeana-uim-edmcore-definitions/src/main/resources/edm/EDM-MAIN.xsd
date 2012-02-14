@@ -25,7 +25,7 @@
   xmlns:ore="http://www.openarchives.org/ore/terms/">
   <annotation>
     <documentation>
-      EDM First Implementation Schema: Main schema in  the EDM namespace, to be wrapped up in RDF
+      EDM First Implementation Schema: Main schema in the EDM namespace, to be wrapped up in RDF
 
       Technical contact: Borys Omelayenko
       Modelling contact:      
@@ -40,10 +40,8 @@
   <import namespace="http://www.europeana.eu/schemas/edm/enrichment/" schemaLocation="ENRICHMENT.xsd" />
   <import namespace="http://www.w3.org/2002/07/owl#" schemaLocation="OWL.xsd" />
   <import namespace="http://www.openarchives.org/ore/terms/" schemaLocation="AGGREGATION.xsd" />
+  <import namespace="http://www.openarchives.org/ore/terms/" schemaLocation="PROXY.xsd" />
   <include schemaLocation="CONTEXTS.xsd" />
-
-
-
 
   <complexType name="RDF">
       <sequence minOccurs="0" maxOccurs="unbounded">
@@ -55,23 +53,24 @@
             <element name="TimeSpan" type="edm:TimeSpanType" />
             <element ref="skos:Concept" />          
             <element ref="ore:Aggregation" />
+            <element ref="ore:Proxy" />
           </choice>
       </sequence>
   </complexType>
 
   <complexType name="ProvidedCHOType">
-    <complexContent>
-      <extension base="edm:EuropeanaType">
-        <sequence>
+        <complexContent>
+      <extension base="rdf:AboutType">
+      <sequence>
           <element ref="owl:sameAs" maxOccurs="unbounded" minOccurs="0" />
           <element name="isNextInSequence" type="rdf:ResourceType" maxOccurs="1" minOccurs="0" />
         </sequence>
-      </extension>
-    </complexContent>
+        </extension>
+        </complexContent>
   </complexType>
-
+  
   <!-- AI: commented: not used for data ingestion -->
-  <!-- <complexType name="EuropeanaAggregationType">
+   <complexType name="EuropeanaAggregationType">
     <annotation>
       <documentation>
         Europeana aggregation
@@ -79,13 +78,13 @@
     </annotation>
     <complexContent>
       <extension base="rdf:AboutType">
-        <sequence> -->
+        <sequence> 
           <!-- From AggregationType -->
-          <!-- <element name="aggregatedCHO" type="rdf:ResourceType" maxOccurs="1" minOccurs="1" />
+          <element name="aggregatedCHO" type="rdf:ResourceType" maxOccurs="1" minOccurs="1" />
           <element name="dataProvider" type="rdf:ResourceType" maxOccurs="1" minOccurs="1" />
           <element name="provider" type="rdf:ResourceType" maxOccurs="1" minOccurs="1" />
           <element ref="dc:rights" maxOccurs="unbounded" minOccurs="0" />
-          <element ref="edm:rights" maxOccurs="1" minOccurs="1" />-->
+          <element ref="edm:rights" maxOccurs="1" minOccurs="1" />
           <!-- Enrichments [AI: not yet active, not on the Aggregation element] -->
           <!--<element ref="enrichment:agent_label" maxOccurs="unbounded" minOccurs="0" />
           <element ref="enrichment:agent_term" maxOccurs="unbounded" minOccurs="0" />
@@ -95,10 +94,10 @@
           <element ref="enrichment:period_term" maxOccurs="unbounded" minOccurs="0" />
           <element ref="enrichment:place_label" maxOccurs="unbounded" minOccurs="0" />
           <element ref="enrichment:place_term" maxOccurs="unbounded" minOccurs="0" />-->
-        <!-- </sequence>
+         </sequence>
       </extension>
     </complexContent>
-  </complexType>-->
+  </complexType>
 
   <complexType name="WebResourceType">
     <annotation>
@@ -116,7 +115,7 @@
     </complexContent>
   </complexType>
 
-  <complexType name="EuropeanaType">
+  <complexType name="ProxyType">
     <annotation>
       <documentation>
         EuropeanaType contains the Europeana Properties in addition to DC.
@@ -143,6 +142,11 @@
     </restriction>
   </simpleType>
 
+  <simpleType name="UGCType">
+    <restriction base="string">
+      <enumeration value="TRUE" />
+    </restriction>
+  </simpleType>
 
   <element name="rights" type="rdf:ResourceOrLiteralType"></element>
   <element name="aggregatedCHO" type="rdf:ResourceType"/>
@@ -152,5 +156,5 @@
   <element name="isShownBy" type="rdf:ResourceType"  />
   <element name="isShownAt" type="rdf:ResourceType" />
   <element name="object" type="rdf:ResourceType" />
-  
+  <element name="ugc" type="edm:UGCType" />
 </schema>
