@@ -125,7 +125,7 @@
       <extension base="dc:DCType">
         <sequence>
           <element name="type" type="edm:EdmType" maxOccurs="1" minOccurs="1" />
-          <element name="currentLocation" type="rdf:ResourceType" maxOccurs="1" minOccurs="0" />
+         
         </sequence>
       </extension>
     </complexContent>

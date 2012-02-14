@@ -40,14 +40,17 @@
   <import namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" schemaLocation="RDF.xsd" />
   <import namespace="http://www.europeana.eu/schemas/edm/" schemaLocation="EDM-MAIN.xsd" />
   
-  <element name="Proxy" type="edm:ProxyType">
+  <element name="Proxy">
   <complexType>
-    <annotation>
-      <documentation>
-        Proxy: A link to an Provided CHO and an Aggregation
-      </documentation>
-    </annotation>
+  <complexContent>
+      <extension base="edm:ProxyType">
+        <sequence>
+        	 <element name="currentLocation" type="rdf:ResourceType" maxOccurs="1" minOccurs="0" />
+        </sequence>
+        </extension>
+        </complexContent>
   </complexType>
   </element>
+
   
 </schema>
