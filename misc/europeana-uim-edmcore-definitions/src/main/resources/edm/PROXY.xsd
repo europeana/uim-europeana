@@ -44,9 +44,8 @@
   <complexType>
   <complexContent>
       <extension base="edm:ProxyType">
-        <sequence>
-        	 <element name="currentLocation" type="rdf:ResourceType" maxOccurs="1" minOccurs="0" />
-        </sequence>
+      <attribute name="proxyIn" use="required"/>
+      <attribute name="proxyFor" use="required"/>
         </extension>
         </complexContent>
   </complexType>
