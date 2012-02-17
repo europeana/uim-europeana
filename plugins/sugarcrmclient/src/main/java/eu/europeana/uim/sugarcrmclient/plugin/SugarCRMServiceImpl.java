@@ -388,6 +388,10 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, providerInfo.get("website"));
         cuurprovider.putValue(ControlledVocabularyProxy.SUGARCRMID, providerInfo.get("sugarCRMID"));
         cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERTYPE, providerInfo.get("type"));
+        cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERDEASENT, providerInfo.get("providerdeaSent"));
+        cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERDEASIGNED, providerInfo.get("providerdeaSigned"));
+        
+        
         cuurprovider.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, countryCode);
         engine.updateProvider(cuurprovider);
         engine.checkpoint();
@@ -460,6 +464,8 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         String website = extractFromElement("website", el);
         String type = extractFromElement("account_type", el);
         String country = extractFromElement("country_c", el);
+        String providerdeaSent = extractFromElement("dea_sent_c", el);
+        String providerdeaSigned = extractFromElement("dea_signed_c", el);
 
         //Insert values in Provider Object
         returnInfo.put("sugarCRMID", providerID);
@@ -469,6 +475,8 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         returnInfo.put("website", website);
         returnInfo.put("type", type);
         returnInfo.put("country", country);
+        returnInfo.put("providerdeaSent", providerdeaSent);
+        returnInfo.put("providerdeaSigned", providerdeaSigned);
 
         return returnInfo;
     }
