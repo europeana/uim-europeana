@@ -37,7 +37,8 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	PROVIDERWEBSITE("providerWebsite"),
 	PROVIDERTYPE("providerType"),
 	PROVIDERCOUNTRY("providerCountry"),
-	
+	PROVIDERDEASENT("providerdeaSent"),
+	PROVIDERDEASIGNED("providerdeaSigned"),
 	//Ingestion Results
 	AMOUNT(EuropeanaUpdatableField.AMOUNT), 
 	TOTAL_INGESTED(EuropeanaUpdatableField.TOTAL_INGESTED), 
