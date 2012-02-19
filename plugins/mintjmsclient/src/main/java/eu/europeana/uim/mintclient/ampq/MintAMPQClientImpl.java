@@ -12,6 +12,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 
+import eu.europeana.uim.mintclient.ampq.listeners.UIMConsumerFactory;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
@@ -67,7 +68,10 @@ public final class MintAMPQClientImpl implements MintAMPQClient {
 		try {
 			rabbitConnection = factory.newConnection();
 			sendChannel = rabbitConnection.createChannel();
+			receiveChannel = rabbitConnection.createChannel();
 			sendChannel.queueDeclare(inbound, true, false, false, null);
+			receiveChannel.queueDeclare(outbound, true, false, false, null);
+			receiveChannel.basicConsume(outbound, true, new UIMConsumerFactory(receiveChannel));
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
