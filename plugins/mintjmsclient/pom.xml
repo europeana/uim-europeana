@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  
-  	<parent>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<parent>
 		<artifactId>europeana-uim-plugins</artifactId>
 		<groupId>eu.europeana</groupId>
 		<version>1.3.0-SNAPSHOT</version>
 	</parent>
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>eu.europeana</groupId>
-  <artifactId>europeana-uim-plugin-mint</artifactId>
-  <packaging>bundle</packaging>
-  <name>Unified Ingestion Manager: Mint JMS Client Plugin</name>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>eu.europeana</groupId>
+	<artifactId>europeana-uim-plugin-mint</artifactId>
+	<packaging>bundle</packaging>
+	<name>Unified Ingestion Manager: Mint JMS Client Plugin</name>
 
-  
+
 	<dependencies>
 
 		<dependency>
@@ -30,13 +30,19 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.rabbitmq</groupId>
+			<artifactId>amqp-client</artifactId>
+			<version>2.7.1</version>
+		</dependency>
 
 	</dependencies>
 
-  <!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->
-  
-  <!-- see http://felix.apache.org/site/maven-bundle-plugin-bnd.html for more info -->
-<build>
+	<!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->
+
+	<!-- see http://felix.apache.org/site/maven-bundle-plugin-bnd.html for more 
+		info -->
+	<build>
 		<resources>
 			<!-- standard Maven folder -->
 			<resource>
@@ -65,8 +71,8 @@
 						<DynamicImport-Package>*</DynamicImport-Package>
 						<Export-Package>eu.europeana.uim.sugarcrmclient.*</Export-Package>
 						<Import-Package>
-						    org.apache.felix.gogo.commands,
-						    org.apache.felix.service.command,
+							org.apache.felix.gogo.commands,
+							org.apache.felix.service.command,
 							org.springframework.ws.soap,
 							org.springframework.ws.soap.saaj,
 							!com.sun.xml.messaging.saaj.soap.encoding,
@@ -80,23 +86,24 @@
 					</instructions>
 				</configuration>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -129,8 +136,8 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-</build>
-  
+	</build>
 
-  
+
+
 </project>
