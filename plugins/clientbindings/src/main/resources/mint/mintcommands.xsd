@@ -9,11 +9,13 @@
 	</xs:complexType>
 	<xs:complexType name="CreateImportCommand">
 		<xs:sequence>
-			<xs:element name="organizationId"/>
+			<xs:element name="organizationId" type="xs:string"/>
 			<xs:element name="userId" type="xs:string"/>
 			<xs:element name="jdbcRepoxURL" type="xs:string"/>
 			<xs:element name="repoxTableName" type="xs:string"/>
 			<xs:element name="correlationId" type="xs:string"/>
+			<xs:element name="repoxUserName" type="xs:string"/>
+			<xs:element name="repoxUserPassword" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="PublicationResponse">
