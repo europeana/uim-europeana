@@ -6,6 +6,8 @@ package eu.europeana.uim.plugins.mint.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientImpl;
@@ -17,57 +19,68 @@ import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 
 import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
+import eu.europeana.uim.mintclient.utils.DummyMintClient;
 /**
  * @author geomark
  *
  */
-public class MINTAMPQTest {
+public class MintSendTest {
 
-	@Test
-	public void createOrganizationTest(){
-		MintAMPQClient client = new MintAMPQClientImpl();
-		CreateOrganizationCommand command = new CreateOrganizationCommand();
-		
-		command.setCorrelationId("ProviderMenmonic");
-		command.setCountry("es");
-		command.setEnglishName("?");
-		command.setName("?");
-		command.setType("Type");
-		command.setUserId("userid");
-		client.createOrganization(command);
+	private static MintAMPQClient client;
+	
+	@BeforeClass public static void initclient() {
+		client = new MintAMPQClientImpl();
 	}
-	
-	
+	    
+	@AfterClass public static void tearDown() {
+	   client = null;
+	   System.gc();
+	}
 	
 	@Test
 	public void createUserTest(){
-		MintAMPQClient client = new MintAMPQClientImpl();
 		CreateUserCommand command = new CreateUserCommand();
 		command.setCorrelationId("correlationId");
 		command.setEmail("email");
 		command.setFirstName("firstName");
 		command.setLastName("lastName");
-		command.setUserName("user");
+		command.setUserName("userX");
 		command.setPassword("werwer");
 		command.setPhone("234234234");
+		command.setOrganization("1001");
 		client.createUser(command);
 	}
 	
 	@Test
+	public void createOrganizationTest(){
+		CreateOrganizationCommand command = new CreateOrganizationCommand();
+		
+		command.setCorrelationId("correlationId");
+		command.setCountry("es");
+		command.setEnglishName("TestOrg");
+		command.setName("TestOrg");
+		command.setType("Type");
+		command.setUserId("1002");
+		client.createOrganization(command);
+	}
+	
+	
+	
+
+	
+	@Test
 	public void createImportsTest(){
-		MintAMPQClient client = new MintAMPQClientImpl();
 		CreateImportCommand command = new CreateImportCommand();
 		command.setCorrelationId("CollectionId");
 		command.setJdbcRepoxURL("jdbcRepoxURL");
 		command.setRepoxTableName("menmonic");
-		command.setUserId("userId");
+		command.setUserId("1002");
 		client.createImports(command);
 		
 	}
 	
 	@Test
 	public void getImportsTest(){
-		MintAMPQClient client = new MintAMPQClientImpl();
 		GetImportsCommand command =  new GetImportsCommand();
 		command.setCorrelationId("provid");
 		command.setOrganizationId("orgid");
@@ -76,7 +89,6 @@ public class MINTAMPQTest {
 	
 	@Test
 	public void getTransformations(){
-		MintAMPQClient client = new MintAMPQClientImpl();
 		GetTransformationsCommand command = new GetTransformationsCommand();
 		command.setCorrelationId("correlationId");
 		command.setOrganizationId("orgid");
@@ -85,7 +97,6 @@ public class MINTAMPQTest {
 	
 	@Test
 	public void publishCollection(){
-		MintAMPQClient client = new MintAMPQClientImpl();
 		PublicationCommand command = new PublicationCommand();
 		command.setCorrelationId("correlationId");
 		List<String> list =  new ArrayList();

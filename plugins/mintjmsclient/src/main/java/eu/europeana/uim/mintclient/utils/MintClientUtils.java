@@ -3,7 +3,9 @@
  */
 package eu.europeana.uim.mintclient.utils;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -16,7 +18,7 @@ import org.jibx.runtime.JiBXException;
  */
 public class MintClientUtils {
 
-	public static String unmarshallObject(Object jibxObject,
+	public static synchronized String unmarshallObject(Object jibxObject,
 			org.apache.log4j.Logger LOGGER) {
 		IBindingFactory context;
 
@@ -36,5 +38,8 @@ public class MintClientUtils {
 			return null;
 		}
 	}
+	
+	
+
 
 }

@@ -47,15 +47,15 @@ import com.rabbitmq.client.AMQP.BasicProperties.Builder;
  * 
  * @author Georgios Markakis
  */
-public final class MintAMPQClientImpl implements MintAMPQClient {
+public class MintAMPQClientImpl implements MintAMPQClient {
 
-	private static Connection rabbitConnection;
-	private static Channel sendChannel;
-	private static Channel receiveChannel;
-	private static String inbound = "MintInboundQueue";
-	private static String outbound = "MintOutboundQueue";
-	private Builder builder;
-	private BasicProperties pros;
+	protected static Connection rabbitConnection;
+	protected static Channel sendChannel;
+	protected static Channel receiveChannel;
+	protected static String inbound = "MintInboundQueue";
+	protected static String outbound = "MintOutboundQueue";
+	protected Builder builder;
+	protected BasicProperties pros;
 
 	
 	public MintAMPQClientImpl(){
@@ -131,7 +131,11 @@ public final class MintAMPQClientImpl implements MintAMPQClient {
 	}
 
 
+	protected Connection getConnection(){
+		return this.rabbitConnection;
+	}
 
+	
 	
 	private void sendChunk(byte[] payload, boolean isLast){
 		builder.deliveryMode(2);
