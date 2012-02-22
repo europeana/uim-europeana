@@ -5,7 +5,9 @@ package eu.europeana.uim.mintclient.ampq;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -38,10 +40,12 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.MessageProperties;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.AMQP.BasicProperties.Builder;
-
+import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.ShutdownSignalException;
 
 /**
  * 
@@ -54,8 +58,12 @@ public class MintAMPQClientImpl implements MintAMPQClient {
 	protected static Channel receiveChannel;
 	protected static String inbound = "MintInboundQueue";
 	protected static String outbound = "MintOutboundQueue";
+	protected static String rpcQueue = "RPCQueue";
+	protected static String rndReplyqueue;
+	
 	protected Builder builder;
 	protected BasicProperties pros;
+	private QueueingConsumer consumer;
 
 	
 	public MintAMPQClientImpl(){
@@ -69,9 +77,13 @@ public class MintAMPQClientImpl implements MintAMPQClient {
 			rabbitConnection = factory.newConnection();
 			sendChannel = rabbitConnection.createChannel();
 			receiveChannel = rabbitConnection.createChannel();
-			sendChannel.queueDeclare(inbound, true, false, false, null);
+			rndReplyqueue = receiveChannel.queueDeclare().getQueue();
+			//sendChannel.queueDeclare(inbound, true, false, false, null);
+			sendChannel.queueDeclare(rpcQueue, true, false, false, null);
 			receiveChannel.queueDeclare(outbound, true, false, false, null);
-			receiveChannel.basicConsume(outbound, true, new UIMConsumerFactory(receiveChannel));
+			consumer = new QueueingConsumer(receiveChannel);
+			receiveChannel.basicConsume(rndReplyqueue, true, consumer);
+			//receiveChannel.basicConsume(outbound, true, new UIMConsumerFactory(receiveChannel));
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
@@ -80,54 +92,90 @@ public class MintAMPQClientImpl implements MintAMPQClient {
 	
 	
 	@Override
-	public void createOrganization(
-		CreateOrganizationCommand command) {
+	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command) {
 		CreateOrganizationAction cu = new CreateOrganizationAction();
 		cu.setCreateOrganizationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
-		sendChunk(cmdstring.getBytes(),true);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,rpcQueue);
+		
+		String resp = handleSynchronousDelivery(command.getCorrelationId());
+		
+		CreateOrganizationResponse respObj = new CreateOrganizationResponse();
+		MintClientUtils.marshallobject(resp, respObj);
+		
+		return respObj;
 	}
 
 	@Override
-	public void createUser(CreateUserCommand command) {
+	public CreateUserResponse createUser(CreateUserCommand command) {
 		CreateUserAction cu = new CreateUserAction();
 		cu.setCreateUserCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
-		sendChunk(cmdstring.getBytes(),true);
-
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,rpcQueue);
+		
+		String resp = handleSynchronousDelivery(command.getCorrelationId());
+		CreateUserResponse respObj = new CreateUserResponse();
+		MintClientUtils.marshallobject(resp, respObj);
+		
+		return respObj;
 	}
 
 	
+	
 	@Override
-	public void getImports(GetImportsCommand command) {
+	public GetImportsResponse getImports(GetImportsCommand command) {
 		GetImportsAction cu = new GetImportsAction();
 		cu.setGetImportsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
-		sendChunk(cmdstring.getBytes(),true);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,rpcQueue);
+		
+		String resp = handleSynchronousDelivery(command.getCorrelationId());
+		GetImportsResponse respObj = new GetImportsResponse();
+		MintClientUtils.marshallobject(resp, respObj);
+		
+		return respObj;
 	}
 
 	@Override
-	public void createImports(CreateImportCommand command) {
+	public CreateImportResponse createImports(CreateImportCommand command) {
 		CreateImportAction cu = new CreateImportAction();
 		cu.setCreateImportCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
-		sendChunk(cmdstring.getBytes(),true);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,rpcQueue);
+		
+		String resp = handleSynchronousDelivery(command.getCorrelationId());
+		CreateImportResponse respObj = new CreateImportResponse();
+		MintClientUtils.marshallobject(resp, respObj);
+		
+		return respObj;
 	}
 	
 	@Override
-	public void getTransformations(GetTransformationsCommand command) {
+	public GetTransformationsResponse getTransformations(GetTransformationsCommand command) {
 		GetTransformationsAction cu = new GetTransformationsAction();
 		cu.setGetTransformationsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
-		sendChunk(cmdstring.getBytes(),true);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,rpcQueue);
+		
+		String resp = handleSynchronousDelivery(command.getCorrelationId());
+		GetTransformationsResponse respObj = new GetTransformationsResponse();
+		MintClientUtils.marshallobject(resp, respObj);
+		
+		return respObj;
 	}
 
 	@Override
-	public void publishCollection(PublicationCommand command) {
+	public PublicationResponse publishCollection(PublicationCommand command) {
 		PublicationAction cu = new PublicationAction();
 		cu.setPublicationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
-		sendChunk(cmdstring.getBytes(),true);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,rpcQueue);
+		
+		String resp = handleSynchronousDelivery(command.getCorrelationId());
+		PublicationResponse respObj = new PublicationResponse();
+		MintClientUtils.marshallobject(resp, respObj);
+		
+		return respObj;
 	}
 
 
@@ -137,16 +185,46 @@ public class MintAMPQClientImpl implements MintAMPQClient {
 
 	
 	
-	private void sendChunk(byte[] payload, boolean isLast){
+	
+	private String handleSynchronousDelivery(String correlationID){
+	    while (true) {
+	    	QueueingConsumer.Delivery delivery;
+			try {
+				delivery = consumer.nextDelivery();
+		        if (delivery.getProperties().getCorrelationId().equals(correlationID)) {
+		            String response = new String(delivery.getBody());
+		            
+		            return response;
+		        }
+			} catch (ShutdownSignalException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ConsumerCancelledException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}           
+	    }
+	}
+	
+	
+	private void sendChunk(String correlationId,byte[] payload, boolean isLast,String queue){
 		builder.deliveryMode(2);
 		HashMap<String, Object> heads = new HashMap<String, Object>();
 		heads.put("isLast", isLast);
 		builder.headers(heads);
-		pros = builder.build();
+		BasicProperties properties =  new BasicProperties
+         .Builder()
+         .correlationId(correlationId)
+         .replyTo(rndReplyqueue)
+         //.headers(message.header().properties())
+         .build();
 		
 		try {
-			sendChannel.basicPublish( "", inbound, 
-			        pros,
+			sendChannel.basicPublish( "", queue, 
+					properties,
 			        payload);
 		} catch (IOException e) {
 			e.printStackTrace();

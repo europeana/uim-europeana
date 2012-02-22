@@ -17,9 +17,8 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
-
 import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
-import eu.europeana.uim.mintclient.utils.DummyMintClient;
+
 /**
  * @author geomark
  *
@@ -37,19 +36,7 @@ public class MintSendTest {
 	   System.gc();
 	}
 	
-	@Test
-	public void createUserTest(){
-		CreateUserCommand command = new CreateUserCommand();
-		command.setCorrelationId("correlationId");
-		command.setEmail("email");
-		command.setFirstName("firstName");
-		command.setLastName("lastName");
-		command.setUserName("userX");
-		command.setPassword("werwer");
-		command.setPhone("234234234");
-		command.setOrganization("1001");
-		client.createUser(command);
-	}
+	
 	
 	@Test
 	public void createOrganizationTest(){
@@ -64,6 +51,22 @@ public class MintSendTest {
 		client.createOrganization(command);
 	}
 	
+	@Test
+	public void createUserTest(){
+		CreateUserCommand command = new CreateUserCommand();
+		command.setCorrelationId("correlationId");
+		command.setEmail("email");
+		command.setFirstName("firstName");
+		command.setLastName("lastName");
+		command.setUserName("userXXXWAASDFFF");
+		command.setPassword("werwer");
+		command.setPhone("234234234");
+		command.setOrganization("1001");
+		client.createUser(command);
+	}
+	
+
+	
 	
 	
 
@@ -71,10 +74,14 @@ public class MintSendTest {
 	@Test
 	public void createImportsTest(){
 		CreateImportCommand command = new CreateImportCommand();
-		command.setCorrelationId("CollectionId");
-		command.setJdbcRepoxURL("jdbcRepoxURL");
-		command.setRepoxTableName("menmonic");
-		command.setUserId("1002");
+		
+		command.setCorrelationId("123");
+		command.setUserId("1000");
+		command.setOrganizationId("1");
+		command.setJdbcRepoxURL("jdbc:postgresql://localhost:5432/repox");
+		command.setRepoxUserName("postgres");
+		command.setRepoxUserPassword("raistlin");
+		command.setRepoxTableName("azores13");
 		client.createImports(command);
 		
 	}
@@ -83,7 +90,7 @@ public class MintSendTest {
 	public void getImportsTest(){
 		GetImportsCommand command =  new GetImportsCommand();
 		command.setCorrelationId("provid");
-		command.setOrganizationId("orgid");
+		command.setOrganizationId("1002");
 		client.getImports(command);
 	}
 	
@@ -91,7 +98,7 @@ public class MintSendTest {
 	public void getTransformations(){
 		GetTransformationsCommand command = new GetTransformationsCommand();
 		command.setCorrelationId("correlationId");
-		command.setOrganizationId("orgid");
+		command.setOrganizationId("1002");
 		client.getTransformations(command);
 	}
 	

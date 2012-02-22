@@ -23,15 +23,15 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateImportResponse;
  */
 public interface MintAMPQClient {
 
-	public void createOrganization(CreateOrganizationCommand command);
+	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command);
 	
-	public void createUser(CreateUserCommand command);
+	public CreateUserResponse createUser(CreateUserCommand command);
 	
-	public void getImports(GetImportsCommand command);
+	public GetImportsResponse getImports(GetImportsCommand command);
 	
-	public void getTransformations(GetTransformationsCommand command);
+	public GetTransformationsResponse getTransformations(GetTransformationsCommand command);
 	
-	public void publishCollection(PublicationCommand command);
+	public PublicationResponse publishCollection(PublicationCommand command);
 	
-	public void createImports(CreateImportCommand command);
+	public CreateImportResponse createImports(CreateImportCommand command);
 }

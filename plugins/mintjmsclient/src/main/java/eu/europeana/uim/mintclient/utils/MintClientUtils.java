@@ -4,12 +4,15 @@
 package eu.europeana.uim.mintclient.utils;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
 /**
@@ -39,6 +42,19 @@ public class MintClientUtils {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static synchronized <T> void marshallobject(String str2marshall, T jibxObject){
+		IBindingFactory context;
+		
+		try {
+			context = BindingDirectory.getFactory(jibxObject.getClass());
+			IUnmarshallingContext umctx = context.createUnmarshallingContext();
+			jibxObject =(T) umctx.unmarshalDocument(new StringReader(str2marshall));
+		} catch (JiBXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 
 
