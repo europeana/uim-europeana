@@ -16,7 +16,7 @@ public enum DataSetType {
 	PUBLISHER("Publisher"),
 	PRIVATE("Private"),
 	AGGREGATOR("Aggregator"),
-	UNKNOWN("Unknown");
+	UNKNOWN("Other/None");
 	
 	private String sugarName;
 	

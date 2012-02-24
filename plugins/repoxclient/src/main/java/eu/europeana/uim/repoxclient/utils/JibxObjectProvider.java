@@ -347,6 +347,6 @@ public class JibxObjectProvider {
 			}
 		}
 		
-		return "OTHER";
+		return "UNKNOWN";
 	}
 }
