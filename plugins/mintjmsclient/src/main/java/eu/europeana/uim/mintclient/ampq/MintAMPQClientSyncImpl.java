@@ -4,17 +4,7 @@
 package eu.europeana.uim.mintclient.ampq;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
-
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IMarshallingContext;
-import org.jibx.runtime.JiBXException;
-
-import eu.europeana.uim.mintclient.ampq.listeners.UIMConsumerFactory;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
@@ -34,14 +24,12 @@ import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationResponse;
 import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
+import eu.europeana.uim.mintclient.plugin.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
-
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConsumerCancelledException;
-import com.rabbitmq.client.MessageProperties;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.AMQP.BasicProperties.Builder;
 import com.rabbitmq.client.QueueingConsumer;
@@ -51,45 +39,54 @@ import com.rabbitmq.client.ShutdownSignalException;
  * 
  * @author Georgios Markakis
  */
-public class MintAMPQClientImpl implements MintAMPQClient {
+public class MintAMPQClientSyncImpl implements MintAMPQClientSync {
 
 	protected static Connection rabbitConnection;
 	protected static Channel sendChannel;
 	protected static Channel receiveChannel;
-	protected static String inbound = "MintInboundQueue";
-	protected static String outbound = "MintOutboundQueue";
 	protected static String rpcQueue = "RPCQueue";
 	protected static String rndReplyqueue;
 	
-	protected Builder builder;
-	protected BasicProperties pros;
-	private QueueingConsumer consumer;
+	protected static Builder builder;
+	protected static BasicProperties pros;
+	private static QueueingConsumer consumer;
 
+	private static MintAMPQClientSyncImpl instance;
 	
-	public MintAMPQClientImpl(){
-		ConnectionFactory factory = new ConnectionFactory();
-		builder = new Builder();
+	private MintAMPQClientSyncImpl(){
 
-		factory.setHost("panic.image.ntua.gr");
-		factory.setUsername("guest");
-		factory.setPassword("guest");
-		try {
-			rabbitConnection = factory.newConnection();
-			sendChannel = rabbitConnection.createChannel();
-			receiveChannel = rabbitConnection.createChannel();
-			rndReplyqueue = receiveChannel.queueDeclare().getQueue();
-			//sendChannel.queueDeclare(inbound, true, false, false, null);
-			sendChannel.queueDeclare(rpcQueue, true, false, false, null);
-			receiveChannel.queueDeclare(outbound, true, false, false, null);
-			consumer = new QueueingConsumer(receiveChannel);
-			receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-			//receiveChannel.basicConsume(outbound, true, new UIMConsumerFactory(receiveChannel));
-		} catch (IOException e) {			
-			e.printStackTrace();
-		}
 	}
 	
 	
+
+	protected static MintAMPQClient getClient() {
+		
+		if(instance != null){
+			return instance;
+		}
+		else{
+			ConnectionFactory factory = new ConnectionFactory();
+			builder = new Builder();
+
+			factory.setHost("panic.image.ntua.gr");
+			factory.setUsername("guest");
+			factory.setPassword("guest");
+			try {
+				rabbitConnection = factory.newConnection();
+				sendChannel = rabbitConnection.createChannel();
+				receiveChannel = rabbitConnection.createChannel();
+				rndReplyqueue = receiveChannel.queueDeclare().getQueue();
+				sendChannel.queueDeclare(rpcQueue, true, false, false, null);
+				consumer = new QueueingConsumer(receiveChannel);
+				receiveChannel.basicConsume(rndReplyqueue, true, consumer);
+				instance = new MintAMPQClientSyncImpl();
+				
+			} catch (IOException e) {			
+				e.printStackTrace();
+			}
+		}
+		return instance;
+	}
 	
 	@Override
 	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command) {
@@ -179,10 +176,6 @@ public class MintAMPQClientImpl implements MintAMPQClient {
 	}
 
 
-	protected Connection getConnection(){
-		return this.rabbitConnection;
-	}
-
 	
 	
 	
@@ -230,4 +223,9 @@ public class MintAMPQClientImpl implements MintAMPQClient {
 			e.printStackTrace();
 		}
 	}
+
+
+
+
+
 }

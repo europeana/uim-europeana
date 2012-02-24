@@ -4,20 +4,21 @@
 package eu.europeana.uim.plugins.mint.test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.europeana.uim.mintclient.ampq.MintAMPQClientImpl;
+import eu.europeana.uim.mintclient.ampq.MintAMPQClientSyncImpl;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
+import eu.europeana.uim.mintclient.plugin.MintAMPQClientSync;
 
 /**
  * @author geomark
@@ -25,10 +26,10 @@ import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
  */
 public class MintSendTest {
 
-	private static MintAMPQClient client;
+	private static MintAMPQClientSync client;
 	
 	@BeforeClass public static void initclient() {
-		client = new MintAMPQClientImpl();
+		//client = new MintAMPQClientSync();
 	}
 	    
 	@AfterClass public static void tearDown() {
@@ -58,7 +59,7 @@ public class MintSendTest {
 		command.setEmail("email");
 		command.setFirstName("firstName");
 		command.setLastName("lastName");
-		command.setUserName("userXXXWAASDFFF");
+		command.setUserName("user" + (new Date()).toString());
 		command.setPassword("werwer");
 		command.setPhone("234234234");
 		command.setOrganization("1001");
@@ -66,11 +67,6 @@ public class MintSendTest {
 	}
 	
 
-	
-	
-	
-
-	
 	@Test
 	public void createImportsTest(){
 		CreateImportCommand command = new CreateImportCommand();

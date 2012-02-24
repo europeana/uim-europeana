@@ -12,7 +12,7 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
+import eu.europeana.uim.mintclient.plugin.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.plugin.MintUIMService;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
@@ -22,7 +22,7 @@ import eu.europeana.uim.store.Provider;
  *
  */
 public class MintUIMServiceImpl implements MintUIMService {
-private MintAMPQClient client;
+private MintAMPQClientSync client;
 
 
 	/* (non-Javadoc)

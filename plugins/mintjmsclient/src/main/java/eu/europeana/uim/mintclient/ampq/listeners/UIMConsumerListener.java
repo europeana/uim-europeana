@@ -14,13 +14,14 @@ import com.rabbitmq.client.Envelope;
  * @author geomark
  *
  */
-public class UIMConsumerFactory extends DefaultConsumer {
+public class UIMConsumerListener extends DefaultConsumer {
 
 	private Channel channel; 
 	
-	public UIMConsumerFactory(Channel channel) {
+	public UIMConsumerListener(Channel channel) {
 		super(channel);
 		this.channel = channel;
+		
 	}
 	
     @Override
