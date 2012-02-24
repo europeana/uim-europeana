@@ -229,7 +229,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		nameCode.append(prov.getNameCode().getNameCode());
 		homepage.append("url=");
 		
-		if(prov.getUrl() != null){
+		if(prov.getUrl().getUrl() != ""){
 			if(!prov.getUrl().getUrl().startsWith("http://"))
 			{
 				homepage.append("http://");
@@ -336,7 +336,7 @@ public class RepoxRestClientImpl  implements RepoxRestClient {
 		nameCode.append(prov.getNameCode().getNameCode());
 		homepage.append("url=");
 		
-		if(prov.getUrl() != null){
+		if(prov.getUrl().getUrl() != ""){
 			if(!prov.getUrl().getUrl().startsWith("http"))
 			{
 				homepage.append("http://" + prov.getUrl().getUrl().split("/")[0]);
