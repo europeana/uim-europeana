@@ -3,9 +3,13 @@
  */
 package eu.europeana.uim.mintclient.ampq;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 
+import eu.europeana.uim.mintclient.ampq.listeners.UIMConsumerListener;
 import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
 
 /**
@@ -17,11 +21,25 @@ public class MintClientFactory {
 
 	
 	
-	public static void defineMode(boolean isSync){
-		
+	
+	public <T  extends DefaultConsumer> ProducerProxy defineMode(boolean isSync,Class<T> listenerClass) {
+		if(isSync==true && listenerClass!= null){
+			throw new IllegalArgumentException("Synchronous client does not support Listener Classes");
+		}
+		else if(isSync==true && listenerClass == null){
+			return this.new ProducerProxySyncImpl();
+		}
+		else if(isSync==false && listenerClass == null){
+			return this.new ProducerProxyAsyncImpl<UIMConsumerListener>();
+		}
+		else if(isSync==false && listenerClass != null){
+			return this.new ProducerProxyAsyncImpl<T>(listenerClass);
+		}
+		else{
+			throw new UnsupportedOperationException("Proxy was not properly initialized");
+		}
+
 	}
-	
-	
 
 	
 	private interface ProducerProxy{
@@ -30,15 +48,20 @@ public class MintClientFactory {
 	}
 	
 	
-	private class ProducerProxyAsyncImpl implements ProducerProxy{
-	
+	private class ProducerProxyAsyncImpl <T> implements ProducerProxy{
+		private Class<T> listenerClass;
+		
 		ProducerProxyAsyncImpl(){
 			
 		}
 
+		ProducerProxyAsyncImpl(Class<T> listenerClass){
+			this.listenerClass = listenerClass;
+		}
+		
 		@Override
 		public MintAMPQClient createClient() {
-			// TODO Auto-generated method stub
+
 			return null;
 		}
 		
@@ -47,33 +70,14 @@ public class MintClientFactory {
 	
 	private class ProducerProxySyncImpl implements ProducerProxy{
 		
-		ProducerProxySyncImpl(){
-			
-		}
-
 		@Override
 		public MintAMPQClient createClient() {
-			// TODO Auto-generated method stub
-			return null;
+			return MintAMPQClientSyncImpl.getClient();
 		}
 		
 		
 	}
 	
-	/**
-	 * @param isAsync
-	 * @param asyncConsumer
-	 * @return
-	 */
-	public MintAMPQClient createClient(boolean isAsync,DefaultConsumer asyncConsumer){
-		
-		if(isAsync == true && asyncConsumer == null){
-			throw new IllegalArgumentException("If isAsync id true then asyncConsumer cannot be null");
-		}
-		
-		MintAMPQClient client = isAsync ? MintAMPQClientSyncImpl.getClient() : null; 
 
-		return client;
-	}
 	
 }

@@ -4,12 +4,17 @@
 package eu.europeana.uim.mintclient.ampq;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.AMQP.BasicProperties.Builder;
+import com.rabbitmq.client.Consumer;
+
 import eu.europeana.uim.mintclient.ampq.listeners.UIMConsumerListener;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
@@ -43,6 +48,7 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 	protected static BasicProperties pros;
 
 
+	private static Consumer defaultConsumer;
 	private static MintAMPQClientAsyncImpl instance;
 	
 	private MintAMPQClientAsyncImpl(){
@@ -50,6 +56,36 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 	}
 	
 	
+	protected static <T extends DefaultConsumer> MintAMPQClient getClient(Class<T> listenerClassType) {
+		
+		Constructor<T> con;
+
+			try {
+				con = listenerClassType.getConstructor(listenerClassType);
+				defaultConsumer = (T) con.newInstance(receiveChannel);
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		
+		return getClient();
+	}
 
 	protected static MintAMPQClient getClient() {
 		
@@ -69,7 +105,12 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 				receiveChannel = rabbitConnection.createChannel();
 				sendChannel.queueDeclare(inbound, true, false, false, null);
 				receiveChannel.queueDeclare(outbound, true, false, false, null);
-				receiveChannel.basicConsume(outbound, true, new UIMConsumerListener(receiveChannel));
+				
+				defaultConsumer =  defaultConsumer==null ? new UIMConsumerListener(receiveChannel) : defaultConsumer;
+
+				
+				receiveChannel.basicConsume(outbound, true, defaultConsumer);
+				
 				instance = new MintAMPQClientAsyncImpl();
 				
 			} catch (IOException e) {			
