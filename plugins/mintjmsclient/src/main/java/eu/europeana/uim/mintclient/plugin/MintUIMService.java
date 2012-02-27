@@ -3,6 +3,8 @@
  */
 package eu.europeana.uim.mintclient.plugin;
 
+import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 
@@ -12,12 +14,12 @@ import eu.europeana.uim.store.Provider;
  */
 public interface MintUIMService {
 
-	public void createMintAuthorizedUser(Provider<?> provider);
+	public void createMintAuthorizedUser(Provider<?> provider) throws MintOSGIClientException, MintRemoteException;
 	
-	public void createMintOrganization(Provider<?> provider);
+	public void createMintOrganization(Provider<?> provider) throws MintOSGIClientException, MintRemoteException;
 	
-	public void createMappingSession(Collection<?> collection);
+	public void createMappingSession(Collection<?> collection) throws MintOSGIClientException, MintRemoteException;
 	
-	public void publishCollection(Collection<?> collection);
+	public void publishCollection(Collection<?> collection) throws MintOSGIClientException, MintRemoteException;
 	
 }

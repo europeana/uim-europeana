@@ -4,6 +4,7 @@
 package eu.europeana.uim.mintclient.ampq;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
 import eu.europeana.uim.mintclient.plugin.MintAMPQClientASync;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
 
 /**
@@ -44,6 +47,7 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 	protected static Channel receiveChannel;
 	protected static String inbound = "MintInboundQueue";
 	protected static String outbound = "MintOutboundQueue";
+		
 	protected static Builder builder;
 	protected static BasicProperties pros;
 
@@ -56,38 +60,39 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 	}
 	
 	
-	protected static <T extends DefaultConsumer> MintAMPQClient getClient(Class<T> listenerClassType) {
+	protected static <T extends DefaultConsumer> MintAMPQClient getClient(Class<T> listenerClassType) throws MintOSGIClientException{
 		
 		Constructor<T> con;
 
 			try {
-				con = listenerClassType.getConstructor(listenerClassType);
+				con = listenerClassType.getConstructor(Channel.class);
 				defaultConsumer = (T) con.newInstance(receiveChannel);
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
+						"Error in instantiating session listener");
+
 			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
+						"Error in instantiating session listener");
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
+						"Error in instantiating session listener");
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
+						"Error in instantiating session listener");
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
+						"Error in instantiating session listener");
 			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
+						"Error in instantiating session listener");
 			}
 
 		
 		return getClient();
 	}
 
-	protected static MintAMPQClient getClient() {
+	protected static MintAMPQClient getClient() throws MintOSGIClientException{
 		
 		if(instance != null){
 			return instance;
@@ -114,66 +119,67 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 				instance = new MintAMPQClientAsyncImpl();
 				
 			} catch (IOException e) {			
-				e.printStackTrace();
+				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
+						"Error in instantiating asynchronous client");
 			}
 		}
 		return instance;
 	}
 	
 	@Override
-	public void createOrganization(CreateOrganizationCommand command) {
+	public void createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateOrganizationAction cu = new CreateOrganizationAction();
 		cu.setCreateOrganizationCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
+		String cmdstring = MintClientUtils.unmarshallObject(cu);
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
 	@Override
-	public void createUser(CreateUserCommand command) {
+	public void createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateUserAction cu = new CreateUserAction();
 		cu.setCreateUserCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
+		String cmdstring = MintClientUtils.unmarshallObject(cu);
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
 	
 	
 	@Override
-	public void getImports(GetImportsCommand command) {
+	public void getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException {
 		GetImportsAction cu = new GetImportsAction();
 		cu.setGetImportsCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
+		String cmdstring = MintClientUtils.unmarshallObject(cu);
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
 	@Override
-	public void createImports(CreateImportCommand command) {
+	public void createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateImportAction cu = new CreateImportAction();
 		cu.setCreateImportCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
+		String cmdstring = MintClientUtils.unmarshallObject(cu);
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 	
 	@Override
-	public void getTransformations(GetTransformationsCommand command) {
+	public void getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException {
 		GetTransformationsAction cu = new GetTransformationsAction();
 		cu.setGetTransformationsCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
+		String cmdstring = MintClientUtils.unmarshallObject(cu);
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
 	@Override
-	public void publishCollection(PublicationCommand command) {
+	public void publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException {
 		PublicationAction cu = new PublicationAction();
 		cu.setPublicationCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(cu, null);
+		String cmdstring = MintClientUtils.unmarshallObject(cu);
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
 
 	
 	
-	private void sendChunk(String correlationId,byte[] payload, boolean isLast,String queue){
+	private void sendChunk(String correlationId,byte[] payload, boolean isLast,String queue) throws MintRemoteException, MintOSGIClientException{
 		builder.deliveryMode(2);
 		HashMap<String, Object> heads = new HashMap<String, Object>();
 		heads.put("isLast", isLast);
@@ -190,11 +196,13 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 					properties,
 			        payload);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw MintClientUtils.propagateException(e, MintRemoteException.class,
+					"Error in in sending asynchronous chunk");
 		}
 	}
 
 
+	
 
 
 }

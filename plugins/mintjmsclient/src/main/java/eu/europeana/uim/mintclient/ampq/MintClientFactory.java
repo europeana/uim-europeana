@@ -3,14 +3,12 @@
  */
 package eu.europeana.uim.mintclient.ampq;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
-import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
-
 import eu.europeana.uim.mintclient.ampq.listeners.UIMConsumerListener;
 import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
 
 /**
  * 
@@ -20,35 +18,27 @@ import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
 public class MintClientFactory {
 
 	
-	
-	
-	public <T  extends DefaultConsumer> ProducerProxy defineMode(boolean isSync,Class<T> listenerClass) {
-		if(isSync==true && listenerClass!= null){
-			throw new IllegalArgumentException("Synchronous client does not support Listener Classes");
-		}
-		else if(isSync==true && listenerClass == null){
-			return this.new ProducerProxySyncImpl();
-		}
-		else if(isSync==false && listenerClass == null){
-			return this.new ProducerProxyAsyncImpl<UIMConsumerListener>();
-		}
-		else if(isSync==false && listenerClass != null){
-			return this.new ProducerProxyAsyncImpl<T>(listenerClass);
-		}
-		else{
-			throw new UnsupportedOperationException("Proxy was not properly initialized");
-		}
-
+	public ProducerProxy syncMode(){
+		return this.new ProducerProxySyncImpl();
 	}
+	
+	public ProducerProxy asyncMode(){
+		return this.new ProducerProxyAsyncImpl<UIMConsumerListener>();
+	}
+	
+	public <T  extends DefaultConsumer> ProducerProxy asyncMode(Class<T> listenerClass){
+		return this.new ProducerProxyAsyncImpl<T>(listenerClass);
+	}
+	
 
 	
-	private interface ProducerProxy{
+	public interface ProducerProxy{
 		
-		public MintAMPQClient createClient();
+		public MintAMPQClient createClient() throws MintOSGIClientException,MintRemoteException;
 	}
 	
 	
-	private class ProducerProxyAsyncImpl <T> implements ProducerProxy{
+	public class ProducerProxyAsyncImpl <T extends DefaultConsumer> implements ProducerProxy{
 		private Class<T> listenerClass;
 		
 		ProducerProxyAsyncImpl(){
@@ -60,15 +50,21 @@ public class MintClientFactory {
 		}
 		
 		@Override
-		public MintAMPQClient createClient() {
+		public MintAMPQClient createClient() throws MintOSGIClientException{
 
-			return null;
+			if(listenerClass == null){
+				return MintAMPQClientAsyncImpl.getClient();
+			}
+			else{
+				return MintAMPQClientAsyncImpl.getClient(listenerClass);
+			}
+			
 		}
 		
 		
 	}
 	
-	private class ProducerProxySyncImpl implements ProducerProxy{
+	public class ProducerProxySyncImpl implements ProducerProxy{
 		
 		@Override
 		public MintAMPQClient createClient() {

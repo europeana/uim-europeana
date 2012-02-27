@@ -5,8 +5,7 @@ package eu.europeana.uim.mintclient.ampq;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+
 
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
@@ -14,6 +13,8 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.plugin.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.plugin.MintUIMService;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 
@@ -29,7 +30,7 @@ private MintAMPQClientSync client;
 	 * @see eu.europeana.uim.mintclient.plugin.MintUIMService#createMintAuthorizedUser(eu.europeana.uim.store.Provider)
 	 */
 	@Override
-	public void createMintAuthorizedUser(Provider<?> provider) {
+	public void createMintAuthorizedUser(Provider<?> provider) throws MintOSGIClientException, MintRemoteException {
 		CreateUserCommand command = new CreateUserCommand();
 		command.setCorrelationId("correlationId");
 		command.setEmail("email");
@@ -47,7 +48,7 @@ private MintAMPQClientSync client;
 	 * @see eu.europeana.uim.mintclient.plugin.MintUIMService#createMintOrganization(eu.europeana.uim.store.Provider)
 	 */
 	@Override
-	public void createMintOrganization(Provider<?> provider) {
+	public void createMintOrganization(Provider<?> provider) throws MintOSGIClientException, MintRemoteException {
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
 		command.setCorrelationId("correlationId");
 		command.setCountry("es");
@@ -63,7 +64,7 @@ private MintAMPQClientSync client;
 	 * @see eu.europeana.uim.mintclient.plugin.MintUIMService#createMappingSession(eu.europeana.uim.store.Collection)
 	 */
 	@Override
-	public void createMappingSession(Collection<?> collection) {
+	public void createMappingSession(Collection<?> collection) throws MintOSGIClientException, MintRemoteException {
 		CreateImportCommand command = new CreateImportCommand();
 		
 		command.setCorrelationId("123");
@@ -81,7 +82,7 @@ private MintAMPQClientSync client;
 	 * @see eu.europeana.uim.mintclient.plugin.MintUIMService#publishCollection(eu.europeana.uim.store.Collection)
 	 */
 	@Override
-	public void publishCollection(Collection<?> collection) {
+	public void publishCollection(Collection<?> collection) throws MintOSGIClientException, MintRemoteException {
 		PublicationCommand command = new PublicationCommand();
 		command.setCorrelationId("correlationId");
 		List<String> list =  new ArrayList();

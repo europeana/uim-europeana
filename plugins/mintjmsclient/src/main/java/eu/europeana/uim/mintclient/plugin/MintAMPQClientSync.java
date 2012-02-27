@@ -15,6 +15,8 @@ import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportResponse;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
 
 /**
  * 
@@ -23,15 +25,15 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateImportResponse;
  */
 public interface MintAMPQClientSync extends MintAMPQClient {
 
-	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command);
+	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException;
 	
-	public CreateUserResponse createUser(CreateUserCommand command);
+	public CreateUserResponse createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException;
 	
-	public GetImportsResponse getImports(GetImportsCommand command);
+	public GetImportsResponse getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException;
 	
-	public GetTransformationsResponse getTransformations(GetTransformationsCommand command);
+	public GetTransformationsResponse getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException;
 	
-	public PublicationResponse publishCollection(PublicationCommand command);
+	public PublicationResponse publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException;
 	
-	public CreateImportResponse createImports(CreateImportCommand command);
+	public CreateImportResponse createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException;
 }

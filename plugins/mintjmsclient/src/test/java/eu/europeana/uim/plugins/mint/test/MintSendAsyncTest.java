@@ -11,25 +11,28 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.europeana.uim.mintclient.ampq.MintAMPQClientSyncImpl;
-import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
-import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
+import eu.europeana.uim.mintclient.ampq.MintClientFactory;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
+import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
+import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClientSync;
+import eu.europeana.uim.mintclient.plugin.MintAMPQClientASync;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
+
 
 /**
- * @author geomark
- *
+ * 
+ * @author Georgios Markakis
  */
-public class MintSendTest {
-
-	private static MintAMPQClientSync client;
+public class MintSendAsyncTest {
+	private static MintAMPQClientASync client;
 	
-	@BeforeClass public static void initclient() {
-		//client = new MintAMPQClientSync();
+	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
+		MintClientFactory factory = new MintClientFactory();
+		client = (MintAMPQClientASync) factory.asyncMode().createClient(); 
 	}
 	    
 	@AfterClass public static void tearDown() {
@@ -40,7 +43,7 @@ public class MintSendTest {
 	
 	
 	@Test
-	public void createOrganizationTest(){
+	public void createOrganizationTest() throws Exception{
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
 		
 		command.setCorrelationId("correlationId");
@@ -53,7 +56,7 @@ public class MintSendTest {
 	}
 	
 	@Test
-	public void createUserTest(){
+	public void createUserTest() throws Exception{
 		CreateUserCommand command = new CreateUserCommand();
 		command.setCorrelationId("correlationId");
 		command.setEmail("email");
@@ -68,7 +71,7 @@ public class MintSendTest {
 	
 
 	@Test
-	public void createImportsTest(){
+	public void createImportsTest() throws Exception{
 		CreateImportCommand command = new CreateImportCommand();
 		
 		command.setCorrelationId("123");
@@ -83,7 +86,7 @@ public class MintSendTest {
 	}
 	
 	@Test
-	public void getImportsTest(){
+	public void getImportsTest() throws Exception{
 		GetImportsCommand command =  new GetImportsCommand();
 		command.setCorrelationId("provid");
 		command.setOrganizationId("1002");
@@ -91,7 +94,7 @@ public class MintSendTest {
 	}
 	
 	@Test
-	public void getTransformations(){
+	public void getTransformations() throws Exception{
 		GetTransformationsCommand command = new GetTransformationsCommand();
 		command.setCorrelationId("correlationId");
 		command.setOrganizationId("1002");
@@ -99,10 +102,10 @@ public class MintSendTest {
 	}
 	
 	@Test
-	public void publishCollection(){
+	public void publishCollection() throws Exception{
 		PublicationCommand command = new PublicationCommand();
 		command.setCorrelationId("correlationId");
-		List<String> list =  new ArrayList();
+		List<String> list =  new ArrayList<String>();
 		list.add("test1");
 		list.add("test2");
 		command.setIncludedImportList(list );
