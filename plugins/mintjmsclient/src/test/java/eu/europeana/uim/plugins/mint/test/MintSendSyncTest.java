@@ -13,6 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import eu.europeana.uim.mintclient.ampq.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientSyncImpl;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
@@ -33,9 +34,8 @@ import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsResponse;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationResponse;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClientSync;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
 
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.europeana.uim.mintclient.plugin;
+package eu.europeana.uim.mintclient.ampq;
 
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationResponse;
@@ -15,8 +15,8 @@ import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportResponse;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 
 /**
  * 

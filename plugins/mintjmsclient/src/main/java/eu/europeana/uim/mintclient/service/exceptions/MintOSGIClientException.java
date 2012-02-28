@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.europeana.uim.mintclient.plugin.exceptions;
+package eu.europeana.uim.mintclient.service.exceptions;
 
 /**
  * 

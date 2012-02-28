@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.europeana.uim.mintclient.plugin;
+package eu.europeana.uim.mintclient.ampq;
 
 /**
  * @author geomark

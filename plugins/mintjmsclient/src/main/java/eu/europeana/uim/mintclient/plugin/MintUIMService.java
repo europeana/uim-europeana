@@ -3,8 +3,8 @@
  */
 package eu.europeana.uim.mintclient.plugin;
 
-import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 

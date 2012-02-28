@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.europeana.uim.mintclient.ampq.listeners;
+package eu.europeana.uim.mintclient.service.listeners;
 
 import java.io.IOException;
 

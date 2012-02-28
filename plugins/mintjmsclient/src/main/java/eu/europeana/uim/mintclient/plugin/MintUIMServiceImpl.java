@@ -1,26 +1,25 @@
 /**
  * 
  */
-package eu.europeana.uim.mintclient.ampq;
+package eu.europeana.uim.mintclient.plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
+import eu.europeana.uim.mintclient.ampq.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClientSync;
-import eu.europeana.uim.mintclient.plugin.MintUIMService;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 
 /**
- * @author geomark
- *
+ * 
+ * @author Georgios Markakis
  */
 public class MintUIMServiceImpl implements MintUIMService {
 private MintAMPQClientSync client;

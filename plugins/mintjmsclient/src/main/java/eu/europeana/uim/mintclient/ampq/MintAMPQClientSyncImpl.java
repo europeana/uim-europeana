@@ -23,10 +23,8 @@ import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsResponse;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationResponse;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClientSync;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -41,7 +39,7 @@ import com.rabbitmq.client.ShutdownSignalException;
  * 
  * @author Georgios Markakis
  */
-public class MintAMPQClientSyncImpl implements MintAMPQClientSync {
+public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements MintAMPQClientSync {
 
 	protected static Connection rabbitConnection;
 	protected static Channel sendChannel;
@@ -59,7 +57,6 @@ public class MintAMPQClientSyncImpl implements MintAMPQClientSync {
 	 * 
 	 */
 	private MintAMPQClientSyncImpl(){
-
 	}
 	
 	
@@ -76,9 +73,9 @@ public class MintAMPQClientSyncImpl implements MintAMPQClientSync {
 			ConnectionFactory factory = new ConnectionFactory();
 			builder = new Builder();
 
-			factory.setHost("panic.image.ntua.gr");
-			factory.setUsername("guest");
-			factory.setPassword("guest");
+			factory.setHost(getHost());
+			factory.setUsername(getUsername());
+			factory.setPassword(getPassword());
 			try {
 				rabbitConnection = factory.newConnection();
 				sendChannel = rabbitConnection.createChannel();

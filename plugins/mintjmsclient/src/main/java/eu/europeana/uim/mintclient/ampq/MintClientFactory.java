@@ -5,10 +5,9 @@ package eu.europeana.uim.mintclient.ampq;
 
 
 import com.rabbitmq.client.DefaultConsumer;
-import eu.europeana.uim.mintclient.ampq.listeners.UIMConsumerListener;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
 
 /**
  * 

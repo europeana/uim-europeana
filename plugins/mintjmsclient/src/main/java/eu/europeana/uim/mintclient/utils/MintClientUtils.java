@@ -16,8 +16,8 @@ import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
-import eu.europeana.uim.mintclient.plugin.exceptions.MintGenericException;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintGenericException;
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 
 /**
  * 

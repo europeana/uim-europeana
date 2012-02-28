@@ -16,7 +16,6 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.AMQP.BasicProperties.Builder;
 import com.rabbitmq.client.Consumer;
 
-import eu.europeana.uim.mintclient.ampq.listeners.UIMConsumerListener;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
@@ -29,18 +28,17 @@ import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsAction;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClient;
-import eu.europeana.uim.mintclient.plugin.MintAMPQClientASync;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintOSGIClientException;
-import eu.europeana.uim.mintclient.plugin.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
 
 /**
  * 
- * @author geomark
- *
+ * 
+ * @author Georgios Markakis
  */
-public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
+public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements MintAMPQClientASync{
 
 	protected static Connection rabbitConnection;
 	protected static Channel sendChannel;
@@ -56,7 +54,6 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 	private static MintAMPQClientAsyncImpl instance;
 	
 	private MintAMPQClientAsyncImpl(){
-
 	}
 	
 	
@@ -101,9 +98,9 @@ public class MintAMPQClientAsyncImpl implements MintAMPQClientASync{
 			ConnectionFactory factory = new ConnectionFactory();
 			builder = new Builder();
 
-			factory.setHost("panic.image.ntua.gr");
-			factory.setUsername("guest");
-			factory.setPassword("guest");
+			factory.setHost(getHost());
+			factory.setUsername(getUsername());
+			factory.setPassword(getPassword());
 			try {
 				rabbitConnection = factory.newConnection();
 				sendChannel = rabbitConnection.createChannel();
