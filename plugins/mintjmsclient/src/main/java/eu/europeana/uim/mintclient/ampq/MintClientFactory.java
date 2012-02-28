@@ -49,7 +49,7 @@ public class MintClientFactory {
 		}
 		
 		@Override
-		public MintAMPQClient createClient() throws MintOSGIClientException{
+		public MintAMPQClientASync createClient() throws MintOSGIClientException{
 
 			if(listenerClass == null){
 				return MintAMPQClientAsyncImpl.getClient();
@@ -66,10 +66,9 @@ public class MintClientFactory {
 	public class ProducerProxySyncImpl implements ProducerProxy{
 		
 		@Override
-		public MintAMPQClient createClient() {
+		public MintAMPQClientSync createClient() {
 			return MintAMPQClientSyncImpl.getClient();
 		}
-		
 		
 	}
 	

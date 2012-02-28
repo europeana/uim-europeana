@@ -5,15 +5,18 @@
 	xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
 
-	<bean id="rs" class="eu.europeana.uim.sugar.SugarServiceImpl">
-		<property name="sugarClient" ref="ssci" />
-		<property name="sugarMappingClass" value="${sugarMappingClass}" />
+	<bean id="mintbean" class="eu.europeana.uim.mintclient.service.MintUIMServiceImpl"
+	      factory-method="createService">
+	      <argument ref="registry"/>
+          <argument ref="orchestrator"/>
 	</bean>
 
-	<service id="mintService" ref="ss"
-		interface="eu.europeana.uim.sugarcrm.SugarService" />
+	<service id="mintService" ref="mintbean"
+		interface="eu.europeana.uim.mintclient.service.MintUIMService" />
 
 	<bp:reference id="registry" interface="eu.europeana.uim.api.Registry" />
+	
+	<bp:reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator"/>
 
-
+ 
 </blueprint>

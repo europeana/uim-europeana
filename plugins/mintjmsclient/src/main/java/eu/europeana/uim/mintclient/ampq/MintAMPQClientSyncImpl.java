@@ -64,7 +64,7 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 	/**
 	 * @return
 	 */
-	protected static MintAMPQClient getClient() {
+	protected static MintAMPQClientSync getClient() {
 		
 		if(instance != null){
 			return instance;

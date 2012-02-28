@@ -57,7 +57,7 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 	}
 	
 	
-	protected static <T extends DefaultConsumer> MintAMPQClient getClient(Class<T> listenerClassType) throws MintOSGIClientException{
+	protected static <T extends DefaultConsumer> MintAMPQClientASync getClient(Class<T> listenerClassType) throws MintOSGIClientException{
 		
 		Constructor<T> con;
 
@@ -89,7 +89,7 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		return getClient();
 	}
 
-	protected static MintAMPQClient getClient() throws MintOSGIClientException{
+	protected static MintAMPQClientASync getClient() throws MintOSGIClientException{
 		
 		if(instance != null){
 			return instance;

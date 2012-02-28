@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.europeana.uim.mintclient.plugin;
+package eu.europeana.uim.mintclient.service;
 
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
