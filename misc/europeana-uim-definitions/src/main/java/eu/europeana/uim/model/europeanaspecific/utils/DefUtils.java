@@ -22,16 +22,14 @@ package eu.europeana.uim.model.europeanaspecific.utils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.jibx.extras.DomElementMapper;
-
-
 import org.w3c.dom.Element;
+
 
 /**
  * 
@@ -71,8 +69,8 @@ public class DefUtils {
 	 * @return
 	 * @throws JiBXException
 	 */
-	public static <T> T unmarshallObject(String xml,T type) throws JiBXException{
-		 IBindingFactory bfactory = BindingDirectory.getFactory(type.getClass());
+	public static <T> T unmarshallObject(String xml,Class<T> class1) throws JiBXException{
+		 IBindingFactory bfactory = BindingDirectory.getFactory(class1);
 		 IUnmarshallingContext context = bfactory.createUnmarshallingContext();
 		 		 
 		 
@@ -91,12 +89,12 @@ public class DefUtils {
 	  * 
 	 * @param <T>
 	 * @param xml
-	 * @param type
+	 * @param class1
 	 * @return
 	 * @throws JiBXException
 	 */
-	public static <T> T unmarshallObjectFromElement(Element element,T type) throws JiBXException{
-		 IBindingFactory bfactory = BindingDirectory.getFactory(type.getClass());
+	public static <T> T unmarshallObjectFromElement(Element element,Class<T> class1) throws JiBXException{
+		 IBindingFactory bfactory = BindingDirectory.getFactory(class1.getClass());
 		 IUnmarshallingContext context = bfactory.createUnmarshallingContext();
 		 
 
