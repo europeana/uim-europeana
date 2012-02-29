@@ -22,8 +22,7 @@ package eu.europeana.uim.europeanaspecific.workflows;
 
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
-import eu.europeana.uim.plugin.linkchecker.service.LinkCheckerPlugin;
-import eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin;
+
 
 
 
@@ -40,9 +39,7 @@ public class InitialIngestionWorkflow extends AbstractWorkflow{
         "This is the workflow to be used in order to import new material from scratch...");
 
         setStart(new BatchWorkflowStart());
-        
-        //addStep(new LinkCheckerPlugin());
-        addStep(new SolrWorkflowPlugin());
+
 	}
 
 	
