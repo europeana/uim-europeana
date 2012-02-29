@@ -20,6 +20,7 @@
  */
 package eu.europeana.uim.gui.cp.client.europeanawidgets;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -75,6 +76,7 @@ import eu.europeana.uim.gui.cp.client.services.ResourceServiceAsync;
 import eu.europeana.uim.gui.cp.client.utils.EuropeanaClientConstants;
 import eu.europeana.uim.gui.cp.client.utils.RecordStates;
 import eu.europeana.uim.gui.cp.shared.ImportResultDTO;
+import eu.europeana.uim.gui.cp.shared.IntegrationStatusDTO;
 import eu.europeana.uim.gui.cp.shared.SugarCRMRecordDTO;
 
 /**
@@ -88,6 +90,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 	private final RepositoryServiceAsync repositoryService;
 	private final ResourceServiceAsync resourceService;
 	private final IntegrationSeviceProxyAsync integrationservice;
+	private String sugarLocation; 
 
 	interface Binder extends UiBinder<Widget, ImportResourcesWidget> {
 	}
@@ -145,7 +148,25 @@ public class ImportResourcesWidget extends IngestionWidget {
 		this.repositoryService = repositoryService;
 		this.resourceService = resourceService;
 		this.integrationservice = integrationservice;
+		this.sugarLocation="";
+		if(integrationservice != null){
+			
+		integrationservice.getSugarCrmURI(new AsyncCallback<String>() {
 
+			@Override
+			public void onFailure(Throwable throwable) {
+			}
+
+			@Override
+			public void onSuccess(String uri) {
+				StringWriter tmpwriter = new StringWriter();
+				tmpwriter.append(uri);
+				tmpwriter.append("index.php?module=Opportunities&action=DetailView&record=");
+				sugarLocation = tmpwriter.toString();
+			}
+		});
+		
+		}
 	}
 
 	/*
@@ -295,7 +316,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 								impResultsTable.setWidget(numRows, 1, new HTML(
 										"A system exception has occured"));
 								impResultsTable.setWidget(numRows, 2, new HTML(
-										throwable.getCause().getLocalizedMessage()));
+										throwable.getStackTrace().toString()));
 
 								progressBar.setProgress(impResultsTable
 										.getRowCount());
@@ -459,8 +480,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 				Anchor hyper = new Anchor();
 				hyper.setName(object.getName());
 				hyper.setText(object.getName());
-				hyper.setHref("http://sip-manager.isti.cnr.it/sugarcrm/index.php?module=Opportunities&action=DetailView&record="
-						+ object.getId());
+				hyper.setHref(sugarLocation	+ object.getId());
 				hyper.setTarget("TOP");
 
 				return hyper;

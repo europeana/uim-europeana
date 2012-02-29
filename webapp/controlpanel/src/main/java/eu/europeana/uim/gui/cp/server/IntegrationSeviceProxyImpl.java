@@ -72,16 +72,10 @@ public class IntegrationSeviceProxyImpl extends
 		IntegrationServicesProviderServlet implements IntegrationSeviceProxy {
 
 	private static final long serialVersionUID = 1L;
-
 	private String repoxURL;
-	private String sugarCrmURL;
-	
+	private String sugarCrmURL;	
 	DialogBox importDialog;
-	
 
-	
-	
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -276,19 +270,16 @@ public class IntegrationSeviceProxyImpl extends
 	
 	
 	/**
+	 * Translates the status code returned by SugarCRM into a human readable form.
+	 * 
 	 * @param sugarcrmStatusStr
 	 * @return
 	 */
 	private String translateStatus(String sugarcrmStatusStr){
 		
 		if(sugarcrmStatusStr != null){
-			
-
-		
 		sugarcrmStatusStr = sugarcrmStatusStr.replace(" ","%");
-		
 		EuropeanaDatasetStates actualvalue = null;
-		
 		for(EuropeanaDatasetStates e : EuropeanaDatasetStates.values()){
 			if(e.getSysId().equals(sugarcrmStatusStr)){
 				actualvalue = e;
@@ -305,7 +296,6 @@ public class IntegrationSeviceProxyImpl extends
 		else{
 			return "No State Defined";
 		}
-
 	}
 
 	
@@ -319,10 +309,7 @@ public class IntegrationSeviceProxyImpl extends
 	public IntegrationStatusDTO retrieveIntegrationInfo(String provider,
 			String collection) {
 		ExpandedOsgiEngine engine = getEngine();
-
 		RepoxUIMService repoxService = engine.getRepoxService();
-		
-		
 		
 		if(repoxURL == null){
 		    repoxURL = repoxService.showConnectionStatus().getDefaultURI();
@@ -334,28 +321,21 @@ public class IntegrationSeviceProxyImpl extends
 		}
 		
 		StorageEngine<?> stengine = engine.getRegistry().getStorageEngine();
-
 		IntegrationStatusDTO ret = new IntegrationStatusDTO();
 
 		//In case that a Workflow is selected
 		if (provider == null && collection == null) {
-
 			ret.setType(TYPE.UNIDENTIFIED);
-
 		} else {
 
 			//If a Provider is selected
 			if (provider != null && collection == null) {
 				try {
-
 					Provider<?> prov = stengine.findProvider(provider);
-					
 					try {
-						
 						String description =  URLDecoder.decode(prov.getValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION), "UTF-8");
 						ret.setDescription(description);
 					} catch (UnsupportedEncodingException e) {
-					
 						ret.setDescription("");
 					}
 
@@ -372,27 +352,15 @@ public class IntegrationSeviceProxyImpl extends
 					if(prov.getValue(ControlledVocabularyProxy.REPOXID) != null){
 						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/#EDIT_DP?id=" + prov.getValue(ControlledVocabularyProxy.REPOXID) );
 					}	
-					
-					
-				
-					
-					
+
 					ControlledVocabularyProxy[] values = ControlledVocabularyProxy.values();
 					
 					for(int i=0;i<values.length;i++){
-						
 						String value = prov.getValue(values[i]);
-						
 						if(value != null){
-							
-							ret.getResourceProperties().put(values[i].toString(),value);
-							
+							ret.getResourceProperties().put(values[i].toString(),value);	
 						}
-	
 					}
-					
-
-					
 				} catch (StorageEngineException e) {
 
 					ret.setType(TYPE.UNIDENTIFIED);
@@ -476,10 +444,7 @@ public class IntegrationSeviceProxyImpl extends
 							statusobj.setPercentage(result.getPercentage());
 							statusobj.setNoRecords(result.getRecords());
 							statusobj.setTimeleft(result.getTimeLeft());
-
 							ret.setHarvestingStatus(statusobj);
-							
-							
 							//Scheduled Sessions
 							
 							HashSet<ScheduleInfo> scheduled =  (HashSet<ScheduleInfo>) repoxService.getScheduledHarvestingSessions(col);
@@ -491,8 +456,6 @@ public class IntegrationSeviceProxyImpl extends
 								}
 							}
 							
-							
-
 						} catch (HarvestingOperationException e) {
 
 							HarvestingStatusDTO status = new HarvestingStatusDTO();
@@ -615,6 +578,18 @@ public class IntegrationSeviceProxyImpl extends
 
 
 		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxy#getSugarCrmURI()
+	 */
+	@Override
+	public String getSugarCrmURI() {
+		ExpandedOsgiEngine engine = getEngine();
+		SugarCrmService sugService = engine.getSugarCrmService();
+		
+		String retstring = sugService.showConnectionStatus().getDefaultURI().split("soap.php")[0];
+		return retstring;
 	}
 
 }

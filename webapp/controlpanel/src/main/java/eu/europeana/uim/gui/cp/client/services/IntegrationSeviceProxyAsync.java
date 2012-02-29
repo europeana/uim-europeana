@@ -46,4 +46,5 @@ public interface IntegrationSeviceProxyAsync {
 
 	public void performRepoxRemoteOperation(RepoxOperationType operationType, String repoxResourceID, AsyncCallback<RepoxExecutionStatusDTO> async);
 
+	public void getSugarCrmURI(AsyncCallback<String> async);
 }

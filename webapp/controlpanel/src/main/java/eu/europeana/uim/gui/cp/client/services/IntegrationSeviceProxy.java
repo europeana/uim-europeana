@@ -49,5 +49,6 @@ public interface IntegrationSeviceProxy extends RemoteService{
 	
 	public RepoxExecutionStatusDTO performRepoxRemoteOperation(RepoxOperationType operationType, String repoxResourceID);
 	
+	public String getSugarCrmURI();
 	
 }
