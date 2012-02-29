@@ -240,7 +240,8 @@ public class OaiPmhLoader {
                             request.getCollection().getMnemonic());
                     */        
 
-                    RDF validedmrecord = DefUtils.unmarshallObjectFromElement(record.getMetadata(), new RDF());
+
+                    RDF validedmrecord = DefUtils.unmarshallObjectFromElement(record.getMetadata(),RDF.class);
                     mdr.addValue(EuropeanaModelRegistry.EDMRECORD,validedmrecord);
                     
                 }
