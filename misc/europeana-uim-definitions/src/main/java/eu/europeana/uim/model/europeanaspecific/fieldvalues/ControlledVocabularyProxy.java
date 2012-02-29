@@ -31,6 +31,9 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	//System Specific
 	REPOXID("repoxID"), 
 	SUGARCRMID("sugarCRMID"),
+	MINTID("mintID"),
+	
+	
 	
 	//Provider Specific (Existing only on Provider level)
 	PROVIDERDESCRIPTION("providerDescription"),
@@ -39,7 +42,14 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	PROVIDERCOUNTRY("providerCountry"),
 	PROVIDERDEASENT("providerdeaSent"),
 	PROVIDERDEASIGNED("providerdeaSigned"),
+	//Provider Mint Specific Fields
+	PROVIDERMINTUSERID("mintUserID"),
+	PROVIDERMINTUSERPASSWORD("mintUserPWD"),
+	
+	//Collection Feilds
 	//Ingestion Results
+	
+	
 	AMOUNT(EuropeanaUpdatableField.AMOUNT), 
 	TOTAL_INGESTED(EuropeanaUpdatableField.TOTAL_INGESTED), 
 	INGESTED_SOUND(EuropeanaUpdatableField.INGESTED_SOUND), 
