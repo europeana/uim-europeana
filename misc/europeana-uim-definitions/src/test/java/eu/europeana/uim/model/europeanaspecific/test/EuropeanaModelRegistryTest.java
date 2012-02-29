@@ -44,69 +44,17 @@ public class EuropeanaModelRegistryTest {
     public void testFullEDMRecord() {
         MetaDataRecord<Long> record = new MetaDataRecordBean<Long>(1L, null);
 
-        RDF rdf = new RDF();
+        String rdf = new String();
         
         //rdf.getChoiceList().get(0).getProvidedCHO().getChoiceList().get(0).getAlternative().getLang().
 
 		record.addValue(EuropeanaModelRegistry.EDMRECORD, rdf);
         
-		List<RDF> values = record.getValues(EuropeanaModelRegistry.EDMRECORD);
+		List<String> values = record.getValues(EuropeanaModelRegistry.EDMRECORD);
 		
-        /*
-        Title title = new Title("Clavicorde lie....");
-        record.addValue(ProvidedChoModelRegistry.TITLE, title, TitleType.MAIN, Language.LAT);
-
-        record.addValue(WebResourceModelRegistry.LINK, new Link("http://ssome.reousec.eu"),
-                LinkTarget.THUMBNAIL);
-        
-        record.addValue(WebResourceModelRegistry.LINK, new Link("http://cc0/rights"),
-                LinkTarget.RIGHTS);
-                
-        List<QualifiedValue<Link>> list = record.getQualifiedValues(WebResourceModelRegistry.LINK);
-        assertEquals(2, list.size());
-
-        list = record.getQualifiedValues(WebResourceModelRegistry.LINK, LinkTarget.RIGHTS);
-        assertEquals(1, list.size());
-        */
 
     }
 	
 	
-    /**
-     * 
-     */
-    @Test
-    public void testAgents() {
-    	
-    }
-    
-    
-    /**
-     * 
-     */
-    @Test
-    public void testPlaces() {
-    	
-    }
-    
-    
-    /**
-     * 
-     */
-    @Test
-    public void testTimeSpan() {
-    	
-    }
-    
-    
-    /**
-     * 
-     */
-    @Test
-    public void testWebResource() {
-    	
-    }
-    
-    
 	
 }
