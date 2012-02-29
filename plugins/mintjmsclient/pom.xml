@@ -68,18 +68,17 @@
 				<configuration>
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
-						<DynamicImport-Package>*</DynamicImport-Package>
-						<Export-Package>eu.europeana.uim.sugarcrmclient.*</Export-Package>
+						<Export-Package>eu.europeana.uim.mintclient.service</Export-Package>
 						<Import-Package>
-							org.apache.felix.gogo.commands,
-							org.apache.felix.service.command,
-							org.springframework.ws.soap,
-							org.springframework.ws.soap.saaj,
-							!com.sun.xml.messaging.saaj.soap.encoding,
-							org.xmlpull.v1,
-							org.quartz,
-							*
+                          com.rabbitmq.client,
+                          com.rabbitmq.client.impl,
+                          com.rabbitmq.tools,
+                          com.rabbitmq.tools.json,
+                          com.rabbitmq.tools.jsonrpc,
+                          com.rabbitmq.utility,
+						  *	
 						</Import-Package>
+						<Embed-Dependency>europeana-uim-plugin-clientbindings</Embed-Dependency>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
@@ -94,7 +93,10 @@
 						<id>bundle-manifest</id>
 						<phase>package</phase>
 						<goals>
-							<goal>bundle</goal>
+						    <goal>bundle</goal>
+						    <!--  
+							<goal>bundleall</goal>
+							-->
 						</goals>
 					</execution>
 				</executions>

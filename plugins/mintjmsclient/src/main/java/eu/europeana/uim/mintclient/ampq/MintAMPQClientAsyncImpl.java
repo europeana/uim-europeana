@@ -62,6 +62,8 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		Constructor<T> con;
 
 			try {
+				
+				//listenerClassType.
 				con = listenerClassType.getConstructor(Channel.class);
 				defaultConsumer = (T) con.newInstance(receiveChannel);
 			} catch (SecurityException e) {

@@ -36,10 +36,11 @@ public class UIMConsumerListener extends DefaultConsumer {
 
         long deliveryTag = envelope.getDeliveryTag();
         
-        //System.out.println(new String(body));
+        System.out.println(new String(body));
         // (process the message components here ...)
 
-        channel.basicAck(deliveryTag, false);
+        
+       // channel.basicAck(deliveryTag, false);
     }
 
 }

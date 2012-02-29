@@ -12,7 +12,7 @@ import java.util.Properties;
 
 
 /**
- * 
+ *
  * @author Georgios Markakis
  */
 public abstract class MintAbstractAMPQClient {
@@ -24,12 +24,20 @@ public abstract class MintAbstractAMPQClient {
 	
 	
 	static {
+		
+		username = "guest";
+		password = "guest";
+		host = "panic.image.ntua.gr";
+		/*
 		try {
+
 			URL url = ClassLoader.getSystemResource("mint.properties");
 			props.load(url.openStream());
 			username = props.getProperty("username");
 			password = props.getProperty("password");
 			host = props.getProperty("host");
+			
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -37,6 +45,7 @@ public abstract class MintAbstractAMPQClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	protected MintAbstractAMPQClient(){

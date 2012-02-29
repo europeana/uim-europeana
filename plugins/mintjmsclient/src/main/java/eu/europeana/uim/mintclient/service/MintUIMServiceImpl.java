@@ -21,6 +21,7 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.api.Registry;
@@ -38,7 +39,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 	private static Orchestrator<?> orchestrator;
 	
 	
-	private MintUIMServiceImpl(){
+	public MintUIMServiceImpl(){
 		 
 	}
 	
@@ -153,8 +154,8 @@ public class MintUIMServiceImpl implements MintUIMService {
 
 	}
 	
-	
-    class UIMConsumerListener extends DefaultConsumer {
+
+    public static class UIMConsumerListener extends DefaultConsumer {
 
 		private Channel channel; 
 		
@@ -175,11 +176,13 @@ public class MintUIMServiceImpl implements MintUIMService {
 
 	        long deliveryTag = envelope.getDeliveryTag();
 	        
-	        //System.out.println(new String(body));
+	        System.out.println(new String(body));
 	        // (process the message components here ...)
 
-	        channel.basicAck(deliveryTag, false);
+	        
+	        ///channel.basicAck(deliveryTag, false);
 	    }
-	}
 
+    }
 }
+    
