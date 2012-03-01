@@ -18,11 +18,13 @@ import org.apache.commons.io.*;
  */
 public class HttpRetriever implements Iterator<String>{
 
-	ZipFile zf; 
-	Enumeration<? extends ZipEntry>  zipentries;
-	Long number_of_recs;
+	private ZipFile zf; 
+	private Enumeration<? extends ZipEntry>  zipentries;
+	private Long number_of_recs;
 	
 	
+
+
 	private HttpRetriever(ZipFile zf,Long number_of_recs, Enumeration<? extends ZipEntry>  zipentries){
 		this.zf = zf;
 		this.number_of_recs = number_of_recs;
@@ -66,4 +68,48 @@ public class HttpRetriever implements Iterator<String>{
 		
 	}
 
+	
+	// Getters & Setters
+	
+	/**
+	 * @return the zf
+	 */
+	public ZipFile getZf() {
+		return zf;
+	}
+
+	/**
+	 * @param zf the zf to set
+	 */
+	public void setZf(ZipFile zf) {
+		this.zf = zf;
+	}
+
+	/**
+	 * @return the zipentries
+	 */
+	public Enumeration<? extends ZipEntry> getZipentries() {
+		return zipentries;
+	}
+
+	/**
+	 * @param zipentries the zipentries to set
+	 */
+	public void setZipentries(Enumeration<? extends ZipEntry> zipentries) {
+		this.zipentries = zipentries;
+	}
+
+	/**
+	 * @return the number_of_recs
+	 */
+	public Long getNumber_of_recs() {
+		return number_of_recs;
+	}
+
+	/**
+	 * @param number_of_recs the number_of_recs to set
+	 */
+	public void setNumber_of_recs(Long number_of_recs) {
+		this.number_of_recs = number_of_recs;
+	}
 }

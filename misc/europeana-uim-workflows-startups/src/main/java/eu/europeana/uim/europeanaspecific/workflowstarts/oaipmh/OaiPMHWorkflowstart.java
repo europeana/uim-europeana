@@ -156,7 +156,6 @@ public class OaiPMHWorkflowstart extends AbstractWorkflowStart{
 	
 	@Override
 	public List<String> getParameters() {
-		// TODO Auto-generated method stub
         return PARAMETER;
 	}
 
