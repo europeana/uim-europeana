@@ -159,7 +159,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 
 			@Override
 			public void onSuccess(String uri) {
-				StringWriter tmpwriter = new StringWriter();
+				StringBuilder tmpwriter = new StringBuilder();
 				tmpwriter.append(uri);
 				tmpwriter.append("index.php?module=Opportunities&action=DetailView&record=");
 				sugarLocation = tmpwriter.toString();
