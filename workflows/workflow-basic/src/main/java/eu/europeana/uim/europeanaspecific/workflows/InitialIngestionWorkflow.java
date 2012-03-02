@@ -20,6 +20,8 @@
  */
 package eu.europeana.uim.europeanaspecific.workflows;
 
+import eu.europeana.uim.europeanaspecific.workflowstarts.httpzip.HttpZipWorkflowStart;
+import eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin;
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 
@@ -35,11 +37,12 @@ public class InitialIngestionWorkflow extends AbstractWorkflow{
 
 	public InitialIngestionWorkflow() {
 
-		super("Europeana Complete Ingestion Workflow",
-        "This is the workflow to be used in order to import new material from scratch...");
+		super("Europeana Initial Ingestion Workflow",
+        "Populates a UIM collection with specific EDM data from Mint");
 
-        setStart(new BatchWorkflowStart());
+        setStart(new HttpZipWorkflowStart("HttpZipWorkflowStart","Downloads zipped EDM file"));
 
+        addStep(new SolrWorkflowPlugin());
 	}
 
 	

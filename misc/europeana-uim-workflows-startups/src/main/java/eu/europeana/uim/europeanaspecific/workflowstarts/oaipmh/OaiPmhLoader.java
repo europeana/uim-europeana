@@ -76,6 +76,7 @@ public class OaiPmhLoader {
     private int                          totalProgress = 0;
 
     private static DocumentBuilder       builder;
+         
 
     /** 
      * An option to allow the unescaping of html encoded characters inside records 	

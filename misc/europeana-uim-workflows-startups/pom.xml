@@ -97,7 +97,7 @@
 							!*
 						</Import-Package>
 						<Export-Package>
-							eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh
+							eu.europeana.uim.europeanaspecific.workflowstarts.*,							
 						</Export-Package>
 						<Embed-Dependency>oclc-harvester2,log4j,xalan,europeana-uim-edmcore-definitions</Embed-Dependency>
 					</instructions>
