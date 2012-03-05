@@ -23,61 +23,64 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.apache.commons.io.*;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 /**
- * Retrieves the specified zip file over the remote http location
- * and performs an iteration within the zipped file contents 
+ * Retrieves the specified zip file over the remote http location and performs
+ * an iteration within the zipped file contents
  * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 5 Mar 2012
  */
-public class HttpRetriever implements Iterator<String>{
+public class HttpRetriever implements Iterator<String> {
 
-	private ZipFile zf; 
-	private Enumeration<? extends ZipEntry>  zipentries;
+	private ZipFile zf;
+	private Enumeration<? extends ZipEntry> zipentries;
 	private int number_of_recs;
-	
-	
-
 
 	/**
-	 * Private Class constructor (can be instantiated only with factory method) 
+	 * Private Class constructor (can be instantiated only with factory method)
 	 * 
-	 * @param zf The zip file reference
-	 * @param number_of_recs The number of files contained within the specific fzip file
-	 * @param zipentries References to the zipped files
+	 * @param zf
+	 *            The zip file reference
+	 * @param number_of_recs
+	 *            The number of files contained within the specific fzip file
+	 * @param zipentries
+	 *            References to the zipped files
 	 */
-	private HttpRetriever(ZipFile zf,int number_of_recs, Enumeration<? extends ZipEntry>  zipentries){
+	private HttpRetriever(ZipFile zf, int number_of_recs,
+			Enumeration<? extends ZipEntry> zipentries) {
 		this.zf = zf;
 		this.number_of_recs = number_of_recs;
 		this.zipentries = zipentries;
 	}
-	
-	
-	
+
 	/**
-	 * Static synchronized factory method that returns an instance of this class.
-	 * It first copies the remote file locally and then instantiates the iterator.
+	 * Static synchronized factory method that returns an instance of this
+	 * class. It first copies the remote file locally and then instantiates the
+	 * iterator.
 	 * 
-	 * @param url The url from which to fetch the file
+	 * @param url
+	 *            The url from which to fetch the file
 	 * @return an instance of this class
 	 * @throws IOException
 	 */
-	public synchronized static HttpRetriever createInstance(URL url) throws IOException{
-		
+	public synchronized static HttpRetriever createInstance(URL url)
+			throws IOException {
+
 		File dest = new File("tmp");
 		FileUtils.copyURLToFile(url, dest, 100, 1000);
 
 		ZipFile zipfile = new ZipFile(dest.getAbsolutePath());
-		Enumeration<? extends ZipEntry>  entries = zipfile.entries();
-		
-		return new HttpRetriever(zipfile,zipfile.size(),entries);
+		Enumeration<? extends ZipEntry> entries = zipfile.entries();
+
+		return new HttpRetriever(zipfile, zipfile.size(), entries);
 	}
-	
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Iterator#hasNext()
 	 */
 	@Override
@@ -85,15 +88,17 @@ public class HttpRetriever implements Iterator<String>{
 		return zipentries.hasMoreElements();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Iterator#next()
 	 */
 	@Override
 	public String next() {
 		ZipEntry zentry = zipentries.nextElement();
-		
+
 		String resp = null;
-		
+
 		try {
 			resp = IOUtils.toString(zf.getInputStream(zentry), "UTF-8");
 		} catch (IOException e) {
@@ -103,7 +108,9 @@ public class HttpRetriever implements Iterator<String>{
 		return resp;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Iterator#remove()
 	 */
 	@Override
@@ -111,9 +118,8 @@ public class HttpRetriever implements Iterator<String>{
 		throw new UnsupportedOperationException("Operation not supported");
 	}
 
-	
 	// Getters & Setters
-	
+
 	/**
 	 * @return the zf
 	 */
@@ -122,7 +128,8 @@ public class HttpRetriever implements Iterator<String>{
 	}
 
 	/**
-	 * @param zf the zf to set
+	 * @param zf
+	 *            the zf to set
 	 */
 	public void setZf(ZipFile zf) {
 		this.zf = zf;
@@ -136,7 +143,8 @@ public class HttpRetriever implements Iterator<String>{
 	}
 
 	/**
-	 * @param zipentries the zipentries to set
+	 * @param zipentries
+	 *            the zipentries to set
 	 */
 	public void setZipentries(Enumeration<? extends ZipEntry> zipentries) {
 		this.zipentries = zipentries;
@@ -150,7 +158,8 @@ public class HttpRetriever implements Iterator<String>{
 	}
 
 	/**
-	 * @param number_of_recs the number_of_recs to set
+	 * @param number_of_recs
+	 *            the number_of_recs to set
 	 */
 	public void setNumber_of_recs(int number_of_recs) {
 		this.number_of_recs = number_of_recs;

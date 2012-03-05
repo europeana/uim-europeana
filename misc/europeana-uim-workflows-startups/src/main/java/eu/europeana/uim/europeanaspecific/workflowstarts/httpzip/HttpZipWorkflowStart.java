@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
-
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -39,10 +38,10 @@ import eu.europeana.uim.workflow.Task;
 import eu.europeana.uim.workflow.TaskCreator;
 import eu.europeana.uim.workflow.WorkflowStartFailedException;
 
-
 /**
- * Worflow start used in the current Mint implementation
- *
+ * Worflow start used in the current Mint implementation. It retrieves data from
+ * a remote zip location.
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 5 Mar 2012
  */
@@ -61,35 +60,34 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 		}
 	};
 
-	
-    /**
-     * 
-     */
-    private static TKey<HttpZipWorkflowStart, Data> DATA_KEY                            = TKey.register(
-    		HttpZipWorkflowStart.class,
-            "data",
-            Data.class);
-	    
+	/**
+	 * TKEY used for storing the Data class in the execution context
+	 */
+	private static TKey<HttpZipWorkflowStart, Data> DATA_KEY = TKey.register(
+			HttpZipWorkflowStart.class, "data", Data.class);
 
 	/**
-	 *
+	 * Private static class used as a container
+	 * 
 	 * @author Georgios Markakis <gwarkx@hotmail.com>
 	 * @since 5 Mar 2012
 	 */
 	private final static class Data implements Serializable {
 
-	            public ZipLoader loader;
-		        public Request<?>   request;
-		
-	            public int          maxrecords = 0;
-		        public int          expected   = 0;
-		    }
-	
+		public ZipLoader loader;
+		public Request<?> request;
+
+		public int maxrecords = 0;
+		public int expected = 0;
+	}
+
 	/**
 	 * Default constructor
 	 * 
-	 * @param name workflow name
-	 * @param description workflow description
+	 * @param name
+	 *            workflow name
+	 * @param description
+	 *            workflow description
 	 */
 	public HttpZipWorkflowStart(String name, String description) {
 		super(name, description);
@@ -138,29 +136,33 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 
 		final Data value = context.getValue(DATA_KEY);
 
-        if (!value.loader.isFinished()) { return new TaskCreator<I>() {
-            @Override
-            public void run() {
-                try {
-                    List<MetaDataRecord<I>> list = value.loader.doNext(100, false);
+		if (!value.loader.isFinished()) {
+			return new TaskCreator<I>() {
+				@Override
+				public void run() {
+					try {
+						List<MetaDataRecord<I>> list = value.loader.doNext(100,
+								false);
 
-                    for (MetaDataRecord<I> mdr : list) {
-                        Task<I> task = new Task<I>(mdr, storage, context);
-                        synchronized (getQueue()) {
-                            getQueue().offer(task);
-                        }
-                    }
+						for (MetaDataRecord<I> mdr : list) {
+							Task<I> task = new Task<I>(mdr, storage, context);
+							synchronized (getQueue()) {
+								getQueue().offer(task);
+							}
+						}
 
-                } catch (Throwable t) {
-                    throw new RuntimeException("Failed to retrieve MDRs from storage. " +
-                                               context.getExecution().toString(), t);
-                } finally {
-                    setDone(true);
-                }
-            }
-        }; }
+					} catch (Throwable t) {
+						throw new RuntimeException(
+								"Failed to retrieve MDRs from storage. "
+										+ context.getExecution().toString(), t);
+					} finally {
+						setDone(true);
+					}
+				}
+			};
+		}
 
-        return null;
+		return null;
 	}
 
 	/*
@@ -173,9 +175,9 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	@Override
 	public <I> boolean isFinished(ExecutionContext<I> context,
 			StorageEngine<I> storage) {
-        Data value = context.getValue(DATA_KEY);
-        boolean finished = value.loader.isFinished();
-        return finished;
+		Data value = context.getValue(DATA_KEY);
+		boolean finished = value.loader.isFinished();
+		return finished;
 	}
 
 	/*
@@ -189,57 +191,61 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	public <I> void initialize(ExecutionContext<I> context,
 			StorageEngine<I> storage) throws WorkflowStartFailedException {
 		Data value = new Data();
-		
+
 		UimDataSet<I> dataset = context.getDataSet();
 		if (dataset instanceof Collection) {
-			
-			Collection<I> collection = (Collection<I>)dataset;
-			
 
-			
+			Collection<I> collection = (Collection<I>) dataset;
+
 			URL url = null;
-			String httpzipurlprop = context.getProperties().getProperty(httpzipurl);
-			
-			
+			String httpzipurlprop = context.getProperties().getProperty(
+					httpzipurl);
+
 			try {
-				
-				if(httpzipurlprop != null){ 
+
+				if (httpzipurlprop != null) {
 					url = new URL(httpzipurlprop);
+				} else {
+					url = new URL(
+							collection
+									.getValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION));
 				}
-				else{
-					url = new URL(collection.getValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION));
-				}
-				
-				Request<I> request = storage.createRequest(collection, new Date());
-	            storage.updateRequest(request);
-	            
-	            HttpRetriever retriever = HttpRetriever.createInstance(url);
-				
-	            ZipLoader loader =  new ZipLoader(retriever.getNumber_of_recs(), retriever,storage, request,context.getMonitor(), context.getLoggingEngine());
 
-	            value.loader = loader;
-	            
-	            context.putValue(DATA_KEY, value);
+				Request<I> request = storage.createRequest(collection,
+						new Date());
+				storage.updateRequest(request);
 
+				HttpRetriever retriever = HttpRetriever.createInstance(url);
+
+				ZipLoader loader = new ZipLoader(retriever.getNumber_of_recs(),
+						retriever, storage, request, context.getMonitor(),
+						context.getLoggingEngine());
+
+				value.loader = loader;
+
+				context.putValue(DATA_KEY, value);
 
 			} catch (MalformedURLException e) {
-	            if (context.getLoggingEngine() != null){
+				if (context.getLoggingEngine() != null) {
 
-	            	context.getLoggingEngine().logFailed(Level.SEVERE, "HttpZipWorkflowStart", e,
-	                        "Error unmarshalling xml for object ");
-	            }
+					context.getLoggingEngine().logFailed(Level.SEVERE,
+							"HttpZipWorkflowStart", e,
+							"Error unmarshalling xml for object ");
+				}
 			} catch (IOException e) {
-	            if (context.getLoggingEngine() != null){
+				if (context.getLoggingEngine() != null) {
 
-	            	context.getLoggingEngine().logFailed(Level.SEVERE, "HttpZipWorkflowStart", e,
-	                        "Error unmarshalling xml for object ");
-	            }
+					context.getLoggingEngine().logFailed(Level.SEVERE,
+							"HttpZipWorkflowStart", e,
+							"Error unmarshalling xml for object ");
+				}
 			} catch (StorageEngineException e) {
-	            if (context.getLoggingEngine() != null){
+				if (context.getLoggingEngine() != null) {
 
-	            	context.getLoggingEngine().logFailed(Level.SEVERE, "HttpZipWorkflowStart", e,
-	                        "Error unmarshalling xml for object ");
-	            }
+					context.getLoggingEngine().logFailed(Level.SEVERE,
+							"HttpZipWorkflowStart", e,
+							"Error unmarshalling xml for object ");
+				}
 			}
 
 		} else if (dataset instanceof Request) {
@@ -262,12 +268,12 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	@Override
 	public <I> void completed(ExecutionContext<I> context,
 			StorageEngine<I> storage) throws WorkflowStartFailedException {
-        Data value = context.getValue(DATA_KEY);
-        value.loader.close();
+		Data value = context.getValue(DATA_KEY);
+		value.loader.close();
 
-        if (context.getExecution().isCanceled()) {
-            value.request.setFailed(true);
-        }
+		if (context.getExecution().isCanceled()) {
+			value.request.setFailed(true);
+		}
 
 	}
 
@@ -280,14 +286,19 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	 */
 	@Override
 	public <I> int getTotalSize(ExecutionContext<I> context) {
-        Data value = context.getValue(DATA_KEY);
-        if (value == null) return Integer.MAX_VALUE;
+		Data value = context.getValue(DATA_KEY);
+		if (value == null)
+			return Integer.MAX_VALUE;
 
-        if (value.expected > 0) { return value.expected; }
+		if (value.expected > 0) {
+			return value.expected;
+		}
 
-        if (value.loader.getExpectedRecordCount() > 0) { return value.loader.getExpectedRecordCount(); }
-        return Integer.MAX_VALUE;
-		
+		if (value.loader.getExpectedRecordCount() > 0) {
+			return value.loader.getExpectedRecordCount();
+		}
+		return Integer.MAX_VALUE;
+
 	}
 
 }
