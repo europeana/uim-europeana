@@ -1,5 +1,18 @@
-/**
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
  * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
 package eu.europeana.uim.europeanaspecific.workflowstarts.httpzip;
 
@@ -10,6 +23,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -24,35 +39,46 @@ import eu.europeana.uim.workflow.Task;
 import eu.europeana.uim.workflow.TaskCreator;
 import eu.europeana.uim.workflow.WorkflowStartFailedException;
 
+
 /**
- * @author Georgios Markakis
- * 
+ * Worflow start used in the current Mint implementation
+ *
+ * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @since 5 Mar 2012
  */
 public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
 
+	/**
+	 * The parameters used by this WorkflowStart
+	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-
 		{
 			add(httpzipurl);
 		}
 	};
 
 	
+    /**
+     * 
+     */
     private static TKey<HttpZipWorkflowStart, Data> DATA_KEY                            = TKey.register(
     		HttpZipWorkflowStart.class,
             "data",
             Data.class);
-	
-	//private HttpRetriever retriever;
-	//private static ZipLoader loader;      
+	    
 
+	/**
+	 *
+	 * @author Georgios Markakis <gwarkx@hotmail.com>
+	 * @since 5 Mar 2012
+	 */
 	private final static class Data implements Serializable {
 
-	       public ZipLoader loader;
+	            public ZipLoader loader;
 		        public Request<?>   request;
 		
 	            public int          maxrecords = 0;
@@ -60,8 +86,10 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 		    }
 	
 	/**
-	 * @param name
-	 * @param description
+	 * Default constructor
+	 * 
+	 * @param name workflow name
+	 * @param description workflow description
 	 */
 	public HttpZipWorkflowStart(String name, String description) {
 		super(name, description);
@@ -182,14 +210,12 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 					url = new URL(collection.getValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION));
 				}
 				
-				Request request = storage.createRequest(collection, new Date());
+				Request<I> request = storage.createRequest(collection, new Date());
 	            storage.updateRequest(request);
-
-	            
 	            
 	            HttpRetriever retriever = HttpRetriever.createInstance(url);
 				
-	            ZipLoader loader =  new ZipLoader(retriever,storage, request,context.getMonitor(), context.getLoggingEngine());
+	            ZipLoader loader =  new ZipLoader(retriever.getNumber_of_recs(), retriever,storage, request,context.getMonitor(), context.getLoggingEngine());
 
 	            value.loader = loader;
 	            
@@ -197,14 +223,23 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 
 
 			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	            if (context.getLoggingEngine() != null){
+
+	            	context.getLoggingEngine().logFailed(Level.SEVERE, "HttpZipWorkflowStart", e,
+	                        "Error unmarshalling xml for object ");
+	            }
 			} catch (IOException e) {
-				// TODO Retriever exception
-				e.printStackTrace();
+	            if (context.getLoggingEngine() != null){
+
+	            	context.getLoggingEngine().logFailed(Level.SEVERE, "HttpZipWorkflowStart", e,
+	                        "Error unmarshalling xml for object ");
+	            }
 			} catch (StorageEngineException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	            if (context.getLoggingEngine() != null){
+
+	            	context.getLoggingEngine().logFailed(Level.SEVERE, "HttpZipWorkflowStart", e,
+	                        "Error unmarshalling xml for object ");
+	            }
 			}
 
 		} else if (dataset instanceof Request) {
@@ -227,7 +262,12 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	@Override
 	public <I> void completed(ExecutionContext<I> context,
 			StorageEngine<I> storage) throws WorkflowStartFailedException {
-		// TODO Auto-generated method stub
+        Data value = context.getValue(DATA_KEY);
+        value.loader.close();
+
+        if (context.getExecution().isCanceled()) {
+            value.request.setFailed(true);
+        }
 
 	}
 

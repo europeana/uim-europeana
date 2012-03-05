@@ -33,11 +33,11 @@
 			<version>2.7.1</version>
 		</dependency>
 
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.1</version>
-        </dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>eu.europeana</groupId>
@@ -49,6 +49,13 @@
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-definitions</artifactId>
+			<version>2.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -97,9 +104,9 @@
 							!*
 						</Import-Package>
 						<Export-Package>
-							eu.europeana.uim.europeanaspecific.workflowstarts.*,							
+							eu.europeana.uim.europeanaspecific.workflowstarts.*,
 						</Export-Package>
-						<Embed-Dependency>oclc-harvester2,log4j,xalan,europeana-uim-edmcore-definitions</Embed-Dependency>
+						<Embed-Dependency>oclc-harvester2,log4j,xalan,corelib-definitions</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>

@@ -1,44 +1,66 @@
-/**
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
  * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
+
 package eu.europeana.uim.europeanaspecific.workflowstarts.httpzip;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.jibx.runtime.JiBXException;
-
 import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.common.ProgressMonitor;
-import eu.europeana.uim.edmcore.definitions.RDF;
-import eu.europeana.uim.europeanaspecific.workflowstarts.oaipmh.OaiPmhRecord;
+import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.utils.DefUtils;
+import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
 
+
 /**
- * @author geomark
- *
+ * 
+ * 
+ * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @since 5 Mar 2012
  */
 public class ZipLoader {
 
     @SuppressWarnings("rawtypes")
-    private final StorageEngine          storage;
-    @SuppressWarnings("unused")
+    private StorageEngine          storage;
+    
     private LoggingEngine<?>             loggingEngine;
     @SuppressWarnings("rawtypes")
-    private final Request                request;
-    private final ProgressMonitor        monitor;
-    private final Iterator<String> zipiterator;
+    private  Request                request;
+    @SuppressWarnings("unused")
+	private  ProgressMonitor        monitor;
+    private  Iterator<String> zipiterator;
     
-	public <I> ZipLoader(Iterator<String> zipiterator, StorageEngine<I> storage, Request<I> request, 
+    private int totalProgress = 0;
+    private int expectedRecords = 0;
+    
+	public <I> ZipLoader(int expectedRecords,Iterator<String> zipiterator, StorageEngine<I> storage, Request<I> request, 
     		ProgressMonitor monitor, LoggingEngine<I> loggingEngine) {
         super();
+        this.expectedRecords = expectedRecords;
         this.zipiterator = zipiterator;
         this.storage = storage;
         this.request = request;
@@ -74,6 +96,9 @@ public class ZipLoader {
 				I uuid = (I) validedmrecord.getChoiceList().get(0)
 						.getProvidedCHO().getAbout();
 
+				loggingEngine.log(Level.INFO, "ZipLoader","Added record with id"
+						,uuid.toString()," in collection ",request.getCollection().getMnemonic() );
+
 				MetaDataRecord<I> mdr = storage.getMetaDataRecord(uuid);
 
 				if (mdr == null) {
@@ -90,25 +115,53 @@ public class ZipLoader {
                 storage.addRequestRecord(request, mdr);
 
                 progress++;
+                totalProgress++;
 			} catch (JiBXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	
+	            if (loggingEngine != null){
+
+					loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
+	                        "Error unmarshalling xml for object ");
+	            }
 			} catch (StorageEngineException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	            if (loggingEngine != null){
+	                loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
+	                        "Error storing object " );
+	            }
 			}
 		}
     	return result;
     }
 
+	/**
+	 * @return
+	 */
 	public boolean isFinished() {
-		// TODO Auto-generated method stub
-		return false;
+		return !zipiterator.hasNext();		
 	}
 
+	
+	/**
+	 * @return the expected records
+	 */
 	public int getExpectedRecordCount() {
-		// TODO Auto-generated method stub
-		return 0;
+
+		return this.expectedRecords;
+	}
+
+	
+	/**
+	 * Finalizes 
+	 */
+	public void close() {
+	
+        this.expectedRecords = 0;
+        this.zipiterator = null;
+        this.storage = null;
+        this.request = null;
+        this.monitor = null;
+        this.loggingEngine = null;
+		
 	}
 
 	
