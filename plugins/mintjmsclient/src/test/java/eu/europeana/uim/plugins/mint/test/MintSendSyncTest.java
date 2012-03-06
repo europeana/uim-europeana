@@ -1,5 +1,18 @@
-/**
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
  * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
 package eu.europeana.uim.plugins.mint.test;
 
@@ -8,13 +21,10 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientSync;
-import eu.europeana.uim.mintclient.ampq.MintAMPQClientSyncImpl;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
@@ -37,24 +47,34 @@ import eu.europeana.uim.mintclient.jibxbindings.PublicationResponse;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
-
-
 import org.apache.log4j.Logger;
 
+
 /**
- * 
- * @author Georgios Markakis
+ *
+ * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @since 6 Mar 2012
  */
 public class MintSendSyncTest {
 	private static org.apache.log4j.Logger log = Logger.getLogger(MintSendSyncTest.class);
 	
+	/**
+	 * 
+	 */
 	private static MintAMPQClientSync client;
 	
+	/**
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
 		client = (MintAMPQClientSync) factory.syncMode().createClient();  
 	}
 	    
+	/**
+	 * 
+	 */
 	@AfterClass public static void tearDown() {
 	   client = null;
 	   System.gc();
@@ -62,6 +82,10 @@ public class MintSendSyncTest {
 	
 	
 	
+	/**
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	@Test
 	public void createOrganizationTest() throws MintOSGIClientException, MintRemoteException{
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
@@ -78,6 +102,10 @@ public class MintSendSyncTest {
 		assertNotNull(resp);
 	}
 	
+	/**
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	@Test
 	public void createUserTest() throws MintOSGIClientException, MintRemoteException{
 		CreateUserCommand command = new CreateUserCommand();
@@ -97,6 +125,10 @@ public class MintSendSyncTest {
 	}
 	
 
+	/**
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	@Test
 	public void createImportsTest() throws MintOSGIClientException, MintRemoteException{
 		CreateImportCommand command = new CreateImportCommand();
@@ -113,6 +145,10 @@ public class MintSendSyncTest {
 		
 	}
 	
+	/**
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	@Test
 	public void getImportsTest() throws MintOSGIClientException, MintRemoteException{
 		GetImportsCommand command =  new GetImportsCommand();
@@ -125,6 +161,10 @@ public class MintSendSyncTest {
 		assertNotNull(resp);
 	}
 	
+	/**
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	@Test
 	public void getTransformations() throws MintOSGIClientException, MintRemoteException{
 		GetTransformationsCommand command = new GetTransformationsCommand();
@@ -137,6 +177,10 @@ public class MintSendSyncTest {
 		assertNotNull(resp);
 	}
 	
+	/**
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	@Test
 	public void publishCollection() throws MintOSGIClientException, MintRemoteException{
 		PublicationCommand command = new PublicationCommand();

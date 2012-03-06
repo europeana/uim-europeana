@@ -1,16 +1,27 @@
-/**
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
  * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
 package eu.europeana.uim.plugins.mint.test;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientASync;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
@@ -23,18 +34,27 @@ import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 
 
+
 /**
- * 
- * @author Georgios Markakis
+ *
+ * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @since 6 Mar 2012
  */
 public class MintSendAsyncTest {
 	private static MintAMPQClientASync client;
 	
+	/**
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
 		client = (MintAMPQClientASync) factory.asyncMode().createClient(); 
 	}
 	    
+	/**
+	 * 
+	 */
 	@AfterClass public static void tearDown() {
 	   client = null;
 	   System.gc();
@@ -42,6 +62,9 @@ public class MintSendAsyncTest {
 	
 	
 	
+	/**
+	 * @throws Exception
+	 */
 	@Test
 	public void createOrganizationTest() throws Exception{
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
@@ -55,6 +78,9 @@ public class MintSendAsyncTest {
 		client.createOrganization(command);
 	}
 	
+	/**
+	 * @throws Exception
+	 */
 	@Test
 	public void createUserTest() throws Exception{
 		CreateUserCommand command = new CreateUserCommand();
@@ -70,6 +96,9 @@ public class MintSendAsyncTest {
 	}
 	
 
+	/**
+	 * @throws Exception
+	 */
 	@Test
 	public void createImportsTest() throws Exception{
 		CreateImportCommand command = new CreateImportCommand();
@@ -82,6 +111,9 @@ public class MintSendAsyncTest {
 		
 	}
 	
+	/**
+	 * @throws Exception
+	 */
 	@Test
 	public void getImportsTest() throws Exception{
 		GetImportsCommand command =  new GetImportsCommand();
@@ -98,6 +130,9 @@ public class MintSendAsyncTest {
 		client.getTransformations(command);
 	}
 	
+	/**
+	 * @throws Exception
+	 */
 	@Test
 	public void publishCollection() throws Exception{
 		PublicationCommand command = new PublicationCommand();

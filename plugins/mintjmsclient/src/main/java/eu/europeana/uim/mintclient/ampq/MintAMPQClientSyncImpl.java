@@ -1,5 +1,18 @@
-/**
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
  * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
 package eu.europeana.uim.mintclient.ampq;
 
@@ -35,9 +48,11 @@ import com.rabbitmq.client.AMQP.BasicProperties.Builder;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 
+
 /**
- * 
- * @author Georgios Markakis
+ *
+ * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @since 6 Mar 2012
  */
 public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements MintAMPQClientSync {
 
@@ -53,6 +68,7 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 
 	private static MintAMPQClientSyncImpl instance;
 	
+
 	/**
 	 * 
 	 */
@@ -93,6 +109,10 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 		return instance;
 	}
 	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#createOrganization(eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand)
+	 */
 	@Override
 	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateOrganizationAction cu = new CreateOrganizationAction();
@@ -104,6 +124,10 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 		return respObj.getCreateOrganizationResponse();
 	}
 
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#createUser(eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand)
+	 */
 	@Override
 	public CreateUserResponse createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateUserAction cu = new CreateUserAction();
@@ -117,6 +141,9 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 
 	
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#getImports(eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand)
+	 */
 	@Override
 	public GetImportsResponse getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException {
 		GetImportsAction cu = new GetImportsAction();
@@ -128,6 +155,9 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 		return respObj.getGetImportsResponse();
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#createImports(eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand)
+	 */
 	@Override
 	public CreateImportResponse createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateImportAction cu = new CreateImportAction();
@@ -139,6 +169,9 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 		return respObj.getCreateImportResponse();
 	}
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#getTransformations(eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand)
+	 */
 	@Override
 	public GetTransformationsResponse getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException {
 		GetTransformationsAction cu = new GetTransformationsAction();
@@ -150,6 +183,9 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 		return respObj.getGetTransformationsResponse();
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#publishCollection(eu.europeana.uim.mintclient.jibxbindings.PublicationCommand)
+	 */
 	@Override
 	public PublicationResponse publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException {
 		PublicationAction cu = new PublicationAction();
@@ -164,6 +200,12 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 
 
 	
+	/**
+	 * @param correlationID
+	 * @return
+	 * @throws MintRemoteException
+	 * @throws MintOSGIClientException
+	 */
 	private String handleSynchronousDelivery(String correlationID) throws MintRemoteException, MintOSGIClientException{
 	    while (true) {
 	    	QueueingConsumer.Delivery delivery;
@@ -185,6 +227,14 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 	}
 	
 	
+	/**
+	 * @param correlationId
+	 * @param payload
+	 * @param isLast
+	 * @param queue
+	 * @throws MintRemoteException
+	 * @throws MintOSGIClientException
+	 */
 	private void sendChunk(String correlationId,byte[] payload, boolean isLast,String queue) throws MintRemoteException, MintOSGIClientException{
 		builder.deliveryMode(2);
 		HashMap<String, Object> heads = new HashMap<String, Object>();
