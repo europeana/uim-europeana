@@ -47,6 +47,7 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	PROVIDERMINTUSERPASSWORD("mintUserPWD"),
 	
 	//Collection Feilds
+	MINTPUBLICATIONLOCATION("mintPubLoc"),
 	//Ingestion Results
 	
 	
