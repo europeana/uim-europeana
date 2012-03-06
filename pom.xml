@@ -103,6 +103,21 @@
 			<url>http://europeanalabs.eu/artifactory/com.springsource.repository.bundles.external</url>
 		</repository>
 
+
+		<!-- Europeana Labs Core libraries -->
+		<repository>
+			<id>europeanalabs.corelibs.eu</id>
+			<name>europeanalabs.libs-releases-local</name>
+			<url>http://europeanalabs.eu/artifactory/libs-releases-local</url>
+		</repository>
+
+		<!-- Europeana Labs Core snapshot libraries -->
+		<repository>
+			<id>europeanalabs.corelibs.eu.snapshots</id>
+			<name>europeanalabs.libs-snapshots-local</name>
+			<url>http://europeanalabs.eu/artifactory/libs-snapshots-local</url>
+		</repository>
+
 	</repositories>
 
 
