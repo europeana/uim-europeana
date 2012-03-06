@@ -11,11 +11,8 @@
 		<xs:sequence>
 			<xs:element name="organizationId" type="xs:string"/>
 			<xs:element name="userId" type="xs:string"/>
-			<xs:element name="jdbcRepoxURL" type="xs:string"/>
 			<xs:element name="repoxTableName" type="xs:string"/>
 			<xs:element name="correlationId" type="xs:string"/>
-			<xs:element name="repoxUserName" type="xs:string"/>
-			<xs:element name="repoxUserPassword" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="PublicationResponse">
@@ -89,6 +86,57 @@
 	<xs:element name="CreateImport" type="CreateImportAction"/>
 	<xs:element name="CreateOrganization" type="CreateOrganizationAction"/>
 	<xs:element name="CreateUser" type="CreateUserAction"/>
+	<xs:element name="ImportExists" type="ImportExistsAction"/>
+	<xs:complexType name="ImportExistsResponse">
+		<xs:sequence>
+			<xs:element name="exists" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ImportExistsCommand">
+		<xs:sequence>
+			<xs:element name="importId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ImportExistsAction">
+		<xs:choice>
+			<xs:element name="ImportExistsCommand" type="ImportExistsCommand"/>
+			<xs:element name="ImportExistsResponse" type="ImportExistsResponse"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="OrganizationExists" type="OrganizationExistsAction"/>
+	<xs:complexType name="OrganizationExistsAction">
+		<xs:choice>
+			<xs:element name="OrganizationExistsCommand" type="OrganizationExistsCommand"/>
+			<xs:element name="OrganizationExistsResponse" type="OrganizationExistsResponse"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="OrganizationExistsResponse">
+		<xs:sequence>
+			<xs:element name="exists" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrganizationExistsCommand">
+		<xs:sequence>
+			<xs:element name="organizationId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="UserExists" type="UserExistsAction"/>
+	<xs:complexType name="UserExistsAction">
+		<xs:choice>
+			<xs:element name="UserExistsCommand" type="UserExistsCommand"/>
+			<xs:element name="UserExistsResponse" type="UserExistsResponse"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="UserExistsResponse">
+		<xs:sequence>
+			<xs:element name="exists" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UserExistsCommand">
+		<xs:sequence>
+			<xs:element name="userId" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
 	<xs:element name="GetImports" type="GetImportsAction"/>
 	<xs:element name="GetTransformations" type="GetTransformationsAction"/>
 	<xs:element name="Publication" type="PublicationAction"/>

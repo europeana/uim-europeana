@@ -11,8 +11,8 @@ import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
 
 /**
  * 
+ * 
  * @author Georgios Markakis
- *
  */
 public class MintClientFactory {
 
@@ -50,7 +50,7 @@ public class MintClientFactory {
 		
 		@Override
 		public MintAMPQClientASync createClient() throws MintOSGIClientException{
-
+ 
 			if(listenerClass == null){
 				return MintAMPQClientAsyncImpl.getClient();
 			}

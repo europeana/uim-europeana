@@ -77,9 +77,6 @@ public class MintSendAsyncTest {
 		command.setCorrelationId("123");
 		command.setUserId("1000");
 		command.setOrganizationId("1");
-		command.setJdbcRepoxURL("jdbc:postgresql://localhost:5432/repox");
-		command.setRepoxUserName("postgres");
-		command.setRepoxUserPassword("raistlin");
 		command.setRepoxTableName("azores13");
 		client.createImports(command);
 		
