@@ -157,20 +157,22 @@ public class ClientUtils {
 	 * @param value The string to be encrypted
 	 * @return the encrypted String
 	 */
-	public static String md5(String value){
-		
-		StringBuffer md5Password = new StringBuffer();
-		
+	public static String md5(String value){	
 		MessageDigest mdEnc;
-		try {
-			mdEnc = MessageDigest.getInstance("MD5");
-			mdEnc.update(value.getBytes(), 0, value.length());
-			md5Password.append(new BigInteger(1, mdEnc.digest()).toString(16)); 
+		try {	
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(value.getBytes());
+            BigInteger number = new BigInteger(1, messageDigest);
+            String hashtext = number.toString(16);
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+            return hashtext;
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} 
 		
-		return md5Password.toString();
+		return "";
 	}
 	
 	
