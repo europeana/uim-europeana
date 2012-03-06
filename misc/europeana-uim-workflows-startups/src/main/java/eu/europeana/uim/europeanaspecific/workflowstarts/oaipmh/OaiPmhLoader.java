@@ -27,8 +27,10 @@ import org.theeuropeanlibrary.model.tel.ObjectModelRegistry;
 import org.theeuropeanlibrary.model.tel.qualifier.FieldSource;
 import org.theeuropeanlibrary.model.common.Identifier;
 import org.theeuropeanlibrary.model.common.qualifier.IdentifierType;
+
+import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
-import eu.europeana.uim.edmcore.definitions.RDF;
+
 import eu.europeana.uim.model.europeanaspecific.utils.DefUtils;
 
 

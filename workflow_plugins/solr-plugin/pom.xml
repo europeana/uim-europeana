@@ -16,32 +16,75 @@
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
-			<version>1.4.1</version>
+			<version>3.5.0</version>
 		</dependency>
-
 		<dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-core</artifactId>
+                <version>3.5.0</version>
+        </dependency>
+	  <!--   <dependency>
 			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-core</artifactId>
-			<version>1.4.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.5.5</version>
-		</dependency>
+			<artifactId>solr-test-framework</artifactId>
+			<version>3.5.0</version>
+			<scope>test</scope>
+	    </dependency> -->
+	    <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+		    <version>3.5.0</version>
+        </dependency>
 
 		<!-- JUnit dependencies -->
+
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit-version}</version>
-			<scope>test</scope>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-plugin-solr3</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-definitions</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-solr-definitions</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-solr</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-datamodel-definitions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-run</artifactId>
+			<version>${jibx.version}</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-extras</artifactId>
+			<version>${jibx.version}</version>
+		</dependency>
+	<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>3.1.0.RELEASE</version>
+		</dependency>
+		<!-- Other 
+		<dependency>
+			<scope>test</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>3.1.0.RELEASE</version>
+		</dependency>-->
 	</dependencies>
 
 
@@ -74,19 +117,10 @@
 					<instructions>
 						<Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
 						<Import-Package>
-							!COM.jrockit.reflect,
-							!javax.portlet,
-							!jrockit.vm,
-							!org.apache.log,
-							!sun.reflect,
-							!org.apache.tools.ant.*,
-							!com.sun.msv.*,
-							!org.mortbay.*,
-							!org.relaxng.datatype.*,
-							!org.apache.avalon.framework.logger,
-							!org.apache.felix.gogo.commands,
-							!org.apache.felix.service.command,
-							*
+							eu.europeana.uim.solr3,
+                            org.apache.lucene.*;version="3.5.0",
+                            org.apache.solr.*;version="3.5.0",
+                            *
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 					</instructions>
@@ -120,24 +154,5 @@
 		</plugins>
 	</build>
 
-	<!-- ================================================ -->
-	<!-- Repository Configuration -->
-	<!-- ================================================ -->
-
-	<repositories>
-		<repository>
-			<id>eclipse-repository</id>
-			<name>Eclipse Repository</name>
-			<url>http://repo1.maven.org/eclipse/</url>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>maven-repo</id>
-			<name>maven repo</name>
-			<url>http://repo1.maven.org/maven2/</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 </project>

@@ -32,9 +32,11 @@ import org.apache.solr.common.SolrInputDocument;
 /**
  * 
  * @author Georgios Markakis
+ * @author Yorgos.Mamakis@ kb.nl
  */
 public class SolrClient {
 
+	
 	private SolrServer server;
 	
 	
@@ -50,7 +52,7 @@ public class SolrClient {
 		String url = "http://localhost:8983/solr";
 			  CommonsHttpSolrServer server;
 			try {
-				server = new CommonsHttpSolrServer(url);
+				  server = new CommonsHttpSolrServer(url);
 				  server.setSoTimeout(1000);  // socket read timeout
 				  server.setConnectionTimeout(100);
 				  server.setDefaultMaxConnectionsPerHost(100);

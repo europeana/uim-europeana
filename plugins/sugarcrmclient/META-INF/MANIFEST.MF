@@ -21,7 +21,7 @@ Export-Package: eu.europeana.uim.sugarcrmclient.plugin.objects.queries
  in.command;uses:="eu.europeana.uim.sugarcrmclient.plugin.objects.quer
  ies,eu.europeana.uim.model.europeanaspecific.fieldvalues,org.apache.f
  elix.service.command,eu.europeana.uim.sugarcrm,eu.europeana.uim.sugar
- crm.model,eu.europeana.uim.workflow,eu.europeana.uim.store,org.apache
+ crm.model,eu.europeana.uim.store,eu.europeana.uim.workflow,org.apache
  .felix.gogo.commands",eu.europeana.uim.sugarcrmclient.ws.quartz;uses:
  ="org.quartz,eu.europeana.uim.sugarcrm,org.springframework.scheduling
  .quartz",eu.europeana.uim.sugarcrmclient.jibxbindings;uses:="org.jibx
@@ -32,16 +32,16 @@ Export-Package: eu.europeana.uim.sugarcrmclient.plugin.objects.queries
  s,eu.europeana.uim.sugarcrm",eu.europeana.uim.sugarcrmclient.ws.excep
  tions;uses:="eu.europeana.uim.sugarcrmclient.jibxbindings,eu.european
  a.uim.sugarcrm"
-Built-By: geomark
+Built-By: gmamakis
 Tool: Bnd-0.0.357
 Bundle-Name: Unified Ingestion Manager: SugarCRM Client Plugin
 Created-By: Apache Maven Bundle Plugin
 Import-Service: eu.europeana.uim.sugarcrm.SugarCrmService;availability
  :=optional
 DynamicImport-Package: *
-Build-Jdk: 1.6.0_25
+Build-Jdk: 1.6.0_23
 Bundle-Version: 1.3.0.SNAPSHOT
-Bnd-LastModified: 1327940786928
+Bnd-LastModified: 1331052629551
 Bundle-ManifestVersion: 2
 Import-Package: eu.europeana.uim.api,eu.europeana.uim.model.europeanas
  pecific.fieldvalues,eu.europeana.uim.store,eu.europeana.uim.sugarcrm,
