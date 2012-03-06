@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import org.junit.Test;
 
-import eu.europeana.uim.edmcore.definitions.RDF;
+
 import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
 
 /**

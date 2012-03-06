@@ -21,11 +21,6 @@
 package eu.europeana.uim.model.europeanaspecific;
 
 import eu.europeana.uim.common.TKey;
-import eu.europeana.uim.edmcore.definitions.RDF;
-import eu.europeana.uim.edmcore.definitions.ProvidedCHOType;
-import eu.europeana.uim.edmcore.definitions.AgentType;
-import eu.europeana.uim.edmcore.definitions.PlaceType;
-import eu.europeana.uim.edmcore.definitions.TimeSpanType;
 
 
 /**
