@@ -56,7 +56,7 @@ import eu.europeana.uim.mintclient.utils.MintClientUtils;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */
-public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements MintAMPQClientASync{
+public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements MintAMPQClientASync{
 
 
 	private static Consumer defaultConsumer;

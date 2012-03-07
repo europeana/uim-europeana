@@ -18,7 +18,6 @@ package eu.europeana.uim.mintclient.ampq;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
@@ -65,7 +64,7 @@ import com.rabbitmq.client.ShutdownSignalException;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */
-public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements MintAMPQClientSync {
+public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements MintAMPQClientSync {
 
 	private static QueueingConsumer consumer;
 	private static MintAMPQClientSyncImpl instance;
@@ -217,6 +216,9 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#organizationExists(eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand)
+	 */
 	@Override
 	public OrganizationExistsResponse organizationExists(
 			OrganizationExistsCommand command) throws MintOSGIClientException,
@@ -232,6 +234,9 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#userExists(eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand)
+	 */
 	@Override
 	public UserExistsResponse userExists(UserExistsCommand command)
 			throws MintOSGIClientException, MintRemoteException {
@@ -246,6 +251,9 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientSync#importExists(eu.europeana.uim.mintclient.jibxbindings.ImportExistsCommand)
+	 */
 	@Override
 	public ImportExistsResponse importExists(ImportExistsCommand command)
 			throws MintOSGIClientException, MintRemoteException {
@@ -271,8 +279,11 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 	    while (true) {
 	    	QueueingConsumer.Delivery delivery;
 			try {
-				delivery = consumer.nextDelivery();
-		        if (delivery.getProperties().getCorrelationId().equals(correlationID)) {
+				delivery = consumer.nextDelivery(1000);
+				if(delivery == null ){
+					throw new MintRemoteException("Response from remote client timed out");
+				}
+				else if (delivery.getProperties().getCorrelationId().equals(correlationID)) {
 		            String response = new String(delivery.getBody());
 		            
 		            return response;
