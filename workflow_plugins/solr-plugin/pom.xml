@@ -79,7 +79,7 @@
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
-			<version>0.99-SNAPSHOT-208patch</version>
+			<version>0.99</version>
 			<scope>compile</scope>
 		</dependency>
 		<!--Optional Jars (for certain features) but required by maven for building. -->
