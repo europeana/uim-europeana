@@ -9,18 +9,8 @@ INDEX
 1. Installation Instructions 
 =============================
 
-1. Compile UIM modules
---------------------------
-Follow steps 1-2 as described in the /europeana-uim/README.txt in order to install 
-karaf and compile and install the core UIM modules.
 
-1.1 Compile extra UIM modules (these will NOT be compiled after issuing mvn install
-in the uim parent folder):
-/europeana-uim/plugins/solr3
-/extra/SourceCode/uim/trunk/uim/gui/common
-/extra/SourceCode/uim/trunk/uim/gui/controlpanel
-
-1.2.  Install the Europeana specific Sugarcrm server:
+1.  Install the Europeana specific Sugarcrm server:
 ----------------------------------------------------
 1.2.1. Download and install SugarCRM version 5.5.4 (NOT the latest version)
 from http://www.sugarforge.org/frs/download.php/7016/SugarCE-5.5.4.zip
