@@ -85,6 +85,21 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	private static int mongoDBport;
 	private static SolrServer solrServer;
 	private static MongoDBServer mongoServer;
+	
+	/** Property which allows to overwrite base url from collection/provider */
+	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
+
+	/**
+	 * The parameters used by this WorkflowStart
+	 */
+	private static final List<String> params = new ArrayList<String>() {
+		private static final long serialVersionUID = 1L;
+		{
+			add(httpzipurl);
+		}
+	};
+    
+    
 	public SolrWorkflowPlugin() {
 		super("solr_workflow", "Solr Repository Ingestion Plugin"); 
 	}
@@ -268,8 +283,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	@Override
 	public List<String> getParameters() {
-		// TODO Auto-generated method stub
-		return null;
+		return params;
 	}
 
 
