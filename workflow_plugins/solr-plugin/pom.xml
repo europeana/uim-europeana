@@ -19,21 +19,17 @@
 			<version>3.5.0</version>
 		</dependency>
 		<dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-core</artifactId>
-                <version>3.5.0</version>
-        </dependency>
-	  <!--   <dependency>
 			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-test-framework</artifactId>
+			<artifactId>solr-core</artifactId>
 			<version>3.5.0</version>
-			<scope>test</scope>
-	    </dependency> -->
-	    <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-		    <version>3.5.0</version>
-        </dependency>
+		</dependency>
+		<!-- <dependency> <groupId>org.apache.solr</groupId> <artifactId>solr-test-framework</artifactId> 
+			<version>3.5.0</version> <scope>test</scope> </dependency> -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>3.5.0</version>
+		</dependency>
 
 		<!-- JUnit dependencies -->
 
@@ -73,18 +69,42 @@
 			<artifactId>jibx-extras</artifactId>
 			<version>${jibx.version}</version>
 		</dependency>
-	<dependency>
+	<!--	<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>3.1.0.RELEASE</version>
 		</dependency>
-		<!-- Other 
+	-->
+
 		<dependency>
-			<scope>test</scope>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>3.1.0.RELEASE</version>
-		</dependency>-->
+			<groupId>com.google.code.morphia</groupId>
+			<artifactId>morphia</artifactId>
+			<version>0.99-SNAPSHOT-208patch</version>
+			<scope>compile</scope>
+		</dependency>
+		<!--Optional Jars (for certain features) but required by maven for building. -->
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>[2.1_3,)</version>
+			<type>jar</type>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.proxytoys</groupId>
+			<artifactId>proxytoys</artifactId>
+			<version>1.0</version>
+			<type>jar</type>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.4</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- Other <dependency> <scope>test</scope> <groupId>org.springframework</groupId> 
+			<artifactId>spring-test</artifactId> <version>3.1.0.RELEASE</version> </dependency> -->
 	</dependencies>
 
 
@@ -109,7 +129,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.1.0</version>
+
 				<extensions>true</extensions>
 				<configuration>
 					<obrRepository>NONE</obrRepository>
@@ -118,11 +138,18 @@
 						<Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
 						<Import-Package>
 							eu.europeana.uim.solr3,
-                            org.apache.lucene.*;version="3.5.0",
-                            org.apache.solr.*;version="3.5.0",
-                            *
+							org.apache.solr.*,
+							org.apache.lucene.*,
+							!com.google.gwt.user.client.rpc,
+							!net.sf.cglib.asm.util,
+							!org.apache.tools.ant.*,
+							!org.testng.*,
+							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
+						<Embed-Dependency>
+							*;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|jibx-run|jibx-extras|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|solr-solrj|spring-context-support
+						</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
