@@ -16,6 +16,7 @@
  */
 package eu.europeana.uim.mintclient.service;
 
+import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.store.Collection;
@@ -34,27 +35,29 @@ public interface MintUIMService {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void createMintAuthorizedUser(Provider<?> provider) throws MintOSGIClientException, MintRemoteException;
+	public void createMintAuthorizedUser(Provider<?> provider) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
 	
 	/**
 	 * @param provider
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void createMintOrganization(Provider<?> provider) throws MintOSGIClientException, MintRemoteException;
+	public void createMintOrganization(Provider<?> provider) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
 	
 	/**
 	 * @param collection
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void createMappingSession(Collection<?> collection) throws MintOSGIClientException, MintRemoteException;
+	public void createMappingSession(Collection<?> collection) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
 	
 	/**
 	 * @param collection
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void publishCollection(Collection<?> collection) throws MintOSGIClientException, MintRemoteException;
+	public void publishCollection(Collection<?> collection) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
+
+
 	
 }

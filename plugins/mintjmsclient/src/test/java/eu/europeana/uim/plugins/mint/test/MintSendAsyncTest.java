@@ -29,14 +29,18 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.ImportExistsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
+import eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 
 
 
 /**
- *
+ * Unit Tests for the asynchronous AMPQ client
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */
@@ -44,6 +48,8 @@ public class MintSendAsyncTest {
 	private static MintAMPQClientASync client;
 	
 	/**
+	 * Create the client on test initialization
+	 * 
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
@@ -53,9 +59,10 @@ public class MintSendAsyncTest {
 	}
 	    
 	/**
-	 * 
+	 * Deallocate resources on system shutdown
 	 */
 	@AfterClass public static void tearDown() {
+		//client.
 	   client = null;
 	   System.gc();
 	}
@@ -145,4 +152,37 @@ public class MintSendAsyncTest {
 		command.setUserId("userId");
 		client.publishCollection(command);
 	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void organizationExists() throws Exception{
+		OrganizationExistsCommand command = new OrganizationExistsCommand();
+		command.setOrganizationId("1001");
+		client.organizationExists(command);
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void userExists() throws Exception{
+		UserExistsCommand command = new UserExistsCommand();
+		command.setUserId("userId");
+		client.userExists(command);
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void importExists() throws Exception{
+		ImportExistsCommand command = new ImportExistsCommand();
+		command.setImportId("importId");
+		client.importExists(command);
+	}
+	
+	
 }

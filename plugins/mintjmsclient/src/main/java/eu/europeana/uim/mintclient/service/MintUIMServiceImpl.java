@@ -19,6 +19,7 @@ package eu.europeana.uim.mintclient.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -29,16 +30,21 @@ import eu.europeana.uim.mintclient.ampq.MintAMPQClientASync;
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
+import eu.europeana.uim.mintclient.jibxbindings.CreateImportResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
+import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.Orchestrator;
+import eu.europeana.uim.api.StorageEngineException;
 
 
 /**
@@ -50,40 +56,44 @@ public class MintUIMServiceImpl implements MintUIMService {
 
 	private static MintAMPQClientSync synchronousClient;
 	private static MintAMPQClientASync asynchronousClient;
-	private static Registry registry;
-	private static Orchestrator<?> orchestrator;
-	
+	private Registry registry;
+	private Orchestrator<?> orchestrator;
+	private LoggingEngine<?> logger; 
 	
 	/**
 	 * 
 	 */
-	public MintUIMServiceImpl(){
-		 
+	@SuppressWarnings("unchecked")
+	public MintUIMServiceImpl(Registry registry,Orchestrator<?> orchestrator){
+		this.registry = registry;
+		this.orchestrator = orchestrator;
+		this.logger = (LoggingEngine<?>) (registry!=null ? registry.getLoggingEngine(): null);
 	}
 	
 	
 	/**
+	 * @param <T>
 	 * @param registryref
 	 * @param orchestratorref
 	 */
-	public static void createService(Registry registryref, Orchestrator<?> orchestratorref ){
 
-		registry = registryref;
-		orchestrator = orchestratorref;
-		
-		
+	public static MintUIMServiceImpl  createService(Registry registryref, Orchestrator<?> orchestratorref ){
+
 		MintClientFactory factory = new MintClientFactory();
 		try {
-			synchronousClient = (MintAMPQClientSync) factory.syncMode().createClient();
-			
+			synchronousClient = (MintAMPQClientSync) factory.syncMode().createClient();			
 			asynchronousClient = (MintAMPQClientASync) factory.asyncMode(MintUIMServiceImpl.UIMConsumerListener.class).createClient();
+			return new MintUIMServiceImpl(registryref,orchestratorref);
 		} catch (MintOSGIClientException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			registryref.getLoggingEngine().logFailed(Level.SEVERE,
+					"MintUIMServiceImpl", e,
+					"Error instaniating service, client threw an exception");
 		} catch (MintRemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			registryref.getLoggingEngine().logFailed(Level.SEVERE,
+					"MintUIMServiceImpl", e,
+					"Error instaniating service, remote Mint Service threw an exception");
 		}
+		return null;
 	}
 	
 	
@@ -95,17 +105,23 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 * (eu.europeana.uim.store.Provider)
 	 */
 	@Override
-	public void createMintOrganization(Provider<?> provider)
-			throws MintOSGIClientException, MintRemoteException {
+	public void createMintOrganization(Provider provider)
+			throws MintOSGIClientException, MintRemoteException, StorageEngineException {
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
-		command.setCorrelationId("correlationId");
-		command.setCountry("es");
-		command.setEnglishName("TestOrg");
-		command.setName("TestOrg");
-		command.setType("Type");
-		command.setUserId("1002");
-		synchronousClient.createOrganization(command);
-
+		command.setCountry(provider.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY));
+		command.setEnglishName(provider.getName());
+		command.setName(provider.getName());
+		command.setType(provider.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
+		String userID = provider.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID);
+		if(userID == null){
+			throw new MintOSGIClientException("User ID value in provider cannot be null");
+		}
+		command.setUserId(userID);
+		
+		CreateOrganizationResponse resp = synchronousClient.createOrganization(command);
+		provider.putValue(ControlledVocabularyProxy.MINTID, resp.getOrganizationId());
+		
+		registry.getStorageEngine().updateProvider(provider);
 	}
 
 	/*
@@ -116,17 +132,17 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 * (eu.europeana.uim.store.Provider)
 	 */
 	@Override
-	public void createMintAuthorizedUser(Provider<?> provider)
+	public void createMintAuthorizedUser(Provider provider)
 			throws MintOSGIClientException, MintRemoteException {
 		CreateUserCommand command = new CreateUserCommand();
-		command.setCorrelationId("correlationId");
+
 		command.setEmail("email");
 		command.setFirstName("firstName");
 		command.setLastName("lastName");
 		command.setUserName("userX");
 		command.setPassword("werwer");
 		command.setPhone("234234234");
-		command.setOrganization("1001");
+		command.setOrganization(provider.getValue(ControlledVocabularyProxy.MINTID));
 		synchronousClient.createUser(command);
 
 	}
@@ -139,15 +155,18 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 * (eu.europeana.uim.store.Collection)
 	 */
 	@Override
-	public void createMappingSession(Collection<?> collection)
-			throws MintOSGIClientException, MintRemoteException {
+	public void createMappingSession(Collection collection)
+			throws MintOSGIClientException, MintRemoteException, StorageEngineException {
 		CreateImportCommand command = new CreateImportCommand();
 
-		command.setCorrelationId("123");
-		command.setUserId("1000");
-		command.setOrganizationId("1");
-		command.setRepoxTableName("azores13");
-		synchronousClient.createImports(command);
+		Provider provider = collection.getProvider();
+		command.setUserId(provider.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
+		command.setOrganizationId(provider.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERPASSWORD));
+		command.setRepoxTableName(collection.getValue(ControlledVocabularyProxy.REPOXID));
+		CreateImportResponse resp = synchronousClient.createImports(command);
+		
+		collection.putValue(ControlledVocabularyProxy.LATESTMINTMAPPINGID, resp.getImportId());
+		registry.getStorageEngine().updateCollection(collection);
 
 	}
 
@@ -161,8 +180,10 @@ public class MintUIMServiceImpl implements MintUIMService {
 	@Override
 	public void publishCollection(Collection<?> collection)
 			throws MintOSGIClientException, MintRemoteException {
+		
+		Provider provider = collection.getProvider();
 		PublicationCommand command = new PublicationCommand();
-		command.setCorrelationId("correlationId");
+		//command.setCorrelationId("correlationId");
 		List<String> list = new ArrayList<String>();
 		list.add("test1");
 		list.add("test2");

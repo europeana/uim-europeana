@@ -9,7 +9,6 @@
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>eu.europeana</groupId>
 	<artifactId>europeana-uim-plugin-mint</artifactId>
 	<packaging>bundle</packaging>
 	<name>Unified Ingestion Manager: Mint JMS Client Plugin</name>
@@ -64,7 +63,6 @@
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
-				<version>2.1.0</version>
 				<configuration>
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>

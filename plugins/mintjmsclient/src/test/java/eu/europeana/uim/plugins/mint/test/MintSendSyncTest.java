@@ -41,9 +41,18 @@ import eu.europeana.uim.mintclient.jibxbindings.GetImportsResponse;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsAction;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsResponse;
+import eu.europeana.uim.mintclient.jibxbindings.ImportExistsAction;
+import eu.europeana.uim.mintclient.jibxbindings.ImportExistsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.ImportExistsResponse;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsAction;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsResponse;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationResponse;
+import eu.europeana.uim.mintclient.jibxbindings.UserExistsAction;
+import eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.UserExistsResponse;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
@@ -194,6 +203,49 @@ public class MintSendSyncTest {
 		PublicationResponse resp = client.publishCollection(command);
 		PublicationAction act = new PublicationAction();
 		act.setPublicationResponse(resp);
+		log.info(MintClientUtils.unmarshallObject(act));
+		assertNotNull(resp);
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void organizationExists() throws Exception{
+		OrganizationExistsCommand command = new OrganizationExistsCommand();
+		command.setOrganizationId("1001");
+		OrganizationExistsResponse resp = client.organizationExists(command);
+		OrganizationExistsAction act = new OrganizationExistsAction();
+		act.setOrganizationExistsResponse(resp);
+		log.info(MintClientUtils.unmarshallObject(act));
+		assertNotNull(resp);
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void userExists() throws Exception{
+		UserExistsCommand command = new UserExistsCommand();
+		command.setUserId("userId");
+		UserExistsResponse resp = client.userExists(command);
+		UserExistsAction act = new UserExistsAction();
+		act.setUserExistsResponse(resp);
+		log.info(MintClientUtils.unmarshallObject(act));
+		assertNotNull(resp);
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void importExists() throws Exception{
+		ImportExistsCommand command = new ImportExistsCommand();
+		command.setImportId("importId");
+		ImportExistsResponse resp = client.importExists(command);
+		ImportExistsAction act = new ImportExistsAction();
+		act.setImportExistsResponse(resp);
 		log.info(MintClientUtils.unmarshallObject(act));
 		assertNotNull(resp);
 	}
