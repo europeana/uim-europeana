@@ -18,7 +18,8 @@ package eu.europeana.uim.mintclient.service.exceptions;
 
 
 /**
- *
+ * An exception thrown by the remote service.
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */

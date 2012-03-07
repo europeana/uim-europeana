@@ -33,55 +33,67 @@ import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 
 
 /**
- *
+ * Interface for a synchronous AMPQ Client
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */
 public interface MintAMPQClientSync extends MintAMPQClient {
 
 	/**
-	 * @param command
-	 * @return
+	 * Send a message that creates an Organization entity
+	 * 
+	 * @param command the AMPQ message payload
+	 * @return the payload of the AMPQ message response
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
 	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
-	 * @param command
-	 * @return
+	 * Send a message that creates a User entity
+	 * 
+	 * @param command the AMPQ message payload
+	 * @return the payload of the AMPQ message response
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
 	public CreateUserResponse createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
-	 * @param command
-	 * @return
+	 * Send a message that gets the specific imports on a given Organization
+	 * 
+	 * @param command the AMPQ message payload
+	 * @return the payload of the AMPQ message response
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
 	public GetImportsResponse getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
-	 * @param command
-	 * @return
+	 * Send a message that gets the transformations from a given Organization
+	 * 
+	 * @param command the AMPQ message payload
+	 * @return the payload of the AMPQ message response
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
 	public GetTransformationsResponse getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
-	 * @param command
-	 * @return
+	 * Publishes the given collection by applying a specific transformation
+	 * 
+	 * @param command the AMPQ message payload
+	 * @return the payload of the AMPQ message response
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
 	public PublicationResponse publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
-	 * @param command
-	 * @return
+	 * Send a message that creates a mapping session by importing from Repox
+	 * 
+	 * @param command the AMPQ message payload
+	 * @return the payload of the AMPQ message response
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */

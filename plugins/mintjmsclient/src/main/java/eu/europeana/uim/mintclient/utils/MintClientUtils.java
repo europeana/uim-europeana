@@ -28,6 +28,7 @@ import eu.europeana.uim.mintclient.service.exceptions.MintGenericException;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 
 /**
+ * Utilities Class for the Mint Client
  * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
@@ -35,8 +36,11 @@ import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 public class MintClientUtils {
 
 	/**
+	 * Unmarshall a JibX object.
+	 * 
 	 * @param jibxObject
-	 * @return
+	 *            the JIBX object
+	 * @return the XML String
 	 * @throws MintOSGIClientException
 	 */
 	public static synchronized String unmarshallObject(Object jibxObject)
@@ -62,9 +66,13 @@ public class MintClientUtils {
 	}
 
 	/**
+	 * Marhalls a String to a JIBX object
+	 * 
 	 * @param str2marshall
+	 *            the String to marshall
 	 * @param type
-	 * @return
+	 *            the class of the produced JIBX Object
+	 * @return the marshalled object
 	 * @throws MintOSGIClientException
 	 */
 	@SuppressWarnings("unchecked")
@@ -85,16 +93,22 @@ public class MintClientUtils {
 	}
 
 	/**
+	 * Wraps the contents of a thrown exception to a mint exception type.
+	 * The latter is instantiated via reflection.
+	 * 
 	 * @param e
+	 *            the original exception
 	 * @param toconvert
+	 *            the mint-specific exception type to be returned
 	 * @param extra
-	 * @return
+	 *            an array of information to be included in the exception
+	 *            message
+	 * @return the mint-specific exception
 	 * @throws MintOSGIClientException
 	 */
 	public static synchronized <T extends MintGenericException> T propagateException(
 			Exception e, Class<T> toconvert, String... extra)
 			throws MintOSGIClientException {
-
 		StringBuilder clientErrorMsg = new StringBuilder();
 		clientErrorMsg.append(e.getClass());
 		clientErrorMsg.append(":");
@@ -104,16 +118,12 @@ public class MintClientUtils {
 			clientErrorMsg.append(" ");
 			clientErrorMsg.append(extra[i]);
 		}
-
 		Constructor<T> con;
 		try {
-
 			con = toconvert.getConstructor(String.class);
 			T instance = (T) con.newInstance(clientErrorMsg.toString());
 			return instance;
-
 		} catch (Exception ex) {
-
 			throw new MintOSGIClientException("Error in propagating exception.");
 		}
 

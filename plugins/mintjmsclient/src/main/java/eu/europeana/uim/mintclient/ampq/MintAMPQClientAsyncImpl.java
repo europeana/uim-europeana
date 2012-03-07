@@ -27,7 +27,6 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.AMQP.BasicProperties.Builder;
 import com.rabbitmq.client.Consumer;
-
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
@@ -47,7 +46,7 @@ import eu.europeana.uim.mintclient.utils.MintClientUtils;
 
 
 /**
- * A Class implementing an asynchronous client.
+ * A Singleton Class implementing an asynchronous client.
  * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
@@ -72,8 +71,10 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 	
 	
 	/**
-	 * Protected static factory method for creating a MINT asynchronous client.
-	 * It takes a 
+	 * Protected overriden static factory method for creating a MINT asynchronous client.
+	 * It takes a Class type argument to indicate the listener class that will be used
+	 * to monitor the specific session, and then instantiates this class via reflection.
+	 * Only public and public static nested classes can by used as listeners. 
 	 * 
 	 * @param listenerClassType the listener class type to be instantiated via reflection
 	 * @return an instance of this class
@@ -82,7 +83,6 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 	protected static <T extends DefaultConsumer> MintAMPQClientASync getClient(Class<T> listenerClassType) throws MintOSGIClientException{
 		
 		Constructor<T> con;
-
 			try {
 				con = listenerClassType.getConstructor(Channel.class);
 				defaultConsumer = (T) con.newInstance(receiveChannel);
@@ -106,11 +106,17 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
 						"Error in instantiating session listener");
 			}
-
-		
 		return getClient();
 	}
 
+	/**
+	 * Protected overridden static factory method for creating a MINT asynchronous client.
+	 * Since this is a singleton class , this method will prohibit from instantiating the
+	 * same object twice.
+	 * 
+	 * @return an instance of this class
+	 * @throws MintOSGIClientException
+	 */
 	protected static MintAMPQClientASync getClient() throws MintOSGIClientException{
 		
 		if(instance != null){
@@ -129,12 +135,8 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 				receiveChannel = rabbitConnection.createChannel();
 				sendChannel.queueDeclare(inbound, true, false, false, null);
 				receiveChannel.queueDeclare(outbound, true, false, false, null);
-				
 				defaultConsumer =  defaultConsumer==null ? new UIMConsumerListener(receiveChannel) : defaultConsumer;
-
-				
 				receiveChannel.basicConsume(outbound, true, defaultConsumer);
-				
 				instance = new MintAMPQClientAsyncImpl();
 				
 			} catch (IOException e) {			
@@ -145,6 +147,10 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		return instance;
 	}
 	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#createOrganization(eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand)
+	 */
 	@Override
 	public void createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateOrganizationAction cu = new CreateOrganizationAction();
@@ -153,6 +159,9 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#createUser(eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand)
+	 */
 	@Override
 	public void createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateUserAction cu = new CreateUserAction();
@@ -161,8 +170,9 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
-	
-	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#getImports(eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand)
+	 */
 	@Override
 	public void getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException {
 		GetImportsAction cu = new GetImportsAction();
@@ -171,6 +181,9 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#createImports(eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand)
+	 */
 	@Override
 	public void createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException {
 		CreateImportAction cu = new CreateImportAction();
@@ -179,6 +192,9 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#getTransformations(eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand)
+	 */
 	@Override
 	public void getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException {
 		GetTransformationsAction cu = new GetTransformationsAction();
@@ -187,6 +203,9 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#publishCollection(eu.europeana.uim.mintclient.jibxbindings.PublicationCommand)
+	 */
 	@Override
 	public void publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException {
 		PublicationAction cu = new PublicationAction();
@@ -198,6 +217,16 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 
 	
 	
+	/**
+	 * Sends a message to the specific queue
+	 * 
+	 * @param correlationId
+	 * @param payload
+	 * @param isLast
+	 * @param queue
+	 * @throws MintRemoteException
+	 * @throws MintOSGIClientException
+	 */
 	private void sendChunk(String correlationId,byte[] payload, boolean isLast,String queue) throws MintRemoteException, MintOSGIClientException{
 		builder.deliveryMode(2);
 		HashMap<String, Object> heads = new HashMap<String, Object>();
@@ -219,9 +248,5 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 					"Error in in sending asynchronous chunk");
 		}
 	}
-
-
-	
-
 
 }

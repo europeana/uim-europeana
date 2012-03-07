@@ -16,9 +16,9 @@
  */
 package eu.europeana.uim.mintclient.service.exceptions;
 
-
 /**
- *
+ * An exception thrown within the Mint OSGI client itself.
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */
@@ -26,6 +26,12 @@ public class MintOSGIClientException extends MintGenericException {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * This constructor takes as an argument a String
+	 * 
+	 * @param message
+	 *            the exception message
+	 */
 	public MintOSGIClientException(String message) {
 		super(message);
 	}

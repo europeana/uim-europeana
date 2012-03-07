@@ -18,7 +18,8 @@ package eu.europeana.uim.mintclient.service.exceptions;
 
 
 /**
- *
+ * The abstract parent of all Mint related exceptions
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */

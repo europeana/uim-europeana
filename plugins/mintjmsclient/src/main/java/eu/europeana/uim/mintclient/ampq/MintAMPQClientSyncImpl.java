@@ -50,7 +50,8 @@ import com.rabbitmq.client.ShutdownSignalException;
 
 
 /**
- *
+ * A Singleton Class implementing a asynchronous client.
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */
@@ -60,27 +61,29 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 	protected static Channel sendChannel;
 	protected static Channel receiveChannel;
 	protected static String rpcQueue = "RPCQueue";
-	protected static String rndReplyqueue;
-	
+	protected static String rndReplyqueue;	
 	protected static Builder builder;
 	protected static BasicProperties pros;
 	private static QueueingConsumer consumer;
-
 	private static MintAMPQClientSyncImpl instance;
 	
 
 	/**
-	 * 
+	 * Private constructor (can only be instantiated via Factory class)
 	 */
 	private MintAMPQClientSyncImpl(){
 	}
 	
 	
-
 	/**
-	 * @return
+	 * Protected overridden static factory method for creating a MINT asynchronous client.
+	 * Since this is a singleton class , this method will prohibit from instantiating the
+	 * same object twice.
+	 * 
+	 * @return an instance of this class
+	 * @throws MintOSGIClientException
 	 */
-	protected static MintAMPQClientSync getClient() {
+	protected static MintAMPQClientSync getClient() throws MintOSGIClientException {
 		
 		if(instance != null){
 			return instance;
@@ -103,7 +106,8 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 				instance = new MintAMPQClientSyncImpl();
 				
 			} catch (IOException e) {			
-				e.printStackTrace();
+				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
+						"Error in instantiating synchronous client");
 			}
 		}
 		return instance;
@@ -201,8 +205,10 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 
 	
 	/**
+	 * Handles a synchronous delivery by the client
 	 * @param correlationID
-	 * @return
+	 * @return the XML string
+	 * 
 	 * @throws MintRemoteException
 	 * @throws MintOSGIClientException
 	 */
@@ -228,6 +234,7 @@ public class MintAMPQClientSyncImpl extends MintAbstractAMPQClient implements Mi
 	
 	
 	/**
+	 * Sends a chunk to the specified queue
 	 * @param correlationId
 	 * @param payload
 	 * @param isLast
