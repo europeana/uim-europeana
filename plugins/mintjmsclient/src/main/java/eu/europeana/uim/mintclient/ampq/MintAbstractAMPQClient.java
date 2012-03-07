@@ -15,7 +15,18 @@
  *  the Licence.
  */
 package eu.europeana.uim.mintclient.ampq;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Properties;
+
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.AMQP.BasicProperties;
+import com.rabbitmq.client.AMQP.BasicProperties.Builder;
+
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.utils.MintClientUtils;
 
 
 
@@ -34,11 +45,25 @@ public abstract class MintAbstractAMPQClient {
 	private static String host;
 	
 	
+	protected static Connection rabbitConnection;
+	protected static Channel sendChannel;
+	protected static Channel receiveChannel;
+	protected static String inbound = "MintInboundQueue";
+	protected static String outbound = "MintOutboundQueue";
+	
+	protected static String rpcQueue = "RPCQueue";
+	protected static String rndReplyqueue;	
+	
+	
+	protected static Builder builder;
+	protected static BasicProperties pros;
+	
 	static {
 		
 		username = "guest";
 		password = "guest";
 		host = "panic.image.ntua.gr";
+		
 		/*
 		try {
 
@@ -84,6 +109,38 @@ public abstract class MintAbstractAMPQClient {
 	 */
 	public static String getHost() {
 		return host;
+	}
+	
+	/**
+	 * Sends a message to the specific queue
+	 * 
+	 * @param correlationId
+	 * @param payload
+	 * @param isLast
+	 * @param queue
+	 * @throws MintRemoteException
+	 * @throws MintOSGIClientException
+	 */
+	protected void sendChunk(String correlationId,byte[] payload, boolean isLast,String sendqueue,String receivequeue) throws MintRemoteException, MintOSGIClientException{
+		builder.deliveryMode(2);
+		HashMap<String, Object> heads = new HashMap<String, Object>();
+		heads.put("isLast", isLast);
+		builder.headers(heads);
+		BasicProperties properties =  new BasicProperties
+         .Builder()
+         .correlationId(correlationId)
+         .replyTo(receivequeue)
+         //.headers(message.header().properties())
+         .build();
+		
+		try {
+			sendChannel.basicPublish( "", sendqueue, 
+					properties,
+			        payload);
+		} catch (IOException e) {
+			throw MintClientUtils.propagateException(e, MintRemoteException.class,
+					"Error in in sending asynchronous chunk");
+		}
 	}
 
 }

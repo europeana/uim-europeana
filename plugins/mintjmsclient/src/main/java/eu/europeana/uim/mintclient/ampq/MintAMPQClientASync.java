@@ -22,6 +22,9 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.ImportExistsCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 
@@ -88,4 +91,35 @@ public interface MintAMPQClientASync extends MintAMPQClient {
 	 * @throws MintRemoteException
 	 */
 	public void createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException;
+
+
+    /**
+     * Checks if an organisation with the provided id exists
+     * 
+     * @param command
+     * @throws MintOSGIClientException
+     * @throws MintRemoteException
+     */
+    public void organizationExists(OrganizationExistsCommand command) throws MintOSGIClientException, MintRemoteException;
+
+    /**
+     * Checks if a user with the provided id exists
+     * 
+     * @param command
+     * @throws MintOSGIClientException
+     * @throws MintRemoteException
+     */
+    public void userExists(UserExistsCommand command) throws MintOSGIClientException, MintRemoteException;
+    
+    /**
+     * Checks if an import with the provided id exists
+     * @param command
+     * @throws MintOSGIClientException
+     * @throws MintRemoteException
+     */
+    public void importExists(ImportExistsCommand command) throws MintOSGIClientException, MintRemoteException;
+
+
+
+
 }

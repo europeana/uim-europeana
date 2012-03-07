@@ -163,7 +163,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 			throws MintOSGIClientException, MintRemoteException {
 		PublicationCommand command = new PublicationCommand();
 		command.setCorrelationId("correlationId");
-		List<String> list = new ArrayList();
+		List<String> list = new ArrayList<String>();
 		list.add("test1");
 		list.add("test2");
 		command.setIncludedImportList(list);

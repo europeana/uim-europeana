@@ -21,18 +21,40 @@ import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 
+
 /**
- * @author geomark
  *
+ * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @since 7 Mar 2012
  */
 public interface MintUIMService {
 
+	/**
+	 * @param provider
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	public void createMintAuthorizedUser(Provider<?> provider) throws MintOSGIClientException, MintRemoteException;
 	
+	/**
+	 * @param provider
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	public void createMintOrganization(Provider<?> provider) throws MintOSGIClientException, MintRemoteException;
 	
+	/**
+	 * @param collection
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	public void createMappingSession(Collection<?> collection) throws MintOSGIClientException, MintRemoteException;
 	
+	/**
+	 * @param collection
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
 	public void publishCollection(Collection<?> collection) throws MintOSGIClientException, MintRemoteException;
 	
 }

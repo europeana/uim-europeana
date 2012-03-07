@@ -19,12 +19,11 @@ package eu.europeana.uim.mintclient.ampq;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.Date;
+
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
-import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.AMQP.BasicProperties.Builder;
 import com.rabbitmq.client.Consumer;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
@@ -37,8 +36,14 @@ import eu.europeana.uim.mintclient.jibxbindings.GetImportsAction;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsAction;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.ImportExistsAction;
+import eu.europeana.uim.mintclient.jibxbindings.ImportExistsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsAction;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
+import eu.europeana.uim.mintclient.jibxbindings.UserExistsAction;
+import eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
@@ -53,13 +58,7 @@ import eu.europeana.uim.mintclient.utils.MintClientUtils;
  */
 public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements MintAMPQClientASync{
 
-	protected static Connection rabbitConnection;
-	protected static Channel sendChannel;
-	protected static Channel receiveChannel;
-	protected static String inbound = "MintInboundQueue";
-	protected static String outbound = "MintOutboundQueue";
-	protected static Builder builder;
-	protected static BasicProperties pros;
+
 	private static Consumer defaultConsumer;
 	private static MintAMPQClientAsyncImpl instance;
 	
@@ -156,7 +155,7 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		CreateOrganizationAction cu = new CreateOrganizationAction();
 		cu.setCreateOrganizationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 	/* (non-Javadoc)
@@ -167,7 +166,7 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		CreateUserAction cu = new CreateUserAction();
 		cu.setCreateUserCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 	/* (non-Javadoc)
@@ -178,7 +177,7 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		GetImportsAction cu = new GetImportsAction();
 		cu.setGetImportsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 	/* (non-Javadoc)
@@ -189,7 +188,7 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		CreateImportAction cu = new CreateImportAction();
 		cu.setCreateImportCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
 	}
 	
 	/* (non-Javadoc)
@@ -200,7 +199,7 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		GetTransformationsAction cu = new GetTransformationsAction();
 		cu.setGetTransformationsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 	/* (non-Javadoc)
@@ -211,42 +210,50 @@ public class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements M
 		PublicationAction cu = new PublicationAction();
 		cu.setPublicationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound);
+		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 
-	
-	
-	/**
-	 * Sends a message to the specific queue
-	 * 
-	 * @param correlationId
-	 * @param payload
-	 * @param isLast
-	 * @param queue
-	 * @throws MintRemoteException
-	 * @throws MintOSGIClientException
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#organizationExists(eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand)
 	 */
-	private void sendChunk(String correlationId,byte[] payload, boolean isLast,String queue) throws MintRemoteException, MintOSGIClientException{
-		builder.deliveryMode(2);
-		HashMap<String, Object> heads = new HashMap<String, Object>();
-		heads.put("isLast", isLast);
-		builder.headers(heads);
-		BasicProperties properties =  new BasicProperties
-         .Builder()
-         .correlationId(correlationId)
-         .replyTo(outbound)
-         //.headers(message.header().properties())
-         .build();
+	@Override
+	public void organizationExists(OrganizationExistsCommand command)
+			throws MintOSGIClientException, MintRemoteException {
+		String correlationId = new Date().toString();	
+		OrganizationExistsAction action  = new OrganizationExistsAction();
+		action.setOrganizationExistsCommand(command);
+		String cmdstring = MintClientUtils.unmarshallObject(action);
+		sendChunk(correlationId,cmdstring.getBytes(),true,inbound,outbound);
 		
-		try {
-			sendChannel.basicPublish( "", queue, 
-					properties,
-			        payload);
-		} catch (IOException e) {
-			throw MintClientUtils.propagateException(e, MintRemoteException.class,
-					"Error in in sending asynchronous chunk");
-		}
+	}
+
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#userExists(eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand)
+	 */
+	@Override
+	public void userExists(UserExistsCommand command)
+			throws MintOSGIClientException, MintRemoteException {
+		String correlationId = new Date().toString();	
+		UserExistsAction action = new UserExistsAction();
+		action.setUserExistsCommand(command);
+		String cmdstring = MintClientUtils.unmarshallObject(action);
+		sendChunk(correlationId,cmdstring.getBytes(),true,inbound,outbound);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#importExists(eu.europeana.uim.mintclient.jibxbindings.ImportExistsCommand)
+	 */
+	@Override
+	public void importExists(ImportExistsCommand command)
+			throws MintOSGIClientException, MintRemoteException {
+		String correlationId = new Date().toString();	
+		ImportExistsAction action = new ImportExistsAction();
+		action.setImportExistsCommand(command);
+		String cmdstring = MintClientUtils.unmarshallObject(action);
+		sendChunk(correlationId,cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 }
