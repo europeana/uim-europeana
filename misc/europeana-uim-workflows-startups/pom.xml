@@ -100,7 +100,7 @@
 						<Export-Package>
 							eu.europeana.uim.europeanaspecific.workflowstarts.*,
 						</Export-Package>
-						<Embed-Dependency>oclc-harvester2,log4j,xalan,corelib-definitions</Embed-Dependency>
+						<Embed-Dependency>oclc-harvester2,log4j,xalan,corelib-solr-definitions</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
