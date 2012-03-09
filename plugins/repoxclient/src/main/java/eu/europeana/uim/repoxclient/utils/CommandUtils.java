@@ -1,22 +1,18 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2007-2012 The Europeana Foundation
  *
- * Licensed under the EUPL, Version 1.1 or - as soon they
- * will be approved by the European Commission - subsequent
- * versions of the EUPL (the "Licence");
- * you may not use this work except in compliance with the
- * Licence.
- * You may obtain a copy of the Licence at:
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
+ * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
  *
- * http://ec.europa.eu/idabc/eupl
- *
- * Unless required by applicable law or agreed to in
- * writing, software distributed under the Licence is
- * distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied.
- * See the Licence for the specific language governing
- * permissions and limitations under the Licence.
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
 package eu.europeana.uim.repoxclient.utils;
 
@@ -25,30 +21,44 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.Set;
-
 import eu.europeana.uim.api.StorageEngine;
-
 import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.repox.AggregatorOperationException;
 import eu.europeana.uim.repox.DataSourceOperationException;
 import eu.europeana.uim.repox.HarvestingOperationException;
 import eu.europeana.uim.repox.ProviderOperationException;
 import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.repox.model.RepoxHarvestingStatus;
-import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
-import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 
 /**
- * A collection of methods 
+ * Utility class containing Operations used by the command console
  * 
  * @author Yorgos Mamakis Email:yorgos.mamakis@kb.nl
- *
+ * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @since  Oct 2012
  */
+
 public class CommandUtils {
 
+	private final static String provMemonicVar = "Provider Mnemonic";
+	private final static String repoxIDVar = "repoxID";
+	private final static String provnameVar ="ProviderName";
+	private final static String dsnameVar ="Datasource Name"; 
+	private final static String dsmnemonicVar = "Datasource Mnemonic"; 
+	private final static String tripleTVar = "\t\t\t";
+	
+	/**
+	 * Private constructor (Utility classes should not have a public
+	 *  or default constructor.)
+	 */
+	private CommandUtils(){
+		
+	}
+	
 	/**
 	 * Retrieves the default URI of the Repox
 	 * 
@@ -73,9 +83,10 @@ public class CommandUtils {
 	 * @param out Console output
 	 * @param in Console input
 	 * @return Aggregator creation confirmation
+	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public static String createAggregator(RepoxUIMService repoxservice, String argument0, String argument1, PrintStream out, BufferedReader in) throws Exception{
+	public static String createAggregator(RepoxUIMService repoxservice, String argument0, String argument1, PrintStream out, BufferedReader in) throws IOException {
 		
 		
 		String aggregatorCountryCode = assignValue("Country Code", argument0, out,
@@ -167,40 +178,41 @@ public class CommandUtils {
 	 * @return Provider creation or update confirmation
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public static String executeCreateUpdateProviderAction(String action,
 			RepoxUIMService repoxservice, Registry registry, String argument0, String argument1,
 			String argument2, String argument3, String argument4,
-			String argument5, String argument6, String argument7,
-			String argument8, PrintStream out, BufferedReader in) throws Exception{
+			String argument5, String argument6, String argument7, PrintStream out, BufferedReader in) throws Exception{
 		
 		String providerName = assignValue("Provider Name", argument0, out, in);
-		String providerMnemonic = assignValue("Provider Mnemonic", argument1, out,
+		String providerMnemonic = assignValue(provMemonicVar, argument1, out,
 				in);
 		String providerUrl = assignValue("Provider URL", argument2, out, in);
 		String providerDescription = assignValue("Provider Description",
 				argument3, out, in);
 		String providerCountryName = assignValue("Provider Country", argument4,
 				out, in);
-		String providerWebsite = assignValue("Provider Website", argument5, out, in);
-		String providerSugarId = assignValue("Provider SugarCRM ID", argument6,
+		String providerSugarId = assignValue("Provider SugarCRM ID", argument5,
 				out, in);
-		String providerType = assignValue("Provider Type", argument7, out, in);
+		String providerType = assignValue("Provider Type", argument6, out, in);
 		String providerOaiMetadataPrefix = assignValue(
-				"Provider OAI Metadata Prefix", argument8, out, in);
+				"Provider OAI Metadata Prefix", argument7, out, in);
 
 		try {
 
 			StorageEngine<?> engine = registry.getStorageEngine();
+			@SuppressWarnings("rawtypes")
 			Provider prov = engine.createProvider();
 			prov.setAggregator(false);
 			prov.setMnemonic(providerMnemonic);
 			prov.setName(providerName);
 			prov.setOaiBaseUrl(providerUrl);
-			prov.putValue("providerDescription", providerDescription);
-			prov.putValue("providerCountry", providerCountryName);
-			prov.putValue("providerWebsite", providerUrl);
-			prov.putValue("sugarID", providerSugarId);
-			prov.putValue("providerType", providerType);
+			
+			prov.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, providerDescription);
+			prov.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, providerCountryName);
+			prov.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, providerUrl);
+			prov.putValue(ControlledVocabularyProxy.SUGARCRMID, providerSugarId);
+			prov.putValue(ControlledVocabularyProxy.PROVIDERTYPE, providerType);
 			prov.setOaiMetadataPrefix(providerOaiMetadataPrefix);
 			engine.updateProvider(prov);
 			engine.checkpoint();
@@ -231,22 +243,24 @@ public class CommandUtils {
 	 * @param out - Console Output
 	 * @param in - Console Input
 	 * @return Provider deletion confirmation
-	 * @throws Exception
+	 * @throws IOException 
+	 * @throws StorageEngineException 
 	 */
 	public static String deleteProvider(RepoxUIMService repoxservice,
 			Registry registry, String argument0, String argument1,
-			PrintStream out, BufferedReader in) throws Exception{
+			PrintStream out, BufferedReader in) throws IOException, StorageEngineException {
 		String providerName = assignValue("Provider Name", argument0, out, in);
-		String providerMnemonic = assignValue("Provider Mnemonic", argument1, out,
+		String providerMnemonic = assignValue(provMemonicVar, argument1, out,
 				in);
 		
 		try {
 
 			StorageEngine<?> engine = registry.getStorageEngine();
+			@SuppressWarnings("rawtypes")
 			Provider provider = engine.createProvider();
 			provider.setName(providerName);
 			provider.setMnemonic(providerMnemonic);
-			provider.putValue("repoxID", providerName + "r0");
+			provider.putValue(repoxIDVar, providerName + "r0");
 			repoxservice.deleteProviderfromUIMObj(provider);
 			return "Provider deleted successfully.";
 		} catch (ProviderOperationException e) {
@@ -272,22 +286,24 @@ public class CommandUtils {
 	 * @param out - Console Output
 	 * @param in - Console Input
 	 * @return Datasource creation confirmation
-	 * @throws Exception
+	 * @throws IOException 
+	 * @throws StorageEngineException 
 	 */
 	
 
+	@SuppressWarnings("unchecked")
 	public static String createUpdateDataSource(String action,RepoxUIMService repoxservice,
 			Registry registry, String argument0, String argument1,
 			String argument2, String argument3, String argument4,
-			String argument5, String argument6, PrintStream out, BufferedReader in) throws Exception{
+			String argument5, String argument6, PrintStream out, BufferedReader in) throws IOException, StorageEngineException {
 		
 		
-		String providerName = assignValue("ProviderName", argument0, out, in);
-		String providerMnemonic = assignValue("Provider Mnemonic", argument1, out,
+		String providerName = assignValue(provnameVar, argument0, out, in);
+		String providerMnemonic = assignValue(provMemonicVar, argument1, out,
 				in);
 		String dsLanguage = assignValue("Datasource Language", argument2, out, in);
-		String dsName = assignValue("Datasource Name", argument3, out, in);
-		String dsMnemonic = assignValue("Datasource Mnemonic", argument4, out, in);
+		String dsName = assignValue(dsnameVar, argument3, out, in);
+		String dsMnemonic = assignValue(dsmnemonicVar, argument4, out, in);
 		String dsOAIPMHURI = assignValue("Datasource OAI-PMH URI", argument5, out,
 				in);
 		String dsOAIMetadataPrefix = assignValue("Datasource Metadata Prefix",
@@ -296,11 +312,13 @@ public class CommandUtils {
 
 			StorageEngine<?> engine = registry.getStorageEngine();
 
+			@SuppressWarnings("rawtypes")
 			Provider provider = engine.createProvider();
 			provider.setName(providerName);
 			provider.setMnemonic(providerMnemonic);
-			provider.putValue("repoxID", providerName + "r0");
+			provider.putValue(repoxIDVar, providerName + "r0");
 
+			@SuppressWarnings("rawtypes")
 			Collection collection = engine.createCollection(provider);
 
 			collection.setLanguage(dsLanguage);
@@ -341,31 +359,36 @@ public class CommandUtils {
 	 * @param out - Console output
 	 * @param in - Console input
 	 * @return Datasource deletion confirmation
-	 * @throws Exception
+	 * @throws IOException 
+	 * @throws StorageEngineException 
 	 */
+	@SuppressWarnings("unchecked")
 	public static String deleteDatasource(RepoxUIMService repoxservice,
 			Registry registry, String argument0, String argument1,
-			String argument2, String argument3, String argument4, PrintStream out,  BufferedReader in) throws Exception{
-		String providerName = assignValue("ProviderName", argument0, out, in);
-		String providerMnemonic = assignValue("Provider Mnemonic", argument1, out,
+			String argument2, String argument3, String argument4, PrintStream out,  BufferedReader in) throws IOException, StorageEngineException {
+		String providerName = assignValue(provnameVar, argument0, out, in);
+		String providerMnemonic = assignValue(provMemonicVar, argument1, out,
 				in);
+		@SuppressWarnings("unused")
 		String dsLanguage = assignValue("Datasource Language", argument2, out, in);
-		String dsName = assignValue("Datasource Name", argument3, out, in);
-		String dsMnemonic = assignValue("Datasource Mnemonic", argument4, out, in);
+		String dsName = assignValue(dsnameVar, argument3, out, in);
+		String dsMnemonic = assignValue(dsmnemonicVar, argument4, out, in);
 		try {
 
 			StorageEngine<?> engine = registry.getStorageEngine();
 
+			@SuppressWarnings("rawtypes")
 			Provider provider = engine.createProvider();
 			provider.setName(providerName);
 			provider.setMnemonic(providerMnemonic);
-			provider.putValue("repoxID", providerName + "r0");
+			provider.putValue(repoxIDVar, providerName + "r0");
 
+			@SuppressWarnings("rawtypes")
 			Collection collection = engine.createCollection(provider);
 			collection.setMnemonic(dsMnemonic);
 			collection.setName(dsName);
 			collection.putValue("collectionID", dsName + "r0");
-			collection.putValue("repoxID", dsName + dsMnemonic + "r0");
+			collection.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
 			engine.updateCollection(collection);
 			engine.checkpoint();
 
@@ -390,17 +413,17 @@ public class CommandUtils {
 		try {
 			Set<Provider<?>> aggregators = repoxservice.retrieveAggregators();
 			sb.append("CountryCode\t\t\tName\t\t\tNameCode\t\t\tURL\n\n");
-			for (Provider aggregator : aggregators) {
+			for (Provider<?> aggregator : aggregators) {
 
 				sb.append(aggregator.getValue("country")
-						+ aggregator.getName() + "\t\t\t"
-						+ aggregator.getValue("nameCode") + "\t\t\t"
+						+ aggregator.getName() + tripleTVar
+						+ aggregator.getValue("nameCode") + tripleTVar
 						+ aggregator.getValue("url") + "\n");
 
 			}
 		} catch (Exception e) {
-			sb.append("Error occurred in the retrieval of aggregators. "
-					+ e.getMessage());
+			sb.append("Error occurred in the retrieval of aggregators. ");
+			sb.append(e.getMessage());
 		}
 		return sb.toString();
 	}
@@ -418,21 +441,21 @@ public class CommandUtils {
 		try {
 			Set<Provider<?>> providers = repoxservice.retrieveProviders();
 			sb.append("ID\t\t\tName\t\t\tMnemonic\t\t\tBase URL\t\t\tOAI Prefix\t\t\tDescription\t\t\tCountry\t\t\tWebsite\t\t\tSugarCRM ID\t\t\tType\n\n");
-			for (Provider provider : providers) {
-				sb.append(provider.getId() + "\t\t\t" + provider.getName()
-						+ "\t\t\t" + provider.getMnemonic() + "\t\t\t"
-						+ provider.getOaiBaseUrl() + "\t\t\t"
-						+ provider.getOaiMetadataPrefix() + "\t\t\t"
+			for (Provider<?> provider : providers) {
+				sb.append(provider.getId() + tripleTVar + provider.getName()
+						+ tripleTVar + provider.getMnemonic() + tripleTVar
+						+ provider.getOaiBaseUrl() + tripleTVar
+						+ provider.getOaiMetadataPrefix() + tripleTVar
 						+ provider.getValue("providerDescription")
-						+ "\t\t\t" + provider.getValue("providerCountry")
-						+ "\t\t\t" + provider.getValue("providerWebsite")
-						+ "\t\t\t" + provider.getValue("sugarID")
-						+ "\t\t\t" + provider.getValue("providerType")
+						+ tripleTVar + provider.getValue("providerCountry")
+						+ tripleTVar + provider.getValue("providerWebsite")
+						+ tripleTVar + provider.getValue("sugarID")
+						+ tripleTVar + provider.getValue("providerType")
 						+ "\n");
 			}
 		} catch (Exception e) {
-			sb.append("Error occurred in the retrieval of providers. "
-					+ e.getMessage());
+			sb.append("Error occurred in the retrieval of providers. ");
+			sb.append(e.getMessage());
 		}
 		return sb.toString();
 	}
@@ -451,7 +474,7 @@ public class CommandUtils {
 			sb.append("Provider\tID        \tCollectionID\tName\tMnemonic\tLast Modified\tLast Synchronized\tOAI-PMH Base URL\tOAI-PMH Metadata Prefix");
 			HashSet<Collection<?>> dsCol = (HashSet<Collection<?>>) repoxservice
 					.retrieveDataSources();
-			for (Collection col : dsCol) {
+			for (Collection<?> col : dsCol) {
 				sb.append(col.getProvider() + "\t" + col.getId() + "\t"
 						+ col.getValue("collectionId") + "\t"
 						+ col.getLanguage() + "\t" + col.getName() + "\t"
@@ -464,8 +487,8 @@ public class CommandUtils {
 			}
 
 		} catch (DataSourceOperationException e) {
-			sb.append("Error occurred in the retrieval of atasources. "
-					+ e.getMessage());
+			sb.append("Error occurred in the retrieval of Datasources.");
+			sb.append(e.getMessage());
 		}
 		return sb.toString();
 	}
@@ -481,30 +504,34 @@ public class CommandUtils {
 	 * @param out - Console output
 	 * @param in - Console Input
 	 * @return Confirmation of the initiation of harvesting
-	 * @throws Exception
+	 * @throws IOException 
+	 * @throws StorageEngineException 
 	 */
 	public static String initiateHarvesting(RepoxUIMService repoxservice,
 			Registry registry, String argument0, String argument1,
 			String argument2, String argument3, PrintStream out,
-			BufferedReader in) throws Exception{
+			BufferedReader in) throws IOException, StorageEngineException {
 
-		String providerName = assignValue("ProviderName", argument0, out, in);
-		String providerMnemonic = assignValue("Provider Mnemonic", argument1, out,
+		String providerName = assignValue(provnameVar, argument0, out, in);
+		String providerMnemonic = assignValue(provMemonicVar, argument1, out,
 				in);
-		String dsName = assignValue("Datasource Name", argument2, out, in);
-		String dsMnemonic = assignValue("Datasource Mnemonic", argument3, out, in);
+		String dsName = assignValue(dsnameVar, argument2, out, in);
+		String dsMnemonic = assignValue(dsmnemonicVar, argument3, out, in);
 		try {
 			StorageEngine<?> engine = registry.getStorageEngine();
 
+
+			@SuppressWarnings("rawtypes")
 			Provider provider = engine.createProvider();
 			provider.setName(providerName);
 			provider.setMnemonic(providerMnemonic);
-			provider.putValue("repoxID", providerName + "r0");
+			provider.putValue(repoxIDVar, providerName + "r0");
 
+			@SuppressWarnings("unchecked")
 			Collection<?> coll = engine.createCollection(provider);
 			coll.setName(dsName);
 			coll.setMnemonic(dsMnemonic);
-			coll.putValue("repoxID", dsName + dsMnemonic + "r0");
+			coll.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
 
 			repoxservice.initiateHarvestingfromUIMObj(coll, true);
 			return "Harvesting has been initiated. ";
@@ -526,31 +553,33 @@ public class CommandUtils {
 	 * @param out - Console output
 	 * @param in - Console input
 	 * @return The harvesting status
-	 * @throws Exception
+	 * @throws IOException 
+	 * @throws StorageEngineException 
 	 */
 	public static String getHarvestingStatus(RepoxUIMService repoxservice,
 			Registry registry, String argument0, String argument1,
 			String argument2, String argument3, String argument4,
-			PrintStream out, BufferedReader in) throws Exception{
+			PrintStream out, BufferedReader in) throws IOException, StorageEngineException {
 		
-		String providerName = assignValue("ProviderName", argument0, out, in);
-		String providerMnemonic = assignValue("Provider Mnemonic", argument1, out,
+		String providerName = assignValue(provnameVar, argument0, out, in);
+		String providerMnemonic = assignValue(provMemonicVar, argument1, out,
 				in);
 		String dsLanguage = assignValue("Datasource Language", argument2, out, in);
-		String dsName = assignValue("Datasource Name", argument3, out, in);
-		String dsMnemonic = assignValue("Datasource Mnemonic", argument4, out, in);
+		String dsName = assignValue(dsnameVar, argument3, out, in);
+		String dsMnemonic = assignValue(dsmnemonicVar, argument4, out, in);
 		try {
 			StorageEngine<?> engine = registry.getStorageEngine();
 
+			@SuppressWarnings("rawtypes")
 			Provider provider = engine.createProvider();
 			provider.setName(providerName);
 			provider.setMnemonic(providerMnemonic);
-			provider.putValue("repoxID", providerName + "r0");
+			provider.putValue(repoxIDVar, providerName + "r0");
 
 			Collection<?> coll = engine.createCollection(provider);
 			coll.setName(dsName);
 			coll.setMnemonic(dsMnemonic);
-			coll.putValue("repoxID", dsName + dsMnemonic + "r0");
+			coll.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
 			RepoxHarvestingStatus res = repoxservice.getHarvestingStatus(coll);
 			return "Status \n" + res.getStatus();
 		} catch (HarvestingOperationException e) {
@@ -572,7 +601,7 @@ public class CommandUtils {
 			sb.append("Provider\tID        \tCollectionID\tName\tMnemonic\tLast Modified\tLast Synchronized\tOAI-PMH Base URL\tOAI-PMH Metadata Prefix");
 			HashSet<Collection<?>> collectionSet = (HashSet<Collection<?>>) repoxservice
 					.getActiveHarvestingSessions();
-			for (Collection col : collectionSet) {
+			for (Collection<?> col : collectionSet) {
 				sb.append(col.getProvider() + "\t" + col.getId() + "\t"
 						+ col.getValue("collectionId") + "\t"
 						+ col.getLanguage() + "\t" + col.getName() + "\t"
@@ -584,8 +613,8 @@ public class CommandUtils {
 			}
 			
 		} catch (HarvestingOperationException e) {
-			sb.append("Error in getting active harvests. "
-					+ e.getMessage());
+			sb.append("Error in getting active harvests. ");
+			sb.append(e.getMessage());
 		}
 		return sb.toString();
 	}
@@ -599,7 +628,7 @@ public class CommandUtils {
 	 * @throws IOException
 	 */
 	private static String assignValue(String description, String argument,
-			PrintStream out, BufferedReader in) throws IOException {
+			PrintStream out, BufferedReader in) throws IOException  {
 		String retval = null;
 		if (argument != null) {
 			return argument;

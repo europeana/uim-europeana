@@ -1,34 +1,27 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2007-2012 The Europeana Foundation
  *
- * Licensed under the EUPL, Version 1.1 or - as soon they
- * will be approved by the European Commission - subsequent
- * versions of the EUPL (the "Licence");
- * you may not use this work except in compliance with the
- * Licence.
- * You may obtain a copy of the Licence at:
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
+ * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
  *
- * http://ec.europa.eu/idabc/eupl
- *
- * Unless required by applicable law or agreed to in
- * writing, software distributed under the Licence is
- * distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied.
- * See the Licence for the specific language governing
- * permissions and limitations under the Licence.
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
 package eu.europeana.uim.repoxclient.plugin;
 
 import org.joda.time.DateTime;
-
-
 import eu.europeana.uim.repox.AggregatorOperationException;
 import eu.europeana.uim.repox.DataSourceOperationException;
 import eu.europeana.uim.repox.HarvestingOperationException;
 import eu.europeana.uim.repox.ProviderOperationException;
 import eu.europeana.uim.repox.RecordOperationException;
-import eu.europeana.uim.repox.RepoxException;
 import eu.europeana.uim.repox.model.IngestFrequency;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregators;
@@ -38,13 +31,9 @@ import eu.europeana.uim.repoxclient.jibxbindings.Provider;
 import eu.europeana.uim.repoxclient.jibxbindings.DataProviders;
 import eu.europeana.uim.repoxclient.jibxbindings.DataSources;
 import eu.europeana.uim.repoxclient.jibxbindings.Source;
-
-
-
 import eu.europeana.uim.repoxclient.jibxbindings.RunningTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.ScheduleTasks;
 import eu.europeana.uim.repoxclient.jibxbindings.Success;
-
 import eu.europeana.uim.repoxclient.jibxbindings.RecordResult;
 
 /**
@@ -62,7 +51,7 @@ public interface RepoxRestClient {
 	 * 
 	 * @return the http address where REPOX resides
 	 */
-	public String getDefaultURI();
+	 String getDefaultURI();
 	
 	
 	/**
@@ -71,7 +60,7 @@ public interface RepoxRestClient {
 	 * @param aggregator an Aggregator object 
 	 * @throws AggregatorOperationException
 	 */
-	public Aggregator createAggregator(Aggregator aggregator) throws AggregatorOperationException;
+	 Aggregator createAggregator(Aggregator aggregator) throws AggregatorOperationException;
 	
 	
 	/**
@@ -79,7 +68,7 @@ public interface RepoxRestClient {
 	 * @param aggregator a reference to the Aggregator object
 	 * @throws AggregatorOperationException
 	 */
-	public Success deleteAggregator(String aggregatorId)throws AggregatorOperationException;	
+	 Success deleteAggregator(String aggregatorId)throws AggregatorOperationException;	
 	
 	
 	/**
@@ -87,7 +76,7 @@ public interface RepoxRestClient {
 	 * @param aggregator the Aggregator object to update
 	 * @throws AggregatorOperationException
 	 */
-	public Aggregator updateAggregator(Aggregator aggregator)throws AggregatorOperationException;	
+	 Aggregator updateAggregator(Aggregator aggregator)throws AggregatorOperationException;	
 	
 	
 	/**
@@ -95,7 +84,7 @@ public interface RepoxRestClient {
 	 * @return an object containing all available Aggregators 
 	 * @throws AggregatorOperationException
 	 */
-	public Aggregators retrieveAggregators() throws AggregatorOperationException;	
+	 Aggregators retrieveAggregators() throws AggregatorOperationException;	
 	
 	
 	/**
@@ -104,7 +93,7 @@ public interface RepoxRestClient {
 	 * @param agr the Aggregator reference
 	 * @throws ProviderOperationException
 	 */
-	public Provider createProvider(Provider prov,Aggregator agr) throws ProviderOperationException;
+	 Provider createProvider(Provider prov,Aggregator agr) throws ProviderOperationException;
 		
 	
 	/**
@@ -113,7 +102,7 @@ public interface RepoxRestClient {
 	 * @param prov the Provider reference
 	 * @throws ProviderOperationException
 	 */
-	public Success deleteProvider(String provID) throws ProviderOperationException;
+	 Success deleteProvider(String provID) throws ProviderOperationException;
 	
 	
 	/**
@@ -122,7 +111,7 @@ public interface RepoxRestClient {
 	 * @param the Provider object to update
 	 * @throws ProviderOperationException
 	 */
-	public Provider updateProvider(Provider prov) throws ProviderOperationException;
+	 Provider updateProvider(Provider prov) throws ProviderOperationException;
 	
 	
 	/**
@@ -130,7 +119,7 @@ public interface RepoxRestClient {
 	 * @return an object containing all provider references
 	 * @throws ProviderOperationException
 	 */
-	public DataProviders retrieveProviders() throws ProviderOperationException;	
+	 DataProviders retrieveProviders() throws ProviderOperationException;	
 	
 	/**
 	 * Retrieve all available Repox DataSources
@@ -139,7 +128,7 @@ public interface RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public DataSources retrieveDataSources() throws DataSourceOperationException;
+	 DataSources retrieveDataSources() throws DataSourceOperationException;
 	
 
 	/**
@@ -150,7 +139,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws DataSourceOperationException
 	 */
-	public Source createDatasourceOAI(Source ds,Provider prov) throws DataSourceOperationException;
+	 Source createDatasourceOAI(Source ds,Provider prov) throws DataSourceOperationException;
 	
 	
 	/**
@@ -161,7 +150,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws DataSourceOperationException
 	 */
-	public Source createDatasourceZ3950Timestamp(Source ds,Provider prov) throws DataSourceOperationException;
+	 Source createDatasourceZ3950Timestamp(Source ds,Provider prov) throws DataSourceOperationException;
 	
 	
 	/**
@@ -172,7 +161,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws DataSourceOperationException
 	 */
-	public Source createDatasourceZ3950IdFile(Source ds,Provider prov) throws DataSourceOperationException;
+	 Source createDatasourceZ3950IdFile(Source ds,Provider prov) throws DataSourceOperationException;
 	
 	
 	
@@ -184,7 +173,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws DataSourceOperationException
 	 */
-	public Source createDatasourceZ3950IdSequence(Source ds,Provider prov) throws DataSourceOperationException;	
+	 Source createDatasourceZ3950IdSequence(Source ds,Provider prov) throws DataSourceOperationException;	
 	
 	
 	/**
@@ -195,7 +184,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws DataSourceOperationException
 	 */
-	public Source createDatasourceFtp(Source ds,Provider prov) throws DataSourceOperationException;		
+	 Source createDatasourceFtp(Source ds,Provider prov) throws DataSourceOperationException;		
 	
 	
 	/**
@@ -206,7 +195,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws DataSourceOperationException
 	 */
-	public Source createDatasourceHttp(Source ds,Provider prov) throws DataSourceOperationException;		
+	 Source createDatasourceHttp(Source ds,Provider prov) throws DataSourceOperationException;		
 	
 	
 	/**
@@ -217,7 +206,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws DataSourceOperationException
 	 */
-	public Source createDatasourceFolder(Source ds,Provider prov) throws DataSourceOperationException;
+	 Source createDatasourceFolder(Source ds,Provider prov) throws DataSourceOperationException;
 	
 	
 	/**
@@ -226,7 +215,7 @@ public interface RepoxRestClient {
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 */
-	public Source updateDatasourceOAI(Source ds) throws DataSourceOperationException;
+	 Source updateDatasourceOAI(Source ds) throws DataSourceOperationException;
 	
 	
 	/**
@@ -235,7 +224,7 @@ public interface RepoxRestClient {
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 */
-	public Source updateDatasourceZ3950Timestamp(Source ds) throws DataSourceOperationException;
+	 Source updateDatasourceZ3950Timestamp(Source ds) throws DataSourceOperationException;
 	
 	
 	/**
@@ -244,7 +233,7 @@ public interface RepoxRestClient {
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 */
-	public Source updateDatasourceZ3950IdFile(Source ds) throws DataSourceOperationException;
+	 Source updateDatasourceZ3950IdFile(Source ds) throws DataSourceOperationException;
 	
 	/**
 	 * Update an existing Z3950IdSequence DataSource
@@ -252,7 +241,7 @@ public interface RepoxRestClient {
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 */
-	public Source updateDatasourceZ3950IdSequence(Source ds) throws DataSourceOperationException;
+	 Source updateDatasourceZ3950IdSequence(Source ds) throws DataSourceOperationException;
 	
 	/**
 	 * Update an existing Ftp DataSource
@@ -260,7 +249,7 @@ public interface RepoxRestClient {
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 */
-	public Source updateDatasourceFtp(Source ds) throws DataSourceOperationException;
+	 Source updateDatasourceFtp(Source ds) throws DataSourceOperationException;
 	
 	/**
 	 * Update an existing Http DataSource
@@ -268,7 +257,7 @@ public interface RepoxRestClient {
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 */
-	public Source updateDatasourceHttp(Source ds) throws DataSourceOperationException;
+	 Source updateDatasourceHttp(Source ds) throws DataSourceOperationException;
 	
 	
 	/**
@@ -277,7 +266,7 @@ public interface RepoxRestClient {
 	 * @param ds a DataSource object
 	 * @throws DataSourceOperationException
 	 */
-	public Source updateDatasourceFolder(Source ds) throws DataSourceOperationException;
+	 Source updateDatasourceFolder(Source ds) throws DataSourceOperationException;
 	
 	
 	/**
@@ -287,7 +276,7 @@ public interface RepoxRestClient {
 	 * @throws DataSourceOperationException
 	 * @throws RepoxException
 	 */
-	public Success deleteDatasource(String dsID) throws DataSourceOperationException;
+	 Success deleteDatasource(String dsID) throws DataSourceOperationException;
 
 
 	
@@ -300,7 +289,7 @@ public interface RepoxRestClient {
 	 * @throws RecordOperationException
 	 * @throws RepoxException
 	 */
-	public RecordResult retrieveRecord(String recordID) throws RecordOperationException;
+	 RecordResult retrieveRecord(String recordID) throws RecordOperationException;
 	
 	
 	
@@ -313,7 +302,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws RecordOperationException
 	 */
-	public Success saveRecord(String recordID,Source ds,String recordXML) throws RecordOperationException;
+	 Success saveRecord(String recordID,Source ds,String recordXML) throws RecordOperationException;
 	
 	
 	/**
@@ -323,7 +312,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws RecordOperationException
 	 */
-	public Success markRecordAsDeleted(String recordID) throws RecordOperationException;
+	 Success markRecordAsDeleted(String recordID) throws RecordOperationException;
 	
 	
 	/**
@@ -333,7 +322,7 @@ public interface RepoxRestClient {
 	 * @return
 	 * @throws RecordOperationException
 	 */
-	public Success eraseRecord(String recordID) throws RecordOperationException;
+	 Success eraseRecord(String recordID) throws RecordOperationException;
 	
 	
 	/**
@@ -345,7 +334,7 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public Success initiateHarvesting(String dsID,boolean isfull) throws HarvestingOperationException;
+	 Success initiateHarvesting(String dsID,boolean isfull) throws HarvestingOperationException;
 	
 	/**
 	 * Starts a remote harvesting process at a specific Date (scheduling) 
@@ -357,7 +346,7 @@ public interface RepoxRestClient {
 	 * @throws HarvestingOperationException
 	 * @throws RepoxException
 	 */
-	public Success scheduleHarvesting(String dsID,DateTime ingestionDate,IngestFrequency frequency, boolean isfull) throws HarvestingOperationException;
+	 Success scheduleHarvesting(String dsID,DateTime ingestionDate,IngestFrequency frequency, boolean isfull) throws HarvestingOperationException;
 	
 	
 	
@@ -365,7 +354,7 @@ public interface RepoxRestClient {
 	 * @param ds
 	 * @throws HarvestingOperationException
 	 */
-	public Success cancelHarvesting(String dsID) throws HarvestingOperationException;
+	 Success cancelHarvesting(String dsID) throws HarvestingOperationException;
 	
 	/**
 	 * Check the status of an existing harvesting job 
@@ -373,7 +362,7 @@ public interface RepoxRestClient {
 	 * @return the status
 	 * @throws RepoxException
 	 */
-	public HarvestingStatus getHarvestingStatus(String dsID) throws HarvestingOperationException;
+	 HarvestingStatus getHarvestingStatus(String dsID) throws HarvestingOperationException;
 	
 
 
@@ -382,7 +371,7 @@ public interface RepoxRestClient {
 	 * @return an object containing a reference to all DataSources
 	 * @throws HarvestingOperationException
 	 */
-	public RunningTasks getActiveHarvestingSessions() throws HarvestingOperationException;
+	 RunningTasks getActiveHarvestingSessions() throws HarvestingOperationException;
 	
 	
 	/**
@@ -390,7 +379,7 @@ public interface RepoxRestClient {
 	 * @return an object containing a reference to all DataSources
 	 * @throws HarvestingOperationException
 	 */
-	public ScheduleTasks getScheduledHarvestingSessions(String dsID) throws HarvestingOperationException;
+	 ScheduleTasks getScheduledHarvestingSessions(String dsID) throws HarvestingOperationException;
 	
 	
 	
@@ -400,7 +389,7 @@ public interface RepoxRestClient {
 	 * @return the HarvestLog
 	 * @throws HarvestingOperationException
 	 */
-	public Log getHarvestLog(String dsID) throws HarvestingOperationException;
+	 Log getHarvestLog(String dsID) throws HarvestingOperationException;
 	
 	
 	
@@ -410,5 +399,5 @@ public interface RepoxRestClient {
 	 * @param dsID the DataSource reference
 	 * @param records no of records per file
 	 */
-	public Success initializeExport(String dsID,int records) throws HarvestingOperationException;
+	 Success initializeExport(String dsID,int records) throws HarvestingOperationException;
 }

@@ -1,22 +1,18 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2007-2012 The Europeana Foundation
  *
- * Licensed under the EUPL, Version 1.1 or - as soon they
- * will be approved by the European Commission - subsequent
- * versions of the EUPL (the "Licence");
- * you may not use this work except in compliance with the
- * Licence.
- * You may obtain a copy of the Licence at:
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
+ * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
  *
- * http://ec.europa.eu/idabc/eupl
- *
- * Unless required by applicable law or agreed to in
- * writing, software distributed under the Licence is
- * distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied.
- * See the Licence for the specific language governing
- * permissions and limitations under the Licence.
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
 package eu.europeana.uim.repoxclient.rest;
 
@@ -24,6 +20,8 @@ package eu.europeana.uim.repoxclient.rest;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.joda.time.DateTime;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
@@ -72,6 +70,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 	private static final String defaultAggrgatorURL = "http://repox.ist.utl.pt";
 	private static final String defaultAggrgatorIDPostfix = "aggregatorr0";
+	
+	private static final String htypeInfo = "HARVESTING_TYPE information not available in UIM for the specific object.";
+	
 	private RepoxRestClient repoxRestClient;
 	private Registry registry;
 
@@ -188,7 +189,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	 * @see eu.europeana.uim.repox.RepoxUIMService#retrieveAggregators()
 	 */
 	@Override
-	public HashSet<Provider<?>> retrieveAggregators()
+	public Set<Provider<?>> retrieveAggregators()
 			throws AggregatorOperationException {
 
 		StorageEngine<?> engine = registry.getStorageEngine();
@@ -232,7 +233,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			return false;
 		}
 
-		HashSet<Provider<?>> prov = retrieveProviders();
+		Set<Provider<?>> prov = retrieveProviders();
 
 		for(Provider<?> p: prov){
 			if(p.getMnemonic().equals(provider.getMnemonic())){
@@ -350,7 +351,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	 * @see eu.europeana.uim.repox.RepoxUIMService#retrieveProviders()
 	 */
 	@Override
-	public HashSet<Provider<?>> retrieveProviders()
+	public Set<Provider<?>> retrieveProviders()
 			throws ProviderOperationException {
 		StorageEngine<?> engine = registry.getStorageEngine();
 
@@ -425,7 +426,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		if(htypeString == null){
 			throw new DataSourceOperationException("Error during the creation of a Datasource: " +
-					"HARVESTING_TYPE information not available in UIM for the specific object.");
+					htypeInfo);
 		}
 		
 		DSType harvestingtype = DSType.valueOf(htypeString);
@@ -474,6 +475,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		case folder:
 			retsource = repoxRestClient.createDatasourceFolder(ds, jibxProv);
 			break;
+		default:
+			throw new DataSourceOperationException("Error during the creation of a Datasource: " +
+					"HARVESTING_TYPE for the specific object does not match the predefined acceptable values.");
 		}
 		
 		
@@ -507,7 +511,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		
 		if(htypeString == null){
 			throw new DataSourceOperationException("Error during the creation of a Datasource: " +
-					"HARVESTING_TYPE information not available in UIM for the specific object.");
+					htypeInfo);
 		}
 		
 		DSType harvestingtype =   DSType.valueOf(htypeString);
@@ -545,6 +549,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			case maximumid:
 				repoxRestClient.updateDatasourceZ3950IdSequence(ds);
 				break;
+			 default:
+				throw new DataSourceOperationException("Z3950 Method Value used for the creation of a datasource was invalid.");	
 			}
 			break;
 			
@@ -559,6 +565,9 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		case folder:
 			repoxRestClient.updateDatasourceFolder(ds);
 			break;
+			
+		default:
+			throw new DataSourceOperationException("Harvesting Type Value used for the creation of a datasource was invalid.");	
 		}
 		
 		repoxRestClient.updateDatasourceOAI(ds);
@@ -571,7 +580,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	 * @see eu.europeana.uim.repox.RepoxUIMService#deleteDatasourcefromUIMObj(eu.europeana.uim.store.Collection)
 	 */
 	@Override
-	public void deleteDatasourcefromUIMObj(Collection col)
+	public void deleteDatasourcefromUIMObj(Collection<?> col)
 			throws DataSourceOperationException {
 
 		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
@@ -608,7 +617,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 			if(src.getNameCode() != null)
 			{
-				String id = src.getNameCode().toString();
+				String id = src.getNameCode();
 
 				try {
 					Collection<?> coll = engine.findCollection(id);
@@ -743,7 +752,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	 * @see eu.europeana.uim.repox.RepoxUIMService#getActiveHarvestingSessions()
 	 */
 	@Override
-	public HashSet<Collection<?>> getActiveHarvestingSessions()
+	public Set<Collection<?>> getActiveHarvestingSessions()
 			throws HarvestingOperationException {
 		
 		StorageEngine<?> engine = registry.getStorageEngine();
@@ -776,7 +785,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	 * @see eu.europeana.uim.repox.RepoxUIMService#getScheduledHarvestingSessions()
 	 */
 	@Override
-	public HashSet<ScheduleInfo> getScheduledHarvestingSessions(Collection<?> col)
+	public Set<ScheduleInfo> getScheduledHarvestingSessions(Collection<?> col)
 			throws HarvestingOperationException {
 
 		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
@@ -809,11 +818,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			String[] timeArray = datetimeArray[1].split(":");
 			
 			
-			int year = new Integer(dateArray[0]);
-			int monthOfYear = new Integer(dateArray[1]);
-			int dayOfMonth = new Integer(dateArray[2]);
-			int hourOfDay = new Integer(timeArray[0]);
-			int minuteOfHour = new Integer(timeArray[1]);
+			int year = Integer.valueOf(dateArray[0]);
+			int monthOfYear = Integer.valueOf(dateArray[1]);
+			int dayOfMonth = Integer.valueOf(dateArray[2]);
+			int hourOfDay = Integer.valueOf(timeArray[0]);
+			int minuteOfHour = Integer.valueOf(timeArray[1]);
 			
 			DateTime dt = new DateTime( year,  monthOfYear,  dayOfMonth,  hourOfDay,  minuteOfHour, 0, 0);
 			
@@ -863,17 +872,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	 */
 	@Override
 	public void initializeExport(Collection<?> col, int numberOfRecords)
-			throws HarvestingOperationException {
-
-		StringBuffer sb = new StringBuffer();
-		
+			throws HarvestingOperationException {		
 		String id = col.getValue(ControlledVocabularyProxy.REPOXID);
-
 		if (id == null) {
 			throw new HarvestingOperationException(
 					"Missing repoxID element from Collection object");
 		}
-		
 		repoxRestClient.initializeExport(id, numberOfRecords);
 	}
 

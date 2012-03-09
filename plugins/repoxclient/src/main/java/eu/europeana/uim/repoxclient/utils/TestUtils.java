@@ -1,33 +1,27 @@
 /*
- * Copyright 2007 EDL FOUNDATION
+ * Copyright 2007-2012 The Europeana Foundation
  *
- * Licensed under the EUPL, Version 1.1 or - as soon they
- * will be approved by the European Commission - subsequent
- * versions of the EUPL (the "Licence");
- * you may not use this work except in compliance with the
- * Licence.
- * You may obtain a copy of the Licence at:
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
+ * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
  *
- * http://ec.europa.eu/idabc/eupl
- *
- * Unless required by applicable law or agreed to in
- * writing, software distributed under the Licence is
- * distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied.
- * See the Licence for the specific language governing
- * permissions and limitations under the Licence.
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
  */
 package eu.europeana.uim.repoxclient.utils;
 
 import java.io.StringWriter;
 import java.math.BigInteger;
-
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
-
 import eu.europeana.uim.repoxclient.jibxbindings.Address;
 import eu.europeana.uim.repoxclient.jibxbindings.Aggregator;
 import eu.europeana.uim.repoxclient.jibxbindings.Charset;
@@ -70,13 +64,26 @@ import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
 
 /**
- * 
+ * Utilities used for Unit Tests
  * 
  * @author Georgios Markakis
  * @author Yorgos Mamakis
  */
 public class TestUtils {
 
+	
+	/**
+	 * Utility classes should not have a public or default constructor.
+	 */
+	private TestUtils(){
+	}
+	
+	/**
+	 * @param strName
+	 * @param strNameCode
+	 * @param strUrl
+	 * @return
+	 */
 	public static Aggregator createAggregatorObj(String strName, String strNameCode, String strUrl) {
 
 		Aggregator aggr = new Aggregator();
@@ -95,6 +102,9 @@ public class TestUtils {
 
 	}
 
+	/**
+	 * @return
+	 */
 	public static Provider createProviderObj() {
 
 		Provider prov = new Provider();
@@ -124,11 +134,24 @@ public class TestUtils {
 
 	}
 
+	/**
+	 * 
+	 * /rest/dataSources/createOai?dataProviderId=DPRestr0&
+	 * id=bdaSet&
+	 * description=Biblioteca Digital Do Alentejo&
+	 * nameCode=00123&name=Alentejo&
+	 * exportPath=D:/Projectos/repoxdata_new&
+	 * schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&
+	 * namespace=http://www.europeana.eu/schemas/ese/&
+	 * metadataFormat=ese&
+	 * oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&
+	 * oaiSet=bda
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public static Source createOAIDataSource(String id) {
-		// /rest/dataSources/createOai?dataProviderId=DPRestr0&id=bdaSet&description=Biblioteca
-		// Digital Do Alentejo&nameCode=00123&name=Alentejo&
-		// exportPath=D:/Projectos/repoxdata_new&schema=http://www.europeana.eu/schemas/ese/ESE-V3.3.xsd&namespace=http://www.europeana.eu/schemas/ese/&
-		// metadataFormat=ese&oaiURL=http://bd1.inesc-id.pt:8080/repoxel/OAIHandler&oaiSet=bda
+
 
 		Source ds = new Source();
 		ds.setId(id);
@@ -599,8 +622,7 @@ public class TestUtils {
 			LOGGER.info(stringWriter.toString());
 			LOGGER.info("===========================================");
 		} catch (JiBXException e) {
-
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 	}
 }
