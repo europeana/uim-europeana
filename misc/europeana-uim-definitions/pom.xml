@@ -41,12 +41,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.europeana</groupId>
-			<artifactId>europeana-uim-edmcore-definitions</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.2</version>
@@ -81,7 +75,7 @@
 							!*
 						</Import-Package>
 						<Export-Package>
-							eu.europeana.uim.model.europeanaspecific.*,org.theeuropeanlibrary.model.tel.*,eu.europeana.uim.edmcore.definitions.*
+							eu.europeana.uim.model.europeanaspecific.*,org.theeuropeanlibrary.model.tel.*
 						</Export-Package>
 					</instructions>
 				</configuration>
