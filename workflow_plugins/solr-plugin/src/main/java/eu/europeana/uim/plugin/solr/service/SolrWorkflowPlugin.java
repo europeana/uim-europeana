@@ -21,6 +21,7 @@ package eu.europeana.uim.plugin.solr.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +67,10 @@ import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
 import eu.europeana.uim.solr3.Solr3Initializer;
 import eu.europeana.uim.store.MetaDataRecord;
+import eu.europeana.uim.store.Request;
+import eu.europeana.uim.store.UimDataSet;
+
+
 
 /**
  * This is the main class implementing the UIM functionality for 
@@ -77,14 +82,15 @@ import eu.europeana.uim.store.MetaDataRecord;
  */
 public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
-	@Value("#{europeanaProperties['solr.selectUrl']}")
-	private static String solrUrl;
-	@Value("#{europeanaProperties['mongoDB.host']}")
-	private static String mongoDBhost;
-	@Value("#{europeanaProperties['mongoDB.port']}")
-	private static int mongoDBport;
+	//@Value("#{europeanaProperties['solr.selectUrl']}")
+	private static String solrUrl="http://localhost:8282/apache-solr-3.5.0";
+	//@Value("#{europeanaProperties['mongoDB.host']}")
+	private static String mongoDBhost="localhost";
+	//@Value("#{europeanaProperties['mongoDB.port']}")
+	private static int mongoDBport=27017;
 	private static SolrServer solrServer;
 	private static MongoDBServer mongoServer;
+	
 	
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
@@ -228,17 +234,21 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		return 10;
 	}
 
-	public void initialize(ExecutionContext context) throws IngestionPluginFailedException {
+	public <I> void initialize(ExecutionContext<I> context) throws IngestionPluginFailedException {
 		Solr3Initializer solr3Initializer = new Solr3Initializer(solrUrl,"");
 		solrServer = solr3Initializer.getServer();
+		
 		try {
 			mongoServer = new MongoDBServerImpl(mongoDBhost,mongoDBport,"europeana");
+			mongoServer.getDatastore();
 		} catch (MongoDBException e) {
 			context.getLoggingEngine().logFailed(Level.SEVERE, this, e, "Mongo DB server error: "+ e.getMessage());
+			e.printStackTrace();
 		}
+		
 	}
 
-	public void completed(ExecutionContext context)
+	public <I>void completed(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
 		try{
 			solrServer.commit();
@@ -287,6 +297,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	}
 
 
+	
 
 
 
