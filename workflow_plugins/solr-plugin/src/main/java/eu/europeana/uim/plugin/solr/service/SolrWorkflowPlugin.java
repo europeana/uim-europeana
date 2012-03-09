@@ -22,6 +22,7 @@ package eu.europeana.uim.plugin.solr.service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -83,7 +84,7 @@ import eu.europeana.uim.store.UimDataSet;
 public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	//@Value("#{europeanaProperties['solr.selectUrl']}")
-	private static String solrUrl="http://localhost:8282/apache-solr-3.5.0";
+	private static String solrUrl="http://localhost:8484/apache-solr-3.5.0";
 	//@Value("#{europeanaProperties['mongoDB.host']}")
 	private static String mongoDBhost="localhost";
 	//@Value("#{europeanaProperties['mongoDB.port']}")
@@ -124,7 +125,10 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		try{
 			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			RDF rdf = (RDF) uctx.unmarshalDocument(new ByteArrayInputStream(mdr.getValues(EuropeanaModelRegistry.UNCLASSIFIED, null).get(0).getBytes()), null);
+			
+			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
+			
+			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			List<Choice> rdfElements = rdf.getChoiceList();
 			solrInputDocument = new SolrInputDocument();
 			FullBean fullBean = new FullBeanImpl();
