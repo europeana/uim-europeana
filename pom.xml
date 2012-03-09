@@ -119,14 +119,6 @@
 			<name>Spring External Dependencies Repository</name>
 			<url>http://europeanalabs.eu/artifactory/spring-ext-bundles</url>
 		</repository>
-
-    <repository>
-        <id>europeanalabs.ext-releases-local</id>
-        <name>europeanalabs.eu-releases</name>
-        <url>http://europeanalabs.eu/artifactory/ext-releases-local</url>
-    </repository>
-
-
 		<repository>
 			<id>europeanalabs.eu.repo1</id>
 			<name>europeanalabs.eu-releases</name>

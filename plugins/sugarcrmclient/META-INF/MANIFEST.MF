@@ -39,9 +39,9 @@ Created-By: Apache Maven Bundle Plugin
 Import-Service: eu.europeana.uim.sugarcrm.SugarCrmService;availability
  :=optional
 DynamicImport-Package: *
-Build-Jdk: 1.6.0_23
+Build-Jdk: 1.6.0_30
 Bundle-Version: 1.3.0.SNAPSHOT
-Bnd-LastModified: 1331052629551
+Bnd-LastModified: 1331304634574
 Bundle-ManifestVersion: 2
 Import-Package: eu.europeana.uim.api,eu.europeana.uim.model.europeanas
  pecific.fieldvalues,eu.europeana.uim.store,eu.europeana.uim.sugarcrm,

@@ -6,7 +6,7 @@ lang="en">
 <title>Europeana - Europeana Data Model</title>
 <link rel="shortcut icon" href="/portal/favicon.ico"/>
 <link rel="search" type="application/opensearchdescription+xml" href="http://api.europeana.eu/api/opensearch.xml" title="Europeana Search"/>
-<link rel="stylesheet" href="/portal/branding/portal2/css/min/core.min.css"/>
+<link rel="stylesheet" href="/portal/branding/portal2/css/min/common.min.css"/>
 <link rel="stylesheet" href="/portal/branding/portal2/css/min/staticpages.min.css"/>
 <!--[if IE]><link rel="stylesheet" href="/portal/branding/portal2/css/min/ie.min.css"/><![endif]-->
 <!--[if lte IE 7]><link rel="stylesheet" href="/portal/branding/portal2/css/min/ie7.min.css"/><![endif]-->
@@ -18,109 +18,28 @@ lang="en">
 </head>
 <body class="locale-en">
 <div id="header" class="notranslate">
-<ul id="menu-main" class="notranslate">
-<li><a href="/portal/" target="_self" title="Home" class="menu-tab">Home</a></li>
-<li>
-<a href="/portal/explore.html" target="_self" title="Explore" class="dropdown menu-tab">Explore</a>
-<ul>
-<li><a href="http://remix.europeana.eu" target="_self" title="Europeana Remix" class="menu-sub-tab">Europeana Remix</a></li>
-<li><a href="http://exhibitions.europeana.eu" target="_self" title="Exhibitions" class="menu-sub-tab">Exhibitions</a></li>
-<li><a href="/portal/newcontent.html" target="_self" title="New content" class="menu-sub-tab">New content</a></li>
-<li><a href="/portal/europeana-providers.html" target="_self" title="By provider" class="menu-sub-tab">By provider</a></li>
-<li><a href="/portal/timeline.html?query=*:*&amp;format=simile" target="_self" title="Timeline" class="menu-sub-tab">Timeline</a></li>
-</ul>
-</li>
-<li>
-<a href="/portal/usingeuropeana.html" target="_self" title="Help" class="dropdown menu-tab">Help</a>
-<ul>
-<li><a href="/portal/usingeuropeana_search.html" target="_self" title="Searching Europeana" class="menu-sub-tab">Searching Europeana</a></li>
-<li><a href="/portal/usingeuropeana_explore.html" target="_self" title="Exploring Europeana" class="menu-sub-tab">Exploring Europeana</a></li>
-<li><a href="/portal/usingeuropeana_results.html" target="_self" title="Results in Europeana" class="menu-sub-tab">Results in Europeana</a></li>
-<li><a href="/portal/usingeuropeana_myeuropeana.html" target="_self" title="Using My Europeana" class="menu-sub-tab">Using My Europeana</a></li>
-</ul>
-</li>
-<li>
-<a href="/portal/aboutus.html" target="_self" title="About Us" class="dropdown menu-tab">About Us</a>
-<ul>
-<li><a href="/portal/aboutus_background.html" target="_self" title="Background" class="menu-sub-tab">Background</a></li>
-<li><a href="/portal/aboutus_press.html" target="_self" title="Press Room" class="menu-sub-tab">Press Room</a></li>
-<li><a href="/portal/aboutus_jobs.html" target="_self" title="Job opportunities" class="menu-sub-tab">Job opportunities</a></li>
-<li><a href="/portal/partners.html" target="_self" title="Partners" class="menu-sub-tab">Partners</a></li>
-<li><a href="/portal/thoughtlab.html" target="_self" title="ThoughtLab" class="menu-sub-tab">ThoughtLab</a></li>
-<li><a href="/portal/aboutus_faqs.html" target="_self" title="FAQs" class="menu-sub-tab">FAQs</a></li>
-</ul>
-</li>
-<li>
-<a href="/portal/followus.html" target="_self" title="Follow Us" class="dropdown menu-tab">Follow Us</a>
-<ul>
-<li><a href="http://blog.europeana.eu/" target="_self" title="Blog" class="menu-sub-tab">Blog</a></li>
-<li><a href="/portal/aboutus_enews.html" target="_self" title="Newsletter" class="menu-sub-tab">Newsletter</a></li>
-<li><a href="http://www.facebook.com/Europeana" target="_blank" title="Facebook" class="menu-sub-tab external">Facebook</a></li>
-<li><a href="http://www.twitter.com/EuropeanaEU" target="_blank" title="Twitter" class="menu-sub-tab external">Twitter</a></li>
-</ul>
-</li>
-<li><a href="/portal/myeuropeana.html" target="_self" title="My Europeana" class="menu-tab">My Europeana</a></li>
-<li>
-<form method="post" action="/portal/rr-r.html" id="language-selector">
-<select id="embeddedlang" name="embeddedlang" title="Choose a language">
-<option value="Choose language" selected="selected">Choose a language</option>
-<option value="eu">Basque (eus)</option>
-<option value="bg">&#x0411;&#x044a;&#x043b;&#x0433;&#x0430;&#x0440;&#x0441;&#x043a;&#x0438; (bul)</option>
-<option value="ca">Catal&#224; (ca)</option>
-<option value="cs">&#268;e&#353;tina (cze/cse)</option>
-<option value="da">Dansk (dan)</option>
-<option value="de">Deutsch (deu)</option>
-<option value="el">&#917;&#955;&#955;&#951;&#957;&#953;&#954;&#940; (ell/gre)</option>
-<option value="en">English (eng)</option>
-<option value="es">Espa&#241;ol (esp)</option>
-<option value="et">Eesti (est)</option>
-<option value="fi">Suomi (fin)</option>
-<option value="fr">Fran&#231;ais (fre)</option>
-<option value="ga">Irish (gle)</option>
-<option value="hu">Magyar (hun)</option>
-<option value="is">&#205;slenska (ice)</option>
-<option value="it">Italiano (ita)</option>
-<option value="lt">Lietuvi&#371; (lit)</option>
-<option value="lv">Latvie&#353;u (lav)</option>
-<option value="mt">Malti (mlt)</option>
-<option value="nl">Nederlands (dut)</option>
-<option value="no">Norsk (nor)</option>
-<option value="pl">Polski (pol)</option>
-<option value="pt">Portugu&#234;s (por)</option>
-<option value="ro">Rom&#226;n&#259; (rom)</option>
-<option value="ru">Russian (rus)</option>
-<option value="sk">Slovensk&#253; (slo)</option>
-<option value="sl">Sloven&#353;&#269;ina (slv)</option>
-<option value="sv">Svenska (sve/swe)</option>
-<option value="uk">Ukrainian (ukr)</option>
-</select>
-<noscript><input type="submit" /></noscript>
-</form>
-</li>
-</ul>
-<h1 id="logo">
-<a href="/portal/" title="Europeana Think Culture">
-<span id="beta-icon"></span>
-<img src="/portal/sp/img/europeana-logo-en.png" alt="Europeana Think Culture" width="206" height="123"/>
-</a>
-</h1>
-<div id="query">
-<h3>Explore Europe's cultural collections</h3>
-<form id="query-search" method="get" action="/portal/search.html">
-<fieldset>
-<input type="text" name="query" id="query-input" title="Search term(s)" maxlength="175"/>
-<input type="submit" class="submit-button" value="Search"/>
-</fieldset>
-<a href="/portal/usingeuropeana.html" id="search-help">Help</a>
-</form>
-</div>
+	<h1 id="logo">
+	<a href="/portal/" title="Europeana Think Culture">
+	<span id="beta-icon"></span>
+	<img src="/portal/sp/img/europeana-logo-en.png" alt="Europeana Think Culture" width="206" height="123"/>
+	</a>
+	</h1>
+	<div id="query">
+		<h3>Explore Europe's cultural collections</h3>
+		<form id="query-search" method="get" action="/portal/search.html">
+		<fieldset>
+		<input type="text" name="query" id="query-input" title="Search term(s)" maxlength="175"/>
+		<input type="submit" class="submit-button" value="Search"/>
+		</fieldset>
+		<a href="/portal/usingeuropeana.html" id="search-help">Help</a>
+		</form>
+	</div>
 </div>
 <div id="content">
 <div id="content-main">
 <h1><span rel="dc:creator" resource="http://europeana.eu">Europeana</span>: <span property="dc:title" xml:lang="en">Europeana Data Model (EDM) - disclaimer</span></h1>
-<p>The latest EDM specifications v5.2.2 and the EDM Primer are available at <a href="http://version1.europeana.eu/web/europeana-project/technicaldocuments/
-">http://version1.europeana.eu/web/europeana-project/technicaldocuments/</a>. </p>
-<p>Any provider who wishes to resubmit data to Europeana in EDM or map their data to EDM, in order to increase its richness within Europeana, can refer to the <a href="http://version1.europeana.eu/web/europeana-project/technicaldocuments/
+<p>The latest EDM specifications v5.2.3 and the EDM Primer are available at <a href="http://pro.europeana.eu/edm-documentation">http://pro.europeana.eu/edm-documentation</a>. </p>
+<p>Any provider who wishes to resubmit data to Europeana in EDM or map their data to EDM, in order to increase its richness within Europeana, can refer to the <a href="http://pro.europeana.eu/edm-documentation
 ">EDM Mapping Guidelines</a>. It contains definitions of the properties, information about the data types that can be used as values and the obligation level of each property. 
 The mapping rules are defined against the EDM <a href="http://europeanalabs.eu/svn/europeana/trunk/ROOT/src/main/webapp/schemas/edm/">XML schema</a>.</p> 
 <p>For further information, 
