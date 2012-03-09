@@ -16,7 +16,6 @@
 
 	<modules>
 		<module>plugins</module>
-		<module>misc/europeana-uim-edmcore-definitions</module>
 		<module>misc/europeana-uim-definitions</module>
 		<module>workflow_plugins/linkchecker</module>
 		<module>workflow_plugins/solr-plugin</module>
