@@ -112,10 +112,10 @@ public class ZipLoader {
 				I uuid = (I) validedmrecord.getChoiceList().get(0)
 						.getProvidedCHO().getAbout();
 
-				loggingEngine.log(Level.INFO, "ZipLoader",
-						"Added record with id", uuid.toString(),
-						" in collection ", request.getCollection()
-								.getMnemonic());
+				//loggingEngine.log(Level.INFO, "ZipLoader",
+				//		"Added record with id", uuid.toString(),
+				//		" in collection ", request.getCollection()
+				//				.getMnemonic());
 
 				MetaDataRecord<I> mdr = storage.getMetaDataRecord(uuid);
 
