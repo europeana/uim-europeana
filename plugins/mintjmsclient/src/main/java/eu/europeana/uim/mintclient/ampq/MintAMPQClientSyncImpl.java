@@ -279,13 +279,13 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	    while (true) {
 	    	QueueingConsumer.Delivery delivery;
 			try {
-				delivery = consumer.nextDelivery(1000);
+				delivery = consumer.nextDelivery(10000);
 				if(delivery == null ){
 					throw new MintRemoteException("Response from remote client timed out");
 				}
 				else if (delivery.getProperties().getCorrelationId().equals(correlationID)) {
 		            String response = new String(delivery.getBody());
-		            
+		            receiveChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 		            return response;
 		        }
 			} catch (ShutdownSignalException e) {
@@ -293,6 +293,8 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 			} catch (ConsumerCancelledException e) {
 				throw MintClientUtils.propagateException(e, MintRemoteException.class, "Error in handling synchronous delivery in " + this.getClass());
 			} catch (InterruptedException e) {
+				throw MintClientUtils.propagateException(e, MintRemoteException.class, "Error in handling synchronous delivery in " + this.getClass());
+			} catch (IOException e) {
 				throw MintClientUtils.propagateException(e, MintRemoteException.class, "Error in handling synchronous delivery in " + this.getClass());
 			}           
 	    }

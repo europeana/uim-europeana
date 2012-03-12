@@ -62,7 +62,6 @@ public class MintSendAsyncTest {
 	 * Deallocate resources on system shutdown
 	 */
 	@AfterClass public static void tearDown() {
-		//client.
 	   client = null;
 	   System.gc();
 	}

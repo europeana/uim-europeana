@@ -24,7 +24,8 @@ import eu.europeana.uim.store.Provider;
 
 
 /**
- *
+ * Mint UIM Service Interface
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 7 Mar 2012
  */
@@ -50,14 +51,5 @@ public interface MintUIMService {
 	 * @throws MintRemoteException
 	 */
 	public void createMappingSession(Collection<?> collection) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
-	
-	/**
-	 * @param collection
-	 * @throws MintOSGIClientException
-	 * @throws MintRemoteException
-	 */
-	public void publishCollection(Collection<?> collection) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
-
-
-	
+		
 }

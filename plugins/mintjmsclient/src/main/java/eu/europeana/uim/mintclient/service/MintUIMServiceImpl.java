@@ -37,7 +37,6 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
-import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
@@ -48,7 +47,8 @@ import eu.europeana.uim.api.StorageEngineException;
 
 
 /**
- *
+ * Base Class for implementing the UIM Mint connectivity 
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */
@@ -56,8 +56,8 @@ public class MintUIMServiceImpl implements MintUIMService {
 
 	private static MintAMPQClientSync synchronousClient;
 	private static MintAMPQClientASync asynchronousClient;
-	private Registry registry;
-	private Orchestrator<?> orchestrator;
+	private static Registry registry;
+	private static Orchestrator<?> orchestrator;
 	private LoggingEngine<?> logger; 
 	
 	/**
@@ -136,12 +136,12 @@ public class MintUIMServiceImpl implements MintUIMService {
 			throws MintOSGIClientException, MintRemoteException {
 		CreateUserCommand command = new CreateUserCommand();
 
-		command.setEmail("email");
-		command.setFirstName("firstName");
-		command.setLastName("lastName");
-		command.setUserName("userX");
-		command.setPassword("werwer");
-		command.setPhone("234234234");
+		command.setEmail(provider.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
+		command.setFirstName(provider.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERFIRSTNAME));
+		command.setLastName(provider.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERLASTNAME));
+		command.setUserName(provider.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
+		command.setPassword(provider.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERPASSWORD));
+		command.setPhone(provider.getValue(ControlledVocabularyProxy.PROVIDERMINTPHONE));
 		command.setOrganization(provider.getValue(ControlledVocabularyProxy.MINTID));
 		synchronousClient.createUser(command);
 
@@ -170,43 +170,20 @@ public class MintUIMServiceImpl implements MintUIMService {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.europeana.uim.mintclient.service.MintUIMService#publishCollection(
-	 * eu.europeana.uim.store.Collection)
-	 */
-	@Override
-	public void publishCollection(Collection<?> collection)
-			throws MintOSGIClientException, MintRemoteException {
-		
-		Provider provider = collection.getProvider();
-		PublicationCommand command = new PublicationCommand();
-		//command.setCorrelationId("correlationId");
-		List<String> list = new ArrayList<String>();
-		list.add("test1");
-		list.add("test2");
-		command.setIncludedImportList(list);
-		command.setOrganizationId("orgid");
-		command.setUserId("userId");
-		synchronousClient.publishCollection(command);
 
-	}
 	
 
     /**
+     * Public static nested class implementing a Listener for incoming messages
      *
      * @author Georgios Markakis <gwarkx@hotmail.com>
      * @since 6 Mar 2012
      */
     public static class UIMConsumerListener extends DefaultConsumer {
 
-		private Channel channel; 
 		
 		public UIMConsumerListener(Channel channel) {
 			super(channel);
-			// TODO Auto-generated constructor stub
 		}
 		
 	    @Override
@@ -219,8 +196,10 @@ public class MintUIMServiceImpl implements MintUIMService {
 	        String routingKey = envelope.getRoutingKey();
 	        String contentType = properties.getContentType();
 
+	
+	        //properties.
 	        long deliveryTag = envelope.getDeliveryTag();
-	        
+	        super.getChannel().basicAck(envelope.getDeliveryTag(), false);
 	        System.out.println(new String(body));
 	        // (process the message components here ...)
 
