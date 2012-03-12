@@ -45,9 +45,13 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	//Provider Mint Specific Fields
 	PROVIDERMINTUSERID("mintUserID"),
 	PROVIDERMINTUSERPASSWORD("mintUserPWD"),
-	
+	PROVIDERMINTUSERFIRSTNAME("mintFirstName"),
+	PROVIDERMINTUSERLASTNAME("mintLastName"),
+	PROVIDERMINTPHONE("mintPhone"),
 	//Collection Feilds
 	MINTPUBLICATIONLOCATION("mintPubLoc"),
+	LATESTMINTMAPPINGID("latestMintMapID"),
+	
 	//Ingestion Results
 	
 	
