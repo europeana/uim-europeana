@@ -2,12 +2,12 @@ package eu.europeana.uim.sugarcrmclient.ws;
 
 import org.apache.log4j.Logger;
 import org.springframework.ws.client.core.WebServiceTemplate;
-
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLoginFailureException;
 
 /**
- * 
+ * Class used by Spring to instantiate a client
+ *  
  * @author Georgios Markakis
  */
 public class ClientFactory {

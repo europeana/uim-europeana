@@ -20,14 +20,10 @@
  */
 package eu.europeana.uim.sugarcrmclient.plugin.objects;
 
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
+
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.UserDataHandler;
-
 import eu.europeana.uim.sugarcrm.SugarCrmRecord;
 import eu.europeana.uim.sugarcrm.model.SugarCrmField;
 import eu.europeana.uim.sugarcrm.model.UpdatableField;

@@ -65,6 +65,9 @@ public class ExtendedSaajSoapMessageFactory extends SaajSoapMessageFactory {
     }
 	
     
+    /* (non-Javadoc)
+     * @see org.springframework.ws.soap.saaj.SaajSoapMessageFactory#createWebServiceMessage(java.io.InputStream)
+     */
     public SaajSoapMessage createWebServiceMessage(InputStream inputStream) throws IOException {
         MimeHeaders mimeHeaders = parseMimeHeaders(inputStream);
 

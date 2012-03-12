@@ -24,7 +24,6 @@ package eu.europeana.uim.sugarcrmclient.plugin;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,7 +65,6 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntryResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl;
@@ -180,7 +178,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         request.setModuleName("Opportunities");
         request.setSession(sugarwsClient.getSessionID());
 
-        sugarwsClient.set_entry(request);
+        sugarwsClient.setentry(request);
     }
 
     /*
@@ -233,7 +231,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
 
         request.setQuery("(opportunities.id LIKE '" + id + "')");
 
-        GetEntryListResponse response = sugarwsClient.get_entry_list(request);
+        GetEntryListResponse response = sugarwsClient.getentrylist(request);
 
         ArrayList<Element> list = (ArrayList<Element>)response.getReturn().getEntryList().getArray().getAnyList();
 
@@ -269,7 +267,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
 
         request.setQuery(query.toString());
 
-        GetEntryListResponse response = sugarwsClient.get_entry_list(request);
+        GetEntryListResponse response = sugarwsClient.getentrylist(request);
 
         ArrayList<Element> list = null;
 
@@ -415,7 +413,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         request.setRelatedModuleQuery("");
         request.setSession(sugarwsClient.getSessionID());
 
-        GetRelationshipsResponse resp = sugarwsClient.get_relationships(request);
+        GetRelationshipsResponse resp = sugarwsClient.getrelationships(request);
 
         if (resp.getReturn().getIds().getArray() == null) { throw new JIXBQueryResultException(
                 "Could not retrieve related provider information from 'Accounts module' "); }
@@ -431,7 +429,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
 
         String provideriD = node.getTextContent();
 
-        HashMap<String, String> providerInfo = retrieveproviderinfo(provideriD);
+        HashMap<String, String> providerInfo = (HashMap<String, String>) retrieveproviderinfo(provideriD);
 
         return providerInfo;
 
@@ -442,7 +440,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
      * @return
      * @throws JIXBQueryResultException
      */
-    private HashMap<String, String> retrieveproviderinfo(String providerID)
+    private Map<String, String> retrieveproviderinfo(String providerID)
             throws QueryResultException {
 
         HashMap<String, String> returnInfo = new HashMap<String, String>();
@@ -454,7 +452,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         SelectFields selectFields = new SelectFields();
         request.setSelectFields(selectFields);
 
-        GetEntryResponse response = sugarwsClient.get_entry(request);
+        GetEntryResponse response = sugarwsClient.getentry(request);
 
         Element el = response.getReturn().getEntryList().getArray().getAnyList().get(0);
 
@@ -629,7 +627,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         request.setNote(note);
         request.setSession(sugarwsClient.getSessionID());
         ClientUtils.logMarshalledObject(request);
-        SetNoteAttachmentResponse resp = sugarwsClient.set_note_attachment(request);
+        SetNoteAttachmentResponse resp = sugarwsClient.setnoteattachment(request);
 
     }
 
@@ -743,7 +741,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         request.setModuleName(DSMODULENAME);
         request.setSession(sugarwsClient.getSessionID());
 
-        SetEntryResponse response = sugarwsClient.set_entry(request);
+        sugarwsClient.setentry(request);
 
     }
 

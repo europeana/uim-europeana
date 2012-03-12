@@ -60,7 +60,7 @@ public class PollingBean extends QuartzJobBean {
 			throws JobExecutionException {
 
 		    LinkedHashMap<String,PollingListener>  pollingListeners = sugarcrmPlugin.getPollingListeners();
-		    Iterator itr = pollingListeners.keySet().iterator();
+		    Iterator<String> itr = pollingListeners.keySet().iterator();
 		    
 			if(pollingListeners != null){
 				

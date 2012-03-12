@@ -105,7 +105,7 @@ public final class SugarCRMWSTest {
 	@Before
 	public void setupSession() throws JIXBLoginFailureException{
 		LoginResponse lresponse;
-		lresponse = sugarWsClient.login2(ClientUtils.createStandardLoginObject("test", "test"));
+		lresponse = sugarWsClient.login2(ClientUtils.createStandardLoginObject("wsaccount", "g2Q64wV"));
 		assertNotNull(lresponse.getReturn().getId());
 		sessionID = lresponse.getReturn().getId();
 	}
@@ -131,7 +131,7 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testLogin() throws Exception{
 		LoginResponse response;
-		Login login = ClientUtils.createStandardLoginObject("test", "test");			
+		Login login = ClientUtils.createStandardLoginObject("wsaccount", "g2Q64wV");			
 		ClientUtils.logMarshalledObject(login);
 		response = sugarWsClient.login2(login);		
 		assertNotNull(response);
@@ -149,7 +149,7 @@ public final class SugarCRMWSTest {
 		IsUserAdmin user = new IsUserAdmin();		
 		user.setSession(sessionID);
 		IsUserAdminResponse response;
-		response = sugarWsClient.is_user_admin(user);
+		response = sugarWsClient.isuseradmin(user);
 		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 	}
@@ -165,7 +165,7 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetUserIdResponse response;
-		response = sugarWsClient.get_user_id(request);
+		response = sugarWsClient.getuserid(request);
 		assertNotNull(response);
 		ClientUtils.logMarshalledObject(response);
 	}
@@ -181,7 +181,7 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);
 		ClientUtils.logMarshalledObject(request);
 		GetAvailableModulesResponse response;
-		response = sugarWsClient.get_available_modules(request);
+		response = sugarWsClient.getavailablemodules(request);
 		assertNotNull(response);		
 		ClientUtils.logMarshalledObject(response);
 		
@@ -207,7 +207,7 @@ public final class SugarCRMWSTest {
 		request.setModuleName("Accounts");
 		ClientUtils.logMarshalledObject(request);
 		GetModuleFieldsResponse response;
-		response = sugarWsClient.get_module_fields(request);
+		response = sugarWsClient.getmodulefields(request);
 		assertNotNull(response);		
 		ClientUtils.logMarshalledObject(response);
 	}
@@ -244,7 +244,7 @@ public final class SugarCRMWSTest {
 		ClientUtils.logMarshalledObject(request);
 		GetEntryListResponse response;
 		try {
-			response = sugarWsClient.get_entry_list(request);
+			response = sugarWsClient.getentrylist(request);
 			assertNotNull(response);
 			ClientUtils.logMarshalledObject(response);
 		} catch (JIXBQueryResultException e) {
@@ -274,7 +274,7 @@ public final class SugarCRMWSTest {
 		request.setIds(fields);
 		ClientUtils.logMarshalledObject(request);
 		GetEntriesResponse response;
-		response = sugarWsClient.get_entries(request);
+		response = sugarWsClient.getentries(request);
 		ClientUtils.logMarshalledObject(response);
 	}
 	
@@ -297,7 +297,7 @@ public final class SugarCRMWSTest {
 		request.setSelectFields(selectFields );
 		ClientUtils.logMarshalledObject(request);
 		GetEntryResponse response;
-		response = sugarWsClient.get_entry(request);
+		response = sugarWsClient.getentry(request);
 		ClientUtils.logMarshalledObject(response);
 	}
 	
@@ -336,7 +336,7 @@ public final class SugarCRMWSTest {
 		request.setSession(sessionID);	
 		ClientUtils.logMarshalledObject(request);
 		SetEntryResponse response;
-		response = sugarWsClient.set_entry(request);
+		response = sugarWsClient.setentry(request);
 		ClientUtils.logMarshalledObject(response);
 	}
 	
@@ -359,7 +359,7 @@ public final class SugarCRMWSTest {
 		request.setSession(sugarWsClient.getSessionID());
 		ClientUtils.logMarshalledObject(request);
 		SetNoteAttachmentResponse resp;
-		resp = sugarWsClient.set_note_attachment(request );
+		resp = sugarWsClient.setnoteattachment(request );
 		ClientUtils.logMarshalledObject(resp);
 
 	}
@@ -385,7 +385,7 @@ public final class SugarCRMWSTest {
 		
 		ClientUtils.logMarshalledObject(request);
 		
-		GetRelationshipsResponse resp = sugarWsClient.get_relationships(request);
+		GetRelationshipsResponse resp = sugarWsClient.getrelationships(request);
 		
 		ClientUtils.logMarshalledObject(resp);
 		

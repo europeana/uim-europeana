@@ -20,7 +20,6 @@
  */
 package eu.europeana.uim.sugarcrmclient.ws;
 
-
 import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
@@ -54,148 +53,166 @@ import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLogoutFailureException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBQueryResultException;
 
 /**
- *  Interface describing the available SOAP based sugarCRM operations 
- *  
+ * Interface describing the available SOAP based sugarCRM operations
+ * 
  * @author Georgios Markakis
  */
 public interface SugarWsClient {
 
+	/**
+	 * Public method for performing Login operations (see Junit test for usage
+	 * example)
+	 * 
+	 * @param login
+	 *            the Login object
+	 * @return a String containing the current Session id
+	 * @throws JIXBLoginFailureException
+	 *             when login credentials are incorrect
+	 * @throws GenericSugarCrmException
+	 */
+	String login(Login login) throws JIXBLoginFailureException;
 
 	/**
-	 * Public method for performing Login operations (see Junit test for usage example) 
-	 * 
-	 * @param login the Login object
-	 * @return a String containing the current Session id
-	 * @throws JIXBLoginFailureException when login credentials are incorrect
-	 * @throws GenericSugarCrmException 
-	 */
-	public String login(Login login) throws JIXBLoginFailureException;
-	
-	
-	/**
-	 * Public method for performing Login operations (see JUnit test for usage example) 
+	 * Public method for performing Login operations (see JUnit test for usage
+	 * example)
 	 * 
 	 * @param login
 	 * @return a LoginResponse object
-	 * @throws JIXBLoginFailureException when login credentials are incorrect
+	 * @throws JIXBLoginFailureException
+	 *             when login credentials are incorrect
 	 * @throws GenericSugarCrmException
 	 */
-	public LoginResponse login2(Login login) throws JIXBLoginFailureException;
-	
-	
+	LoginResponse login2(Login login) throws JIXBLoginFailureException;
+
 	/**
-	 * Public method for performing Logout operations (see Junit test for usage example) 
+	 * Public method for performing Logout operations (see Junit test for usage
+	 * example)
 	 * 
-	 * @param a logout request object
+	 * @param a
+	 *            logout request object
 	 * @return a LogoutResponse object
-	 * @throws JIXBLogoutFailureException when logout fails
+	 * @throws JIXBLogoutFailureException
+	 *             when logout fails
 	 * @throws GenericSugarCrmException
 	 */
-	public LogoutResponse logout(Logout request) throws JIXBLogoutFailureException;
-	
+	LogoutResponse logout(Logout request) throws JIXBLogoutFailureException;
+
 	/**
-	 * This method returns an object indicating that the current user has admin privileges or not.
-	 * @param request
-	 * @return
-	 * @throws GenericSugarCrmException 
-	 */
-	public IsUserAdminResponse is_user_admin(IsUserAdmin request) throws GenericSugarCrmException;
-	
-	/**
-	 * This method gives the user name of the user who "owns" the specific session 
+	 * This method returns an object indicating that the current user has admin
+	 * privileges or not.
 	 * 
 	 * @param request
 	 * @return
-	 * @throws GenericSugarCrmException 
+	 * @throws GenericSugarCrmException
 	 */
-	public GetUserIdResponse get_user_id(GetUserId request) throws GenericSugarCrmException;
-	
+	IsUserAdminResponse isuseradmin(IsUserAdmin request)
+			throws GenericSugarCrmException;
+
 	/**
-	 * Shows all the available module names in SugarCRM 
+	 * This method gives the user name of the user who "owns" the specific
+	 * session
 	 * 
 	 * @param request
 	 * @return
-	 * @throws JIXBQueryResultException 
-	 * @throws GenericSugarCrmException 
+	 * @throws GenericSugarCrmException
 	 */
-	public GetAvailableModulesResponse get_available_modules(GetAvailableModules request) throws JIXBQueryResultException ;
-	
+	GetUserIdResponse getuserid(GetUserId request)
+			throws GenericSugarCrmException;
+
 	/**
-	 * Get the fields for a specific module 
+	 * Shows all the available module names in SugarCRM
 	 * 
-	 * @param request 
+	 * @param request
+	 * @return
+	 * @throws JIXBQueryResultException
+	 * @throws GenericSugarCrmException
+	 */
+	GetAvailableModulesResponse getavailablemodules(GetAvailableModules request)
+			throws JIXBQueryResultException;
+
+	/**
+	 * Get the fields for a specific module
+	 * 
+	 * @param request
 	 * @return a GetModuleFieldsResponse containing a list of module fields
-	 * @throws JIXBQueryResultException 
+	 * @throws JIXBQueryResultException
 	 */
-	public GetModuleFieldsResponse get_module_fields(GetModuleFields request) throws JIXBQueryResultException;
-	
+	GetModuleFieldsResponse getmodulefields(GetModuleFields request)
+			throws JIXBQueryResultException;
+
 	/**
 	 * Performs a query on the records contained in sugarCRM
-	 *  
+	 * 
 	 * @param request
 	 * @return
-	 * @throws JIXBQueryResultException 
+	 * @throws JIXBQueryResultException
 	 */
-	public GetEntryListResponse get_entry_list(GetEntryList request) throws JIXBQueryResultException;
-	
+	GetEntryListResponse getentrylist(GetEntryList request)
+			throws JIXBQueryResultException;
+
 	/**
 	 * Gets a specific entry
+	 * 
 	 * @param request
 	 * @return
-	 * @throws JIXBQueryResultException 
+	 * @throws JIXBQueryResultException
 	 */
-	public GetEntryResponse get_entry(GetEntry request) throws JIXBQueryResultException;
-	
+	GetEntryResponse getentry(GetEntry request) throws JIXBQueryResultException;
+
 	/**
 	 * Creates/Updates an entry in SugarCRM
 	 * 
 	 * @param request
-	 * @return 
-	 * @throws JIXBQueryResultException 
+	 * @return
+	 * @throws JIXBQueryResultException
 	 */
-	public SetEntryResponse set_entry(SetEntry request) throws JIXBQueryResultException;
-	
+	SetEntryResponse setentry(SetEntry request) throws JIXBQueryResultException;
+
 	/**
 	 * Gets the entries for a request
 	 * 
 	 * @param request
 	 * @return
-	 * @throws JIXBQueryResultException 
+	 * @throws JIXBQueryResultException
 	 */
-	public GetEntriesResponse get_entries(GetEntries request) throws JIXBQueryResultException;
-	
-	
+	GetEntriesResponse getentries(GetEntries request)
+			throws JIXBQueryResultException;
+
 	/**
 	 * Sets a note attachment to a record
 	 * 
 	 * @param request
 	 * @return
-	 * @throws JIXBFileAttachmentException 
+	 * @throws JIXBFileAttachmentException
 	 */
-	public SetNoteAttachmentResponse set_note_attachment(SetNoteAttachment request) throws JIXBFileAttachmentException;
-	
+	SetNoteAttachmentResponse setnoteattachment(SetNoteAttachment request)
+			throws JIXBFileAttachmentException;
+
 	/**
 	 * Gets a note attachment from a record
 	 * 
 	 * @param request
 	 * @return
-	 * @throws JIXBFileAttachmentException 
+	 * @throws JIXBFileAttachmentException
 	 */
-	public GetNoteAttachmentResponse get_note_attachment(GetNoteAttachment request) throws JIXBFileAttachmentException;
-	
+	GetNoteAttachmentResponse getnoteattachment(GetNoteAttachment request)
+			throws JIXBFileAttachmentException;
+
 	/**
 	 * Gets the Relationships for a specific module
+	 * 
 	 * @param request
 	 * @return
 	 * @throws JIXBQueryResultException
 	 */
-	public GetRelationshipsResponse get_relationships(GetRelationships request) throws JIXBQueryResultException;
+	GetRelationshipsResponse getrelationships(GetRelationships request)
+			throws JIXBQueryResultException;
 
-
-	
 	/**
 	 * Get the current session id
+	 * 
 	 * @return
 	 */
-	public String getSessionID(); 
+	String getSessionID();
+
 }

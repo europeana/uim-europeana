@@ -7,14 +7,12 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Function;
-
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
@@ -25,7 +23,6 @@ import eu.europeana.uim.sugarcrm.SugarCrmRecord;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 import eu.europeana.uim.sugarcrm.model.DatasetStates;
 import eu.europeana.uim.sugarcrm.model.UpdatableField;
-
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaUpdatableField;
@@ -68,7 +65,7 @@ public class SugarCrmCommand implements Function, Action {
 	@Override
 	public Object execute(CommandSession commandsession) throws Exception {
 
-		PrintStream out = commandsession.getConsole();
+		final PrintStream out = commandsession.getConsole();
 	    BufferedReader in = new BufferedReader(new InputStreamReader(commandsession.getKeyboard()));
 	    
 		if (operation == null) {
@@ -144,8 +141,8 @@ public class SugarCrmCommand implements Function, Action {
 			SugarCrmRecord re = sugarcrmPlugin.retrieveRecord(poprecID);
 			if(re != null)
 			{
-				Provider prov = sugarcrmPlugin.updateProviderFromRecord(re);
-				Collection coll = sugarcrmPlugin.updateCollectionFromRecord(re, prov);
+				Provider<?> prov = sugarcrmPlugin.updateProviderFromRecord(re);
+				Collection<?> coll = sugarcrmPlugin.updateCollectionFromRecord(re, prov);
 				out.println("Provider/Collection created successfully");
 			}
 			else{
@@ -173,7 +170,7 @@ public class SugarCrmCommand implements Function, Action {
 				public void performAction(SugarCrmService pluginReference,
 						List<SugarCrmRecord> retrievedRecords)
 						throws GenericSugarCrmException {
-					System.out.println("Invoking Poller...");
+					out.println("Invoking Poller...");
 					
 				}
 				
@@ -183,7 +180,7 @@ public class SugarCrmCommand implements Function, Action {
 		case removepollinglisteners:
 			LinkedHashMap<String,PollingListener>  listeners = new LinkedHashMap<String,PollingListener> ();
 			sugarcrmPlugin.setPollingListeners(listeners);
-			System.out.println("Pollers Removed");
+			out.println("Pollers Removed");
 			break;
 		default:
 			out.println("Unknown Command...");
@@ -201,9 +198,6 @@ public class SugarCrmCommand implements Function, Action {
 	@Override
 	public Object execute(CommandSession commandsession, List<Object> arg1)
 			throws Exception {
-
-		PrintStream out = commandsession.getConsole();
-		
 		return null;
 	}
 	

@@ -8,6 +8,14 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.ErrorValue;
  * @date Aug 12, 2011
  */
 public class JIXBUtil {
+	
+	/**
+	 * Utility classes should not have a public or default constructor.
+	 */
+	private JIXBUtil(){
+		
+	}
+	
     /**
      * Auxiliary method method accessible from all subclasses of this exception type.
      * It is used to formulate the exception description message... 

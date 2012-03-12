@@ -29,7 +29,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,25 +37,20 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Array;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.ArrayAttributes;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.ArrayAttributes.ArrayType;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.CommonAttributes;
-import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.Login;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SelectFields;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.UserAuth;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValueList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.NameValue;
-
-
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -71,9 +65,14 @@ import org.jibx.runtime.JiBXException;
  */
 public class ClientUtils {
 
-	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(ClientUtils.class);
+	private static org.apache.log4j.Logger logger = Logger.getLogger(ClientUtils.class);
 
-	
+	/**
+	 * Utility Class (Does not instantiate)
+	 */
+	private ClientUtils(){
+		
+	}
 	
 	/**
 	 * This method marshals the contents of a  JAXB Element and outputs the results to the
@@ -86,15 +85,15 @@ public class ClientUtils {
 
 			String xmlContent = unmarshallObject(jibxObject);
 			
-			LOGGER.info("===========================================");
+			logger.info("===========================================");
 			StringBuffer sb = new StringBuffer("Soap Ouput for Class: ");
 			sb.append(jibxObject.getClass().getSimpleName());
-			LOGGER.info(sb.toString());
-			LOGGER.info(xmlContent);
-			LOGGER.info("===========================================");
+			logger.info(sb.toString());
+			logger.info(xmlContent);
+			logger.info("===========================================");
 		} catch (JiBXException e) {
 
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 	}
@@ -121,8 +120,7 @@ public class ClientUtils {
 			out.println(xmlContent);
 			out.println("===========================================");
 		} catch (JiBXException e) {
-
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 	}
@@ -228,19 +226,12 @@ public class ClientUtils {
 	        
 	        for( String fieldname : fieldnames){
 	        	Element element = document.createElement("string");
-	        	
 	        	Array array =  new Array();
 	        	array.getAnyList();
 				selfields.setArray(array );
-	        	
-	    		//selfields.getAnies().add(rootElement);
-	    		element.appendChild(document.createTextNode(fieldname));
-	    		//selfields.getAnies().add(element);
-	    		
+	    		element.appendChild(document.createTextNode(fieldname));  		
 	        }
 
-            
-	        
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			return null;
@@ -352,15 +343,10 @@ public class ClientUtils {
 	    		String name = infoNodes.item(z).getFirstChild().getTextContent();
 	    		String value = infoNodes.item(z).getLastChild().getTextContent();
 	    		
-	    		elementData.put(name,value);
-	    		
-	    	}
-	    		    	
+	    		elementData.put(name,value);		
+	    	}	    		    	
 	    	returnMap.put(id, elementData);
-
 	    }
-	    
-	    
 		return returnMap;
 	}
 	
@@ -379,11 +365,7 @@ public class ClientUtils {
 		try {
 			documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		    Document document = documentBuilder.parse(new InputSource(new StringReader(responseString)));
-			
-		    String sessionID  = null;
-		    String messageName = document.getFirstChild().getNodeName();
-		    
-		    
+		    String sessionID  = null;		    
 		    NodeList nl = document.getElementsByTagName("id");
 		    
 		    if (nl.getLength() > 0){
@@ -393,14 +375,11 @@ public class ClientUtils {
 		    return sessionID;
 		    
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 
@@ -408,16 +387,18 @@ public class ClientUtils {
 	}
 	
 	
-	public static String extractFromElement(String value, Element el){
-		
-		NodeList nl =el.getElementsByTagName(value);
-		
-		if(nl.getLength() != 0){
-			
+	/**
+	 * Extracte a specific value from a DOM element
+	 * 
+	 * @param value
+	 * @param el
+	 * @return the extracted value
+	 */
+	public static String extractFromElement(String value, Element el){	
+		NodeList nl =el.getElementsByTagName(value);	
+		if(nl.getLength() != 0){		
 			return nl.item(0).getTextContent();
 		}
-		
-		
 		return null;
 	}
 	
