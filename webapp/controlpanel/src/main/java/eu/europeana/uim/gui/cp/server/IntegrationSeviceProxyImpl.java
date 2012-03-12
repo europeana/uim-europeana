@@ -176,8 +176,7 @@ public class IntegrationSeviceProxyImpl extends
 		queryObj.setOrderBy(EuropeanaRetrievableField.ID);
 
 		try {
-			//TODO:Parametrize this according to user credentials
-			sugService.updateSession("test", "test");
+			sugService.updateSession(null,null);
 			
 			ArrayList<SugarCrmRecord> results = (ArrayList<SugarCrmRecord>) sugService
 					.retrieveRecords(queryObj);
