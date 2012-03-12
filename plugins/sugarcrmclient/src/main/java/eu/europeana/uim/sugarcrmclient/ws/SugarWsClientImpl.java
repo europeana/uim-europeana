@@ -63,6 +63,10 @@ public class SugarWsClientImpl implements SugarWsClient {
 
 	private WebServiceTemplate webServiceTemplate;
 
+	private String username;
+	
+	private String password;
+	
 	private String sessionID;
 
 	/**
@@ -389,6 +393,36 @@ public class SugarWsClientImpl implements SugarWsClient {
 		return response;
 	}
 
+	
+	/**
+	 * @return
+	 */
+	@Override
+	public String getSessionID() {
+		return sessionID;
+	}
+
+	@Override
+	public String getUsername() {
+		return username;
+	}
+	
+	@Override
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	@Override
+	public String getPassword() {
+		return password;
+	}
+
+	@Override
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	
 	/* Getters & Setters */
 
 	/**
@@ -427,11 +461,7 @@ public class SugarWsClientImpl implements SugarWsClient {
 		this.sessionID = sessionID;
 	}
 
-	/**
-	 * @return
-	 */
-	public String getSessionID() {
-		return sessionID;
-	}
+
+
 
 }

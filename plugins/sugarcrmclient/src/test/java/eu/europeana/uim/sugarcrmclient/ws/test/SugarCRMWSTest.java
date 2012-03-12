@@ -90,40 +90,8 @@ public final class SugarCRMWSTest {
 
 	@Resource
 	private SugarWsClient sugarWsClient; 
-	
-	private String sessionID;
-
-	
-	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMWSTest.class);
-	
-	
-	/**
-	 *  Method invoked before each test execution. It performs the initial login in order for allow permission to the 
-	 *  subsequent web service calls. It also sets the session id for this test run. 
-	 * @throws JIXBLoginFailureException 
-	 */
-	@Before
-	public void setupSession() throws JIXBLoginFailureException{
-		LoginResponse lresponse;
-		lresponse = sugarWsClient.login2(ClientUtils.createStandardLoginObject("wsaccount", "g2Q64wV"));
-		assertNotNull(lresponse.getReturn().getId());
-		sessionID = lresponse.getReturn().getId();
-	}
-	
-	
-	/**
-	 * Method invoked after each test has been executed. It destroys the current session. 
-	 * @throws JIXBLogoutFailureException 
-	 */
-	@After
-	public void destroySession() throws JIXBLogoutFailureException{
-		Logout request = new Logout();
-		request.setSession(sessionID);
-		LogoutResponse lgresponse;
-		lgresponse = sugarWsClient.logout(request );
 		
-	}
-
+	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(SugarCRMWSTest.class);
 
 	/**
 	 * User Login Test (make sure that the user has been created in advance in in the configured SCRM installation)
@@ -131,7 +99,7 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testLogin() throws Exception{
 		LoginResponse response;
-		Login login = ClientUtils.createStandardLoginObject("wsaccount", "g2Q64wV");			
+		Login login = ClientUtils.createStandardLoginObject(sugarWsClient.getUsername(), sugarWsClient.getPassword());			
 		ClientUtils.logMarshalledObject(login);
 		response = sugarWsClient.login2(login);		
 		assertNotNull(response);
@@ -147,7 +115,7 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testIsUserAdmin() throws GenericSugarCrmException{	
 		IsUserAdmin user = new IsUserAdmin();		
-		user.setSession(sessionID);
+		user.setSession(sugarWsClient.getSessionID());
 		IsUserAdminResponse response;
 		response = sugarWsClient.isuseradmin(user);
 		assertNotNull(response);
@@ -162,7 +130,7 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testGetUserID() throws GenericSugarCrmException{	 
 		GetUserId request = new GetUserId();
-		request.setSession(sessionID);
+		request.setSession(sugarWsClient.getSessionID());
 		ClientUtils.logMarshalledObject(request);
 		GetUserIdResponse response;
 		response = sugarWsClient.getuserid(request);
@@ -178,7 +146,7 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testGetAvailableModules() throws JIXBQueryResultException{	 	
 		GetAvailableModules request = new GetAvailableModules();
-		request.setSession(sessionID);
+		request.setSession(sugarWsClient.getSessionID());
 		ClientUtils.logMarshalledObject(request);
 		GetAvailableModulesResponse response;
 		response = sugarWsClient.getavailablemodules(request);
@@ -203,7 +171,7 @@ public final class SugarCRMWSTest {
 	@Test
 	public void testGetModuleFields() throws Exception{	 		
 		GetModuleFields request = new GetModuleFields();
-		request.setSession(sessionID);
+		request.setSession(sugarWsClient.getSessionID());
 		request.setModuleName("Accounts");
 		ClientUtils.logMarshalledObject(request);
 		GetModuleFieldsResponse response;
@@ -234,11 +202,10 @@ public final class SugarCRMWSTest {
 		
   		request.setModuleName("Contacts");	
 		request.setSelectFields(fields);
-		request.setSession(sessionID);
+		request.setSession(sugarWsClient.getSessionID());
 		request.setOrderBy("last_name");
 		request.setMaxResults(10);
 		request.setOffset(0);
-		//request.setQuery("(contacts.salutation = 'Mr.' AND contacts.title LIKE 'doctor appointment%')");
 		request.setQuery("(contacts.first_name LIKE '%M%')");
 		
 		ClientUtils.logMarshalledObject(request);
@@ -270,7 +237,7 @@ public final class SugarCRMWSTest {
 		SelectFields fields = ClientUtils.generatePopulatedSelectFields(fieldnames);
   		request.setModuleName("Contacts");	
 		request.setSelectFields(fields);
-		request.setSession(sessionID);
+		request.setSession(sugarWsClient.getSessionID());
 		request.setIds(fields);
 		ClientUtils.logMarshalledObject(request);
 		GetEntriesResponse response;
@@ -292,7 +259,7 @@ public final class SugarCRMWSTest {
 		GetEntry request = new GetEntry();
 		request.setId("ca410eea-d4fb-0829-aa25-4c585fbb1136");
 		request.setModuleName("Accounts");
-		request.setSession(sessionID);	
+		request.setSession(sugarWsClient.getSessionID());	
 		SelectFields selectFields = new SelectFields();
 		request.setSelectFields(selectFields );
 		ClientUtils.logMarshalledObject(request);
@@ -333,7 +300,7 @@ public final class SugarCRMWSTest {
 		
 		request.setNameValueList(valueList);
 		request.setModuleName("Contacts");
-		request.setSession(sessionID);	
+		request.setSession(sugarWsClient.getSessionID());	
 		ClientUtils.logMarshalledObject(request);
 		SetEntryResponse response;
 		response = sugarWsClient.setentry(request);
@@ -381,7 +348,7 @@ public final class SugarCRMWSTest {
 		request.setModuleName("Opportunities");
 		request.setRelatedModule("Accounts");
 		request.setRelatedModuleQuery("");
-		request.setSession(sessionID);
+		request.setSession(sugarWsClient.getSessionID());
 		
 		ClientUtils.logMarshalledObject(request);
 		

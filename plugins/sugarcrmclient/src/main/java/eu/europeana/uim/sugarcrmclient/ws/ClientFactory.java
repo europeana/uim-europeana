@@ -26,6 +26,8 @@ public class ClientFactory {
 	public  SugarWsClientImpl createInstance(String userName, String password){
 		
 		SugarWsClientImpl client = new SugarWsClientImpl();
+		client.setUsername(userName);
+		client.setPassword(password);
 		client.setWebServiceTemplate(webServiceTemplate);
 		
 		try {

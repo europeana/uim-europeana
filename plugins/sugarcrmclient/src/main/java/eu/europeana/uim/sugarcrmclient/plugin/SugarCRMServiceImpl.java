@@ -121,6 +121,15 @@ public class SugarCRMServiceImpl implements SugarCrmService {
      */
     @Override
     public String updateSession(String username, String password) throws LoginFailureException {
+    	
+    	if(username == null){
+    		username = sugarwsClient.getUsername();
+    	}
+
+    	if(password ==  null){
+    		password = sugarwsClient.getPassword();
+    	}
+    	
         StringBuffer connectionInfo = new StringBuffer();
         Login login = ClientUtils.createStandardLoginObject(username, password);
         String newsessionID = sugarwsClient.login(login);

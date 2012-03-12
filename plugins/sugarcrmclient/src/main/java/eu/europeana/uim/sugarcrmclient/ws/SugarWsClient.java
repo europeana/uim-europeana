@@ -214,5 +214,26 @@ public interface SugarWsClient {
 	 * @return
 	 */
 	String getSessionID();
+	
+	
+	/**
+	 * @return
+	 */
+	String getUsername();
+	
+	/**
+	 * @param username
+	 */
+	void setUsername(String username);
+	
+	/**
+	 * @return
+	 */
+	String getPassword();
+	
+	/**
+	 * @param password
+	 */
+	void setPassword(String password);
 
 }
