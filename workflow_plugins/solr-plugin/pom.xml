@@ -79,7 +79,7 @@
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
-			<version>0.99</version>
+			<version>0.99-SNAPSHOT-208patch</version>
 			<scope>compile</scope>
 		</dependency>
 		<!--Optional Jars (for certain features) but required by maven for building. -->
@@ -148,11 +148,13 @@
 							!net.sf.cglib.asm.util,
 							!org.apache.tools.ant.*,
 							!org.testng.*,
+							!org.dom4j.*,
+							!org.jdom.*,
 							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>
-							*;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|jibx-run|jibx-extras|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|solr-solrj|spring-context-support
+							*;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|solr-solrj|spring-context-support
 						</Embed-Dependency>
 					</instructions>
 				</configuration>

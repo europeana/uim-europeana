@@ -15,13 +15,9 @@
  *  the Licence.
  */
 
-
 package eu.europeana.uim.plugin.solr.service;
 
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +31,6 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import org.springframework.beans.factory.annotation.Value;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
@@ -60,6 +55,7 @@ import eu.europeana.corelib.solr.server.importer.util.ProvidedCHOFieldInput;
 import eu.europeana.corelib.solr.server.importer.util.ProxyFieldInput;
 import eu.europeana.corelib.solr.server.importer.util.TimespanFieldInput;
 import eu.europeana.corelib.solr.server.importer.util.WebResourcesFieldInput;
+import eu.europeana.corelib.solr.utils.MongoUtils;
 import eu.europeana.uim.api.AbstractIngestionPlugin;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
@@ -68,31 +64,26 @@ import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
 import eu.europeana.uim.solr3.Solr3Initializer;
 import eu.europeana.uim.store.MetaDataRecord;
-import eu.europeana.uim.store.Request;
-import eu.europeana.uim.store.UimDataSet;
-
-
 
 /**
- * This is the main class implementing the UIM functionality for 
- * the solr workflow plugin exposed as an OSGI service.
+ * This is the main class implementing the UIM functionality for the solr
+ * workflow plugin exposed as an OSGI service.
  * 
  * @author Georgios Markakis
  * @author Yorgos.Mamakis@ kb.nl
- *
+ * 
  */
 public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
-	//@Value("#{europeanaProperties['solr.selectUrl']}")
-	private static String solrUrl="http://localhost:8484/apache-solr-3.5.0";
-	//@Value("#{europeanaProperties['mongoDB.host']}")
-	private static String mongoDBhost="localhost";
-	//@Value("#{europeanaProperties['mongoDB.port']}")
-	private static int mongoDBport=27017;
+	// @Value("#{europeanaProperties['solr.selectUrl']}")
+	private static String solrUrl = "http://127.0.0.1:8282/";
+	// @Value("#{europeanaProperties['mongoDB.host']}")
+	private static String mongoDBhost = "127.0.0.1";
+	// @Value("#{europeanaProperties['mongoDB.port']}")
+	private static int mongoDBport = 27017;
 	private static SolrServer solrServer;
 	private static MongoDBServer mongoServer;
-	
-	
+
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
 
@@ -105,34 +96,36 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			add(httpzipurl);
 		}
 	};
-    
-    
+
 	public SolrWorkflowPlugin() {
-		super("solr_workflow", "Solr Repository Ingestion Plugin"); 
+		super("solr_workflow", "Solr Repository Ingestion Plugin");
 	}
 
-
-
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.
+	 * MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
 	 */
-	public  <I> boolean processRecord(MetaDataRecord<I> mdr, ExecutionContext<I> context)	
-    throws IngestionPluginFailedException, CorruptedMetadataRecordException{
+	public <I> boolean processRecord(MetaDataRecord<I> mdr,
+			ExecutionContext<I> context) throws IngestionPluginFailedException,
+			CorruptedMetadataRecordException {
 
 		SolrInputDocument solrInputDocument = null;
-		
-		try{
+
+		try {
 			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			
-			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
-			
+
+			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
+					0);
+
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			List<Choice> rdfElements = rdf.getChoiceList();
 			solrInputDocument = new SolrInputDocument();
 			FullBean fullBean = new FullBeanImpl();
-			List<AggregationImpl> aggregations = Collections.synchronizedList(new ArrayList<AggregationImpl>());
+			List<AggregationImpl> aggregations = Collections
+					.synchronizedList(new ArrayList<AggregationImpl>());
 			List<AgentImpl> agentList = new ArrayList<AgentImpl>();
 			List<ConceptImpl> conceptList = new ArrayList<ConceptImpl>();
 			List<PlaceImpl> placeList = new ArrayList<PlaceImpl>();
@@ -140,73 +133,153 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			List<ProxyImpl> proxyList = new ArrayList<ProxyImpl>();
 			List<WebResourceImpl> webResourceList = new ArrayList<WebResourceImpl>();
 			List<TimespanImpl> timespanList = new ArrayList<TimespanImpl>();
-			for (Choice rdfElement : rdfElements){
-		
-				if(rdfElement.ifAgent()){
-					solrInputDocument = AgentFieldInput.createAgentSolrFields(rdfElement.getAgent(), solrInputDocument);
-					agentList.add(AgentFieldInput.createAgentMongoEntity(rdfElement.getAgent(), mongoServer));
-				}
-				else if(rdfElement.ifAggregation()){
-					solrInputDocument = AggregationFieldInput.createAggregationSolrFields(rdfElement.getAggregation(), solrInputDocument);
-					AggregationImpl aggregation = AggregationFieldInput.createAggregationMongoFields(rdfElement.getAggregation(),mongoServer);
-					if(webResourceList.size()>0){
-						AggregationFieldInput.appendWebResource(aggregations, webResourceList, mongoServer);
+
+			for (Choice element : rdfElements) {
+
+				if (element.ifProvidedCHO()) {
+					try {
+						fullBean.setAbout(element.getProvidedCHO().getAbout());
+						solrInputDocument = ProvidedCHOFieldInput
+								.createProvidedCHOFields(
+										element.getProvidedCHO(),
+										solrInputDocument);
+						solrInputDocument = ProxyFieldInput
+								.createProxySolrFields(
+										element.getProvidedCHO(),
+										solrInputDocument);
+						providedCHOList.add(ProvidedCHOFieldInput
+								.createProvidedCHOMongoFields(
+										element.getProvidedCHO(), mongoServer));
+						if (proxyList.size() > 0) {
+							proxyList.set(0, ProxyFieldInput
+									.createProxyMongoFields(new ProxyImpl(),
+											element.getProvidedCHO(),
+											mongoServer));
+						} else {
+							proxyList.add(ProxyFieldInput
+									.createProxyMongoFields(new ProxyImpl(),
+											element.getProvidedCHO(),
+											mongoServer));
+						}
+					} catch (InstantiationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-					aggregations.add(aggregation);
 				}
-				else if(rdfElement.ifConcept()){
-					solrInputDocument = ConceptFieldInput.createConceptSolrFields(rdfElement.getConcept(),solrInputDocument);
-					conceptList.add(ConceptFieldInput.createConceptMongoFields(rdfElement.getConcept(), mongoServer));
-				}
-				else if(rdfElement.ifPlace()){
-					solrInputDocument = PlaceFieldInput.createPlaceSolrFields(rdfElement.getPlace(),solrInputDocument) ;
-					placeList.add(PlaceFieldInput.createPlaceMongoFields(rdfElement.getPlace(), mongoServer));
-				}
-				else if(rdfElement.ifProvidedCHO()){
-					
-					solrInputDocument = ProvidedCHOFieldInput.createProvidedCHOFields(rdfElement.getProvidedCHO(),solrInputDocument);
-					providedCHOList.add(ProvidedCHOFieldInput.createProvidedCHOMongoFields(rdfElement.getProvidedCHO(), mongoServer));
-					if(proxyList.size()>0){
-						proxyList.set(0, ProxyFieldInput.createProxyMongoFields(new ProxyImpl(),rdfElement.getProvidedCHO(), mongoServer));
+				if (element.ifAggregation()) {
+					solrInputDocument = AggregationFieldInput
+							.createAggregationSolrFields(
+									element.getAggregation(), solrInputDocument);
+					solrInputDocument = ProxyFieldInput.addProxyForSolr(
+							element.getAggregation(), solrInputDocument);
+					aggregations.add(AggregationFieldInput
+							.createAggregationMongoFields(
+									element.getAggregation(), mongoServer));
+					if (webResourceList.size() > 0) {
+						aggregations.set(0, AggregationFieldInput
+								.appendWebResource(aggregations,
+										webResourceList, mongoServer));
 					}
-					else{
-						proxyList.add(ProxyFieldInput.createProxyMongoFields(new ProxyImpl(),rdfElement.getProvidedCHO(), mongoServer));
+					if (proxyList.size() > 0) {
+						proxyList.set(
+								0,
+								ProxyFieldInput.addProxyForMongo(
+										proxyList.get(0),
+										element.getAggregation(), mongoServer));
+					} else {
+						proxyList.add(ProxyFieldInput.addProxyForMongo(
+								new ProxyImpl(), element.getAggregation(),
+								mongoServer));
 					}
+
 				}
-				
-				else if (rdfElement.ifTimeSpan()) {
-					solrInputDocument = TimespanFieldInput.createTimespanSolrFields(rdfElement.getTimeSpan(), solrInputDocument);
-					timespanList.add(TimespanFieldInput.createTimespanMongoField(rdfElement.getTimeSpan(),mongoServer));
+				if (element.ifConcept()) {
+					solrInputDocument = ConceptFieldInput
+							.createConceptSolrFields(element.getConcept(),
+									solrInputDocument);
+
+					conceptList.add(ConceptFieldInput.createConceptMongoFields(
+							element.getConcept(), mongoServer));
 				}
-				else{
-					solrInputDocument = WebResourcesFieldInput.createWebResourceSolrFields(rdfElement.getWebResource(), solrInputDocument);
-					webResourceList.add(WebResourcesFieldInput.createWebResourceMongoField(rdfElement.getWebResource(), mongoServer));
-					if(aggregations.size()>0){
-						aggregations.set(0, AggregationFieldInput.appendWebResource(aggregations, webResourceList, mongoServer));
+				if (element.ifPlace()) {
+					solrInputDocument = PlaceFieldInput.createPlaceSolrFields(
+							element.getPlace(), solrInputDocument);
+
+					placeList.add(PlaceFieldInput.createPlaceMongoFields(
+							element.getPlace(), mongoServer));
+				}
+
+				if (element.ifWebResource()) {
+					solrInputDocument = WebResourcesFieldInput
+							.createWebResourceSolrFields(
+									element.getWebResource(), solrInputDocument);
+
+					webResourceList.add(WebResourcesFieldInput
+							.createWebResourceMongoField(
+									element.getWebResource(), mongoServer));
+					if (aggregations.size() > 0) {
+						aggregations.set(0, AggregationFieldInput
+								.appendWebResource(aggregations,
+										webResourceList, mongoServer));
 					}
+
+				}
+				if (element.ifTimeSpan()) {
+					timespanList.add(TimespanFieldInput
+							.createTimespanMongoField(element.getTimeSpan(),
+									mongoServer));
+				}
+				if (element.ifAgent()) {
+					solrInputDocument = AgentFieldInput.createAgentSolrFields(
+							element.getAgent(), solrInputDocument);
+					agentList.add(AgentFieldInput.createAgentMongoEntity(
+							element.getAgent(), mongoServer));
 				}
 			}
-			fullBean.setAggregations(aggregations);
+
+			AggregationImpl aggregation = aggregations.get(0);
+			aggregation.setWebResources(webResourceList);
 			fullBean.setProvidedCHOs(providedCHOList);
-			fullBean.setConcepts(conceptList);
-			fullBean.setPlaces(placeList);
-			fullBean.setTimespans(timespanList);
-			fullBean.setProxies(proxyList);
 			fullBean.setAgents(agentList);
-			
-			mongoServer.getDatastore().save(fullBean);
+
+			fullBean.setAggregations(aggregations);
+			try {
+				fullBean.setConcepts(conceptList);
+				fullBean.setPlaces(placeList);
+				fullBean.setTimespans(timespanList);
+				fullBean.setProxies(proxyList);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			if (mongoServer.searchByAbout(FullBeanImpl.class,
+					fullBean.getAbout()) != null) {
+				MongoUtils.updateFullBean(fullBean, mongoServer);
+			} else {
+				mongoServer.getDatastore().save(fullBean);
+			}
 			List<SolrInputDocument> records = new ArrayList<SolrInputDocument>();
 			records.add(solrInputDocument);
+			System.out.println(solrServer);
 			solrServer.add(records);
 			return true;
-		}
-		catch (JiBXException e) {
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e, "JiBX unmarshalling has failed with the following error: "+ e.getMessage());
+		} catch (JiBXException e) {
+			context.getLoggingEngine().logFailed(
+					Level.SEVERE,
+					this,
+					e,
+					"JiBX unmarshalling has failed with the following error: "
+							+ e.getMessage());
 		} catch (InstantiationException e) {
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e, "Unkwown error: "+ e.getMessage());
-			
+			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
+					"Unkwown error: " + e.getMessage());
+
 		} catch (IllegalAccessException e) {
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e, "Unknown error: "+ e.getMessage());
+			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
+					"Unknown error: " + e.getMessage());
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -216,20 +289,17 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		}
 		return false;
 	}
-	
-	
-	
+
 	public void initialize() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void shutdown() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	
 	public int getPreferredThreadCount() {
 		return 5;
 	}
@@ -238,35 +308,48 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		return 10;
 	}
 
-	public <I> void initialize(ExecutionContext<I> context) throws IngestionPluginFailedException {
-		Solr3Initializer solr3Initializer = new Solr3Initializer(solrUrl,"");
+	public <I> void initialize(ExecutionContext<I> context)
+			throws IngestionPluginFailedException {
+
+		Solr3Initializer solr3Initializer = new Solr3Initializer(solrUrl,
+				"apache-solr-3.5.0");
+		solr3Initializer.run();
 		solrServer = solr3Initializer.getServer();
-		
+
 		try {
-			mongoServer = new MongoDBServerImpl(mongoDBhost,mongoDBport,"europeana");
+			mongoServer = new MongoDBServerImpl(mongoDBhost, mongoDBport,
+					"europeana");
 			mongoServer.getDatastore();
 		} catch (MongoDBException e) {
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e, "Mongo DB server error: "+ e.getMessage());
+			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
+					"Mongo DB server error: " + e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	public <I>void completed(ExecutionContext<I> context)
+	public <I> void completed(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
-		try{
+		try {
 			solrServer.commit();
 			solrServer.optimize();
-		}
-		catch(IOException e){
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e, "Input/Output exception occured in Solr with the following message: "+ e.getMessage());
+
+		} catch (IOException e) {
+			context.getLoggingEngine().logFailed(
+					Level.SEVERE,
+					this,
+					e,
+					"Input/Output exception occured in Solr with the following message: "
+							+ e.getMessage());
 		} catch (SolrServerException e) {
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e, "Solr server exception occured in Solr with the following message: "+ e.getMessage());
+			context.getLoggingEngine().logFailed(
+					Level.SEVERE,
+					this,
+					e,
+					"Solr server exception occured in Solr with the following message: "
+							+ e.getMessage());
 		}
 	}
-
-
-
 
 	@Override
 	public TKey<?, ?>[] getInputFields() {
@@ -274,17 +357,11 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		return null;
 	}
 
-
-
-
 	@Override
 	public TKey<?, ?>[] getOptionalFields() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-
 
 	@Override
 	public TKey<?, ?>[] getOutputFields() {
@@ -292,19 +369,9 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		return null;
 	}
 
-
-
-
 	@Override
 	public List<String> getParameters() {
 		return params;
 	}
-
-
-	
-
-
-
-	
 
 }
