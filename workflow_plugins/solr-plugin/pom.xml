@@ -103,8 +103,11 @@
 			<version>2.4</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Other <dependency> <scope>test</scope> <groupId>org.springframework</groupId> 
-			<artifactId>spring-test</artifactId> <version>3.1.0.RELEASE</version> </dependency> -->
+		<dependency> 
+			<scope>test</scope> 
+			<groupId>org.springframework</groupId> 
+			<artifactId>spring-test</artifactId> 
+		</dependency>
 	</dependencies>
 
 
