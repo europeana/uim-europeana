@@ -91,11 +91,7 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 		tabInfoSubPanel.setAnimationDuration(1000);
 		tabInfoSubPanel.getElement().getStyle().setMarginBottom(10.0, Unit.PX);
 		tabInfoSubPanel.setVisible(false);
-		
 
-
-  	    //operationsListBox.addItem(RepoxOperationType.SCHEDULE_HARVESTING.getDescription());   
-		
         Binder uiBinder = GWT.create(Binder.class);
         Widget widget = uiBinder.createAndBindUi(this);
         
@@ -142,7 +138,7 @@ public class ExpandedResourceManagementWidget extends ResourceManagementWidget{
 
             @Override
             public void onSuccess(IntegrationStatusDTO status) {
-            	wfactory.generateIntergationInfoPanel(tabInfoSubPanel, status,integrationservice);
+            	wfactory.generateIntergationInfoPanel(tabInfoSubPanel,cellTable, status,integrationservice);
             }
         }		
         

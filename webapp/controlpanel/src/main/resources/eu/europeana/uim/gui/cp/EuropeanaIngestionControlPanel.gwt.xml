@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='EuropeanaIngestionControlPanel'>
     <inherits name='eu.europeana.uim.gui.cp.IngestionControlPanel' />
+    <inherits name='org.vectomatic.libgwtsvg'/>
 
     <!-- Specify the app entry point class. -->
     <entry-point class='eu.europeana.uim.gui.cp.client.EuropeanaIngestionControlPanel' />

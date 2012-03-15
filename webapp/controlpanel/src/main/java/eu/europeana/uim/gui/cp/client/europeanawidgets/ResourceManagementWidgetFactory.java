@@ -10,6 +10,7 @@ import java.util.Map;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -27,6 +28,7 @@ import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxyAsync;
 import eu.europeana.uim.gui.cp.client.utils.EuropeanaClientConstants;
 import eu.europeana.uim.gui.cp.client.utils.RepoxOperationType;
 import eu.europeana.uim.gui.cp.shared.IntegrationStatusDTO;
+import eu.europeana.uim.gui.cp.shared.ParameterDTO;
 import eu.europeana.uim.gui.cp.shared.RepoxExecutionStatusDTO;
 import eu.europeana.uim.gui.cp.shared.IntegrationStatusDTO.TYPE;
 
@@ -50,18 +52,16 @@ public class ResourceManagementWidgetFactory {
 	 * 
 	 * @param status
 	 */
-	public void generateIntergationInfoPanel(TabLayoutPanel tabInfoSubPanel,IntegrationStatusDTO status,
+	public void generateIntergationInfoPanel(TabLayoutPanel tabInfoSubPanel,CellTable<ParameterDTO>  cellTable,IntegrationStatusDTO status,
 			IntegrationSeviceProxyAsync integrationservice){
 
-		if(status.getType().equals(TYPE.UNIDENTIFIED)){
-			tabInfoSubPanel.setVisible(false);
+		if(status.getType().equals(TYPE.WORKFLOW)){
+			tabInfoSubPanel.clear();
+			tabInfoSubPanel.add(cellTable, new HTML("Resource Properties"));
 		}
 		else{
-			tabInfoSubPanel.setVisible(true);
 			tabInfoSubPanel.clear();
-			
 			tabInfoSubPanel.add(createGeneralInfoTabContent(status), new HTML("Resource Info"));
-			tabInfoSubPanel.add(createIntrgrationInfoTabContent(status), new HTML("Integration Info"));
 			
 			if(status.getSugarCRMID() != null){
 			tabInfoSubPanel.add(createSugarCrmTabContent(status), new HTML("SugarCRM"));
@@ -70,8 +70,8 @@ public class ResourceManagementWidgetFactory {
 			if(status.getRepoxID() != null){
 				tabInfoSubPanel.add(createRepoxTabContent(status), new HTML("Repox"));
 			}
-
-			tabInfoSubPanel.add(createResourcePropertiesTabContent(status), new HTML("Resource Properties"));
+			tabInfoSubPanel.add(cellTable, new HTML("Resource Properties"));
+			tabInfoSubPanel.add(createResourcePropertiesTabContent(status), new HTML("Resource Attributes"));
 		}
 
 
@@ -135,47 +135,34 @@ public class ResourceManagementWidgetFactory {
 		    	generalInfoTable.setWidget(5, 0, new HTML("Provider Type:"));
 		    	generalInfoTable.setWidget(5, 1, new HTML(status.getResourceProperties().get("PROVIDERTYPE")));
 			  }
+	    	
+	    	
+	    	generalInfoTable.setWidget(7, 0, new HTML("<hr/> <B>Integration Status</B> <hr/>"));
 
+	    	generalInfoTable.setWidget(8, 0, new HTML("SugarCRM:"));
+	    	
+	    	if(status.getSugarCRMID() == null){
+	    		generalInfoTable.setWidget(8, 1, new Image(EuropeanaClientConstants.ERRORIMAGELOC)); 
+	    	}
+	    	else{
+	    		
+	    		generalInfoTable.setWidget(8, 1, new Image(EuropeanaClientConstants.SUCCESSIMAGELOC)); 
+	   		
+	    	}
+	    	
+	    	generalInfoTable.setWidget(9, 0, new HTML("Repox:"));
+	    	
+	    	if(status.getRepoxID() == null){
+	    		generalInfoTable.setWidget(9, 1, new Image(EuropeanaClientConstants.ERRORIMAGELOC)); 
+	    	}
+	    	else{
+	    		generalInfoTable.setWidget(9, 1, new Image(EuropeanaClientConstants.SUCCESSIMAGELOC)); 
+	    	}
 	    	
 		return generalInfoContainer;
 
 	}
 	
-	
-	
-	/**
-	 * @param status
-	 * @return
-	 */
-	private  ScrollPanel createIntrgrationInfoTabContent(IntegrationStatusDTO status){
-
-		ScrollPanel container =new ScrollPanel();
-
-		FlexTable resourcePropertiesTable = new FlexTable();
-		container.add(resourcePropertiesTable);
-		
-		resourcePropertiesTable.setWidget(3, 0, new HTML("SugarCRM:"));
-    	
-    	if(status.getSugarCRMID() == null){
-    		resourcePropertiesTable.setWidget(3, 1, new Image(EuropeanaClientConstants.ERRORIMAGELOC)); 
-    	}
-    	else{
-    		
-    		resourcePropertiesTable.setWidget(3, 1, new Image(EuropeanaClientConstants.SUCCESSIMAGELOC)); 
-   		
-    	}
-    	
-    	resourcePropertiesTable.setWidget(4, 0, new HTML("Repox:"));
-    	
-    	if(status.getRepoxID() == null){
-    		resourcePropertiesTable.setWidget(4, 1, new Image(EuropeanaClientConstants.ERRORIMAGELOC)); 
-    	}
-    	else{
-    		resourcePropertiesTable.setWidget(4, 1, new Image(EuropeanaClientConstants.SUCCESSIMAGELOC)); 
-    	}
-		
-		return container;
-	}
 
 	
 	/**
@@ -316,16 +303,7 @@ public class ResourceManagementWidgetFactory {
 				resourcePropertiesTable.setWidget(13, 0, new HTML("Setspec:"));
 				resourcePropertiesTable.setWidget(13, 1, new HTML(status.getResourceProperties().get("SETSPEC")));   
 			}
-			
-			
-			
-			
- 
-			
-			
-			
-			
-			
+
 			resourcePropertiesTable.setWidget(14, 0, new HTML("<hr></hr>"));           		    	
 			resourcePropertiesTable.setWidget(14, 0, new HTML("Permitted operations:"));
 		
@@ -334,7 +312,6 @@ public class ResourceManagementWidgetFactory {
 			resourcePropertiesTable.setWidget(14, 1, command.getOperationsListBox());
 			// Create a table to layout the content
 
-			
 			resourcePropertiesTable.setWidget(14, 2, command.generateRepoxCommandButton());
 			
 			break;
@@ -349,6 +326,10 @@ public class ResourceManagementWidgetFactory {
 	
 	
 	
+	/**
+	 * @param status
+	 * @return
+	 */
 	private  ScrollPanel createMintTabContent(IntegrationStatusDTO status){
 		ScrollPanel container =new ScrollPanel();
 

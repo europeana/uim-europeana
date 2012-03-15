@@ -34,6 +34,7 @@ public class IntegrationStatusDTO implements IsSerializable {
 	public static enum TYPE{
 		PROVIDER,
 		COLLECTION,
+		WORKFLOW,
 		UNIDENTIFIED
 	}
 	
@@ -46,6 +47,9 @@ public class IntegrationStatusDTO implements IsSerializable {
 	private String sugarCRMID;
 	
 	private String repoxID;
+	
+	private String mintID;
+	
 	
 	private HarvestingStatusDTO harvestingStatus;
 	
@@ -222,6 +226,22 @@ public class IntegrationStatusDTO implements IsSerializable {
 	 */
 	public String getDescription() {
 		return description;
+	}
+
+
+	/**
+	 * @return the MINT resource id
+	 */
+	public String getMintID() {
+		return mintID;
+	}
+
+
+	/**
+	 * @param mintID
+	 */
+	public void setMintID(String mintID) {
+		this.mintID = mintID;
 	}
 	
 	

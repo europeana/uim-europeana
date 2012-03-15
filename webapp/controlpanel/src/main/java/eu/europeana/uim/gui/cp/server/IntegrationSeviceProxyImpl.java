@@ -324,7 +324,7 @@ public class IntegrationSeviceProxyImpl extends
 
 		//In case that a Workflow is selected
 		if (provider == null && collection == null) {
-			ret.setType(TYPE.UNIDENTIFIED);
+			ret.setType(TYPE.WORKFLOW);
 		} else {
 
 			//If a Provider is selected
