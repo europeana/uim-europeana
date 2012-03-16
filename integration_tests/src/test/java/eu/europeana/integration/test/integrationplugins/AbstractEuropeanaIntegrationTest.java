@@ -53,7 +53,8 @@ public abstract class AbstractEuropeanaIntegrationTest extends
      */
     @Configuration
     public static Option[] configuration() throws Exception {
-         return combine(
+      
+    	return combine(
  				Helper.getDefaultOptions(
 						systemProperty("karaf.name").value("junit"),
 						systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("DEBUG")),
@@ -102,8 +103,9 @@ public abstract class AbstractEuropeanaIntegrationTest extends
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-basic").versionAsInProject().startLevel(30),
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-repox").versionAsInProject().startLevel(40),
                 mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-sugarcrmclient").versionAsInProject().startLevel(40),
+                mavenBundle().groupId("eu.europeana").artifactId("europeana-uim-plugin-solrosgi").versionAsInProject().startLevel(40),
                 felix(),
-
+                
                 waitForFrameworkStartup()
         );
     }
