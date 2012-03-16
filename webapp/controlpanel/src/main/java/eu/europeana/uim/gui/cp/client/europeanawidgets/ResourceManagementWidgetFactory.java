@@ -33,7 +33,7 @@ import eu.europeana.uim.gui.cp.shared.RepoxExecutionStatusDTO;
 import eu.europeana.uim.gui.cp.shared.IntegrationStatusDTO.TYPE;
 
 /**
- * 
+ * Provides Widgets for the ResourceManagementWidget
  * 
  * @author Georgios Markakis
  */
@@ -50,7 +50,8 @@ public class ResourceManagementWidgetFactory {
 	/**
 	 * Creates the integration info sub panels displaying integration-specific information
 	 * 
-	 * @param status
+	 * @param status the object holding integration information & other variables
+	 * @return a ScrollPanel gui component
 	 */
 	public void generateIntergationInfoPanel(TabLayoutPanel tabInfoSubPanel,CellTable<ParameterDTO>  cellTable,IntegrationStatusDTO status,
 			IntegrationSeviceProxyAsync integrationservice){
@@ -70,6 +71,11 @@ public class ResourceManagementWidgetFactory {
 			if(status.getRepoxID() != null){
 				tabInfoSubPanel.add(createRepoxTabContent(status), new HTML("Repox"));
 			}
+			
+			if(status.getMintID() != null){
+				tabInfoSubPanel.add(createMintTabContent(status), new HTML("Mint"));
+			}
+			
 			tabInfoSubPanel.add(cellTable, new HTML("Resource Properties"));
 			tabInfoSubPanel.add(createResourcePropertiesTabContent(status), new HTML("Resource Attributes"));
 		}
@@ -80,8 +86,10 @@ public class ResourceManagementWidgetFactory {
 	
 	
 	/**
-	 * @param status
-	 * @return
+	 * Creates the General Information Tab 
+	 * 
+	 * @param status the object holding integration information & other variables
+	 * @return a ScrollPanel gui component
 	 */
 	private  ScrollPanel createGeneralInfoTabContent(IntegrationStatusDTO status){
 
@@ -110,7 +118,6 @@ public class ResourceManagementWidgetFactory {
 
 		    	generalInfoTable.setWidget(3, 0, new HTML("Processing Phase:"));
 		    	generalInfoTable.setWidget(3, 1, new HTML(status.getState()));
-		    	
 		    	
 		    	generalInfoTable.setWidget(4, 0, new HTML("Metadata Format:"));
 		    	generalInfoTable.setWidget(4, 1, new HTML(status.getResourceProperties().get("METADATA_FORMAT")));
@@ -157,6 +164,16 @@ public class ResourceManagementWidgetFactory {
 	    	}
 	    	else{
 	    		generalInfoTable.setWidget(9, 1, new Image(EuropeanaClientConstants.SUCCESSIMAGELOC)); 
+	    	}
+	    	
+	    	
+	    	generalInfoTable.setWidget(10, 0, new HTML("Mint:"));
+	    	
+	    	if(status.getMintID() == null){
+	    		generalInfoTable.setWidget(10, 1, new Image(EuropeanaClientConstants.ERRORIMAGELOC)); 
+	    	}
+	    	else{
+	    		generalInfoTable.setWidget(10, 1, new Image(EuropeanaClientConstants.SUCCESSIMAGELOC)); 
 	    	}
 	    	
 		return generalInfoContainer;
@@ -327,6 +344,8 @@ public class ResourceManagementWidgetFactory {
 	
 	
 	/**
+	 * Creates the Mint Content Panel
+	 * 
 	 * @param status
 	 * @return
 	 */
@@ -336,6 +355,14 @@ public class ResourceManagementWidgetFactory {
 		FlexTable resourcePropertiesTable = new FlexTable();
 		container.add(resourcePropertiesTable);
 		
+		resourcePropertiesTable.setWidget(0, 0, new HTML("Mint ID:"));
+		resourcePropertiesTable.setWidget(0, 1, new HTML(status.getMintID()));   
+		
+		resourcePropertiesTable.setWidget(1, 0, new HTML("Location of latest published data:"));
+		resourcePropertiesTable.setWidget(1, 1, new HTML(status.getResourceProperties().get("MINTPUBLICATIONLOCATION")));   
+		
+		resourcePropertiesTable.setWidget(2, 0, new HTML("ID of latest mapping used:"));
+		resourcePropertiesTable.setWidget(2, 1, new HTML(status.getResourceProperties().get("LATESTMINTMAPPINGID")));   
 		
 		return container;
 	}
@@ -462,11 +489,17 @@ public class ResourceManagementWidgetFactory {
 		}
 		
 		
+		/**
+		 * @return
+		 */
 		public ListBox getOperationsListBox() {
 			return operationsListBox;
 		}
 
 
+		/**
+		 * @param operationsListBox
+		 */
 		public void setOperationsListBox(ListBox operationsListBox) {
 			this.operationsListBox = operationsListBox;
 		}
