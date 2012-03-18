@@ -238,6 +238,7 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 			throws ProviderOperationException {
 
 		StringBuffer aggregatorId = new StringBuffer();
+		StringBuffer dataproviderId = new StringBuffer();
 		StringBuffer name = new StringBuffer();
 		StringBuffer description = new StringBuffer();
 		StringBuffer country = new StringBuffer();
@@ -247,6 +248,10 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 
 		aggregatorId.append("aggregatorId=");
 		aggregatorId.append(agr.getId());
+
+		dataproviderId.append("dataProviderId=");
+	    dataproviderId.append(prov.getId());
+	
 		name.append(nameVar);
 		name.append(prov.getName().getName());
 		description.append(descriptionVar);
@@ -286,7 +291,8 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 		}
 
 		Response resp = invokRestTemplate("/dataProviders/create",
-				Response.class, aggregatorId.toString(), name.toString(),
+				Response.class, aggregatorId.toString(),dataproviderId.toString(),
+				name.toString(),
 				description.toString(), country.toString(),
 				nameCode.toString(), homepage.toString(),
 				datasetType.toString());
@@ -1172,16 +1178,108 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 
 	}
 
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#retrieveAggregator(java.lang.String)
+	 */
+	@Override
+	public Aggregator retrieveAggregator(String aggregatorID)
+			throws AggregatorOperationException {
+		StringBuffer id = new StringBuffer();
+
+		id.append(idVar);
+		id.append(aggregatorID);
+		
+		Response resp = invokRestTemplate("/aggregators/getAggregator",
+				Response.class, id.toString());
+		
+		if (resp.getError() != null) {
+
+			if(resp.getError().getType().equals("NOT_FOUND")){
+				return null;
+			}
+				throw new AggregatorOperationException(
+						createRepoxFailureMessage(resp.getError()));
+		}
+		else {
+			return resp.getAggregator();
+
+			}
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#retrieveProvider(java.lang.String)
+	 */
+	@Override
+	public Provider retrieveProvider(String providerID)
+			throws ProviderOperationException {
+		StringBuffer id = new StringBuffer();
+
+		id.append(idVar);
+		id.append(providerID);
+		
+		Response resp = invokRestTemplate("/dataProviders/getDataProvider",
+				Response.class, id.toString());
+
+		if (resp.getError() != null) {
+
+			if(resp.getError().getType().equals("NOT_FOUND")){
+				return null;
+			}
+				throw new ProviderOperationException(
+						createRepoxFailureMessage(resp.getError()));
+		}
+		else {
+			return resp.getProvider();
+
+			}
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#retrieveDataSource(java.lang.String)
+	 */
+	@Override
+	public Source retrieveDataSource(String dsID)
+			throws DataSourceOperationException {
+		StringBuffer id = new StringBuffer();
+
+		id.append(idVar);
+		id.append(dsID);
+		
+		Response resp = invokRestTemplate("/dataSources/getDataSource",
+				Response.class, id.toString());
+		
+		if (resp.getError() != null) {
+
+			if(resp.getError().getType().equals("NOT_FOUND")){
+				return null;
+			}
+				throw new DataSourceOperationException(
+						createRepoxFailureMessage(resp.getError()));
+		}
+		else {
+			return resp.getSource();
+
+			}
+	}
+	
+	
 	/*
 	 * Record related operations
 	 */
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#retrieveRecord(java.lang.String)
+	 */
 	public RecordResult retrieveRecord(String recordString)
 			throws RecordOperationException {
 
 		throw new UnsupportedOperationException("Not implemented yet...");
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#saveRecord(java.lang.String, eu.europeana.uim.repoxclient.jibxbindings.Source, java.lang.String)
+	 */
 	@Override
 	public Success saveRecord(String recordID, Source ds, String recordXML)
 			throws RecordOperationException {
@@ -1189,6 +1287,9 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 		throw new UnsupportedOperationException("Not implemented yet...");
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#markRecordAsDeleted(java.lang.String)
+	 */
 	@Override
 	public Success markRecordAsDeleted(String recordID)
 			throws RecordOperationException {
@@ -1197,6 +1298,9 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repoxclient.plugin.RepoxRestClient#eraseRecord(java.lang.String)
+	 */
 	@Override
 	public Success eraseRecord(String recordID) throws RecordOperationException {
 
@@ -2373,5 +2477,7 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 
 		return sb.toString();
 	}
+
+
 
 }

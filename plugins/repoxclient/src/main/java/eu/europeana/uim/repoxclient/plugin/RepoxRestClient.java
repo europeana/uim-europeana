@@ -65,6 +65,7 @@ public interface RepoxRestClient {
 	
 	/**
 	 * Deletes an existing Aggregator from Repox
+	 * 
 	 * @param aggregator a reference to the Aggregator object
 	 * @throws AggregatorOperationException
 	 */
@@ -73,6 +74,7 @@ public interface RepoxRestClient {
 	
 	/**
 	 * Updates an existing Aggregator in Repox
+	 * 
 	 * @param aggregator the Aggregator object to update
 	 * @throws AggregatorOperationException
 	 */
@@ -81,14 +83,26 @@ public interface RepoxRestClient {
 	
 	/**
 	 * Retrieves all the available Aggregators from Repox
+	 * 
 	 * @return an object containing all available Aggregators 
 	 * @throws AggregatorOperationException
 	 */
 	 Aggregators retrieveAggregators() throws AggregatorOperationException;	
 	
+	 
+	/**
+	 * Retrieves an Aggregator given its id
+	 * 
+	 * @param aggregatorID
+	 * @return
+	 * @throws AggregatorOperationException
+	 */
+	Aggregator retrieveAggregator(String aggregatorID)throws AggregatorOperationException;	
+	 
 	
 	/**
 	 * Creates a provider in Repox and assigns it to the specific Aggregator
+	 * 
 	 * @param prov the Provider definition
 	 * @param agr the Aggregator reference
 	 * @throws ProviderOperationException
@@ -116,11 +130,22 @@ public interface RepoxRestClient {
 	
 	/**
 	 * Retrieves all available providers within Repox
+	 * 
 	 * @return an object containing all provider references
 	 * @throws ProviderOperationException
 	 */
 	 DataProviders retrieveProviders() throws ProviderOperationException;	
 	
+	 
+	 /**
+	  * Retrieves a specific provider given its ID
+	  * 
+	 * @param providerID
+	 * @return
+	 * @throws ProviderOperationException
+	 */
+	Provider retrieveProvider(String providerID) throws ProviderOperationException;
+	 
 	/**
 	 * Retrieve all available Repox DataSources
 	 * 
@@ -131,6 +156,15 @@ public interface RepoxRestClient {
 	 DataSources retrieveDataSources() throws DataSourceOperationException;
 	
 
+    /**
+	 * Retrieves a specific datasource based on its ID
+	 * 
+	 * @param dsID
+	 * @return
+	 * @throws DataSourceOperationException
+	 */
+	Source retrieveDataSource(String dsID) throws DataSourceOperationException;
+	 
 	/**
 	 * Creates a OAI-PMH Datasource
 	 * 
@@ -351,6 +385,8 @@ public interface RepoxRestClient {
 	
 	
 	/**
+	 * Cancels a harvesting session
+	 * 
 	 * @param ds
 	 * @throws HarvestingOperationException
 	 */

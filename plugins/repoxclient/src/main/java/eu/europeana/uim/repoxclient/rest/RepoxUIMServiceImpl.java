@@ -19,9 +19,7 @@ package eu.europeana.uim.repoxclient.rest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 import org.joda.time.DateTime;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.api.StorageEngine;
@@ -109,17 +107,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		}
 		
 		String aggrID = countrycode + defaultAggrgatorIDPostfix;
-		Aggregators aggrs = repoxRestClient.retrieveAggregators();
+		Aggregator aggr = repoxRestClient.retrieveAggregator(aggrID);
 		
-		List<Aggregator> aggregatorList = aggrs.getAggregatorList();
-				
-		for(Aggregator aggr: aggregatorList){
+		boolean exists = aggr != null?true:false; 
 		
-			if(aggrID.equals(aggr.getId())){
-				return true;
-			}
-		}		
-		return false;
+		return exists;
 	}
 
 
@@ -233,15 +225,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			return false;
 		}
 
-		Set<Provider<?>> prov = retrieveProviders();
-
-		for(Provider<?> p: prov){
-			if(p.getMnemonic().equals(provider.getMnemonic())){
-				return true;
-			}
-		}
 		
-		return false;
+		eu.europeana.uim.repoxclient.jibxbindings.Provider prov = repoxRestClient.retrieveProvider(provId);
+
+		boolean exists = prov != null?true:false; 
+		
+		return exists;
 
 	}
 
@@ -397,19 +386,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			return false;
 		}
 		
-		HashSet<Collection<?>> colls = retrieveDataSources();
-
+		Source src = repoxRestClient.retrieveDataSource(colid);
 		
-		if(!colls.isEmpty()){
-			
-		for(Collection<?> c: colls){
-			if(c.getMnemonic().equals(col.getMnemonic())) {
-				return true;
-			}
-		}
+		boolean exists = src != null?true:false; 
 		
-		}
-		return false;
+		return exists;
 	}
 
 	

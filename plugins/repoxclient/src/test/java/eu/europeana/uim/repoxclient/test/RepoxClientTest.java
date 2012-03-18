@@ -18,6 +18,8 @@ package eu.europeana.uim.repoxclient.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.ArrayList;
 import javax.annotation.Resource;
 import org.apache.log4j.Logger;
@@ -125,9 +127,25 @@ public void testCreateUpdateDeleteAggregator() throws Exception{
 	assertEquals(rtAggr.getNameCode().getNameCode(),upAggr.getNameCode().getNameCode());
 	assertEquals(rtAggr.getUrl().getUrl(),upAggr.getUrl().getUrl());
 	TestUtils.logMarshalledObject(upAggr,LOGGER);
+	
+	//Retrieve the Agrrgator by its ID
+	Aggregator retrievedAggr  = repoxRestClient.retrieveAggregator(rtAggr.getId());
+	
+	assertNotNull(retrievedAggr);
+	assertEquals(retrievedAggr.getId(),upAggr.getId());
+	assertEquals(retrievedAggr.getName().getName(),upAggr.getName().getName());
+	assertEquals(retrievedAggr.getNameCode().getNameCode(),upAggr.getNameCode().getNameCode());
+	assertEquals(retrievedAggr.getUrl().getUrl(),upAggr.getUrl().getUrl());
+	TestUtils.logMarshalledObject(upAggr,LOGGER);
+	
 	//Delete the Aggregator
 	Success res = repoxRestClient.deleteAggregator(rtAggr.getId());
 	assertNotNull(res);
+	
+	//Retrieve the Agrrgator by its ID
+	Aggregator retrieveddelAggr  = repoxRestClient.retrieveAggregator(rtAggr.getId());
+	assertNull(retrieveddelAggr);
+	
 	TestUtils.logMarshalledObject(res,LOGGER);
 }
 
@@ -162,10 +180,24 @@ public void testCreateUpdateDeleteProvider() throws Exception{
 	assertEquals(respprov.getId(),upprov.getId());
 	assertEquals(respprov.getName().getName(),upprov.getName().getName());
 	TestUtils.logMarshalledObject(upprov,LOGGER);
+	
+	//Retrieve the created provider
+	 Provider retprov =  repoxRestClient.retrieveProvider(upprov.getId());
+	 assertNotNull(retprov);
+	 assertEquals(retprov.getId(),upprov.getId());
+	 assertEquals(retprov.getName().getName(),upprov.getName().getName());
+	 TestUtils.logMarshalledObject(upprov,LOGGER);
+	 
+	 
 	//Delete the Provider
 	Success res = repoxRestClient.deleteProvider(upprov.getId());
 	assertNotNull(res);
 	TestUtils.logMarshalledObject(res,LOGGER);
+	
+	//Check if the provider has already been deleted
+	Provider retNullProv =  repoxRestClient.retrieveProvider(upprov.getId());
+	assertNull(retNullProv);
+	
 	//Delete the Aggregator
 	Success aggres = repoxRestClient.deleteAggregator(rtAggr.getId());
 	assertNotNull(aggres);
@@ -204,6 +236,13 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	Source updOaids = repoxRestClient.updateDatasourceOAI(respOaids);	
 	assertNotNull(updOaids);	
 	assertEquals("edm",updOaids.getMetadataFormat());	
+	
+	//Retrieve a OAI PMH Datasource
+	Source retrOaids = repoxRestClient.retrieveDataSource(updOaids.getId());
+	assertNotNull(retrOaids);	
+	assertEquals("edm",retrOaids.getMetadataFormat());	
+	
+	
 	//Initialize a harvesting session
 	Success harvestRes = repoxRestClient.initiateHarvesting(updOaids.getId(),true);
 	assertNotNull(harvestRes);
@@ -233,6 +272,8 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
 	//Log harvestLog = repoxRestClient.getHarvestLog(updOaids.getId());
     //assertNotNull(harvestLog);
 	//TestUtils.logMarshalledObject(harvestLog,LOGGER);
+	
+	
 	
 	Success deleted = repoxRestClient.deleteDatasource(updOaids.getId());
     assertNotNull(deleted);
