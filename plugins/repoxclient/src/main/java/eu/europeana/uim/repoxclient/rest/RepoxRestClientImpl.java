@@ -250,7 +250,7 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 		aggregatorId.append(agr.getId());
 
 		dataproviderId.append("dataProviderId=");
-	    dataproviderId.append(prov.getId());
+	    //dataproviderId.append(prov.getId());
 	
 		name.append(nameVar);
 		name.append(prov.getName().getName());
