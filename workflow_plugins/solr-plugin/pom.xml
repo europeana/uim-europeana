@@ -13,7 +13,7 @@
 	<name>Unified Ingestion Manager: Solr Workflow Plugin</name>
 
 	<dependencies>
-		<dependency>
+	<!-- 	<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
 			<version>3.5.0</version>
@@ -22,15 +22,15 @@
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-core</artifactId>
 			<version>3.5.0</version>
-		</dependency>
+		</dependency> -->
 		<!-- <dependency> <groupId>org.apache.solr</groupId> <artifactId>solr-test-framework</artifactId> 
 			<version>3.5.0</version> <scope>test</scope> </dependency> -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
 			<version>3.5.0</version>
 		</dependency>
-
+-->
 		<!-- JUnit dependencies -->
 
 		<dependency>
@@ -51,6 +51,11 @@
 		<dependency>
 			<groupId>eu.europeana.corelib</groupId>
 			<artifactId>corelib-solr</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-utils</artifactId>
 			<version>2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -75,13 +80,30 @@
 			<version>3.1.0.RELEASE</version>
 		</dependency>
 	-->
-
+	
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
-			<version>0.99-SNAPSHOT-208patch</version>
+			<version>0.99</version>
 			<scope>compile</scope>
 		</dependency>
+		 <dependency>
+	                <groupId>org.codehaus.woodstox</groupId>
+	                <artifactId>wstx-asl</artifactId>
+	                <version>3.2.9</version>
+	                <exclusions>
+                <exclusion>
+                    <groupId>stax</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
+	                <scope>compile</scope>
+         </dependency>
+          <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+            <version>1.0.1</version>
+        </dependency> 
 		<!--Optional Jars (for certain features) but required by maven for building. -->
 		<dependency>
 			<groupId>cglib</groupId>
@@ -147,17 +169,20 @@
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,
+							!org.dom4j.*,
+							!org.imgscalr.*,
+							!org.relaxng.datatype.*,
+							!org.jdom.*,
 							!com.google.gwt.user.client.rpc,
 							!net.sf.cglib.asm.util,
 							!org.apache.tools.ant.*,
 							!org.testng.*,
-							!org.dom4j.*,
-							!org.jdom.*,
+							!com.sun.msv.*,
 							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>
-							*;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|solr-solrj|spring-context-support
+							*;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support 
 						</Embed-Dependency>
 					</instructions>
 				</configuration>

@@ -19,6 +19,7 @@ package eu.europeana.uim.plugin.solr.service;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,6 +31,9 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
@@ -61,10 +65,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	// @Value("#{europeanaProperties['solr.selectUrl']}")
 	private static String solrUrl = "http://127.0.0.1:8282/";
-	// @Value("#{europeanaProperties['mongoDB.host']}")
-	private static String mongoDBhost = "127.0.0.1";
-	// @Value("#{europeanaProperties['mongoDB.port']}")
-	private static int mongoDBport = 27017;
+	private static Mongo mongo;
 	private static SolrServer solrServer;
 	private static MongoDBServer mongoServer;
 	private static int recordNumber;
@@ -118,7 +119,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 			List<SolrInputDocument> records = new ArrayList<SolrInputDocument>();
 			records.add(SolrConstructor.constructSolrDocument(rdf));
-
+			
 			solrServer.add(records);
 			recordNumber++;
 			return true;
@@ -167,19 +168,24 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	public <I> void initialize(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
-
 		Solr3Initializer solr3Initializer = new Solr3Initializer(solrUrl,
 				"apache-solr-3.5.0");
 		solr3Initializer.run();
 		solrServer = solr3Initializer.getServer();
-
+		
 		try {
-			mongoServer = new MongoDBServerImpl(mongoDBhost, mongoDBport,
-					"europeana");
+			mongo = new Mongo("127.0.0.1", 27017);
+			mongoServer = new MongoDBServerImpl(mongo,"europeana");
 			mongoServer.getDatastore();
 		} catch (MongoDBException e) {
 			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
 					"Mongo DB server error: " + e.getMessage());
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MongoException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
