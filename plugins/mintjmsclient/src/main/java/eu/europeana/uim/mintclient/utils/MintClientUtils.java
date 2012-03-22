@@ -24,6 +24,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.jibx.runtime.IMarshallable; 
 import eu.europeana.uim.mintclient.service.exceptions.MintGenericException;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 
@@ -92,6 +93,46 @@ public class MintClientUtils {
 		}
 	}
 
+	
+	
+
+	/**
+	 * @param str2marshall
+	 * @return
+	 * @throws MintOSGIClientException
+	 */
+	public static synchronized  IMarshallable unmarshallobject(String str2marshall) throws MintOSGIClientException {
+		IBindingFactory context;
+
+		try {
+			String cdmType = "eu.europeana.uim.mintclient.jibxbindings." +
+					str2marshall.split("<")[2].split(">")[0] + 
+					"Command";
+			
+			
+			context = BindingDirectory.getFactory(Class.forName(cdmType).newInstance().getClass());
+			IUnmarshallingContext umctx = context.createUnmarshallingContext();
+			IMarshallable jibxObject = (IMarshallable) umctx.unmarshalDocument(new StringReader(
+					str2marshall));
+			return jibxObject;
+		} catch (JiBXException e) {
+			throw propagateException(e, MintOSGIClientException.class,
+					"Error in Jibx marshalling.");
+		} catch (InstantiationException e) {
+			throw propagateException(e, MintOSGIClientException.class,
+					"Error in Instantiating Class via reflection from received message.");
+		} catch (IllegalAccessException e) {
+			throw propagateException(e, MintOSGIClientException.class,
+					"Error in Instantiating Class via reflection from received message.");
+		} catch (ClassNotFoundException e) {
+			throw propagateException(e, MintOSGIClientException.class,
+					"Error in Instantiating Class via reflection from received message.");
+		}
+
+	}
+
+	
+	
 	/**
 	 * Wraps the contents of a thrown exception to a mint exception type.
 	 * The latter is instantiated via reflection.

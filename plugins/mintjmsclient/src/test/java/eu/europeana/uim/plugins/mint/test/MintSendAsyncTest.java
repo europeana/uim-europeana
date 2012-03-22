@@ -82,6 +82,10 @@ public class MintSendAsyncTest {
 		command.setType("Type");
 		command.setUserId("1002");
 		client.createOrganization(command);
+		
+		//Wait for async response
+		Thread.sleep(10000);
+
 	}
 	
 	/**
@@ -99,6 +103,9 @@ public class MintSendAsyncTest {
 		command.setPhone("234234234");
 		command.setOrganization("1001");
 		client.createUser(command);
+		
+		//Wait for async response
+		Thread.sleep(10000);
 	}
 	
 
@@ -114,6 +121,9 @@ public class MintSendAsyncTest {
 		command.setOrganizationId("1");
 		command.setRepoxTableName("azores13");
 		client.createImports(command);
+		
+		//Wait for async response
+		Thread.sleep(10000);
 		
 	}
 	
@@ -134,6 +144,9 @@ public class MintSendAsyncTest {
 		command.setCorrelationId("correlationId");
 		command.setOrganizationId("1002");
 		client.getTransformations(command);
+		
+		//Wait for async response
+		Thread.sleep(10000);
 	}
 	
 	/**
@@ -150,6 +163,9 @@ public class MintSendAsyncTest {
 		command.setOrganizationId("orgid");
 		command.setUserId("userId");
 		client.publishCollection(command);
+		
+		//Wait for async response
+		Thread.sleep(10000);
 	}
 	
 	/**
@@ -160,6 +176,9 @@ public class MintSendAsyncTest {
 		OrganizationExistsCommand command = new OrganizationExistsCommand();
 		command.setOrganizationId("1001");
 		client.organizationExists(command);
+		
+		//Wait for async response
+		Thread.sleep(10000);
 	}
 	
 	
@@ -171,6 +190,9 @@ public class MintSendAsyncTest {
 		UserExistsCommand command = new UserExistsCommand();
 		command.setUserId("userId");
 		client.userExists(command);
+		
+		//Wait for async response
+		Thread.sleep(10000);
 	}
 	
 	/**
@@ -181,6 +203,9 @@ public class MintSendAsyncTest {
 		ImportExistsCommand command = new ImportExistsCommand();
 		command.setImportId("importId");
 		client.importExists(command);
+		
+		//Wait for async response
+		Thread.sleep(10000);
 	}
 	
 	

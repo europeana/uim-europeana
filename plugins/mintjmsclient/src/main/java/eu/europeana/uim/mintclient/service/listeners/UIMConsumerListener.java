@@ -18,10 +18,15 @@ package eu.europeana.uim.mintclient.service.listeners;
 
 import java.io.IOException;
 
+import org.jibx.runtime.IMarshallable;
+
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+
+import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.mintclient.utils.MintClientUtils;
 
 
 /**
@@ -54,8 +59,20 @@ public class UIMConsumerListener extends DefaultConsumer {
 
         long deliveryTag = envelope.getDeliveryTag();
         
-        System.out.println(new String(body));
-        // (process the message components here ...)
+    	System.out.println("ASDF");
+    	System.out.println(new String(body));
+    	IMarshallable type;
+		try {
+			type = MintClientUtils.unmarshallobject(new String(body));
+	    	System.out.println(type.JiBX_getName());
+	    	System.out.println("XXX");
+		} catch (MintOSGIClientException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+
+    	
 
         
        // channel.basicAck(deliveryTag, false);

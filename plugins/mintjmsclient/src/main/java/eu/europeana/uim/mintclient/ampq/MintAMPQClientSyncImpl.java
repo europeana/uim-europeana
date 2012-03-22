@@ -284,6 +284,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 					throw new MintRemoteException("Response from remote client timed out");
 				}
 				else if (delivery.getProperties().getCorrelationId().equals(correlationID)) {
+					
 		            String response = new String(delivery.getBody());
 		            receiveChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 		            return response;

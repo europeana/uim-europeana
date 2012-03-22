@@ -19,7 +19,10 @@ package eu.europeana.uim.mintclient.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
+
+import org.jibx.runtime.IMarshallable;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -35,8 +38,11 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
+import eu.europeana.uim.mintclient.jibxbindings.ErrorResponse;
+
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.utils.MintClientUtils;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
@@ -59,6 +65,9 @@ public class MintUIMServiceImpl implements MintUIMService {
 	private static Registry registry;
 	private static Orchestrator<?> orchestrator;
 	private LoggingEngine<?> logger; 
+	
+	private final static String HEADERERRORMESSAGE = "hasError";
+	
 	
 	/**
 	 * 
@@ -196,11 +205,40 @@ public class MintUIMServiceImpl implements MintUIMService {
 	        String routingKey = envelope.getRoutingKey();
 	        String contentType = properties.getContentType();
 
-	
-	        //properties.
+	        Map <String,Object> maprops = properties.getHeaders();
+	        
+	        boolean hasError = Boolean.parseBoolean( (String) maprops.get(HEADERERRORMESSAGE));
+
+	        if( hasError){
+	        	try {
+	        		ErrorResponse err = MintClientUtils.marshallobject(new String(body),ErrorResponse.class);
+	        		
+	        		
+				} catch (MintOSGIClientException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	        
 	        long deliveryTag = envelope.getDeliveryTag();
 	        super.getChannel().basicAck(envelope.getDeliveryTag(), false);
-	        System.out.println(new String(body));
+	        
+	        try {
+	        	IMarshallable type = MintClientUtils.unmarshallobject(new String(body));
+	        	
+	        	//hasError
+	        	
+	        	
+	        	
+	        	///System.out.println(type.JiBX_getName());
+	        	
+	        	
+			} catch (MintOSGIClientException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        
+	       
 	        // (process the message components here ...)
 
 	        
