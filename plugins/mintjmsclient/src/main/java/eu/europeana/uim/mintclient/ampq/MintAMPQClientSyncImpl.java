@@ -244,7 +244,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		UserExistsAction action = new UserExistsAction();
 		action.setUserExistsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(null,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		sendChunk(corrId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
 		String resp = handleSynchronousDelivery(corrId);
 		UserExistsAction respObj =  MintClientUtils.marshallobject(resp, UserExistsAction.class);
 		return respObj.getUserExistsResponse();
@@ -261,7 +261,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		ImportExistsAction action = new ImportExistsAction();
 		action.setImportExistsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(null,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		sendChunk(corrId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
 		String resp = handleSynchronousDelivery(corrId);
 		ImportExistsAction respObj =  MintClientUtils.marshallobject(resp, ImportExistsAction.class);
 		return respObj.getImportExistsResponse();
@@ -284,9 +284,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 					throw new MintRemoteException("Response from remote client timed out");
 				}
 				else if (delivery.getProperties().getCorrelationId().equals(correlationID)) {
-					
 		            String response = new String(delivery.getBody());
-		            receiveChannel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 		            return response;
 		        }
 			} catch (ShutdownSignalException e) {
@@ -295,9 +293,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 				throw MintClientUtils.propagateException(e, MintRemoteException.class, "Error in handling synchronous delivery in " + this.getClass());
 			} catch (InterruptedException e) {
 				throw MintClientUtils.propagateException(e, MintRemoteException.class, "Error in handling synchronous delivery in " + this.getClass());
-			} catch (IOException e) {
-				throw MintClientUtils.propagateException(e, MintRemoteException.class, "Error in handling synchronous delivery in " + this.getClass());
-			}           
+			}        
 	    }
 	}
 

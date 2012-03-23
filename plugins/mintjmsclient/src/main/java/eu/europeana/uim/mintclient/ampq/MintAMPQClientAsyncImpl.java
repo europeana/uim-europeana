@@ -151,109 +151,75 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#createOrganization(eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand)
 	 */
 	@Override
-	public void createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException {
+	public void createOrganization(CreateOrganizationCommand command,String providerID) throws MintOSGIClientException, MintRemoteException {
+		String correlationID = MintClientUtils.createCorrelationId(providerID);
 		CreateOrganizationAction cu = new CreateOrganizationAction();
 		cu.setCreateOrganizationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
+		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#createUser(eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand)
 	 */
 	@Override
-	public void createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException {
+	public void createUser(CreateUserCommand command,String providerID) throws MintOSGIClientException, MintRemoteException {
+		String correlationID = MintClientUtils.createCorrelationId(providerID);
 		CreateUserAction cu = new CreateUserAction();
 		cu.setCreateUserCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
+		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#getImports(eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand)
 	 */
 	@Override
-	public void getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException {
+	public void getImports(GetImportsCommand command,String providerID) throws MintOSGIClientException, MintRemoteException {
+		String correlationID = MintClientUtils.createCorrelationId(providerID);
 		GetImportsAction cu = new GetImportsAction();
 		cu.setGetImportsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
+		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#createImports(eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand)
 	 */
 	@Override
-	public void createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException {
+	public void createImports(CreateImportCommand command,String collectionID) throws MintOSGIClientException, MintRemoteException {
+		String correlationID = MintClientUtils.createCorrelationId(collectionID);
 		CreateImportAction cu = new CreateImportAction();
 		cu.setCreateImportCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
+		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);
 	}
 	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#getTransformations(eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand)
 	 */
 	@Override
-	public void getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException {
+	public void getTransformations(GetTransformationsCommand command,String providerID) throws MintOSGIClientException, MintRemoteException {
+		String correlationID = MintClientUtils.createCorrelationId(providerID);
 		GetTransformationsAction cu = new GetTransformationsAction();
 		cu.setGetTransformationsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
+		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#publishCollection(eu.europeana.uim.mintclient.jibxbindings.PublicationCommand)
 	 */
 	@Override
-	public void publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException {
+	public void publishCollection(PublicationCommand command,String providerID) throws MintOSGIClientException, MintRemoteException {
+		String correlationID = MintClientUtils.createCorrelationId(providerID);
 		PublicationAction cu = new PublicationAction();
 		cu.setPublicationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(command.getCorrelationId(),cmdstring.getBytes(),true,inbound,outbound);
+		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);
 	}
 
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#organizationExists(eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand)
-	 */
-	@Override
-	public void organizationExists(OrganizationExistsCommand command)
-			throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		OrganizationExistsAction action  = new OrganizationExistsAction();
-		action.setOrganizationExistsCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(correlationId,cmdstring.getBytes(),true,inbound,outbound);
-		
-	}
-
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#userExists(eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand)
-	 */
-	@Override
-	public void userExists(UserExistsCommand command)
-			throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		UserExistsAction action = new UserExistsAction();
-		action.setUserExistsCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(correlationId,cmdstring.getBytes(),true,inbound,outbound);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClientASync#importExists(eu.europeana.uim.mintclient.jibxbindings.ImportExistsCommand)
-	 */
-	@Override
-	public void importExists(ImportExistsCommand command)
-			throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		ImportExistsAction action = new ImportExistsAction();
-		action.setImportExistsCommand(command);
-		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(correlationId,cmdstring.getBytes(),true,inbound,outbound);
-	}
+	
 
 }

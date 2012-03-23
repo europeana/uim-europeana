@@ -70,12 +70,6 @@ public class UIMConsumerListener extends DefaultConsumer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
-
-    	
-
-        
-       // channel.basicAck(deliveryTag, false);
     }
 
 }

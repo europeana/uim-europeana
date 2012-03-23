@@ -16,12 +16,21 @@
  */
 package eu.europeana.uim.plugins.mint.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.jibx.runtime.IMarshallable;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
+
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientASync;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
@@ -35,6 +44,7 @@ import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.utils.MintClientUtils;
 
 
 
@@ -46,6 +56,8 @@ import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
  */
 public class MintSendAsyncTest {
 	private static MintAMPQClientASync client;
+	private final static String provId = "099";
+	private final static String colId= "09911";
 	
 	/**
 	 * Create the client on test initialization
@@ -55,7 +67,7 @@ public class MintSendAsyncTest {
 	 */
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
-		client = (MintAMPQClientASync) factory.asyncMode().createClient(); 
+		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient(); 
 	}
 	    
 	/**
@@ -74,14 +86,12 @@ public class MintSendAsyncTest {
 	@Test
 	public void createOrganizationTest() throws Exception{
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
-		
-		command.setCorrelationId("correlationId");
 		command.setCountry("es");
 		command.setEnglishName("TestOrg");
 		command.setName("TestOrg");
 		command.setType("Type");
 		command.setUserId("1002");
-		client.createOrganization(command);
+		client.createOrganization(command,provId);
 		
 		//Wait for async response
 		Thread.sleep(10000);
@@ -94,7 +104,6 @@ public class MintSendAsyncTest {
 	@Test
 	public void createUserTest() throws Exception{
 		CreateUserCommand command = new CreateUserCommand();
-		command.setCorrelationId("correlationId");
 		command.setEmail("email");
 		command.setFirstName("firstName");
 		command.setLastName("lastName");
@@ -102,7 +111,7 @@ public class MintSendAsyncTest {
 		command.setPassword("werwer");
 		command.setPhone("234234234");
 		command.setOrganization("1001");
-		client.createUser(command);
+		client.createUser(command,provId);
 		
 		//Wait for async response
 		Thread.sleep(10000);
@@ -115,12 +124,10 @@ public class MintSendAsyncTest {
 	@Test
 	public void createImportsTest() throws Exception{
 		CreateImportCommand command = new CreateImportCommand();
-		
-		command.setCorrelationId("123");
 		command.setUserId("1000");
 		command.setOrganizationId("1");
 		command.setRepoxTableName("azores13");
-		client.createImports(command);
+		client.createImports(command,colId);
 		
 		//Wait for async response
 		Thread.sleep(10000);
@@ -133,17 +140,15 @@ public class MintSendAsyncTest {
 	@Test
 	public void getImportsTest() throws Exception{
 		GetImportsCommand command =  new GetImportsCommand();
-		command.setCorrelationId("provid");
 		command.setOrganizationId("1002");
-		client.getImports(command);
+		client.getImports(command,provId);
 	}
 	
 	@Test
 	public void getTransformations() throws Exception{
 		GetTransformationsCommand command = new GetTransformationsCommand();
-		command.setCorrelationId("correlationId");
 		command.setOrganizationId("1002");
-		client.getTransformations(command);
+		client.getTransformations(command,provId);
 		
 		//Wait for async response
 		Thread.sleep(10000);
@@ -162,51 +167,51 @@ public class MintSendAsyncTest {
 		command.setIncludedImportList(list );
 		command.setOrganizationId("orgid");
 		command.setUserId("userId");
-		client.publishCollection(command);
+		client.publishCollection(command,colId);
 		
 		//Wait for async response
 		Thread.sleep(10000);
 	}
 	
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void organizationExists() throws Exception{
-		OrganizationExistsCommand command = new OrganizationExistsCommand();
-		command.setOrganizationId("1001");
-		client.organizationExists(command);
+
+	public static class TestListener extends DefaultConsumer {
+
+		private Channel channel; 
 		
-		//Wait for async response
-		Thread.sleep(10000);
-	}
-	
-	
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void userExists() throws Exception{
-		UserExistsCommand command = new UserExistsCommand();
-		command.setUserId("userId");
-		client.userExists(command);
+		public TestListener(Channel channel) {
+			super(channel);
+			this.channel = channel;
+			
+		}
 		
-		//Wait for async response
-		Thread.sleep(10000);
+	    /* (non-Javadoc)
+	     * @see com.rabbitmq.client.DefaultConsumer#handleDelivery(java.lang.String, com.rabbitmq.client.Envelope, com.rabbitmq.client.AMQP.BasicProperties, byte[])
+	     */
+	    @Override
+	    public void handleDelivery(String consumerTag,
+	                               Envelope envelope,
+	                               AMQP.BasicProperties properties,
+	                               byte[] body)
+	        throws IOException
+	    {
+	        String routingKey = envelope.getRoutingKey();
+	        String contentType = properties.getContentType();
+
+	        long deliveryTag = envelope.getDeliveryTag();
+	        
+	    	System.out.println("ASDFX");
+	    	System.out.println(new String(body));
+	    	IMarshallable type;
+			try {
+				type = MintClientUtils.unmarshallobject(new String(body));
+		    	System.out.println(type.JiBX_getName());
+		    	System.out.println("XXX");
+			} catch (MintOSGIClientException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
+
 	}
-	
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void importExists() throws Exception{
-		ImportExistsCommand command = new ImportExistsCommand();
-		command.setImportId("importId");
-		client.importExists(command);
-		
-		//Wait for async response
-		Thread.sleep(10000);
-	}
-	
 	
 }

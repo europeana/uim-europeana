@@ -45,7 +45,7 @@ public interface MintAMPQClientASync extends MintAMPQClient {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException;
+	public void createOrganization(CreateOrganizationCommand command,String providerID) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
 	 * Send a message that creates a User entity
@@ -54,7 +54,7 @@ public interface MintAMPQClientASync extends MintAMPQClient {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException;
+	public void createUser(CreateUserCommand command,String providerID) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
 	 * Send a message that gets the specific imports on a given Organization
@@ -63,7 +63,7 @@ public interface MintAMPQClientASync extends MintAMPQClient {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException;
+	public void getImports(GetImportsCommand command,String providerID) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
 	 * Send a message that gets the transformations from a given Organization
@@ -72,7 +72,7 @@ public interface MintAMPQClientASync extends MintAMPQClient {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException;
+	public void getTransformations(GetTransformationsCommand command,String providerID) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
 	 * Publishes the given collection by applying a specific transformation
@@ -81,7 +81,7 @@ public interface MintAMPQClientASync extends MintAMPQClient {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException;
+	public void publishCollection(PublicationCommand command,String collectionID) throws MintOSGIClientException, MintRemoteException;
 	
 	/**
 	 * Send a message that creates a mapping session by importing from Repox
@@ -90,35 +90,7 @@ public interface MintAMPQClientASync extends MintAMPQClient {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	public void createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException;
-
-
-    /**
-     * Checks if an organisation with the provided id exists
-     * 
-     * @param command
-     * @throws MintOSGIClientException
-     * @throws MintRemoteException
-     */
-    public void organizationExists(OrganizationExistsCommand command) throws MintOSGIClientException, MintRemoteException;
-
-    /**
-     * Checks if a user with the provided id exists
-     * 
-     * @param command
-     * @throws MintOSGIClientException
-     * @throws MintRemoteException
-     */
-    public void userExists(UserExistsCommand command) throws MintOSGIClientException, MintRemoteException;
-    
-    /**
-     * Checks if an import with the provided id exists
-     * @param command
-     * @throws MintOSGIClientException
-     * @throws MintRemoteException
-     */
-    public void importExists(ImportExistsCommand command) throws MintOSGIClientException, MintRemoteException;
-
+	public void createImports(CreateImportCommand command,String collectionID) throws MintOSGIClientException, MintRemoteException;
 
 
 

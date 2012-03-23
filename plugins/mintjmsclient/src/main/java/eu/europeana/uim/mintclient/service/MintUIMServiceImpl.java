@@ -17,18 +17,13 @@
 package eu.europeana.uim.mintclient.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
 import org.jibx.runtime.IMarshallable;
-
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientASync;
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
@@ -39,9 +34,9 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.ErrorResponse;
-
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.utils.AMPQOperations;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
@@ -213,6 +208,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 	        	try {
 	        		ErrorResponse err = MintClientUtils.marshallobject(new String(body),ErrorResponse.class);
 	        		
+	        		//Log Error
 	        		
 				} catch (MintOSGIClientException e) {
 					// TODO Auto-generated catch block
@@ -220,19 +216,46 @@ public class MintUIMServiceImpl implements MintUIMService {
 				}
 	        }
 	        
-	        long deliveryTag = envelope.getDeliveryTag();
-	        super.getChannel().basicAck(envelope.getDeliveryTag(), false);
 	        
 	        try {
-	        	IMarshallable type = MintClientUtils.unmarshallobject(new String(body));
-	        	
-	        	//hasError
-	        	
-	        	
-	        	
-	        	///System.out.println(type.JiBX_getName());
-	        	
-	        	
+	        	IMarshallable response = MintClientUtils.unmarshallobject(new String(body));   	
+	   
+	        	AMPQOperations responseType = MintClientUtils.translateAMPQOperation(response.JiBX_getName());
+	   
+	        	switch(responseType){
+	        	case CreateOrganizationAction:
+	        		
+	        	     break;
+	        	case CreateUserAction:
+	        		
+	        	     break;	        		
+	        	case CreateImportAction:
+	        		
+	        		break;	 
+	        		
+	        	case	GetImportsAction:
+	        		
+	        		break;	 
+	        	case	GetTransformationsAction:
+	        		
+	        		break;	 
+	        	case	PublicationAction:
+	        		
+	        		break;	 
+	        	case	ImportExistsAction:
+	        		
+	        		break;	 
+	        	case	UserExistsAction:
+	        		
+	        		break;	 
+	        	case	OrganizationExistsAction:
+	        		
+	        		break;	 
+
+	        	default:
+	        		throw new UnsupportedOperationException("Received Message from Mint is not supported.");
+	        	}
+
 			} catch (MintOSGIClientException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

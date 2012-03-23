@@ -19,6 +19,9 @@ package eu.europeana.uim.mintclient.utils;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
+import java.text.DateFormat;
+import java.util.Date;
+
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
@@ -27,6 +30,7 @@ import org.jibx.runtime.JiBXException;
 import org.jibx.runtime.IMarshallable; 
 import eu.europeana.uim.mintclient.service.exceptions.MintGenericException;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
 
 /**
  * Utilities Class for the Mint Client
@@ -36,6 +40,15 @@ import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
  */
 public class MintClientUtils {
 
+	
+	
+	/**
+	 * Utility Classes should not be instantiated
+	 */
+	private MintClientUtils(){
+		
+	}
+	
 	/**
 	 * Unmarshall a JibX object.
 	 * 
@@ -170,4 +183,44 @@ public class MintClientUtils {
 
 	}
 
+	
+	
+	/**
+	 * Translates the full class name into an AMPQOperations entry
+	 * 
+	 * @param fullclassName
+	 * @return
+	 * @throws MintOSGIClientException 
+	 */
+	public static synchronized AMPQOperations translateAMPQOperation(String fullclassName) throws MintOSGIClientException{
+		
+		if(fullclassName != null){
+		AMPQOperations actualvalue = null;
+		for(AMPQOperations e : AMPQOperations.values()){
+			if(e.getSysId().equals(fullclassName)){
+				actualvalue = e;
+				return actualvalue;
+			}
+		}
+
+		throw new MintOSGIClientException("Error in propagating exception.");
+		}
+		return null;
+
+	}
+	
+	
+	/**
+	 * @param uimEntityID
+	 * @return
+	 */
+	public static String createCorrelationId(String uimEntityID){
+		StringBuilder sb = new StringBuilder();
+		Date rndDate = new Date();
+		sb.append(uimEntityID);
+		sb.append("*");
+		sb.append(DateFormat.getDateInstance().format(rndDate));
+		
+		return sb.toString();
+	}
 }
