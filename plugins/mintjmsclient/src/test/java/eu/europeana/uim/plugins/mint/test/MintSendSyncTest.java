@@ -98,7 +98,6 @@ public class MintSendSyncTest {
 	@Test
 	public void createOrganizationTest() throws MintOSGIClientException, MintRemoteException{
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
-		command.setCorrelationId("correlationId");
 		command.setCountry("es");
 		command.setEnglishName("TestOrg");
 		command.setName("TestOrg");
@@ -118,7 +117,6 @@ public class MintSendSyncTest {
 	@Test
 	public void createUserTest() throws MintOSGIClientException, MintRemoteException{
 		CreateUserCommand command = new CreateUserCommand();
-		command.setCorrelationId("correlationId");
 		command.setEmail("email");
 		command.setFirstName("firstName");
 		command.setLastName("lastName");
@@ -141,8 +139,6 @@ public class MintSendSyncTest {
 	@Test
 	public void createImportsTest() throws MintOSGIClientException, MintRemoteException{
 		CreateImportCommand command = new CreateImportCommand();
-		
-		command.setCorrelationId("123");
 		command.setUserId("1000");
 		command.setOrganizationId("1");
 		command.setRepoxTableName("azores13");
@@ -161,7 +157,6 @@ public class MintSendSyncTest {
 	@Test
 	public void getImportsTest() throws MintOSGIClientException, MintRemoteException{
 		GetImportsCommand command =  new GetImportsCommand();
-		command.setCorrelationId("provid");
 		command.setOrganizationId("1002");
 		GetImportsResponse resp = client.getImports(command);
 		GetImportsAction act = new GetImportsAction();
@@ -177,7 +172,6 @@ public class MintSendSyncTest {
 	@Test
 	public void getTransformations() throws MintOSGIClientException, MintRemoteException{
 		GetTransformationsCommand command = new GetTransformationsCommand();
-		command.setCorrelationId("correlationId");
 		command.setOrganizationId("1002");
 		GetTransformationsResponse resp = client.getTransformations(command);
 		GetTransformationsAction act = new GetTransformationsAction();
@@ -193,7 +187,6 @@ public class MintSendSyncTest {
 	@Test
 	public void publishCollection() throws MintOSGIClientException, MintRemoteException{
 		PublicationCommand command = new PublicationCommand();
-		command.setCorrelationId("correlationId");
 		List<String> list =  new ArrayList<String>();
 		list.add("test1");
 		list.add("test2");
@@ -228,7 +221,7 @@ public class MintSendSyncTest {
 	@Test
 	public void userExists() throws Exception{
 		UserExistsCommand command = new UserExistsCommand();
-		command.setUserId("userId");
+		command.setUserId("0101");
 		UserExistsResponse resp = client.userExists(command);
 		UserExistsAction act = new UserExistsAction();
 		act.setUserExistsResponse(resp);
@@ -242,7 +235,7 @@ public class MintSendSyncTest {
 	@Test
 	public void importExists() throws Exception{
 		ImportExistsCommand command = new ImportExistsCommand();
-		command.setImportId("importId");
+		command.setImportId("92392");
 		ImportExistsResponse resp = client.importExists(command);
 		ImportExistsAction act = new ImportExistsAction();
 		act.setImportExistsResponse(resp);

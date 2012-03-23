@@ -144,6 +144,9 @@ public class MintSendAsyncTest {
 		client.getImports(command,provId);
 	}
 	
+	/**
+	 * @throws Exception
+	 */
 	@Test
 	public void getTransformations() throws Exception{
 		GetTransformationsCommand command = new GetTransformationsCommand();
@@ -160,7 +163,6 @@ public class MintSendAsyncTest {
 	@Test
 	public void publishCollection() throws Exception{
 		PublicationCommand command = new PublicationCommand();
-		command.setCorrelationId("correlationId");
 		List<String> list =  new ArrayList<String>();
 		list.add("test1");
 		list.add("test2");

@@ -18,6 +18,9 @@ package eu.europeana.uim.mintclient.ampq;
 
 import java.io.IOException;
 import java.util.Date;
+
+import org.jibx.runtime.IMarshallable;
+
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
@@ -27,6 +30,7 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
+import eu.europeana.uim.mintclient.jibxbindings.ErrorResponse;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsAction;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsResponse;
@@ -58,6 +62,7 @@ import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 
 
+
 /**
  * A Singleton Class implementing a asynchronous client.
  * 
@@ -68,7 +73,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 
 	private static QueueingConsumer consumer;
 	private static MintAMPQClientSyncImpl instance;
-	
+	private final static String HEADERERRORMESSAGE = "hasError";
 
 	/**
 	 * Private constructor (can only be instantiated via Factory class)
@@ -121,8 +126,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 */
 	@Override
 	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		command.setCorrelationId(correlationId);
+		String correlationId = MintClientUtils.createCorrelationId();
 		CreateOrganizationAction cu = new CreateOrganizationAction();
 		cu.setCreateOrganizationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
@@ -138,8 +142,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 */
 	@Override
 	public CreateUserResponse createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		command.setCorrelationId(correlationId);
+		String correlationId = MintClientUtils.createCorrelationId();
 		CreateUserAction cu = new CreateUserAction();
 		cu.setCreateUserCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
@@ -156,8 +159,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 */
 	@Override
 	public GetImportsResponse getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		command.setCorrelationId(correlationId);
+		String correlationId = MintClientUtils.createCorrelationId();
 		GetImportsAction cu = new GetImportsAction();
 		cu.setGetImportsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
@@ -172,8 +174,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 */
 	@Override
 	public CreateImportResponse createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		command.setCorrelationId(correlationId);
+		String correlationId = MintClientUtils.createCorrelationId();
 		CreateImportAction cu = new CreateImportAction();
 		cu.setCreateImportCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
@@ -188,8 +189,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 */
 	@Override
 	public GetTransformationsResponse getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		command.setCorrelationId(correlationId);
+		String correlationId = MintClientUtils.createCorrelationId();	
 		GetTransformationsAction cu = new GetTransformationsAction();
 		cu.setGetTransformationsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
@@ -204,8 +204,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 */
 	@Override
 	public PublicationResponse publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException {
-		String correlationId = new Date().toString();	
-		command.setCorrelationId(correlationId);
+		String correlationId = MintClientUtils.createCorrelationId();
 		PublicationAction cu = new PublicationAction();
 		cu.setPublicationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
@@ -223,12 +222,12 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	public OrganizationExistsResponse organizationExists(
 			OrganizationExistsCommand command) throws MintOSGIClientException,
 			MintRemoteException {
-		String corrId = new Date().toString();
+		String correlationId = MintClientUtils.createCorrelationId();
 		OrganizationExistsAction action  = new OrganizationExistsAction();
 		action.setOrganizationExistsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(corrId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
-		String resp = handleSynchronousDelivery(corrId);
+		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		String resp = handleSynchronousDelivery(correlationId);
 		OrganizationExistsAction respObj =  MintClientUtils.marshallobject(resp, OrganizationExistsAction.class);
 		return respObj.getOrganizationExistsResponse();
 	}
@@ -240,12 +239,12 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public UserExistsResponse userExists(UserExistsCommand command)
 			throws MintOSGIClientException, MintRemoteException {
-		String corrId = new Date().toString();	
+		String correlationId = MintClientUtils.createCorrelationId();
 		UserExistsAction action = new UserExistsAction();
 		action.setUserExistsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(corrId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
-		String resp = handleSynchronousDelivery(corrId);
+		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		String resp = handleSynchronousDelivery(correlationId);
 		UserExistsAction respObj =  MintClientUtils.marshallobject(resp, UserExistsAction.class);
 		return respObj.getUserExistsResponse();
 	}
@@ -257,12 +256,12 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public ImportExistsResponse importExists(ImportExistsCommand command)
 			throws MintOSGIClientException, MintRemoteException {
-		String corrId = new Date().toString();	
+		String correlationId = MintClientUtils.createCorrelationId();
 		ImportExistsAction action = new ImportExistsAction();
 		action.setImportExistsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(corrId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
-		String resp = handleSynchronousDelivery(corrId);
+		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		String resp = handleSynchronousDelivery(correlationId);
 		ImportExistsAction respObj =  MintClientUtils.marshallobject(resp, ImportExistsAction.class);
 		return respObj.getImportExistsResponse();
 	}
@@ -282,6 +281,17 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 				delivery = consumer.nextDelivery(10000);
 				if(delivery == null ){
 					throw new MintRemoteException("Response from remote client timed out");
+				}
+				else if(delivery.getProperties().getHeaders().get(HEADERERRORMESSAGE) != null &&
+						delivery.getProperties().getHeaders().get(HEADERERRORMESSAGE).equals("true")){
+					IMarshallable err = MintClientUtils.unmarshallobject(new String(delivery.getBody()));
+					
+					StringBuffer sb = new StringBuffer();
+					sb.append("Remote Server threw an exception-");
+					sb.append("Operation ID:");
+					//sb.append(err.getCommand());
+					sb.append("Error Message:");
+					///sb.append(err.getErrorMessage());
 				}
 				else if (delivery.getProperties().getCorrelationId().equals(correlationID)) {
 		            String response = new String(delivery.getBody());

@@ -153,7 +153,7 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 	@Override
 	public void createOrganization(CreateOrganizationCommand command,String providerID) throws MintOSGIClientException, MintRemoteException {
 		String correlationID = MintClientUtils.createCorrelationId(providerID);
-		CreateOrganizationAction cu = new CreateOrganizationAction();
+		CreateOrganizationAction cu = new CreateOrganizationAction();		
 		cu.setCreateOrganizationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
 		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);

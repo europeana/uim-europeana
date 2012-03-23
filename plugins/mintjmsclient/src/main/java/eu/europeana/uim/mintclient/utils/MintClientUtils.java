@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Random;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -211,16 +212,28 @@ public class MintClientUtils {
 	
 	
 	/**
-	 * @param uimEntityID
+	 * Create A random correlationID for the sent message
+	 * @param uimEntityID the collection or provider ID for the specific message
 	 * @return
 	 */
 	public static String createCorrelationId(String uimEntityID){
 		StringBuilder sb = new StringBuilder();
-		Date rndDate = new Date();
 		sb.append(uimEntityID);
 		sb.append("*");
-		sb.append(DateFormat.getDateInstance().format(rndDate));
-		
+		sb.append(new Random().nextDouble());
+
+		return sb.toString();
+	}
+	
+	
+	/**
+	 * Create A random correlationID for the sent message
+	 * @return
+	 */
+	public static String createCorrelationId(){
+		StringBuilder sb = new StringBuilder();
+		sb.append(new Random().nextDouble());
+
 		return sb.toString();
 	}
 }
