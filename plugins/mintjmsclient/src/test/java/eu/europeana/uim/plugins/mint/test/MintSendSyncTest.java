@@ -16,6 +16,7 @@
  */
 package eu.europeana.uim.plugins.mint.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
@@ -67,6 +68,11 @@ import org.apache.log4j.Logger;
 public class MintSendSyncTest {
 	private static org.apache.log4j.Logger log = Logger.getLogger(MintSendSyncTest.class);
 	
+	private static String userId;
+	private static String orgId;
+	private static String importId;
+	
+	
 	/**
 	 * 
 	 */
@@ -104,6 +110,7 @@ public class MintSendSyncTest {
 		command.setType("Type");
 		command.setUserId("1002");
 		CreateOrganizationResponse resp = client.createOrganization(command);
+		orgId = resp.getOrganizationId();
 		CreateOrganizationAction act = new CreateOrganizationAction();
 		act.setCreateOrganizationResponse(resp);
 		log.info(MintClientUtils.unmarshallObject(act));
@@ -123,8 +130,9 @@ public class MintSendSyncTest {
 		command.setUserName("user" + (new Date()).toString());
 		command.setPassword("werwer");
 		command.setPhone("234234234");
-		command.setOrganization("1001");
+		command.setOrganization(orgId);
 		CreateUserResponse resp = client.createUser(command);
+		userId = resp.getUserId();
 		CreateUserAction act = new CreateUserAction();
 		act.setCreateUserResponse(resp);
 		log.info(MintClientUtils.unmarshallObject(act));
@@ -139,10 +147,11 @@ public class MintSendSyncTest {
 	@Test
 	public void createImportsTest() throws MintOSGIClientException, MintRemoteException{
 		CreateImportCommand command = new CreateImportCommand();
-		command.setUserId("1000");
-		command.setOrganizationId("1");
+		command.setUserId(userId);
+		command.setOrganizationId(orgId);
 		command.setRepoxTableName("azores13");
 		CreateImportResponse resp = client.createImports(command);
+		importId = resp.getImportId();
 		CreateImportAction act = new CreateImportAction();
 		act.setCreateImportResponse(resp);
 		log.info(MintClientUtils.unmarshallObject(act));
@@ -157,7 +166,7 @@ public class MintSendSyncTest {
 	@Test
 	public void getImportsTest() throws MintOSGIClientException, MintRemoteException{
 		GetImportsCommand command =  new GetImportsCommand();
-		command.setOrganizationId("1002");
+		command.setOrganizationId(orgId);
 		GetImportsResponse resp = client.getImports(command);
 		GetImportsAction act = new GetImportsAction();
 		act.setGetImportsResponse(resp);
@@ -172,7 +181,7 @@ public class MintSendSyncTest {
 	@Test
 	public void getTransformations() throws MintOSGIClientException, MintRemoteException{
 		GetTransformationsCommand command = new GetTransformationsCommand();
-		command.setOrganizationId("1002");
+		command.setOrganizationId(orgId);
 		GetTransformationsResponse resp = client.getTransformations(command);
 		GetTransformationsAction act = new GetTransformationsAction();
 		act.setGetTransformationsResponse(resp);
@@ -191,8 +200,8 @@ public class MintSendSyncTest {
 		list.add("test1");
 		list.add("test2");
 		command.setIncludedImportList(list );
-		command.setOrganizationId("orgid");
-		command.setUserId("userId");
+		command.setOrganizationId(orgId);
+		command.setUserId(userId);
 		PublicationResponse resp = client.publishCollection(command);
 		PublicationAction act = new PublicationAction();
 		act.setPublicationResponse(resp);
@@ -206,12 +215,13 @@ public class MintSendSyncTest {
 	@Test
 	public void organizationExists() throws Exception{
 		OrganizationExistsCommand command = new OrganizationExistsCommand();
-		command.setOrganizationId("1001");
+		command.setOrganizationId(orgId);
 		OrganizationExistsResponse resp = client.organizationExists(command);
 		OrganizationExistsAction act = new OrganizationExistsAction();
 		act.setOrganizationExistsResponse(resp);
 		log.info(MintClientUtils.unmarshallObject(act));
 		assertNotNull(resp);
+		assertEquals(resp.isExists(),true);
 	}
 	
 	
@@ -221,12 +231,13 @@ public class MintSendSyncTest {
 	@Test
 	public void userExists() throws Exception{
 		UserExistsCommand command = new UserExistsCommand();
-		command.setUserId("0101");
+		command.setUserId(userId);
 		UserExistsResponse resp = client.userExists(command);
 		UserExistsAction act = new UserExistsAction();
 		act.setUserExistsResponse(resp);
 		log.info(MintClientUtils.unmarshallObject(act));
 		assertNotNull(resp);
+		assertEquals(resp.isExists(),true);
 	}
 	
 	/**
@@ -235,11 +246,62 @@ public class MintSendSyncTest {
 	@Test
 	public void importExists() throws Exception{
 		ImportExistsCommand command = new ImportExistsCommand();
-		command.setImportId("92392");
+		command.setImportId(importId);
 		ImportExistsResponse resp = client.importExists(command);
 		ImportExistsAction act = new ImportExistsAction();
 		act.setImportExistsResponse(resp);
 		log.info(MintClientUtils.unmarshallObject(act));
 		assertNotNull(resp);
+		assertEquals(resp.isExists(),true);
 	}
+	
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void organizationNotExists() throws Exception{
+		OrganizationExistsCommand command = new OrganizationExistsCommand();
+		command.setOrganizationId("0");
+		OrganizationExistsResponse resp = client.organizationExists(command);
+		OrganizationExistsAction act = new OrganizationExistsAction();
+		act.setOrganizationExistsResponse(resp);
+		log.info(MintClientUtils.unmarshallObject(act));
+		assertNotNull(resp);
+		assertEquals(resp.isExists(),false);
+	}
+	
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void userNotExists() throws Exception{
+		UserExistsCommand command = new UserExistsCommand();
+		command.setUserId("0");
+		UserExistsResponse resp = client.userExists(command);
+		UserExistsAction act = new UserExistsAction();
+		act.setUserExistsResponse(resp);
+		log.info(MintClientUtils.unmarshallObject(act));
+		assertNotNull(resp);
+		assertEquals(resp.isExists(),false);
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void importNotExists() throws Exception{
+		ImportExistsCommand command = new ImportExistsCommand();
+		command.setImportId("0");
+		ImportExistsResponse resp = client.importExists(command);
+		ImportExistsAction act = new ImportExistsAction();
+		act.setImportExistsResponse(resp);
+		log.info(MintClientUtils.unmarshallObject(act));
+		assertNotNull(resp);
+		assertEquals(resp.isExists(),false);
+	}
+	
+	
 }

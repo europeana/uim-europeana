@@ -279,22 +279,24 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	    	QueueingConsumer.Delivery delivery;
 			try {
 				delivery = consumer.nextDelivery(10000);
+				 
 				if(delivery == null ){
 					throw new MintRemoteException("Response from remote client timed out");
 				}
-				else if(delivery.getProperties().getHeaders().get(HEADERERRORMESSAGE) != null &&
-						delivery.getProperties().getHeaders().get(HEADERERRORMESSAGE).equals("true")){
-					IMarshallable err = MintClientUtils.unmarshallobject(new String(delivery.getBody()));
-					
-					StringBuffer sb = new StringBuffer();
-					sb.append("Remote Server threw an exception-");
-					sb.append("Operation ID:");
-					//sb.append(err.getCommand());
-					sb.append("Error Message:");
-					///sb.append(err.getErrorMessage());
-				}
 				else if (delivery.getProperties().getCorrelationId().equals(correlationID)) {
 		            String response = new String(delivery.getBody());
+		            
+		            boolean hasErrorMessage = (Boolean) delivery.getProperties().getHeaders().get(HEADERERRORMESSAGE);
+		            
+		            if(hasErrorMessage){						
+						StringBuffer sb = new StringBuffer();
+						sb.append("Remote Server threw an exception-");
+						sb.append("Error Message:");
+						sb.append(response);
+						throw new MintRemoteException(sb.toString());
+		            }
+
+		            
 		            return response;
 		        }
 			} catch (ShutdownSignalException e) {
