@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2009 sp1 (http://www.altova.com) by cpard (EMBRACE) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:complexType name="PublishTransformationAction">
+		<xs:choice>
+			<xs:element name="PublishTransformationResponse" type="PublishTransformationResponse"/>
+			<xs:element name="error" type="ErrorResponse"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="PublishTransformation" type="PublishTransformationAction"/>
+	<xs:complexType name="PublishTransformationResponse">
+		<xs:sequence>
+			<xs:element name="transformationId" type="xs:string"/>
+			<xs:element name="url" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
 	<xs:complexType name="CreateImportResponse">
 		<xs:sequence>
 			<xs:element name="importId" type="xs:string"/>
