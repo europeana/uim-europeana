@@ -9,6 +9,7 @@
 	      factory-method="createService">
 	      <argument ref="registry"/>
           <argument ref="orchestrator"/>
+          <argument ref="sugarcrm"/>
 	</bean>
 
 	<service id="mintService" ref="mintbean"
@@ -17,6 +18,8 @@
 	<bp:reference id="registry" interface="eu.europeana.uim.api.Registry" />
 	
 	<bp:reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator"/>
+	
+	<bp:reference id="sugarcrm" interface="eu.europeana.uim.sugarcrm.SugarCrmService"/>
 
  
 </blueprint>
