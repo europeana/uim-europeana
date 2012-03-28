@@ -30,6 +30,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.io</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
 			<version>2.7.1</version>
@@ -68,15 +74,21 @@
 					<instructions>
 						<Export-Package>eu.europeana.uim.mintclient.service</Export-Package>
 						<Import-Package>
-                          com.rabbitmq.client,
-                          com.rabbitmq.client.impl,
-                          com.rabbitmq.tools,
-                          com.rabbitmq.tools.json,
-                          com.rabbitmq.tools.jsonrpc,
-                          com.rabbitmq.utility,
-						  *	
+							org.w3c.dom; version=0.0.0,
+							org.apache.log4j; version=1.2.15,
+							org.osgi.service.blueprint; version=1.0.1,
+							org.jibx.runtime; version=1.2.3,
+							org.jibx.runtime.impl; version=1.2.3,
+							eu.europeana.uim.store,
+							eu.europeana.uim.api,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues,
+							eu.europeana.uim.sugarcrm, 
+							javax.net, 
+							javax.net.ssl, 
+							javax.security.auth.callback, 
+							javax.security.sasl
 						</Import-Package>
-						<Embed-Dependency>europeana-uim-plugin-clientbindings</Embed-Dependency>
+						<Embed-Dependency>europeana-uim-plugin-clientbindings,amqp-client,com.springsource.org.apache.commons.io</Embed-Dependency>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
@@ -91,10 +103,8 @@
 						<id>bundle-manifest</id>
 						<phase>package</phase>
 						<goals>
-						    <goal>bundle</goal>
-						    <!--  
-							<goal>bundleall</goal>
-							-->
+							<goal>bundle</goal>
+							<!-- <goal>bundleall</goal> -->
 						</goals>
 					</execution>
 				</executions>
