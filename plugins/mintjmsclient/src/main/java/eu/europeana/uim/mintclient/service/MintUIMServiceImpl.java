@@ -149,10 +149,6 @@ public class MintUIMServiceImpl implements MintUIMService {
 		CreateOrganizationAction action = new CreateOrganizationAction();
 		action.setCreateOrganizationResponse(resp);
 		resphandler.handleResponse(action, provider);
-		//provider.putValue(ControlledVocabularyProxy.MINTID,
-		//		resp.getOrganizationId());
-
-		//registry.getStorageEngine().updateProvider(provider);
 	}
 
 	/*
