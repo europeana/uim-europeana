@@ -44,9 +44,9 @@ import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.UserExistsAction;
 import eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand;
+import eu.europeana.uim.mintclient.service.MintUIMServiceImpl;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
-import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
 
 
@@ -134,7 +134,7 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 				receiveChannel = rabbitConnection.createChannel();
 				sendChannel.queueDeclare(inbound, true, false, false, null);
 				receiveChannel.queueDeclare(outbound, true, false, false, null);
-				defaultConsumer =  defaultConsumer==null ? new UIMConsumerListener(receiveChannel) : defaultConsumer;
+				defaultConsumer =  defaultConsumer==null ? new MintUIMServiceImpl.UIMConsumerListener(receiveChannel) : defaultConsumer;
 				receiveChannel.basicConsume(outbound, true, defaultConsumer);
 				instance = new MintAMPQClientAsyncImpl();
 				

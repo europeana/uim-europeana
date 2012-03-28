@@ -27,11 +27,15 @@ import com.rabbitmq.client.Envelope;
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientASync;
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
+import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportResponse;
+import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationResponse;
+import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
+import eu.europeana.uim.mintclient.jibxbindings.CreateUserResponse;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.ErrorResponse;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
@@ -61,11 +65,11 @@ public class MintUIMServiceImpl implements MintUIMService {
 	private static Orchestrator<?> orchestrator;
 	private static SugarCrmService sugservice;
 	private static LoggingEngine<?> logger;
+	private static ReponseHandler resphandler;
 
 	private final static String HEADERERRORMESSAGE = "hasError";
 	private final static String HEADERCORRELATIONID = "correlationID";
-	
-	
+
 	/**
 	 * Private constructor, instantiated via private factory method
 	 */
@@ -76,13 +80,13 @@ public class MintUIMServiceImpl implements MintUIMService {
 		MintUIMServiceImpl.sugservice = sugservice;
 		MintUIMServiceImpl.logger = (LoggingEngine<?>) (registry != null ? registry
 				.getLoggingEngine() : null);
+		
+		MintUIMServiceImpl.resphandler = new ReponseHandler(registry,orchestrator,sugservice);
 	}
 
-
-
 	/**
-	 * Factory method currently used for initialising the service
-	 * instance (currently used by Spring).
+	 * Factory method currently used for initialising the service instance
+	 * (currently used by Spring).
 	 * 
 	 * @param registryref
 	 * @param orchestratorref
@@ -141,10 +145,14 @@ public class MintUIMServiceImpl implements MintUIMService {
 
 		CreateOrganizationResponse resp = synchronousClient
 				.createOrganization(command);
-		provider.putValue(ControlledVocabularyProxy.MINTID,
-				resp.getOrganizationId());
+		
+		CreateOrganizationAction action = new CreateOrganizationAction();
+		action.setCreateOrganizationResponse(resp);
+		resphandler.handleResponse(action, provider);
+		//provider.putValue(ControlledVocabularyProxy.MINTID,
+		//		resp.getOrganizationId());
 
-		registry.getStorageEngine().updateProvider(provider);
+		//registry.getStorageEngine().updateProvider(provider);
 	}
 
 	/*
@@ -156,7 +164,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 */
 	@Override
 	public void createMintAuthorizedUser(Provider provider)
-			throws MintOSGIClientException, MintRemoteException {
+			throws MintOSGIClientException, MintRemoteException, StorageEngineException {
 		CreateUserCommand command = new CreateUserCommand();
 
 		command.setEmail(provider
@@ -173,8 +181,11 @@ public class MintUIMServiceImpl implements MintUIMService {
 				.getValue(ControlledVocabularyProxy.PROVIDERMINTPHONE));
 		command.setOrganization(provider
 				.getValue(ControlledVocabularyProxy.MINTID));
-		synchronousClient.createUser(command);
+		CreateUserResponse response = synchronousClient.createUser(command);
 
+		CreateUserAction action = new CreateUserAction();
+		action.setCreateUserResponse(response);
+		resphandler.handleResponse(action, provider);
 	}
 
 	/*
@@ -199,10 +210,9 @@ public class MintUIMServiceImpl implements MintUIMService {
 				.getValue(ControlledVocabularyProxy.REPOXID));
 		CreateImportResponse resp = synchronousClient.createImports(command);
 
-		collection.putValue(ControlledVocabularyProxy.LATESTMINTMAPPINGID,
-				resp.getImportId());
-		registry.getStorageEngine().updateCollection(collection);
-
+		CreateImportAction action = new CreateImportAction();
+		action.setCreateImportResponse(resp);
+		resphandler.handleResponse(action,collection);
 	}
 
 	/**
@@ -213,10 +223,23 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 */
 	public static class UIMConsumerListener extends DefaultConsumer {
 
+		/**
+		 * Default Constructor
+		 * 
+		 * @param channel
+		 */
 		public UIMConsumerListener(Channel channel) {
 			super(channel);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * com.rabbitmq.client.DefaultConsumer#handleDelivery(java.lang.String,
+		 * com.rabbitmq.client.Envelope,
+		 * com.rabbitmq.client.AMQP.BasicProperties, byte[])
+		 */
 		@Override
 		public void handleDelivery(String consumerTag, Envelope envelope,
 				AMQP.BasicProperties properties, byte[] body)
@@ -230,78 +253,38 @@ public class MintUIMServiceImpl implements MintUIMService {
 			boolean hasError = Boolean.parseBoolean((String) maprops
 					.get(HEADERERRORMESSAGE));
 
-			if (hasError) {
-				try {
+			try {
+				if (hasError) {
+
 					ErrorResponse err = MintClientUtils.marshallobject(
 							new String(body), ErrorResponse.class);
 
 					// Log Error
-					StringBuilder sb = new  StringBuilder();
+					StringBuilder sb = new StringBuilder();
 					sb.append("Operation Name:");
 					sb.append(err.getCommand());
 					sb.append("Error Description:");
 					sb.append(err.getErrorMessage());
 					sb.append("Correlation ID:");
 					sb.append(correlationid);
-					
-					logger.logFailed(Level.SEVERE, "RemoteServer has throw an exception:",
+
+					logger.logFailed(Level.SEVERE,
+							"RemoteServer has thrown an exception:",
 							new MintRemoteException(sb.toString()));
 
-				} catch (MintOSGIClientException e) {
-					logger.logFailed(Level.SEVERE, "Incoming message caused an exception to the client",e);
-				}
-			}
+				} else {
 
-			try {
-				IMarshallable response = MintClientUtils
-						.unmarshallobject(new String(body));
-
-				AMPQOperations responseType = MintClientUtils
-						.translateAMPQOperation(response.JiBX_getName());
-
-				switch (responseType) {
-				case CreateOrganizationAction:
-
-					break;
-				case CreateUserAction:
-
-					break;
-				case CreateImportAction:
-
-					break;
-
-				case GetImportsAction:
-
-					break;
-				case GetTransformationsAction:
-
-					break;
-				case PublicationAction:
-
-					break;
-				case ImportExistsAction:
-
-					break;
-				case UserExistsAction:
-
-					break;
-				case OrganizationExistsAction:
-
-					break;
-
-				default:
-					throw new UnsupportedOperationException(
-							"Received Message from Mint is not supported.");
+					resphandler.handleResponse(new String(body), correlationid);
 				}
 
 			} catch (MintOSGIClientException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.logFailed(Level.SEVERE,
+						"Incoming message caused an exception to the client", e);
+			} catch (StorageEngineException e) {
+				logger.logFailed(Level.SEVERE,
+						"Incoming message has thrown a storage exception", e);
 			}
 
-			// (process the message components here ...)
-
-			// /channel.basicAck(deliveryTag, false);
 		}
 
 	}

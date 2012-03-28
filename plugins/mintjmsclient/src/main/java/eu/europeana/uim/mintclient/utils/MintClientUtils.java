@@ -236,4 +236,30 @@ public class MintClientUtils {
 
 		return sb.toString();
 	}
+	
+	
+	/**
+	 * Method that extracts a mnemonic ID from a given AMPQ provided
+	 * correlation ID
+	 * 
+	 * @param id string that should conform to the <collection/provider id>*<random number> pattern
+	 * @return a mnemonic ID
+	 * @throws MintOSGIClientException
+	 */
+	public static String extractIDfromCorrId(String id) throws MintOSGIClientException{
+		if(id == null){
+			throw new MintOSGIClientException("Tried to extract UIM entity menmonic from correlation ID string" +
+					"but the latter was null");
+		}
+		
+		String uimId = id.split("*")[0];
+		
+		if(uimId == null){
+			throw new MintOSGIClientException("Tried to extract UIM entity menmonic from correlation ID string" +
+					"but the latter did not conform to the <collection/provider id>*<randomnumber> pattern");
+		}
+		
+		return uimId;
+	}
+	
 }

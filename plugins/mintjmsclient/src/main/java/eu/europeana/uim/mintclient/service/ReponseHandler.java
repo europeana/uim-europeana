@@ -17,68 +17,168 @@
 package eu.europeana.uim.mintclient.service;
 
 import org.jibx.runtime.IMarshallable;
-
 import eu.europeana.uim.api.Orchestrator;
 import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
+import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
+import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
+import eu.europeana.uim.mintclient.jibxbindings.GetImportsAction;
+import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsAction;
+import eu.europeana.uim.mintclient.jibxbindings.ImportExistsAction;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsAction;
+import eu.europeana.uim.mintclient.jibxbindings.PublicationAction;
+import eu.europeana.uim.mintclient.jibxbindings.PublishTransformationAction;
+import eu.europeana.uim.mintclient.jibxbindings.UserExistsAction;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
-import eu.europeana.uim.mintclient.utils.AMPQOperations;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.store.UimEntity;
+import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.workflow.Workflow;
 
 /**
- *
+ * This is the core class for handling both synchronous and asyncronous  incoming messages 
+ * from Mint to UIM. This class defines the actual interaction between incoming
+ * Mint messages and UIM entities & processes
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 22 Mar 2012
  */
 public class ReponseHandler {
 
-	private static Registry registry;
-	private static Orchestrator<?> orchestrator;
+	private Registry registry;
+	private Orchestrator<?> orchestrator;
+	private StorageEngine<?> storage;
+	private SugarCrmService sugservice;
+	private final static String ingestionWf = "InitialIngestionWorkflow";
 	
-	
-	public ReponseHandler(Registry registry,Orchestrator<?> orchestrator){
+	/**
+	 * Default constructor
+	 * 
+	 * @param registry
+	 * @param orchestrator
+	 * @param sugservice
+	 */
+	public ReponseHandler(Registry registry, Orchestrator<?> orchestrator,SugarCrmService sugservice) {
 		this.registry = registry;
 		this.orchestrator = orchestrator;
+		this.storage = registry.getStorageEngine();
+		this.sugservice = sugservice;
 	}
+
 	
-	public void handleResponse(IMarshallable response ){
-    	
+	/**
+	 * This method is used by the asynchronous listener in order to format the 
+	 * input received by the UIMConsumerListener in a format compatible
+	 *  to an asynchronous response
+	 *  
+	 * @param responseStr the raw XML string of the received message
+	 * @param corrID the correlation id of the message
+	 * @throws MintOSGIClientException
+	 * @throws StorageEngineException
+	 * @see MintUIMServiceImpl.UIMConsumerListener
+	 */
+	public void handleResponse(String responseStr, String corrID)
+			throws MintOSGIClientException, StorageEngineException {
 
- 	   
-    	AMPQOperations responseType;
-		try {
-			responseType = MintClientUtils.translateAMPQOperation(response.JiBX_getName());
-	    	switch(responseType){
-	    	case CreateOrganizationAction:
-	    		
-	    	     break;
-	    	case CreateUserAction:
-	    		
-	    	     break;	        		
-	    	case CreateImportAction:
-	    		break;	 
-	    		
-	    	case	GetImportsAction:
-	    		break;	 
-	    	case	GetTransformationsAction:
-	    		
-	    		break;	 
-	    	case	PublicationAction:
-	    		break;	 
-	    	case	ImportExistsAction:
-	    		break;	 
-	    	case	UserExistsAction:
-	    		break;	 
-	    	case	OrganizationExistsAction:
-	    		break;	 
+		String uimID = MintClientUtils.extractIDfromCorrId(corrID);
 
-	    	default:
-	    		throw new UnsupportedOperationException("Received Message from Mint is not supported.");
-	    	}
-		} catch (MintOSGIClientException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		IMarshallable response = MintClientUtils.unmarshallobject(responseStr);
+
+		Collection<?> coll = storage.findCollection(uimID);
+		if (coll != null) {
+			handleResponse(response, coll);
+		} else {
+			Provider<?> prov = storage.findProvider(uimID);
+			if (prov != null) {
+				handleResponse(response, prov);
+			} else {
+				throw new MintOSGIClientException(
+						"Erroneous Message sent by Mint: Collection or provider Id declared "
+								+ "in the correlationID ("
+								+ corrID
+								+ ") of the received"
+								+ "AMPQ message does not correspond to an existing UIM entity");
+			}
 		}
 
+	}
+
+	
+	
+	/**
+	 * This is the actual place where the interactions with the entities
+	 * and operations of UIM take place. If you need to process new types
+	 * of incoming messages just place them here...
+	 * 
+	 * @param response the JIBX implementation of the response
+	 * @param entity the UIM entity (either a provider or collection)
+	 * @throws MintOSGIClientException
+	 * @throws StorageEngineException
+	 */
+	public void handleResponse(IMarshallable response, UimEntity entity)
+			throws MintOSGIClientException, StorageEngineException {
+
+   	   if(response instanceof CreateOrganizationAction){
+			@SuppressWarnings("rawtypes")
+			Provider prov = (Provider) entity;
+			CreateOrganizationAction action = (CreateOrganizationAction) response;
+			prov.putValue(ControlledVocabularyProxy.MINTID, action
+					.getCreateOrganizationResponse().getOrganizationId());
+			storage.updateProvider(prov);
+		}
+		else if(response instanceof CreateUserAction){
+			@SuppressWarnings("rawtypes")
+			Provider prov2 = (Provider) entity;
+			CreateUserAction action2 = (CreateUserAction) response;
+		}
+		else if(response instanceof CreateImportAction){
+			@SuppressWarnings("rawtypes")
+			Collection collection = (Collection) entity;
+			CreateImportAction action = (CreateImportAction) response;
+			collection.putValue(ControlledVocabularyProxy.LATESTMINTMAPPINGID,
+					action.getCreateImportResponse().getImportId());
+			storage.updateCollection(collection);
+		}
+		else if(response instanceof GetImportsAction){
+
+			// This method does not affect the status of the UIM Entity
+		}
+		else if(response instanceof GetTransformationsAction){
+			// This method does not affect the status of the UIM Entity
+		}
+		else if(response instanceof PublicationAction){
+			// This method does not affect the status of the UIM Entity
+		}
+		else if(response instanceof PublishTransformationAction){
+			@SuppressWarnings("rawtypes")
+			Collection collection = (Collection) entity;
+			PublishTransformationAction action = (PublishTransformationAction) response;
+			collection.putValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION,
+					action.getPublishTransformationResponse().getUrl());
+			storage.updateCollection(collection);
+			Workflow ingestionworkflow =registry.getWorkflow(ingestionWf);
+			
+			orchestrator.executeWorkflow(ingestionworkflow, collection);
+		}
+		else if(response instanceof ImportExistsAction){
+			// This method does not affect the status of the UIM Entity
+		}
+		else if(response instanceof UserExistsAction){
+			// This method does not affect the status of the UIM Entity
+		}
+		else if(response instanceof OrganizationExistsAction){
+			// This method does not affect the status of the UIM Entity
+		}
+		else{
+			throw new MintOSGIClientException("Received message is not considered to be a valid operation by" +
+					"the consumer...");
+		}
+	
 
 	}
 }

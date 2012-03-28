@@ -17,10 +17,9 @@
 package eu.europeana.uim.mintclient.ampq;
 
 import com.rabbitmq.client.DefaultConsumer;
-
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
-import eu.europeana.uim.mintclient.service.listeners.UIMConsumerListener;
+
 
 /**
  * Factory Class for instantiating syncronous & asynchronous clients for the
@@ -46,7 +45,7 @@ public class MintClientFactory {
 	 * @return a proxy
 	 */
 	public ProducerProxy asyncMode() {
-		return this.new ProducerProxyAsyncImpl<UIMConsumerListener>();
+		return this.new ProducerProxyAsyncImpl();
 	}
 
 	/**
