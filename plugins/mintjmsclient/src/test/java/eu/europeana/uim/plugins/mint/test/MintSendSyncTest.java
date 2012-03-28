@@ -19,6 +19,7 @@ package eu.europeana.uim.plugins.mint.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -88,11 +89,16 @@ public class MintSendSyncTest {
 	}
 	    
 	/**
+	 * Closes the current connection used for tests, nullifies the client
+	 * and forces garbage collection.
 	 * 
+	 * @throws IOException 
 	 */
-	@AfterClass public static void tearDown() {
-	   client = null;
-	   System.gc();
+	@AfterClass public static void tearDown() throws IOException {
+		client.closeConnection();
+		client = null;
+	    System.gc();
+		log.info("Destroyed Synchronous Client after test completion");
 	}
 	
 	

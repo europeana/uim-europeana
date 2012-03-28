@@ -219,7 +219,4 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);
 	}
 
-
-	
-
 }

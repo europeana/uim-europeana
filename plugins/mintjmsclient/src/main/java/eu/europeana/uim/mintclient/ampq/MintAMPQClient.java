@@ -17,6 +17,8 @@
 
 package eu.europeana.uim.mintclient.ampq;
 
+import java.io.IOException;
+
 
 /**
  * General interface for all AMPQ client implementations
@@ -26,5 +28,11 @@ package eu.europeana.uim.mintclient.ampq;
  */
 public interface MintAMPQClient {
 
+	/**
+	 * Closes the current client connection & communication channels 
+	 * 
+	 * @throws IOException
+	 */
+	public void closeConnection() throws IOException;
 
 }

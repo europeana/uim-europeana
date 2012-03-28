@@ -37,7 +37,7 @@ import eu.europeana.uim.mintclient.utils.MintClientUtils;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 6 Mar 2012
  */
-public abstract class MintAbstractAMPQClient {
+public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 
 	private final static  Properties props = new Properties();
 	private static  String username;
@@ -141,6 +141,15 @@ public abstract class MintAbstractAMPQClient {
 			throw MintClientUtils.propagateException(e, MintRemoteException.class,
 					"Error in in sending asynchronous chunk");
 		}
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.mintclient.ampq.MintAMPQClient#closeConnection()
+	 */
+	@Override
+	public void closeConnection() throws IOException {
+		rabbitConnection.close();	
 	}
 
 }

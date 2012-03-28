@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jibx.runtime.IMarshallable;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,13 +39,11 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
-import eu.europeana.uim.mintclient.jibxbindings.ImportExistsCommand;
-import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand;
 import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
-import eu.europeana.uim.mintclient.jibxbindings.UserExistsCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
+
 
 
 
@@ -58,7 +57,8 @@ public class MintSendAsyncTest {
 	private static MintAMPQClientASync client;
 	private final static String provId = "099";
 	private final static String colId= "09911";
-	
+	private static Logger log = Logger.getLogger(MintSendAsyncTest.class);
+
 	/**
 	 * Create the client on test initialization
 	 * 
@@ -68,14 +68,20 @@ public class MintSendAsyncTest {
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
 		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient(); 
+		log.info("Initialized test context & created Asynchronous Client");
 	}
 	    
 	/**
-	 * Deallocate resources on system shutdown
+	 * Closes the current connection used for tests, nullifies the client
+	 * and forces garbage collection.
+	 * 
+	 * @throws IOException 
 	 */
-	@AfterClass public static void tearDown() {
+	@AfterClass public static void tearDown() throws IOException {
+	   client.closeConnection();	
 	   client = null;
 	   System.gc();
+	   log.info("Destroyed Asynchronous Client after test completion");
 	}
 	
 	
@@ -85,6 +91,7 @@ public class MintSendAsyncTest {
 	 */
 	@Test
 	public void createOrganizationTest() throws Exception{
+		log.info("CreateOrganizationTest:Sending request");
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
 		command.setCountry("es");
 		command.setEnglishName("TestOrg");
@@ -92,7 +99,7 @@ public class MintSendAsyncTest {
 		command.setType("Type");
 		command.setUserId("1002");
 		client.createOrganization(command,provId);
-		
+
 		//Wait for async response
 		Thread.sleep(10000);
 
@@ -103,6 +110,7 @@ public class MintSendAsyncTest {
 	 */
 	@Test
 	public void createUserTest() throws Exception{
+		log.info("CreateUserTest : Sending request");
 		CreateUserCommand command = new CreateUserCommand();
 		command.setEmail("email");
 		command.setFirstName("firstName");
@@ -123,6 +131,7 @@ public class MintSendAsyncTest {
 	 */
 	@Test
 	public void createImportsTest() throws Exception{
+		log.info("CreateImportsTest : Sending request");
 		CreateImportCommand command = new CreateImportCommand();
 		command.setUserId("1000");
 		command.setOrganizationId("1");
@@ -139,6 +148,7 @@ public class MintSendAsyncTest {
 	 */
 	@Test
 	public void getImportsTest() throws Exception{
+		log.info("GetImportsTest : Sending request");
 		GetImportsCommand command =  new GetImportsCommand();
 		command.setOrganizationId("1002");
 		client.getImports(command,provId);
@@ -149,6 +159,7 @@ public class MintSendAsyncTest {
 	 */
 	@Test
 	public void getTransformations() throws Exception{
+		log.info("GetTransformationsTest : Sending request");
 		GetTransformationsCommand command = new GetTransformationsCommand();
 		command.setOrganizationId("1002");
 		client.getTransformations(command,provId);
@@ -162,6 +173,7 @@ public class MintSendAsyncTest {
 	 */
 	@Test
 	public void publishCollection() throws Exception{
+		log.info("PublishCollectionTest : Sending request");
 		PublicationCommand command = new PublicationCommand();
 		List<String> list =  new ArrayList<String>();
 		list.add("test1");
@@ -176,8 +188,13 @@ public class MintSendAsyncTest {
 	}
 	
 
+	/**
+	 *
+	 * @author Georgios Markakis <gwarkx@hotmail.com>
+	 * @since 26 Mar 2012
+	 */
 	public static class TestListener extends DefaultConsumer {
-
+		private static Logger log = Logger.getLogger(TestListener.class);
 		private Channel channel; 
 		
 		public TestListener(Channel channel) {
@@ -198,19 +215,17 @@ public class MintSendAsyncTest {
 	    {
 	        String routingKey = envelope.getRoutingKey();
 	        String contentType = properties.getContentType();
-
 	        long deliveryTag = envelope.getDeliveryTag();
-	        
-	    	System.out.println("ASDFX");
-	    	System.out.println(new String(body));
+	        log.info("Received new message");
+	        log.info(new String(body));
+
 	    	IMarshallable type;
 			try {
 				type = MintClientUtils.unmarshallobject(new String(body));
-		    	System.out.println(type.JiBX_getName());
-		    	System.out.println("XXX");
+				log.info("For operation name: " + type.JiBX_getName());
+		
 			} catch (MintOSGIClientException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("An exception has occured: ", e);				
 			}
 	    }
 

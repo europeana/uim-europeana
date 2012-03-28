@@ -16,8 +16,11 @@
  */
 package eu.europeana.uim.mintclient.utils;
 
+
+
 /**
- *
+ * Enumeration holding Action states for MINT AMPQ Client Operatoins
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 22 Mar 2012
  */
@@ -37,7 +40,7 @@ public enum AMPQOperations {
 	
 	private final String sysId;
 	
-	 AMPQOperations(String sysId){
+    AMPQOperations(String sysId){
 		this.sysId = sysId;
 	}
 

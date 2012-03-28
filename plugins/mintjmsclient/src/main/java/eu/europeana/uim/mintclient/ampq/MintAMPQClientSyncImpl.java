@@ -307,9 +307,5 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 				throw MintClientUtils.propagateException(e, MintRemoteException.class, "Error in handling synchronous delivery in " + this.getClass());
 			}        
 	    }
-	}
-
-
-
-	
+	}	
 }
