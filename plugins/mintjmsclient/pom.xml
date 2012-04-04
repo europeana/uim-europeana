@@ -80,15 +80,22 @@
 							org.jibx.runtime; version=1.2.3,
 							org.jibx.runtime.impl; version=1.2.3,
 							eu.europeana.uim.store,
+							eu.europeana.uim.store.mongo.decorators,
+                            eu.europeana.uim.store.mongo,
+                            eu.europeana.uim.store.mongo.resourceentities,
 							eu.europeana.uim.api,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues,
 							eu.europeana.uim.sugarcrm, 
 							javax.net, 
 							javax.net.ssl, 
 							javax.security.auth.callback, 
-							javax.security.sasl
-						</Import-Package>
-						<Embed-Dependency>europeana-uim-plugin-clientbindings,amqp-client,com.springsource.org.apache.commons.io</Embed-Dependency>
+							javax.security.sasl,
+							eu.europeana.uim.workflow,
+							eu.europeana.uim.common, 
+							eu.europeana.uim.sugarcrm.model, 
+							eu.europeana.uim.util
+							</Import-Package>
+						<Embed-Dependency>europeana-uim-plugin-clientbindings,mongo-java-driver,amqp-client,com.springsource.org.apache.commons.io</Embed-Dependency>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>

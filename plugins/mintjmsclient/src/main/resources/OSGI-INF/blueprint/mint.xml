@@ -21,5 +21,14 @@
 	
 	<bp:reference id="sugarcrm" interface="eu.europeana.uim.sugarcrm.SugarCrmService"/>
 
- 
+    <!-- Mint specific workflows  -->
+    
+     <bean id="mintImportWorkflowBean" class="eu.europeana.uim.mintclient.workflows.MintImportWorkflow">
+       <argument ref="mintbean"/>
+       <argument ref="sugarcrm"/>
+     </bean>
+     
+     <service id="mintImportWorkflow" ref="mintImportWorkflowBean"
+		interface="eu.europeana.uim.workflow.Workflow" />
+
 </blueprint>

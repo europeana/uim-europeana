@@ -127,6 +127,13 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public CreateOrganizationResponse createOrganization(CreateOrganizationCommand command) throws MintOSGIClientException, MintRemoteException {
 		String correlationId = MintClientUtils.createCorrelationId();
+		
+		//If mint user id is not specified for the specific collection, then use the default
+		//"admin" role to create the organization
+		if(command.getUserId() == null){
+			command.setUserId(ADMINUSERID);
+		}
+		
 		CreateOrganizationAction cu = new CreateOrganizationAction();
 		cu.setCreateOrganizationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
@@ -175,6 +182,13 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public CreateImportResponse createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException {
 		String correlationId = MintClientUtils.createCorrelationId();
+		
+		//If mint user id is not specified for the specific collection, then use the default
+		//"admin" role to create the import
+		if(command.getUserId() == null){
+			command.setUserId(ADMINUSERID);
+		}
+		
 		CreateImportAction cu = new CreateImportAction();
 		cu.setCreateImportCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);

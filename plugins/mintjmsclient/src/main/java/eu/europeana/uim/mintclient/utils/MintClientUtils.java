@@ -262,4 +262,21 @@ public class MintClientUtils {
 		return uimId;
 	}
 	
+	
+	
+	/**
+	 * Generates a Repox Table Name from the collection identifier
+	 * 
+	 * @param menmonic
+	 * @return the Repox tablename
+	 */
+	public static String generateRepoxTableName(String menmonic){
+		StringBuilder sb = new StringBuilder();
+		sb.append("repox_");
+		sb.append(menmonic);
+		sb.append("_record");
+		return sb.toString();
+	}
+	
+	
 }

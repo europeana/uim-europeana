@@ -19,7 +19,6 @@ package eu.europeana.uim.mintclient.service;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
-import org.jibx.runtime.IMarshallable;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
@@ -36,11 +35,9 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserResponse;
-import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.ErrorResponse;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
-import eu.europeana.uim.mintclient.utils.AMPQOperations;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
@@ -137,10 +134,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 				.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
 		String userID = provider
 				.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID);
-		if (userID == null) {
-			throw new MintOSGIClientException(
-					"User ID value in provider cannot be null");
-		}
+		
 		command.setUserId(userID);
 
 		CreateOrganizationResponse resp = synchronousClient
@@ -201,9 +195,18 @@ public class MintUIMServiceImpl implements MintUIMService {
 		command.setUserId(provider
 				.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
 		command.setOrganizationId(provider
-				.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERPASSWORD));
-		command.setRepoxTableName(collection
-				.getValue(ControlledVocabularyProxy.REPOXID));
+				.getValue(ControlledVocabularyProxy.MINTID));
+		
+		String repoxID =  collection.getValue(ControlledVocabularyProxy.REPOXID);
+		
+		if(repoxID == null){
+			throw new MintOSGIClientException("Cannot create mapping session because" +
+					"there is not a repox datasource registered in UIM which can" +
+					"provide the data for the mapping session");
+		}
+		
+		command.setRepoxTableName(repoxID);
+		
 		CreateImportResponse resp = synchronousClient.createImports(command);
 
 		CreateImportAction action = new CreateImportAction();

@@ -44,6 +44,7 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 	private static String password;
 	private static String host;
 	
+	protected final static String ADMINUSERID = "1000";
 	
 	protected static Connection rabbitConnection;
 	protected static Channel sendChannel;
@@ -62,7 +63,9 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 		
 		username = "guest";
 		password = "guest";
-		host = "panic.image.ntua.gr";
+		//host = "localhost";
+	    host = "sip-manager.isti.cnr.it";
+		//host = "panic.image.ntua.gr";
 		
 		/*
 		try {
