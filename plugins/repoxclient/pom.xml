@@ -63,7 +63,9 @@
                         <Export-Package>eu.europeana.uim.repoxclient.*</Export-Package>
                         <Import-Package>
                             eu.europeana.uim.repox, 
-                            eu.europeana.uim.repox.model, 
+                            eu.europeana.uim.repox.model,
+                            eu.europeana.uim.sugarcrm,
+                            eu.europeana.uim.workflow, 
                             org.apache.felix.gogo.commands,
 						    org.apache.felix.service.command,
                   			org.xmlpull.v1,

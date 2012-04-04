@@ -47,5 +47,21 @@
    <osgi:service id="repoxAgentService" ref="repoxAgent" interface="eu.europeana.uim.repox.RepoxUIMService"/>
    
    <osgi:reference id="registry" interface="eu.europeana.uim.api.Registry"/>
+   
+   <osgi:reference id="sugarcrm" interface="eu.europeana.uim.sugarcrm.SugarCrmService"/>
+   
+   <!--Plugins & Workflow Plugins-->  
+    <bean id="repoxHarvestWf" class="eu.europeana.uim.repoxclient.workflow.RepoxHarvestingWorkflow">
+       <constructor-arg ref="repoxAgent"/>
+       <constructor-arg ref="sugarcrm"/>
+    </bean>
+
+
+   <osgi:service id="repoxHarvestingWorkflow" ref="repoxHarvestWf" interface="eu.europeana.uim.workflow.Workflow"/> 
+
+   
+
+    
+
     
 </beans>
