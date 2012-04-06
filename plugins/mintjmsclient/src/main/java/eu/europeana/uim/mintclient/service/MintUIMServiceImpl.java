@@ -65,7 +65,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 	private static ReponseHandler resphandler;
 
 	private final static String HEADERERRORMESSAGE = "hasError";
-	private final static String HEADERCORRELATIONID = "correlationID";
+	private final static String HEADERCORRELATIONID = "correlation_id";
 
 	/**
 	 * Private constructor, instantiated via private factory method
@@ -190,7 +190,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 			throws MintOSGIClientException, MintRemoteException,
 			StorageEngineException {
 		CreateImportCommand command = new CreateImportCommand();
-
+		
 		Provider provider = collection.getProvider();
 		command.setUserId(provider
 				.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
@@ -247,10 +247,8 @@ public class MintUIMServiceImpl implements MintUIMService {
 			String contentType = properties.getContentType();
 
 			Map<String, Object> maprops = properties.getHeaders();
-
-			String correlationid = (String) maprops.get(HEADERCORRELATIONID);
-			boolean hasError = Boolean.parseBoolean((String) maprops
-					.get(HEADERERRORMESSAGE));
+			String correlationid = properties.getCorrelationId();
+			boolean hasError = (Boolean) maprops.get(HEADERERRORMESSAGE);
 
 			try {
 				if (hasError) {
@@ -282,6 +280,9 @@ public class MintUIMServiceImpl implements MintUIMService {
 			} catch (StorageEngineException e) {
 				logger.logFailed(Level.SEVERE,
 						"Incoming message has thrown a storage exception", e);
+			} catch (Exception e){
+				logger.logFailed(Level.SEVERE,
+						"Incoming message has thrown an unknown exception", e);
 			}
 
 		}

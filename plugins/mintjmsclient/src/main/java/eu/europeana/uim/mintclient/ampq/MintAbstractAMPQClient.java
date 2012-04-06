@@ -63,8 +63,8 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 		
 		username = "guest";
 		password = "guest";
-		//host = "localhost";
-	    host = "sip-manager.isti.cnr.it";
+		host = "localhost";
+	    //host = "sip-manager.isti.cnr.it";
 		//host = "panic.image.ntua.gr";
 		
 		/*

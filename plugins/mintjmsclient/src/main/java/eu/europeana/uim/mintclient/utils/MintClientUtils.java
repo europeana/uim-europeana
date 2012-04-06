@@ -19,10 +19,7 @@ package eu.europeana.uim.mintclient.utils;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Random;
-
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
@@ -31,8 +28,8 @@ import org.jibx.runtime.JiBXException;
 import org.jibx.runtime.IMarshallable; 
 import eu.europeana.uim.mintclient.service.exceptions.MintGenericException;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
-import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
-
+import eu.europeana.uim.mintclient.jibxbindings.*;
+import eu.europeana.uim.mintclient.jibxbindings.PublishTransformationAction;
 /**
  * Utilities Class for the Mint Client
  * 
@@ -121,7 +118,7 @@ public class MintClientUtils {
 		try {
 			String cdmType = "eu.europeana.uim.mintclient.jibxbindings." +
 					str2marshall.split("<")[2].split(">")[0] + 
-					"Command";
+					"Action";
 			
 			
 			context = BindingDirectory.getFactory(Class.forName(cdmType).newInstance().getClass());
@@ -252,7 +249,7 @@ public class MintClientUtils {
 					"but the latter was null");
 		}
 		
-		String uimId = id.split("*")[0];
+		String uimId = id.split("\\*")[0];
 		
 		if(uimId == null){
 			throw new MintOSGIClientException("Tried to extract UIM entity menmonic from correlation ID string" +
