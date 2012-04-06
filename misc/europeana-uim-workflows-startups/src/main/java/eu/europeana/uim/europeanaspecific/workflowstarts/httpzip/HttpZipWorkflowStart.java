@@ -176,7 +176,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	public <I> boolean isFinished(ExecutionContext<I> context,
 			StorageEngine<I> storage) {
 		Data value = context.getValue(DATA_KEY);
-		boolean finished = value.loader.isFinished();
+		boolean finished = value== null? true:value.loader.isFinished();
 		return finished;
 	}
 
@@ -226,34 +226,17 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 				context.putValue(DATA_KEY, value);
 
 			} catch (MalformedURLException e) {
-				if (context.getLoggingEngine() != null) {
-
-					context.getLoggingEngine().logFailed(Level.SEVERE,
-							"HttpZipWorkflowStart", e,
-							"Error unmarshalling xml for object ");
-				}
+				throw new WorkflowStartFailedException("HttpZipWorkflowStart:Error accessing URL exposed by MINT ",e);
 			} catch (IOException e) {
-				if (context.getLoggingEngine() != null) {
-
-					context.getLoggingEngine().logFailed(Level.SEVERE,
-							"HttpZipWorkflowStart", e,
-							"Error unmarshalling xml for object ");
-				}
+				throw new WorkflowStartFailedException("HttpZipWorkflowStart:Error reading zip file ",e);
 			} catch (StorageEngineException e) {
-				if (context.getLoggingEngine() != null) {
-
-					context.getLoggingEngine().logFailed(Level.SEVERE,
-							"HttpZipWorkflowStart", e,
-							"Error unmarshalling xml for object ");
-				}
+				throw new WorkflowStartFailedException("HttpZipWorkflowStart:Error accessigng UIM storage engine",e);
 			}
 
 		} else if (dataset instanceof Request) {
-			throw new IllegalArgumentException(
-					"A request cannot be the basis for a new import.");
+			throw new WorkflowStartFailedException("HttpZipWorkflowStart:A request cannot be the basis for a new import.");
 		} else {
-			throw new IllegalStateException("Unsupported dataset <"
-					+ context.getDataSet() + ">");
+			throw new WorkflowStartFailedException("Unsupported dataset <"+ context.getDataSet() + ">");
 		}
 
 	}
