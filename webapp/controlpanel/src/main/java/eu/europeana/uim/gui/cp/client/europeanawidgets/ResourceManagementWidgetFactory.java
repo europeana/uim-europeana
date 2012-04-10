@@ -355,14 +355,23 @@ public class ResourceManagementWidgetFactory {
 		FlexTable resourcePropertiesTable = new FlexTable();
 		container.add(resourcePropertiesTable);
 		
-		resourcePropertiesTable.setWidget(0, 0, new HTML("Mint ID:"));
-		resourcePropertiesTable.setWidget(0, 1, new HTML(status.getMintID()));   
-		
-		resourcePropertiesTable.setWidget(1, 0, new HTML("Location of latest published data:"));
-		resourcePropertiesTable.setWidget(1, 1, new HTML(status.getResourceProperties().get("MINTPUBLICATIONLOCATION")));   
-		
-		resourcePropertiesTable.setWidget(2, 0, new HTML("ID of latest mapping used:"));
-		resourcePropertiesTable.setWidget(2, 1, new HTML(status.getResourceProperties().get("LATESTMINTMAPPINGID")));   
+		switch(status.getType()){
+		  case COLLECTION:
+				resourcePropertiesTable.setWidget(0, 0, new HTML("Mint ID:"));
+				resourcePropertiesTable.setWidget(0, 1, new HTML(status.getMintID()));   
+				
+				resourcePropertiesTable.setWidget(1, 0, new HTML("Location of latest published data:"));
+				resourcePropertiesTable.setWidget(1, 1, new HTML(status.getResourceProperties().get("MINTPUBLICATIONLOCATION")));   
+				
+				resourcePropertiesTable.setWidget(2, 0, new HTML("ID of latest mapping used:"));
+				resourcePropertiesTable.setWidget(2, 1, new HTML(status.getResourceProperties().get("LATESTMINTMAPPINGID"))); 
+			  break;
+			  
+		  case PROVIDER:
+				resourcePropertiesTable.setWidget(0, 0, new HTML("Mint ID:"));
+				resourcePropertiesTable.setWidget(0, 1, new HTML(status.getMintID()));   
+			  break;
+		}
 		
 		return container;
 	}

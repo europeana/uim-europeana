@@ -3,12 +3,9 @@ package eu.europeana.uim.gui.cp.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.prefetch.RunAsyncCode;
-
-import eu.europeana.uim.gui.cp.client.europeanawidgets.ExecutionFlowManagementWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ExpandedResourceManagementWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportResourcesWidget;
 import eu.europeana.uim.gui.cp.client.management.IngestionTriggerWidget;
-import eu.europeana.uim.gui.cp.client.management.ResourceManagementWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionDetailWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionHistoryWidget;
 import eu.europeana.uim.gui.cp.client.services.ExecutionService;
@@ -58,10 +55,6 @@ public class EuropeanaIngestionControlPanel extends AbstractIngestionControlPane
                 resourceService, executionService),RunAsyncCode.runAsyncCode(IngestionTriggerWidget.class));
         treeModel.addMenuEntry("Managing", new ExpandedResourceManagementWidget(repositoryService,
                 resourceService,integrationService), RunAsyncCode.runAsyncCode(ExpandedResourceManagementWidget.class));
-        //treeModel.addMenuEntry("Managing", new ExecutionFlowManagementWidget(repositoryService,
-         //       resourceService,integrationService), RunAsyncCode.runAsyncCode(ExecutionFlowManagementWidget.class));
-        
-
         treeModel.addMenuEntry("Importing", new ImportResourcesWidget(repositoryService,
                 resourceService,integrationService), RunAsyncCode.runAsyncCode(ImportResourcesWidget.class));
  

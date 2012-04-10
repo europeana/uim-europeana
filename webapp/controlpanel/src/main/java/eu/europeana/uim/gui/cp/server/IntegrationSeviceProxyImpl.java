@@ -343,6 +343,8 @@ public class IntegrationSeviceProxyImpl extends
 					ret.setInfo(prov.getName());
 					ret.setSugarCRMID(prov.getValue(ControlledVocabularyProxy.SUGARCRMID));
 					ret.setRepoxID(prov.getValue(ControlledVocabularyProxy.REPOXID));
+					ret.setMintID(prov.getValue(ControlledVocabularyProxy.MINTID));
+					
 					
 					if(prov.getValue(ControlledVocabularyProxy.SUGARCRMID) != null){
 						ret.setSugarURL(sugarCrmURL.split("/soap.php")[0] + "?module=Accounts&action=DetailView&record=" + prov.getValue(ControlledVocabularyProxy.SUGARCRMID));
@@ -373,6 +375,7 @@ public class IntegrationSeviceProxyImpl extends
 					Collection<?> col = stengine.findCollection(collection);
 					ret.setType(TYPE.COLLECTION);
 					ret.setId(collection);
+
 					
 					try {
 						String description =  URLDecoder.decode(col.getValue(ControlledVocabularyProxy.DESCRIPTION), "UTF-8");
@@ -386,10 +389,9 @@ public class IntegrationSeviceProxyImpl extends
 					ret.setState(translateStatus(col.getValue(ControlledVocabularyProxy.STATUS)));
 					
 					ret.setSugarCRMID(col.getValue(ControlledVocabularyProxy.SUGARCRMID));
-					
-					
-					
 					ret.setRepoxID(col.getValue(ControlledVocabularyProxy.REPOXID));
+					ret.setMintID(col.getValue(ControlledVocabularyProxy.MINTID));
+					
 					ret.setInfo(col.getName());
 					ret.setHarvestingStatus(null);
 
