@@ -18,6 +18,7 @@ package eu.europeana.uim.repoxclient.workflow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import eu.europeana.uim.api.AbstractIngestionPlugin;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
@@ -93,15 +94,15 @@ public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
 				
 				context.getExecution().setActive(true);
 				
-				while(status.getStatus() == HarvestingState.RUNNING){
-					String norecords = status.getRecords().split("/")[0];
-					
+				while(status.getStatus() == HarvestingState.RUNNING || status.getStatus() == HarvestingState.undefined){
+					String norecords = status.getRecords()==null? "0":status.getRecords().split("/")[0];
+					Thread.sleep(100);
 					context.getExecution().setProcessedCount(Integer.parseInt(norecords));
 					status = repoxservice.getHarvestingStatus(coll);
 				}
 				
 				context.getExecution().setActive(false);
-				
+
 				String sugarID = coll.getValue("sugarCRMID");
 				switch(status.getStatus()){
 				case OK:
@@ -109,77 +110,94 @@ public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
 							EuropeanaDatasetStates.READY_FOR_REPLICATION);
 					break;
 				case ERROR:
-					
 					sugarservice.changeEntryStatus(sugarID, 
 							EuropeanaDatasetStates.HARVESTING_PENDING);
 					break;
 				
 				}
+				
+				String log = repoxservice.getHarvestLog(coll);
+				context.getLoggingEngine().log(Level.INFO, "Repox Harvesting Session Results",log);
+				
 			}
 			else{
 				
 			}
 		} catch (DataSourceOperationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IngestionPluginFailedException("Error during accessing remote Datasource from UIM",e);
 		} catch (HarvestingOperationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IngestionPluginFailedException("Error while initiating harvestiing at the remote " +
+					"Datasource from UIM",e);
 		} catch (QueryResultException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IngestionPluginFailedException("Error while trying to write information back to SugarCRM",e);
+		} catch (InterruptedException e) {
+			throw new IngestionPluginFailedException("InterruptedException",e);
 		}
-		
-		// TODO Auto-generated method stub
-		
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#getInputFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getInputFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#getMaximumThreadCount()
+	 */
 	@Override
 	public int getMaximumThreadCount() {
 		return 100;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#getOptionalFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getOptionalFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#getOutputFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getOutputFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#getParameters()
+	 */
 	@Override
 	public List<String> getParameters() {
 		return params;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#getPreferredThreadCount()
+	 */
 	@Override
 	public int getPreferredThreadCount() {
-		
 		return 10;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#initialize()
+	 */
 	@Override
 	public void initialize() {
 		// nothing done here
-		
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#initialize(eu.europeana.uim.api.ExecutionContext)
+	 */
 	@Override
 	public <I> void initialize(ExecutionContext<I> arg0)
 			throws IngestionPluginFailedException {
-		
-		
-		
+		// nothing done here
 	}
 
 	@Override
@@ -191,10 +209,11 @@ public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#shutdown()
+	 */
 	@Override
-	public void shutdown() {
-		// TODO Auto-generated method stub
-		
+	public void shutdown() {		
 	}
 
 }

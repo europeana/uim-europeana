@@ -718,7 +718,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		 }
 		 
 		 if(jibxstatus.getTimeLeft() != null){
-			 returnStatus.setTimeLeft(jibxstatus.getRecords().getRecords());
+			 returnStatus.setTimeLeft(jibxstatus.getTimeLeft().getTimeLeft());
 		 }
 		 
 		 
