@@ -36,7 +36,7 @@ public class InitialIngestionWorkflow extends AbstractWorkflow{
 
 	public InitialIngestionWorkflow() {
 
-		super("Europeana Initial Ingestion Workflow",
+		super("(Re)Import Data from Mint Mapping Tool",
         "Populates a UIM collection with specific EDM data from Mint");
 
         setStart(new HttpZipWorkflowStart("HttpZipWorkflowStart","Downloads zipped EDM file"));
