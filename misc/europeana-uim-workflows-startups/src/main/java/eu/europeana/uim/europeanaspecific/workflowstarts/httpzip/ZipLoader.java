@@ -123,7 +123,14 @@ public class ZipLoader {
 					mdr = storage.createMetaDataRecord(request.getCollection(),
 							uuid.toString());
 				}
+				else{
+					mdr.deleteValues(EuropeanaModelRegistry.UIMINGESTIONDATE);
+					mdr.deleteValues(EuropeanaModelRegistry.EDMRECORD);
+				}
+				
+				
 
+				
 				mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
 						new Date().toString());
 				mdr.addValue(EuropeanaModelRegistry.EDMRECORD, rdfstring);
