@@ -17,14 +17,18 @@
 package eu.europeana.uim.europeanaspecific.workflowstarts.httpzip;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.List;
+import java.util.Random;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+
 
 /**
  * Retrieves the specified zip file over the remote http location and performs
@@ -35,8 +39,16 @@ import org.apache.commons.io.IOUtils;
  */
 public class HttpRetriever implements Iterator<String> {
 
-	private ZipFile zf;
-	private Enumeration<? extends ZipEntry> zipentries;
+
+	private List<String> filecontents;
+	
+	private Iterator<String> xmlentriesiterator;
+	
+	private static Random generator; 
+	
+	
+	
+
 	private int number_of_recs;
 
 	/**
@@ -49,11 +61,11 @@ public class HttpRetriever implements Iterator<String> {
 	 * @param zipentries
 	 *            References to the zipped files
 	 */
-	private HttpRetriever(ZipFile zf, int number_of_recs,
-			Enumeration<? extends ZipEntry> zipentries) {
-		this.zf = zf;
-		this.number_of_recs = number_of_recs;
-		this.zipentries = zipentries;
+	private HttpRetriever(List<String> filecontents) {
+		this.filecontents = filecontents;
+		this.number_of_recs = filecontents.size();
+		this.xmlentriesiterator = filecontents.iterator();
+		
 	}
 
 	/**
@@ -69,13 +81,40 @@ public class HttpRetriever implements Iterator<String> {
 	public synchronized static HttpRetriever createInstance(URL url)
 			throws IOException {
 
-		File dest = new File("tmp");
+		List<String> list = new ArrayList<String>();
+		
+		if(generator == null){
+			generator =  new Random();
+		}
+		//First copy the remote URI to a 
+		File dest = new File("C:\\tmp\\"+new Integer(generator.nextInt()).toString());
 		FileUtils.copyURLToFile(url, dest, 100, 1000);
 
-		ZipFile zipfile = new ZipFile(dest.getAbsolutePath());
-		Enumeration<? extends ZipEntry> entries = zipfile.entries();
+		TarArchiveInputStream tarfile;
 
-		return new HttpRetriever(zipfile, zipfile.size(), entries);
+			tarfile =  new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(dest)));
+
+			TarArchiveEntry  entry;
+			
+			while( (entry = tarfile.getNextTarEntry()) != null){
+				
+				if(entry.isDirectory()){
+
+				}
+				else{
+					
+					byte[] content = new byte[(int) entry.getSize()];
+					
+					tarfile.read(content, 0, (int) entry.getSize());
+
+					String xml = new String(content);
+					
+					list.add(xml);
+				}
+			}
+			
+			tarfile.close();
+		return new HttpRetriever(list);
 	}
 
 	/*
@@ -85,7 +124,7 @@ public class HttpRetriever implements Iterator<String> {
 	 */
 	@Override
 	public boolean hasNext() {
-		return zipentries.hasMoreElements();
+		return xmlentriesiterator.hasNext();
 	}
 
 	/*
@@ -95,17 +134,7 @@ public class HttpRetriever implements Iterator<String> {
 	 */
 	@Override
 	public String next() {
-		ZipEntry zentry = zipentries.nextElement();
-
-		String resp = null;
-
-		try {
-			resp = IOUtils.toString(zf.getInputStream(zentry), "UTF-8");
-		} catch (IOException e) {
-			resp = "";
-		}
-
-		return resp;
+       return xmlentriesiterator.next();
 	}
 
 	/*
@@ -120,35 +149,7 @@ public class HttpRetriever implements Iterator<String> {
 
 	// Getters & Setters
 
-	/**
-	 * @return the zf
-	 */
-	public ZipFile getZf() {
-		return zf;
-	}
 
-	/**
-	 * @param zf
-	 *            the zf to set
-	 */
-	public void setZf(ZipFile zf) {
-		this.zf = zf;
-	}
-
-	/**
-	 * @return the zipentries
-	 */
-	public Enumeration<? extends ZipEntry> getZipentries() {
-		return zipentries;
-	}
-
-	/**
-	 * @param zipentries
-	 *            the zipentries to set
-	 */
-	public void setZipentries(Enumeration<? extends ZipEntry> zipentries) {
-		this.zipentries = zipentries;
-	}
 
 	/**
 	 * @return the number_of_recs
