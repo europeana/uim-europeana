@@ -19,6 +19,7 @@ package eu.europeana.uim.plugin.solr.service;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.logging.Level;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrException;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -39,8 +40,8 @@ import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
-import eu.europeana.corelib.solr.server.MongoDBServer;
-import eu.europeana.corelib.solr.server.impl.MongoDBServerImpl;
+import eu.europeana.corelib.solr.server.EdmMongoServer;
+import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.MongoUtils;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
@@ -67,9 +68,9 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	private static String solrUrl = "http://127.0.0.1:8282/";
 	private static Mongo mongo;
 	private static SolrServer solrServer;
-	private static MongoDBServer mongoServer;
+	private static EdmMongoServer mongoServer;
 	private static int recordNumber;
-	
+	private static final int RETRIES=10;
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
 
@@ -117,12 +118,25 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 				mongoServer.getDatastore().save(fullBean);
 			}
 
-			List<SolrInputDocument> records = new ArrayList<SolrInputDocument>();
-			records.add(SolrConstructor.constructSolrDocument(rdf));
 			
-			solrServer.add(records);
-			recordNumber++;
-			return true;
+			int retries=0;
+			while(retries<RETRIES ){
+			try {
+				solrServer.add(SolrConstructor.constructSolrDocument(rdf),1000);
+				retries = RETRIES;
+				recordNumber++;
+				return true;
+			} catch (SolrServerException e) {
+				retries++;
+			} catch (IOException e) {
+				retries++;
+			}
+			catch(SolrException e){
+				retries++;
+			}
+			}
+			
+			
 		} catch (JiBXException e) {
 			context.getLoggingEngine().logFailed(
 					Level.SEVERE,
@@ -138,13 +152,13 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		} catch (IllegalAccessException e) {
 			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
 					"Unknown error: " + e.getMessage());
-		} catch (SolrServerException e) {
+		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
 		return false;
 	}
 
@@ -175,7 +189,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		
 		try {
 			mongo = new Mongo("127.0.0.1", 27017);
-			mongoServer = new MongoDBServerImpl(mongo,"europeana");
+			mongoServer = new EdmMongoServerImpl(mongo,"europeana");
 			mongoServer.getDatastore();
 		} catch (MongoDBException e) {
 			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
