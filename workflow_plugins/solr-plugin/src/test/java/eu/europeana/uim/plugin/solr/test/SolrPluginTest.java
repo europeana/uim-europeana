@@ -18,7 +18,6 @@ import eu.europeana.uim.store.bean.CollectionBean;
 import eu.europeana.uim.store.bean.ExecutionBean;
 import eu.europeana.uim.store.bean.MetaDataRecordBean;
 
-
 public class SolrPluginTest {
 	private static final String RECORD="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
 			"<rdf:RDF xmlns:dcterms=\"http://purl.org/dc/terms/\""+

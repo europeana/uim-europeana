@@ -39,9 +39,11 @@ import com.mongodb.MongoException;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.corelib.solr.denormalization.impl.VocabularyMongoServer;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.EdmMongoServer;
 import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
+import eu.europeana.corelib.solr.server.importer.util.Dereferencer;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.MongoUtils;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
@@ -191,6 +193,9 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			mongo = new Mongo("127.0.0.1", 27017);
 			mongoServer = new EdmMongoServerImpl(mongo,"europeana");
 			mongoServer.getDatastore();
+			
+			Dereferencer.setServer(new VocabularyMongoServer(mongo, "vocabulary"));
+			
 		} catch (MongoDBException e) {
 			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
 					"Mongo DB server error: " + e.getMessage());
