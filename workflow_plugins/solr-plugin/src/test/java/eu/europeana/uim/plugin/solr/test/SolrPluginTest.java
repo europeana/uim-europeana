@@ -73,8 +73,8 @@ public class SolrPluginTest {
       
         mdr.addValue(EuropeanaModelRegistry.EDMRECORD, RECORD);
         plugin.initialize(context);
-        plugin.processRecord(mdr, context);
-       // Assert.assertTrue(plugin.processRecord(mdr, context));
+        
+        Assert.assertTrue(plugin.processRecord(mdr, context));
         
         plugin.completed(context);
         Assert.assertEquals(1, SolrWorkflowPlugin.getRecords());
