@@ -563,7 +563,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         String DELETED = record.getItemValue(EuropeanaUpdatableField.DELETED); 
         String ACRONYM = record.getItemValue(EuropeanaRetrievableField.ACRONYM); 
         String ENABLED = record.getItemValue(EuropeanaUpdatableField.ENABLED); 
-        
+        String PREVIEWS_IN_PORTAL = record.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL); 
         
         Collection currcollection = engine.findCollection(mnemonicCode);
 
@@ -606,6 +606,8 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         currcollection.putValue(ControlledVocabularyProxy.DELETED, DELETED);
         currcollection.putValue(ControlledVocabularyProxy.ACRONYM, ACRONYM);
         currcollection.putValue(ControlledVocabularyProxy.ENABLED, ENABLED);        
+        currcollection.putValue(ControlledVocabularyProxy.PREVIEWS_ONLY_IN_PORTAL, PREVIEWS_IN_PORTAL); 
+        
         
         engine.updateCollection(currcollection);
         engine.checkpoint();
