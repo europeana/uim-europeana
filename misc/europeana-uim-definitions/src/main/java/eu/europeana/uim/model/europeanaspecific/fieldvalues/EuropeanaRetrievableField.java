@@ -48,6 +48,7 @@ public enum EuropeanaRetrievableField implements RetrievableField{
 	IDENTIFIER("name_id_c","name_id_c","Identifier"),
 	DATASET_COUNTRY("language_c","language_c","Dataset Country"),
 	ACCESS_TO_CONTENT_CHECKER("access_to_content_checker_c","access_to_content_checker_c","Access To Content Checker"),
+	PREVIEWS_ONLY_IN_PORTAL("previews_only_on_europeana_por_c","previews_only_on_europeana_por_c","Previews only in Europeana Portal"),
 	HARVESTING_TYPE("harvesting_type_list_c","harvesting_type_list_c","Harvesting Type")
 	;
 	
