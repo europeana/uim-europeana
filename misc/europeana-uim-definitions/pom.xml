@@ -39,6 +39,13 @@
 			<artifactId>europeana-uim-model-tel</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+	    <dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-model-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -75,7 +82,7 @@
 							!*
 						</Import-Package>
 						<Export-Package>
-							eu.europeana.uim.model.europeanaspecific.*,org.theeuropeanlibrary.model.tel.*
+							eu.europeana.uim.model.europeanaspecific.*,org.theeuropeanlibrary.model.tel.*,org.theeuropeanlibrary.model.common.*
 						</Export-Package>
 					</instructions>
 				</configuration>
