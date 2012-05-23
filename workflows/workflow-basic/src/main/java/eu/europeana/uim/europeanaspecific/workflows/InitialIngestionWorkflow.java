@@ -23,6 +23,7 @@ package eu.europeana.uim.europeanaspecific.workflows;
 import eu.europeana.uim.europeanaspecific.workflowstarts.httpzip.HttpZipWorkflowStart;
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin;
 import eu.europeana.uim.workflow.AbstractWorkflow;
+import eu.europeana.uim.workflows.SysoutPlugin;
 
 
 
@@ -41,7 +42,7 @@ public class InitialIngestionWorkflow extends AbstractWorkflow{
 
         setStart(new HttpZipWorkflowStart("HttpZipWorkflowStart","Downloads zipped EDM file"));
 
-        addStep(new SolrWorkflowPlugin());
+        addStep(new SysoutPlugin());
 	}
 
 	
