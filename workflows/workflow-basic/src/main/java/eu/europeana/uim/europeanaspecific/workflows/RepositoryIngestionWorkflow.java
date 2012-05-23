@@ -28,7 +28,7 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
  */
 public class RepositoryIngestionWorkflow extends AbstractWorkflow{
 
-	RepositoryIngestionWorkflow(){
+	public RepositoryIngestionWorkflow(){
 		super("Ingest into Repositotry",
 		        "Ingests everything into SOLR and MONGODB");
 
