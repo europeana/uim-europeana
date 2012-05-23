@@ -23,12 +23,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.LinkStatus;
+
 import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.common.ProgressMonitor;
+import eu.europeana.corelib.definitions.jibx.Aggregation;
+import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
+import eu.europeana.uim.model.europeana.EuropeanaLink;
+import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.utils.DefUtils;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
@@ -84,12 +89,14 @@ public class ZipLoader {
 	}
 
 	/**
-	 * @param <I>
+	 * Returns the next batch of metadata records to the orchestrator
+	 * 
+	 * @param <I> the type of the Metadata Record ID
 	 * @param batchSize
 	 *            number of loaded records
 	 * @param save
 	 *            Should they be saved to the index?
-	 * @return list of loaded MARC records
+	 * @return list of loaded Metadata records
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public synchronized <I> List<MetaDataRecord<I>> doNext(int batchSize,
@@ -112,11 +119,7 @@ public class ZipLoader {
 				I uuid = (I) validedmrecord.getChoiceList().get(0)
 						.getProvidedCHO().getAbout();
 
-				//loggingEngine.log(Level.INFO, "ZipLoader",
-				//		"Added record with id", uuid.toString(),
-				//		" in collection ", request.getCollection()
-				//				.getMnemonic());
-
+				
 				MetaDataRecord<I> mdr = storage.getMetaDataRecord(uuid);
 
 				if (mdr == null) {
@@ -124,17 +127,22 @@ public class ZipLoader {
 							uuid.toString());
 				}
 				else{
+					//Remove the previous ingestion date
 					mdr.deleteValues(EuropeanaModelRegistry.UIMINGESTIONDATE);
+					//Remove the previous instances of EDM Records
 					mdr.deleteValues(EuropeanaModelRegistry.EDMRECORD);
+					//Remove the previous registered links
+					mdr.deleteValues(EuropeanaModelRegistry.EUROPEANALINK);
 				}
-				
-				
 
-				
 				mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
 						new Date().toString());
+				
 				mdr.addValue(EuropeanaModelRegistry.EDMRECORD, rdfstring);
 
+				//Add Links to be checked values here 
+				addLinkcheckingValues(validedmrecord,mdr);
+				
 				storage.updateMetaDataRecord(mdr);
 
 				result.add(mdr);
@@ -159,6 +167,81 @@ public class ZipLoader {
 		return result;
 	}
 
+	
+	/**
+	 * Extracts the locations of links from the imported JIBX representation of EDM
+	 * and registers the appropriate values
+	 * 
+	 * @param validedmrecord
+	 */
+	private <I> void addLinkcheckingValues(RDF validedmrecord,MetaDataRecord<I> mdr ){
+		
+		Aggregation aggregation = validedmrecord.getChoiceList().get(0).getAggregation();
+
+		if(aggregation != null){
+			
+			List<HasView> has_views = aggregation.getHasViewList();
+			
+			for(HasView view : has_views){
+				String resource = view.getResource();
+				EuropeanaLink link = new EuropeanaLink();
+				link.setCacheable(true);
+				link.setLinkStatus(LinkStatus.NOT_CHECKED);
+				link.setUrl(resource);
+				mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+			}
+		}
+		
+		List<HasView> edm_has_view = validedmrecord.getChoiceList().get(0).getAggregation().getHasViewList();
+		
+		for(HasView view : edm_has_view){
+			String hasView = view.getResource();
+			EuropeanaLink link = new EuropeanaLink();
+			link.setCacheable(false);
+			link.setLinkStatus(LinkStatus.NOT_CHECKED);
+			link.setUrl(hasView);
+			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+		}
+		
+		if(aggregation.getIsShownAt() != null){
+			String isShownAt = aggregation.getIsShownAt().getResource();
+			EuropeanaLink link = new EuropeanaLink();
+			link.setCacheable(false);
+			link.setLinkStatus(LinkStatus.NOT_CHECKED);
+			link.setUrl(isShownAt);
+			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+		}
+		
+		if(aggregation.getIsShownBy() != null){
+			String isShownBy = aggregation.getIsShownBy().getResource();
+			EuropeanaLink link = new EuropeanaLink();
+			link.setCacheable(false);
+			link.setLinkStatus(LinkStatus.NOT_CHECKED);
+			link.setUrl(isShownBy);
+			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+		}
+		
+		if(aggregation.getObject() != null){
+			String theObject = aggregation.getObject().getResource();
+			EuropeanaLink link = new EuropeanaLink();
+			link.setCacheable(false);
+			link.setLinkStatus(LinkStatus.NOT_CHECKED);
+			link.setUrl(theObject);
+			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+		}
+		
+		
+		if(validedmrecord.getChoiceList().get(0).getWebResource() != null){
+		   String about = validedmrecord.getChoiceList().get(0).getWebResource().getAbout();
+			EuropeanaLink link = new EuropeanaLink();
+			link.setCacheable(false);
+			link.setLinkStatus(LinkStatus.NOT_CHECKED);
+			link.setUrl(about);
+			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+		}
+		
+	}
+	
 	/**
 	 * Returns the loading state
 	 * 

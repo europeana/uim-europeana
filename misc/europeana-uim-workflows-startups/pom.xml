@@ -57,12 +57,32 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-model-europeana</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-model-common</artifactId>
+			<version>${project.version}</version>
+		</dependency> 
+
+
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-plugin-basic</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>eu.europeana.corelib</groupId>
 			<artifactId>corelib-solr-definitions</artifactId>
 			<version>2.0-SNAPSHOT</version>
 		</dependency>
+
 
 	</dependencies>
 
@@ -96,7 +116,8 @@
 							javax.xml.*,
 							javax.management,
 							javax.naming,
-							eu.europeana.uim.model.europeanaspecific.*,
+							org.theeuropeanlibrary.model.common.*,
+							org.theeuropeanlibrary.model.europeana.*,
 							org.xmlpull.v1,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
