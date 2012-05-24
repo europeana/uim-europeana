@@ -117,7 +117,7 @@
 							javax.management,
 							javax.naming,
 							org.theeuropeanlibrary.model.common.*,
-							org.theeuropeanlibrary.model.europeana.*,
+							eu.europeana.uim.model.europeana.*,
 							org.xmlpull.v1,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,

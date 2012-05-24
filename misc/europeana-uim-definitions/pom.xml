@@ -82,6 +82,9 @@
 						<Import-Package>
 							eu.europeana.uim.api,
 							eu.europeana.uim.common,
+							org.theeuropeanlibrary.repository.convert,
+                            org.theeuropeanlibrary.translation,
+                            org.theeuropeanlibrary.collections.guarded,
 							eu.europeana.uim.store,
 							eu.europeana.uim.store.bean,
 							eu.europeana.uim.util,
@@ -95,7 +98,7 @@
 						</Import-Package>
 						<Export-Package>
 							eu.europeana.uim.model.europeanaspecific.*,org.theeuropeanlibrary.model.tel.*,
-							org.theeuropeanlibrary.model.common.*,org.theeuropeanlibrary.model.europeana.*,
+							org.theeuropeanlibrary.model.common.*,eu.europeana.uim.model.europeana.*,
 							org.theeuropeanlibrary.model.adapters.*,eu.europeana.uim.model.europeanaspecific.utils.*
 						</Export-Package>
 					</instructions>
