@@ -61,6 +61,7 @@ import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
 import eu.europeana.uim.solr3.Solr3Initializer;
 import eu.europeana.uim.store.MetaDataRecord;
@@ -87,11 +88,11 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private static SugarCrmService sugarCrmService;
 
-	public static SugarCrmService getSugarCrmService() {
+	public SugarCrmService getSugarCrmService() {
 		return sugarCrmService;
 	}
 
-	public static void setSugarCrmService(SugarCrmService sugarCrmService) {
+	public void setSugarCrmService(SugarCrmService sugarCrmService) {
 		SolrWorkflowPlugin.sugarCrmService = sugarCrmService;
 	}
 
@@ -135,18 +136,18 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 			String collectionId = (String) mdr.getCollection().getId();
 			SugarCrmRecord sugarCrmRecord = sugarCrmService
-					.retrieveRecord(collectionId);
+					.retrieveRecord(mdr.getCollection().getValue(ControlledVocabularyProxy.SUGARCRMID));
 			String previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 			String fileName = (String) mdr.getCollection().getName();
-			String hash = hashExists(collectionId, fileName, fullBean);
+			//String hash = hashExists(collectionId, fileName, fullBean);
 			fullBean.getAggregations()
 					.get(0)
 					.setEdmPreviewNoDistribute(
 							Boolean.parseBoolean(previewsOnlyInPortal));
-			if (StringUtils.isNotEmpty(hash)) {
-				createLookupEntry(fullBean, hash);
-			}
+			//if (StringUtils.isNotEmpty(hash)) {
+				//createLookupEntry(fullBean, hash);
+			//}
 			if (mongoServer.getDatastore().find(FullBeanImpl.class)
 					.filter("about", fullBean.getAbout()) != null) {
 				MongoUtils.updateFullBean(fullBean, mongoServer);
