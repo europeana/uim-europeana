@@ -32,6 +32,7 @@ import eu.europeana.uim.common.ProgressMonitor;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
+import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.utils.DefUtils;
@@ -141,7 +142,7 @@ public class ZipLoader {
 				mdr.addValue(EuropeanaModelRegistry.EDMRECORD, rdfstring);
 
 				//Add Links to be checked values here 
-				///addLinkcheckingValues(validedmrecord,mdr);
+				addLinkcheckingValues(validedmrecord,mdr);
 				
 				storage.updateMetaDataRecord(mdr);
 
@@ -176,9 +177,11 @@ public class ZipLoader {
 	 */
 	private <I> void addLinkcheckingValues(RDF validedmrecord,MetaDataRecord<I> mdr ){
 		
-		Aggregation aggregation = validedmrecord.getChoiceList().get(0).getAggregation();
-
-		if(aggregation != null){
+		int aggindex = validedmrecord.getChoiceList().indexOf(Aggregation.class);
+		
+		if(aggindex != -1){
+			
+			Aggregation aggregation = validedmrecord.getChoiceList().get(aggindex).getAggregation();
 			
 			List<HasView> has_views = aggregation.getHasViewList();
 			
@@ -190,9 +193,9 @@ public class ZipLoader {
 				link.setUrl(resource);
 				mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
 			}
-		}
+
 		
-		List<HasView> edm_has_view = validedmrecord.getChoiceList().get(0).getAggregation().getHasViewList();
+		List<HasView> edm_has_view = aggregation.getHasViewList();
 		
 		for(HasView view : edm_has_view){
 			String hasView = view.getResource();
@@ -229,17 +232,20 @@ public class ZipLoader {
 			link.setUrl(theObject);
 			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
 		}
-		
-		
-		if(validedmrecord.getChoiceList().get(0).getWebResource() != null){
-		   String about = validedmrecord.getChoiceList().get(0).getWebResource().getAbout();
-			EuropeanaLink link = new EuropeanaLink();
-			link.setCacheable(false);
-			link.setLinkStatus(LinkStatus.NOT_CHECKED);
-			link.setUrl(about);
-			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
 		}
 		
+		
+		int webresourceindex = validedmrecord.getChoiceList().indexOf(WebResourceType.class);
+		
+		if(aggindex != -1){
+			WebResourceType wrtype = validedmrecord.getChoiceList().get(webresourceindex).getWebResource();
+				   String about = wrtype.getAbout();
+					EuropeanaLink link = new EuropeanaLink();
+					link.setCacheable(false);
+					link.setLinkStatus(LinkStatus.NOT_CHECKED);
+					link.setUrl(about);
+					mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+		}
 	}
 	
 	/**
