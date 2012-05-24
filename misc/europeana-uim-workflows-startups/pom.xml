@@ -122,6 +122,7 @@
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,
+							eu.europeana.uim.model.europeanaspecific.utils,
 							!*
 						</Import-Package>
 						<Export-Package>
