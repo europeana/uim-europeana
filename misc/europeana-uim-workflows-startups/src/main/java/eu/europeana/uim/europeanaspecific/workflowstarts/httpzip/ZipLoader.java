@@ -141,7 +141,7 @@ public class ZipLoader {
 				mdr.addValue(EuropeanaModelRegistry.EDMRECORD, rdfstring);
 
 				//Add Links to be checked values here 
-				addLinkcheckingValues(validedmrecord,mdr);
+				///addLinkcheckingValues(validedmrecord,mdr);
 				
 				storage.updateMetaDataRecord(mdr);
 
