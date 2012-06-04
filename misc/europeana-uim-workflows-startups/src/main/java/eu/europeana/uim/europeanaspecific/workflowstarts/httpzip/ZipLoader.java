@@ -33,6 +33,7 @@ import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
+import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.utils.DefUtils;
@@ -177,11 +178,15 @@ public class ZipLoader {
 	 */
 	private <I> void addLinkcheckingValues(RDF validedmrecord,MetaDataRecord<I> mdr ){
 		
-		int aggindex = validedmrecord.getChoiceList().indexOf(Aggregation.class);
+		List<Choice> elements = validedmrecord.getChoiceList();
 		
-		if(aggindex != -1){
+		for (Choice element : elements) {
 			
-			Aggregation aggregation = validedmrecord.getChoiceList().get(aggindex).getAggregation();
+
+		
+		if(element.ifAggregation()){
+			
+			Aggregation aggregation = element.getAggregation();
 			
 			List<HasView> has_views = aggregation.getHasViewList();
 			
@@ -235,16 +240,16 @@ public class ZipLoader {
 		}
 		
 		
-		int webresourceindex = validedmrecord.getChoiceList().indexOf(WebResourceType.class);
-		
-		if(aggindex != -1){
-			WebResourceType wrtype = validedmrecord.getChoiceList().get(webresourceindex).getWebResource();
+		if(element.ifWebResource()){
+			WebResourceType wrtype = element.getWebResource();
 				   String about = wrtype.getAbout();
 					EuropeanaLink link = new EuropeanaLink();
 					link.setCacheable(false);
 					link.setLinkStatus(LinkStatus.NOT_CHECKED);
 					link.setUrl(about);
 					mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+		}
+		
 		}
 	}
 	
