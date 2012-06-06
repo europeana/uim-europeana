@@ -69,4 +69,22 @@ public class EuropeanaClientConstants {
 			"has been imported, but some of its external dependencies (ie REPOX) have not been setup proprerly." +
 			"Try modifying the values contained in SugarCRM and importing these values again." ;
 	
+	//Import Controlled Vocabulary Labels
+	public final static String IMPORTVOCABULARY = "Import Vocabulary";
+	public final static String VOCABULARYNAME = "Vocabulary Name:";
+	public final static String VOCABULARYURI = "Vocabulary URI";
+	public final static String VOCABULARYSUFFIX = "Vocabulary Suffix";
+	public final static String VOCSAVEANDUPLOAD = "Save and Upload";
+	public final static String VOCSELECTLOCALFILE = "Select File";
+	public final static String VOCORIGINALFIELDS = "Original Fields";
+	public final static String VOCMAPPABLEFIELDS = "Mappable EDM Fields";
+	public final static String VOCCREATEMAPPING = "Create Field Mapping";
+	public final static String VOCMAPPEDFIELDS = "Mapped Fields";
+	public final static String VOCSAVEMAPPING = "Save Mapping";
+	public final static String VOCDELETEMAPPING = "Delete Field Mapping";
+	public final static String VOCDELETEVOCABULARY = "Delete Vocabulary";
+	public final static String VOCEDITVOCABULARY = "Edit Vocabulary";
+	public final static String VOCREFRESHVOCABULARY="Refresh";
+	public final static String UPLOAD_SERVLET_URL="http://localhost:8181/gui/EuropeanaIngestionControlPanel/uploadservlet";
+	public final static String REMOTE_UPLOAD_SERVLET_URL="http://localhost:8181/gui/EuropeanaIngestionControlPanel/remoteuploadservlet";
 }

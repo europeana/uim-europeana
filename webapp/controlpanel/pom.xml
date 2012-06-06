@@ -1,8 +1,9 @@
 <!-- <?xml version="1.0" encoding="UTF-8"?> -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
+
 
   <parent>
 	<artifactId>europeana-uim-europeanaspecific</artifactId>
@@ -11,182 +12,250 @@
   </parent>
 
 
-    <artifactId>europeana-uim-gui-controlpanel</artifactId>
-    <packaging>war</packaging>
-    <name>Unified Ingestion Manager: Europeana Ingestion Control Panel GUI (GWT)</name>
+	<artifactId>europeana-uim-gui-controlpanel</artifactId>
+	<packaging>war</packaging>
+	<name>Unified Ingestion Manager: Europeana Ingestion Control Panel GUI (GWT)</name>
 
-    <properties>
-        <gwtVersion>2.3.0</gwtVersion>
-        <!-- GWT needs at least java 1.6 -->
-        <maven.compiler.source>1.6</maven.compiler.source> 
-        <maven.compiler.target>1.6</maven.compiler.target>
+	<properties>
+		<gwtVersion>2.3.0</gwtVersion>
+		<!-- GWT needs at least java 1.6 -->
+		<maven.compiler.source>1.6</maven.compiler.source>
+		<maven.compiler.target>1.6</maven.compiler.target>
 
-        <!-- Don't let your Mac use a crazy non-standard encoding -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-    </properties>
+		<!-- Don't let your Mac use a crazy non-standard encoding -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
+	</properties>
 
-    <build>
-        <!-- Generate compiled stuff in the folder used for developing mode -->
-        <outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
+	<build>
+		<!-- Generate compiled stuff in the folder used for developing mode -->
+		<outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
 
-        <plugins>
-            <!-- GWT Maven Plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>gwt-maven-plugin</artifactId>
-                <version>2.3.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <runTarget>EuropeanaIngestionControlPanel.html</runTarget>
-                    <hostedWebapp>${webappDirectory}</hostedWebapp>
-                    <!-- <i18nMessagesBundle>eu.europeana.uim.gui.cp.client.Messages</i18nMessagesBundle> -->
+		<plugins>
+			<!-- GWT Maven Plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>2.3.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<runTarget>EuropeanaIngestionControlPanel.html</runTarget>
+					<hostedWebapp>${webappDirectory}</hostedWebapp>
+					<!-- <i18nMessagesBundle>eu.europeana.uim.gui.cp.client.Messages</i18nMessagesBundle> -->
 
-                    <!-- Additional configuration to be able to run the development mode against the webapp deployed on the 
-                        OSGI platform -->
-                    <port>8181</port>
-                    <noServer>true</noServer>
-                    <runTarget>gui/EuropeanaIngestionControlPanel.html</runTarget>
-                    <!-- custom argument to tell the AbstractOSGIRemoteServiceServlet that it can trust this environment -->
-                    <!-- note the whitespace, I suppose this is due to the maven-gwt-plugin already providing some additional 
-                        VM arguments -->
-                    <extraJvmArgs> -Ddevmode=true </extraJvmArgs>
-                </configuration>
-            </plugin>
+					<!-- Additional configuration to be able to run the development mode 
+						against the webapp deployed on the OSGI platform -->
+					<port>8181</port>
+					<noServer>true</noServer>
+					<runTarget>gui/EuropeanaIngestionControlPanel.html</runTarget>
+					<!-- custom argument to tell the AbstractOSGIRemoteServiceServlet that 
+						it can trust this environment -->
+					<!-- note the whitespace, I suppose this is due to the maven-gwt-plugin 
+						already providing some additional VM arguments -->
+					<extraJvmArgs> -Ddevmode=true </extraJvmArgs>
+				</configuration>
+			</plugin>
 
-            <!-- Copy static web files before executing gwt:run -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>exploded</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <webappDirectory>${webappDirectory}</webappDirectory>
-                    <outputFileNameMapping>@{artifactId}@.@{extension}@</outputFileNameMapping>
-                    <archive>
-                        <!-- add the generated manifest to the war -->
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
-                </configuration>
-            </plugin>
+			<!-- Copy static web files before executing gwt:run -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>exploded</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<webappDirectory>${webappDirectory}</webappDirectory>
+					<outputFileNameMapping>@{artifactId}@.@{extension}@</outputFileNameMapping>
+					<archive>
+						<!-- add the generated manifest to the war -->
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <supportedProjectTypes>
-                        <supportedProjectType>jar</supportedProjectType>
-                        <supportedProjectType>bundle</supportedProjectType>
-                        <supportedProjectType>war</supportedProjectType>
-                    </supportedProjectTypes>
-                    <instructions>
-                        <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
-                        <Bundle-Activator>eu.europeana.uim.gui.cp.server.engine.ExpandedOsgiEngineActivator</Bundle-Activator>
-                        <Embed-Directory>WEB-INF/lib</Embed-Directory>
-                        <Embed-Dependency>
-                            europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload
-                        </Embed-Dependency>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-StripVersion>true</Embed-StripVersion>
-                        <Import-Package>
-                            !eu.europeana.uim.gui.cp.*,
-                            eu.europeana.uim.common,
-                            eu.europeana.uim.store,
-                            eu.europeana.uim.store.mongo.decorators,
-                            eu.europeana.uim.store.mongo,
-                            eu.europeana.uim.store.mongo.resourceentities,
-                            eu.europeana.uim.*,
-                            eu.europeana.uim.workflow,
-                            eu.europeana.uim.api,
-                            org.apache.solr.*,
-                            org.osgi.framework,
-                            org.w3c.dom,
-                            org.xml.sax,
-                            org.xml.sax.ext,
-                            org.xml.sax.helpers,
-                            javax.xml.parsers,
-                            javax.servlet,
-                            javax.servlet.http,
-                            org.joda.time,
-                        </Import-Package>
 
-                        <!-- OSGi spec config option -->
-                        <Web-ContextPath>gui</Web-ContextPath>
-                        <!-- Pax Web Extender knows this option -->
-                        <Webapp-Context>gui</Webapp-Context>
-                    </instructions>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.1.0</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<supportedProjectTypes>
+						<supportedProjectType>jar</supportedProjectType>
+						<supportedProjectType>bundle</supportedProjectType>
+						<supportedProjectType>war</supportedProjectType>
+					</supportedProjectTypes>
+					<instructions>
+						<Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+						<Bundle-Activator>eu.europeana.uim.gui.cp.server.engine.ExpandedOsgiEngineActivator</Bundle-Activator>
+						<Embed-Directory>WEB-INF/lib</Embed-Directory>
+						<Embed-Dependency>
+							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,corelib-solr,corelib-solr-tools,corelib-solr-dereference,corelib-definitions,corelib-utils,corelib-solr-definitions,morphia,wstx-asl
+						</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-StripVersion>true</Embed-StripVersion>
+						<Import-Package>
+							!eu.europeana.uim.gui.cp.*,
+							eu.europeana.uim.common,
+							eu.europeana.uim.store,
+							eu.europeana.uim.store.mongo.decorators,
+							eu.europeana.uim.store.mongo,
+							eu.europeana.uim.store.mongo.resourceentities,
+							eu.europeana.uim.*,
+							eu.europeana.uim.workflow,
+							eu.europeana.uim.api,
+							org.apache.solr.*,
+							org.osgi.framework,
+							org.w3c.dom,
+							org.xml.sax,
+							org.xml.sax.ext,
+							org.xml.sax.helpers,
+							org.apache.commons.lang,
+							javax.xml.parsers,
+							javax.xml.stream,
+							javax.xml.stream.util,
+							javax.xml.transform,
+							javax.xml.transform.stream,
+							javax.xml.namespace,
+							javax.servlet,
+							javax.servlet.http,
+							javax.net,
+							javax.management,
+							org.joda.time,
+							com.ctc.wstx.stax.*,
+						</Import-Package>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-                    <wtpversion>2.0</wtpversion>
-                    <wtpContextName>${project.artifactId}</wtpContextName>
-                    <additionalProjectnatures>
-                        <projectnature>com.google.gwt.eclipse.core.gwtNature</projectnature>
-                    </additionalProjectnatures>
-                    <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
-                        <classpathContainer>com.google.gwt.eclipse.core.GWT_CONTAINER</classpathContainer>
-                    </classpathContainers>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-servlet</artifactId>
-            <version>${gwtVersion}</version>
-        </dependency>
+						<!-- OSGi spec config option -->
+						<Web-ContextPath>gui</Web-ContextPath>
+						<!-- Pax Web Extender knows this option -->
+						<Webapp-Context>gui</Webapp-Context>
+					</instructions>
+				</configuration>
+			</plugin>
 
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-user</artifactId>
-            <version>${gwtVersion}</version>
-            <scope>provided</scope>
-        </dependency>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<wtpversion>2.0</wtpversion>
+					<wtpContextName>${project.artifactId}</wtpContextName>
+					<additionalProjectnatures>
+						<projectnature>com.google.gwt.eclipse.core.gwtNature</projectnature>
+					</additionalProjectnatures>
+					<classpathContainers>
+						<classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
+						<classpathContainer>com.google.gwt.eclipse.core.GWT_CONTAINER</classpathContainer>
+					</classpathContainers>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-        <dependency>
-            <groupId>com.google</groupId>
-            <artifactId>gwt-incubator</artifactId>
-            <version>20101117-r1766</version>
-        </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-servlet</artifactId>
+			<version>${gwtVersion}</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-user</artifactId>
+			<version>${gwtVersion}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google</groupId>
+			<artifactId>gwt-incubator</artifactId>
+			<version>20101117-r1766</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-gui-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-definitions</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-solr-dereference</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-solr-definitions</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-solr</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-solr-tools</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-utils</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>europeana-uim-plugin-repox</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 
         <dependency>
             <groupId>org.osgi</groupId>
@@ -213,12 +282,53 @@
         </dependency>
          
         <dependency>
+
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
-			<version>${project.version}</version>	
+			<version>${project.version}</version>
 		</dependency>
-               
-    </dependencies>
-    
-    
+		<dependency>
+			<groupId>com.google.code.morphia</groupId>
+			<artifactId>morphia</artifactId>
+			<version>0.99</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>wstx-asl</artifactId>
+			<version>3.2.9</version>
+			<exclusions>
+				<exclusion>
+					<groupId>stax</groupId>
+					<artifactId>stax-api</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-stax-api_1.0_spec</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.proxytoys</groupId>
+			<artifactId>proxytoys</artifactId>
+			<version>1.0</version>
+			<type>jar</type>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.2.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
+		</dependency>
+	</dependencies>
+
+
 </project>

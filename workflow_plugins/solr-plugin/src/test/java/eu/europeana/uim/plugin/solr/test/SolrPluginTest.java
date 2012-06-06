@@ -67,7 +67,7 @@ public class SolrPluginTest {
 			+ "<edm:object rdf:resource=\"http://www.mimo-db.eu/media/GNM/IMAGE/MINe298_H_1304604690701_2.jpg\"></edm:object>"
 			+ "</ore:Aggregation>" + "</rdf:RDF>";
 
-	private final String record = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record><first><item><name>previews_only_on_europeana_por_c</name><type>true</type></item></first></record>";
+	private final String record = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record><first><item><name>previews_only_on_europeana_por_c</name><type>0</type></item></first></record>";
 	
 	
 	private SolrWorkflowPlugin plugin;

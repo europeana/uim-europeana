@@ -9,6 +9,14 @@
 		<servlet-class>eu.europeana.uim.gui.cp.server.RepositoryServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
+		<servlet-name>importVocabulary</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.ImportVocabularyProxyImpl</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>collectionManagement</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.CollectionManagementProxyImpl</servlet-class>
+	</servlet>
+	<servlet>
 		<servlet-name>resourceService</servlet-name>
 		<servlet-class>eu.europeana.uim.gui.cp.server.ResourceServiceImpl</servlet-class>
 	</servlet>
@@ -21,6 +29,14 @@
 		<servlet-class>eu.europeana.uim.gui.cp.server.FileUploadService</servlet-class>
 	</servlet>
 	<servlet>
+		<servlet-name>uploadServlet</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.UploadServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>remoteUploadServlet</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.RemoteUploadServlet</servlet-class>
+	</servlet>
+	<servlet>
 		<servlet-name>integrationService</servlet-name>
 		<servlet-class>eu.europeana.uim.gui.cp.server.IntegrationSeviceProxyImpl</servlet-class>
 	</servlet>
@@ -28,6 +44,7 @@
 		<servlet-name>logFileService</servlet-name>
 		<servlet-class>eu.europeana.uim.gui.cp.server.EuropeanaLogFileService</servlet-class>
 	</servlet>
+	
 	<servlet-mapping>
 		<servlet-name>logFileService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/logfile</url-pattern>
@@ -35,6 +52,14 @@
 	<servlet-mapping>
 		<servlet-name>repositoryService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/repository</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>importVocabulary</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/importvocabulary</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>collectionManagement</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/collectionmanagement</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>resourceService</servlet-name>
@@ -49,12 +74,19 @@
 		<url-pattern>/EuropeanaIngestionControlPanel/fileupload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>remoteUploadServlet</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/remoteuploadservlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>uploadServlet</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/uploadservlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>integrationService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/integration</url-pattern>
 	</servlet-mapping>
-
-	<!-- Default page to serve -->
-	<welcome-file-list>
-		<welcome-file>EuropeanaIngestionControlPanel.html</welcome-file>
-	</welcome-file-list>
+    <!-- Default page to serve -->
+    <welcome-file-list>
+        <welcome-file>EuropeanaIngestionControlPanel.html</welcome-file>
+    </welcome-file-list>
 </web-app>

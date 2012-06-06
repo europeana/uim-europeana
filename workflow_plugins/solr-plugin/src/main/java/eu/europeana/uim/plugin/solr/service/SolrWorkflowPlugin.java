@@ -64,6 +64,7 @@ import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
 import eu.europeana.uim.solr3.Solr3Initializer;
+import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugarcrm.QueryResultException;
 import eu.europeana.uim.sugarcrm.SugarCrmRecord;
@@ -79,7 +80,7 @@ import eu.europeana.uim.sugarcrm.SugarCrmService;
  */
 public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
-	private static String solrUrl = "http://127.0.0.1:8282/";
+	private static String solrUrl;
 	private static Mongo mongo;
 	private static SolrServer solrServer;
 	private static EdmMongoServer mongoServer;
@@ -87,7 +88,17 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	private static final int RETRIES = 10;
 
 	private static SugarCrmService sugarCrmService;
-
+	private static String previewsOnlyInPortal;
+	private static String europeanaID;
+	private static String collections;
+	private static String mongoHost;
+	private static int mongoPort;
+	private static String mongoDB;
+	private static String solrCore;
+	private static String repository;
+	private static String vocabulary;
+   
+	//GETTERS & SETTERS
 	public SugarCrmService getSugarCrmService() {
 		return sugarCrmService;
 	}
@@ -95,6 +106,86 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	public void setSugarCrmService(SugarCrmService sugarCrmService) {
 		SolrWorkflowPlugin.sugarCrmService = sugarCrmService;
 	}
+
+	public static String getSolrUrl() {
+		return solrUrl;
+	}
+
+	public static void setSolrUrl(String solrUrl) {
+		SolrWorkflowPlugin.solrUrl = solrUrl;
+	}
+
+	public static String getEuropeanaID() {
+		return europeanaID;
+	}
+
+	public static void setEuropeanaID(String europeanaID) {
+		SolrWorkflowPlugin.europeanaID = europeanaID;
+	}
+
+	public static String getCollections() {
+		return collections;
+	}
+
+	public static void setCollections(String collections) {
+		SolrWorkflowPlugin.collections = collections;
+	}
+
+	public static String getMongoHost() {
+		return mongoHost;
+	}
+
+	public static void setMongoHost(String mongoHost) {
+		SolrWorkflowPlugin.mongoHost = mongoHost;
+	}
+
+	public static int getMongoPort() {
+		return mongoPort;
+	}
+
+	public static void setMongoPort(int mongoPort) {
+		SolrWorkflowPlugin.mongoPort = mongoPort;
+	}
+
+	public static String getMongoDB() {
+		return mongoDB;
+	}
+
+	public static void setMongoDB(String mongoDB) {
+		SolrWorkflowPlugin.mongoDB = mongoDB;
+	}
+
+	public static String getSolrCore() {
+		return solrCore;
+	}
+
+	public static void setSolrCore(String solrCore) {
+		SolrWorkflowPlugin.solrCore = solrCore;
+	}
+
+	public static String getRepository() {
+		return repository;
+	}
+
+	public static void setRepository(String repository) {
+		SolrWorkflowPlugin.repository = repository;
+	}
+
+
+
+
+
+	public static String getVocabulary() {
+		return vocabulary;
+	}
+
+	public static void setVocabulary(String vocabulary) {
+		SolrWorkflowPlugin.vocabulary = vocabulary;
+	}
+
+
+
+
 
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
@@ -135,23 +226,23 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			FullBean fullBean = mongoConstructor.constructFullBean(rdf);
 
 			String collectionId = (String) mdr.getCollection().getId();
-			SugarCrmRecord sugarCrmRecord = sugarCrmService
-					.retrieveRecord(mdr.getCollection().getValue(ControlledVocabularyProxy.SUGARCRMID));
-			String previewsOnlyInPortal = sugarCrmRecord
-					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
+			
 			String fileName = (String) mdr.getCollection().getName();
-			//String hash = hashExists(collectionId, fileName, fullBean);
+			String hash = hashExists(collectionId, fileName, fullBean);
 			fullBean.getAggregations()
 					.get(0)
 					.setEdmPreviewNoDistribute(
 							Boolean.parseBoolean(previewsOnlyInPortal));
-			//if (StringUtils.isNotEmpty(hash)) {
-				//createLookupEntry(fullBean, hash);
-			//}
+			if (StringUtils.isNotEmpty(hash)) {
+				createLookupEntry(fullBean, hash);
+			}
+			
 			if (mongoServer.getDatastore().find(FullBeanImpl.class)
-					.filter("about", fullBean.getAbout()) != null) {
+					.filter("about", fullBean.getAbout()).get() != null) {
+				System.out.println("Updating");
 				MongoUtils.updateFullBean(fullBean, mongoServer);
 			} else {
+				System.out.println("Saving");
 				mongoServer.getDatastore().save(fullBean);
 			}
 
@@ -197,16 +288,13 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (QueryResultException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return false;
 	}
 
 	private void createLookupEntry(FullBean fullBean, String hash) {
 		EuropeanaIdMongoServer europeanaIdMongoServer = new EuropeanaIdMongoServer(
-				mongo, "EuropeanaId");
+				mongo, europeanaID);
 		EuropeanaId europeanaId = europeanaIdMongoServer
 				.retrieveEuropeanaIdFromOld(hash).get(0);
 		europeanaId.setNewId(fullBean.getAbout());
@@ -217,7 +305,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	private String hashExists(String collectionId, String fileName,
 			FullBean fullBean) {
 		SipCreatorUtils sipCreatorUtils= new SipCreatorUtils();
-		sipCreatorUtils.setRepository("");
+		sipCreatorUtils.setRepository(repository);
 		return HashUtils.createHash(EseEdmMap.valueOf(
 				sipCreatorUtils.getHashField(collectionId, fileName))
 				.getEdmValue(fullBean));
@@ -245,17 +333,24 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	public <I> void initialize(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
 		Solr3Initializer solr3Initializer = new Solr3Initializer(solrUrl,
-				"apache-solr-3.5.0");
+				solrCore);
 		solr3Initializer.run();
 		solrServer = solr3Initializer.getServer();
 
 		try {
-			mongo = new Mongo("127.0.0.1", 27017);
-			mongoServer = new EdmMongoServerImpl(mongo, "europeana");
+			mongo = new Mongo(mongoHost,mongoPort);
+			mongoServer = new EdmMongoServerImpl(mongo, mongoDB);
 			mongoServer.getDatastore();
 
 			Dereferencer.setServer(new VocabularyMongoServer(mongo,
-					"vocabulary"));
+					vocabulary));
+@SuppressWarnings("rawtypes")
+String sugarCrmId = ((Collection) context.getDataSet()).getValue(ControlledVocabularyProxy.SUGARCRMID);
+			
+			SugarCrmRecord sugarCrmRecord = sugarCrmService
+					.retrieveRecord(sugarCrmId);
+			 previewsOnlyInPortal = sugarCrmRecord
+					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
 		} catch (MongoDBException e) {
 			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
@@ -265,6 +360,9 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MongoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (QueryResultException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
