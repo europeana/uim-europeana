@@ -86,7 +86,17 @@ public class SolrPluginTest {
 		SugarCrmService service = mock(SugarCRMServiceImpl.class);
 		
 		plugin = new SolrWorkflowPlugin();
+		
+		plugin.setSolrUrl("http://127.0.0.1:8282/");
+		plugin.setSolrCore("apache-solr-3.5.0");
 		plugin.setSugarCrmService(service);
+		plugin.setMongoHost("127.0.0.1");
+		plugin.setMongoPort(27017);
+		plugin.setMongoDB("europeana_test");
+		plugin.setVocabularyDB("vocabulary");
+		plugin.setRepository("/export/repository");
+		plugin.setCollections("collections");
+		plugin.setEuropeanaID("EuropeanaID");
 		ExecutionBean execution = new ExecutionBean(1L);
 		execution.setDataSet(collection);
 		Properties properties = new Properties();
