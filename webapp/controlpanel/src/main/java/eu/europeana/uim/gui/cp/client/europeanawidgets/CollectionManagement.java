@@ -76,9 +76,11 @@ public class CollectionManagement extends IngestionWidget {
 
 	private ScrollPanel createMappedCollectionTable() {
 		ScrollPanel scroll = new ScrollPanel();
+		FlexTable table = new FlexTable();
 		mappedCollections = new CellList<CollectionMappingDTO>(
 				new CollectionCell());
-		scroll.add(mappedCollections);
+		table.add(mappedCollections);
+		scroll.add(table);
 		fillMappedCollections();
 		return scroll;
 	}
@@ -312,7 +314,7 @@ public class CollectionManagement extends IngestionWidget {
 		public void render(com.google.gwt.cell.client.Cell.Context context,
 				CollectionMappingDTO value, SafeHtmlBuilder sb) {
 			sb.appendHtmlConstant("<tr><td>");
-			sb.appendHtmlConstant(value.getOriginalCollection() + "</td><td>"
+			sb.appendHtmlConstant(value.getOriginalCollection() + "</td>|<td>"
 					+ value.getNewCollection() + "</td></tr>");
 
 		}
