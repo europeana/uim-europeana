@@ -31,6 +31,19 @@ IntegrationServicesProviderServlet implements ImportVocabularyProxy {
 
 	private static Extractor extractor;
 	private static VocabularyMongoServer mongo;
+	
+	{
+		try {
+			mongo = new VocabularyMongoServer(new Mongo("127.0.0.1", 27017), "vocabulary");
+			
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MongoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	@Override
 	public ControlledVocabularyDTO importVocabulary(
 			ControlledVocabularyDTO vocabulary) {
@@ -43,24 +56,16 @@ IntegrationServicesProviderServlet implements ImportVocabularyProxy {
 			controlledVocabulary.setSuffix(vocabulary.getSuffix());
 		}
 		
-			extractor = new Extractor(controlledVocabulary,mongo);
-		
+			
+		extractor = new Extractor(controlledVocabulary,mongo);
 		vocabulary.setMapping(convertEdmMap(extractor
 				.readSchema(vocabulary.getLocation())));
 		return vocabulary;
 	}
 
 	public MappingDTO mapField(String originalField, String mappedField) {
-		try {
-			mongo = new VocabularyMongoServer(new Mongo("127.0.0.1", 27017), "vocabulary");
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MongoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		extractor = new Extractor(controlledVocabulary, mongo);
+	
+		extractor = new Extractor(controlledVocabulary,mongo);
 		extractor.setMappedField(originalField, EdmLabel.getEdmLabel(mappedField));
 		OriginalFieldDTO originalFieldDTO = new OriginalFieldDTO();
 		originalFieldDTO.setField(originalField);
@@ -100,16 +105,7 @@ IntegrationServicesProviderServlet implements ImportVocabularyProxy {
 
 	@Override
 	public List<ControlledVocabularyDTO> retrieveVocabularies() {
-		try {
-			mongo = new VocabularyMongoServer(new Mongo("127.0.0.1", 27017), "vocabulary");
-			extractor = new Extractor(controlledVocabulary,mongo);
-		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (MongoException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		extractor = new Extractor(controlledVocabulary,mongo);
 		List<ControlledVocabularyImpl> controlledVocabularies = new ArrayList<ControlledVocabularyImpl>();
 		try{
 			controlledVocabularies = extractor.getControlledVocabularies();
@@ -144,16 +140,11 @@ IntegrationServicesProviderServlet implements ImportVocabularyProxy {
 
 	@Override
 	public boolean removeVocabulary(String vocabularyName) {
-		try {
-			mongo = new VocabularyMongoServer(new Mongo("127.0.0.1", 27017), "vocabulary");
-		} catch (UnknownHostException e) {
-			return true;
-		} catch (MongoException e) {
-			return false;
-		}
-		extractor = new Extractor(controlledVocabulary,mongo);
+		if (extractor != null) {
 		extractor.removeVocabulary(vocabularyName);
 		return true;
+		}
+		return false;
 	}
 
 }

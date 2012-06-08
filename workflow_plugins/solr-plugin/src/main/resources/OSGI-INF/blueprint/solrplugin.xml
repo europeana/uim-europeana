@@ -11,7 +11,7 @@ xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
     	 <property name="solrCore" value="${solrCore}" />
     	 <property name="mongoDB" value="${mongoDB}" />
     	 <property name="repository" value="${repository}" />
-    	 <property name="vocabulary" value="${vocabulary}" />
+    	 <property name="vocabularyDB" value="${vocabularyDB}" />
     </bean>
 	<bp:reference id="sugarcrm" interface="eu.europeana.uim.sugarcrm.SugarCrmService"/>
 	<service id="solrPlugin" ref="solrbean" interface="eu.europeana.uim.api.IngestionPlugin" />
@@ -23,11 +23,11 @@ xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
             <cm:property name="collections" value="collections" />
             <cm:property name="mongoHost" value="127.0.0.1" />
             <cm:property name="mongoPort" value="27017" />
-            <cm:property name="solrUrl" value="http://127.0.0.1:8282" />
+            <cm:property name="solrUrl" value="http://127.0.0.1:8282/" />
             <cm:property name="solrCore" value="apache-solr-3.5.0" />
             <cm:property name="mongoDB" value="europeana" />
             <cm:property name="repository" value="/export/repository" />
-            <cm:property name="vocabulary" value="vocabulary" />
+            <cm:property name="vocabularyDB" value="vocabulary" />
         </cm:default-properties>
     </cm:property-placeholder>
 
