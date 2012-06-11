@@ -29,7 +29,7 @@ IntegrationServicesProviderServlet implements ImportVocabularyProxy {
 	private static final long serialVersionUID = 1L;
 	private static ControlledVocabulary controlledVocabulary;
 
-	private final static String MONGO_HOST = "http://europeana-ese2edm.isti.cnr.it";
+	private final static String MONGO_HOST = "europeana-ese2edm.isti.cnr.it";
 	private final static int MONGO_PORT = 27017;
 	private final static String MONGO_DB = "vocabulary";
 	private static Extractor extractor;
