@@ -29,12 +29,15 @@ IntegrationServicesProviderServlet implements ImportVocabularyProxy {
 	private static final long serialVersionUID = 1L;
 	private static ControlledVocabulary controlledVocabulary;
 
+	private final static String MONGO_HOST = "http://europeana-ese2edm.isti.cnr.it";
+	private final static int MONGO_PORT = 27017;
+	private final static String MONGO_DB = "vocabulary";
 	private static Extractor extractor;
 	private static VocabularyMongoServer mongo;
 	
 	{
 		try {
-			mongo = new VocabularyMongoServer(new Mongo("127.0.0.1", 27017), "vocabulary");
+			mongo = new VocabularyMongoServer(new Mongo(MONGO_HOST, MONGO_PORT), MONGO_DB);
 			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block

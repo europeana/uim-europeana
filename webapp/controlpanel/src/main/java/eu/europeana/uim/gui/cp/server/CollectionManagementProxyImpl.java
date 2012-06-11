@@ -28,7 +28,8 @@ public class CollectionManagementProxyImpl extends
 	private static CollectionMongoServer collectionMongoServer;
 	private static Collection collection;
 
-	private static final String MONGO_HOST="127.0.0.1";
+	//private static final String MONGO_HOST="127.0.0.1";
+	private static final String MONGO_HOST="http://europeana-ese2.edm.isti.cnr.it";
 	private static final int MONGO_PORT = 27017;
 	private static final String MONGO_DB = "collections";
 	private static final String REPOSITORY = "/export/repository/";
