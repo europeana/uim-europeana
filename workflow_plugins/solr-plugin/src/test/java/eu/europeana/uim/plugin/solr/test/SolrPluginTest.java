@@ -81,12 +81,12 @@ public class SolrPluginTest {
 				new ProviderBean<String>("test_provider"));
 		
 		collection.putValue(ControlledVocabularyProxy.SUGARCRMID, "09431");
+		collection.setMnemonic("12345");
+		
 		MetaDataRecord mdr = new MetaDataRecordBean<String>("09431", collection);
 		mdr.addValue(EuropeanaModelRegistry.EDMRECORD, RECORD);
 		SugarCrmService service = mock(SugarCRMServiceImpl.class);
-		
 		plugin = new SolrWorkflowPlugin();
-		
 		plugin.setSolrUrl("http://127.0.0.1:8282/");
 		plugin.setSolrCore("apache-solr-3.5.0");
 		plugin.setSugarCrmService(service);
@@ -97,20 +97,20 @@ public class SolrPluginTest {
 		plugin.setRepository("/export/repository");
 		plugin.setCollections("collections");
 		plugin.setEuropeanaID("EuropeanaID");
-		ExecutionBean execution = new ExecutionBean(1L);
+		ExecutionBean execution = new ExecutionBean();
 		execution.setDataSet(collection);
 		Properties properties = new Properties();
 		LoggingEngine logging = LoggingEngineAdapter.LONG;
-		when(context.getProperties()).thenReturn(properties);
-		when(context.getExecution()).thenReturn(execution);
-		when(context.getLoggingEngine()).thenReturn(logging);
+		
 		SugarCrmRecord sugarRecord =  SugarCrmRecordImpl.getInstance(getElement(record));
 		try {
 			when(service.retrieveRecord("09431")).thenReturn(sugarRecord);
-		} catch (QueryResultException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		when(context.getExecution()).thenReturn(execution);
+		when(context.getProperties()).thenReturn(properties);
+		when(context.getLoggingEngine()).thenReturn(logging);
 		plugin.initialize(context);
 
 		Assert.assertTrue(plugin.processRecord(mdr, context));
@@ -135,4 +135,5 @@ public class SolrPluginTest {
 		
 	}
 
+	
 }

@@ -347,7 +347,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			Dereferencer.setServer(new VocabularyMongoServer(mongo,
 					vocabularyDB));
 			@SuppressWarnings("rawtypes")
-			Collection collection = (Collection) context.getDataSet();
+			Collection collection = (Collection) context.getExecution().getDataSet();
 			String sugarCrmId = collection
 					.getValue(ControlledVocabularyProxy.SUGARCRMID);
 
