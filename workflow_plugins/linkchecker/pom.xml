@@ -57,6 +57,12 @@
             <version>${project.parent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-model-adapters</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
