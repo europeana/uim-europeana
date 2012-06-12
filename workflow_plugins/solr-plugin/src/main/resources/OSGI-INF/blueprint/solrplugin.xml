@@ -28,7 +28,7 @@ xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
               <cm:property name="solrUrl" value="http://localhost:8282/" />
              -->
              <!--  for remote use -->
-            <cm:property name="mongoHost" value="europeana-ese2.edm.isti.cnr.it"
+            <cm:property name="mongoHost" value="europeana-ese2.edm.isti.cnr.it" />
             <cm:property name="solrUrl" value="http://europeana-ese2.edm.isti.cnr.it:9292/" />
             <cm:property name="solrCore" value="solr" />
              <cm:property name="mongoPort" value="27017" />
