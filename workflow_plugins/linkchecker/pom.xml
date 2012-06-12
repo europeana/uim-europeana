@@ -10,14 +10,13 @@
 
 	<artifactId>europeana-uim-plugin-linkchecker</artifactId>
 	<packaging>bundle</packaging>
-	<name>Unified Ingestion Manager: Europeana Linkchecker Plugin</name>
+	<name>Unified Ingestion Manager: Europeana LinkChecker - Thumbler Plugin</name>
 
 	<dependencies>
 		<!-- JUnit dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>${junit-version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -41,8 +40,8 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr</artifactId>
+            <groupId>eu.europeana.corelib</groupId>
+	        <artifactId>corelib-db</artifactId>
 			<version>2.0-SNAPSHOT</version>
 		</dependency>
 		
@@ -52,10 +51,40 @@
 			<version>2.0-SNAPSHOT</version>
 		</dependency>
 		
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>europeana-uim-model-europeana</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+
 		<dependency>
-			<groupId>eu.europeana</groupId>
-			<artifactId>europeana-datamodel-definitions</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+                <version>4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+                <version>4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+                <version>3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+                <version>1.1.1</version>
 		</dependency>
 		
 		<dependency>
@@ -64,6 +93,17 @@
 			<version>${jibx.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.morphia</groupId>
+			<artifactId>morphia</artifactId>
+			<version>0.99</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -101,7 +141,28 @@
 						<Export-Package>
 							eu.europeana.uim.plugin.linkchecker.*
 						</Export-Package>
-						<Import-Package>*</Import-Package>
+						<Import-Package>							
+						    eu.europeana.uim.api,
+							eu.europeana.uim.common,
+							eu.europeana.uim.store,
+							eu.europeana.uim.util,
+                            eu.europeana.uim.sugarcrm,
+							eu.europeana.uim.workflow,
+							org.theeuropeanlibrary.collections.guarded,
+                            org.theeuropeanlibrary.model.common,
+                            org.theeuropeanlibrary.model.common.qualifier,
+							org.theeuropeanlibrary.model.tel,
+							eu.europeana.uim.model.europeana,
+							eu.europeana.uim.model.adapters.*,
+							org.osgi.service.blueprint,
+							org.apache.commons.io,
+							javax.net.ssl,
+							javax.management.*,
+							!*
+						  </Import-Package>
+						  <Embed-Dependency>tel-uim-plugin-check-link,commons-logging,corelib-db,
+						  commons-codec,httpcore,httpclient,commons-httpclient,mongo-java-driver,morphia,
+						  corelib-definitions,corelib-solr-definitions,corelib-utils</Embed-Dependency>
 						<Include-Resource>src/main/resources</Include-Resource>
 					</instructions>
 				</configuration>
@@ -134,11 +195,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
-
+ 
 		</plugins>
 	</build>
 

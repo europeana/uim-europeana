@@ -1,8 +1,35 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <bean id="linkchecker" class="eu.europeana.uim.plugin.linkchecker.service.LinkCheckerPlugin">
+
+
+    <!-- The Thumbler (thumbnail caching plugin) constitues a separate implementation, which is however 
+         based on TEL's synchronous threadpooling mechanism
+      -->
+    <bean id="thumbler" class="eu.europeana.uim.plugin.thumbler.service.ThumblerPlugin">
     </bean>
 
-	<service id="linkcheckerPlugin" ref="linkchecker" interface="eu.europeana.uim.api.IngestionPlugin" />
+	<service id="thumblerPlugin" ref="thumbler" interface="eu.europeana.uim.api.IngestionPlugin" />
+
+    <!-- The Linkchecker Plugin from Tel is directly used as as an embedded dependency -->
+
+    <bean id="linkchecker" class="org.theeuropeanlibrary.uim.check.weblink.LinkCheckIngestionPlugin">
+    </bean>
+
+    <service id="linkCheckerPlugin" ref="linkchecker" interface="eu.europeana.uim.api.IngestionPlugin" />
+
+
+    <!-- Workflows Definitions -->
+    <bean id="lcw" class="eu.europeana.uim.plugin.thumbler.workflows.LinkCheckWorkflow" />
+    <service id="linkCheckingWorkflow" ref="lcw" interface="eu.europeana.uim.workflow.Workflow" />
+
+    <bean id="thw" class="eu.europeana.uim.plugin.thumbler.workflows.ImageCacheWorkflow" />
+    <service id="imageCacheWorkflow" ref="thw" interface="eu.europeana.uim.workflow.Workflow" />
+
+
+    <reference id="sugar" interface="eu.europeana.uim.sugarcrm.SugarService" availability="optional">
+        <reference-listener bind-method="setSugarService" unbind-method="unsetSugarService" ref="linkchecker">
+        </reference-listener>
+    </reference>
+
 
 </blueprint>
