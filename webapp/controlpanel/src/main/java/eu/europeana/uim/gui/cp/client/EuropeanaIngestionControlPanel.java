@@ -8,6 +8,8 @@ import eu.europeana.uim.gui.cp.client.europeanawidgets.CollectionManagement;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ExpandedResourceManagementWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportControlledVocabularyWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportResourcesWidget;
+import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkReportingWidget;
+import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkValidationWidget;
 import eu.europeana.uim.gui.cp.client.management.IngestionTriggerWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionDetailWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionHistoryWidget;
@@ -19,10 +21,14 @@ import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxy;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxyAsync;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxy;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxyAsync;
+import eu.europeana.uim.gui.cp.client.services.ReportingService;
+import eu.europeana.uim.gui.cp.client.services.ReportingServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.RepositoryService;
 import eu.europeana.uim.gui.cp.client.services.RepositoryServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.ResourceService;
 import eu.europeana.uim.gui.cp.client.services.ResourceServiceAsync;
+import eu.europeana.uim.gui.cp.client.services.RetrievalService;
+import eu.europeana.uim.gui.cp.client.services.RetrievalServiceAsync;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -46,6 +52,8 @@ public class EuropeanaIngestionControlPanel extends
 
 	@Override
 	protected void addMenuEntries(SidebarMenu treeModel) {
+		
+		// Initialize services here 
 		final RepositoryServiceAsync repositoryService = (RepositoryServiceAsync) GWT
 				.create(RepositoryService.class);
 		final ResourceServiceAsync resourceService = (ResourceServiceAsync) GWT
@@ -58,6 +66,11 @@ public class EuropeanaIngestionControlPanel extends
 				.create(ImportVocabularyProxy.class);
 		final CollectionManagementProxyAsync collectionManagement = (CollectionManagementProxyAsync) GWT
 				.create(CollectionManagementProxy.class);
+		final RetrievalServiceAsync retrievalService = (RetrievalServiceAsync)GWT.create(RetrievalService.class);
+		
+	    final ReportingServiceAsync reportService = (ReportingServiceAsync)GWT.create(ReportingService.class);
+		
+		// Initialize Panel Components here
 		treeModel.addMenuEntry("Monitoring", new IngestionDetailWidget(
 				executionService), RunAsyncCode
 				.runAsyncCode(IngestionDetailWidget.class));
@@ -72,11 +85,16 @@ public class EuropeanaIngestionControlPanel extends
 				new ExpandedResourceManagementWidget(repositoryService,
 						resourceService, integrationService), RunAsyncCode
 						.runAsyncCode(ExpandedResourceManagementWidget.class));
-		// treeModel.addMenuEntry("Managing", new
-		// ExecutionFlowManagementWidget(repositoryService,
-		// resourceService,integrationService),
-		// RunAsyncCode.runAsyncCode(ExecutionFlowManagementWidget.class));
 
+		treeModel.addMenuEntry("Validation", new LinkValidationWidget(repositoryService,
+                retrievalService), RunAsyncCode.runAsyncCode(LinkValidationWidget.class));
+
+		
+		treeModel.addMenuEntry("Link/Field Checker", new LinkReportingWidget(reportService,
+                "Link Validation", new String[] { "LinkCheckWorkflow" },
+                "linkcheck_overview.rptdesign", new String[] { "pdf" }),
+                RunAsyncCode.runAsyncCode(LinkReportingWidget.class));
+		
 		treeModel.addMenuEntry("Importing", new ImportResourcesWidget(
 				repositoryService, resourceService, integrationService),
 				RunAsyncCode.runAsyncCode(ImportResourcesWidget.class));

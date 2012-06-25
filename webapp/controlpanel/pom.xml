@@ -113,7 +113,9 @@
 						<Bundle-Activator>eu.europeana.uim.gui.cp.server.engine.ExpandedOsgiEngineActivator</Bundle-Activator>
 						<Embed-Directory>WEB-INF/lib</Embed-Directory>
 						<Embed-Dependency>
-							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,corelib-solr,corelib-solr-tools,corelib-solr-dereference,corelib-definitions,corelib-utils,corelib-solr-definitions,morphia,wstx-asl
+							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,
+							corelib-solr,corelib-solr-tools,corelib-solr-dereference,corelib-definitions,corelib-utils,
+							corelib-solr-definitions,morphia,wstx-asl
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
@@ -146,6 +148,8 @@
 							javax.management,
 							org.joda.time,
 							com.ctc.wstx.stax.*,
+							org.jibx.runtime,
+                            org.jibx.runtime.impl
 						</Import-Package>
 
 
@@ -284,7 +288,7 @@
         <dependency>
 
 			<groupId>eu.europeana</groupId>
-			<artifactId>europeana-datamodel-definitions</artifactId>
+			<artifactId>europeana-uim-model-europeana</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

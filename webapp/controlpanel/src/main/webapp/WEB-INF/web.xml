@@ -44,6 +44,19 @@
 		<servlet-name>logFileService</servlet-name>
 		<servlet-class>eu.europeana.uim.gui.cp.server.EuropeanaLogFileService</servlet-class>
 	</servlet>
+	<servlet>
+        <servlet-name>retrievalService</servlet-name>
+        <servlet-class>eu.europeana.uim.gui.cp.server.RetrievalServiceImpl</servlet-class>
+    </servlet>
+		<servlet>
+        <servlet-name>reportingService</servlet-name>
+        <servlet-class>eu.europeana.uim.gui.cp.server.ReportingServiceImpl</servlet-class>
+    </servlet>
+	<servlet>
+        <servlet-name>reportDownloadServlet</servlet-name>
+        <servlet-class>eu.europeana.uim.gui.cp.server.ReportDownloadServlet</servlet-class>
+    </servlet>
+	
 	
 	<servlet-mapping>
 		<servlet-name>logFileService</servlet-name>
@@ -85,6 +98,18 @@
 		<servlet-name>integrationService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/integration</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+        <servlet-name>retrievalService</servlet-name>
+        <url-pattern>/EuropeanaIngestionControlPanel/retrieval</url-pattern>
+    </servlet-mapping>
+    	<servlet-mapping>
+        <servlet-name>reportingService</servlet-name>
+        <url-pattern>/EuropeanaIngestionControlPanel/reporting</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>reportDownloadServlet</servlet-name>
+        <url-pattern>/EuropeanaIngestionControlPanel/reportDownload</url-pattern>
+    </servlet-mapping>
     <!-- Default page to serve -->
     <welcome-file-list>
         <welcome-file>EuropeanaIngestionControlPanel.html</welcome-file>
