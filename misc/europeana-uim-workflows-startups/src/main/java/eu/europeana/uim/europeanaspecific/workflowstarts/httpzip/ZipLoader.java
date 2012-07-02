@@ -18,9 +18,13 @@
 package eu.europeana.uim.europeanaspecific.workflowstarts.httpzip;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.LinkStatus;
@@ -179,11 +183,10 @@ public class ZipLoader {
 	private <I> void addLinkcheckingValues(RDF validedmrecord,MetaDataRecord<I> mdr ){
 		
 		List<Choice> elements = validedmrecord.getChoiceList();
+		Set<String> existingLinks = Collections.synchronizedSet(new HashSet<String>());
 		
 		for (Choice element : elements) {
-			
 
-		
 		if(element.ifAggregation()){
 			
 			Aggregation aggregation = element.getAggregation();
@@ -192,11 +195,7 @@ public class ZipLoader {
 			
 			for(HasView view : has_views){
 				String resource = view.getResource();
-				EuropeanaLink link = new EuropeanaLink();
-				link.setCacheable(true);
-				link.setLinkStatus(LinkStatus.NOT_CHECKED);
-				link.setUrl(resource);
-				mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+				addLink(resource,mdr,existingLinks,false);
 			}
 
 		
@@ -204,38 +203,22 @@ public class ZipLoader {
 		
 		for(HasView view : edm_has_view){
 			String hasView = view.getResource();
-			EuropeanaLink link = new EuropeanaLink();
-			link.setCacheable(false);
-			link.setLinkStatus(LinkStatus.NOT_CHECKED);
-			link.setUrl(hasView);
-			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+			addLink(hasView,mdr,existingLinks,false);
 		}
 		
 		if(aggregation.getIsShownAt() != null){
 			String isShownAt = aggregation.getIsShownAt().getResource();
-			EuropeanaLink link = new EuropeanaLink();
-			link.setCacheable(false);
-			link.setLinkStatus(LinkStatus.NOT_CHECKED);
-			link.setUrl(isShownAt);
-			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+			addLink(isShownAt,mdr,existingLinks,false);
 		}
 		
 		if(aggregation.getIsShownBy() != null){
 			String isShownBy = aggregation.getIsShownBy().getResource();
-			EuropeanaLink link = new EuropeanaLink();
-			link.setCacheable(false);
-			link.setLinkStatus(LinkStatus.NOT_CHECKED);
-			link.setUrl(isShownBy);
-			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+			addLink(isShownBy,mdr,existingLinks,false);
 		}
 		
 		if(aggregation.getObject() != null){
 			String theObject = aggregation.getObject().getResource();
-			EuropeanaLink link = new EuropeanaLink();
-			link.setCacheable(false);
-			link.setLinkStatus(LinkStatus.NOT_CHECKED);
-			link.setUrl(theObject);
-			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+			addLink(theObject,mdr,existingLinks,false);
 		}
 		}
 		
@@ -243,15 +226,33 @@ public class ZipLoader {
 		if(element.ifWebResource()){
 			WebResourceType wrtype = element.getWebResource();
 				   String about = wrtype.getAbout();
-					EuropeanaLink link = new EuropeanaLink();
-					link.setCacheable(false);
-					link.setLinkStatus(LinkStatus.NOT_CHECKED);
-					link.setUrl(about);
-					mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, link);
+				   addLink(about,mdr,existingLinks,false);
 		}
 		
 		}
 	}
+	
+	
+	/**
+	 * Attach a EuropeanaLink object to the specific MDR
+	 * (if it is not declared twice in the EDM record context)
+	 * 
+	 * @param <I>
+	 */
+	private <I> void addLink(String link,MetaDataRecord<I> mdr, Set<String> existingLinks,boolean isCacheable){
+		
+		if(!existingLinks.contains(link)){
+			EuropeanaLink eulink = new EuropeanaLink();
+			//eulink.s
+			eulink.setCacheable(isCacheable);
+			eulink.setLinkStatus(LinkStatus.NOT_CHECKED);
+			eulink.setUrl(link);
+			mdr.addValue(EuropeanaModelRegistry.EUROPEANALINK, eulink);
+			existingLinks.add(link);
+		}
+
+	}
+	
 	
 	/**
 	 * Returns the loading state
