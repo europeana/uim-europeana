@@ -243,7 +243,6 @@ public class ZipLoader {
 		
 		if(!existingLinks.contains(link)){
 			EuropeanaLink eulink = new EuropeanaLink();
-			//eulink.s
 			eulink.setCacheable(isCacheable);
 			eulink.setLinkStatus(LinkStatus.NOT_CHECKED);
 			eulink.setUrl(link);
