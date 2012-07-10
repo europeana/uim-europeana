@@ -230,9 +230,9 @@ public class LinkValidationWidget extends IngestionWidget {
                 Collections.sort(result, new Comparator<ProviderDTO>() {
                     @Override
                     public int compare(ProviderDTO o1, ProviderDTO o2) {
-                        String n1 = o1.getCountry() == null ? "XXX: " + o1.getName()
+                        String n1 = o1.getCountry() == null ? "eu: " + o1.getName()
                                 : o1.getCountry() + ": " + o1.getName();
-                        String n2 = o2.getCountry() == null ? "XXX: " + o2.getName()
+                        String n2 = o2.getCountry() == null ? "eu: " + o2.getName()
                                 : o2.getCountry() + ": " + o2.getName();
 
                         return n1.compareTo(n2);
@@ -242,7 +242,7 @@ public class LinkValidationWidget extends IngestionWidget {
                 providers.addAll(result);
                 
                 for (ProviderDTO provider : providers) {
-                    String name = provider.getCountry() == null ? "XXX: " + provider.getName()
+                    String name = provider.getCountry() == null ? "eu: " + provider.getName()
                             : provider.getCountry() + ": " + provider.getName();
                     providerBox.addItem(name);
                 }

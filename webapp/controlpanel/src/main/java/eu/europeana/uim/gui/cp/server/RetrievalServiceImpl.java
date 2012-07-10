@@ -49,21 +49,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.Link;
-import org.theeuropeanlibrary.model.common.Title;
-import org.theeuropeanlibrary.model.common.party.Party;
-import org.theeuropeanlibrary.model.common.qualifier.Language;
-import org.theeuropeanlibrary.model.common.qualifier.LanguageRelation;
-import org.theeuropeanlibrary.model.common.qualifier.PartyRelation;
-import org.theeuropeanlibrary.model.common.qualifier.SpatialRelation;
-import org.theeuropeanlibrary.model.common.qualifier.TemporalRelation;
-import org.theeuropeanlibrary.model.common.spatial.NamedPlace;
-import org.theeuropeanlibrary.model.common.time.Instant;
-import org.theeuropeanlibrary.model.common.time.InstantGranularity;
-import org.theeuropeanlibrary.model.tel.Metadata;
-import org.theeuropeanlibrary.model.tel.ObjectModelRegistry;
-import org.theeuropeanlibrary.model.tel.ObjectModelUtils;
 import org.theeuropeanlibrary.model.tel.qualifier.FieldSource;
-
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
@@ -72,15 +58,10 @@ import eu.europeana.uim.gui.cp.shared.validation.LinkDTO;
 import eu.europeana.uim.gui.cp.shared.validation.LinksResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.MetaDataRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.MetaDataResultDTO;
-import eu.europeana.uim.gui.cp.shared.validation.NGramRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.NGramResultDTO;
-import eu.europeana.uim.gui.cp.shared.validation.SearchRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.SearchResultDTO;
-
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.gui.cp.server.AbstractOSGIRemoteServiceServlet;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
@@ -114,6 +95,10 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
         super();
     }
 
+    
+    /* (non-Javadoc)
+     * @see eu.europeana.uim.gui.cp.client.services.RetrievalService#getRecordsForCollection(java.lang.String, int, int, java.lang.String)
+     */
     @Override
     public MetaDataResultDTO getRecordsForCollection(String collectionId, int offset, int maxSize,
             String constraint) {
@@ -213,58 +198,31 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
                     			if(dcchoice.ifLanguage()){
                     				record.setWorkLanguage(dcchoice.getDate().getString());
                     			}
+                    			
+                    			if(dcchoice.ifCreator()){
+                    				record.setCreator(dcchoice.getCreator().getString());
+                    			}
+                    			
+                    			if(dcchoice.ifPublisher()){
+                    				record.setPublicationPlace(dcchoice.getPublisher().getString());
+                    			}
+                    			
+                    			if(dcchoice.ifDate()){
+                    				record.setPublicationYear(dcchoice.getDate().getString());
+                    			}
+                    			
                     		}
                     		
                     	}
                     }
-                    
-                    //record.setTitle(title.getTitle());
+
                 }
                 
 				} catch (JiBXException e) {
-					// TODO Auto-generated catch block
+
 					e.printStackTrace();
 				}
-                /*
 
-                Language language = metaDataRecord.getFirstValue(ObjectModelRegistry.LANGUAGE,
-                        LanguageRelation.LANGUAGE_OF_CONTENT);
-                if (language != null) {
-                    record.setWorkLanguage(language.getName());
-                }
-
-                List<NamedPlace> places = ObjectModelUtils.getPlaces(metaDataRecord,
-                        SpatialRelation.PUBLICATION);
-                if (places != null && places.size() > 0) {
-                    record.setPublicationPlace(places.get(0).getPlaceName());
-                }
-
-                List<QualifiedValue<? extends Party>> parties = ObjectModelUtils.getQualifiedParties(metaDataRecord);
-                for (QualifiedValue<? extends Party> party : parties) {
-                    if (party.getQualifiers().contains(PartyRelation.CREATOR) &&
-                        record.getCreator() == null) {
-                        record.setCreator(party.getValue().getDisplay());
-                    }
-
-                    if (party.getQualifiers().contains(PartyRelation.PUBLISHER) &&
-                        record.getContributor() == null) {
-                        record.setContributor(party.getValue().getPartyName());
-                    }
-                }
-
-                Instant year = metaDataRecord.getFirstValue(ObjectModelRegistry.INSTANT,
-                        TemporalRelation.PUBLICATION);
-                if (year != null) {
-                    record.setPublicationYear(year.getDisplay(InstantGranularity.DAY));
-                } else {
-                    year = metaDataRecord.getFirstValue(ObjectModelRegistry.INSTANT,
-                            TemporalRelation.CREATION_OR_AVAILABILITY);
-                    if (year != null) {
-                        record.setPublicationYear(year.getDisplay(InstantGranularity.DAY));
-                    }
-                }
-                 * 
-                 */
                 results.add(record);
             }
         }
@@ -290,10 +248,34 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
                 log.log(Level.WARNING, "Could not find record with id '" + recordId + "'!");
             } else {
 
-                Metadata firstQField = metaDataRecord.getFirstValue(ObjectModelRegistry.METADATA,
-                        FieldSource.PROVIDER);
-                res = firstQField != null ? firstQField.getRecordInXml() : "";
+              
+            }
+        }
 
+        return res;
+    }
+
+    @Override
+    public String getXmlRecord(String recordId) {
+        String res = "";
+
+        StorageEngine<String> storage = (StorageEngine<String>)getEngine().getRegistry().getStorageEngine();
+        if (storage == null) {
+            log.log(Level.SEVERE, "Storage connection is null!");
+        } else {
+            MetaDataRecord<String> metaDataRecord = null;
+            try {
+                metaDataRecord = storage.getMetaDataRecord(recordId);
+            } catch (Throwable t) {
+                log.log(Level.WARNING, "Could not retrieve record for id '" + recordId + "'!", t);
+            }
+
+            if (metaDataRecord == null) {
+                log.log(Level.WARNING, "Could not find record with id '" + recordId + "'!");
+            } else {
+
+            	res = metaDataRecord.getFirstValue(EuropeanaModelRegistry.EDMRECORD);
+            	
                 try {
                     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                     DocumentBuilder db = dbf.newDocumentBuilder();
@@ -304,16 +286,12 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
                     log.log(Level.WARNING, "Could not format xml for '" + recordId + "'!", t);
 
                 }
+
             }
         }
 
         return res;
-    }
 
-    @Override
-    public String getXmlRecord(String recordId) {
-
-         throw new UnsupportedOperationException("Not Implemented Yet");
         
     }
 
