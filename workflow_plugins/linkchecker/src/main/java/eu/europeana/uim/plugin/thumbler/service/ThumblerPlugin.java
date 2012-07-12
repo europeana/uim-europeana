@@ -79,6 +79,7 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
      */
     private static final Logger           log       = Logger.getLogger(ThumblerPlugin.class.getName());
     
+    
     private static SugarService           sugarService;
     
 	public ThumblerPlugin() {
@@ -108,9 +109,6 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 
             for(QualifiedValue<Link> qlink : linkList){
             	
-            //if(qlink.getValue().getLinkStatus() != null){
-            		
-
 
                 final LoggingEngine<I> loggingEngine = context.getLoggingEngine();
                
@@ -173,7 +171,6 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 					                    }
 					                }
 
-					                // TODO: deal with mdr update
 					                log.info("Checked <" + getLink().getUrl() + ">" + message);
 					            }
 					        }, context);
@@ -182,12 +179,8 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 					e.printStackTrace();
 				}
 
- 
-			
-
-
             }
-            //}
+
 		return false;
 	}
 		
