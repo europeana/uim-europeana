@@ -17,45 +17,19 @@
 
 package eu.europeana.uim.plugin.solr.service;
 
-import java.io.IOException;
 import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.model.EdmLabel;
-import eu.europeana.corelib.definitions.solr.beans.FullBean;
-import eu.europeana.corelib.dereference.impl.Dereferencer;
-import eu.europeana.corelib.dereference.impl.VocabularyMongoServer;
-import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.corelib.solr.exceptions.MongoDBException;
-import eu.europeana.corelib.solr.server.EdmMongoServer;
-import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
-import eu.europeana.corelib.solr.utils.EseEdmMap;
-import eu.europeana.corelib.solr.utils.MongoConstructor;
-import eu.europeana.corelib.solr.utils.MongoUtils;
-import eu.europeana.corelib.solr.utils.SolrConstructor;
-import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
-import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
-import eu.europeana.corelib.tools.utils.HashUtils;
-import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
-import eu.europeana.corelib.tools.utils.SipCreatorUtils;
 import eu.europeana.uim.api.AbstractIngestionPlugin;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
@@ -64,7 +38,6 @@ import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
-import eu.europeana.uim.solr3.Solr3Initializer;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugarcrm.QueryResultException;
@@ -82,22 +55,18 @@ import eu.europeana.uim.sugarcrm.SugarCrmService;
 public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private static String solrUrl;
-	private static Mongo mongo;
-	private static SolrServer solrServer;
-	private static EdmMongoServer mongoServer;
 	private static int recordNumber;
-	private static final int RETRIES = 10;
 
 	private static SugarCrmService sugarCrmService;
 	private static String previewsOnlyInPortal;
-	private static String europeanaID;
+	
 	private static String collections;
 	private static String mongoHost;
 	private static int mongoPort;
 	private static String mongoDB;
 	private static String solrCore;
-	private static String repository;
-	private static String vocabularyDB;
+	
+
 
 	// GETTERS & SETTERS
 	public SugarCrmService getSugarCrmService() {
@@ -108,13 +77,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		SolrWorkflowPlugin.sugarCrmService = sugarCrmService;
 	}
 
-	public void setVocabularyDB(String vocabularyDB) {
-		SolrWorkflowPlugin.vocabularyDB = vocabularyDB;
-	}
-
-	public String getVocabularyDB() {
-		return vocabularyDB;
-	}
+	
 
 	public String getSolrUrl() {
 		return solrUrl;
@@ -124,13 +87,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		SolrWorkflowPlugin.solrUrl = solrUrl;
 	}
 
-	public String getEuropeanaID() {
-		return europeanaID;
-	}
-
-	public void setEuropeanaID(String europeanaID) {
-		SolrWorkflowPlugin.europeanaID = europeanaID;
-	}
+	
 
 	public String getCollections() {
 		return collections;
@@ -172,13 +129,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		SolrWorkflowPlugin.solrCore = solrCore;
 	}
 
-	public String getRepository() {
-		return repository;
-	}
 
-	public void setRepository(String repository) {
-		SolrWorkflowPlugin.repository = repository;
-	}
 
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
@@ -213,52 +164,12 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
 					0);
-			MongoConstructor mongoConstructor = new MongoConstructor();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			mongoConstructor.setMongoServer(mongoServer);
-			FullBean fullBean = mongoConstructor.constructFullBean(rdf);
-
-			String collectionId = (String) mdr.getCollection().getId();
-
-			String fileName = (String) mdr.getCollection().getName();
-			String hash = hashExists(collectionId, fileName, fullBean);
-			fullBean.getAggregations()
-					.get(0)
-					.setEdmPreviewNoDistribute(
-							Boolean.parseBoolean(previewsOnlyInPortal));
-			if (StringUtils.isNotEmpty(hash)) {
-				createLookupEntry(fullBean, hash);
-			}
-
-			if (mongoServer.getDatastore().find(FullBeanImpl.class)
-					.filter("about", fullBean.getAbout()).get() != null) {
-				System.out.println("Updating");
-				MongoUtils.updateFullBean(fullBean, mongoServer);
-			} else {
-				System.out.println("Saving");
-				mongoServer.getDatastore().save(fullBean);
-			}
-
-			int retries = 0;
-			while (retries < RETRIES) {
-				try {
-					SolrInputDocument solrInputDocument = SolrConstructor
-							.constructSolrDocument(rdf);
-					solrInputDocument.addField(
-							EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
-							Boolean.parseBoolean(previewsOnlyInPortal));
-					solrServer.add(solrInputDocument, 1000);
-					retries = RETRIES;
-					recordNumber++;
+			
+					
 					return true;
-				} catch (SolrServerException e) {
-					retries++;
-				} catch (IOException e) {
-					retries++;
-				} catch (SolrException e) {
-					retries++;
-				}
-			}
+				
+			
 
 		} catch (JiBXException e) {
 			context.getLoggingEngine().logFailed(
@@ -268,51 +179,11 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 					"JiBX unmarshalling has failed with the following error: "
 							+ e.getMessage());
 			e.printStackTrace();
-		} catch (InstantiationException e) {
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
-					"Unkwown error: " + e.getMessage());
-
-		} catch (IllegalAccessException e) {
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
-					"Unknown error: " + e.getMessage());
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return false;
 	}
 
-	private void createLookupEntry(FullBean fullBean, String hash) {
-		EuropeanaIdMongoServer europeanaIdMongoServer = new EuropeanaIdMongoServer(
-				mongo, europeanaID);
-		EuropeanaId europeanaId = europeanaIdMongoServer
-				.retrieveEuropeanaIdFromOld(hash).get(0);
-		europeanaId.setNewId(fullBean.getAbout());
-		europeanaIdMongoServer.saveEuropeanaId(europeanaId);
-
-	}
-
-	private String hashExists(String collectionId, String fileName,
-			FullBean fullBean) {
-		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
-		sipCreatorUtils.setRepository(repository);
-		if (sipCreatorUtils.getHashField(collectionId, fileName) != null) {
-			return HashUtils.createHash(EseEdmMap.valueOf(
-					sipCreatorUtils.getHashField(collectionId, fileName))
-					.getEdmValue(fullBean));
-		}
-		PreSipCreatorUtils preSipCreatorUtils = new PreSipCreatorUtils();
-		preSipCreatorUtils.setRepository(repository);
-		if (preSipCreatorUtils.getHashField(collectionId, fileName) != null) {
-			return HashUtils.createHash(EseEdmMap.valueOf(
-					preSipCreatorUtils.getHashField(collectionId, fileName))
-					.getEdmValue(fullBean));
-		}
-		return null;
-	}
+	
 
 	public void initialize() {
 		// TODO Auto-generated method stub
@@ -334,18 +205,12 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	public <I> void initialize(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
-		Solr3Initializer solr3Initializer = new Solr3Initializer(solrUrl,
-				solrCore);
-		solr3Initializer.run();
-		solrServer = solr3Initializer.getServer();
+		
 
 		try {
-			mongo = new Mongo(mongoHost, mongoPort);
-			mongoServer = new EdmMongoServerImpl(mongo, mongoDB);
-			mongoServer.getDatastore();
-
-			Dereferencer.setServer(new VocabularyMongoServer(mongo,
-					vocabularyDB));
+			
+			
+			
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) context.getExecution().getDataSet();
 			String sugarCrmId = collection
@@ -356,14 +221,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
-		} catch (MongoDBException e) {
-			context.getLoggingEngine().logFailed(Level.SEVERE, this, e,
-					"Mongo DB server error: " + e.getMessage());
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MongoException e) {
+		}  catch (MongoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (QueryResultException e) {
@@ -375,25 +233,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	public <I> void completed(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
-		try {
-			solrServer.commit();
-			solrServer.optimize();
-
-		} catch (IOException e) {
-			context.getLoggingEngine().logFailed(
-					Level.SEVERE,
-					this,
-					e,
-					"Input/Output exception occured in Solr with the following message: "
-							+ e.getMessage());
-		} catch (SolrServerException e) {
-			context.getLoggingEngine().logFailed(
-					Level.SEVERE,
-					this,
-					e,
-					"Solr server exception occured in Solr with the following message: "
-							+ e.getMessage());
-		}
+		
 	}
 
 	@Override

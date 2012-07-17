@@ -72,7 +72,7 @@ public class SolrPluginTest {
 	
 	private SolrWorkflowPlugin plugin;
 
-	@Test
+//	@Test
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void store() {
 		
@@ -93,10 +93,10 @@ public class SolrPluginTest {
 		plugin.setMongoHost("127.0.0.1");
 		plugin.setMongoPort(27017);
 		plugin.setMongoDB("europeana_test");
-		plugin.setVocabularyDB("vocabulary");
-		plugin.setRepository("/export/repository");
+		//plugin.setVocabularyDB("vocabulary");
+		//plugin.setRepository("/export/repository");
 		plugin.setCollections("collections");
-		plugin.setEuropeanaID("EuropeanaID");
+		//plugin.setEuropeanaID("EuropeanaID");
 		ExecutionBean execution = new ExecutionBean();
 		execution.setDataSet(collection);
 		Properties properties = new Properties();
