@@ -187,9 +187,9 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
                     		
                     		ProvidedCHOType cho = choice.getProvidedCHO();
                     		
-                    		List<eu.europeana.corelib.definitions.jibx.DCType.Choice> dctypelist = cho.getChoiceList1s();
+                    		List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> dctypelist = cho.getChoiceList();
                     		
-                    		for(eu.europeana.corelib.definitions.jibx.DCType.Choice dcchoice : dctypelist){
+                    		for(eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice dcchoice : dctypelist){
                     			
                     			if(dcchoice.ifTitle()){
                     				record.setTitle(dcchoice.getTitle().getString());
