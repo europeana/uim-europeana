@@ -38,6 +38,9 @@ import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
+
+
+
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.plugin.thumbler.utils.EDMXMPValues;
 import eu.europeana.uim.plugin.thumbler.utils.ImageMagickUtils;
@@ -385,10 +388,9 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				if (element.ifProvidedCHO()) {
 					ProvidedCHOType pcho = element.getProvidedCHO();
 
-					List<eu.europeana.corelib.definitions.jibx.DCType.Choice> dclist = pcho
-							.getChoiceList1s();
+					List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> dclist = pcho.getChoiceList();
 
-					for (eu.europeana.corelib.definitions.jibx.DCType.Choice dcchoice : dclist) {
+					for (eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice dcchoice : dclist) {
 						if (dcchoice.ifCreator()) {
 							EDMXMPValuesMap.put(EDMXMPValues.cc_attributionName,
 									dcchoice.getCreator().getString());
