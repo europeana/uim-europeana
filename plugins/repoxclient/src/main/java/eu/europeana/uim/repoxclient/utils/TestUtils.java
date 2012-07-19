@@ -502,7 +502,7 @@ public class TestUtils {
 		RetrieveStrategy.Choice choiceRetStr = new RetrieveStrategy.Choice();
 		
 		Url url = new Url();
-		url.setUrl("http://digmap2.ist.utl.pt:8080/index_digital/contente/09428_Ag_DE_ELocal.zip");
+		url.setUrl("http://sip-manager.isti.cnr.it/geomark/Rene-Test-01-records.zip");
 		choiceRetStr.setUrl(url);
 		retrieveStrategy.setChoice(choiceRetStr);
 		seq1.setRetrieveStrategy(retrieveStrategy);
