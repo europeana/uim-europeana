@@ -35,6 +35,7 @@ import eu.europeana.corelib.db.service.ThumbnailService;
 import eu.europeana.corelib.db.service.impl.ThumbnailServiceImpl;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
+import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
@@ -385,9 +386,11 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 				}
 
-				if (element.ifProvidedCHO()) {
-					ProvidedCHOType pcho = element.getProvidedCHO();
+				if (element.ifProxy()) {
+					ProxyType pcho = element.getProxy();
 
+				
+					
 					List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> dclist = pcho.getChoiceList();
 
 					for (eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice dcchoice : dclist) {

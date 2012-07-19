@@ -51,6 +51,7 @@ import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.Link;
 import org.theeuropeanlibrary.model.tel.qualifier.FieldSource;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
+import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.uim.gui.cp.client.services.RetrievalService;
@@ -183,9 +184,9 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
                     
                     for(Choice choice: rdfchoicelist){
                     	
-                    	if(choice.ifProvidedCHO()){
+                    	if(choice.ifProxy()){
                     		
-                    		ProvidedCHOType cho = choice.getProvidedCHO();
+                    		 ProxyType cho = choice.getProxy();
                     		
                     		List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> dctypelist = cho.getChoiceList();
                     		
