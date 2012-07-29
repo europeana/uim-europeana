@@ -61,6 +61,10 @@ import eu.europeana.uim.gui.cp.client.services.RepositoryServiceAsync;
 import eu.europeana.uim.gui.cp.shared.CollectionDTO;
 import eu.europeana.uim.gui.cp.shared.ProviderDTO;
 
+import java.io.UnsupportedEncodingException;
+
+import com.google.gwt.http.client.URL;
+
 /**
  * Table view showing current links for link checking
  * 
@@ -71,7 +75,7 @@ public class LinkValidationWidget extends IngestionWidget {
 
     // /** String PORTAL_SINGLE_RECORD_URL */
     private static final String PORTAL_SINGLE_RECORD_URL = "http://www.tel.ulcc.ac.uk/alpha/record/";
-
+    private static final String REPOSITORY_PREVIEW_URL = "http://127.0.0.1:8181/gui/EuropeanaIngestionControlPanel/mongoImageView";
     /**
      * The UiBinder interface used by this example.
      */
@@ -511,7 +515,7 @@ public class LinkValidationWidget extends IngestionWidget {
             final SingleSelectionModel<LinkDTO> linkSelectionModel) {
 
         // try to get the current position in the link selection to try to restore it for the newly
-// selected record
+        // selected record
 
         int selectedIdx = 0;
         for (int i = 0; i < linkList.size(); i++) {
@@ -527,9 +531,15 @@ public class LinkValidationWidget extends IngestionWidget {
 
         final String recordId = (String)selected.getId();
 
-        linkList.clear();
-        linkList.add(new LinkDTO(PORTAL_SINGLE_RECORD_URL + recordId, "Record in portal"));
+        String uencoderecordId = URL.encodeQueryString(recordId);
+        
 
+        
+        linkList.clear();
+        linkList.add(new LinkDTO(PORTAL_SINGLE_RECORD_URL + uencoderecordId, "Record in portal"));
+        linkList.add(new LinkDTO(REPOSITORY_PREVIEW_URL + "?recordID=" + uencoderecordId, "Preview cahched images in repository"));
+        
+        
         retrievalService.getLinks(recordId, new AsyncCallback<LinksResultDTO>() {
 
             @Override

@@ -37,10 +37,6 @@ public class RecordDetailsDialogBox extends DialogBox {
 
         TabPanel tabPanel = new TabPanel();
 
-        final TextArea raw = new TextArea();
-        raw.setCharacterWidth(100);
-        raw.setVisibleLines(20);
-        tabPanel.add(raw, "Raw");
 
         final TextArea xml = new TextArea();
         xml.setCharacterWidth(100);
@@ -65,17 +61,6 @@ public class RecordDetailsDialogBox extends DialogBox {
         dialogContents.add(closeButton);
         dialogContents.setCellHorizontalAlignment(closeButton, HasHorizontalAlignment.ALIGN_RIGHT);
 
-        retrievalServiceAsync.getRawRecord(recordId, new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                caught.printStackTrace();
-            }
-
-            @Override
-            public void onSuccess(String result) {
-                raw.setText(result);
-            }
-        });
 
         retrievalServiceAsync.getXmlRecord(recordId, new AsyncCallback<String>() {
             @Override
@@ -89,6 +74,8 @@ public class RecordDetailsDialogBox extends DialogBox {
             }
         });
 
+        //TODO: to be implementd for Mongodb & Solr
+        /*
         retrievalServiceAsync.getSearchRecord(recordId, new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -100,5 +87,7 @@ public class RecordDetailsDialogBox extends DialogBox {
                 search.setText(result);
             }
         });
+        */
+        
     }
 }

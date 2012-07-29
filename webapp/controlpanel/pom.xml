@@ -115,7 +115,7 @@
 						<Embed-Dependency>
 							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,
 							corelib-solr,corelib-solr-tools,corelib-solr-dereference,corelib-definitions,corelib-utils,
-							corelib-solr-definitions,morphia,wstx-asl
+							corelib-solr-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
@@ -248,6 +248,13 @@
 			<artifactId>corelib-utils</artifactId>
 			<version>2.0-SNAPSHOT</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-db</artifactId>
+			<version>2.0-SNAPSHOT</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
@@ -332,6 +339,15 @@
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.imgscalr</groupId>
+			<artifactId>imgscalr-lib</artifactId>
+			<version>4.2</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		
 	</dependencies>
 
 

@@ -8,6 +8,7 @@ import eu.europeana.uim.gui.cp.client.europeanawidgets.CollectionManagement;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ExpandedResourceManagementWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportControlledVocabularyWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportResourcesWidget;
+import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkCachingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkReportingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkValidationWidget;
 import eu.europeana.uim.gui.cp.client.management.IngestionTriggerWidget;
@@ -90,10 +91,16 @@ public class EuropeanaIngestionControlPanel extends
                 retrievalService), RunAsyncCode.runAsyncCode(LinkValidationWidget.class));
 
 		
-		treeModel.addMenuEntry("Link/Field Checker", new LinkReportingWidget(reportService,
+		treeModel.addMenuEntry("Link Checker/ Thumbler", new LinkReportingWidget(reportService,
                 "Link Validation", new String[] { "LinkCheckWorkflow" },
                 "linkcheck_overview.rptdesign", new String[] { "pdf" }),
                 RunAsyncCode.runAsyncCode(LinkReportingWidget.class));
+		
+		
+		treeModel.addMenuEntry("Link Checker/ Thumbler", new LinkCachingWidget(reportService,
+                "Link Caching", new String[] { "ImageCacheWorkflow" },
+                "linkcheck_overview.rptdesign", new String[] { "html" }),
+                RunAsyncCode.runAsyncCode(LinkCachingWidget.class));
 		
 		treeModel.addMenuEntry("Importing", new ImportResourcesWidget(
 				repositoryService, resourceService, integrationService),
