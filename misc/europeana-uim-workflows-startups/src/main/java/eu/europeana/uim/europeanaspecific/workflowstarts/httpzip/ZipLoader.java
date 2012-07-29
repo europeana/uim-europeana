@@ -23,12 +23,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.LinkStatus;
-
 import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -218,7 +216,7 @@ public class ZipLoader {
 		
 		if(aggregation.getObject() != null){
 			String theObject = aggregation.getObject().getResource();
-			addLink(theObject,mdr,existingLinks,false);
+			addLink(theObject,mdr,existingLinks,true);
 		}
 		}
 		
