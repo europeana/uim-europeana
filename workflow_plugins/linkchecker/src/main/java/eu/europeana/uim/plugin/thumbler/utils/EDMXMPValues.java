@@ -24,33 +24,33 @@ package eu.europeana.uim.plugin.thumbler.utils;
  */
 public enum  EDMXMPValues {
 	
-	dc_title("dc:title"),// dc:title (with xml:lang attribute set to "x-default") from dc:title
+	dc_title("xmp-dc:Title"),// dc:title (with xml:lang attribute set to "x-default") from dc:title
 	// dc:rights from edm:rights
-	dc_rights("dc:rights"),
+	dc_rights("xmp-dc:Rights"),
 	// cc:attributionName from dc:creator
-	cc_attributionName("cc:attributionName"),
+	cc_attributionName("xmp-cc:attributionName"),
 	// dc:rights from edm:rights
-	edm_rights("dc:rights"),
+	edm_rights("xmp-dc:Rights"),
 	// edm:dataProvider from europeana:dataProvider
-	edm_dataProvider("edm:dataProvider"),
+	edm_dataProvider("xmp-edm:DataProvider"),
 	// edm:provider from europeana:provider
-	edm_provider("edm:provider"),
+	edm_provider("xmp-edm:Provider"),
 	// xmpRights:Marked from europeana:rights: "False" if europeana:rights
 	// is http://creativecommons.org/publicdomain/mark/1.0/ or
 	// http://creativecommons.org/publicdomain/zero/1.0/, "True" otherwise.
-	xmpRights_Marked("xmpRights:Marked"),
+	xmpRights_Marked("xmp-xmpRights:Marked"),
 	// xmpRights:WebStatement from europeana:isShownAt
-	xmpRights_WebStatement("xmpRights:WebStatement"),
+	xmpRights_WebStatement("xmp-xmpRights:WebStatement"),
 	// cc:morePermissions from europeana:isShownAt (as a value for the
 	// rdf:resource attribute)
-	cc_morePermissions("cc:morePermissions"),
+	cc_morePermissions("xmp-cc:morePermissions"),
 	// xmpMM:OriginalDocumentID from europeana:object
-	xmpMM_OriginalDocumentID("xmpMM:OriginalDocumentID"),
+	xmpMM_OriginalDocumentID("xmp-xmpMM:OriginalDocumentID"),
 	// cc:useGuidelines with http://www.europeana.eu/rights/pd-usage-guide/
 	// (as a value for the rdf:resource attribute) if europeana:rights is
 	// http://creativecommons.org/publicdomain/mark/1.0/ or
 	// http://creativecommons.org/publicdomain/zero/
-	cc_useGuidelines("cc:useGuidelines");
+	cc_useGuidelines("xmp-cc:useGuidelines");
 	
 	
 	private String fieldId;

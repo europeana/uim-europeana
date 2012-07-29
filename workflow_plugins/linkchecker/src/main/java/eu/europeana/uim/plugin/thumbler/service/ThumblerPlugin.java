@@ -20,11 +20,9 @@
  */
 package eu.europeana.uim.plugin.thumbler.service;
 
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,11 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.Link;
 import org.theeuropeanlibrary.model.common.qualifier.LinkStatus;
 import org.theeuropeanlibrary.model.tel.ObjectModelRegistry;
@@ -175,7 +168,6 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 					            }
 					        }, context);
 				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 

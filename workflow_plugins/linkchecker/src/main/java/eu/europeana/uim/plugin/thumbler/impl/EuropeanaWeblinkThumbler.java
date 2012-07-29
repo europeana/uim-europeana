@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -45,6 +47,7 @@ import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.plugin.thumbler.utils.EDMXMPValues;
 import eu.europeana.uim.plugin.thumbler.utils.ImageMagickUtils;
+import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.UimDataSet;
 
@@ -80,8 +83,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 	private static final String STORAGELOCATION = "C:\\tmpimages\\";
 	
-	private static Random generator = new Random(); 
-	
+
 	/**
 	 * Private singleton constructor.
 	 */
@@ -199,12 +201,16 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 						 
 						 File img = retrieveFile(offeredlink.getUrl());
 
-						 BufferedImage convimg = ImageMagickUtils.convert(img);
+						 File convimg = ImageMagickUtils.convert(img);
 						 
 						 ImageMagickUtils.addXMPInfo(convimg,xmpvalues);
+
+						 BufferedImage buff = ImageIO.read(convimg); 
+
+					     Collection coll = (Collection) dataset;
 						 
 						 thumbnailHandler.storeThumbnail(objectIDURI,
-									(String) dataset.getId(), convimg,
+									(String) coll.getId(), buff,
 									offeredlink.getUrl());
 					 }
 				} else {
@@ -226,12 +232,16 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 										
 										File img = retrieveFile(resource);
 										
-										 BufferedImage convimg = ImageMagickUtils.convert(img);
+										File convimg = ImageMagickUtils.convert(img);
 										 
-										 ImageMagickUtils.addXMPInfo(convimg,xmpvalues);
+										ImageMagickUtils.addXMPInfo(convimg,xmpvalues);
+
+										BufferedImage buff = ImageIO.read(convimg); 
+
+										Collection coll = (Collection) dataset;
 										
 										thumbnailHandler.storeThumbnail(objectIDURI,resource,
-													(String) dataset.getId(), convimg,
+													(String) coll.getMnemonic(), buff,
 													offeredlink.getUrl());										 
 									 }
 								}
@@ -244,6 +254,9 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 				return target;
 			} catch (Throwable t) {
+				
+				log.severe(t.getMessage());
+
 			}
 			return null;
 		}
@@ -269,8 +282,9 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				if (status == HttpStatus.SC_BAD_REQUEST) {
 					log.info("Bad request: <" + guarded.getUrl() + ">.");
 
+					
 				} else if (status == HttpStatus.SC_OK) {
-					String name = new Integer(generator.nextInt()).toString();
+					String name =  guarded.getUrl().getFile();  //new Integer(generator.nextInt()).toString();
 
 					target = new File(STORAGELOCATION +name);
 					FileUtils.copyURLToFile(new URL(url), target, 100, 1000);

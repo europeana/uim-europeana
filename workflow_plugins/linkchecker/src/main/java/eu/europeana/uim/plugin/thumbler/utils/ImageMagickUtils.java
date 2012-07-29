@@ -19,7 +19,9 @@ package eu.europeana.uim.plugin.thumbler.utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.ETOperation;
@@ -41,7 +43,7 @@ public final class ImageMagickUtils {
 	private final static ProcessExecutor exec;
 	
 	static{
-		String myPath="C:\\Program Files\\ImageMagick-6.7.7-Q16\\ImageMagick.exe;C:\\Software\\exiftool\\exiftool(-k).exe";
+		String myPath="C:\\Program Files\\ImageMagick-6.7.7-Q16\\;C:\\Software\\exiftool\\";
 		ProcessStarter.setGlobalSearchPath(myPath);
 		
 		 exec = new ProcessExecutor();
@@ -57,73 +59,83 @@ public final class ImageMagickUtils {
 	/**
 	 * @param img
 	 */
-	public static BufferedImage convert(File img){
-		BufferedImage newimg;
+	public static File convert(File img0){
+		String img = img0.getAbsolutePath();
 		
-		try {
-			newimg = ImageIO.read(img);
-			return newimg;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String img2 = img0.getAbsolutePath() + ".jpg";
+		
+		IMOperation  op = new IMOperation ();
 
-		return null;
-
-		/*
-		IMOperation op = new IMOperation();
-		op.addImage(img.getPath());
-		op.addImage(img.getPath() + ".jpg");
+		op.addImage(img);
+		op.addImage(img2);
 
 		ConvertCmd convert = new ConvertCmd();
-		try {
-			convert.run(op);
-			
-			BufferedImage newimg = ImageIO.read(new File(img.getPath() + ".jpg"));
-			BufferedImage newimg = ImageIO.read(img);
 
-			return newimg;
 
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IM4JavaException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-		*/
+			try {
+				convert.run(op);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IM4JavaException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return new File(img2);
+
 	}
 	
 	
 	/**
 	 * @param img
 	 */
-	public static void addXMPInfo(BufferedImage img, Map<EDMXMPValues, String> map){
-		ETOperation op = new ETOperation();
-
-		 Iterator<EDMXMPValues> it = map.keySet().iterator();
+	public static void addXMPInfo(File img, Map<EDMXMPValues, String> map){
+		 List<String> exiftoolargs = new ArrayList<String>();
+		 List<String> tags = new ArrayList<String>();
+		 
+        Iterator<EDMXMPValues> it = map.keySet().iterator();
 		 
 		 while(it.hasNext()){
 			 EDMXMPValues xmpkey = it.next();
-			 String xmpvalue = map.get(xmpkey);
-			 op.setTag(xmpkey.getFieldId(), xmpvalue);
-		 }
+			 String xmpvalue = map.get(xmpkey);			 
+			 String xmpname = xmpkey.getFieldId().split(":")[1];
+			 tags.add(xmpname);
+			 
+			 StringBuffer sb = new StringBuffer();
+			 sb.append("-");
+			 sb.append(xmpkey.getFieldId());
+			 sb.append("=\"");
+			 sb.append(xmpvalue);
+			 sb.append("\"");
 
-        ExiftoolCmd cmd = new ExiftoolCmd();
-        
-        
-		try {
-			cmd.run(op, img);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IM4JavaException e) {
-			e.printStackTrace();
-		}
+			 exiftoolargs.add(sb.toString());
+		 }
+		 
+
+		ETOperation op = new ETOperation();
+		op.addImage(img.getAbsolutePath());
+
+
+		op.delTags(tags.toArray(new String[tags.size()]));
+
+		op.addRawArgs(exiftoolargs);
+
+      ExiftoolCmd cmd = new ExiftoolCmd();
+      try {
+		cmd.run(op);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (IM4JavaException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	}
 
 }
