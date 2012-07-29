@@ -153,8 +153,10 @@ public class MintSendSyncTest {
 	@Test
 	public void createImportsTest() throws MintOSGIClientException, MintRemoteException{
 		CreateImportCommand command = new CreateImportCommand();
-		command.setUserId(userId);
-		command.setOrganizationId(orgId);
+		//command.setUserId(userId);
+		command.setUserId("1000");
+		//command.setOrganizationId(orgId);
+		command.setOrganizationId("1");
 		command.setRepoxTableName("azores13");
 		CreateImportResponse resp = client.createImports(command);
 		importId = resp.getImportId();

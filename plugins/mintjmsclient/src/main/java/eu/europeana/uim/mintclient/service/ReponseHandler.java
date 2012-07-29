@@ -135,6 +135,7 @@ public class ReponseHandler {
 			@SuppressWarnings("rawtypes")
 			Provider prov2 = (Provider) entity;
 			CreateUserAction action2 = (CreateUserAction) response;
+			//TODO:Create user support when needed here
 		}
 		else if(response instanceof CreateImportAction){
 			@SuppressWarnings("rawtypes")
@@ -160,19 +161,10 @@ public class ReponseHandler {
 			PublishTransformationAction action = (PublishTransformationAction) response;
 			
 			//TODO: Rename this temporarily until MINT fixes the bug
-			String ziplocation = action.getPublishTransformationResponse().getUrl().split("//")[1];
-			String[] arr = ziplocation.split("/");
-			
-			StringBuffer sb = new StringBuffer();
-			sb.append("http://");
-			sb.append(arr[0]);
-			sb.append("/");
-			sb.append("MintUimDemo");
-			sb.append("/");			
-			sb.append(arr[1]);
-			
+			String ziplocation = action.getPublishTransformationResponse().getUrl();
+
 			collection.putValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION,
-					sb.toString());
+					ziplocation);
 			storage.updateCollection(collection);
 			Workflow ingestionworkflow =registry.getWorkflow(ingestionWf);
 			

@@ -36,6 +36,8 @@ import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserResponse;
 import eu.europeana.uim.mintclient.jibxbindings.ErrorResponse;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.OrganizationExistsResponse;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
@@ -125,6 +127,37 @@ public class MintUIMServiceImpl implements MintUIMService {
 	public void createMintOrganization(Provider provider)
 			throws MintOSGIClientException, MintRemoteException,
 			StorageEngineException {
+		
+		String mintID = provider.getValue(ControlledVocabularyProxy.MINTID);
+		
+		if(mintID == null){
+			performOrgCreation(provider);
+		}
+		 else{
+				OrganizationExistsCommand org = new OrganizationExistsCommand();
+				org.setOrganizationId(mintID);
+				
+				OrganizationExistsResponse orgresp = synchronousClient.organizationExists(org);
+
+				synchronousClient.organizationExists(org );
+				if(!orgresp.isExists()){
+					performOrgCreation(provider);
+			    }
+		 }
+			
+		}
+	
+			
+	
+
+	
+	/**
+	 * @param provider
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 * @throws StorageEngineException
+	 */
+	private void performOrgCreation(Provider provider) throws MintOSGIClientException, MintRemoteException, StorageEngineException{
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
 		command.setCountry(provider
 				.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY));
@@ -137,6 +170,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 		
 		command.setUserId(userID);
 
+
 		CreateOrganizationResponse resp = synchronousClient
 				.createOrganization(command);
 		
@@ -144,7 +178,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 		action.setCreateOrganizationResponse(resp);
 		resphandler.handleResponse(action, provider);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -192,8 +226,10 @@ public class MintUIMServiceImpl implements MintUIMService {
 		CreateImportCommand command = new CreateImportCommand();
 		
 		Provider provider = collection.getProvider();
-		command.setUserId(provider
-				.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
+		//command.setUserId(provider
+		//		.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
+		
+		command.setUserId("1000");
 		command.setOrganizationId(provider
 				.getValue(ControlledVocabularyProxy.MINTID));
 		
@@ -205,13 +241,14 @@ public class MintUIMServiceImpl implements MintUIMService {
 					"provide the data for the mapping session");
 		}
 		
-		command.setRepoxTableName(repoxID);
-		
-		CreateImportResponse resp = synchronousClient.createImports(command);
-
+		command.setRepoxTableName(repoxID);		
+		asynchronousClient.createImports(command,repoxID);
+		/*
+				CreateImportResponse resp = 
 		CreateImportAction action = new CreateImportAction();
 		action.setCreateImportResponse(resp);
 		resphandler.handleResponse(action,collection);
+		*/
 	}
 
 	/**

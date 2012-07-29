@@ -292,7 +292,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	    while (true) {
 	    	QueueingConsumer.Delivery delivery;
 			try {
-				delivery = consumer.nextDelivery(10000);
+				delivery = consumer.nextDelivery(100000);
 				 
 				if(delivery == null ){
 					throw new MintRemoteException("Response from remote client timed out");
