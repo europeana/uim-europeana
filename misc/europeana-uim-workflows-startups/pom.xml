@@ -121,6 +121,7 @@
 							org.jibx.runtime.impl,
 							org.jibx.extras,
 							eu.europeana.uim.model.europeanaspecific.utils,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues,
 							!*
 						</Import-Package>
 						<Export-Package>

@@ -191,17 +191,21 @@ public class ZipLoader {
 			
 			List<HasView> has_views = aggregation.getHasViewList();
 			
+			if(has_views != null){
+				
 			for(HasView view : has_views){
 				String resource = view.getResource();
 				addLink(resource,mdr,existingLinks,false);
 			}
-
+			}
 		
 		List<HasView> edm_has_view = aggregation.getHasViewList();
 		
+		if(edm_has_view != null){
 		for(HasView view : edm_has_view){
 			String hasView = view.getResource();
 			addLink(hasView,mdr,existingLinks,false);
+		}
 		}
 		
 		if(aggregation.getIsShownAt() != null){
