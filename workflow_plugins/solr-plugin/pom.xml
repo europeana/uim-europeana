@@ -206,6 +206,7 @@
 							!com.sun.msv.*,
 							!org.apache.xml.resolver,
 							!org.apache.xml.resolver.*,
+							!org.apache.xml.serializer,
 							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
