@@ -197,7 +197,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
                     			}
                     			
                     			if(dcchoice.ifLanguage()){
-                    				record.setWorkLanguage(dcchoice.getDate().getString());
+                    				record.setWorkLanguage(dcchoice.getLanguage().getString());
                     			}
                     			
                     			if(dcchoice.ifCreator()){
