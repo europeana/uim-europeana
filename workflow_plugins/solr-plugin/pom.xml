@@ -205,6 +205,7 @@
 							!org.testng.*,
 							!com.sun.msv.*,
 							!org.apache.xml.resolver,
+							!org.apache.xml.resolver.*,
 							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
