@@ -1,0 +1,39 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" 
+xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
+
+    <bean id="enrichmentbean" class="eu.europeana.uim.enrichment.EnrichmentPlugin">
+    	 <property name="europeanaID" value="${europeanaID}" />
+    	 <property name="mongoHost" value="${mongoHost}" />
+    	 <property name="mongoPort" value="${mongoPort}" />
+    	 <property name="solrUrl" value="${solrUrl}" />
+    	 <property name="solrCore" value="${solrCore}" />
+    	 <property name="mongoDB" value="${mongoDB}" />
+    	 <property name="repository" value="${repository}" />
+    	 <property name="vocabularyDB" value="${vocabularyDB}" />
+    	 <property name="sugarCrmService" ref="sugarcrm"/>
+    	 <property name="collections" value="${collections}" />
+    </bean>
+    <reference id="sugarcrm" interface="eu.europeana.uim.sugarcrm.SugarCrmService"/>
+	<service id="enrichmentPlugin" ref="enrichmentbean" interface="eu.europeana.uim.api.IngestionPlugin" />
+	
+	    <!-- Property place holder -->
+    <cm:property-placeholder persistent-id="eu.europeana.uim.enrichment.EnrichmentPlugin">
+        <cm:default-properties>
+            <cm:property name="europeanaID" value="EuropeanaID" />
+            <cm:property name="collections" value="collections" />
+            <cm:property name="mongoHost" value="127.0.0.1" />
+             <cm:property name="solrCore" value="apache-solr-3.5.0" />
+              <cm:property name="solrUrl" value="http://localhost:8282/" />
+            
+             <!--  for remote use 
+            <cm:property name="mongoHost" value="europeana-ese2.edm.isti.cnr.it" />
+            <cm:property name="solrUrl" value="http://europeana-ese2.edm.isti.cnr.it:9292/" />
+            <cm:property name="solrCore" value="solr" /> -->
+             <cm:property name="mongoPort" value="27017" />
+            <cm:property name="mongoDB" value="europeana" />
+            <cm:property name="repository" value="/export/repository" />
+            <cm:property name="vocabularyDB" value="vocabulary" />
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+</blueprint>
