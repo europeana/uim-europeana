@@ -115,7 +115,7 @@
 						<Embed-Dependency>
 							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,
 							corelib-solr,corelib-solr-tools,corelib-solr-dereference,corelib-definitions,corelib-utils,
-							corelib-solr-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib
+							corelib-solr-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,europeana-uim-plugin-enrichment
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
