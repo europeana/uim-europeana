@@ -13,8 +13,13 @@
     <bean id="riwClient" class="eu.europeana.uim.europeanaspecific.workflows.RepositoryIngestionWorkflow">
     </bean>
     
+      <bean id="eiwClient" class="eu.europeana.uim.europeanaspecific.workflows.EnrichmentWorkflow">
+    </bean>
+    
     <service id="initialIngestionWorkflow" ref="iiwClient" interface="eu.europeana.uim.workflow.Workflow"/>
     
     <service id="repositoryIngestionWorkflow" ref="riwClient" interface="eu.europeana.uim.workflow.Workflow"/>
+    
+     <service id="enrichmentIngestionWorkflow" ref="eiwClient" interface="eu.europeana.uim.workflow.Workflow"/>
 
 </blueprint>
