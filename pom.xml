@@ -19,15 +19,17 @@
 		<module>plugins</module>
 		<module>misc/europeana-uim-workflows-startups</module>
 		<module>workflows/workflow-basic</module>
+		<module>workflow_plugins/europeana-uim-plugin-enrichment</module>
 		<module>workflow_plugins/linkchecker</module>
 		<module>workflow_plugins/solr-plugin</module>
+		
 		<module>webapp/controlpanel</module>
 	</modules>
 
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<slf4j.version>1.6.0</slf4j.version>
+		<slf4j.version>1.6.1</slf4j.version>
 		<spring.maven.artifact.version>3.0.5.RELEASE</spring.maven.artifact.version>
 		<spring.osgi.version>1.2.1</spring.osgi.version>
 		<spring.ws.version>2.0.0.RELEASE</spring.ws.version>

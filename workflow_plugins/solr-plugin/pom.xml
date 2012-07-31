@@ -207,6 +207,7 @@
 							!org.apache.xml.resolver,
 							!org.apache.xml.resolver.*,
 							!org.apache.xml.serializer,
+							!sun.io.*,
 							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
