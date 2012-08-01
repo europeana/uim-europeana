@@ -32,9 +32,9 @@ public class RepositoryIngestionWorkflow extends AbstractWorkflow{
 		        "Dereference functionality of UIM");
 
 		        setStart(new BatchWorkflowStart());
-
-		        addStep(new SolrWorkflowPlugin());
-		        isSavepoint("SolrWorkflowPlugin");
+		        SolrWorkflowPlugin solrPlugin = new SolrWorkflowPlugin();
+		        addStep(solrPlugin);
+		        isSavepoint(solrPlugin.getIdentifier());
 	}
 
 	@Override

@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +113,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 					0);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			
-			Map<String, List<String>> dereferencedValues = new HashMap<String,List<String>>();
+			Map<String, List<String>> dereferencedValues = Collections.synchronizedMap(new HashMap<String,List<String>>());
 			List<Choice> choices =	rdf.getChoiceList();
 			for(Choice choice : choices){
 				if(choice.ifAgent()){
@@ -149,9 +150,8 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			RDF der = solr2Rdf.constructFromMap(SolrConstructor.constructSolrDocument(rdf), dereferencedValues);
 			IMarshallingContext marshallingContext = bfact.createMarshallingContext();
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			 marshallingContext.marshalDocument(der, "UTF-8", null, out);
-			context.putValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, out.toString());
-			
+			marshallingContext.marshalDocument(der, "UTF-8", null, out);
+			mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, out.toString());
 			return true;
 				
 			
@@ -189,9 +189,12 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		return false;
 	}
 
+
+	
+	
 	private Map<String, ? extends List<String>> dereferenceWebResource(
 			WebResourceType webResource) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteralList(webResource.getConformsToList()));
 		retVal.putAll(derefResourceOrLiteralList(webResource.getCreatedList()));
 		retVal.putAll(derefResourceOrLiteralList(webResource.getDescriptionList()));
@@ -210,7 +213,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private Map<String, ? extends List<String>> dereferenceTimespan(
 			TimeSpanType timeSpan) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteralList(timeSpan.getAltLabelList()));
 		retVal.putAll(derefResourceOrLiteralList(timeSpan.getPrefLabelList()));
 		retVal.putAll(derefResourceOrLiteralList(timeSpan.getHasPartList()));
@@ -225,7 +228,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private Map<String, ? extends List<String>> dereferenceProxy(
 			ProxyType proxy) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteralList(proxy.getHasMetList()));
 		retVal.putAll(derefResourceOrLiteralList(proxy.getHasTypeList()));
 		retVal.putAll(derefResourceOrLiteralList(proxy.getIncorporateList()));
@@ -285,7 +288,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private Map<String, ? extends List<String>> dereferenceProvidedCHO(
 			ProvidedCHOType providedCHO) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteral(providedCHO.getAbout()));
 		retVal.putAll(derefResourceOrLiteralList(providedCHO.getSameAList()));
 		return retVal;
@@ -293,7 +296,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private Map<String, ? extends List<String>> dereferencePlace(
 			PlaceType place) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteral(place.getAbout()));
 		retVal.putAll(derefResourceOrLiteral(place.getAlt()));
 		retVal.putAll(derefResourceOrLiteral(place.getLat()));
@@ -308,7 +311,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private Map<String, ? extends List<String>> dereferenceConcept(
 			Concept concept) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteral(concept.getAbout()));
 		for(eu.europeana.corelib.definitions.jibx.Concept.Choice choice : concept.getChoiceList()){
 				
@@ -330,7 +333,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private Map<String, ? extends List<String>> dereferenceEuropeanaAggregation(
 			EuropeanaAggregationType aggregation) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteral(aggregation.getAbout()));
 		retVal.putAll(derefResourceOrLiteral(aggregation.getAggregatedCHO()));
 		retVal.putAll(derefResourceOrLiteral(aggregation.getCountry()));
@@ -346,7 +349,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private Map<String, ? extends List<String>> dereferenceAggregation(
 			Aggregation aggregation) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteral(aggregation.getAbout()));
 		retVal.putAll(derefResourceOrLiteral(aggregation.getAggregatedCHO()));
 		retVal.putAll(derefResourceOrLiteral(aggregation.getDataProvider()));
@@ -363,7 +366,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	private Map<String, ? extends List<String>> dereferenceAgent(
 			AgentType agent) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		retVal.putAll(derefResourceOrLiteral(agent.getAbout()));
 		retVal.putAll(derefResourceOrLiteralList(agent.getAltLabelList()));
 		retVal.putAll(derefResourceOrLiteralList(agent.getDateList()));
@@ -386,7 +389,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	}
 	
 	private Map<String,List<String>> derefResourceOrLiteralList(List<?>list) throws MalformedURLException, IOException{
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		if(list!=null){
 		for(Object object:list){
 			retVal.putAll(derefResourceOrLiteral(object));
@@ -397,7 +400,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	
 	private Map<String, ? extends List<String>> derefResourceOrLiteral(
 			Object object) throws MalformedURLException, IOException {
-		Map<String,List<String>> retVal = new HashMap<String, List<String>>();
+		Map<String,List<String>> retVal = Collections.synchronizedMap(new HashMap<String, List<String>>());
 		if (object instanceof ResourceType){
 			if(((ResourceType)object).getResource()!=null){
 				retVal.putAll(Dereferencer.normalize(((ResourceType)object).getResource()));
@@ -431,11 +434,11 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	}
 
 	public int getPreferredThreadCount() {
-		return 1;
+		return 5;
 	}
 
 	public int getMaximumThreadCount() {
-		return 1;
+		return 10;
 	}
 
 	public <I> void initialize(ExecutionContext<I> context)
