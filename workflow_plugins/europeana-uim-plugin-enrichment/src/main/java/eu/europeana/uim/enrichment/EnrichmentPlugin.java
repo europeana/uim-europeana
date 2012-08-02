@@ -192,7 +192,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(
 					0);
-			System.out.println(value);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			SolrInputDocument solrInputDocument = enrichmentService.enrich(SolrConstructor.constructSolrDocument(rdf));
 			Solr2Rdf solr2Rdf = new Solr2Rdf();
