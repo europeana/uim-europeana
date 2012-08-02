@@ -39,7 +39,7 @@ import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
-import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
+import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
@@ -51,7 +51,6 @@ import eu.europeana.uim.sugarcrm.SugarCrmService;
 
 public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static String vocabularyDB;
-	private static EuropeanaEnrichmentTagger tagger;
 	private static MongoConstructor mongoConstructor;
 	private static EdmMongoServerImpl edmMongoServer;
 	private static CommonsHttpSolrServer solrServer;
@@ -66,6 +65,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static final int RETRIES = 10;
 	private static String repository;
 	private static SugarCrmService sugarCrmService;
+	private static EnrichmentService enrichmentService;
 	private static String previewsOnlyInPortal;	
 	private static String collections;
 	
@@ -128,7 +128,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public <I> void initialize(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
 		// TODO Auto-generated method stub
-		tagger = new EuropeanaEnrichmentTagger();
+		
 		try {
 			
 			solrServer = new CommonsHttpSolrServer(solrUrl+"/"+solrCore);
@@ -146,7 +146,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
-			tagger.init("Europeana");
 			mongoConstructor = new MongoConstructor();
 			mongo  = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			edmMongoServer = new EdmMongoServerImpl(mongo,mongoDB,"","");
@@ -194,9 +193,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(
 					0);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			SolrInputDocument solrInputDocument = tagger
-					.tagDocument(SolrConstructor.constructSolrDocument(rdf));
-			
+			System.out.println(value);
+			SolrInputDocument solrInputDocument = enrichmentService.enrich(SolrConstructor.constructSolrDocument(rdf));
 			Solr2Rdf solr2Rdf = new Solr2Rdf();
 			solr2Rdf.initialize();
 			RDF der = solr2Rdf.constructFromSolrDocument(solrInputDocument);
@@ -261,12 +259,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		return true;
 	}
 	
-	public EuropeanaEnrichmentTagger getTagger() {
-		return tagger;
-	}
-	public void setTagger(EuropeanaEnrichmentTagger tagger) {
-		EnrichmentPlugin.tagger = tagger;
-	}
+	
 	public MongoConstructor getMongoConstructor() {
 		return mongoConstructor;
 	}
@@ -360,6 +353,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	}
 	public void setSolrCore(String solrCore) {
 		EnrichmentPlugin.solrCore = solrCore;
+	}
+	public EnrichmentService getEnrichmentService() {
+		return enrichmentService;
+	}
+	public void setEnrichmentService(EnrichmentService enrichmentService) {
+		EnrichmentPlugin.enrichmentService = enrichmentService;
 	}
 	private void createLookupEntry(FullBean fullBean, String hash) {
 		EuropeanaIdMongoServer europeanaIdMongoServer = new EuropeanaIdMongoServer(
