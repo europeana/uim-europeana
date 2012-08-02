@@ -11,6 +11,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
@@ -54,6 +55,7 @@ public class EnrichmentTest {
 			+ "</ore:Aggregation>" + "</rdf:RDF>";
 	
 	@SuppressWarnings("unchecked")
+	@Ignore
 	@Test
 	public void testAnnocultorEnrichment(){
 		EuropeanaEnrichmentTagger tagger = new EuropeanaEnrichmentTagger();
