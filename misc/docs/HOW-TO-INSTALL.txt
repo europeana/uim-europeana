@@ -256,12 +256,15 @@ svn co https://europeanalabs.eu/svn/uim/trunk/uim uim
 cd uim
 mvn clean install -DskipTests -P europeana
 
+2. Annocultor for enrichment plugin
+svn co https://europeanalabs.eu/svn/europeana/trunk/tools/annocultor_solr3.5 annocultor
+mvn clean install -DskipTests
+export ANNOCULTOR_HOME=/path/to/annocultor/converters/europeana
 
-2. The UIM Europeana Specific Compoenents:
+3. The UIM Europeana Specific Compoenents:
 svn co https://europeanalabs.eu/svn/europeana/trunk/uim europeanacomponents
 cd europeanacomponents
 mvn clean install -DskipTests
-
 
 Logging Engine:
 
