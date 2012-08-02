@@ -131,7 +131,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		
 		try {
 			
-			solrServer = new CommonsHttpSolrServer(solrUrl+"/"+solrCore);
+			solrServer = new CommonsHttpSolrServer(solrUrl+solrCore);
 			 solrServer.setSoTimeout(1000);  // socket read timeout
 			  solrServer.setConnectionTimeout(100);
 			  solrServer.setDefaultMaxConnectionsPerHost(100);
@@ -192,12 +192,13 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(
 					0);
-			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			System.out.println(value);
+			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			SolrInputDocument solrInputDocument = enrichmentService.enrich(SolrConstructor.constructSolrDocument(rdf));
 			Solr2Rdf solr2Rdf = new Solr2Rdf();
 			solr2Rdf.initialize();
-			RDF der = solr2Rdf.constructFromSolrDocument(solrInputDocument);
+			
+			RDF der = (RDF) uctx.unmarshalDocument(new StringReader(solr2Rdf.constructFromSolrDocument(solrInputDocument)));
 			IMarshallingContext marshallingContext = bfact.createMarshallingContext();
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			 marshallingContext.marshalDocument(der, "UTF-8", null, out);			
