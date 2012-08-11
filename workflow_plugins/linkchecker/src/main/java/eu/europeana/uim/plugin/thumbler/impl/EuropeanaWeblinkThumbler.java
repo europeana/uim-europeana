@@ -45,7 +45,6 @@ import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 
 
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
-import eu.europeana.uim.plugin.thumbler.utils.EDMXMPValues;
 import eu.europeana.uim.plugin.thumbler.utils.ImageMagickUtils;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
@@ -187,10 +186,8 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 				RDF edmRecord = (RDF) uctx.unmarshalDocument(reader);
 
-				Map<EDMXMPValues, String> xmpvalues = populatevalues(edmRecord);
 
-				String objectIDURI = xmpvalues
-						.get(EDMXMPValues.xmpMM_OriginalDocumentID);
+				String objectIDURI = extractOrigDocumentId(edmRecord);
 
 				Link offeredlink = guarded.getLink();
 
@@ -202,8 +199,6 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 						 File img = retrieveFile(offeredlink.getUrl());
 
 						 File convimg = ImageMagickUtils.convert(img);
-						 
-						 ImageMagickUtils.addXMPInfo(convimg,xmpvalues);
 
 						 BufferedImage buff = ImageIO.read(convimg); 
 
@@ -211,7 +206,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 						 
 						 thumbnailHandler.storeThumbnail(objectIDURI,
 									(String) coll.getId(), buff,
-									offeredlink.getUrl());
+									offeredlink.getUrl(),edmRecord);
 					 }
 				} else {
 					List<Choice> elements = edmRecord.getChoiceList();
@@ -233,16 +228,13 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 										File img = retrieveFile(resource);
 										
 										File convimg = ImageMagickUtils.convert(img);
-										 
-										ImageMagickUtils.addXMPInfo(convimg,xmpvalues);
 
 										BufferedImage buff = ImageIO.read(convimg); 
 
 										Collection coll = (Collection) dataset;
 										
-										thumbnailHandler.storeThumbnail(objectIDURI,resource,
-													(String) coll.getMnemonic(), buff,
-													offeredlink.getUrl());										 
+										thumbnailHandler.storeThumbnail(objectIDURI,(String) coll.getId(),
+													buff,offeredlink.getUrl(),edmRecord);										 
 									 }
 								}
 
@@ -339,9 +331,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		 * @param edmRecord
 		 * @return
 		 */
-		private Map<EDMXMPValues, String> populatevalues(RDF edmRecord) {
-
-			HashMap<EDMXMPValues, String> EDMXMPValuesMap = new HashMap<EDMXMPValues, String>();
+		private String extractOrigDocumentId(RDF edmRecord) {
 
 			List<Choice> elements = edmRecord.getChoiceList();
 
@@ -353,81 +343,21 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 					Aggregation aggregation = element.getAggregation();
 
 
-					if (aggregation.getIsShownAt() != null) {
-						EDMXMPValuesMap.put(EDMXMPValues.xmpRights_Marked, aggregation
-								.getIsShownAt().getResource());
-						EDMXMPValuesMap.put(EDMXMPValues.cc_morePermissions, aggregation
-								.getIsShownAt().getResource());
-					}
-
 					if (aggregation.getObject() != null) {
-						EDMXMPValuesMap.put(EDMXMPValues.xmpMM_OriginalDocumentID,
-								aggregation.getObject().getResource());
+						return aggregation.getObject().getResource();
+					}
+					else{
+						return "";
 					}
 
-					if (aggregation.getRights() != null) {
-						EDMXMPValuesMap.put(EDMXMPValues.edm_rights, aggregation
-								.getRights().getResource());
-
-						if (aggregation
-								.getRights()
-								.getResource()
-								.equals("http://creativecommons.org/publicdomain/mark/1.0/")
-								|| aggregation
-										.getRights()
-										.getResource()
-										.equals("http://creativecommons.org/publicdomain/zero/1.0/")) {
-
-							EDMXMPValuesMap.put(EDMXMPValues.xmpRights_Marked, "False");
-							EDMXMPValuesMap
-									.put(EDMXMPValues.cc_useGuidelines,
-											"http://www.europeana.eu/rights/pd-usage-guide/");
-						} else {
-							EDMXMPValuesMap.put(EDMXMPValues.xmpRights_Marked, "True");
-						}
-
-					}
-
-					if (aggregation.getDataProvider() != null) {
-						EDMXMPValuesMap.put(EDMXMPValues.edm_dataProvider, aggregation
-								.getDataProvider().getResource());
-					}
-
-					if (aggregation.getProvider() != null) {
-						EDMXMPValuesMap.put(EDMXMPValues.edm_provider, aggregation
-								.getProvider().getResource());
-					}
-
+		
 				}
 
-				if (element.ifProxy()) {
-					ProxyType pcho = element.getProxy();
 
-				
-					
-					List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> dclist = pcho.getChoiceList();
-
-					for (eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice dcchoice : dclist) {
-						if (dcchoice.ifCreator()) {
-							EDMXMPValuesMap.put(EDMXMPValues.cc_attributionName,
-									dcchoice.getCreator().getString());
-						}
-						if (dcchoice.ifTitle()) {
-							EDMXMPValuesMap.put(EDMXMPValues.dc_title, dcchoice
-									.getTitle().getString());
-						}
-						if (dcchoice.ifRights()) {
-							EDMXMPValuesMap.put(EDMXMPValues.dc_rights, dcchoice
-									.getRights().getString());
-						}
-					}
-
-				}
-
-			}
-			return EDMXMPValuesMap;
 		}
+			return null;
 
+	}
 	}
 
 

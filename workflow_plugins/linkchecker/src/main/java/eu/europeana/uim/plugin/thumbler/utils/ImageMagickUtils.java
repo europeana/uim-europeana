@@ -87,55 +87,5 @@ public final class ImageMagickUtils {
 			return new File(img2);
 
 	}
-	
-	
-	/**
-	 * @param img
-	 */
-	public static void addXMPInfo(File img, Map<EDMXMPValues, String> map){
-		 List<String> exiftoolargs = new ArrayList<String>();
-		 List<String> tags = new ArrayList<String>();
-		 
-        Iterator<EDMXMPValues> it = map.keySet().iterator();
-		 
-		 while(it.hasNext()){
-			 EDMXMPValues xmpkey = it.next();
-			 String xmpvalue = map.get(xmpkey);			 
-			 String xmpname = xmpkey.getFieldId().split(":")[1];
-			 tags.add(xmpname);
-			 
-			 StringBuffer sb = new StringBuffer();
-			 sb.append("-");
-			 sb.append(xmpkey.getFieldId());
-			 sb.append("=\"");
-			 sb.append(xmpvalue);
-			 sb.append("\"");
-
-			 exiftoolargs.add(sb.toString());
-		 }
-		 
-
-		ETOperation op = new ETOperation();
-		op.addImage(img.getAbsolutePath());
-
-
-		op.delTags(tags.toArray(new String[tags.size()]));
-
-		op.addRawArgs(exiftoolargs);
-
-      ExiftoolCmd cmd = new ExiftoolCmd();
-      try {
-		cmd.run(op);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (IM4JavaException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	}
 
 }
