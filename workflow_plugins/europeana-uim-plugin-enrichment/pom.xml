@@ -82,6 +82,11 @@
 			<version>0.99</version>
 			<scope>compile</scope>
 		</dependency>
+		   <dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>1.9.9</version>
+		</dependency>
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>wstx-asl</artifactId>
@@ -170,6 +175,8 @@
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,
+							!org.codehaus.jackson.*,
+							!org.codehaus.jackson.map.*,
 							!org.dom4j.*,
 							!org.imgscalr.*,
 							!org.relaxng.datatype.*,
@@ -199,6 +206,8 @@
 							!org.codehaus.jettison.*,
 							!sun.misc,
 							!sun.reflect,
+							!javax.ws.rs,
+							!javax.ws.rs.*,
 							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
