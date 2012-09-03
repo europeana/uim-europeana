@@ -22,25 +22,48 @@ import eu.europeana.uim.util.LoggingIngestionPlugin;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 
 /**
- *
+ * UIM Workflow for Image Caching. It is declared and exposed as a service 
+ * in the linkchecker_plugin.xml blueprint declaration.
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 11 Jun 2012
  */
 public class ImageCacheWorkflow extends AbstractWorkflow{
 	
 	
+	/**
+	 * Initialise the workflow by creating a new instance of this class.
+	 */
 	public ImageCacheWorkflow(){
         super("Image Caching",
-                "Workflow which is used to cache selected imeges into MongoDB.");
+                "Workflow which is used to cache selected images into MongoDB.");
+
+        //Load metadata records from storage engine and offer them
+        //to the declared plugins in batches. The size of the batch 
+        //is determined by the relevant property defined by the batch workflow.
         setStart(new BatchWorkflowStart());
+        //Add the Link Checking Plugin as a step
         addStep(new ThumblerPlugin());
+        //Performs logging of TKey<LoggingIngestionPlugin, Data> DATA_KEY 
+        //typed key values, previously stored by the ThumblerPlugin plugin.
+        //These values are used in a later phase in order to generate 
+        //BIRT reports. Note here that although this step is compatible with
+        //both logging engine implementations (memory & database), you
+        //should use the database (postgres specific module) in order for
+        //this to work properly.
         addStep(new LoggingIngestionPlugin());
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.workflow.Workflow#isSavepoint(java.lang.String)
+	 */
 	public boolean isSavepoint(String pluginIdentifier) {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.workflow.Workflow#isMandatory(java.lang.String)
+	 */
 	public boolean isMandatory(String pluginIdentifier) {
 		return false;
 	}

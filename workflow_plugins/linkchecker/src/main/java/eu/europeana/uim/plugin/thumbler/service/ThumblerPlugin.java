@@ -49,6 +49,7 @@ import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimDataSet;
 import eu.europeana.uim.store.MetaDataRecord.QualifiedValue;
 import eu.europeana.uim.sugarcrm.SugarService;
+import eu.europeana.uim.api.ActiveExecution;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPluginFailedException;
@@ -60,7 +61,13 @@ import eu.europeana.uim.common.TKey;
 
 
 /**
- *
+ * Main Implementation of the Thumbler plugin. It is basically a variation
+ * of the linkchecking plugin that checks only the links that represent 
+ * images in the relevant section of the EDM document (europeana:object)
+ * and uses these to create 3 different thumbnails (TINY,MEDIUM,LARGE).
+ * It also embeds metadata information contained in the correspording EDM
+ * XML document in all three thumbnails. 
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 12 Apr 2012
  */
@@ -76,7 +83,7 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
     private static SugarService           sugarService;
     
 	public ThumblerPlugin() {
-		super("thumbler_plugin", "check the integrity of http links contained in records");
+		super("thumbler_plugin", "store remote thumbnails into MongoDB ");
 	}
 
 
@@ -90,21 +97,12 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 		
         // Adapter that ensures compatibility with the europeana datamodel 
 		Map<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>> strategies =  new HashMap<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>>();
-		
 		strategies.put(ObjectModelRegistry.LINK, new EuropeanaLinkAdapterStrategy());
-		
-		 MetadataRecordAdapter<I, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = AdapterFactory.getAdapter(mdr, strategies);
-		 
+		MetadataRecordAdapter<I, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = AdapterFactory.getAdapter(mdr, strategies);
 		 List<QualifiedValue<Link>> linkList = mdrad.getQualifiedValues(ObjectModelRegistry.LINK);
-		
-	
 	        int index = 0;
-
-            for(QualifiedValue<Link> qlink : linkList){
-            	
-
+            for(QualifiedValue<Link> qlink : linkList){            	
                 final LoggingEngine<I> loggingEngine = context.getLoggingEngine();
-               
                 try {
 					EuropeanaWeblinkThumbler.getShared().offer(
 					        new GuardedMetaDataRecordUrl<I>(context.getExecution(), mdr, qlink.getValue(), index++,
@@ -177,21 +175,17 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 	}
 		
 
-	public void shutdown() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#getParameters()
+	 */
 	public List<String> getParameters() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
 	}
 
 
-	public void initialize() {
-  
-		
-	}
-
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.api.IngestionPlugin#initialize(eu.europeana.uim.api.ExecutionContext)
+	 */
 	public <I> void initialize(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
 		
@@ -212,11 +206,14 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 	}
 
 	
+    /* (non-Javadoc)
+     * @see org.theeuropeanlibrary.uim.check.weblink.AbstractLinkIngestionPlugin#completed(eu.europeana.uim.api.ExecutionContext)
+     */
     @Override
     public <I> void completed(ExecutionContext<I> context) throws IngestionPluginFailedException {
         Data value = context.getValue(DATA);
 
-        /*
+
         Collection<I> collection = null;
         UimDataSet<I> dataset = context.getDataSet();
         if (dataset instanceof Collection) {
@@ -242,8 +239,8 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
         try {
             if (collection != null) {
 
-                collection.putValue(SugarControlledVocabulary.COLLECTION_LINK_VALIDATION,
-                        "" + context.getExecution().getId());
+                //collection.putValue(SugarControlledVocabulary.COLLECTION_LINK_VALIDATION,
+                //        "" + context.getExecution().getId());
 
                 ((ActiveExecution<I>)context).getStorageEngine().updateCollection(collection);
 
@@ -257,7 +254,7 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
             log.log(Level.WARNING, "Failed to update collection or call sugar service: " +
                                    collection, t);
         }
-        */
+
     }
 
 

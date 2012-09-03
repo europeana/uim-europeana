@@ -11,6 +11,8 @@ import org.junit.Test;
 
 
 /**
+ * Link Checker specific unit tests
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  *
  * @since 11 Aug 2012
@@ -28,6 +30,8 @@ public class LinkCheckerTest {
 	
 	
 	/**
+	 * Tests the Image conversion functionality performed by Image Magick
+	 * 
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws IM4JavaException

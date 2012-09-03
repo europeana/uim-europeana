@@ -3,11 +3,13 @@
 
 
     <!-- The Thumbler (thumbnail caching plugin) constitues a separate implementation, which is however 
-         based on TEL's synchronous threadpooling mechanism
+         based on TEL's synchronous threadpooling mechanism. In the blueprint definition, both the
+         Linchecking and Thumbler (image caching) workflows are exported.
       -->
     <bean id="thumbler" class="eu.europeana.uim.plugin.thumbler.service.ThumblerPlugin">
     </bean>
 
+    <!-- Export the thumblerPlugin as a service -->
 	<service id="thumblerPlugin" ref="thumbler" interface="eu.europeana.uim.api.IngestionPlugin" />
 
     <!-- The Linkchecker Plugin from Tel is directly used as as an embedded dependency -->
@@ -15,13 +17,16 @@
     <bean id="linkchecker" class="org.theeuropeanlibrary.uim.check.weblink.LinkCheckIngestionPlugin">
     </bean>
 
+    <!-- Export the linkCheckerPlugin as a service -->
     <service id="linkCheckerPlugin" ref="linkchecker" interface="eu.europeana.uim.api.IngestionPlugin" />
 
 
     <!-- Workflows Definitions -->
+    <!-- Export the LinckCheckingWorkfow as a service -->
     <bean id="lcw" class="eu.europeana.uim.plugin.thumbler.workflows.LinkCheckWorkflow" />
     <service id="linkCheckingWorkflow" ref="lcw" interface="eu.europeana.uim.workflow.Workflow" />
 
+    <!-- Export the ImageCacheWorkflow as a service -->
     <bean id="thw" class="eu.europeana.uim.plugin.thumbler.workflows.ImageCacheWorkflow" />
     <service id="imageCacheWorkflow" ref="thw" interface="eu.europeana.uim.workflow.Workflow" />
 

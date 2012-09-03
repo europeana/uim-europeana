@@ -16,24 +16,17 @@
  */
 package eu.europeana.uim.plugin.thumbler.utils;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import org.im4java.core.ConvertCmd;
-import org.im4java.core.ETOperation;
-import org.im4java.core.ExiftoolCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.process.ProcessExecutor;
 import org.im4java.process.ProcessStarter;
-import javax.imageio.ImageIO;
 
 /**
-*
+* Image Magick specific functionality used by the Thumbler plugin
+* 
 * @author Georgios Markakis <gwarkx@hotmail.com>
 * @since 12 Apr 2012
 */
@@ -42,11 +35,12 @@ public final class ImageMagickUtils {
 
 	private final static ProcessExecutor exec;
 	
+	//Static initialisation block used to initialise the exact location
+	//of the ImageMagick binaries invoked by Img4J.
 	static{
 		String myPath="C:\\Program Files\\ImageMagick-6.7.7-Q16\\;C:\\Software\\exiftool\\";
 		ProcessStarter.setGlobalSearchPath(myPath);
-		
-		 exec = new ProcessExecutor();
+		exec = new ProcessExecutor();
 	}
 
 	/**
@@ -56,22 +50,22 @@ public final class ImageMagickUtils {
 		
 	}
 	
+	
+	
 	/**
+	 * Converts a given File object, which represents a downloaded
+	 * file from the linkchecking process (that can be a GIF,a TIFF
+	 * or a PDF file) into a JPEG file and returns it.
+	 * 
 	 * @param img
 	 */
 	public static File convert(File img0){
 		String img = img0.getAbsolutePath();
-		
 		String img2 = img0.getAbsolutePath() + ".jpg";
-		
 		IMOperation  op = new IMOperation ();
-
 		op.addImage(img);
 		op.addImage(img2);
-
 		ConvertCmd convert = new ConvertCmd();
-
-
 			try {
 				convert.run(op);
 			} catch (IOException e) {

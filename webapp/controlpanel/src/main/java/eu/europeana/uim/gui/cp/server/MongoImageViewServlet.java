@@ -46,20 +46,24 @@ import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.store.MetaDataRecord;
 
 /**
+ * Servlet that communicates with the underlying Mongo Image 
+ * Storage Repository 
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  *
- * 27 Jul 2012
+ * @since 27 Jul 2012
  */
 public class MongoImageViewServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
     private  ExpandedOsgiEngine        engine;
 	private static ThumbnailService thumbnailHandler;
 	
-    @Override
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @SuppressWarnings("restriction")
+	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     	
@@ -67,7 +71,9 @@ public class MongoImageViewServlet extends HttpServlet {
 		 response.setContentType("text/html");
 		 
     	String recid = request.getParameter("recordID");
-    	 StorageEngine<String> storagenegine = (StorageEngine<String>) engine.getRegistry().getStorageEngine();
+    	 
+    	@SuppressWarnings("unchecked")
+		StorageEngine<String> storagenegine = (StorageEngine<String>) engine.getRegistry().getStorageEngine();
     	
     	 try {
 			MetaDataRecord<String> record = storagenegine.getMetaDataRecord(recid);
@@ -124,7 +130,7 @@ public class MongoImageViewServlet extends HttpServlet {
     }
     
 	/**
-	 * Initialization method
+	 * Servlet Initialization method
 	 */
 	public void init(ServletConfig config) throws ServletException {
 		Morphia mor = new Morphia();

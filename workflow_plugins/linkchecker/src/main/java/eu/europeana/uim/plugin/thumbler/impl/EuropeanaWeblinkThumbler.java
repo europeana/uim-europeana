@@ -6,15 +6,9 @@ import java.io.File;
 import java.io.StringReader;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.logging.Logger;
-
 import javax.imageio.ImageIO;
-
-
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -37,19 +31,13 @@ import eu.europeana.corelib.db.service.ThumbnailService;
 import eu.europeana.corelib.db.service.impl.ThumbnailServiceImpl;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
-import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
-import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
-
-
-
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.plugin.thumbler.utils.ImageMagickUtils;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.UimDataSet;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
@@ -96,7 +84,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 			Datastore store = mor.createDatastore(mongo, dbName);
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			NosqlDaoImpl morphiaDAOImpl = new NosqlDaoImpl(ImageCache.class,
 					store);
 
@@ -123,7 +111,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 	
 	/**
-	 * @return the singleton linkchecker instance
+	 * @return the singleton thumbler instance
 	 */
 	public static EuropeanaWeblinkThumbler getShared() {
 		if (instance == null) {
@@ -132,12 +120,18 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		return instance;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer#shutdown()
+	 */
 	@Override
 	public void shutdown() {
 		super.shutdown();
 		instance = null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer#createTask(org.theeuropeanlibrary.collections.guarded.Guarded)
+	 */
 	@Override
 	public Runnable createTask(Guarded guarded) {
 		return new CacheTask((GuardedMetaDataRecordUrl<?>) guarded);
@@ -164,11 +158,6 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 			
 		/**
-		 * @param response
-		 * @param directory
-		 *            where to store
-		 * @param name
-		 *            under which name to store
 		 * @return file with downloaded content
 		 */
 		protected File store() {
@@ -176,34 +165,20 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			try {
 
 				UimDataSet<?> dataset = guarded.getExecution().getDataSet();
-
 				MetaDataRecord<?> mdr = guarded.getMetaDataRecord();
-
 				String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
 						.get(0);
-
 				StringReader reader = new StringReader(value);
-
 				RDF edmRecord = (RDF) uctx.unmarshalDocument(reader);
-
-
 				String objectIDURI = extractOrigDocumentId(edmRecord);
-
 				Link offeredlink = guarded.getLink();
 
-
-
 				if (offeredlink.getUrl().equals(objectIDURI)) {
-					 if(!thumbnailHandler.exists(offeredlink.getUrl())){
-						 
+					 if(!thumbnailHandler.exists(offeredlink.getUrl())){						 
 						 File img = retrieveFile(offeredlink.getUrl());
-
 						 File convimg = ImageMagickUtils.convert(img);
-
 						 BufferedImage buff = ImageIO.read(convimg); 
-
 					     Collection coll = (Collection) dataset;
-						 
 						 thumbnailHandler.storeThumbnail(objectIDURI,
 									(String) coll.getId(), buff,
 									offeredlink.getUrl(),edmRecord);
@@ -211,28 +186,19 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				} else {
 					List<Choice> elements = edmRecord.getChoiceList();
 					for (Choice element : elements) {
-
 						if (element.ifAggregation()) {
-
 							Aggregation aggregation = element.getAggregation();
-
 							List<HasView> has_views = aggregation.getHasViewList();
-
 							for (HasView view : has_views) {
 								String resource = view.getResource();
 								if (resource.equals(offeredlink.getUrl())) {
 									
 									if(!thumbnailHandler.exists(objectIDURI,
-											 resource)){
-										
+											 resource)){										
 										File img = retrieveFile(resource);
-										
 										File convimg = ImageMagickUtils.convert(img);
-
 										BufferedImage buff = ImageIO.read(convimg); 
-
 										Collection coll = (Collection) dataset;
-										
 										thumbnailHandler.storeThumbnail(objectIDURI,(String) coll.getId(),
 													buff,offeredlink.getUrl(),edmRecord);										 
 									 }
@@ -242,13 +208,9 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 						}
 					}
 				}
-				
-
 				return target;
 			} catch (Throwable t) {
-				
 				log.severe(t.getMessage());
-
 			}
 			return null;
 		}
@@ -273,25 +235,19 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 				if (status == HttpStatus.SC_BAD_REQUEST) {
 					log.info("Bad request: <" + guarded.getUrl() + ">.");
-
 					
 				} else if (status == HttpStatus.SC_OK) {
-					String name =  guarded.getUrl().getFile();  //new Integer(generator.nextInt()).toString();
-
+					String name =  guarded.getUrl().getFile(); 
 					target = new File(STORAGELOCATION +name);
 					FileUtils.copyURLToFile(new URL(url), target, 100, 1000);
-					
 					return target;
-
 				}
 
 			} catch (Throwable t) {
 				synchronized (submission) {
 					submission.incrExceptions();
 				}
-
 				log.info("Failed to store url: <" + guarded.getUrl() + ">");
-
 				guarded.processed(0, t.getLocalizedMessage());
 			} finally {
 				try {
@@ -306,7 +262,6 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 					if (status == HttpStatus.SC_OK && target != null
 							&& target.exists()) {
-
 						guarded.processed(status,
 								"file://" + target.getAbsolutePath());
 					} else if (status > 0) {
@@ -332,28 +287,18 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		 * @return
 		 */
 		private String extractOrigDocumentId(RDF edmRecord) {
-
 			List<Choice> elements = edmRecord.getChoiceList();
-
 			for (Choice element : elements) {
-
 				// Deal with Aggregation elements
 				if (element.ifAggregation()) {
-
 					Aggregation aggregation = element.getAggregation();
-
-
 					if (aggregation.getObject() != null) {
 						return aggregation.getObject().getResource();
 					}
 					else{
 						return "";
 					}
-
-		
 				}
-
-
 		}
 			return null;
 
