@@ -130,7 +130,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		// TODO Auto-generated method stub
 		
 		try {
-			
 			solrServer = new CommonsHttpSolrServer(solrUrl+solrCore);
 			 solrServer.setSoTimeout(1000);  // socket read timeout
 			  solrServer.setConnectionTimeout(100);
@@ -203,7 +202,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			 marshallingContext.marshalDocument(der, "UTF-8", null, out);			
 			FullBean fullBean = mongoConstructor.constructFullBean(der);
 			solrInputDocument.addField(EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(), previewsOnlyInPortal);
-			fullBean.setPreviewNoDistribute(previewsOnlyInPortal);
+			//fullBean.setPreviewNoDistribute(previewsOnlyInPortal);
 			String collectionId = (String) mdr.getCollection().getId();
 			
 			String fileName = (String) mdr.getCollection().getName();
