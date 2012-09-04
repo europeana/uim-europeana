@@ -97,14 +97,11 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			uctx = bfact.createUnmarshallingContext();
 
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.severe(e.getMessage());
 		} catch (MongoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.severe(e.getMessage());
 		} catch (JiBXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.severe(e.getMessage());
 		}
 
 	}
@@ -158,6 +155,8 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 			
 		/**
+		 * Intitializes the entire store operation
+		 * 
 		 * @return file with downloaded content
 		 */
 		protected File store() {
@@ -217,6 +216,8 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 
 		/**
+		 * Retrieves a file given a URI
+		 * 
 		 * @param url
 		 * @return
 		 */
@@ -273,7 +274,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 						log.info("Status was zero: <" + guarded.getUrl() + ">.");
 					}
 				} catch (Throwable t) {
-					t.printStackTrace();
+					log.severe(t.getMessage());
 				}
 			}
 
@@ -283,6 +284,8 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		
 
 		/**
+		 * Extracts the original document ID from the EDM document
+		 * 
 		 * @param edmRecord
 		 * @return
 		 */
