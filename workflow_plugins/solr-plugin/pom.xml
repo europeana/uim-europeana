@@ -115,6 +115,11 @@
             </exclusions>
 	                <scope>compile</scope>
          </dependency>
+         <dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>1.9.9</version>
+		</dependency>
           <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-stax-api_1.0_spec</artifactId>
@@ -195,6 +200,8 @@
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,
+							!org.codehaus.jackson.*,
+							!org.codehaus.jackson.map.*,
 							!org.dom4j.*,
 							!org.imgscalr.*,
 							!org.relaxng.datatype.*,
@@ -208,6 +215,8 @@
 							!org.apache.xml.resolver.*,
 							!org.apache.xml.serializer,
 							!sun.io.*,
+							!javax.ws.rs,
+							!javax.ws.rs.*,
 							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
