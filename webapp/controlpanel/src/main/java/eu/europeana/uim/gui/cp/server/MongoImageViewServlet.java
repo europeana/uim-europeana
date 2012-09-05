@@ -20,24 +20,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
 import java.util.Map;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
-
 import eu.europeana.corelib.db.dao.impl.NosqlDaoImpl;
 import eu.europeana.corelib.db.entity.nosql.Image;
 import eu.europeana.corelib.db.entity.nosql.ImageCache;
 import eu.europeana.corelib.db.exception.DatabaseException;
 import eu.europeana.corelib.db.service.ThumbnailService;
 import eu.europeana.corelib.db.service.impl.ThumbnailServiceImpl;
+import eu.europeana.corelib.definitions.model.ThumbSize;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.gui.cp.server.engine.ExpandedOsgiEngine;
@@ -57,6 +55,7 @@ public class MongoImageViewServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
     private  ExpandedOsgiEngine        engine;
+	private ThumbSize size;
 	private static ThumbnailService thumbnailHandler;
 	
     /* (non-Javadoc)
@@ -77,7 +76,6 @@ public class MongoImageViewServlet extends HttpServlet {
     	
     	 try {
 			MetaDataRecord<String> record = storagenegine.getMetaDataRecord(recid);
-			
 			
 			EuropeanaLink value = record.getValues(EuropeanaModelRegistry.EUROPEANALINK)
 					.get(0);
@@ -100,25 +98,63 @@ public class MongoImageViewServlet extends HttpServlet {
 			 Image tiny = imgs.get("TINY");
 			 
 			 String bigbase64 =  new sun.misc.BASE64Encoder().encode(big.getImage());
-			 
 			 String smallbase64 =  new sun.misc.BASE64Encoder().encode(small.getImage());
-			 
 			 String tinybase64 =  new sun.misc.BASE64Encoder().encode(tiny.getImage());
-			 
-			 
 
+			 String bigxmpData = thumbnailHandler.extractXMPInfo(imgcache.getObjectId(), imgcache.getImageId(), ThumbSize.LARGE);
+			 String mediumxmpData = thumbnailHandler.extractXMPInfo(imgcache.getObjectId(), imgcache.getImageId(), ThumbSize.MEDIUM);
+			 String smallxmpData =  thumbnailHandler.extractXMPInfo(imgcache.getObjectId(), imgcache.getImageId(), ThumbSize.TINY);
+			 
 			 out.write("<h1>Cached Images for record" + recid + "</h1>");
-			 out.write("</hr>");
+			 out.write("</hr>"); 
+			 out.write("<table border=\"1\">");
+			 out.write("<tr><th><b>Thumbnail</b></th><th><b>Embedded XMP Metadata</b></th></tr>"); 
+			 out.write("<tr>");
+			 out.write("<td>");
 			 out.write("<h3>Large thumbnail: </h3>");
-			 out.write("</br>");
 			 out.write("<img src=\"data:image/jpeg;base64," + bigbase64 + "\" />");
-			 out.write("</hr>");
+			 out.write("</td>");
+			 out.write("<td>");
+			 
+			 if(bigxmpData != null){
+				 out.write(bigxmpData);
+			 }
+			 else{
+				 out.write("<b>NO METADATA</b>");
+			 }
+			 out.write("</td>");
+			 out.write("</tr>");
+			 out.write("<tr>");
+			 out.write("<td>");
 			 out.write("<h3>Medium thumbnail: </h3>");
 			 out.write("<img src=\"data:image/jpeg;base64," + smallbase64 + "\" />");
-			 out.write("</hr>");
+			 out.write("</td>");
+			 out.write("<td>");
+			 if(mediumxmpData != null){
+				 out.write(mediumxmpData);
+			 }
+			 else{
+				 out.write("<b>NO METADATA</b>");
+			 }
+			 out.write("</td>");
+			 out.write("</tr>");
+			 out.write("<tr>");
+			 out.write("<td>");
 			 out.write("<h3>Tiny thumbnail: </h3>");
 			 out.write("<img src=\"data:image/jpeg;base64," + tinybase64 + "\" />");
-			 out.write("</hr>");
+			 out.write("</td>");
+			 out.write("<td>");
+			 if(smallxmpData != null){
+				 out.write(smallxmpData);
+			 }
+			 else{
+				 out.write("<b>NO METADATA</b>");
+			 }
+			 out.write("</td>");
+			 out.write("</tr>");
+			 
+			 out.write("</table>");
+			 
 			
 		} catch (StorageEngineException e) {
 			e.printStackTrace();
