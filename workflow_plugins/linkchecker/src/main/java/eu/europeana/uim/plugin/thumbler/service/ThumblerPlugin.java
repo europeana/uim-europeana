@@ -82,6 +82,9 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
     
     private static SugarService           sugarService;
     
+	/**
+	 * Default Constructor
+	 */
 	public ThumblerPlugin() {
 		super("thumbler_plugin", "store remote thumbnails into MongoDB ");
 	}

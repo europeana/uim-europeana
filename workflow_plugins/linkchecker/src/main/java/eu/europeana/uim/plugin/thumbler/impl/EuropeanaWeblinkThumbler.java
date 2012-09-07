@@ -173,7 +173,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				Link offeredlink = guarded.getLink();
 
 				if (offeredlink.getUrl().equals(objectIDURI)) {
-					 if(!thumbnailHandler.exists(offeredlink.getUrl())){						 
+					 
 						 File img = retrieveFile(offeredlink.getUrl());
 						 File convimg = ImageMagickUtils.convert(img);
 						 BufferedImage buff = ImageIO.read(convimg); 
@@ -181,7 +181,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 						 thumbnailHandler.storeThumbnail(objectIDURI,
 									(String) coll.getId(), buff,
 									offeredlink.getUrl(),edmRecord);
-					 }
+
 				} else {
 					List<Choice> elements = edmRecord.getChoiceList();
 					for (Choice element : elements) {
@@ -192,15 +192,12 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 								String resource = view.getResource();
 								if (resource.equals(offeredlink.getUrl())) {
 									
-									if(!thumbnailHandler.exists(objectIDURI,
-											 resource)){										
 										File img = retrieveFile(resource);
 										File convimg = ImageMagickUtils.convert(img);
 										BufferedImage buff = ImageIO.read(convimg); 
 										Collection coll = (Collection) dataset;
 										thumbnailHandler.storeThumbnail(objectIDURI,(String) coll.getId(),
 													buff,offeredlink.getUrl(),edmRecord);										 
-									 }
 								}
 
 							}
@@ -240,7 +237,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				} else if (status == HttpStatus.SC_OK) {
 					String name =  guarded.getUrl().getFile(); 
 					target = new File(STORAGELOCATION +name);
-					FileUtils.copyURLToFile(new URL(url), target, 100, 1000);
+					FileUtils.copyURLToFile(new URL(url), target, 1000, 1000000);
 					return target;
 				}
 
@@ -249,7 +246,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 					submission.incrExceptions();
 				}
 				log.info("Failed to store url: <" + guarded.getUrl() + ">");
-				guarded.processed(0, t.getLocalizedMessage());
+				guarded.processed(0, t.getCause().getMessage());
 			} finally {
 				try {
 					if (response != null)
