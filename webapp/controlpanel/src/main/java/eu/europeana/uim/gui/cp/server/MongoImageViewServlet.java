@@ -19,6 +19,7 @@ package eu.europeana.uim.gui.cp.server;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -77,18 +78,24 @@ public class MongoImageViewServlet extends HttpServlet {
     	 try {
 			MetaDataRecord<String> record = storagenegine.getMetaDataRecord(recid);
 			
-			EuropeanaLink value = record.getValues(EuropeanaModelRegistry.EUROPEANALINK)
-					.get(0);
+			List<EuropeanaLink> values = record.getValues(EuropeanaModelRegistry.EUROPEANALINK);
+			
+			out.write("<h1>Cached Images for record" + recid + "</h1>");
+			
+			for(EuropeanaLink value:values){
+			
+				String url = value.getUrl();
 
-			String url = value.getUrl();
 			ImageCache imgcache = thumbnailHandler.findByOriginalUrl(url);
 			
 			if(imgcache == null){
-				out.write("<h1>No images were cached for record with id " + recid+ "</h1>");
-				return;
+				out.write("<h2>No images were cached for link with id" + url+ "</h2>");
+				
 			}
+			else
+			{
 			
-			
+				out.write("<h2> Cached images for link " + url+ "</h2>");
 			 Map<String, Image> imgs = imgcache.getImages();
 			 
 			 Image big = imgs.get("LARGE");
@@ -105,7 +112,10 @@ public class MongoImageViewServlet extends HttpServlet {
 			 String mediumxmpData = thumbnailHandler.extractXMPInfo(imgcache.getObjectId(), imgcache.getImageId(), ThumbSize.MEDIUM);
 			 String smallxmpData =  thumbnailHandler.extractXMPInfo(imgcache.getObjectId(), imgcache.getImageId(), ThumbSize.TINY);
 			 
-			 out.write("<h1>Cached Images for record" + recid + "</h1>");
+			 bigxmpData = bigxmpData.replaceAll("<","&lt;").replaceAll(">","&gt;");
+			 mediumxmpData = mediumxmpData.replaceAll("<","&lt;").replaceAll(">","&gt;");
+			 smallxmpData = smallxmpData.replaceAll("<","&lt;").replaceAll(">","&gt;");
+			 
 			 out.write("</hr>"); 
 			 out.write("<table border=\"1\">");
 			 out.write("<tr><th><b>Thumbnail</b></th><th><b>Embedded XMP Metadata</b></th></tr>"); 
@@ -117,7 +127,9 @@ public class MongoImageViewServlet extends HttpServlet {
 			 out.write("<td>");
 			 
 			 if(bigxmpData != null){
+				 out.write("<pre>");
 				 out.write(bigxmpData);
+				 out.write("</pre>");
 			 }
 			 else{
 				 out.write("<b>NO METADATA</b>");
@@ -131,7 +143,9 @@ public class MongoImageViewServlet extends HttpServlet {
 			 out.write("</td>");
 			 out.write("<td>");
 			 if(mediumxmpData != null){
+				 out.write("<pre>");
 				 out.write(mediumxmpData);
+				 out.write("</pre>");
 			 }
 			 else{
 				 out.write("<b>NO METADATA</b>");
@@ -145,7 +159,9 @@ public class MongoImageViewServlet extends HttpServlet {
 			 out.write("</td>");
 			 out.write("<td>");
 			 if(smallxmpData != null){
+				 out.write("<pre>");
 				 out.write(smallxmpData);
+				 out.write("</pre>");
 			 }
 			 else{
 				 out.write("<b>NO METADATA</b>");
@@ -155,11 +171,13 @@ public class MongoImageViewServlet extends HttpServlet {
 			 
 			 out.write("</table>");
 			 
+			}
+			}
+			
 			
 		} catch (StorageEngineException e) {
 			e.printStackTrace();
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	
