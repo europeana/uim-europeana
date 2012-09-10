@@ -184,12 +184,18 @@
 							javax.imageio.*,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
+							org.w3c.dom,
+							javax.xml.transform,
+							javax.xml.transform.dom,
+							javax.xml.parsers,
+							javax.xml.transform.stream,
+							org.xml.sax,
 							!*
 						</Import-Package>
 						<Embed-Dependency>tel-uim-plugin-check-link,commons-logging,corelib-db,
 							commons-codec,httpcore,httpclient,commons-httpclient,mongo-java-driver,morphia,
 							corelib-definitions,corelib-solr-definitions,spring-test,im4java,jibx-run,
-							corelib-utils,imgscalr-lib
+							corelib-utils,imgscalr-lib,sanselan
 							</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Include-Resource>src/main/resources</Include-Resource>
