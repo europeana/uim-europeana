@@ -242,6 +242,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		retVal.putAll(derefResourceOrLiteral(proxy.getProxyFor()));
 		retVal.putAll(derefResourceOrLiteral(proxy.getType()));
 		List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> choices = proxy.getChoiceList();
+		if(choices!=null){
 		for(eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice choice:choices){
 			retVal.putAll(derefResourceOrLiteral(choice.getAlternative()));
 			retVal.putAll(derefResourceOrLiteral(choice.getConformsTo()));
@@ -279,6 +280,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			retVal.putAll(derefResourceOrLiteral(choice.getTemporal()));
 			retVal.putAll(derefResourceOrLiteral(choice.getTitle()));
 			retVal.putAll(derefResourceOrLiteral(choice.getType()));
+		}
 		}
 		return retVal;
 	}
