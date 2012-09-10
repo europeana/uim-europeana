@@ -40,6 +40,7 @@ import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
+import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
@@ -51,8 +52,7 @@ import eu.europeana.uim.sugarcrm.SugarCrmService;
 
 public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static String vocabularyDB;
-	private static MongoConstructor mongoConstructor;
-	private static EdmMongoServerImpl edmMongoServer;
+	
 	private static CommonsHttpSolrServer solrServer;
 	private static Mongo mongo;
 	private static String mongoDB;
@@ -117,12 +117,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 	public int getPreferredThreadCount() {
 		// TODO Auto-generated method stub
-		return 1;
+		return 3;
 	}
 
 	public int getMaximumThreadCount() {
 		// TODO Auto-generated method stub
-		return 1;
+		return 5;
 	}
 
 	public <I> void initialize(ExecutionContext<I> context)
@@ -130,12 +130,10 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		// TODO Auto-generated method stub
 		
 		try {
-			solrServer = new CommonsHttpSolrServer(solrUrl+solrCore);
-			 solrServer.setSoTimeout(1000);  // socket read timeout
-			  solrServer.setConnectionTimeout(100);
-			  solrServer.setDefaultMaxConnectionsPerHost(100);
-			  solrServer.setMaxTotalConnections(100);
-			  solrServer.setFollowRedirects(false);
+			
+			  solrServer = enrichmentService.getSolrServer();
+			  mongoDB = enrichmentService.getMongoDB();
+			  mongo = enrichmentService.getMongo();
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) context.getExecution().getDataSet();
 			String sugarCrmId = collection
@@ -145,10 +143,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
-			mongoConstructor = new MongoConstructor();
-			mongo  = new Mongo(mongoHost, Integer.parseInt(mongoPort));
-			edmMongoServer = new EdmMongoServerImpl(mongo,mongoDB,"","");
-			mongoConstructor.setMongoServer(edmMongoServer);
+			
+		
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -184,7 +180,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			ExecutionContext<I> context) throws IngestionPluginFailedException,
 			CorruptedMetadataRecordException {
 		IBindingFactory bfact;
+		MongoConstructor mongoConstructor = new MongoConstructor();
+		
 		try {
+			OsgiEdmMongoServer edmMongoServer = new OsgiEdmMongoServer(mongo,mongoDB,"","");
+			mongoConstructor.setMongoServer(edmMongoServer);
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
@@ -216,6 +216,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			if (edmMongoServer.getFullBean(fullBean.getAbout()) == null) {
 				edmMongoServer.getDatastore().save(fullBean);
 			}
+			
 			
 			int retries = 0;
 			while (retries < RETRIES) {
@@ -259,18 +260,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	}
 	
 	
-	public MongoConstructor getMongoConstructor() {
-		return mongoConstructor;
-	}
-	public void setMongoConstructor(MongoConstructor mongoConstructor) {
-		EnrichmentPlugin.mongoConstructor = mongoConstructor;
-	}
-	public EdmMongoServerImpl getEdmMongoServer() {
-		return edmMongoServer;
-	}
-	public void setEdmMongoServer(EdmMongoServerImpl edmMongoServer) {
-		EnrichmentPlugin.edmMongoServer = edmMongoServer;
-	}
 	public CommonsHttpSolrServer getSolrServer() {
 		return solrServer;
 	}
