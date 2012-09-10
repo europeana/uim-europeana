@@ -161,9 +161,6 @@
 					<!-- <obrRepository>NONE</obrRepository> -->
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
-						<Export-Package>
-							eu.europeana.uim.plugin.linkchecker.*
-						</Export-Package>
 						<Import-Package>
 							eu.europeana.uim.api,
 							eu.europeana.uim.common,
