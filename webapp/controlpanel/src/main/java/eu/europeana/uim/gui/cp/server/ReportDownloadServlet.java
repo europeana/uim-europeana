@@ -61,12 +61,6 @@ public class ReportDownloadServlet extends HttpServlet {
         }
         response.setContentType(fileTypes.get(type));
 
-        // ResourceEngine resourceEngine = engine.getRegistry().getResourceEngine();
-
-        // if (resourceEngine == null) {
-        // response.sendError(404, "Could not get resource engine");
-        // }
-
         File file = ReportUtils.getReportFile(reportDesign, executionid, type);
 
         if (!file.exists()) {
