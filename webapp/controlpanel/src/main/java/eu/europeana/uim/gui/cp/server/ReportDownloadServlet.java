@@ -29,6 +29,8 @@ public class ReportDownloadServlet extends HttpServlet {
     static {
         fileTypes.put("pdf", "application/pdf");
         fileTypes.put("xls", "application/vnd.ms-excel");
+        fileTypes.put("html", "text/html");
+        
     }
 
     final static int                         BUFSIZE   = 4096;
@@ -75,7 +77,7 @@ public class ReportDownloadServlet extends HttpServlet {
         }
         // just reuuse the name from the storage
         String filenameToSave = file.getName();
-        doDownload(request, response, file, filenameToSave);
+        doDownload(request, response, file, filenameToSave,type);
     }
 
     /**
@@ -93,13 +95,17 @@ public class ReportDownloadServlet extends HttpServlet {
      *            The name the browser should receive.
      */
     private void doDownload(HttpServletRequest req, HttpServletResponse resp, File file,
-            String original_filename) throws IOException {
+            String original_filename,String type) throws IOException {
 
         int length = 0;
         ServletOutputStream op = resp.getOutputStream();
 
+        resp.setContentType(type);  
         resp.setContentLength((int)file.length());
-        resp.setHeader("Content-Disposition", "attachment; filename=\"" + original_filename + "\"");
+        resp.setHeader("Content-Disposition", "inline;  filename=\"" + original_filename + "\"");
+        resp.setHeader("Cache-Control", "no-cache"); 
+        resp.setDateHeader("Expires", 0);  
+        resp.setHeader("Pragma", "No-cache");
 
         //
         // Stream to the requester.
