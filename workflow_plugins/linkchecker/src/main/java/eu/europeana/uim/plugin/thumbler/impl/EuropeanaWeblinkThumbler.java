@@ -261,7 +261,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 					if (status == HttpStatus.SC_OK && target != null
 							&& target.exists()) {
 						guarded.processed(status,
-								"file://" + target.getAbsolutePath());
+								"filename: " + target.getAbsolutePath());
 					} else if (status > 0) {
 						if (response != null)
 							guarded.processed(status, response.getStatusLine()
