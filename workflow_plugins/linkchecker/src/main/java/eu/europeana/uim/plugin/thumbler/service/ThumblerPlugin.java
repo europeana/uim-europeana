@@ -20,6 +20,8 @@
  */
 package eu.europeana.uim.plugin.thumbler.service;
 
+import java.io.File;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -36,7 +38,6 @@ import org.theeuropeanlibrary.model.tel.ObjectModelRegistry;
 import org.theeuropeanlibrary.uim.check.weblink.AbstractLinkIngestionPlugin;
 import org.theeuropeanlibrary.uim.check.weblink.http.GuardedMetaDataRecordUrl;
 import org.theeuropeanlibrary.uim.check.weblink.http.Submission;
-import org.theeuropeanlibrary.uim.check.weblink.http.WeblinkLinkchecker;
 import eu.europeana.uim.model.adapters.AdapterFactory;
 import eu.europeana.uim.model.adapters.MetadataRecordAdapter;
 import eu.europeana.uim.model.adapters.QValueAdapterStrategy;
@@ -82,6 +83,12 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
     
     private static SugarService           sugarService;
     
+    protected static final TKey<ThumblerPlugin, EuropeanaLinkData> DATA = TKey.register(
+    		ThumblerPlugin.class,
+            "europeanalinkdata", EuropeanaLinkData.class);
+    
+    
+    
 	/**
 	 * Default Constructor
 	 */
@@ -97,6 +104,7 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 	public   <I> boolean processRecord(MetaDataRecord<I> mdr, ExecutionContext<I> context)	
     throws IngestionPluginFailedException, CorruptedMetadataRecordException{
 		
+		EuropeanaLinkData value = context.getValue(DATA);
 		
         // Adapter that ensures compatibility with the europeana datamodel 
 		Map<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>> strategies =  new HashMap<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>>();
@@ -104,7 +112,12 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 		MetadataRecordAdapter<I, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = AdapterFactory.getAdapter(mdr, strategies);
 		 List<QualifiedValue<Link>> linkList = mdrad.getQualifiedValues(ObjectModelRegistry.LINK);
 	        int index = 0;
-            for(QualifiedValue<Link> qlink : linkList){            	
+            for(QualifiedValue<Link> qlink : linkList){ 
+            	
+            	synchronized (value) {
+                    value.submitted++;
+                }
+            	
                 final LoggingEngine<I> loggingEngine = context.getLoggingEngine();
                 try {
 					EuropeanaWeblinkThumbler.getShared().offer(
@@ -131,16 +144,16 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 
 					                Execution<I> execution = getExecution();
 
-					                loggingEngine.logLink(execution, "linkcheck", getMetaDataRecord(),
+					                loggingEngine.logLink(execution, "thumbler", getMetaDataRecord(),
 					                        getLink().getUrl(), status, time, message,
 					                        getUrl().getHost(), getUrl().getPath());
 
-					                Submission submission = WeblinkLinkchecker.getShared().getSubmission(
+					                Submission submission = EuropeanaWeblinkThumbler.getShared().getSubmission(
 					                        execution);
 
 					                if (submission != null) {
 					                    synchronized (submission) {
-					                        execution.putValue("linkcheck.processed",
+					                        execution.putValue("thumbler.processed",
 					                                "" + submission.getProcessed());
 					                        
 					                        if (!execution.isActive()) {
@@ -191,6 +204,7 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 	 */
 	public <I> void initialize(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
+		EuropeanaLinkData value = new EuropeanaLinkData();
 		
 	      Collection<?> collection = null;
 	        UimDataSet<?> dataset = context.getDataSet();
@@ -204,7 +218,9 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 	        String mnem = collection != null ? collection.getMnemonic() : "NULL";
 	        String name = collection != null ? collection.getName() : "No collection";
 
-	        context.getLoggingEngine().log(context.getExecution(), Level.INFO, "linkcheck",
+	        context.putValue(DATA, value);
+	        
+	        context.getLoggingEngine().log(context.getExecution(), Level.INFO, "thumbler",
 	                "initialize", mnem, name, time);
 	}
 
@@ -214,7 +230,7 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
      */
     @Override
     public <I> void completed(ExecutionContext<I> context) throws IngestionPluginFailedException {
-        Data value = context.getValue(DATA);
+    	EuropeanaLinkData value = context.getValue(DATA);
 
 
         Collection<I> collection = null;
@@ -228,15 +244,15 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
         String time = df.format(new Date());
         String mnem = collection != null ? collection.getMnemonic() : "NULL";
         String name = collection != null ? collection.getName() : "No collection";
-        context.getLoggingEngine().log(context.getExecution(), Level.INFO, "linkcheck",
+        context.getLoggingEngine().log(context.getExecution(), Level.INFO, "thumbler",
                 "completed", mnem, name, "" + value.submitted, "" + value.ignored, time);
 
-        context.getExecution().putValue("linkcheck.ignored", "" + value.ignored);
-        context.getExecution().putValue("linkcheck.submitted", "" + value.submitted);
+        context.getExecution().putValue("thumbler.ignored", "" + value.ignored);
+        context.getExecution().putValue("thumbler.submitted", "" + value.submitted);
 
-        Submission submission = WeblinkLinkchecker.getShared().getSubmission(context.getExecution());
+        Submission submission = EuropeanaWeblinkThumbler.getShared().getSubmission(context.getExecution());
         if (submission != null) {
-            context.getExecution().putValue("linkcheck.processed", "" + submission.getProcessed());
+            context.getExecution().putValue("thumbler.processed", "" + submission.getProcessed());
         }
 
         try {
@@ -284,6 +300,18 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
     }
 
 
+    /**
+     * Container holding all execution specific information for the validation plugin.
+     */
+    protected static class EuropeanaLinkData implements Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		int             ignored    = 0;
+        int             submitted  = 0;
+
+        File            directory;
+    }
 
 
 }
