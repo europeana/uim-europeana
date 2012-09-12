@@ -47,6 +47,11 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
     private final ReportingServiceAsync reportService;
     private final List<ExecutionDTO>    pastExecutions = new ArrayList<ExecutionDTO>();
 
+    String IGNORED_KEY;
+    String SUBMITTED_KEY;
+    String PROCESSED_KEY;
+    
+    
     /**
      * The UiBinder interface used by this example.
      */
@@ -99,7 +104,6 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
     public Widget onInitialize() {
         cellTable = new CellTable<ExecutionDTO>(ExecutionDTO.KEY_PROVIDER);
         cellTable.setWidth("100%", true);
-//        cellTable.setHeight("30px");
         cellTable.setPageSize(10);
 
         // List Data providers
@@ -256,11 +260,11 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
                 new TextCell()) {
             @Override
             public String getValue(ExecutionDTO object) {
-                String ignored = object.getValue("linkcheck.ignored");
+                String ignored = object.getValue(IGNORED_KEY);
                 ignored = ignored == null ? "0" : ignored;
-                String submitted = object.getValue("linkcheck.submitted");
+                String submitted = object.getValue(SUBMITTED_KEY);
                 submitted = submitted == null ? "0" : submitted;
-                String processed = object.getValue("linkcheck.processed");
+                String processed = object.getValue(PROCESSED_KEY);
                 processed = processed == null ? "0" : processed;
 
                 return "" + object.getCompleted() + "/" + submitted + "/" + ignored + "/" +
@@ -423,7 +427,7 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
     class WaiterDialogBox extends DialogBox {
         public WaiterDialogBox() {
             setText("Generating reports...");
-            Image img = new Image("img/ajax-loader.gif");
+            Image img = new Image("images/network.gif");
 
             setWidget(img);
         }

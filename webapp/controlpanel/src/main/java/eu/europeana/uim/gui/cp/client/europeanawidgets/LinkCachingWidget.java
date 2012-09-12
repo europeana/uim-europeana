@@ -20,10 +20,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-
 import eu.europeana.uim.gui.cp.client.services.ReportingServiceAsync;
 
 /**
+ * Displays progress information and provides report printing functionality
+ * for the whole link caching process
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  *
  * 29 Jul 2012
@@ -31,7 +33,7 @@ import eu.europeana.uim.gui.cp.client.services.ReportingServiceAsync;
 public class LinkCachingWidget extends AbstractReportingWidget{
 
 	
-	   /**
+	 /**
      * Creates a new instance of this class.
      * 
      * @param reportService
@@ -43,6 +45,9 @@ public class LinkCachingWidget extends AbstractReportingWidget{
     public LinkCachingWidget(ReportingServiceAsync reportService, String widgetName,
                                String[] workflows, String reportName, String[] outputFormats) {
         super(reportService, widgetName, workflows, reportName, outputFormats);
+        super.IGNORED_KEY = "thumbler.ignored";
+        super.PROCESSED_KEY = "thumbler.processed";
+        super.SUBMITTED_KEY = "thumbler.submitted";
     }
 
     @Override

@@ -26,6 +26,9 @@ public class LinkReportingWidget extends AbstractReportingWidget {
     public LinkReportingWidget(ReportingServiceAsync reportService, String widgetName,
                                String[] workflows, String reportName, String[] outputFormats) {
         super(reportService, widgetName, workflows, reportName, outputFormats);
+        super.IGNORED_KEY = "linkcheck.ignored";
+        super.PROCESSED_KEY = "linkcheck.processed";
+        super.SUBMITTED_KEY = "linkcheck.submitted";
     }
 
     @Override
