@@ -50,7 +50,7 @@ public class RecordDetailsDialogBox extends DialogBox {
         tabPanel.add(xml, "XML");
 
         final RichTextArea search = new RichTextArea();
-        search.setPixelSize(500, 400);
+        search.setPixelSize(900, 600);
         //setCharacterWidth(100);
         //search.setVisibleLines(20);
         tabPanel.add(search, "Search");
