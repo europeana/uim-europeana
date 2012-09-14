@@ -17,12 +17,12 @@
 	<modules>
 	    <module>misc/europeana-uim-definitions</module>
 		<module>plugins</module>
+		<module>corelib-osgi</module>
 		<module>misc/europeana-uim-workflows-startups</module>
 		<module>workflows/workflow-basic</module>
 		<module>workflow_plugins/europeana-uim-plugin-enrichment</module>
 		<module>workflow_plugins/linkchecker</module>
-		<module>workflow_plugins/solr-plugin</module>
-		
+		<module>workflow_plugins/solr-plugin</module>		
 		<module>webapp/controlpanel</module>
 	</modules>
 
@@ -63,7 +63,11 @@
 			<url>http://europeanalabs.eu/artifactory/repo1</url>
 		</repository>
 
-
+<repository>
+			<id>europeanalabs.eu.repo1</id>
+			<name>europeanalabs.eu-snapshots</name>
+			<url>http://europeanalabs.eu/artifactory/ext-snapshots-local</url>
+		</repository>
 
 		<!-- Europeana Labs Java.net Maven 2 Repository (mirror) -->
 		<repository>
