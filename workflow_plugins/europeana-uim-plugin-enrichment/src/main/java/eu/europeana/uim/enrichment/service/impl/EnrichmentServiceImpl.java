@@ -34,7 +34,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 		  solrServer.setDefaultMaxConnectionsPerHost(100);
 		  solrServer.setMaxTotalConnections(100);
 		  solrServer.setFollowRedirects(false);
-			mongo  = new Mongo(mongoHost, Integer.parseInt(mongoPort));
+		mongo  = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			
 		
 			tagger.init("Europeana");

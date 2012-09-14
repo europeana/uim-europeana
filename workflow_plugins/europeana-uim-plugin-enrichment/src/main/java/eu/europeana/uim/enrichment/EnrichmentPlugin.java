@@ -134,6 +134,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			  solrServer = enrichmentService.getSolrServer();
 			  mongoDB = enrichmentService.getMongoDB();
 			  mongo = enrichmentService.getMongo();
+			 
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) context.getExecution().getDataSet();
 			String sugarCrmId = collection
@@ -183,7 +184,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		MongoConstructor mongoConstructor = new MongoConstructor();
 		
 		try {
-			OsgiEdmMongoServer edmMongoServer = new OsgiEdmMongoServer(mongo,mongoDB,"","");
+			  EdmMongoServerImpl edmMongoServer = new OsgiEdmMongoServer(mongo,mongoDB,"","");
 			mongoConstructor.setMongoServer(edmMongoServer);
 			bfact = BindingDirectory.getFactory(RDF.class);
 
