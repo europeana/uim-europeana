@@ -17,7 +17,7 @@
 	<modules>
 	    <module>misc/europeana-uim-definitions</module>
 		<module>plugins</module>
-		<module>corelib-osgi</module>
+<!-- 		<module>corelib-osgi</module> -->
 		<module>misc/europeana-uim-workflows-startups</module>
 		<module>workflows/workflow-basic</module>
 		<module>workflow_plugins/europeana-uim-plugin-enrichment</module>
