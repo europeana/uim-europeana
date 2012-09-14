@@ -1,5 +1,6 @@
 package eu.europeana.uim.gui.cp.client.services;
 
+import eu.europeana.uim.gui.cp.shared.validation.EdmRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.LinksResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.MetaDataResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.NGramResultDTO;
@@ -68,7 +69,7 @@ public interface RetrievalServiceAsync {
      * @param recordId
      * @param async
      */
-    void getSearchRecord(String recordId, AsyncCallback<String> async);
+    void getSearchRecord(String recordId, AsyncCallback<EdmRecordDTO> async);
 
     /**
      * Delivers up to a maxSize number of suggestions starting at the offset together with facets

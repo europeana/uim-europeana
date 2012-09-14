@@ -1,5 +1,7 @@
 package eu.europeana.uim.gui.cp.client.europeanawidgets;
 
+import java.util.List;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -11,6 +13,9 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import eu.europeana.uim.gui.cp.client.services.RetrievalServiceAsync;
+import eu.europeana.uim.gui.cp.shared.validation.EdmFieldRecordDTO;
+import eu.europeana.uim.gui.cp.shared.validation.EdmRecordDTO;
+import eu.europeana.uim.gui.cp.shared.validation.FieldValueDTO;
 
 /**
  * Shows raw, xml and search index representation of a record.
@@ -74,20 +79,43 @@ public class RecordDetailsDialogBox extends DialogBox {
             }
         });
 
-        //TODO: to be implementd for Mongodb & Solr
-        /*
-        retrievalServiceAsync.getSearchRecord(recordId, new AsyncCallback<String>() {
+        
+        retrievalServiceAsync.getSearchRecord(recordId, new AsyncCallback<EdmRecordDTO>() {
             @Override
             public void onFailure(Throwable caught) {
                 caught.printStackTrace();
             }
 
             @Override
-            public void onSuccess(String result) {
-                search.setText(result);
+            public void onSuccess(EdmRecordDTO result) {
+                search.setText(convertToTable(result));
             }
         });
-        */
         
+       
+    }
+    private String convertToTable(EdmRecordDTO result){
+    	EdmFieldRecordDTO solrFields= result.getSolrRecord();
+    	EdmFieldRecordDTO mongoFields = result.getMongoRecord();
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("<table><tr><td><b>SOLR Fields</b></td></tr>");
+    	createTable(sb,solrFields);
+    	sb.append("</table>\n<table>tr><td><b>MongoDB Fields</b></td></tr>");
+    	createTable(sb,mongoFields);
+    	sb.append("</table>");
+    	return sb.toString();
+    }
+    
+    private void createTable(StringBuilder sb,EdmFieldRecordDTO rec){
+    	List<FieldValueDTO> solrFieldList = rec.getFieldValue();
+    	for(FieldValueDTO fieldValueDTO:solrFieldList){
+    		sb.append("<tr><td>"+fieldValueDTO.getFieldName()+"</td><td>");
+    		List<String> values = fieldValueDTO.getFieldValue();
+    		for(String value:values){
+    			sb.append(value+"\n");
+    		}
+    		sb.append("</td></tr>");
+    		
+    	}
     }
 }

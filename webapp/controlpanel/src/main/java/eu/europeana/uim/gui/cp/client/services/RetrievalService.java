@@ -1,5 +1,6 @@
 package eu.europeana.uim.gui.cp.client.services;
 
+import eu.europeana.uim.gui.cp.shared.validation.EdmRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.LinksResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.MetaDataResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.NGramResultDTO;
@@ -62,9 +63,9 @@ public interface RetrievalService extends RemoteService {
 
     /**
      * @param recordId
-     * @return xml representation of the actual record in the search index
+     * @return The stored SOLR and Mongo values for the record
      */
-    String getSearchRecord(String recordId);
+    EdmRecordDTO getSearchRecord(String recordId);
    
     /**
      * Delivers up to a maxSize number of suggestions starting at the offset together with facets
