@@ -391,22 +391,22 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		EdmFieldRecordDTO mongoFields = new EdmFieldRecordDTO();
 		List<FieldValueDTO> fieldValues = new ArrayList<FieldValueDTO>();
 		fieldValues.add(MongoConverter.getFieldValues(FullBeanImpl.class,
-				fullBean, "about", EdmLabel.EUROPEANA_ID));
+				fullBean, "getAbout", EdmLabel.EUROPEANA_ID));
 		fieldValues.add(MongoConverter.getFieldValues(FullBeanImpl.class,
-				fullBean, "country", EdmLabel.COUNTRY));
+				fullBean, "getCountry", EdmLabel.COUNTRY));
 		fieldValues.add(MongoConverter.getFieldValues(FullBeanImpl.class,
-				fullBean, "europeanaCollectionName",
+				fullBean, "getEuropeanaCollectionName",
 				EdmLabel.EUROPEANA_COLLECTIONNAME));
 		fieldValues.add(MongoConverter.getFieldValues(FullBeanImpl.class,
-				fullBean, "language", EdmLabel.LANGUAGE));
+				fullBean, "getLanguage", EdmLabel.LANGUAGE));
 		fieldValues.add(MongoConverter.getFieldValues(FullBeanImpl.class,
-				fullBean, "provider", EdmLabel.PROVIDER));
+				fullBean, "getProvider", EdmLabel.PROVIDER));
 		fieldValues.add(MongoConverter.getFieldValues(FullBeanImpl.class,
-				fullBean, "title", EdmLabel.TITLE));
+				fullBean, "getTitle", EdmLabel.TITLE));
 		fieldValues.add(MongoConverter.getFieldValues(FullBeanImpl.class,
-				fullBean, "type", EdmLabel.TYPE));
+				fullBean, "getType", EdmLabel.TYPE));
 		fieldValues.add(MongoConverter.getFieldValues(FullBeanImpl.class,
-				fullBean, "year", EdmLabel.YEAR));
+				fullBean, "getYear", EdmLabel.YEAR));
 		List<ProxyImpl> proxies = fullBean.getProxies();
 		if (proxies != null) {
 			for (ProxyImpl proxy : proxies) {

@@ -1,6 +1,7 @@
 package eu.europeana.uim.gui.cp.server;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import eu.europeana.corelib.definitions.model.EdmLabel;
+import eu.europeana.corelib.definitions.solr.DocType;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
@@ -32,144 +34,144 @@ public final class MongoConverter {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
 
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"about", EdmLabel.PROVIDER_AGGREGATION_ORE_AGGREGATION));
+				"getAbout", EdmLabel.PROVIDER_AGGREGATION_ORE_AGGREGATION));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"aggregatedCHO",
+				"getAggregatedCHO",
 				EdmLabel.PROVIDER_AGGREGATION_EDM_AGGREGATED_CHO));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"dcRights", EdmLabel.PROVIDER_AGGREGATION_DC_RIGHTS));
+				"getDcRights", EdmLabel.PROVIDER_AGGREGATION_DC_RIGHTS));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"edmDataProvider",
+				"getEdmDataProvider",
 				EdmLabel.PROVIDER_AGGREGATION_EDM_DATA_PROVIDER));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"edmHasView", EdmLabel.PROVIDER_AGGREGATION_EDM_HASVIEW));
+				"getHasView", EdmLabel.PROVIDER_AGGREGATION_EDM_HASVIEW));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"edmIsShownAt", EdmLabel.PROVIDER_AGGREGATION_EDM_IS_SHOWN_AT));
+				"getEdmIsShownAt", EdmLabel.PROVIDER_AGGREGATION_EDM_IS_SHOWN_AT));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"edmIsShownBy", EdmLabel.PROVIDER_AGGREGATION_EDM_IS_SHOWN_BY));
+				"getEdmIsShownBy", EdmLabel.PROVIDER_AGGREGATION_EDM_IS_SHOWN_BY));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"edmObject", EdmLabel.PROVIDER_AGGREGATION_EDM_OBJECT));
+				"getEdmObject", EdmLabel.PROVIDER_AGGREGATION_EDM_OBJECT));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"edmProvider", EdmLabel.PROVIDER_AGGREGATION_EDM_PROVIDER));
+				"getEdmProvider", EdmLabel.PROVIDER_AGGREGATION_EDM_PROVIDER));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"edmRights", EdmLabel.PROVIDER_AGGREGATION_EDM_RIGHTS));
+				"getEdmRights", EdmLabel.PROVIDER_AGGREGATION_EDM_RIGHTS));
 		fieldValueList.add(getFieldValues(AggregationImpl.class, aggregation,
-				"aggregates", EdmLabel.PROVIDER_AGGREGATION_ORE_AGGREGATES));
+				"getAggregates", EdmLabel.PROVIDER_AGGREGATION_ORE_AGGREGATES));
 
 		return fieldValueList;
 	}
 
 	public static List<FieldValueDTO> convertProxy(ProxyImpl proxy) {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "about",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getAbout",
 				EdmLabel.ORE_PROXY));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dcContributor", EdmLabel.PROXY_DC_CONTRIBUTOR));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcCoverage",
+				"getDcContributor", EdmLabel.PROXY_DC_CONTRIBUTOR));
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcCoverage",
 				EdmLabel.PROXY_DC_COVERAGE));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcCreator",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcCreator",
 				EdmLabel.PROXY_DC_CREATOR));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcDate",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcDate",
 				EdmLabel.PROXY_DC_DATE));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcFormat",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcFormat",
 				EdmLabel.PROXY_DC_FORMAT));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dcIdentifier", EdmLabel.PROXY_DC_IDENTIFIER));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcLanguage",
+				"getDcIdentifier", EdmLabel.PROXY_DC_IDENTIFIER));
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcLanguage",
 				EdmLabel.PROXY_DC_LANGUAGE));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dcPublisher", EdmLabel.PROXY_DC_PUBLISHER));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcRelation",
+				"getDcPublisher", EdmLabel.PROXY_DC_PUBLISHER));
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcRelation",
 				EdmLabel.PROXY_DC_RELATION));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcRights",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcRights",
 				EdmLabel.PROXY_DC_RIGHTS));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcSource",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcSource",
 				EdmLabel.PROXY_DC_SOURCE));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcSubject",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcSubject",
 				EdmLabel.PROXY_DC_SUBJECT));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcTitle",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcTitle",
 				EdmLabel.PROXY_DC_TITLE));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dcType",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDcType",
 				EdmLabel.PROXY_DC_TYPE));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsAlternative", EdmLabel.PROXY_DCTERMS_ALTERNATIVE));
+				"getDctermsAlternative", EdmLabel.PROXY_DCTERMS_ALTERNATIVE));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsConformsTo", EdmLabel.PROXY_DCTERMS_CONFORMS_TO));
+				"getDctermsConformsTo", EdmLabel.PROXY_DCTERMS_CONFORMS_TO));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsCreated", EdmLabel.PROXY_DCTERMS_CREATED));
+				"getDctermsCreated", EdmLabel.PROXY_DCTERMS_CREATED));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsExtent", EdmLabel.PROXY_DCTERMS_EXTENT));
+				"getDctermsExtent", EdmLabel.PROXY_DCTERMS_EXTENT));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsHasFormat", EdmLabel.PROXY_DCTERMS_HAS_FORMAT));
+				"getDctermsHasFormat", EdmLabel.PROXY_DCTERMS_HAS_FORMAT));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsHasPart", EdmLabel.PROXY_DCTERMS_HAS_PART));
+				"getDctermsHasPart", EdmLabel.PROXY_DCTERMS_HAS_PART));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsHasVersion", EdmLabel.PROXY_DCTERMS_HAS_VERSION));
+				"getDctermsHasVersion", EdmLabel.PROXY_DCTERMS_HAS_VERSION));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsIsFormatOf", EdmLabel.PROXY_DCTERMS_IS_FORMAT_OF));
+				"getDctermsIsFormatOf", EdmLabel.PROXY_DCTERMS_IS_FORMAT_OF));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsIsPartOf", EdmLabel.PROXY_DCTERMS_IS_PART_OF));
+				"getDctermsIsPartOf", EdmLabel.PROXY_DCTERMS_IS_PART_OF));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsIsReferencedBy",
+				"getDctermsIsReferencedBy",
 				EdmLabel.PROXY_DCTERMS_IS_REFERENCED_BY));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsIsReplacedBy", EdmLabel.PROXY_DCTERMS_IS_REPLACED_BY));
+				"getDctermsIsReplacedBy", EdmLabel.PROXY_DCTERMS_IS_REPLACED_BY));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsIsRequiredBy", EdmLabel.PROXY_DCTERMS_IS_REQUIRED_BY));
+				"getDctermsIsRequiredBy", EdmLabel.PROXY_DCTERMS_IS_REQUIRED_BY));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsIsVersionOf", EdmLabel.PROXY_DCTERMS_IS_VERSION_OF));
+				"getDctermsIsVersionOf", EdmLabel.PROXY_DCTERMS_IS_VERSION_OF));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsIssued", EdmLabel.PROXY_DCTERMS_ISSUED));
+				"getDctermsIssued", EdmLabel.PROXY_DCTERMS_ISSUED));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsMedium", EdmLabel.PROXY_DCTERMS_MEDIUM));
+				"getDctermsMedium", EdmLabel.PROXY_DCTERMS_MEDIUM));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsProvenance", EdmLabel.PROXY_DCTERMS_PROVENANCE));
+				"getDctermsProvenance", EdmLabel.PROXY_DCTERMS_PROVENANCE));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsReferences", EdmLabel.PROXY_DCTERMS_REFERENCES));
+				"getDctermsReferences", EdmLabel.PROXY_DCTERMS_REFERENCES));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsReplaces", EdmLabel.PROXY_DCTERMS_REPLACES));
+				"getDctermsReplaces", EdmLabel.PROXY_DCTERMS_REPLACES));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsRequires", EdmLabel.PROXY_DCTERMS_REQUIRES));
+				"getDctermsRequires", EdmLabel.PROXY_DCTERMS_REQUIRES));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsSpatial", EdmLabel.PROXY_DCTERMS_SPATIAL));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "dctermsTOC",
+				"getDctermsSpatial", EdmLabel.PROXY_DCTERMS_SPATIAL));
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getDctermsTOC",
 				EdmLabel.PROXY_DCTERMS_TABLE_OF_CONTENTS));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"dctermsTemporal", EdmLabel.PROXY_DCTERMS_TEMPORAL));
+				"getDctermsTemporal", EdmLabel.PROXY_DCTERMS_TEMPORAL));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmCurrentLocation", EdmLabel.PROXY_EDM_CURRENT_LOCATION));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "edmHasType",
+				"getEdmCurrentLocation", EdmLabel.PROXY_EDM_CURRENT_LOCATION));
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getEdmHasType",
 				EdmLabel.PROXY_EDM_HAS_TYPE));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmIncorporates", EdmLabel.PROXY_EDM_INCORPORATES));
+				"getEdmIncorporates", EdmLabel.PROXY_EDM_INCORPORATES));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmIsNextInSequence", EdmLabel.PROXY_EDM_IS_NEXT_IN_SEQUENCE));
+				"getEdmIsNextInSequence", EdmLabel.PROXY_EDM_IS_NEXT_IN_SEQUENCE));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmIsDerivativeOf", EdmLabel.PROXY_EDM_ISDERIVATIVE_OF));
+				"getEdmIsDerivativeOf", EdmLabel.PROXY_EDM_ISDERIVATIVE_OF));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmIsRelatedTo", EdmLabel.PROXY_EDM_ISRELATEDTO));
+				"getEdmIsRelatedTo", EdmLabel.PROXY_EDM_ISRELATEDTO));
 		fieldValueList
 				.add(getFieldValues(ProxyImpl.class, proxy,
-						"edmIsRepresentationOf",
+						"getEdmIsRepresentationOf",
 						EdmLabel.PROXY_EDM_ISREPRESENTATIONOF));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmIsSimilarTo", EdmLabel.PROXY_EDM_ISSIMILARTO));
+				"getEdmIsSimilarTo", EdmLabel.PROXY_EDM_ISSIMILARTO));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmIsSuccessorOf", EdmLabel.PROXY_EDM_ISSUCCESSOROF));
+				"getEdmIsSuccessorOf", EdmLabel.PROXY_EDM_ISSUCCESSOROF));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmRealizes", EdmLabel.PROXY_EDM_REALIZES));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "edmRights",
+				"getEdmRealizes", EdmLabel.PROXY_EDM_REALIZES));
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getEdmRights",
 				EdmLabel.PROXY_EDM_RIGHTS));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"edmWasPresentAt", EdmLabel.PROXY_EDM_WASPRESENTAT));
+				"getEdmWasPresentAt", EdmLabel.PROXY_EDM_WASPRESENTAT));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"oreProxyFor", EdmLabel.PROXY_ORE_PROXY_FOR));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "oreProxyIn",
+				"getProxyFor", EdmLabel.PROXY_ORE_PROXY_FOR));
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getProxyIn",
 				EdmLabel.PROXY_ORE_PROXY_IN));
-		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "edmType",
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getEdmType",
 				EdmLabel.PROVIDER_EDM_TYPE));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
-				"europeanaProxy", EdmLabel.EDM_ISEUROPEANA_PROXY));
+				"isEuropeanaProxy", EdmLabel.EDM_ISEUROPEANA_PROXY));
 
 		return fieldValueList;
 	}
@@ -179,35 +181,48 @@ public final class MongoConverter {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
 
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "about", EdmLabel.EDM_EUROPEANA_AGGREGATION));
+				aggregation, "getAbout", EdmLabel.EDM_EUROPEANA_AGGREGATION));
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "aggregatedCHO",
+				aggregation, "getAggregatedCHO",
 				EdmLabel.EUROPEANA_AGGREGATION_ORE_AGGREGATEDCHO));
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "dcCreator",
+				aggregation, "getDcCreator",
 				EdmLabel.EUROPEANA_AGGREGATION_DC_CREATOR));
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "edmCountry",
+				aggregation, "getEdmCountry",
 				EdmLabel.EUROPEANA_AGGREGATION_EDM_COUNTRY));
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "edmHasView",
+				aggregation, "getEdmHasView",
 				EdmLabel.EUROPEANA_AGGREGATION_EDM_HASVIEW));
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "edmIsShownBy",
+				aggregation, "getEdmIsShownBy",
 				EdmLabel.EUROPEANA_AGGREGATION_EDM_ISSHOWNBY));
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "edmLandingPage",
+				aggregation, "getEdmLandingPage",
 				EdmLabel.EUROPEANA_AGGREGATION_EDM_LANDINGPAGE));
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "edmLanguage",
+				aggregation, "getEdmLanguage",
 				EdmLabel.EUROPEANA_AGGREGATION_EDM_LANGUAGE));
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "edmRights",
+				aggregation, "getEdmRights",
 				EdmLabel.EUROPEANA_AGGREGATION_EDM_RIGHTS));
+		/*This does not work*/
 		fieldValueList.add(getFieldValues(EuropeanaAggregationImpl.class,
-				aggregation, "aggregates",
+				aggregation, "getAggregates",
 				EdmLabel.EUROPEANA_AGGREGATION_ORE_AGGREGATES));
-
+		/*This works*/
+//		String[] val = aggregation.getAggregates();
+//		FieldValueDTO fieldValueDTO = new FieldValueDTO();
+//		fieldValueDTO.setFieldName(EdmLabel.EUROPEANA_AGGREGATION_ORE_AGGREGATES.toString());
+//		List<String> values = new ArrayList<String>();
+//		if (val != null) {
+//			for (String entry :  val)
+//					 {
+//					values.add(entry);
+//			}
+//		}
+//		fieldValueDTO.setFieldValue(values);
+//		fieldValueList.add(fieldValueDTO);
 		return fieldValueList;
 	}
 
@@ -216,86 +231,86 @@ public final class MongoConverter {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
 
 		fieldValueList.add(getFieldValues(ProvidedCHOImpl.class, providedCHO,
-				"about", EdmLabel.EUROPEANA_ID));
+				"getAbout", EdmLabel.EUROPEANA_ID));
 		fieldValueList.add(getFieldValues(ProvidedCHOImpl.class, providedCHO,
-				"owlSameas", EdmLabel.PROXY_OWL_SAMEAS));
+				"getOwlSameas", EdmLabel.PROXY_OWL_SAMEAS));
 
 		return fieldValueList;
 	}
 
 	public static List<FieldValueDTO> convertAgent(AgentImpl agent) {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "about",
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getAbout",
 				EdmLabel.EDM_AGENT));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "dcDate",
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getDcDate",
 				EdmLabel.AG_DC_DATE));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"dcIdentifier", EdmLabel.AG_DC_IDENTIFIER));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "begin",
+				"getDcIdentifier", EdmLabel.AG_DC_IDENTIFIER));
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getBegin",
 				EdmLabel.AG_EDM_BEGIN));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "end",
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getEnd",
 				EdmLabel.AG_EDM_END));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "edmHasMet",
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getEdmHasMet",
 				EdmLabel.AG_EDM_HASMET));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"edmIsRelatedto", EdmLabel.AG_EDM_ISRELATEDTO));
+				"getEdmIsRelatedto", EdmLabel.AG_EDM_ISRELATEDTO));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"edmWasPresentAt", EdmLabel.AG_EDM_WASPRESENTAT));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "owlSameAs",
+				"getEdmWasPresentAt", EdmLabel.AG_EDM_WASPRESENTAT));
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getOwlSameAs",
 				EdmLabel.AG_OWL_SAMEAS));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "foafName",
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getFoafName",
 				EdmLabel.AG_FOAF_NAME));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"rdaGr2BiographicalInformation",
+				"getRdaGr2BiographicalInformation",
 				EdmLabel.AG_RDAGR2_BIOGRAPHICALINFORMATION));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"rdaGr2DateOfBirth", EdmLabel.AG_RDAGR2_DATEOFBIRTH));
+				"getRdaGr2DateOfBirth", EdmLabel.AG_RDAGR2_DATEOFBIRTH));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"rdaGr2DateOfDeath", EdmLabel.AG_RDAGR2_DATEOFDEATH));
+				"getRdaGr2DateOfDeath", EdmLabel.AG_RDAGR2_DATEOFDEATH));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"rdaGr2DateOfEstablishment",
+				"getRdaGr2DateOfEstablishment",
 				EdmLabel.AG_RDAGR2_DATEOFESTABLISHMENT));
 		fieldValueList
 				.add(getFieldValues(AgentImpl.class, agent,
-						"rdaGr2DateOfTermination",
+						"getRdaGr2DateOfTermination",
 						EdmLabel.AG_RDAGR2_DATEOFTERMINATION));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"rdaGr2Gender", EdmLabel.AG_RDAGR2_GENDER));
+				"getRdaGr2Gender", EdmLabel.AG_RDAGR2_GENDER));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"rdaGr2ProfessionOrOccupation",
+				"getRdaGr2ProfessionOrOccupation",
 				EdmLabel.AG_RDAGR2_PROFESSIONOROCCUPATION));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "prefLabel",
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getPrefLabel",
 				EdmLabel.AG_SKOS_PREF_LABEL));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "altLabel",
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getAltLabel",
 				EdmLabel.AG_SKOS_ALT_LABEL));
-		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "note",
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getNote",
 				EdmLabel.AG_SKOS_NOTE));
 		return fieldValueList;
 	}
 
 	public static List<FieldValueDTO> convertPlace(PlaceImpl place) {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
-		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "about",
+		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getAbout",
 				EdmLabel.EDM_PLACE));
 		fieldValueList.add(getFieldValues(PlaceImpl.class, place,
-				"dctermsHasPart", EdmLabel.PL_DCTERMS_HASPART));
+				"getDctermsHasPart", EdmLabel.PL_DCTERMS_HASPART));
 		fieldValueList.add(getFieldValues(PlaceImpl.class, place,
-				"dctermsIsPartOf", EdmLabel.PL_DCTERMS_ISPART_OF));
-		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "owlSameAs",
+				"getDctermsIsPartOf", EdmLabel.PL_DCTERMS_ISPART_OF));
+		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getOwlSameAs",
 				EdmLabel.PL_OWL_SAMEAS));
-		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "prefLabel",
+		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getPrefLabel",
 				EdmLabel.PL_SKOS_PREF_LABEL));
-		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "altLabel",
+		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getAltLabel",
 				EdmLabel.PL_SKOS_ALT_LABEL));
 		fieldValueList.add(getFieldValues(PlaceImpl.class, place,
-				"hiddenLabel", EdmLabel.PL_SKOS_HIDDENLABEL));
-		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "note",
+				"getHiddenLabel", EdmLabel.PL_SKOS_HIDDENLABEL));
+		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getNote",
 				EdmLabel.PL_SKOS_NOTE));
-		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "altitude",
+		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getAltitude",
 				EdmLabel.PL_WGS84_POS_ALT));
-		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "latitude",
+		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getLatitude",
 				EdmLabel.PL_WGS84_POS_LAT));
-		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "longitude",
+		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getLongitude",
 				EdmLabel.PL_WGS84_POS_LONG));
 
 		return fieldValueList;
@@ -304,24 +319,24 @@ public final class MongoConverter {
 	public static List<FieldValueDTO> convertTimespan(TimespanImpl timespan) {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"about", EdmLabel.EDM_TIMESPAN));
+				"getAbout", EdmLabel.EDM_TIMESPAN));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"dctermsHasPart", EdmLabel.TS_DCTERMS_HASPART));
+				"getDctermsHasPart", EdmLabel.TS_DCTERMS_HASPART));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"dctermsIsPartOf", EdmLabel.TS_DCTERMS_ISPART_OF));
+				"getDctermsIsPartOf", EdmLabel.TS_DCTERMS_ISPART_OF));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"begin", EdmLabel.TS_EDM_BEGIN));
-		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan, "end",
+				"getBegin", EdmLabel.TS_EDM_BEGIN));
+		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan, "getEnd",
 				EdmLabel.TS_EDM_END));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"owlSameAs", EdmLabel.TS_OWL_SAMEAS));
+				"getOwlSameAs", EdmLabel.TS_OWL_SAMEAS));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"altLabel", EdmLabel.TS_SKOS_ALT_LABEL));
+				"getAltLabel", EdmLabel.TS_SKOS_ALT_LABEL));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"prefLabel", EdmLabel.TS_SKOS_PREF_LABEL));
+				"getPrefLabel", EdmLabel.TS_SKOS_PREF_LABEL));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"hiddenLabel", EdmLabel.TS_SKOS_HIDDENLABEL));
-		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan, "note",
+				"getHiddenLabel", EdmLabel.TS_SKOS_HIDDENLABEL));
+		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan, "getNote",
 				EdmLabel.TS_SKOS_NOTE));
 
 		return fieldValueList;
@@ -329,36 +344,36 @@ public final class MongoConverter {
 
 	public static List<FieldValueDTO> convertConcept(ConceptImpl concept) {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
-		fieldValueList.add(getFieldValues(ConceptImpl.class, concept, "about",
+		fieldValueList.add(getFieldValues(ConceptImpl.class, concept, "getAbout",
 				EdmLabel.SKOS_CONCEPT));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"broader", EdmLabel.CC_SKOS_BROADER));
+				"getBroader", EdmLabel.CC_SKOS_BROADER));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"altLabel", EdmLabel.CC_SKOS_ALT_LABEL));
+				"getAltLabel", EdmLabel.CC_SKOS_ALT_LABEL));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"broadMatch", EdmLabel.CC_SKOS_BROADMATCH));
+				"getBroadMatch", EdmLabel.CC_SKOS_BROADMATCH));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"closeMatch", EdmLabel.CC_SKOS_CLOSEMATCH));
+				"getCloseMatch", EdmLabel.CC_SKOS_CLOSEMATCH));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"exactMatch", EdmLabel.CC_SKOS_EXACTMATCH));
+				"getExactMatch", EdmLabel.CC_SKOS_EXACTMATCH));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"hiddenLabel", EdmLabel.CC_SKOS_HIDDEN_LABEL));
+				"getHiddenLabel", EdmLabel.CC_SKOS_HIDDEN_LABEL));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"inScheme", EdmLabel.CC_SKOS_INSCHEME));
+				"getInScheme", EdmLabel.CC_SKOS_INSCHEME));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"narrower", EdmLabel.CC_SKOS_NARROWER));
+				"getNarrower", EdmLabel.CC_SKOS_NARROWER));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"narrowMatch", EdmLabel.CC_SKOS_NARROWMATCH));
+				"getNarrowMatch", EdmLabel.CC_SKOS_NARROWMATCH));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"notation", EdmLabel.CC_SKOS_NOTATIONS));
-		fieldValueList.add(getFieldValues(ConceptImpl.class, concept, "note",
+				"getNotation", EdmLabel.CC_SKOS_NOTATIONS));
+		fieldValueList.add(getFieldValues(ConceptImpl.class, concept, "getNote",
 				EdmLabel.CC_SKOS_NOTE));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"prefLabel", EdmLabel.CC_SKOS_PREF_LABEL));
+				"getPrefLabel", EdmLabel.CC_SKOS_PREF_LABEL));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"related", EdmLabel.CC_SKOS_RELATED));
+				"getRelated", EdmLabel.CC_SKOS_RELATED));
 		fieldValueList.add(getFieldValues(ConceptImpl.class, concept,
-				"relatedMatch", EdmLabel.CC_SKOS_RELATEDMATCH));
+				"getRelatedMatch", EdmLabel.CC_SKOS_RELATEDMATCH));
 		return fieldValueList;
 	}
 
@@ -366,37 +381,37 @@ public final class MongoConverter {
 			WebResourceImpl webResource) {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"about", EdmLabel.EDM_WEB_RESOURCE));
+				"getAbout", EdmLabel.EDM_WEB_RESOURCE));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dcDescription", EdmLabel.WR_DC_DESCRIPTION));
+				"getDcDescription", EdmLabel.WR_DC_DESCRIPTION));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dcFormat", EdmLabel.WR_DC_FORMAT));
+				"getDcFormat", EdmLabel.WR_DC_FORMAT));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dcRights", EdmLabel.WR_DC_RIGHTS));
+				"getWebResourceDcRights", EdmLabel.WR_DC_RIGHTS));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dcSource", EdmLabel.WR_DC_SOURCE));
+				"getDcSource", EdmLabel.WR_DC_SOURCE));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dctermsConformsTo", EdmLabel.WR_DCTERMS_CONFORMSTO));
+				"getDctermsConformsTo", EdmLabel.WR_DCTERMS_CONFORMSTO));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dctermsCreated", EdmLabel.WR_DCTERMS_CREATED));
+				"getDctermsCreated", EdmLabel.WR_DCTERMS_CREATED));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dctermsHasPart", EdmLabel.WR_DCTERMS_HAS_PART));
+				"getDctermsHasPart", EdmLabel.WR_DCTERMS_HAS_PART));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dctermsExtent", EdmLabel.WR_DCTERMS_EXTENT));
+				"getDctermsExtent", EdmLabel.WR_DCTERMS_EXTENT));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dctermsIsFormatOf", EdmLabel.WR_DCTERMS_ISFORMATOF));
+				"getDctermsIsFormatOf", EdmLabel.WR_DCTERMS_ISFORMATOF));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"dctermsIssued", EdmLabel.WR_DCTERMS_ISSUED));
+				"getDctermsIssued", EdmLabel.WR_DCTERMS_ISSUED));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"edmIsNextInSequence", EdmLabel.WR_EDM_IS_NEXT_IN_SEQUENCE));
+				"getIsNextInSequence", EdmLabel.WR_EDM_IS_NEXT_IN_SEQUENCE));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
-				"edmRights", EdmLabel.WR_EDM_RIGHTS));
+				"getWebResourceEdmRights", EdmLabel.WR_EDM_RIGHTS));
 		return fieldValueList;
 	}
 
 	@SuppressWarnings("unchecked")
 	public static FieldValueDTO getFieldValues(Class<?> input, Object obj,
-			String fieldName, EdmLabel label) {
+			String methodName, EdmLabel label) {
 		FieldValueDTO fieldValueDTO = new FieldValueDTO();
 
 		try {
@@ -405,17 +420,23 @@ public final class MongoConverter {
 			// System.out.println("Class: " + obj.getClass().getCanonicalName()
 			// + " | Field: "+ field.getName());
 			// }
-			Field field = obj.getClass().getDeclaredField(fieldName);
-			field.setAccessible(true);
+			
+			//Field field = input.getDeclaredField(methodName);
+			//field.setAccessible(true);
 			fieldValueDTO.setFieldName(label.toString());
+			
+			Method method = input.getMethod(methodName);
+			Object field = method.invoke(obj);
+			
 			List<String> values = new ArrayList<String>();
-			if (field.getType().isAssignableFrom(Map.class)) {
+			if(field!=null){
+			if (field.getClass().isAssignableFrom(HashMap.class)) {
 
-				Map<String, List<String>> val = new HashMap<String, List<String>>();
-				field.get(val);
+				Map<String, List<String>> val = (HashMap<String, List<String>>) field;
+				//field.get(val);
+				
 				if (val != null) {
-					for (Entry<String, List<String>> entry : ((HashMap<String, List<String>>) val)
-							.entrySet()) {
+					for (Entry<String, List<String>> entry :  val.entrySet()) {
 						for (String str : entry.getValue()) {
 							values.add(entry.getKey() + ":" + str);
 						}
@@ -423,10 +444,9 @@ public final class MongoConverter {
 				}
 			}
 
-			if (field.getType().isAssignableFrom(String[].class)) {
+			if (field.getClass().isAssignableFrom(String[].class)) {
 
-				String[] val = new String[] {};
-				field.get(val);
+				String[] val =  (String[]) field;
 				if (val != null) {
 
 					for (String str : val) {
@@ -436,10 +456,9 @@ public final class MongoConverter {
 				}
 			}
 
-			if (field.getType().isAssignableFrom(String.class)) {
+			if (field.getClass().isAssignableFrom(String.class)) {
 
-				String val = new String();
-				field.get(val);
+				String val = (String)field;
 				if (val != null) {
 
 					values.add(val);
@@ -447,22 +466,26 @@ public final class MongoConverter {
 				}
 			}
 
-			if (field.getType().isAssignableFrom(Float.class)) {
+			if (field.getClass().isAssignableFrom(Float.class)) {
 
-				float val = 0f;
-				field.get(val);
+				float val = (Float) field;
 
 				values.add(Float.toString(val));
 
 			}
 
-			if (field.getType().isAssignableFrom(Boolean.class)) {
+			if (field.getClass().isAssignableFrom(Boolean.class)) {
 
-				boolean val = false;
-				field.get(val);
+				boolean val = (Boolean) field;
 
 				values.add(Boolean.toString(val));
 
+			}
+			
+			if(field.getClass().isAssignableFrom(DocType.class)){
+				String val = ((DocType)field).toString();
+				values.add(val);
+			}
 			}
 
 			fieldValueDTO.setFieldValue(values);
@@ -473,10 +496,13 @@ public final class MongoConverter {
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
+		}  catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

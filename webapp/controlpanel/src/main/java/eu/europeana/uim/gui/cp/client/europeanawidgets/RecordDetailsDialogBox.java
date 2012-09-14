@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -48,11 +49,12 @@ public class RecordDetailsDialogBox extends DialogBox {
         xml.setVisibleLines(20);
         tabPanel.add(xml, "XML");
 
-        final TextArea search = new TextArea();
-        search.setCharacterWidth(100);
-        search.setVisibleLines(20);
+        final RichTextArea search = new RichTextArea();
+        search.setPixelSize(500, 400);
+        //setCharacterWidth(100);
+        //search.setVisibleLines(20);
         tabPanel.add(search, "Search");
-
+        
         tabPanel.selectTab(0);
 
         dialogContents.add(tabPanel);
@@ -88,7 +90,7 @@ public class RecordDetailsDialogBox extends DialogBox {
 
             @Override
             public void onSuccess(EdmRecordDTO result) {
-                search.setText(convertToTable(result));
+                search.setHTML(convertToTable(result));
             }
         });
         
@@ -98,9 +100,9 @@ public class RecordDetailsDialogBox extends DialogBox {
     	EdmFieldRecordDTO solrFields= result.getSolrRecord();
     	EdmFieldRecordDTO mongoFields = result.getMongoRecord();
     	StringBuilder sb = new StringBuilder();
-    	sb.append("<table><tr><td><b>SOLR Fields</b></td></tr>");
+    	sb.append("<table border='1'><tr><td><b>SOLR Fields</b></td></tr>");
     	createTable(sb,solrFields);
-    	sb.append("</table>\n<table>tr><td><b>MongoDB Fields</b></td></tr>");
+    	sb.append("</table>\n<table border='1'><tr><td><b>MongoDB Fields</b></td></tr>");
     	createTable(sb,mongoFields);
     	sb.append("</table>");
     	return sb.toString();
