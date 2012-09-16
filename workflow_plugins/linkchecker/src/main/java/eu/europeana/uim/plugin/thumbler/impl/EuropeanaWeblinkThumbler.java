@@ -10,11 +10,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.util.EntityUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -159,8 +154,8 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		 * 
 		 * @return file with downloaded content
 		 */
-		protected File store() {
-			File target = null;
+		protected void store() {
+
 			try {
 
 				UimDataSet<?> dataset = guarded.getExecution().getDataSet();
@@ -204,11 +199,11 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 						}
 					}
 				}
-				return target;
+
 			} catch (Throwable t) {
 				log.severe(t.getMessage());
 			}
-			return null;
+
 		}
 
 
@@ -223,23 +218,22 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			Submission submission = getSubmission(guarded.getExecution());
 			File target = null;
 			int status = 0;
-			HttpResponse response = null;
-			HttpRequestBase http = new HttpGet(guarded.getUrl()
-					.toExternalForm());
-
 			try {
-				response = HttpClientSetup.getHttpClient().execute(http);
-				status = response.getStatusLine().getStatusCode();
-
-				if (status == HttpStatus.SC_BAD_REQUEST) {
-					log.info("Bad request: <" + guarded.getUrl() + ">.");
-					
-				} else if (status == HttpStatus.SC_OK) {
 					String name =  guarded.getUrl().getFile(); 
 					target = new File(STORAGELOCATION +name);
 					FileUtils.copyURLToFile(new URL(url), target, 1000, 1000000);
+					
+					
+					guarded.processed(status,
+							"filename: " + target.getAbsolutePath());
+					
+					synchronized (submission) {
+						submission.incrStatus(status);
+						submission.incrProcessed();
+						submission.removeRemaining(guarded);
+					}
+					
 					return target;
-				}
 
 			} catch (Throwable t) {
 				synchronized (submission) {
@@ -247,35 +241,9 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				}
 				log.info("Failed to store url: <" + guarded.getUrl() + ">");
 				guarded.processed(0, t.getCause().getMessage());
-			} finally {
-				try {
-					if (response != null)
-						EntityUtils.consume(response.getEntity());
+			} 
 
-					synchronized (submission) {
-						submission.incrStatus(status);
-						submission.incrProcessed();
-						submission.removeRemaining(guarded);
-					}
-
-					if (status == HttpStatus.SC_OK && target != null
-							&& target.exists()) {
-						guarded.processed(status,
-								"filename: " + target.getAbsolutePath());
-					} else if (status > 0) {
-						if (response != null)
-							guarded.processed(status, response.getStatusLine()
-									.getReasonPhrase());
-					} else {
-						// already handled within catch clause
-						log.info("Status was zero: <" + guarded.getUrl() + ">.");
-					}
-				} catch (Throwable t) {
-					log.severe(t.getMessage());
-				}
-			}
-
-			return null;
+			return target;
 		}
 		
 		

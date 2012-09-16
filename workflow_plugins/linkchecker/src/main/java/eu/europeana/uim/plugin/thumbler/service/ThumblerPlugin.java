@@ -1,4 +1,4 @@
-/*
+ /**
  * Copyright 2007 EDL FOUNDATION
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they
@@ -17,7 +17,7 @@
  * express or implied.
  * See the Licence for the specific language governing
  * permissions and limitations under the Licence.
- */
+ */ 
 package eu.europeana.uim.plugin.thumbler.service;
 
 import java.io.File;
