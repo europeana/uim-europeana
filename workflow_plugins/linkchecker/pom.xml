@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>org.theeuropeanlibrary</groupId>
 			<artifactId>tel-uim-plugin-check-link</artifactId>
-			<version>1.3.0-SNAPSHOT</version>
+			<version>${pom.version}</version>
 		</dependency>
 
 		<dependency>
@@ -187,6 +187,7 @@
 							javax.xml.parsers,
 							javax.xml.transform.stream,
 							org.xml.sax,
+							javax.net,
 							!*
 						</Import-Package>
 						<Embed-Dependency>tel-uim-plugin-check-link,commons-logging,corelib-db,
