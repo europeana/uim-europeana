@@ -9,6 +9,8 @@ import eu.europeana.uim.gui.cp.client.services.ReportingService;
 import eu.europeana.uim.gui.cp.server.ExecutionServiceImpl;
 import eu.europeana.uim.gui.cp.shared.ExecutionDTO;
 
+
+
 /**
  * The implementation of the reporting service. This is just a frontend to the ReportUtils.
  * 
@@ -16,7 +18,10 @@ import eu.europeana.uim.gui.cp.shared.ExecutionDTO;
  * @date Jul 15, 2011
  */
 public class ReportingServiceImpl extends ExecutionServiceImpl implements ReportingService {    
-    /**
+
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Creates a new instance of this class.
      */
     public ReportingServiceImpl() {
