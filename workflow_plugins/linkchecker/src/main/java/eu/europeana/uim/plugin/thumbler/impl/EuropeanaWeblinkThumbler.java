@@ -201,7 +201,14 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				}
 
 			} catch (Throwable t) {
-				log.severe(t.getMessage());
+				Submission submission = getSubmission(guarded.getExecution());
+				synchronized (submission) {
+					submission.incrExceptions();
+				}
+				
+				log.info("Failed to store and process file locally" + guarded.getUrl() + ">");
+				guarded.processed(1, t.getMessage());
+				log.severe(t.getClass().getName());
 			}
 
 		}
@@ -240,7 +247,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 					submission.incrExceptions();
 				}
 				log.info("Failed to store url: <" + guarded.getUrl() + ">");
-				guarded.processed(0, t.getCause().getMessage());
+				guarded.processed(1, t.getClass().getName());
 			} 
 
 			return target;

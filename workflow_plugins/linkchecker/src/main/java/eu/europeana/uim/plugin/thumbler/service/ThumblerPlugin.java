@@ -127,15 +127,12 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 					            @Override
 					            public void processed(int status, String message) {
 					                LinkStatus state = null;
+					                
 					                if (status == 0) {
+					                    state = LinkStatus.CACHED;
+					                } else if (status == 1) {
 					                    state = LinkStatus.FAILED_CONNECTION;
-					                } else if (status < 400) {
-					                    state = LinkStatus.VALID;
-					                } else if (status < 500) {
-					                    state = LinkStatus.FAILED_FOURHUNDRED;
-					                } else {
-					                    state = LinkStatus.FAILED_FIVEHUNDRED;
-					                }
+					                } 
 
 					                getLink().setLastChecked(new Date());
 					                getLink().setLinkStatus(state);

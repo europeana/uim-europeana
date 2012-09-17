@@ -68,15 +68,6 @@
                     <property name="wordWrap">false</property>
                 </structure>
                 <structure>
-                    <property name="columnName">execution</property>
-                    <property name="analysis">dimension</property>
-                    <text-property name="displayName">execution</text-property>
-                    <text-property name="heading">execution</text-property>
-                    <property name="displayLength">20</property>
-                    <property name="horizontalAlign">justify</property>
-                    <property name="wordWrap">false</property>
-                </structure>
-                <structure>
                     <property name="columnName">link</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">link</text-property>
@@ -176,15 +167,6 @@
                     <property name="wordWrap">false</property>
                 </structure>
                 <structure>
-                    <property name="columnName">metadatarecord</property>
-                    <property name="analysis">dimension</property>
-                    <text-property name="displayName">metadatarecord</text-property>
-                    <text-property name="heading">metadatarecord</text-property>
-                    <property name="displayLength">20</property>
-                    <property name="horizontalAlign">justify</property>
-                    <property name="wordWrap">false</property>
-                </structure>
-                <structure>
                     <property name="columnName">module</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">module</text-property>
@@ -251,86 +233,76 @@
                     </structure>
                     <structure>
                         <property name="position">3</property>
-                        <property name="name">execution</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
                         <property name="name">link</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">5</property>
+                        <property name="position">4</property>
                         <property name="name">message0</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">6</property>
+                        <property name="position">5</property>
                         <property name="name">message1</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">7</property>
+                        <property name="position">6</property>
                         <property name="name">message2</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">8</property>
+                        <property name="position">7</property>
                         <property name="name">message3</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">9</property>
+                        <property name="position">8</property>
                         <property name="name">message4</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">10</property>
+                        <property name="position">9</property>
                         <property name="name">message5</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">11</property>
+                        <property name="position">10</property>
                         <property name="name">message6</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">12</property>
+                        <property name="position">11</property>
                         <property name="name">message7</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">13</property>
+                        <property name="position">12</property>
                         <property name="name">message8</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">14</property>
+                        <property name="position">13</property>
                         <property name="name">message9</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">15</property>
-                        <property name="name">metadatarecord</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">16</property>
+                        <property name="position">14</property>
                         <property name="name">module</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">17</property>
+                        <property name="position">15</property>
                         <property name="name">status</property>
                         <property name="dataType">integer</property>
                     </structure>
                     <structure>
-                        <property name="position">18</property>
+                        <property name="position">16</property>
                         <property name="name">stringexecutionid</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">19</property>
+                        <property name="position">17</property>
                         <property name="name">stringmetadatarecordid</property>
                         <property name="dataType">string</property>
                     </structure>
@@ -344,133 +316,102 @@
                     <property name="name">oid</property>
                     <property name="nativeName">oid</property>
                     <property name="dataType">decimal</property>
-                    <property name="nativeDataType">-5</property>
                 </structure>
                 <structure>
                     <property name="position">2</property>
                     <property name="name">date</property>
                     <property name="nativeName">date</property>
                     <property name="dataType">date-time</property>
-                    <property name="nativeDataType">93</property>
                 </structure>
                 <structure>
                     <property name="position">3</property>
-                    <property name="name">execution</property>
-                    <property name="nativeName">execution</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">4</property>
                     <property name="name">link</property>
                     <property name="nativeName">link</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">5</property>
+                    <property name="position">4</property>
                     <property name="name">message0</property>
                     <property name="nativeName">message0</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">6</property>
+                    <property name="position">5</property>
                     <property name="name">message1</property>
                     <property name="nativeName">message1</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">7</property>
+                    <property name="position">6</property>
                     <property name="name">message2</property>
                     <property name="nativeName">message2</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">8</property>
+                    <property name="position">7</property>
                     <property name="name">message3</property>
                     <property name="nativeName">message3</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">9</property>
+                    <property name="position">8</property>
                     <property name="name">message4</property>
                     <property name="nativeName">message4</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">10</property>
+                    <property name="position">9</property>
                     <property name="name">message5</property>
                     <property name="nativeName">message5</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">11</property>
+                    <property name="position">10</property>
                     <property name="name">message6</property>
                     <property name="nativeName">message6</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">12</property>
+                    <property name="position">11</property>
                     <property name="name">message7</property>
                     <property name="nativeName">message7</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">13</property>
+                    <property name="position">12</property>
                     <property name="name">message8</property>
                     <property name="nativeName">message8</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">14</property>
+                    <property name="position">13</property>
                     <property name="name">message9</property>
                     <property name="nativeName">message9</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">15</property>
-                    <property name="name">metadatarecord</property>
-                    <property name="nativeName">metadatarecord</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
-                </structure>
-                <structure>
-                    <property name="position">16</property>
+                    <property name="position">14</property>
                     <property name="name">module</property>
                     <property name="nativeName">module</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">17</property>
+                    <property name="position">15</property>
                     <property name="name">status</property>
                     <property name="nativeName">status</property>
                     <property name="dataType">integer</property>
-                    <property name="nativeDataType">4</property>
                 </structure>
                 <structure>
-                    <property name="position">18</property>
+                    <property name="position">16</property>
                     <property name="name">stringexecutionid</property>
                     <property name="nativeName">stringexecutionid</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">19</property>
+                    <property name="position">17</property>
                     <property name="name">stringmetadatarecordid</property>
                     <property name="nativeName">stringmetadatarecordid</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
             <xml-property name="queryText"><![CDATA[select *
@@ -1021,189 +962,9 @@
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
-            <structure name="cachedMetaData">
-                <list-property name="resultSet">
-                    <structure>
-                        <property name="position">1</property>
-                        <property name="name">oid</property>
-                        <property name="dataType">decimal</property>
-                    </structure>
-                    <structure>
-                        <property name="position">2</property>
-                        <property name="name">date</property>
-                        <property name="dataType">date-time</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">execution</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">4</property>
-                        <property name="name">level</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">5</property>
-                        <property name="name">message0</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">6</property>
-                        <property name="name">message1</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">7</property>
-                        <property name="name">message2</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">8</property>
-                        <property name="name">message3</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">9</property>
-                        <property name="name">message4</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">10</property>
-                        <property name="name">message5</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">11</property>
-                        <property name="name">message6</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">12</property>
-                        <property name="name">message7</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">13</property>
-                        <property name="name">message8</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">14</property>
-                        <property name="name">message9</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">15</property>
-                        <property name="name">metadatarecord</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
-                        <property name="position">16</property>
-                        <property name="name">module</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                </list-property>
-            </structure>
+            <structure name="cachedMetaData"/>
             <property name="dataSource">KPIAnalyse</property>
-            <list-property name="resultSet">
-                <structure>
-                    <property name="position">1</property>
-                    <property name="name">oid</property>
-                    <property name="nativeName">oid</property>
-                    <property name="dataType">decimal</property>
-                </structure>
-                <structure>
-                    <property name="position">2</property>
-                    <property name="name">date</property>
-                    <property name="nativeName">date</property>
-                    <property name="dataType">date-time</property>
-                </structure>
-                <structure>
-                    <property name="position">3</property>
-                    <property name="name">execution</property>
-                    <property name="nativeName">execution</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">4</property>
-                    <property name="name">level</property>
-                    <property name="nativeName">level</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">5</property>
-                    <property name="name">message0</property>
-                    <property name="nativeName">message0</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">6</property>
-                    <property name="name">message1</property>
-                    <property name="nativeName">message1</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">7</property>
-                    <property name="name">message2</property>
-                    <property name="nativeName">message2</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">8</property>
-                    <property name="name">message3</property>
-                    <property name="nativeName">message3</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">9</property>
-                    <property name="name">message4</property>
-                    <property name="nativeName">message4</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">10</property>
-                    <property name="name">message5</property>
-                    <property name="nativeName">message5</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">11</property>
-                    <property name="name">message6</property>
-                    <property name="nativeName">message6</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">12</property>
-                    <property name="name">message7</property>
-                    <property name="nativeName">message7</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">13</property>
-                    <property name="name">message8</property>
-                    <property name="nativeName">message8</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">14</property>
-                    <property name="name">message9</property>
-                    <property name="nativeName">message9</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">15</property>
-                    <property name="name">metadatarecord</property>
-                    <property name="nativeName">metadatarecord</property>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="position">16</property>
-                    <property name="name">module</property>
-                    <property name="nativeName">module</property>
-                    <property name="dataType">string</property>
-                </structure>
-            </list-property>
+            <list-property name="resultSet"/>
             <xml-property name="queryText"><![CDATA[select *
 from public.uim_logentry
 where execution = ?]]></xml-property>
@@ -1650,8 +1411,8 @@ where execution = ?]]></xml-property>
                                     <property name="contentType">html</property>
                                 </text-data>
                                 <image id="311">
-                                    <property name="height">7.486111111111111in</property>
-                                    <property name="width">5.194444444444445in</property>
+                                    <property name="height">1.6979166666666667in</property>
+                                    <property name="width">1.5833333333333333in</property>
                                     <property name="source">embed</property>
                                     <property name="imageName">logo_English_Apples.gif</property>
                                 </image>
@@ -1663,7 +1424,7 @@ where execution = ?]]></xml-property>
                 <cell id="133">
                     <property name="colSpan">2</property>
                     <property name="rowSpan">1</property>
-                    <extended-item extensionName="Chart" id="143">
+                    <extended-item extensionName="Chart" id="314">
                         <xml-property name="xmlRepresentation"><![CDATA[<model:ChartWithoutAxes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:attribute="http://www.birt.eclipse.org/ChartModelAttribute" xmlns:layout="http://www.birt.eclipse.org/ChartModelLayout" xmlns:model="http://www.birt.eclipse.org/ChartModel" xmlns:type="http://www.birt.eclipse.org/ChartModelType">
   <Version>2.5.3</Version>
   <Type>Pie Chart</Type>
@@ -1697,10 +1458,10 @@ where execution = ?]]></xml-property>
         </Color>
         <Visible>false</Visible>
       </Outline>
-      <Visible>false</Visible>
+      <Visible>true</Visible>
       <Label>
         <Caption>
-          <Value>Pie Chart Title</Value>
+          <Value>Chart Title</Value>
           <Font>
             <Size>16.0</Size>
             <Bold>true</Bold>
@@ -1888,13 +1649,12 @@ where execution = ?]]></xml-property>
         <Visible>false</Visible>
       </Title>
       <TitlePosition>Above</TitlePosition>
-      <ShowValue>true</ShowValue>
     </Children>
     <Bounds>
       <Left>0.0</Left>
       <Top>0.0</Top>
-      <Width>354.3307086614173</Width>
-      <Height>170.07874015748033</Height>
+      <Width>212.0</Width>
+      <Height>130.0</Height>
     </Bounds>
     <Insets>
       <Top>3.0</Top>
@@ -1920,68 +1680,6 @@ where execution = ?]]></xml-property>
     <Visible>true</Visible>
   </Block>
   <Dimension>Two_Dimensional_With_Depth</Dimension>
-  <Script>
-/**
- * Called before populating the series dataset using the DataSetProcessor.
- *
- * @param series
- *            Series
- * @param idsp
- *            IDataSetProcessor
- * @param icsc
- *            IChartScriptContext
- */
-
-function beforeDataSetFilled( series, idsp, icsc )
-{
-}
-
-/**
- * Called before drawing each datapoint graphical representation or marker.
- * 
- * @param dph
- *            DataPointHints
- * @param fill
- *            Fill
- * @param icsc
- *            IChartScriptContext
- */
-
-function beforeDrawDataPoint( dph, fill, icsc )
-{
-	var Condition = dph.getBaseDisplayValue();
-	
-	if(Condition.equals(&quot;0&quot;)){ fill.set(65,147,215); }
-    else if(Condition.startsWith(&quot;2&quot;)) { fill.set(87,151,55);}
-    else if(Condition.startsWith(&quot;3&quot;)) { fill.set(87,151,55);}
-    else if(Condition.startsWith(&quot;4&quot;)) { fill.set(235,64,85);}
-    else if(Condition.startsWith(&quot;5&quot;)) { fill.set(149,27,43);}
-    
-}
-
-/**
- * Called before drawing the legend item.
- * 
- * @param lerh
- * 			  LegendEntryRenderingHints
- * @param bounds
- * 			  Bounds
- * @param icsc
- * 			  IChartScriptContext
- * @since Version 2.2.0
- */
-
-function beforeDrawLegendItem( lerh, bounds, icsc )
-{
-    var Condition = lerh.getLabel().getCaption().getValue();
-    if(Condition.equals(&quot;0&quot;)){ lerh.getFill().set(65,147,215); }
-    else if(Condition.startsWith(&quot;2&quot;)) { lerh.getFill().set(87,151,55);}
-    else if(Condition.startsWith(&quot;3&quot;)) { lerh.getFill().set(87,151,55);}
-    else if(Condition.startsWith(&quot;4&quot;)) { lerh.getFill().set(235,64,85);}
-    else if(Condition.startsWith(&quot;5&quot;)) { lerh.getFill().set(149,27,43);}
-
-}
-</Script>
   <Units>Points</Units>
   <SeriesThickness>10.0</SeriesThickness>
   <GridColumnCount>0</GridColumnCount>
@@ -1991,17 +1689,14 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
   </ExtendedProperties>
   <SampleData>
     <BaseSampleData>
-      <DataSetRepresentation>6,4,12,8,10</DataSetRepresentation>
+      <DataSetRepresentation>'A','B','C','D','E'</DataSetRepresentation>
     </BaseSampleData>
     <OrthogonalSampleData>
       <DataSetRepresentation>6,4,12,8,10</DataSetRepresentation>
       <SeriesDefinitionIndex>0</SeriesDefinitionIndex>
     </OrthogonalSampleData>
   </SampleData>
-  <Interactivity>
-    <Enable>true</Enable>
-    <LegendBehavior>None</LegendBehavior>
-  </Interactivity>
+  <Interactivity/>
   <EmptyMessage>
     <Caption>
       <Value>This chart contains no data.</Value>
@@ -2466,17 +2161,16 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
             <Bottom>0.0</Bottom>
             <Right>3.0</Right>
           </Insets>
-          <Visible>true</Visible>
+          <Visible>false</Visible>
         </Label>
         <DataDefinition>
-          <Definition>row[&quot;status&quot;]</Definition>
+          <Definition>row[&quot;oid&quot;]</Definition>
           <Grouping>
-            <Enabled>true</Enabled>
             <GroupType>Text</GroupType>
-            <AggregateExpression>Min</AggregateExpression>
+            <AggregateExpression>Sum</AggregateExpression>
           </Grouping>
         </DataDefinition>
-        <SeriesIdentifier></SeriesIdentifier>
+        <SeriesIdentifier>Series 1</SeriesIdentifier>
         <DataPoint>
           <Components>
             <Type>Orthogonal_Value</Type>
@@ -2485,6 +2179,16 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
         </DataPoint>
         <LabelPosition>Outside</LabelPosition>
         <Stacked>false</Stacked>
+        <Triggers>
+          <Condition>onmouseover</Condition>
+          <Action>
+            <Type>Show_Tooltip</Type>
+            <Value xsi:type="attribute:TooltipValue">
+              <Text></Text>
+              <Delay>200</Delay>
+            </Value>
+          </Action>
+        </Triggers>
         <Explosion>0</Explosion>
         <Title>
           <Caption>
@@ -2525,9 +2229,12 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
           <Thickness>1</Thickness>
           <Visible>true</Visible>
         </LeaderLineAttributes>
-        <LeaderLineStyle>Fixed_Length</LeaderLineStyle>
         <LeaderLineLength>10.0</LeaderLineLength>
       </Series>
+      <Grouping>
+        <GroupType>Text</GroupType>
+        <AggregateExpression>Sum</AggregateExpression>
+      </Grouping>
     </SeriesDefinitions>
     <Series>
       <Visible>true</Visible>
@@ -2578,22 +2285,19 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
     </Series>
     <Grouping>
       <Enabled>true</Enabled>
-      <GroupingInterval>1.0</GroupingInterval>
       <GroupType>Numeric</GroupType>
-      <AggregateExpression>Count</AggregateExpression>
+      <AggregateExpression>Sum</AggregateExpression>
     </Grouping>
-    <Sorting>Ascending</Sorting>
-    <SortKey>
-      <Definition>row[&quot;status&quot;]</Definition>
-    </SortKey>
   </SeriesDefinitions>
+  <MinSlice>0.0</MinSlice>
+  <MinSlicePercent>false</MinSlicePercent>
 </model:ChartWithoutAxes>
 ]]></xml-property>
                         <property name="outputFormat">JPG</property>
                         <property name="inheritColumns">false</property>
                         <property name="dataSet">LogEntryLink</property>
-                        <property name="height">60mm</property>
-                        <property name="width">125mm</property>
+                        <property name="height">2.6979166666666665in</property>
+                        <property name="width">5.083333333333333in</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">oid</property>
@@ -2604,11 +2308,6 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
                                 <property name="name">date</property>
                                 <expression name="expression" type="javascript">dataSetRow["date"]</expression>
                                 <property name="dataType">date-time</property>
-                            </structure>
-                            <structure>
-                                <property name="name">execution</property>
-                                <expression name="expression" type="javascript">dataSetRow["execution"]</expression>
-                                <property name="dataType">string</property>
                             </structure>
                             <structure>
                                 <property name="name">link</property>
@@ -2666,11 +2365,6 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
                                 <property name="dataType">string</property>
                             </structure>
                             <structure>
-                                <property name="name">metadatarecord</property>
-                                <expression name="expression" type="javascript">dataSetRow["metadatarecord"]</expression>
-                                <property name="dataType">string</property>
-                            </structure>
-                            <structure>
                                 <property name="name">module</property>
                                 <expression name="expression" type="javascript">dataSetRow["module"]</expression>
                                 <property name="dataType">string</property>
@@ -2679,6 +2373,16 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
                                 <property name="name">status</property>
                                 <expression name="expression" type="javascript">dataSetRow["status"]</expression>
                                 <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">stringexecutionid</property>
+                                <expression name="expression" type="javascript">dataSetRow["stringexecutionid"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">stringmetadatarecordid</property>
+                                <expression name="expression" type="javascript">dataSetRow["stringmetadatarecordid"]</expression>
+                                <property name="dataType">string</property>
                             </structure>
                         </list-property>
                     </extended-item>
@@ -2716,12 +2420,6 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
                                 <text-property name="displayName">date</text-property>
                                 <expression name="expression" type="javascript">dataSetRow["date"]</expression>
                                 <property name="dataType">date-time</property>
-                            </structure>
-                            <structure>
-                                <property name="name">execution</property>
-                                <text-property name="displayName">execution</text-property>
-                                <expression name="expression" type="javascript">dataSetRow["execution"]</expression>
-                                <property name="dataType">string</property>
                             </structure>
                             <structure>
                                 <property name="name">link</property>
@@ -2790,12 +2488,6 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
                                 <property name="dataType">string</property>
                             </structure>
                             <structure>
-                                <property name="name">metadatarecord</property>
-                                <text-property name="displayName">metadatarecord</text-property>
-                                <expression name="expression" type="javascript">dataSetRow["metadatarecord"]</expression>
-                                <property name="dataType">string</property>
-                            </structure>
-                            <structure>
                                 <property name="name">module</property>
                                 <text-property name="displayName">module</text-property>
                                 <expression name="expression" type="javascript">dataSetRow["module"]</expression>
@@ -2819,6 +2511,25 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
                                         <property name="name">Expression</property>
                                     </structure>
                                 </list-property>
+                            </structure>
+                            <structure>
+                                <property name="name">stringmetadatarecorid</property>
+                                <text-property name="displayName">metadatarecord</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["stringmetadatarecordid"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">stringexecutionid_1</property>
+                                <text-property name="displayName">stringexecutionid</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["stringexecutionid"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Column Binding</property>
+                                <expression name="expression" type="javascript">dataSetRow["stringmetadatarecordid"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
                             </structure>
                         </list-property>
                         <column id="100">
@@ -3002,7 +2713,7 @@ function beforeDrawLegendItem( lerh, bounds, icsc )
                                     <property name="borderTopWidth">1px</property>
                                     <data id="76">
                                         <property name="whiteSpace">nowrap</property>
-                                        <property name="resultSetColumn">metadatarecord</property>
+                                        <property name="resultSetColumn">Column Binding</property>
                                     </data>
                                 </cell>
                                 <cell id="159">
