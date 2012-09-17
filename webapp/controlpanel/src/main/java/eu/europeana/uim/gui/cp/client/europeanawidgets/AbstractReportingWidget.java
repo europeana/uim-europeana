@@ -154,7 +154,6 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
                         pastExecutions.addAll(executions);
                         cellTable.setRowData(0, pastExecutions);
                         cellTable.setRowCount(pastExecutions.size());
-//                        cellTable.setHeight((30 + 20 * pastExecutions.size()) + "px");
                     }
                 });
     }
@@ -179,8 +178,9 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
             }
         });
         cellTable.addColumn(idColumn, "ID");
-        cellTable.setColumnWidth(idColumn, 10, Unit.PCT);
-
+        cellTable.setColumnWidth(idColumn, 20, Unit.PCT);
+        
+        /*
         // Name
         Column<ExecutionDTO, String> nameColumn = new Column<ExecutionDTO, String>(new TextCell()) {
             @Override
@@ -217,6 +217,8 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
         cellTable.setColumnWidth(datasetColumn, 15, Unit.PCT);
 
         // Workflow
+
+
         Column<ExecutionDTO, String> workflowColumn = new Column<ExecutionDTO, String>(
                 new TextCell()) {
             @Override
@@ -231,9 +233,12 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
                 return o1.getWorkflow().compareTo(o2.getWorkflow());
             }
         });
+        
         cellTable.addColumn(workflowColumn, "Workflow");
         cellTable.setColumnWidth(workflowColumn, 15, Unit.PCT);
 
+         * 
+         */
         DateTimeFormat dtf = DateTimeFormat.getFormat("dd.MM.yyyy 'at' HH:mm:ss");
         // Start Time
         Column<ExecutionDTO, Date> startTimeColumn = new Column<ExecutionDTO, Date>(new DateCell(
@@ -279,7 +284,7 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
             }
         });
         cellTable.addColumn(completedColumn, "Rec./Sub./Ign./Open");
-        cellTable.setColumnWidth(completedColumn, 120, Unit.PX);
+        cellTable.setColumnWidth(completedColumn,  30, Unit.PCT);
 
         ActionCell.Delegate<ExecutionDTO> generateDelegate = new ActionCell.Delegate<ExecutionDTO>() {
             @Override

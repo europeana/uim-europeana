@@ -99,7 +99,7 @@ public class EuropeanaIngestionControlPanel extends
 		
 		treeModel.addMenuEntry("Link Checker/ Thumbler", new LinkCachingWidget(reportService,
                 "Link Caching", new String[] { "ImageCacheWorkflow" },
-                "thumbler_overview.rptdesign", new String[] { "html" }),
+                "thumbler_overview.rptdesign", new String[] { "pdf" }),
                 RunAsyncCode.runAsyncCode(LinkCachingWidget.class));
 		
 		treeModel.addMenuEntry("Importing", new ImportResourcesWidget(
