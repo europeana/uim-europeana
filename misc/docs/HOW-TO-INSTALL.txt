@@ -233,6 +233,14 @@ mint.api.verb = getransformation
 Restart the Tomcat server for the changes to take effect...
 
 
+6.1) Install BIRT
+
+Download the latest BIRT runtime from here:
+
+Unzip it and copy the birt.war file into your tomcat webapps folder
+
+
+
 ------------------------------------------------------
 UIM Core & Europeana Specific Plugins
 ------------------------------------------------------
@@ -267,8 +275,22 @@ svn co https://europeanalabs.eu/svn/europeana/trunk/uim europeanacomponents
 cd europeanacomponents
 mvn clean install -DskipTests
 
-Logging Engine:
 
+4. Linkchecker:
+Make sure that the following dependencies are dep-loyed locally and their 
+paths within UIM are properly defined:
+
+1.ImageMagic & Postscript
+Download & installation instructions here: http://www.imagemagick.org/script/index.php 
+(do this only on Windows installations): http://pages.cs.wisc.edu/~ghost/
+
+2.Deploy the *.rptdesign files located in
+europeana\trunk\uim\workflow_plugins\linkchecker\src\main\resources
+(linkcheck_overview.rptdesign & thumbler_overview.rptdesign) files in the
+/webapps/birt/reports folder in your tomcat installation
+
+
+Logging Engine:
 
 Create the 
 
