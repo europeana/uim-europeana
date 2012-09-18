@@ -542,7 +542,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				.<InputElement> cast().getValue());
 		vocabulary.setSuffix(DOM.getElementById("vocabularySuffix")
 				.<InputElement> cast().getValue());
-		vocabulary.setLocation("/home/gmamakis/repository/"
+		vocabulary.setLocation("/export/repository/"
 				+ retrieveFileName());
 		vocabulary.setUri(DOM.getElementById("vocabularyURI")
 				.<InputElement> cast().getValue());
