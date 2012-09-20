@@ -10,7 +10,7 @@ public interface EnrichmentService {
 
 	SolrInputDocument enrich(SolrInputDocument solrDocument) throws Exception;
 
-	Mongo getMongo();
+//	Mongo getMongo();
 
 	CommonsHttpSolrServer getSolrServer();
 

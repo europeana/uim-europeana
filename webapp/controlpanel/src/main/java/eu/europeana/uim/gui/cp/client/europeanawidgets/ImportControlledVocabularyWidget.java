@@ -1,6 +1,7 @@
 package eu.europeana.uim.gui.cp.client.europeanawidgets;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -487,11 +488,17 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		table.setWidget(3, 1, url);
 		table.setWidget(1, 1, vocabularyUri);
 		table.setWidget(4, 0, new Label(
+				EuropeanaClientConstants.VOCABULARYRULES));
+		final TextBox vocabularyRules = new TextBox();
+		setDOMID(vocabularyRules, "vocabularyRules");
+		vocabularyRules.setName("vocabularyRules");
+		table.setWidget(4, 1, vocabularyRules);
+		table.setWidget(5, 0, new Label(
 				EuropeanaClientConstants.VOCABULARYSUFFIX));
 		TextBox vocabularySuffix = new TextBox();
 		setDOMID(vocabularySuffix, "vocabularySuffix");
 		vocabularySuffix.setName("vocabularySuffix");
-		table.setWidget(4, 1, vocabularySuffix);
+		table.setWidget(5, 1, vocabularySuffix);
 		Button submit = new Button(EuropeanaClientConstants.VOCSAVEANDUPLOAD);
 		submit.addClickHandler(new ClickHandler() {
 			@Override
@@ -499,11 +506,11 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				form.submit();
 			}
 		});
-		table.setWidget(5, 1, submit);
+		table.setWidget(6, 1, submit);
 		TextBox vocabularyLocation = new TextBox();
 		vocabularyLocation.setName("vocabularyLocation");
 		vocabularyLocation.setVisible(false);
-		table.setWidget(5,0,vocabularyLocation);
+		table.setWidget(6,0,vocabularyLocation);
 		form.add(table);
 		form.addSubmitHandler(new SubmitHandler() {
 			@Override
@@ -546,7 +553,11 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				+ retrieveFileName());
 		vocabulary.setUri(DOM.getElementById("vocabularyURI")
 				.<InputElement> cast().getValue());
-
+		Window.alert(DOM.getElementById("vocabularyRules")
+				.<InputElement> cast().getValue().split(" ")[0]);
+		vocabulary.setRules(DOM.getElementById("vocabularyRules")
+				.<InputElement> cast().getValue().split(" "));
+		Window.alert("just after");
 		importedVocabulary.importVocabulary(vocabulary,
 				new AsyncCallback<ControlledVocabularyDTO>() {
 					@Override

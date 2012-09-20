@@ -74,6 +74,7 @@ public class EuropeanaClientConstants {
 	public final static String VOCABULARYNAME = "Vocabulary Name:";
 	public final static String VOCABULARYURI = "Vocabulary URI";
 	public final static String VOCABULARYSUFFIX = "Vocabulary Suffix";
+	public final static String VOCABULARYRULES = "Vocabulary Rules";
 	public final static String VOCSAVEANDUPLOAD = "Save and Upload";
 	public final static String VOCSELECTLOCALFILE = "Select File";
 	public final static String VOCORIGINALFIELDS = "Original Fields";

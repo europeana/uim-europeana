@@ -1,5 +1,6 @@
 package eu.europeana.uim.gui.cp.shared;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -21,6 +22,8 @@ public class ControlledVocabularyDTO implements IsSerializable {
 	private List<MappingDTO> mapping;
 	
 	private String location;
+	
+	private String[] rules;
 
 	// GETTERS AND SETTERS
 	
@@ -62,6 +65,14 @@ public class ControlledVocabularyDTO implements IsSerializable {
 
 	public void setMapping(List<MappingDTO> mapping) {
 		this.mapping = mapping;
+	}
+
+	public String[] getRules() {
+		return rules;
+	}
+
+	public void setRules(String[] rules) {
+		this.rules = rules;
 	}
 
 	

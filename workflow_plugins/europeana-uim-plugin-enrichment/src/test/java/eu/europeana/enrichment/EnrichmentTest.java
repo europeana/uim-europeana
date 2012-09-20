@@ -65,7 +65,7 @@ public class EnrichmentTest {
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(RECORD));
 			SolrInputDocument solrInputDocument = tagger
-					.tagDocument(SolrConstructor.constructSolrDocument(rdf));
+					.tagDocument(new SolrConstructor().constructSolrDocument(rdf));
 			StringBuilder sb = new StringBuilder();
 			
 			for (String fieldName : solrInputDocument.getFieldNames()){

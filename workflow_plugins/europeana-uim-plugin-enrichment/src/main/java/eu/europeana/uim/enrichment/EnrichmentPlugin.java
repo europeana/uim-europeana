@@ -7,10 +7,13 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
@@ -54,10 +57,10 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static String vocabularyDB;
 	
 	private static CommonsHttpSolrServer solrServer;
-	private static Mongo mongo;
+	
 	private static String mongoDB;
-	private static String mongoHost;
-	private static String mongoPort;
+	private static String mongoHost="127.0.0.1";
+	private static String mongoPort="27017";
 	private static String solrUrl;
 	private static String solrCore;
 	private static int recordNumber;
@@ -77,7 +80,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		super("","");
 		// TODO Auto-generated constructor stub
 	}
-	
+	private static final Logger           log       = Logger.getLogger(EnrichmentPlugin.class.getName());
 	/**
 	 * The parameters used by this WorkflowStart
 	 */
@@ -117,12 +120,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 	public int getPreferredThreadCount() {
 		// TODO Auto-generated method stub
-		return 3;
+		return 1;
 	}
 
 	public int getMaximumThreadCount() {
 		// TODO Auto-generated method stub
-		return 5;
+		return 1;
 	}
 
 	public <I> void initialize(ExecutionContext<I> context)
@@ -133,7 +136,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			
 			  solrServer = enrichmentService.getSolrServer();
 			  mongoDB = enrichmentService.getMongoDB();
-			  mongo = enrichmentService.getMongo();
+			 
 			 
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) context.getExecution().getDataSet();
@@ -184,7 +187,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		MongoConstructor mongoConstructor = new MongoConstructor();
 		
 		try {
-			  EdmMongoServerImpl edmMongoServer = new OsgiEdmMongoServer(mongo,mongoDB,"","");
+			Mongo mongo = new Mongo(mongoHost,Integer.parseInt(mongoPort));
+			EdmMongoServerImpl edmMongoServer = new OsgiEdmMongoServer(mongo,mongoDB,"","");
 			mongoConstructor.setMongoServer(edmMongoServer);
 			bfact = BindingDirectory.getFactory(RDF.class);
 
@@ -193,7 +197,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(
 					0);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			SolrInputDocument solrInputDocument = enrichmentService.enrich(SolrConstructor.constructSolrDocument(rdf));
+			SolrInputDocument solrInputDocument = enrichmentService.enrich(new SolrConstructor().constructSolrDocument(rdf));
 			Solr2Rdf solr2Rdf = new Solr2Rdf();
 			solr2Rdf.initialize();
 			
@@ -203,6 +207,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			 marshallingContext.marshalDocument(der, "UTF-8", null, out);			
 			FullBean fullBean = mongoConstructor.constructFullBean(der);
 			solrInputDocument.addField(EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(), previewsOnlyInPortal);
+			
 			//fullBean.setPreviewNoDistribute(previewsOnlyInPortal);
 			String collectionId = (String) mdr.getCollection().getId();
 			
@@ -210,10 +215,10 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			String hash = hashExists(collectionId, fileName, fullBean);
 			
 			if (StringUtils.isNotEmpty(hash)) {
-				createLookupEntry(fullBean, hash);
+				createLookupEntry(mongo,fullBean, hash);
 			}
 			
-			
+			fullBean.setEuropeanaCollectionName(new String[]{fileName});
 			if (edmMongoServer.getFullBean(fullBean.getAbout()) == null) {
 				edmMongoServer.getDatastore().save(fullBean);
 			}
@@ -222,42 +227,38 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			int retries = 0;
 			while (retries < RETRIES) {
 				try {
-				solrServer.add(solrInputDocument, 1000);
-				retries = RETRIES;
+				solrServer.add(solrInputDocument);
+				retries ++;
 				recordNumber++;
 				return true;
 			} catch (SolrServerException e) {
-				e.printStackTrace();
+				log.log(Level.WARNING, "Solr Exception occured with error "+e.getMessage()+"\nRetrying");
 				retries++;
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.log(Level.WARNING, "IO Exception occured with error "+e.getMessage()+"\nRetrying");
 				retries++;
 			} catch (SolrException e) {
-				e.printStackTrace();
+				log.log(Level.WARNING, "Solr Exception occured with error "+e.getMessage()+"\nRetrying");
 				retries++;
 			}
 		}
 
 		} catch (JiBXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.WARNING, "JibX Exception occured with error "+e.getMessage()+"\nRetrying");
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.WARNING, "Malformed URL Exception occured with error "+e.getMessage()+"\nRetrying");
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.WARNING, "Instantiation Exception occured with error "+e.getMessage()+"\nRetrying");
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.WARNING, "Illegal Access Exception occured with error "+e.getMessage()+"\nRetrying");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.WARNING, "IO Exception occured with error "+e.getMessage()+"\nRetrying");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
+			log.log(Level.WARNING, "Generic Exception occured with error "+e.getMessage()+"\nRetrying");
 			e.printStackTrace();
 		}
-		return true;
+		return false;
 	}
 	
 	
@@ -267,12 +268,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public void setSolrServer(CommonsHttpSolrServer solrServer) {
 		EnrichmentPlugin.solrServer = solrServer;
 	}
-	public Mongo getMongo() {
-		return mongo;
-	}
-	public void setMongo(Mongo mongo) {
-		EnrichmentPlugin.mongo = mongo;
-	}
+	
 	public void setSugarCrmService(SugarCrmService sugarCrmService) {
 		EnrichmentPlugin.sugarCrmService = sugarCrmService;
 	}
@@ -349,7 +345,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public void setEnrichmentService(EnrichmentService enrichmentService) {
 		EnrichmentPlugin.enrichmentService = enrichmentService;
 	}
-	private void createLookupEntry(FullBean fullBean, String hash) {
+	private void createLookupEntry(Mongo mongo, FullBean fullBean, String hash) {
 		EuropeanaIdMongoServer europeanaIdMongoServer = new EuropeanaIdMongoServer(
 				mongo, europeanaID);
 		EuropeanaId europeanaId = europeanaIdMongoServer

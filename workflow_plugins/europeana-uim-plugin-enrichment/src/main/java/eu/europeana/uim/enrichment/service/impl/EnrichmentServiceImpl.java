@@ -34,7 +34,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 		  solrServer.setDefaultMaxConnectionsPerHost(100);
 		  solrServer.setMaxTotalConnections(100);
 		  solrServer.setFollowRedirects(false);
-		mongo  = new Mongo(mongoHost, Integer.parseInt(mongoPort));
+		//mongo  = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			
 		
 			tagger.init("Europeana");
@@ -52,11 +52,11 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 		return solrServer;
 	}
 
-	@Override
-	public Mongo getMongo() {
-		return mongo;
-	}
-	
+//	@Override
+//	public Mongo getMongo() {
+//		return mongo;
+//	}
+//	
 
 	@Override
 	public SolrInputDocument enrich(SolrInputDocument solrDocument) throws Exception {
@@ -111,9 +111,9 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 		EnrichmentServiceImpl.solrServer = solrServer;
 	}
 
-	public void setMongo(Mongo mongo) {
-		EnrichmentServiceImpl.mongo = mongo;
-	}
+//	public void setMongo(Mongo mongo) {
+//		EnrichmentServiceImpl.mongo = mongo;
+//	}
 	public  EuropeanaEnrichmentTagger getTagger() {
 		return tagger;
 	}
