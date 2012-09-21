@@ -140,8 +140,8 @@ public class LinkValidationWidget extends IngestionWidget {
      */
     public LinkValidationWidget(RepositoryServiceAsync repositoryService,
                                 RetrievalServiceAsync retrievalService) {
-        super("Central Repository Links",
-                "This view allows the validation of the links in the repository !");
+        super("Ingested Metadata Preview",
+                "This view allows the validation of the links and data in the production and test environments.");
         this.repositoryService = repositoryService;
         this.retrievalService = retrievalService;
     }
