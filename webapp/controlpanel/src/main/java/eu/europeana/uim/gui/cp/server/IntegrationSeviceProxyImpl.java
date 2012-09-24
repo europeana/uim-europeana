@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import org.joda.time.DateTime;
-
 import com.google.gwt.user.client.ui.DialogBox;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -216,6 +215,7 @@ public class IntegrationSeviceProxyImpl extends
 		for (SugarCrmRecord originalrecord : toconvert) {
 			SugarCRMRecordDTO guirecord = new SugarCRMRecordDTO();
 
+			
 			Collection colexists = resengine
 					.findCollection(originalrecord.getItemValue(
 							EuropeanaRetrievableField.NAME).split("_")[0]);

@@ -18,6 +18,8 @@ package eu.europeana.uim.gui.cp.server;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -108,8 +110,8 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		super();
 		try {
 			solrServer = new CommonsHttpSolrServer(
-					"http://localhost:8282/apache-solr-3.5.0");
-			mongoServer = new EdmMongoServerImpl(new Mongo("localhost", 27017),
+					"http://192.168.34.110:8080/solr");
+			mongoServer = new EdmMongoServerImpl(new Mongo("192.168.34.110", 27017),
 					"europeana", "", "");
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage());
@@ -369,10 +371,12 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 
 	@Override
 	public EdmRecordDTO getSearchRecord(String recordId) {
-		String query = "europeana_id:" + recordId;
-		SolrQuery solrQuery = new SolrQuery().setQuery(query);
 		EdmRecordDTO record = new EdmRecordDTO();
 		try {
+			
+			String query = "europeana_id:" + URLEncoder.encode(recordId, "UTF-8");
+			SolrQuery solrQuery = new SolrQuery().setQuery(query);
+
 			QueryResponse response = solrServer.query(solrQuery);
 			EdmFieldRecordDTO solrRecord = createSolrFields(response);
 			FullBeanImpl fullBean = (FullBeanImpl) mongoServer
@@ -382,6 +386,9 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 			record.setSolrRecord(solrRecord);
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return record;

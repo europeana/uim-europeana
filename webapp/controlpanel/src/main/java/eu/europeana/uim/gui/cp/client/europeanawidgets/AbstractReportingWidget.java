@@ -179,66 +179,7 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
         });
         cellTable.addColumn(idColumn, "ID");
         cellTable.setColumnWidth(idColumn, 20, Unit.PCT);
-        
-        /*
-        // Name
-        Column<ExecutionDTO, String> nameColumn = new Column<ExecutionDTO, String>(new TextCell()) {
-            @Override
-            public String getValue(ExecutionDTO object) {
-                return object.getName();
-            }
-        };
-        nameColumn.setSortable(true);
-        sortHandler.setComparator(nameColumn, new Comparator<ExecutionDTO>() {
-            @Override
-            public int compare(ExecutionDTO o1, ExecutionDTO o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
-        cellTable.addColumn(nameColumn, "Name");
-        cellTable.setColumnWidth(nameColumn, 15, Unit.PCT);
 
-        // Data set
-        Column<ExecutionDTO, String> datasetColumn = new Column<ExecutionDTO, String>(
-                new TextCell()) {
-            @Override
-            public String getValue(ExecutionDTO object) {
-                return object.getDataSet();
-            }
-        };
-        datasetColumn.setSortable(true);
-        sortHandler.setComparator(datasetColumn, new Comparator<ExecutionDTO>() {
-            @Override
-            public int compare(ExecutionDTO o1, ExecutionDTO o2) {
-                return o1.getDataSet().compareTo(o2.getDataSet());
-            }
-        });
-        cellTable.addColumn(datasetColumn, "Dataset");
-        cellTable.setColumnWidth(datasetColumn, 15, Unit.PCT);
-
-        // Workflow
-
-
-        Column<ExecutionDTO, String> workflowColumn = new Column<ExecutionDTO, String>(
-                new TextCell()) {
-            @Override
-            public String getValue(ExecutionDTO object) {
-                return object.getWorkflow();
-            }
-        };
-        workflowColumn.setSortable(true);
-        sortHandler.setComparator(workflowColumn, new Comparator<ExecutionDTO>() {
-            @Override
-            public int compare(ExecutionDTO o1, ExecutionDTO o2) {
-                return o1.getWorkflow().compareTo(o2.getWorkflow());
-            }
-        });
-        
-        cellTable.addColumn(workflowColumn, "Workflow");
-        cellTable.setColumnWidth(workflowColumn, 15, Unit.PCT);
-
-         * 
-         */
         DateTimeFormat dtf = DateTimeFormat.getFormat("dd.MM.yyyy 'at' HH:mm:ss");
         // Start Time
         Column<ExecutionDTO, Date> startTimeColumn = new Column<ExecutionDTO, Date>(new DateCell(
@@ -260,12 +201,34 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
 
         // End Time
 
+        Column<ExecutionDTO, Date> endTimeColumn = new Column<ExecutionDTO, Date>(new DateCell(
+                dtf)) {
+            @Override
+            public Date getValue(ExecutionDTO object) {
+                return object.getEndTime();
+            }
+        };
+        startTimeColumn.setSortable(true);
+        sortHandler.setComparator(endTimeColumn, new Comparator<ExecutionDTO>() {
+            @Override
+            public int compare(ExecutionDTO o1, ExecutionDTO o2) {
+                return o1.getEndTime().compareTo(o2.getEndTime());
+            }
+        });
+        cellTable.addColumn(endTimeColumn, "End Time");
+        cellTable.setColumnWidth(endTimeColumn, 15, Unit.PCT);
+
+        
+        
+        
+        
         // Completed
         Column<ExecutionDTO, String> completedColumn = new Column<ExecutionDTO, String>(
                 new TextCell()) {
             @Override
             public String getValue(ExecutionDTO object) {
-                String ignored = object.getValue(IGNORED_KEY);
+            	
+            	String ignored = object.getValue(IGNORED_KEY);
                 ignored = ignored == null ? "0" : ignored;
                 String submitted = object.getValue(SUBMITTED_KEY);
                 submitted = submitted == null ? "0" : submitted;
@@ -283,7 +246,7 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
                 return new Integer(o1.getCompleted()).compareTo(o2.getCompleted());
             }
         });
-        cellTable.addColumn(completedColumn, "Rec./Sub./Ign./Open");
+        cellTable.addColumn(completedColumn, "Records/Sub.Links/Ign.Links/OK");
         cellTable.setColumnWidth(completedColumn,  30, Unit.PCT);
 
         ActionCell.Delegate<ExecutionDTO> generateDelegate = new ActionCell.Delegate<ExecutionDTO>() {

@@ -45,7 +45,7 @@ public class LinkCachingWidget extends AbstractReportingWidget{
     public LinkCachingWidget(ReportingServiceAsync reportService, String widgetName,
                                String[] workflows, String reportName, String[] outputFormats) {
         super(reportService, widgetName, workflows, reportName, outputFormats);
-        super.IGNORED_KEY = "thumbler.ignored";
+        super.IGNORED_KEY = "thumbler.errors";
         super.PROCESSED_KEY = "thumbler.processed";
         super.SUBMITTED_KEY = "thumbler.submitted";
     }
