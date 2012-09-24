@@ -21,12 +21,8 @@
 package eu.europeana.uim.europeanaspecific.workflows;
 
 import eu.europeana.uim.europeanaspecific.workflowstarts.httpzip.HttpZipWorkflowStart;
-import eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 import eu.europeana.uim.workflows.SysoutPlugin;
-
-
-
 
 /**
  * Workflow used to import material to europeana from scratch
@@ -35,6 +31,9 @@ import eu.europeana.uim.workflows.SysoutPlugin;
  */
 public class InitialIngestionWorkflow extends AbstractWorkflow{
 
+	/**
+	 * Initial Ingestion Workflow Constructor
+	 */
 	public InitialIngestionWorkflow() {
 
 		super("(Re)Import Data from Mint Mapping Tool",
