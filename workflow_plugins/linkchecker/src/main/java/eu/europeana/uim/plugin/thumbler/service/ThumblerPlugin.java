@@ -247,9 +247,14 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
         context.getExecution().putValue("thumbler.ignored", "" + value.ignored);
         context.getExecution().putValue("thumbler.submitted", "" + value.submitted);
 
+        
+        
         Submission submission = EuropeanaWeblinkThumbler.getShared().getSubmission(context.getExecution());
+
         if (submission != null) {
-            context.getExecution().putValue("thumbler.processed", "" + submission.getProcessed());
+        	context.getExecution().putValue("thumbler.errors", "" + submission.getExceptions());
+        	context.getExecution().putValue("thumbler.processed", "" + submission.getProcessed());
+
         }
 
         try {

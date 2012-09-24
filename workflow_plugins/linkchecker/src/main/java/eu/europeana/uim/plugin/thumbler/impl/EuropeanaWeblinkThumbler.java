@@ -184,7 +184,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 							Aggregation aggregation = element.getAggregation();
 							List<HasView> has_views = aggregation.getHasViewList();
 							for (HasView view : has_views) {
-								String resource = view.getResource();
+								String resource = aggregation.getIsShownBy().getResource();
 								if (resource.equals(offeredlink.getUrl())) {
 									
 										File img = retrieveFile(resource);
@@ -192,8 +192,8 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 										BufferedImage buff = ImageIO.read(convimg); 
 										Collection coll = (Collection) dataset;
 										thumbnailHandler.storeThumbnail(objectIDURI,(String) coll.getId(),
-													buff,offeredlink.getUrl(),edmRecord);										 
-								}
+													buff,offeredlink.getUrl(),edmRecord);	
+							}
 
 							}
 						}
@@ -202,8 +202,11 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 			} catch (Throwable t) {
 				Submission submission = getSubmission(guarded.getExecution());
+
 				synchronized (submission) {
+					submission.incrStatus(1);
 					submission.incrExceptions();
+					submission.removeRemaining(guarded);
 				}
 				
 				log.info("Failed to store and process file locally" + guarded.getUrl() + ">");
@@ -226,10 +229,10 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			File target = null;
 			int status = 0;
 			try {
-					String name =  guarded.getUrl().getFile(); 
-					target = new File(STORAGELOCATION +name);
-					FileUtils.copyURLToFile(new URL(url), target, 1000, 1000000);
+					String name =  guarded.getUrl().getFile();
 					
+					target = new File(STORAGELOCATION +name);
+					FileUtils.copyURLToFile(new URL(url), target, 10000000, 1000000000);
 					
 					guarded.processed(status,
 							"filename: " + target.getAbsolutePath());
@@ -243,11 +246,9 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 					return target;
 
 			} catch (Throwable t) {
-				synchronized (submission) {
-					submission.incrExceptions();
-				}
-				log.info("Failed to store url: <" + guarded.getUrl() + ">");
-				guarded.processed(1, t.getClass().getName());
+				
+				log.info("Failed to retrieve url: <" + guarded.getUrl() + ">");
+				
 			} 
 
 			return target;

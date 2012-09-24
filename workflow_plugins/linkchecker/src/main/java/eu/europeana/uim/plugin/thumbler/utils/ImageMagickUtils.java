@@ -60,7 +60,7 @@ public final class ImageMagickUtils {
 	 * @param img
 	 */
 	public static File convert(File img0){
-		String img = img0.getAbsolutePath();
+		String img = img0.getAbsolutePath() + "[0]";
 		String img2 = img0.getAbsolutePath() + ".jpg";
 		IMOperation  op = new IMOperation ();
 		op.addImage(img);
