@@ -3,8 +3,10 @@ package eu.europeana.uim.plugin.thumbler.impl;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -22,12 +24,14 @@ import org.theeuropeanlibrary.uim.check.weblink.http.HttpClientSetup;
 import org.theeuropeanlibrary.uim.check.weblink.http.Submission;
 import eu.europeana.corelib.db.dao.impl.NosqlDaoImpl;
 import eu.europeana.corelib.db.entity.nosql.ImageCache;
+import eu.europeana.corelib.db.exception.DatabaseException;
 import eu.europeana.corelib.db.service.ThumbnailService;
 import eu.europeana.corelib.db.service.impl.ThumbnailServiceImpl;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
+import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.plugin.thumbler.utils.ImageMagickUtils;
 import eu.europeana.uim.store.Collection;
@@ -167,36 +171,12 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				String objectIDURI = extractOrigDocumentId(edmRecord);
 				Link offeredlink = guarded.getLink();
 
-				if (offeredlink.getUrl().equals(objectIDURI)) {
-					 
-						 File img = retrieveFile(offeredlink.getUrl());
-						 File convimg = ImageMagickUtils.convert(img);
-						 BufferedImage buff = ImageIO.read(convimg); 
-					     Collection coll = (Collection) dataset;
-						 thumbnailHandler.storeThumbnail(objectIDURI,
-									(String) coll.getId(), buff,
-									offeredlink.getUrl(),edmRecord);
-
-				} else {
-					List<Choice> elements = edmRecord.getChoiceList();
-					for (Choice element : elements) {
-						if (element.ifAggregation()) {
-							Aggregation aggregation = element.getAggregation();
-							List<HasView> has_views = aggregation.getHasViewList();
-							for (HasView view : has_views) {
-								String resource = aggregation.getIsShownBy().getResource();
-								if (resource.equals(offeredlink.getUrl())) {
-									
-										File img = retrieveFile(resource);
-										File convimg = ImageMagickUtils.convert(img);
-										BufferedImage buff = ImageIO.read(convimg); 
-										Collection coll = (Collection) dataset;
-										thumbnailHandler.storeThumbnail(objectIDURI,(String) coll.getId(),
-													buff,offeredlink.getUrl(),edmRecord);	
-							}
-
-							}
-						}
+				
+				List<EuropeanaLink> europeanalinks = mdr.getValues(EuropeanaModelRegistry.EUROPEANALINK);
+				
+				for(EuropeanaLink eulink: europeanalinks){
+					if(offeredlink.getUrl().equals(eulink.getUrl()) && eulink.isCacheable()){
+						storefileInMongo(offeredlink.getUrl(),dataset,edmRecord);
 					}
 				}
 
@@ -216,6 +196,26 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 		}
 
+		
+		
+		/**
+		 * @param resource
+		 * @param dataset
+		 * @param edmRecord
+		 * @throws IOException
+		 * @throws DatabaseException
+		 */
+		private void storefileInMongo(String resource,
+				UimDataSet<?> dataset,RDF edmRecord) throws IOException, DatabaseException{
+			
+			File img = retrieveFile(resource);
+			File convimg = ImageMagickUtils.convert(img);
+			BufferedImage buff = ImageIO.read(convimg); 
+			Collection coll = (Collection) dataset;
+			thumbnailHandler.storeThumbnail(resource,(String) coll.getId(),
+						buff,resource,edmRecord);	
+		}
+		
 
 		/**
 		 * Retrieves a file given a URI
@@ -231,7 +231,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			try {
 					String name =  guarded.getUrl().getFile();
 					
-					target = new File(STORAGELOCATION +name);
+					target = new File(STORAGELOCATION +URLEncoder.encode(name, "UTF-8"));
 					FileUtils.copyURLToFile(new URL(url), target, 10000000, 1000000000);
 					
 					guarded.processed(status,

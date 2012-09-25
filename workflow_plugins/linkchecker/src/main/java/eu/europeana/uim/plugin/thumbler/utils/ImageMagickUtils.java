@@ -60,12 +60,14 @@ public final class ImageMagickUtils {
 	 * @param img
 	 */
 	public static File convert(File img0){
+		ConvertCmd convert = new ConvertCmd();
 		String img = img0.getAbsolutePath() + "[0]";
 		String img2 = img0.getAbsolutePath() + ".jpg";
 		IMOperation  op = new IMOperation ();
 		op.addImage(img);
+		op.resize(800,600);
 		op.addImage(img2);
-		ConvertCmd convert = new ConvertCmd();
+
 			try {
 				convert.run(op);
 			} catch (IOException e) {
