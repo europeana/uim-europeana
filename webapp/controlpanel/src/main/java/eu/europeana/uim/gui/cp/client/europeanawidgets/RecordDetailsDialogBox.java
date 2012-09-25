@@ -49,11 +49,16 @@ public class RecordDetailsDialogBox extends DialogBox {
         xml.setVisibleLines(20);
         tabPanel.add(xml, "XML");
 
+        final TextArea deref = new TextArea();
+        deref.setCharacterWidth(100);
+        deref.setVisibleLines(20);
+        tabPanel.add(deref,"Dereferenced XML");
+        
         final RichTextArea search = new RichTextArea();
         search.setPixelSize(900, 600);
         //setCharacterWidth(100);
         //search.setVisibleLines(20);
-        tabPanel.add(search, "Search");
+        tabPanel.add(search, "Solr/Mongo Fields");
         
         tabPanel.selectTab(0);
 
@@ -81,6 +86,17 @@ public class RecordDetailsDialogBox extends DialogBox {
             }
         });
 
+        retrievalServiceAsync.getDereferencedRecord(recordId, new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                caught.printStackTrace();
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                deref.setText(result);
+            }
+        });
         
         retrievalServiceAsync.getSearchRecord(recordId, new AsyncCallback<EdmRecordDTO>() {
             @Override
