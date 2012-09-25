@@ -17,27 +17,31 @@
 
 package eu.europeana.uim.plugin.solr.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.lang.StringUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import org.xml.sax.SAXException;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
@@ -58,10 +62,7 @@ import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
-import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
-import eu.europeana.corelib.solr.utils.SolrConstructor;
-import eu.europeana.corelib.tools.rdf.Solr2Rdf;
 import eu.europeana.uim.api.AbstractIngestionPlugin;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
 import eu.europeana.uim.api.ExecutionContext;
@@ -102,7 +103,6 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.
 	 * MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
 	 */
-	@SuppressWarnings("unchecked")
 	public <I> boolean processRecord(MetaDataRecord<I> mdr,
 			ExecutionContext<I> context) throws IngestionPluginFailedException,
 			CorruptedMetadataRecordException {
@@ -133,47 +133,51 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
 					0);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-
-			Map<String, List<String>> dereferencedValues = new HashMap<String, List<String>>();
+			RDF rdfCopy = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			List<Choice> choices = rdf.getChoiceList();
 			for (Choice choice : choices) {
 				if (choice.ifAgent()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>) dereferenceAgent(datastore,
-							choice.getAgent()));
+					dereferenceAgent(rdfCopy, datastore, choice.getAgent());
 				} else if (choice.ifAggregation()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>)dereferenceAggregation(datastore,
-							choice.getAggregation()));
+					dereferenceAggregation(rdfCopy, datastore,
+							choice.getAggregation());
 				} else if (choice.ifConcept()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>)dereferenceConcept(datastore,
-							choice.getConcept()));
+					dereferenceConcept(rdfCopy, datastore, choice.getConcept());
 				} else if (choice.ifEuropeanaAggregation()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>)dereferenceEuropeanaAggregation(
-							datastore, choice.getEuropeanaAggregation()));
+					dereferenceEuropeanaAggregation(rdfCopy, datastore,
+							choice.getEuropeanaAggregation());
 				} else if (choice.ifPlace()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>)dereferencePlace(datastore,
-							choice.getPlace()));
+					dereferencePlace(rdf, datastore, choice.getPlace());
 				} else if (choice.ifProvidedCHO()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>)dereferenceProvidedCHO(datastore,
-							choice.getProvidedCHO()));
+					dereferenceProvidedCHO(rdfCopy, datastore,
+							choice.getProvidedCHO());
 				} else if (choice.ifProxy()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>)dereferenceProxy(datastore,
-							choice.getProxy()));
+					dereferenceProxy(rdfCopy, datastore, choice.getProxy());
 				} else if (choice.ifTimeSpan()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>)dereferenceTimespan(datastore,
-							choice.getTimeSpan()));
+					dereferenceTimespan(rdfCopy, datastore,
+							choice.getTimeSpan());
 				} else if (choice.ifWebResource()) {
-					appendInMap(dereferencedValues, (Map<String, List<String>>)dereferenceWebResource(datastore,
-							choice.getWebResource()));
+					dereferenceWebResource(rdfCopy, datastore,
+							choice.getWebResource());
 				}
 			}
 
-			Solr2Rdf solr2Rdf = new Solr2Rdf();
-			solr2Rdf.initialize();
-			String der = solr2Rdf.constructFromMap(
-					new SolrConstructor().constructSolrDocument(rdf),
-					dereferencedValues);
-			System.out.println(der);
+			// Solr2Rdf solr2Rdf = new Solr2Rdf();
+			// solr2Rdf.initialize();
+			// String der = solr2Rdf.constructFromMap(
+			// new SolrConstructor().constructSolrDocument(rdf),
+			// dereferencedValues);
+			// mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
+			// String der = appendMap2RDF(rdf, dereferencedValues);
+			IBindingFactory bfact2 = BindingDirectory.getFactory(RDF.class);
+			IMarshallingContext marshallingContext = bfact2
+					.createMarshallingContext();
+			marshallingContext.setIndent(2);
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			marshallingContext.marshalDocument(rdfCopy, "UTF-8", null, out);
+			String der = out.toString("UTF-8");
 			mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
+			System.out.println(der);
 			return true;
 
 		} catch (JiBXException e) {
@@ -190,500 +194,438 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (TransformerConfigurationException e) {
+		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SAXException e) {
+		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
+		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		// catch (TransformerConfigurationException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (SAXException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (TransformerException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (InstantiationException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (IllegalAccessException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferenceWebResource(
-			Datastore datastore, WebResourceType webResource)
-			throws MalformedURLException, IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getConformsToList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getCreatedList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getDescriptionList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getExtentList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getFormatList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getHasPartList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getIsFormatOfList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getIssuedList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getRightList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				webResource.getSourceList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				webResource.getIsNextInSequence()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, webResource.getRights()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, webResource.getAbout()));
-		return retVal;
+	
+
+	private void dereferenceWebResource(RDF rdf, Datastore datastore,
+			WebResourceType webResource) throws MalformedURLException,
+			IOException, SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
+		derefResourceOrLiteralList(rdf, datastore,
+				webResource.getConformsToList());
+		derefResourceOrLiteralList(rdf, datastore, webResource.getCreatedList());
+		derefResourceOrLiteralList(rdf, datastore,
+				webResource.getDescriptionList());
+		derefResourceOrLiteralList(rdf, datastore, webResource.getExtentList());
+		derefResourceOrLiteralList(rdf, datastore, webResource.getFormatList());
+		derefResourceOrLiteralList(rdf, datastore, webResource.getHasPartList());
+		derefResourceOrLiteralList(rdf, datastore,
+				webResource.getIsFormatOfList());
+		derefResourceOrLiteralList(rdf, datastore, webResource.getIssuedList());
+		derefResourceOrLiteralList(rdf, datastore, webResource.getRightList());
+		derefResourceOrLiteralList(rdf, datastore, webResource.getSourceList());
+		derefResourceOrLiteral(rdf, datastore,
+				webResource.getIsNextInSequence());
+		derefResourceOrLiteral(rdf, datastore, webResource.getRights());
+		derefResourceOrLiteral(rdf, datastore, webResource.getAbout());
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferenceTimespan(
-			Datastore datastore, TimeSpanType timeSpan)
-			throws MalformedURLException, IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				timeSpan.getAltLabelList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				timeSpan.getPrefLabelList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				timeSpan.getHasPartList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				timeSpan.getIsPartOfList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				timeSpan.getNoteList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				timeSpan.getSameAList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, timeSpan.getAbout()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, timeSpan.getBegin()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, timeSpan.getEnd()));
-		return retVal;
+	private void dereferenceTimespan(RDF rdf, Datastore datastore,
+			TimeSpanType timeSpan) throws MalformedURLException, IOException,
+			SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
+		derefResourceOrLiteralList(rdf, datastore, timeSpan.getAltLabelList());
+		derefResourceOrLiteralList(rdf, datastore, timeSpan.getPrefLabelList());
+		derefResourceOrLiteralList(rdf, datastore, timeSpan.getHasPartList());
+		derefResourceOrLiteralList(rdf, datastore, timeSpan.getIsPartOfList());
+		derefResourceOrLiteralList(rdf, datastore, timeSpan.getNoteList());
+		derefResourceOrLiteralList(rdf, datastore, timeSpan.getSameAList());
+		derefResourceOrLiteral(rdf, datastore, timeSpan.getAbout());
+		derefResourceOrLiteral(rdf, datastore, timeSpan.getBegin());
+		derefResourceOrLiteral(rdf, datastore, timeSpan.getEnd());
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferenceProxy(
-			Datastore datastore, ProxyType proxy) throws MalformedURLException,
-			IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getHasMetList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getHasTypeList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getIncorporateList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getIsDerivativeOfList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getIsRelatedToList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getIsSimilarToList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getIsSuccessorOfList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getProxyInList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getRealizeList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				proxy.getUserTagList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore, proxy.getYearList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, proxy.getAbout()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				proxy.getCurrentLocation()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, proxy.getProxyFor()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, proxy.getType()));
+	private void dereferenceProxy(RDF rdf, Datastore datastore, ProxyType proxy)
+			throws MalformedURLException, IOException, SecurityException,
+			IllegalArgumentException, InstantiationException,
+			IllegalAccessException, NoSuchMethodException,
+			InvocationTargetException {
+		derefResourceOrLiteralList(rdf, datastore, proxy.getHasMetList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getHasTypeList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getIncorporateList());
+		derefResourceOrLiteralList(rdf, datastore,
+				proxy.getIsDerivativeOfList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getIsRelatedToList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getIsSimilarToList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getIsSuccessorOfList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getProxyInList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getRealizeList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getUserTagList());
+		derefResourceOrLiteralList(rdf, datastore, proxy.getYearList());
+		derefResourceOrLiteral(rdf, datastore, proxy.getAbout());
+		derefResourceOrLiteral(rdf, datastore, proxy.getCurrentLocation());
+		derefResourceOrLiteral(rdf, datastore, proxy.getProxyFor());
+		derefResourceOrLiteral(rdf, datastore, proxy.getType());
 		List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> choices = proxy
 				.getChoiceList();
 		if (choices != null) {
 			for (eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice choice : choices) {
 				if (choice.ifAlternative())
-					appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-							choice.getAlternative()));
-				if(choice.ifConformsTo())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getConformsTo()));
-				if(choice.ifContributor())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getContributor()));
-				if(choice.ifCoverage())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getCoverage()));
-				if(choice.ifCreated())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getCreated()));
-				if(choice.ifCreator())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getCreator()));
-				if(choice.ifDate())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getDate()));
-				if(choice.ifDescription())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getDescription()));
-				if(choice.ifExtent())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getExtent()));
-				if(choice.ifFormat())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getFormat()));
-				if(choice.ifHasFormat())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getHasFormat()));
-				if(choice.ifHasPart())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getHasPart()));
-				if(choice.ifHasVersion())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getHasVersion()));
-				if(choice.ifIdentifier())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getIdentifier()));
-				if(choice.ifIsFormatOf())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getIsFormatOf()));
-				if(choice.ifIsPartOf())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getIsPartOf()));
-				if(choice.ifIsReferencedBy())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getIsReferencedBy()));
-				if(choice.ifIsReplacedBy())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getIsReplacedBy()));
-				if(choice.ifIsRequiredBy())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getIsRequiredBy()));
-				if(choice.ifIssued())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getIssued()));
-				if(choice.ifIsVersionOf())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getIsVersionOf()));
-				if(choice.ifLanguage())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getLanguage()));
-				if(choice.ifMedium())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getMedium()));
-				if(choice.ifProvenance())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getProvenance()));
-				if(choice.ifPublisher())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getPublisher()));
-				if(choice.ifReferences())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getReferences()));
-				if(choice.ifRelation())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getRelation()));
-				if(choice.ifReplaces())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getReplaces()));
-				if(choice.ifRights())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getRights()));
-				if(choice.ifSource())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getSource()));
-				if(choice.ifSpatial())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getSpatial()));
-				if(choice.ifSubject())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getSubject()));
-				if(choice.ifTableOfContents())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getTableOfContents()));
-				if(choice.ifTemporal())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getTemporal()));
-				if(choice.ifTitle())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getTitle()));
-				if(choice.ifType())
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-						choice.getType()));
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getAlternative());
+				if (choice.ifConformsTo())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getConformsTo());
+				if (choice.ifContributor())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getContributor());
+				if (choice.ifCoverage())
+					derefResourceOrLiteral(rdf, datastore, choice.getCoverage());
+				if (choice.ifCreated())
+					derefResourceOrLiteral(rdf, datastore, choice.getCreated());
+				if (choice.ifCreator())
+					derefResourceOrLiteral(rdf, datastore, choice.getCreator());
+				if (choice.ifDate())
+					derefResourceOrLiteral(rdf, datastore, choice.getDate());
+				if (choice.ifDescription())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getDescription());
+				if (choice.ifExtent())
+					derefResourceOrLiteral(rdf, datastore, choice.getExtent());
+				if (choice.ifFormat())
+					derefResourceOrLiteral(rdf, datastore, choice.getFormat());
+				if (choice.ifHasFormat())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getHasFormat());
+				if (choice.ifHasPart())
+					derefResourceOrLiteral(rdf, datastore, choice.getHasPart());
+				if (choice.ifHasVersion())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getHasVersion());
+				if (choice.ifIdentifier())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getIdentifier());
+				if (choice.ifIsFormatOf())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getIsFormatOf());
+				if (choice.ifIsPartOf())
+					derefResourceOrLiteral(rdf, datastore, choice.getIsPartOf());
+				if (choice.ifIsReferencedBy())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getIsReferencedBy());
+				if (choice.ifIsReplacedBy())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getIsReplacedBy());
+				if (choice.ifIsRequiredBy())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getIsRequiredBy());
+				if (choice.ifIssued())
+					derefResourceOrLiteral(rdf, datastore, choice.getIssued());
+				if (choice.ifIsVersionOf())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getIsVersionOf());
+				if (choice.ifLanguage())
+					derefResourceOrLiteral(rdf, datastore, choice.getLanguage());
+				if (choice.ifMedium())
+					derefResourceOrLiteral(rdf, datastore, choice.getMedium());
+				if (choice.ifProvenance())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getProvenance());
+				if (choice.ifPublisher())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getPublisher());
+				if (choice.ifReferences())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getReferences());
+				if (choice.ifRelation())
+					derefResourceOrLiteral(rdf, datastore, choice.getRelation());
+				if (choice.ifReplaces())
+					derefResourceOrLiteral(rdf, datastore, choice.getReplaces());
+				if (choice.ifRights())
+					derefResourceOrLiteral(rdf, datastore, choice.getRights());
+				if (choice.ifSource())
+					derefResourceOrLiteral(rdf, datastore, choice.getSource());
+				if (choice.ifSpatial())
+					derefResourceOrLiteral(rdf, datastore, choice.getSpatial());
+				if (choice.ifSubject())
+					derefResourceOrLiteral(rdf, datastore, choice.getSubject());
+				if (choice.ifTableOfContents())
+					derefResourceOrLiteral(rdf, datastore,
+							choice.getTableOfContents());
+				if (choice.ifTemporal())
+					derefResourceOrLiteral(rdf, datastore, choice.getTemporal());
+				if (choice.ifTitle())
+					derefResourceOrLiteral(rdf, datastore, choice.getTitle());
+				if (choice.ifType())
+					derefResourceOrLiteral(rdf, datastore, choice.getType());
 			}
 		}
-		return retVal;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferenceProvidedCHO(
-			Datastore datastore, ProvidedCHOType providedCHO)
-			throws MalformedURLException, IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, providedCHO.getAbout()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				providedCHO.getSameAList()));
-		return retVal;
+	private void dereferenceProvidedCHO(RDF rdf, Datastore datastore,
+			ProvidedCHOType providedCHO) throws MalformedURLException,
+			IOException, SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
+		derefResourceOrLiteral(rdf, datastore, providedCHO.getAbout());
+		derefResourceOrLiteralList(rdf, datastore, providedCHO.getSameAList());
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferencePlace(
-			Datastore datastore, PlaceType place) throws MalformedURLException,
-			IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, place.getAbout()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, place.getAlt()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, place.getLat()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, place.getLong()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				place.getAltLabelList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				place.getPrefLabelList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				place.getIsPartOfList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore, place.getNoteList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				place.getSameAList()));
-		return retVal;
+	private void dereferencePlace(RDF rdf, Datastore datastore, PlaceType place)
+			throws MalformedURLException, IOException, SecurityException,
+			IllegalArgumentException, InstantiationException,
+			IllegalAccessException, NoSuchMethodException,
+			InvocationTargetException {
+		derefResourceOrLiteral(rdf, datastore, place.getAbout());
+		derefResourceOrLiteral(rdf, datastore, place.getAlt());
+		derefResourceOrLiteral(rdf, datastore, place.getLat());
+		derefResourceOrLiteral(rdf, datastore, place.getLong());
+		derefResourceOrLiteralList(rdf, datastore, place.getAltLabelList());
+		derefResourceOrLiteralList(rdf, datastore, place.getPrefLabelList());
+		derefResourceOrLiteralList(rdf, datastore, place.getIsPartOfList());
+		derefResourceOrLiteralList(rdf, datastore, place.getNoteList());
+		derefResourceOrLiteralList(rdf, datastore, place.getSameAList());
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferenceConcept(
-			Datastore datastore, Concept concept) throws MalformedURLException,
-			IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, concept.getAbout()));
+	private void dereferenceConcept(RDF rdf, Datastore datastore,
+			Concept concept) throws MalformedURLException, IOException,
+			SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
+		derefResourceOrLiteral(rdf, datastore, concept.getAbout());
 		for (eu.europeana.corelib.definitions.jibx.Concept.Choice choice : concept
 				.getChoiceList()) {
-			if(choice.ifAltLabel())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getAltLabel()));
-			if(choice.ifPrefLabel())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getPrefLabel()));
-			if(choice.ifBroader())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, choice.getBroader()));
-			if(choice.ifBroadMatch())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getBroadMatch()));
-			if(choice.ifCloseMatch())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getCloseMatch()));
-			if(choice.ifExactMatch())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getExactMatch()));
-			if(choice.ifNarrower())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getNarrower()));
-			if(choice.ifNarrowMatch())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getNarrowMatch()));
-			if(choice.ifNote())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, choice.getNote()));
-			if(choice.ifNotation())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getNotation()));
-			if(choice.ifRelated())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, choice.getRelated()));
-			if(choice.ifRelatedMatch())
-			appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-					choice.getRelatedMatch()));
+			if (choice.ifAltLabel())
+				derefResourceOrLiteral(rdf, datastore, choice.getAltLabel());
+			if (choice.ifPrefLabel())
+				derefResourceOrLiteral(rdf, datastore, choice.getPrefLabel());
+			if (choice.ifBroader())
+				derefResourceOrLiteral(rdf, datastore, choice.getBroader());
+			if (choice.ifBroadMatch())
+				derefResourceOrLiteral(rdf, datastore, choice.getBroadMatch());
+			if (choice.ifCloseMatch())
+				derefResourceOrLiteral(rdf, datastore, choice.getCloseMatch());
+			if (choice.ifExactMatch())
+				derefResourceOrLiteral(rdf, datastore, choice.getExactMatch());
+			if (choice.ifNarrower())
+				derefResourceOrLiteral(rdf, datastore, choice.getNarrower());
+			if (choice.ifNarrowMatch())
+				derefResourceOrLiteral(rdf, datastore, choice.getNarrowMatch());
+			if (choice.ifNote())
+				derefResourceOrLiteral(rdf, datastore, choice.getNote());
+			if (choice.ifNotation())
+				derefResourceOrLiteral(rdf, datastore, choice.getNotation());
+			if (choice.ifRelated())
+				derefResourceOrLiteral(rdf, datastore, choice.getRelated());
+			if (choice.ifRelatedMatch())
+				derefResourceOrLiteral(rdf, datastore, choice.getRelatedMatch());
 		}
-		return retVal;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferenceEuropeanaAggregation(
-			Datastore datastore, EuropeanaAggregationType aggregation)
-			throws MalformedURLException, IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, aggregation.getAbout()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getAggregatedCHO()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getCountry()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				aggregation.getHasViewList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getCreator()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getIsShownBy()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getLandingPage()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getLanguage()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, aggregation.getRights()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				aggregation.getAggregateList()));
-		return retVal;
+	private void dereferenceEuropeanaAggregation(RDF rdf, Datastore datastore,
+			EuropeanaAggregationType aggregation) throws MalformedURLException,
+			IOException, SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
+		derefResourceOrLiteral(rdf, datastore, aggregation.getAbout());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getAggregatedCHO());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getCountry());
+		derefResourceOrLiteralList(rdf, datastore, aggregation.getHasViewList());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getCreator());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownBy());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getLandingPage());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getLanguage());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getRights());
+		derefResourceOrLiteralList(rdf, datastore,
+				aggregation.getAggregateList());
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferenceAggregation(
-			Datastore datastore, Aggregation aggregation)
-			throws MalformedURLException, IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, aggregation.getAbout()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getAggregatedCHO()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getDataProvider()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				aggregation.getHasViewList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getIsShownAt()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getIsShownBy()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, aggregation.getObject()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				aggregation.getProvider()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, aggregation.getRights()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, aggregation.getUgc()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				aggregation.getRightList()));
-		return retVal;
+	private void dereferenceAggregation(RDF rdf, Datastore datastore,
+			Aggregation aggregation) throws MalformedURLException, IOException,
+			SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
+		derefResourceOrLiteral(rdf, datastore, aggregation.getAbout());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getAggregatedCHO());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getDataProvider());
+		derefResourceOrLiteralList(rdf, datastore, aggregation.getHasViewList());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownAt());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownBy());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getObject());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getProvider());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getRights());
+		derefResourceOrLiteral(rdf, datastore, aggregation.getUgc());
+		derefResourceOrLiteralList(rdf, datastore, aggregation.getRightList());
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, ? extends List<String>> dereferenceAgent(
-			Datastore datastore, AgentType agent) throws MalformedURLException,
-			IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, agent.getAbout()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				agent.getAltLabelList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore, agent.getDateList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				agent.getHasMetList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				agent.getIdentifierList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				agent.getIsRelatedToList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore, agent.getNameList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore, agent.getNoteList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				agent.getPrefLabelList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteralList(datastore,
-				agent.getSameAList()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, agent.getBegin()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, agent.getEnd()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				agent.getBiographicalInformation()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, agent.getDateOfBirth()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, agent.getDateOfDeath()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				agent.getDateOfEstablishment()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore,
-				agent.getDateOfTermination()));
-		appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, agent.getGender()));
-		return retVal;
+	private void dereferenceAgent(RDF rdf, Datastore datastore, AgentType agent)
+			throws MalformedURLException, IOException, SecurityException,
+			IllegalArgumentException, InstantiationException,
+			IllegalAccessException, NoSuchMethodException,
+			InvocationTargetException {
+		derefResourceOrLiteral(rdf, datastore, agent.getAbout());
+		derefResourceOrLiteralList(rdf, datastore, agent.getAltLabelList());
+		derefResourceOrLiteralList(rdf, datastore, agent.getDateList());
+		derefResourceOrLiteralList(rdf, datastore, agent.getHasMetList());
+		derefResourceOrLiteralList(rdf, datastore, agent.getIdentifierList());
+		derefResourceOrLiteralList(rdf, datastore, agent.getIsRelatedToList());
+		derefResourceOrLiteralList(rdf, datastore, agent.getNameList());
+		derefResourceOrLiteralList(rdf, datastore, agent.getNoteList());
+		derefResourceOrLiteralList(rdf, datastore, agent.getPrefLabelList());
+		derefResourceOrLiteralList(rdf, datastore, agent.getSameAList());
+		derefResourceOrLiteral(rdf, datastore, agent.getBegin());
+		derefResourceOrLiteral(rdf, datastore, agent.getEnd());
+		derefResourceOrLiteral(rdf, datastore,
+				agent.getBiographicalInformation());
+		derefResourceOrLiteral(rdf, datastore, agent.getDateOfBirth());
+		derefResourceOrLiteral(rdf, datastore, agent.getDateOfDeath());
+		derefResourceOrLiteral(rdf, datastore, agent.getDateOfEstablishment());
+		derefResourceOrLiteral(rdf, datastore, agent.getDateOfTermination());
+		derefResourceOrLiteral(rdf, datastore, agent.getGender());
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String, List<String>> derefResourceOrLiteralList(
-			Datastore datastore, List<?> list) throws MalformedURLException,
-			IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
+	private void derefResourceOrLiteralList(RDF rdf, Datastore datastore,
+			List<?> list) throws MalformedURLException, IOException,
+			SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
 		if (list != null) {
 			for (Object object : list) {
-				appendInMap(retVal,(Map<String, List<String>>) derefResourceOrLiteral(datastore, object));
+				derefResourceOrLiteral(rdf, datastore, object);
 			}
 		}
-		return retVal;
 	}
 
-	private void appendInMap(Map<String, List<String>> retVal,
-			Map<String, List<String>> map) {
-		for(Entry<String,List<String>> entry: map.entrySet()){
-			if(retVal.containsKey(entry.getKey())){
-				List<String> val = retVal.get(entry.getKey());
-				List<String> mapVal = entry.getValue();
-				for(String str:mapVal){
-					if (!val.contains(str)){
-						val.add(str);
-					}
-				}
-				retVal.put(entry.getKey(), val);
-			}
-			else{
-				retVal.put(entry.getKey(),entry.getValue());
-			}
-			
-		}
-		
-	}
-
-	private Map<String, ? extends List<String>> derefResourceOrLiteral(
-			Datastore datastore, Object object) throws MalformedURLException,
-			IOException {
-		Map<String, List<String>> retVal = new HashMap<String, List<String>>();
-		List<String> originalValue = new ArrayList<String>();
+	private void derefResourceOrLiteral(RDF rdf, Datastore datastore,
+			Object object) throws MalformedURLException, IOException,
+			SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
 		OsgiExtractor extractor = new OsgiExtractor();
 		extractor.setDatastore(datastore);
 		if (object instanceof String) {
-			originalValue.add((String) object);
-			retVal.put(EdmLabel.ORIGINAL.toString(), originalValue);
 			if (isURI((String) object)) {
 				ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
 						datastore, "URI", (String) object);
 
-				appendInMap(retVal,(Map<String, List<String>>) extractor.denormalize((String) object,
+				appendInRDF(rdf, extractor.denormalize((String) object,
 						controlVocabulary));
 			}
-		}
-		else if (object instanceof ResourceType) {
+		} else if (object instanceof ResourceType) {
 
 			if (((ResourceType) object).getResource() != null) {
 
-				originalValue.add(((ResourceType) object).getResource());
-				retVal.put(EdmLabel.ORIGINAL.toString(), originalValue);
 				if (isURI(((ResourceType) object).getResource())) {
 					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
 							datastore, "URI",
 							((ResourceType) object).getResource());
-					appendInMap(retVal,(Map<String, List<String>>) extractor.denormalize(
+					appendInRDF(rdf, extractor.denormalize(
 							((ResourceType) object).getResource(),
 							controlVocabulary));
 				}
 			}
 		} else if (object instanceof ResourceOrLiteralType) {
 			if (((ResourceOrLiteralType) object).getResource() != null) {
-				originalValue.add(((ResourceOrLiteralType) object)
-						.getResource());
-				retVal.put(EdmLabel.ORIGINAL.toString(), originalValue);
+
 				if (isURI(((ResourceOrLiteralType) object).getResource())) {
 					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
 							datastore, "URI",
 							((ResourceOrLiteralType) object).getResource());
-					appendInMap(retVal,(Map<String, List<String>>) extractor.denormalize(
+					appendInRDF(rdf, extractor.denormalize(
 							((ResourceOrLiteralType) object).getResource(),
 							controlVocabulary));
 				}
 			}
 			if (((ResourceOrLiteralType) object).getString() != null) {
-				originalValue.add(((ResourceOrLiteralType) object).getString());
-				retVal.put(EdmLabel.ORIGINAL.toString(), originalValue);
+
 				if (isURI(((ResourceOrLiteralType) object).getString())) {
 					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
 							datastore, "URI",
 							((ResourceOrLiteralType) object).getString());
-					appendInMap(retVal,(Map<String, List<String>>) extractor.denormalize(
+					appendInRDF(rdf, extractor.denormalize(
 							((ResourceOrLiteralType) object).getString(),
 							controlVocabulary));
 				}
 			}
 		} else if (object instanceof LiteralType) {
 			if (((LiteralType) object).getString() != null) {
-				originalValue.add(((LiteralType) object).getString());
-				retVal.put(EdmLabel.ORIGINAL.toString(), originalValue);
+
 				if (isURI(((LiteralType) object).getString())) {
+
 					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
 							datastore, "URI",
 							((LiteralType) object).getString());
-					appendInMap(retVal,(Map<String, List<String>>) extractor.denormalize(
+					appendInRDF(rdf, extractor.denormalize(
 							((LiteralType) object).getString(),
 							controlVocabulary));
 				}
 			}
 		}
-		return retVal;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void appendInRDF(RDF rdf, Map<String, List> denormalize) {
+		for (Entry<String, List> entry : denormalize.entrySet()) {
+			if (StringUtils.equals(entry.getKey(), "concepts")) {
+				for (Concept concept : (List<Concept>) entry.getValue()) {
+					Choice choice = new Choice();
+					choice.setConcept(concept);
+					rdf.getChoiceList().add(choice);
+				}
+			}
+			if (StringUtils.equals(entry.getKey(), "agents")) {
+				for (AgentType agent : (List<AgentType>) entry.getValue()) {
+					Choice choice = new Choice();
+					choice.setAgent(agent);
+					rdf.getChoiceList().add(choice);
+				}
+			}
+			if (StringUtils.equals(entry.getKey(), "timespans")) {
+				for (TimeSpanType timespan : (List<TimeSpanType>) entry
+						.getValue()) {
+					Choice choice = new Choice();
+					choice.setTimeSpan(timespan);
+					rdf.getChoiceList().add(choice);
+				}
+			}
+			if (StringUtils.equals(entry.getKey(), "places")) {
+				for (PlaceType place : (List<PlaceType>) entry.getValue()) {
+					Choice choice = new Choice();
+					choice.setPlace(place);
+					rdf.getChoiceList().add(choice);
+				}
+			}
+		}
+
 	}
 
 	public void initialize() {

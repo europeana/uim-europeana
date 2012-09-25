@@ -1,12 +1,9 @@
 package eu.europeana.uim.enrichment.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.osgi.framework.BundleActivator;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
-import com.google.code.morphia.mapping.DefaultCreator;
-import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
@@ -32,7 +29,6 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 	private String username;
 	private String password;
 	private Datastore datastore;
-	private Morphia morphia;
 	
 	public OsgiEdmMongoServer(Mongo mongoServer, String databaseName,
 			String username, String password) throws MongoDBException {
@@ -41,20 +37,14 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 		this.databaseName = databaseName;
 		this.username = username;
 		this.password = password;
-		createDatastore();
+		//createDatastore();
 		
 	}
 
 	
-	private void createDatastore()
+	public Datastore createDatastore(Morphia morphia)
 	{
-		morphia = new Morphia();
-//		morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
-//            @Override
-//            protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
-//            	return MongoBundleActivator.getClassLoader();
-//            }
-//        });
+		//Morphia morphia = new Morphia();
 		morphia.map(FullBeanImpl.class);
 		morphia.map(ProvidedCHOImpl.class);
 		morphia.map(AgentImpl.class);
@@ -69,7 +59,7 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 		morphia.map(PhysicalThingImpl.class);
 		morphia.map(ConceptSchemeImpl.class);
 
-		datastore = morphia.createDatastore(mongoServer, databaseName);
+		Datastore datastore = morphia.createDatastore(mongoServer, databaseName);
 
 		if (StringUtils.isNotBlank(this.username)
 				&& StringUtils.isNotBlank(this.password)) {
@@ -77,16 +67,18 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 					this.password.toCharArray());
 		}
 		datastore.ensureIndexes();
+		this.datastore= datastore;
+		return datastore;
 	}
 	
 	@Override
-	public synchronized <T> T searchByAbout(Class<T> clazz, String about) {
+	public  <T> T searchByAbout(Class<T> clazz, String about) {
 
 		return datastore.find(clazz).filter("about", about).get();
 	}
 	
 	@Override
-	public synchronized FullBean getFullBean(String id) {
+	public  FullBean getFullBean(String id) {
 		if (datastore.find(FullBeanImpl.class).field("about").equal(id).get() != null) {
 			return datastore.find(FullBeanImpl.class).field("about").equal(id)
 					.get();

@@ -7,13 +7,11 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
@@ -22,12 +20,12 @@ import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
+import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
-import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
@@ -188,8 +186,10 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		
 		try {
 			Mongo mongo = new Mongo(mongoHost,Integer.parseInt(mongoPort));
-			EdmMongoServerImpl edmMongoServer = new OsgiEdmMongoServer(mongo,mongoDB,"","");
-			mongoConstructor.setMongoServer(edmMongoServer);
+			OsgiEdmMongoServer edmMongoServer = new OsgiEdmMongoServer(mongo,mongoDB,"","");
+			Morphia morphia = new Morphia();
+			
+			edmMongoServer.createDatastore(morphia);
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
@@ -205,7 +205,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			IMarshallingContext marshallingContext = bfact.createMarshallingContext();
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			 marshallingContext.marshalDocument(der, "UTF-8", null, out);			
-			FullBean fullBean = mongoConstructor.constructFullBean(der);
+			FullBean fullBean = mongoConstructor.constructFullBean(der,edmMongoServer);
 			solrInputDocument.addField(EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(), previewsOnlyInPortal);
 			
 			//fullBean.setPreviewNoDistribute(previewsOnlyInPortal);
