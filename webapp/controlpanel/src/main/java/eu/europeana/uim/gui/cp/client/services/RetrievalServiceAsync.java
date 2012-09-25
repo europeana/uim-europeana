@@ -51,6 +51,13 @@ public interface RetrievalServiceAsync {
     void getXmlRecord(String recordId, AsyncCallback<String> async);
 
     /**
+     * xml representation of the Dereferenced metadata record object model
+     * 
+     * @param recordId
+     * @param async
+     */
+    void getDereferencedRecord(String recordId, AsyncCallback<String> async);
+    /**
      * Delivers up to a maxSize number of records starting at the offset for the provided collection
      * from the search index together with facets and the total number of results.
      * 
