@@ -204,7 +204,7 @@ public class ZipLoader {
 		if(edm_has_view != null){
 		for(HasView view : edm_has_view){
 			String hasView = view.getResource();
-			addLink(hasView,mdr,existingLinks,false);
+			addLink(hasView,mdr,existingLinks,true);
 		}
 		}
 		
@@ -215,7 +215,7 @@ public class ZipLoader {
 		
 		if(aggregation.getIsShownBy() != null){
 			String isShownBy = aggregation.getIsShownBy().getResource();
-			addLink(isShownBy,mdr,existingLinks,false);
+			addLink(isShownBy,mdr,existingLinks,true);
 		}
 		
 		if(aggregation.getObject() != null){
@@ -228,7 +228,7 @@ public class ZipLoader {
 		if(element.ifWebResource()){
 			WebResourceType wrtype = element.getWebResource();
 				   String about = wrtype.getAbout();
-				   addLink(about,mdr,existingLinks,false);
+				   addLink(about,mdr,existingLinks,true);
 		}
 		
 		}
