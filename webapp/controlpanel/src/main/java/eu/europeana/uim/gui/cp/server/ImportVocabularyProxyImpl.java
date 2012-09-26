@@ -2,7 +2,6 @@ package eu.europeana.uim.gui.cp.server;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -11,9 +10,12 @@ import org.apache.commons.lang.StringUtils;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
+import eu.europeana.corelib.definitions.jibx.LiteralType;
+import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
+import eu.europeana.corelib.dereference.impl.RdfMethod;
 import eu.europeana.corelib.dereference.impl.VocabularyMongoServer;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxy;
 import eu.europeana.uim.gui.cp.shared.ControlledVocabularyDTO;
@@ -72,7 +74,7 @@ public class ImportVocabularyProxyImpl extends
 
 		extractor = new Extractor(controlledVocabulary, mongo);
 		extractor.setMappedField(originalField,
-				EdmLabel.getEdmLabel(mappedField));
+				EdmLabel.getEdmLabel(StringUtils.split(mappedField,"@")[0]));
 		OriginalFieldDTO originalFieldDTO = new OriginalFieldDTO();
 		originalFieldDTO.setField(originalField);
 		EdmFieldDTO edmFieldDTO = new EdmFieldDTO();
@@ -135,10 +137,15 @@ public class ImportVocabularyProxyImpl extends
 	@Override
 	public List<EdmFieldDTO> retrieveEdmFields() {
 		List<EdmFieldDTO> edmFields = new ArrayList<EdmFieldDTO>();
-		for (EdmLabel edmField : EdmLabel.values()) {
+		for (RdfMethod edmField : RdfMethod.values()) {
 			EdmFieldDTO edmFieldDTO = new EdmFieldDTO();
-			edmFieldDTO.setField(edmField.toString());
+			edmFieldDTO.setField(edmField.getSolrField());
 			edmFields.add(edmFieldDTO);
+			if(edmField.getClazz().getSuperclass().isAssignableFrom(ResourceOrLiteralType.class)||edmField.getClazz().getSuperclass().isAssignableFrom(LiteralType.class)){
+				EdmFieldDTO edmFieldDTOAttr = new EdmFieldDTO();
+				edmFieldDTOAttr.setField(edmField.getSolrField()+"@xml:lang");
+				edmFields.add(edmFieldDTOAttr);
+			}
 		}
 		return edmFields;
 	}
