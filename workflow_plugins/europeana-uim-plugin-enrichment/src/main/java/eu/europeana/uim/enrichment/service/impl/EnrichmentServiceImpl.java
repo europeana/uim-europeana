@@ -1,16 +1,15 @@
 package eu.europeana.uim.enrichment.service.impl;
 
-import org.apache.solr.client.solrj.SolrServer;
+import java.util.List;
+
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
 import com.mongodb.Mongo;
 
-import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
-import eu.europeana.corelib.solr.utils.MongoConstructor;
+import eu.annocultor.converters.europeana.Entity;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
-import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 
 public class EnrichmentServiceImpl implements EnrichmentService {
 
@@ -59,7 +58,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 //	
 
 	@Override
-	public SolrInputDocument enrich(SolrInputDocument solrDocument) throws Exception {
+	public List<Entity> enrich(SolrInputDocument solrDocument) throws Exception {
 		return tagger.tagDocument(solrDocument);
 	}
 	@Override

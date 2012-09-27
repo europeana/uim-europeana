@@ -564,6 +564,8 @@ public class OsgiExtractor extends Extractor {
 		return denormalizedValues;
 	}
 
+	
+	
 	public void setDatastore(Datastore datastore) {
 		this.datastore = datastore;
 	}
@@ -666,7 +668,7 @@ public class OsgiExtractor extends Extractor {
 
 				ResourceType rs = new ResourceType();
 				rs.setResource(val);
-				lst.add(rs);
+				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 
 			} else if (RDF.getClazz().getSuperclass()
 					.isAssignableFrom(ResourceOrLiteralType.class)) {
@@ -683,7 +685,7 @@ public class OsgiExtractor extends Extractor {
 					lang.setLang(valAttr);
 					rs.setLang(lang);
 				}
-				lst.add(rs);
+				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 			} else if (RDF.getClazz().getSuperclass()
 					.isAssignableFrom(LiteralType.class)) {
 				LiteralType rs = new LiteralType();
@@ -695,11 +697,11 @@ public class OsgiExtractor extends Extractor {
 					lang.setLang(valAttr);
 					rs.setLang(lang);
 				}
-				lst.add(rs);
+				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 			}
 
 			Class<?>[] cls = new Class<?>[1];
-			cls[0] = clazz;
+			cls[0] =  List.class;
 			Method method = obj.getClass()
 					.getMethod(
 							StringUtils.replace(RDF.getMethodName(), "get",

@@ -37,14 +37,12 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 		this.databaseName = databaseName;
 		this.username = username;
 		this.password = password;
-		//createDatastore();
 		
 	}
 
 	
 	public Datastore createDatastore(Morphia morphia)
 	{
-		//Morphia morphia = new Morphia();
 		morphia.map(FullBeanImpl.class);
 		morphia.map(ProvidedCHOImpl.class);
 		morphia.map(AgentImpl.class);

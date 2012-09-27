@@ -64,32 +64,33 @@ public class EnrichmentTest {
 			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(RECORD));
-			SolrInputDocument solrInputDocument = tagger
-					.tagDocument(new SolrConstructor().constructSolrDocument(rdf));
-			StringBuilder sb = new StringBuilder();
-			
-			for (String fieldName : solrInputDocument.getFieldNames()){
-				sb.append("Field name: ");
-				sb.append(fieldName);
-				sb.append(" | ");
-				Object fieldValue = solrInputDocument.getFieldValue(fieldName);
-				if (fieldValue!=null){
-					if(fieldValue instanceof ArrayList){
-						for (String value : (ArrayList<String>) fieldValue){
-							sb.append(value);
-							sb.append(" | ");
-						}
-						
-					}
-					else {
-						ClassType clt = ClassType
-								.getClassType(fieldValue.getClass().getCanonicalName());
-						sb.append(clt.toString(fieldValue));
-						sb.append(" | ");
-					}
-				}
-				sb.append("\n");
-			}
+			//Temporary disabling
+//			SolrInputDocument solrInputDocument = tagger
+//					.tagDocument(new SolrConstructor().constructSolrDocument(rdf));
+//			StringBuilder sb = new StringBuilder();
+//			
+//			for (String fieldName : solrInputDocument.getFieldNames()){
+//				sb.append("Field name: ");
+//				sb.append(fieldName);
+//				sb.append(" | ");
+//				Object fieldValue = solrInputDocument.getFieldValue(fieldName);
+//				if (fieldValue!=null){
+//					if(fieldValue instanceof ArrayList){
+//						for (String value : (ArrayList<String>) fieldValue){
+//							sb.append(value);
+//							sb.append(" | ");
+//						}
+//						
+//					}
+//					else {
+//						ClassType clt = ClassType
+//								.getClassType(fieldValue.getClass().getCanonicalName());
+//						sb.append(clt.toString(fieldValue));
+//						sb.append(" | ");
+//					}
+//				}
+//				sb.append("\n");
+//			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
