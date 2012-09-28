@@ -18,22 +18,17 @@
 package eu.europeana.uim.plugin.solr.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
@@ -162,19 +157,13 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 				}
 			}
 
-			// Solr2Rdf solr2Rdf = new Solr2Rdf();
-			// solr2Rdf.initialize();
-			// String der = solr2Rdf.constructFromMap(
-			// new SolrConstructor().constructSolrDocument(rdf),
-			// dereferencedValues);
-			// mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
-			// String der = appendMap2RDF(rdf, dereferencedValues);
 			IBindingFactory bfact2 = BindingDirectory.getFactory(RDF.class);
 			IMarshallingContext marshallingContext = bfact2
 					.createMarshallingContext();
 			marshallingContext.setIndent(2);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			marshallingContext.marshalDocument(rdfCopy, "UTF-8", null, out);
+			RDF rdfFinal = cleanRDF(rdfCopy);
+			marshallingContext.marshalDocument(rdfFinal, "UTF-8", null, out);
 			String der = out.toString("UTF-8");
 			mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
 			System.out.println(der);
@@ -213,26 +202,91 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// catch (TransformerConfigurationException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (SAXException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (TransformerException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (InstantiationException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (IllegalAccessException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 		return false;
 	}
 
-	
+	private RDF cleanRDF(RDF rdf) {
+		RDF rdfFinal = new RDF();
+		List<AgentType> agents = new CopyOnWriteArrayList<AgentType>();
+		List<TimeSpanType> timespans = new CopyOnWriteArrayList<TimeSpanType>();
+		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
+		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
+		List<RDF.Choice> choices = new ArrayList<RDF.Choice>();
+		for (RDF.Choice rdfChoice : rdf.getChoiceList()) {
+			if (rdfChoice.ifAgent()) {
+				AgentType newAgent = rdfChoice.getAgent();
+				for (AgentType agent : agents) {
+					if (StringUtils.equals(agent.getAbout(),
+							newAgent.getAbout())) {
+						if (agent.getPrefLabelList().size() <= newAgent
+								.getPrefLabelList().size()) {
+							agents.remove(agent);
+						}
+					}
+				}
+				agents.add(newAgent);
+			} else if (rdfChoice.ifConcept()) {
+				Concept newConcept = rdfChoice.getConcept();
+				for (Concept concept : concepts) {
+					if (StringUtils.equals(concept.getAbout(),
+							newConcept.getAbout())) {
+						if (concept.getChoiceList().size() <= newConcept
+								.getChoiceList().size()) {
+							concepts.remove(concept);
+						}
+					}
+				}
+				concepts.add(newConcept);
+			} else if (rdfChoice.ifTimeSpan()) {
+				TimeSpanType newTs = rdfChoice.getTimeSpan();
+				for (TimeSpanType ts : timespans) {
+					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
+						if (ts.getIsPartOfList().size() <= newTs
+								.getIsPartOfList().size()) {
+							timespans.remove(ts);
+						}
+					}
+				}
+				timespans.add(newTs);
+			} else if (rdfChoice.ifPlace()) {
+				PlaceType newPlace = rdfChoice.getPlace();
+				for (PlaceType place : places) {
+					if (StringUtils.equals(place.getAbout(),
+							newPlace.getAbout())) {
+						if (place.getPrefLabelList().size() <= newPlace
+								.getPrefLabelList().size()) {
+							places.remove(place);
+						}
+					}
+				}
+				places.add(newPlace);
+			} else {
+				choices.add(rdfChoice);
+			}
+		}
+		for (AgentType agent : agents) {
+			Choice choice = new Choice();
+			choice.setAgent(agent);
+			choices.add(choice);
+		}
+		for (PlaceType place : places) {
+			Choice choice = new Choice();
+			choice.setPlace(place);
+			choices.add(choice);
+		}
+		for (TimeSpanType timespan : timespans) {
+			Choice choice = new Choice();
+			choice.setTimeSpan(timespan);
+			choices.add(choice);
+		}
+		for (Concept concept : concepts) {
+			Choice choice = new Choice();
+			choice.setConcept(concept);
+			choices.add(choice);
+		}
+		rdfFinal.setChoiceList(choices);
+		return rdfFinal;
+	}
 
 	private void dereferenceWebResource(RDF rdf, Datastore datastore,
 			WebResourceType webResource) throws MalformedURLException,

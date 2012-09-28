@@ -667,7 +667,7 @@ public class OsgiExtractor extends Extractor {
 					.isAssignableFrom(ResourceType.class)) {
 
 				ResourceType rs = new ResourceType();
-				rs.setResource(val);
+				rs.setResource(val!=null?val:valAttr);
 				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 
 			} else if (RDF.getClazz().getSuperclass()
@@ -710,7 +710,7 @@ public class OsgiExtractor extends Extractor {
 		} else {
 			if (RDF.getClazz().isAssignableFrom(ResourceType.class)) {
 				ResourceType rs = new ResourceType();
-				rs.setResource(val);
+				rs.setResource(val!=null?val:valAttr);
 				Class<?>[] cls = new Class<?>[1];
 				cls[0] = RDF.getClazz();
 				Method method = obj.getClass().getMethod(
@@ -779,7 +779,7 @@ public class OsgiExtractor extends Extractor {
 		if (RDF.getClazz().getSuperclass().isAssignableFrom(ResourceType.class)) {
 
 			ResourceType obj = new ResourceType();
-			obj.setResource(val);
+			obj.setResource(val!=null?val:valAttr);
 			Class<?>[] cls = new Class<?>[1];
 			cls[0] = RDF.getClazz();
 			Concept.Choice choice = new Concept.Choice();
