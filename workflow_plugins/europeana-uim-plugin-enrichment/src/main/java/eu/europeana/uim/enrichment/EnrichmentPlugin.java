@@ -39,6 +39,9 @@ import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
+import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.corelib.solr.server.EdmMongoServer;
+import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
@@ -53,7 +56,6 @@ import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
-import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
@@ -61,16 +63,17 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugarcrm.SugarCrmRecord;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
-
+//import eu.europeana.uim.enrichment.osgi.MongoConstructor;
+import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 
 public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static String vocabularyDB;
-	
+
 	private static CommonsHttpSolrServer solrServer;
-	
+
 	private static String mongoDB;
-	private static String mongoHost="127.0.0.1";
-	private static String mongoPort="27017";
+	private static String mongoHost = "127.0.0.1";
+	private static String mongoPort = "27017";
 	private static String solrUrl;
 	private static String solrCore;
 	private static int recordNumber;
@@ -79,25 +82,30 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static String repository;
 	private static SugarCrmService sugarCrmService;
 	private static EnrichmentService enrichmentService;
-	private static String previewsOnlyInPortal;	
+	private static String previewsOnlyInPortal;
 	private static String collections;
-	
+	private static Morphia morphia;
+
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
 		// TODO Auto-generated constructor stub
 	}
+
 	public EnrichmentPlugin() {
-		super("","");
+		super("", "");
 		// TODO Auto-generated constructor stub
 	}
-	private static final Logger           log       = Logger.getLogger(EnrichmentPlugin.class.getName());
+
+	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
+			.getName());
 	/**
 	 * The parameters used by this WorkflowStart
 	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-		
+
 	};
+
 	public TKey<?, ?>[] getInputFields() {
 		// TODO Auto-generated method stub
 		return null;
@@ -141,15 +149,13 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public <I> void initialize(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
 		// TODO Auto-generated method stub
-		
+
 		try {
-			
-			  solrServer = enrichmentService.getSolrServer();
-			  mongoDB = enrichmentService.getMongoDB();
-			 
-			 
+
+			solrServer = enrichmentService.getSolrServer();
 			@SuppressWarnings("rawtypes")
-			Collection collection = (Collection) context.getExecution().getDataSet();
+			Collection collection = (Collection) context.getExecution()
+					.getDataSet();
 			String sugarCrmId = collection
 					.getValue(ControlledVocabularyProxy.SUGARCRMID);
 			SugarCrmRecord sugarCrmRecord = sugarCrmService
@@ -157,9 +163,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
-			
-		
-			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -195,191 +198,242 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			CorruptedMetadataRecordException {
 		IBindingFactory bfact;
 		MongoConstructor mongoConstructor = new MongoConstructor();
-		
+
 		try {
-			Mongo mongo = new Mongo(mongoHost,Integer.parseInt(mongoPort));
-			OsgiEdmMongoServer edmMongoServer = new OsgiEdmMongoServer(mongo,mongoDB,"","");
-			Morphia morphia = new Morphia();
-			
-			edmMongoServer.createDatastore(morphia);
+			morphia = new Morphia();
+			Mongo mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
+			mongoDB = enrichmentService.getMongoDB();
+			OsgiEdmMongoServer mongoServer = new OsgiEdmMongoServer(mongo,
+					mongoDB, "", "");
+		  
+
+			mongoServer.createDatastore(morphia);
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 
-			String value = mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(
-					0);
+			String value = mdr.getValues(
+					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			List<Entity> entities = enrichmentService.enrich(new SolrConstructor().constructSolrDocument(rdf));
-			mergeEntities(rdf,entities);
-			SolrInputDocument solrInputDocument = new SolrConstructor().constructSolrDocument(rdf);
-			FullBean fullBean = mongoConstructor.constructFullBean(rdf,edmMongoServer);
-			solrInputDocument.addField(EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(), previewsOnlyInPortal);
-			
-			//fullBean.setPreviewNoDistribute(previewsOnlyInPortal);
+			List<Entity> entities = enrichmentService
+					.enrich(new SolrConstructor().constructSolrDocument(rdf));
+			mergeEntities(rdf, entities);
+			SolrInputDocument solrInputDocument = new SolrConstructor()
+					.constructSolrDocument(rdf);
+			FullBeanImpl fullBean = mongoConstructor.constructFullBean(rdf,
+					mongoServer);
+			solrInputDocument.addField(
+					EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
+					previewsOnlyInPortal);
+			fullBean.getAggregations()
+					.get(0)
+					.setEdmPreviewNoDistribute(
+							Boolean.parseBoolean(previewsOnlyInPortal));
 			String collectionId = (String) mdr.getCollection().getId();
-			
+
 			String fileName = (String) mdr.getCollection().getName();
 			String hash = hashExists(collectionId, fileName, fullBean);
-			
+
 			if (StringUtils.isNotEmpty(hash)) {
-				createLookupEntry(mongo,fullBean, hash);
+				createLookupEntry(mongo, fullBean, hash);
 			}
-			
-			fullBean.setEuropeanaCollectionName(new String[]{fileName});
-			if (edmMongoServer.getFullBean(fullBean.getAbout()) == null) {
-				edmMongoServer.getDatastore().save(fullBean);
+
+			fullBean.setEuropeanaCollectionName(new String[] { fileName });
+			if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
+				
+				mongoServer.getDatastore().save(fullBean);
 			}
-			
-			
+
 			int retries = 0;
 			while (retries < RETRIES) {
 				try {
-				solrServer.add(solrInputDocument);
-				retries ++;
-				recordNumber++;
-				return true;
-			} catch (SolrServerException e) {
-				log.log(Level.WARNING, "Solr Exception occured with error "+e.getMessage()+"\nRetrying");
-				retries++;
-			} catch (IOException e) {
-				log.log(Level.WARNING, "IO Exception occured with error "+e.getMessage()+"\nRetrying");
-				retries++;
-			} catch (SolrException e) {
-				log.log(Level.WARNING, "Solr Exception occured with error "+e.getMessage()+"\nRetrying");
-				retries++;
+					solrServer.add(solrInputDocument);
+					retries++;
+					recordNumber++;
+					return true;
+				} catch (SolrServerException e) {
+					log.log(Level.WARNING, "Solr Exception occured with error "
+							+ e.getMessage() + "\nRetrying");
+					retries++;
+				} catch (IOException e) {
+					log.log(Level.WARNING, "IO Exception occured with error "
+							+ e.getMessage() + "\nRetrying");
+					retries++;
+				} catch (SolrException e) {
+					log.log(Level.WARNING, "Solr Exception occured with error "
+							+ e.getMessage() + "\nRetrying");
+					retries++;
+				}
 			}
-		}
 
 		} catch (JiBXException e) {
-			log.log(Level.WARNING, "JibX Exception occured with error "+e.getMessage()+"\nRetrying");
+			log.log(Level.WARNING,
+					"JibX Exception occured with error " + e.getMessage()
+							+ "\nRetrying");
 		} catch (MalformedURLException e) {
-			log.log(Level.WARNING, "Malformed URL Exception occured with error "+e.getMessage()+"\nRetrying");
+			log.log(Level.WARNING,
+					"Malformed URL Exception occured with error "
+							+ e.getMessage() + "\nRetrying");
 		} catch (InstantiationException e) {
-			log.log(Level.WARNING, "Instantiation Exception occured with error "+e.getMessage()+"\nRetrying");
+			log.log(Level.WARNING,
+					"Instantiation Exception occured with error "
+							+ e.getMessage() + "\nRetrying");
 		} catch (IllegalAccessException e) {
-			log.log(Level.WARNING, "Illegal Access Exception occured with error "+e.getMessage()+"\nRetrying");
+			log.log(Level.WARNING,
+					"Illegal Access Exception occured with error "
+							+ e.getMessage() + "\nRetrying");
 		} catch (IOException e) {
-			log.log(Level.WARNING, "IO Exception occured with error "+e.getMessage()+"\nRetrying");
+			log.log(Level.WARNING,
+					"IO Exception occured with error " + e.getMessage()
+							+ "\nRetrying");
 		} catch (Exception e) {
-			
-			log.log(Level.WARNING, "Generic Exception occured with error "+e.getMessage()+"\nRetrying");
+
+			log.log(Level.WARNING,
+					"Generic Exception occured with error " + e.getMessage()
+							+ "\nRetrying");
 			e.printStackTrace();
 		}
 		return false;
 	}
-	
-	
-	private void mergeEntities(RDF rdf, List<Entity> entities) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		
+
+	private void mergeEntities(RDF rdf, List<Entity> entities)
+			throws SecurityException, IllegalArgumentException,
+			NoSuchMethodException, IllegalAccessException,
+			InvocationTargetException {
+
 		List<RDF.Choice> choices = rdf.getChoiceList();
-		for(Entity entity:entities){
+		for (Entity entity : entities) {
 			RDF.Choice choice = new RDF.Choice();
-			if(StringUtils.equals(entity.getClassName(),"Concept")){
+			if (StringUtils.equals(entity.getClassName(), "Concept")) {
 				Concept concept = new Concept();
 				List<Field> fields = entity.getFields();
-				if(fields!=null&& fields.size()>0){
-				for(Field field: fields){
-					if(StringUtils.equalsIgnoreCase(field.getName(), "skos_concept")){
-						concept.setAbout(field.getValues().get(field.getValues().keySet().iterator().next()).get(0));
-					}
-					else {
-						for(Entry<String,List<String>> entry:field.getValues().entrySet()){
-							for(String str : entry.getValue()){
-								appendConceptValue(concept, field.getName(), str, "_@xml:lang", entry.getKey());
+				if (fields != null && fields.size() > 0) {
+					for (Field field : fields) {
+						if (StringUtils.equalsIgnoreCase(field.getName(),
+								"skos_concept")) {
+							concept.setAbout(field
+									.getValues()
+									.get(field.getValues().keySet().iterator()
+											.next()).get(0));
+						} else {
+							for (Entry<String, List<String>> entry : field
+									.getValues().entrySet()) {
+								for (String str : entry.getValue()) {
+									appendConceptValue(concept,
+											field.getName(), str, "_@xml:lang",
+											entry.getKey());
+								}
 							}
 						}
+
 					}
-					
+
+					choice.setConcept(concept);
+					choices.add(choice);
+					rdf.setChoiceList(choices);
 				}
-				
-				choice.setConcept(concept);
-				choices.add(choice);
-				rdf.setChoiceList(choices);
-				}
-			} else if(StringUtils.equals(entity.getClassName(),"Timespan")){
+			} else if (StringUtils.equals(entity.getClassName(), "Timespan")) {
 
 				TimeSpanType ts = new TimeSpanType();
 				List<Field> fields = entity.getFields();
-				if(fields!=null && fields.size()>0){
-				for(Field field: fields){
-					if(StringUtils.equalsIgnoreCase(field.getName(), "edm_timespan")){
-						ts.setAbout(field.getValues().get(field.getValues().keySet().iterator().next()).get(0));
-					}
-					else {
-						for(Entry<String,List<String>> entry:field.getValues().entrySet()){
-							for(String str : entry.getValue()){
-								appendValue(TimeSpanType.class,ts, field.getName(), str, "_@xml:lang", entry.getKey());
+				if (fields != null && fields.size() > 0) {
+					for (Field field : fields) {
+						if (StringUtils.equalsIgnoreCase(field.getName(),
+								"edm_timespan")) {
+							ts.setAbout(field
+									.getValues()
+									.get(field.getValues().keySet().iterator()
+											.next()).get(0));
+						} else {
+							for (Entry<String, List<String>> entry : field
+									.getValues().entrySet()) {
+								for (String str : entry.getValue()) {
+									appendValue(TimeSpanType.class, ts,
+											field.getName(), str, "_@xml:lang",
+											entry.getKey());
+								}
 							}
 						}
+
 					}
-					
+
+					choice.setTimeSpan(ts);
+					choices.add(choice);
+					rdf.setChoiceList(choices);
 				}
-				
-				choice.setTimeSpan(ts);
-				choices.add(choice);
-				rdf.setChoiceList(choices);
-				}
-			} else if(StringUtils.equals(entity.getClassName(),"Agent")){
-				
+			} else if (StringUtils.equals(entity.getClassName(), "Agent")) {
+
 				AgentType ts = new AgentType();
 				List<Field> fields = entity.getFields();
-				if(fields!=null && fields.size()>0){
-				for(Field field: fields){
-					if(StringUtils.equalsIgnoreCase(field.getName(), "edm_agent")){
-						ts.setAbout(field.getValues().get(field.getValues().keySet().iterator().next()).get(0));
-					}
-					else {
-						for(Entry<String,List<String>> entry:field.getValues().entrySet()){
-							for(String str : entry.getValue()){
-								appendValue(AgentType.class,ts, field.getName(), str, "_@xml:lang", entry.getKey());
+				if (fields != null && fields.size() > 0) {
+					for (Field field : fields) {
+						if (StringUtils.equalsIgnoreCase(field.getName(),
+								"edm_agent")) {
+							ts.setAbout(field
+									.getValues()
+									.get(field.getValues().keySet().iterator()
+											.next()).get(0));
+						} else {
+							for (Entry<String, List<String>> entry : field
+									.getValues().entrySet()) {
+								for (String str : entry.getValue()) {
+									appendValue(AgentType.class, ts,
+											field.getName(), str, "_@xml:lang",
+											entry.getKey());
+								}
 							}
 						}
+
 					}
-					
-				}
-				
-				choice.setAgent(ts);
-				choices.add(choice);
-				rdf.setChoiceList(choices);
+
+					choice.setAgent(ts);
+					choices.add(choice);
+					rdf.setChoiceList(choices);
 				}
 			} else {
 				PlaceType ts = new PlaceType();
 				List<Field> fields = entity.getFields();
-				if(fields!=null && fields.size()>0){
-				for(Field field: fields){
-					if(StringUtils.equalsIgnoreCase(field.getName(), "edm_place")){
-						ts.setAbout(field.getValues().get(field.getValues().keySet().iterator().next()).get(0));
-					}
-					else {
-						for(Entry<String,List<String>> entry:field.getValues().entrySet()){
-							for(String str : entry.getValue()){
-								appendValue(PlaceType.class,ts, field.getName(), str, "_@xml:lang", entry.getKey());
+				if (fields != null && fields.size() > 0) {
+					for (Field field : fields) {
+						if (StringUtils.equalsIgnoreCase(field.getName(),
+								"edm_place")) {
+							ts.setAbout(field
+									.getValues()
+									.get(field.getValues().keySet().iterator()
+											.next()).get(0));
+						} else {
+							for (Entry<String, List<String>> entry : field
+									.getValues().entrySet()) {
+								for (String str : entry.getValue()) {
+									appendValue(PlaceType.class, ts,
+											field.getName(), str, "_@xml:lang",
+											entry.getKey());
+								}
 							}
 						}
+
 					}
-					
-				}
-				
-				choice.setPlace(ts);
-				choices.add(choice);
-				rdf.setChoiceList(choices);
+
+					choice.setPlace(ts);
+					choices.add(choice);
+					rdf.setChoiceList(choices);
 				}
 			}
 		}
-		
-		
+
 	}
+
 	public CommonsHttpSolrServer getSolrServer() {
 		return solrServer;
 	}
+
 	public void setSolrServer(CommonsHttpSolrServer solrServer) {
 		EnrichmentPlugin.solrServer = solrServer;
 	}
-	
+
 	public void setSugarCrmService(SugarCrmService sugarCrmService) {
 		EnrichmentPlugin.sugarCrmService = sugarCrmService;
 	}
-	
 
 	public String getEuropeanaID() {
 		return europeanaID;
@@ -388,11 +442,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public void setEuropeanaID(String europeanaID) {
 		EnrichmentPlugin.europeanaID = europeanaID;
 	}
-	
+
 	public int getRecords() {
 		return recordNumber;
 	}
-	
+
 	public String getRepository() {
 		return repository;
 	}
@@ -400,6 +454,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public void setRepository(String repository) {
 		EnrichmentPlugin.repository = repository;
 	}
+
 	public void setVocabularyDB(String vocabularyDB) {
 		EnrichmentPlugin.vocabularyDB = vocabularyDB;
 	}
@@ -407,51 +462,67 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public String getVocabularyDB() {
 		return vocabularyDB;
 	}
-	public  String getCollections() {
+
+	public String getCollections() {
 		return collections;
 	}
-	public  void setCollections(String collections) {
+
+	public void setCollections(String collections) {
 		EnrichmentPlugin.collections = collections;
 	}
-	public  SugarCrmService getSugarCrmService() {
+
+	public SugarCrmService getSugarCrmService() {
 		return sugarCrmService;
 	}
-	public  String getMongoDB() {
+
+	public String getMongoDB() {
 		return mongoDB;
 	}
-	public  void setMongoDB(String mongoDB) {
+
+	public void setMongoDB(String mongoDB) {
 		EnrichmentPlugin.mongoDB = mongoDB;
 	}
-	public  String getMongoHost() {
+
+	public String getMongoHost() {
 		return mongoHost;
 	}
+
 	public void setMongoHost(String mongoHost) {
 		EnrichmentPlugin.mongoHost = mongoHost;
 	}
-	public  String getMongoPort() {
+
+	public String getMongoPort() {
 		return mongoPort;
 	}
+
 	public void setMongoPort(String mongoPort) {
 		EnrichmentPlugin.mongoPort = mongoPort;
 	}
+
 	public String getSolrUrl() {
 		return solrUrl;
 	}
+
 	public void setSolrUrl(String solrUrl) {
 		EnrichmentPlugin.solrUrl = solrUrl;
 	}
+
 	public String getSolrCore() {
 		return solrCore;
 	}
+
 	public void setSolrCore(String solrCore) {
 		EnrichmentPlugin.solrCore = solrCore;
 	}
+
 	public EnrichmentService getEnrichmentService() {
 		return enrichmentService;
 	}
+
 	public void setEnrichmentService(EnrichmentService enrichmentService) {
 		EnrichmentPlugin.enrichmentService = enrichmentService;
 	}
+
 	private void createLookupEntry(Mongo mongo, FullBean fullBean, String hash) {
 		EuropeanaIdMongoServer europeanaIdMongoServer = new EuropeanaIdMongoServer(
 				mongo, europeanaID);
@@ -480,8 +551,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		}
 		return null;
 	}
-	
-	
+
 	private <T> T appendValue(Class<T> clazz, T obj, String edmLabel,
 			String val, String edmAttr, String valAttr)
 			throws SecurityException, NoSuchMethodException,

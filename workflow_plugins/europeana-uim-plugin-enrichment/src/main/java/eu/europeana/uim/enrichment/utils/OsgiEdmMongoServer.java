@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
+import com.google.code.morphia.mapping.DefaultCreator;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
@@ -22,6 +24,7 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
+import eu.europeana.uim.enrichment.MongoBundleActivator;
 
 public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 	private Mongo mongoServer;
@@ -43,6 +46,14 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 	
 	public Datastore createDatastore(Morphia morphia)
 	{
+		 morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+             @Override
+             protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+                 // we're the only bundle for now using Morphia so we can be sure that in any case
+                 // the classloader of this bundle has to be used
+                 return MongoBundleActivator.getBundleClassLoader();
+             }
+         });
 		morphia.map(FullBeanImpl.class);
 		morphia.map(ProvidedCHOImpl.class);
 		morphia.map(AgentImpl.class);
@@ -57,7 +68,7 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 		morphia.map(PhysicalThingImpl.class);
 		morphia.map(ConceptSchemeImpl.class);
 
-		Datastore datastore = morphia.createDatastore(mongoServer, databaseName);
+		this.datastore = morphia.createDatastore(mongoServer, databaseName);
 
 		if (StringUtils.isNotBlank(this.username)
 				&& StringUtils.isNotBlank(this.password)) {
@@ -65,7 +76,7 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 					this.password.toCharArray());
 		}
 		datastore.ensureIndexes();
-		this.datastore= datastore;
+		
 		return datastore;
 	}
 	
