@@ -460,7 +460,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 			for (AggregationImpl aggregation : aggregations) {
 				fieldValues.addAll(MongoConverter
 						.convertAggregation(aggregation));
-				List<WebResourceImpl> webResources = aggregation
+				List<WebResourceImpl> webResources = (List<WebResourceImpl>) aggregation
 						.getWebResources();
 				if (webResources != null) {
 					for (WebResourceImpl webResource : webResources) {
