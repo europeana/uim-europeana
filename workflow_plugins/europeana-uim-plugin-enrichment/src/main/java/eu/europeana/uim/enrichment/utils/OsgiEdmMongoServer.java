@@ -49,8 +49,6 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 		 morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
              @Override
              protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
-                 // we're the only bundle for now using Morphia so we can be sure that in any case
-                 // the classloader of this bundle has to be used
                  return MongoBundleActivator.getBundleClassLoader();
              }
          });

@@ -7,8 +7,11 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,16 +35,16 @@ import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.RDF;
+import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
+import eu.europeana.corelib.definitions.solr.entity.Proxy;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.corelib.solr.server.EdmMongoServer;
-import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
@@ -56,6 +59,8 @@ import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
+import eu.europeana.uim.enrichment.utils.EuropeanaDateUtils;
+import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
@@ -63,8 +68,8 @@ import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugarcrm.SugarCrmRecord;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
+
 //import eu.europeana.uim.enrichment.osgi.MongoConstructor;
-import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 
 public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static String vocabularyDB;
@@ -172,6 +177,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public <I> void completed(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
 		try {
+			System.out.println(solrServer.getBaseURL());
 			solrServer.commit();
 			solrServer.optimize();
 
@@ -205,7 +211,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			mongoDB = enrichmentService.getMongoDB();
 			OsgiEdmMongoServer mongoServer = new OsgiEdmMongoServer(mongo,
 					mongoDB, "", "");
-		  
 
 			mongoServer.createDatastore(morphia);
 			bfact = BindingDirectory.getFactory(RDF.class);
@@ -218,10 +223,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			List<Entity> entities = enrichmentService
 					.enrich(new SolrConstructor().constructSolrDocument(rdf));
 			mergeEntities(rdf, entities);
+			RDF rdfFinal = cleanRDF(rdf);
 			SolrInputDocument solrInputDocument = new SolrConstructor()
-					.constructSolrDocument(rdf);
-			FullBeanImpl fullBean = mongoConstructor.constructFullBean(rdf,
-					mongoServer);
+					.constructSolrDocument(rdfFinal);
+			FullBeanImpl fullBean = mongoConstructor.constructFullBean(
+					rdfFinal, mongoServer);
 			solrInputDocument.addField(
 					EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
 					previewsOnlyInPortal);
@@ -229,6 +235,27 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					.get(0)
 					.setEdmPreviewNoDistribute(
 							Boolean.parseBoolean(previewsOnlyInPortal));
+			List<String> years = EuropeanaDateUtils
+					.createEuropeanaYears(fullBean);
+			Proxy europeanaProxy = null;
+			for (Proxy proxy : fullBean.getProxies()) {
+				if (proxy.isEuropeanaProxy()) {
+					europeanaProxy = proxy;
+				}
+			}
+			if (europeanaProxy != null) {
+				Map<String, List<String>> euYears = europeanaProxy.getYear() != null ? europeanaProxy
+						.getYear() : new HashMap<String, List<String>>();
+				List<String> euYearList = new ArrayList<String>();
+				for (String year : years) {
+					euYearList.add(year);
+					solrInputDocument.addField(EdmLabel.PROXY_EDM_YEAR.toString()+".eu", year);
+				}
+				euYears.put("eu",euYearList);
+				europeanaProxy.setYear(euYears);
+				
+			}
+			
 			String collectionId = (String) mdr.getCollection().getId();
 
 			String fileName = (String) mdr.getCollection().getName();
@@ -240,7 +267,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 			fullBean.setEuropeanaCollectionName(new String[] { fileName });
 			if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
-				
+
 				mongoServer.getDatastore().save(fullBean);
 			}
 
@@ -254,17 +281,16 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 				} catch (SolrServerException e) {
 					log.log(Level.WARNING, "Solr Exception occured with error "
 							+ e.getMessage() + "\nRetrying");
-					retries++;
+
 				} catch (IOException e) {
 					log.log(Level.WARNING, "IO Exception occured with error "
 							+ e.getMessage() + "\nRetrying");
-					retries++;
 				} catch (SolrException e) {
 					log.log(Level.WARNING, "Solr Exception occured with error "
 							+ e.getMessage() + "\nRetrying");
-					retries++;
 				}
 			}
+			return false;
 
 		} catch (JiBXException e) {
 			log.log(Level.WARNING,
@@ -421,6 +447,89 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			}
 		}
 
+	}
+
+	private RDF cleanRDF(RDF rdf) {
+		RDF rdfFinal = new RDF();
+		List<AgentType> agents = new CopyOnWriteArrayList<AgentType>();
+		List<TimeSpanType> timespans = new CopyOnWriteArrayList<TimeSpanType>();
+		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
+		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
+		List<RDF.Choice> choices = new ArrayList<RDF.Choice>();
+		for (RDF.Choice rdfChoice : rdf.getChoiceList()) {
+			if (rdfChoice.ifAgent()) {
+				AgentType newAgent = rdfChoice.getAgent();
+				for (AgentType agent : agents) {
+					if (StringUtils.equals(agent.getAbout(),
+							newAgent.getAbout())) {
+						if (agent.getPrefLabelList().size() <= newAgent
+								.getPrefLabelList().size()) {
+							agents.remove(agent);
+						}
+					}
+				}
+				agents.add(newAgent);
+			} else if (rdfChoice.ifConcept()) {
+				Concept newConcept = rdfChoice.getConcept();
+				for (Concept concept : concepts) {
+					if (StringUtils.equals(concept.getAbout(),
+							newConcept.getAbout())) {
+						if (concept.getChoiceList().size() <= newConcept
+								.getChoiceList().size()) {
+							concepts.remove(concept);
+						}
+					}
+				}
+				concepts.add(newConcept);
+			} else if (rdfChoice.ifTimeSpan()) {
+				TimeSpanType newTs = rdfChoice.getTimeSpan();
+				for (TimeSpanType ts : timespans) {
+					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
+						if (ts.getIsPartOfList().size() <= newTs
+								.getIsPartOfList().size()) {
+							timespans.remove(ts);
+						}
+					}
+				}
+				timespans.add(newTs);
+			} else if (rdfChoice.ifPlace()) {
+				PlaceType newPlace = rdfChoice.getPlace();
+				for (PlaceType place : places) {
+					if (StringUtils.equals(place.getAbout(),
+							newPlace.getAbout())) {
+						if (place.getPrefLabelList().size() <= newPlace
+								.getPrefLabelList().size()) {
+							places.remove(place);
+						}
+					}
+				}
+				places.add(newPlace);
+			} else {
+				choices.add(rdfChoice);
+			}
+		}
+		for (AgentType agent : agents) {
+			Choice choice = new Choice();
+			choice.setAgent(agent);
+			choices.add(choice);
+		}
+		for (PlaceType place : places) {
+			Choice choice = new Choice();
+			choice.setPlace(place);
+			choices.add(choice);
+		}
+		for (TimeSpanType timespan : timespans) {
+			Choice choice = new Choice();
+			choice.setTimeSpan(timespan);
+			choices.add(choice);
+		}
+		for (Concept concept : concepts) {
+			Choice choice = new Choice();
+			choice.setConcept(concept);
+			choices.add(choice);
+		}
+		rdfFinal.setChoiceList(choices);
+		return rdfFinal;
 	}
 
 	public CommonsHttpSolrServer getSolrServer() {

@@ -54,8 +54,6 @@ public class EnrichmentTest {
 			+ "<edm:object rdf:resource=\"http://www.mimo-db.eu/media/GNM/IMAGE/MINe298_H_1304604690701_2.jpg\"></edm:object>"
 			+ "</ore:Aggregation>" + "</rdf:RDF>";
 	
-	@SuppressWarnings("unchecked")
-	@Ignore
 	@Test
 	public void testAnnocultorEnrichment(){
 		EuropeanaEnrichmentTagger tagger = new EuropeanaEnrichmentTagger();
