@@ -36,6 +36,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
@@ -111,8 +112,8 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		super();
 		try {
 			solrServer = new CommonsHttpSolrServer(
-					"http://192.168.34.110:8080/solr");
-			mongoServer = new EdmMongoServerImpl(new Mongo("192.168.34.110", 27017),
+					"http://localhost:8282/apache-solr-3.5.0");
+			mongoServer = new EdmMongoServerImpl(new Mongo("localhost", 27017),
 					"europeana", "", "");
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage());
@@ -385,7 +386,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		EdmRecordDTO record = new EdmRecordDTO();
 		try {
 			
-			String query = "europeana_id:" + URLEncoder.encode(recordId, "UTF-8");
+			String query = "europeana_id:" + escapeChars(recordId);
 			SolrQuery solrQuery = new SolrQuery().setQuery(query);
 
 			QueryResponse response = solrServer.query(solrQuery);
@@ -398,11 +399,16 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return record;
+	}
+
+	@Deprecated
+	private String escapeChars(String recordId) {
+		recordId = StringUtils.replace(recordId, "/", "\\/");
+		recordId = StringUtils.replace(recordId, ":", "\\:");
+		recordId = StringUtils.replace(recordId, "#", "\\#");
+		return recordId;
 	}
 
 	private EdmFieldRecordDTO createMongoFiels(FullBeanImpl fullBean) {

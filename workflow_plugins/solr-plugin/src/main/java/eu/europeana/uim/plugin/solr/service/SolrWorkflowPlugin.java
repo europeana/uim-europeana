@@ -46,8 +46,11 @@ import com.mongodb.MongoException;
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Concept;
+import eu.europeana.corelib.definitions.jibx.EdmType;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
+import eu.europeana.corelib.definitions.jibx.EuropeanaProxy;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
+import eu.europeana.corelib.definitions.jibx.LiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
@@ -57,6 +60,7 @@ import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
+import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.uim.api.AbstractIngestionPlugin;
 import eu.europeana.uim.api.CorruptedMetadataRecordException;
@@ -64,6 +68,7 @@ import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
 import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
 import eu.europeana.uim.store.MetaDataRecord;
 
@@ -163,6 +168,54 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			marshallingContext.setIndent(2);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			RDF rdfFinal = cleanRDF(rdfCopy);
+
+			ProxyType europeanaProxy = null;
+			List<String> years = new ArrayList<String>();
+			for (Choice choice : rdfFinal.getChoiceList()) {
+				if (choice.ifProxy()) {
+					if (choice.getProxy().getEuropeanaProxy() == null
+							|| !choice.getProxy().getEuropeanaProxy()
+									.isEuropeanaProxy()) {
+						if (europeanaProxy == null) {
+							europeanaProxy = new ProxyType();
+							EuropeanaProxy prx = new EuropeanaProxy();
+							prx.setEuropeanaProxy(true);
+							europeanaProxy.setEuropeanaProxy(prx);
+							europeanaProxy.setType(choice.getProxy().getType());
+						}
+						years.addAll(EuropeanaDateUtils
+								.createEuropeanaYears(choice.getProxy()));
+					} else {
+						europeanaProxy = choice.getProxy();
+					}
+
+				}
+			}
+
+			if (europeanaProxy != null) {
+				List<Year> yearList = new ArrayList<Year>();
+				for (String year : years) {
+					Year yearObj = new Year();
+					Lang lang = new Lang();
+					lang.setLang("eur");
+					yearObj.setLang(lang);
+					yearObj.setString(year);
+					yearList.add(yearObj);
+				}
+				europeanaProxy.setYearList(yearList);
+			}
+			for (RDF.Choice choice : rdfFinal.getChoiceList()) {
+				if (choice.ifProxy()
+						&& choice.getProxy().getEuropeanaProxy() != null
+						&& choice.getProxy().getEuropeanaProxy()
+								.isEuropeanaProxy()) {
+					rdfFinal.getChoiceList().remove(choice);
+					
+				}
+			}
+			RDF.Choice choiceNew = new RDF.Choice();
+			choiceNew.setProxy(europeanaProxy);
+			rdfFinal.getChoiceList().add(choiceNew);
 			marshallingContext.marshalDocument(rdfFinal, "UTF-8", null, out);
 			String der = out.toString("UTF-8");
 			mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);

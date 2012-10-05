@@ -852,7 +852,7 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	public void setMappedField(String fieldToMap, EdmLabel europeanaField) {
-		HashMap<String, EdmLabel> elements = vocabulary.getElements() != null ? vocabulary
+		HashMap<String, EdmLabel> elements =  vocabulary.getElements() != null ? (HashMap<String,EdmLabel>)vocabulary
 				.getElements() : new HashMap<String, EdmLabel>();
 		elements.put(fieldToMap, europeanaField);
 		vocabulary.setElements(elements);

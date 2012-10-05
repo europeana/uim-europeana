@@ -19,7 +19,7 @@ import eu.europeana.uim.gui.cp.server.engine.Engine;
  * @date Jul 19, 2011
  */
 public class ReportUtils {
-    final static String         BIRT_URL               = "http://127.0.0.1:8484/birt/";
+    final static String         BIRT_URL               = "http://127.0.0.1:8282/birt/";
     final static String         REPORT_DOWNLOAD_PREFIX = "EuropeanaIngestionControlPanel/reportDownload";
 
     private final static Logger log                    = Logger.getLogger(ReportUtils.class.getName());

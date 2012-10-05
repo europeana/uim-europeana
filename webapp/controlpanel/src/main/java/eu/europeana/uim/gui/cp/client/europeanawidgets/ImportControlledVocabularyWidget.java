@@ -364,6 +364,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 			@Override
 			public void onClick(ClickEvent event) {
 				fillMappingTables();
+				importVocabulary.selectTab(1);
 			}
 		});
 		refreshVocabularies.addClickHandler(new ClickHandler() {
@@ -534,6 +535,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				if (radioButton.getValue() || radioButton1.getValue()) {
 					uploadControlledVocabulary();
 					fillVocabularyTable();
+					
 				}
 			}
 		});
@@ -566,6 +568,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 						vocabulary = result;
 						mappings = result.getMapping();
 						fillMappingTables();
+						importVocabulary.selectTab(1);
 					}
 
 					@Override
@@ -659,7 +662,6 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	/**
 	 * Original Field Cell representation
 	 * 
-	 * @author Yorgos.Mamakis@ kb.nl
 	 * 
 	 */
 	private class OriginalCell extends AbstractCell<OriginalFieldDTO> {
@@ -673,7 +675,6 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	/**
 	 * EDM Field Cell representation
 	 * 
-	 * @author Yorgos.Mamakis@ kb.nl
 	 * 
 	 */
 	private class MappableCell extends AbstractCell<EdmFieldDTO> {
@@ -690,7 +691,6 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	 * Mapped fields Cell representation. Currently each field will be mapped as
 	 * Original Field - Mapped Field
 	 * 
-	 * @author Yorgos.Mamakis@ kb.nl
 	 * 
 	 */
 	private class MappedCell extends AbstractCell<MappingDTO> {
@@ -708,7 +708,6 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	/**
 	 * Controlled vocabulary field representation
 	 * 
-	 * @author Yorgos.Mamakis@ kb.nl
 	 * 
 	 */
 	private class VocabularyCell extends AbstractCell<ControlledVocabularyDTO> {

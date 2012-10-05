@@ -101,7 +101,7 @@ public class RecordDetailsDialogBox extends DialogBox {
         retrievalServiceAsync.getSearchRecord(recordId, new AsyncCallback<EdmRecordDTO>() {
             @Override
             public void onFailure(Throwable caught) {
-                caught.printStackTrace();
+                search.setHTML(caught.getMessage());
             }
 
             @Override

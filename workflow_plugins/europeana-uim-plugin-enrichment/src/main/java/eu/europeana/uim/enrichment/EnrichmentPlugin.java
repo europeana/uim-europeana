@@ -7,9 +7,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -42,7 +40,6 @@ import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
-import eu.europeana.corelib.definitions.solr.entity.Proxy;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
@@ -59,7 +56,6 @@ import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
-import eu.europeana.uim.enrichment.utils.EuropeanaDateUtils;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
@@ -90,6 +86,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static String previewsOnlyInPortal;
 	private static String collections;
 	private static Morphia morphia;
+	private static List<SolrInputDocument> solrList;
 
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
@@ -156,7 +153,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		// TODO Auto-generated method stub
 
 		try {
-
+			solrList= new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) context.getExecution()
@@ -177,9 +174,13 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	public <I> void completed(ExecutionContext<I> context)
 			throws IngestionPluginFailedException {
 		try {
-			System.out.println(solrServer.getBaseURL());
+			solrServer.add(solrList);
+			System.out.println("Adding " + solrList.size() + " documents");
+			solrList = new ArrayList<SolrInputDocument>();
 			solrServer.commit();
+			System.out.println("Committed in Solr Server");
 			solrServer.optimize();
+			System.out.println("Optimized");
 
 		} catch (IOException e) {
 			context.getLoggingEngine().logFailed(
@@ -235,26 +236,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					.get(0)
 					.setEdmPreviewNoDistribute(
 							Boolean.parseBoolean(previewsOnlyInPortal));
-			List<String> years = EuropeanaDateUtils
-					.createEuropeanaYears(fullBean);
-			Proxy europeanaProxy = null;
-			for (Proxy proxy : fullBean.getProxies()) {
-				if (proxy.isEuropeanaProxy()) {
-					europeanaProxy = proxy;
-				}
-			}
-			if (europeanaProxy != null) {
-				Map<String, List<String>> euYears = europeanaProxy.getYear() != null ? europeanaProxy
-						.getYear() : new HashMap<String, List<String>>();
-				List<String> euYearList = new ArrayList<String>();
-				for (String year : years) {
-					euYearList.add(year);
-					solrInputDocument.addField(EdmLabel.PROXY_EDM_YEAR.toString()+".eu", year);
-				}
-				euYears.put("eu",euYearList);
-				europeanaProxy.setYear(euYears);
-				
-			}
+			
 			
 			String collectionId = (String) mdr.getCollection().getId();
 
@@ -274,18 +256,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			int retries = 0;
 			while (retries < RETRIES) {
 				try {
-					solrServer.add(solrInputDocument);
+					solrList.add(solrInputDocument);
+					
 					retries++;
 					recordNumber++;
 					return true;
-				} catch (SolrServerException e) {
-					log.log(Level.WARNING, "Solr Exception occured with error "
-							+ e.getMessage() + "\nRetrying");
-
-				} catch (IOException e) {
-					log.log(Level.WARNING, "IO Exception occured with error "
-							+ e.getMessage() + "\nRetrying");
-				} catch (SolrException e) {
+				}  catch (SolrException e) {
 					log.log(Level.WARNING, "Solr Exception occured with error "
 							+ e.getMessage() + "\nRetrying");
 				}
@@ -674,6 +650,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		}
 
 		//
+		if(RDF!=null){
 		if (RDF.getMethodName().endsWith("List")) {
 
 			Method mthd = clazz.getMethod(RDF.getMethodName());
@@ -774,7 +751,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 			}
 		}
-
+		}
 		//
 		return obj;
 	}

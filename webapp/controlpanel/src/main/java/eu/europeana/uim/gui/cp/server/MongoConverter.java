@@ -253,7 +253,7 @@ public final class MongoConverter {
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getEdmHasMet",
 				EdmLabel.AG_EDM_HASMET));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-				"getEdmIsRelatedto", EdmLabel.AG_EDM_ISRELATEDTO));
+				"getEdmIsRelatedTo", EdmLabel.AG_EDM_ISRELATEDTO));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
 				"getEdmWasPresentAt", EdmLabel.AG_EDM_WASPRESENTAT));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent, "getOwlSameAs",
@@ -293,9 +293,9 @@ public final class MongoConverter {
 		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getAbout",
 				EdmLabel.EDM_PLACE));
 		fieldValueList.add(getFieldValues(PlaceImpl.class, place,
-				"getDctermsHasPart", EdmLabel.PL_DCTERMS_HASPART));
+				"getDcTermsHasPart", EdmLabel.PL_DCTERMS_HASPART));
 		fieldValueList.add(getFieldValues(PlaceImpl.class, place,
-				"getDctermsIsPartOf", EdmLabel.PL_DCTERMS_ISPART_OF));
+				"getIsPartOf", EdmLabel.PL_DCTERMS_ISPART_OF));
 		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getOwlSameAs",
 				EdmLabel.PL_OWL_SAMEAS));
 		fieldValueList.add(getFieldValues(PlaceImpl.class, place, "getPrefLabel",
@@ -323,7 +323,7 @@ public final class MongoConverter {
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
 				"getDctermsHasPart", EdmLabel.TS_DCTERMS_HASPART));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
-				"getDctermsIsPartOf", EdmLabel.TS_DCTERMS_ISPART_OF));
+				"getIsPartOf", EdmLabel.TS_DCTERMS_ISPART_OF));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan,
 				"getBegin", EdmLabel.TS_EDM_BEGIN));
 		fieldValueList.add(getFieldValues(TimespanImpl.class, timespan, "getEnd",
