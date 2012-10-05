@@ -3,17 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
-		<groupId>eu.europeana</groupId>
-		<version>1.3.1-SNAPSHOT</version>
+		<groupId>eu.europeana.europeanauim</groupId>
+	    <version>0.99-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>europeana-datamodel-definitions</artifactId>
 	<packaging>bundle</packaging>
 	<name>Unified Ingestion Manager: Europeana Data Model Definitions</name>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
 
 	<dependencies>
 		<dependency>
@@ -35,27 +32,27 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.europeana</groupId>
+			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-model-tel</artifactId>
-			<version>${project.version}</version>
+			<version>${europeana.uim.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>eu.europeana</groupId>
+			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-model-common</artifactId>
-			<version>${project.version}</version>
+			<version>${europeana.uim.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>eu.europeana</groupId>
+			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-model-europeana</artifactId>
-			<version>${project.version}</version>
+			<version>${europeana.uim.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>eu.europeana</groupId>
+			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-model-adapters</artifactId>
-			<version>${project.version}</version>
+			<version>${europeana.uim.version}</version>
 		</dependency>
 
 		<dependency>
@@ -88,10 +85,6 @@
 							eu.europeana.uim.util,
 							eu.europeana.uim.workflow,
 							eu.europeana.uim.sugarcrm.model,
-							org.xmlpull.v1,
-							org.jibx.runtime,
-							org.jibx.runtime.impl,
-							org.jibx.extras,
 							!*
 						</Import-Package>
 						<Export-Package>
@@ -113,6 +106,7 @@
 							eu.europeana.uim.model.adapters,
 							eu.europeana.uim.model.adapters.europeana
 						</Export-Package>
+						<Embed-Dependency>jibx-extras,jibx-run</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>

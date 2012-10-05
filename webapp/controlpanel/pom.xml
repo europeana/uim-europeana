@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 
-  <parent>
-	<artifactId>europeana-uim-europeanaspecific</artifactId>
-	<groupId>eu.europeana</groupId>
-	<version>1.3.1-SNAPSHOT</version>
-  </parent>
+	<parent>
+		<artifactId>europeana-uim-europeanaspecific</artifactId>
+		<groupId>eu.europeana.europeanauim</groupId>
+		<version>0.99-SNAPSHOT</version>
+	</parent>
 
 
 	<artifactId>europeana-uim-gui-controlpanel</artifactId>
@@ -149,7 +149,8 @@
 							org.joda.time,
 							com.ctc.wstx.stax.*,
 							org.jibx.runtime,
-                            org.jibx.runtime.impl
+							org.jibx.runtime.impl,
+							!*
 						</Import-Package>
 
 
@@ -214,104 +215,49 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.europeana</groupId>
+			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-gui-common</artifactId>
-			<version>${project.version}</version>
+			<version>${europeana.uim.version}</version>
 		</dependency>
+
 		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-definitions</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-dereference</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-definitions</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-tools</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-utils</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-db</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>eu.europeana</groupId> -->
-<!-- 			<artifactId>corelib-osgi</artifactId> -->
-<!-- 			<version>2.0-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
-		<dependency>
-			<groupId>eu.europeana</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>eu.europeana</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-uim-plugin-repox</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    
-        <dependency>
-            <groupId>eu.europeana</groupId>
-            <artifactId>europeana-uim-gui-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>eu.europeana</groupId>
-            <artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>eu.europeana</groupId>
-            <artifactId>europeana-uim-plugin-repox</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-         
-        <dependency>
 
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>eu.europeana</groupId>
 			<artifactId>europeana-uim-model-europeana</artifactId>
-			<version>${project.version}</version>
+			<version>${europeana.uim.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
 			<version>0.99</version>
 			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>2.7.2</version>
 			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>wstx-asl</artifactId>
@@ -324,11 +270,13 @@
 			</exclusions>
 			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-stax-api_1.0_spec</artifactId>
 			<version>1.0.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.thoughtworks.proxytoys</groupId>
 			<artifactId>proxytoys</artifactId>
@@ -336,18 +284,19 @@
 			<type>jar</type>
 			<optional>true</optional>
 		</dependency>
+
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.2.1</version>
 			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>
@@ -355,8 +304,8 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-				
-		
+
+
 	</dependencies>
 
 

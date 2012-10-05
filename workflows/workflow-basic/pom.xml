@@ -5,8 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
-		<groupId>eu.europeana</groupId>
-		<version>1.3.1-SNAPSHOT</version>
+		<groupId>eu.europeana.europeanauim</groupId>
+		<version>0.99-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>europeana-uim-workflows-basic</artifactId>
@@ -28,7 +28,7 @@
 			<version>${project.version}</version>
 		</dependency>
 
-	<dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-uim-plugin-enrichment</artifactId>
 			<version>${project.version}</version>
@@ -40,9 +40,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-plugin-basic</artifactId>
-			<version>${project.version}</version>
+			<version>${europeana.uim.version}</version>
 		</dependency>
 
 
@@ -99,7 +99,8 @@
 							eu.europeana.uim.europeanaspecific.workflows.*
 						</Export-Package>
 						<Import-Package>
-						*
+						   eu.europeana.dedup.osgi.service.exceptions,
+							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 					</instructions>
@@ -121,26 +122,5 @@
 
 		</plugins>
 	</build>
-
-	<!-- ================================================ -->
-	<!-- Repository Configuration -->
-	<!-- ================================================ -->
-
-	<repositories>
-		<repository>
-			<id>eclipse-repository</id>
-			<name>Eclipse Repository</name>
-			<url>http://repo1.maven.org/eclipse/</url>
-		</repository>
-
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>maven-repo</id>
-			<name>maven repo</name>
-			<url>http://repo1.maven.org/maven2/</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 </project>

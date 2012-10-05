@@ -5,9 +5,12 @@
            xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
+    <bp:reference id="dedup" interface="eu.europeana.dedup.osgi.service.DeduplicationService"/>
+
     <bp:reference id="registry" interface="eu.europeana.uim.api.Registry"/>
 
     <bean id="iiwClient" class="eu.europeana.uim.europeanaspecific.workflows.InitialIngestionWorkflow">
+      <argument ref="dedup"/>
     </bean>
     
     <bean id="riwClient" class="eu.europeana.uim.europeanaspecific.workflows.RepositoryIngestionWorkflow">
@@ -21,5 +24,7 @@
     <service id="repositoryIngestionWorkflow" ref="riwClient" interface="eu.europeana.uim.workflow.Workflow"/>
     
      <service id="enrichmentIngestionWorkflow" ref="eiwClient" interface="eu.europeana.uim.workflow.Workflow"/>
+
+
 
 </blueprint>

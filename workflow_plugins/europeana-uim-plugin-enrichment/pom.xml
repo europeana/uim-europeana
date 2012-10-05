@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
-		<groupId>eu.europeana</groupId>
-		<version>1.3.1-SNAPSHOT</version>
+		<groupId>eu.europeana.europeanauim</groupId>
+		<version>0.99-SNAPSHOT</version>
 	</parent>
 	<artifactId>europeana-uim-plugin-enrichment</artifactId>
 	<packaging>bundle</packaging>
@@ -14,46 +14,19 @@
 	</properties>
 
 	<dependencies>
+
 		<dependency>
-		<groupId>annocultor</groupId>
-		<artifactId>annocultor</artifactId>
-		<version>3.0.0</version>
+			<groupId>annocultor</groupId>
+			<artifactId>annocultor</artifactId>
+			<version>3.0.0</version>
 		</dependency>
+
 		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-definitions</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-definitions</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-tools</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-dereference</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-utils</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-run</artifactId>
@@ -70,7 +43,7 @@
 			<artifactId>morphia</artifactId>
 			<version>0.99.1-SNAPSHOT</version>
 		</dependency>
-		   <dependency>
+		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-xc</artifactId>
 			<version>1.9.9</version>
@@ -118,7 +91,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 		</dependency>
-	<dependency>
+		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<scope>provided</scope>
@@ -129,10 +102,10 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency> 
-			<scope>test</scope> 
-			<groupId>org.springframework</groupId> 
-			<artifactId>spring-test</artifactId> 
+		<dependency>
+			<scope>test</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -216,7 +189,7 @@
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>
-						 *;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
+							*;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
 						</Embed-Dependency>
 						<Bundle-Activator>eu.europeana.uim.enrichment.MongoBundleActivator</Bundle-Activator>
 					</instructions>
@@ -245,9 +218,14 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
-
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>aduna</id>
+			<name>aduna-releases</name>
+			<url>http://europeanalabs.eu/artifactory/aduna</url>
+		</repository>
+	</repositories>
 </project>

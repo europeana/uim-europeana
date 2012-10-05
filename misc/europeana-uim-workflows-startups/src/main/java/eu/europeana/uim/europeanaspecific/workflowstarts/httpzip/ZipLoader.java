@@ -17,6 +17,7 @@
 
 package eu.europeana.uim.europeanaspecific.workflowstarts.httpzip;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -25,17 +26,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.LinkStatus;
 import eu.europeana.uim.api.LoggingEngine;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.common.ProgressMonitor;
+import eu.europeana.uim.common.RevisableProgressMonitor;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
+import eu.europeana.dedup.osgi.service.DeduplicationResult;
+import eu.europeana.dedup.osgi.service.DeduplicationService;
+import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.utils.DefUtils;
@@ -64,6 +74,8 @@ public class ZipLoader {
 	private int totalProgress = 0;
 	private int expectedRecords = 0;
 
+	private DeduplicationService dedup;
+	
 	/**
 	 * Default constructor for this class
 	 * 
@@ -82,7 +94,7 @@ public class ZipLoader {
 	 */
 	public <I> ZipLoader(int expectedRecords, Iterator<String> zipiterator,
 			StorageEngine<I> storage, Request<I> request,
-			ProgressMonitor monitor, LoggingEngine<I> loggingEngine) {
+			ProgressMonitor monitor, LoggingEngine<I> loggingEngine,DeduplicationService dedup) {
 		super();
 		this.expectedRecords = expectedRecords;
 		this.zipiterator = zipiterator;
@@ -90,7 +102,10 @@ public class ZipLoader {
 		this.request = request;
 		this.monitor = monitor;
 		this.loggingEngine = loggingEngine;
+		this.dedup = dedup;
 	}
+
+
 
 	/**
 	 * Returns the next batch of metadata records to the orchestrator
@@ -115,20 +130,22 @@ public class ZipLoader {
 			}
 
 			String rdfstring = zipiterator.next();
+			
 
-			RDF validedmrecord;
 			try {
-				validedmrecord = DefUtils
-						.unmarshallObject(rdfstring, RDF.class);
-				I uuid = (I) validedmrecord.getChoiceList().get(0)
-						.getProvidedCHO().getAbout();
 
-				
-				MetaDataRecord<I> mdr = storage.getMetaDataRecord(uuid);
+
+				// First Check the record for duplicates 
+			    List<DeduplicationResult> reslist =  dedup.deduplicateRecord((String) request.getCollection().getId()
+							,(String) request.getId(), rdfstring);
+			    
+			    for(DeduplicationResult dedupres : reslist){
+
+				MetaDataRecord<I> mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
 
 				if (mdr == null) {
 					mdr = storage.createMetaDataRecord(request.getCollection(),
-							uuid.toString());
+							dedupres.getDerivedRecordID());
 				}
 				else{
 					//Remove the previous ingestion date
@@ -142,18 +159,19 @@ public class ZipLoader {
 				mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
 						new Date().toString());
 				
-				mdr.addValue(EuropeanaModelRegistry.EDMRECORD, rdfstring);
+				mdr.addValue(EuropeanaModelRegistry.EDMRECORD,unmarshall(dedupres.getEdm()));
 
 				//Add Links to be checked values here 
-				addLinkcheckingValues(validedmrecord,mdr);
-				
+				addLinkcheckingValues(dedupres.getEdm(),mdr);
 				storage.updateMetaDataRecord(mdr);
-
 				result.add(mdr);
 				storage.addRequestRecord(request, mdr);
 
+			    }
+			    
 				progress++;
 				totalProgress++;
+				
 			} catch (JiBXException e) {
 
 				if (loggingEngine != null) {
@@ -166,11 +184,32 @@ public class ZipLoader {
 					loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
 							"Error storing object ");
 				}
+			} catch (DeduplicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
+	    
 		return result;
 	}
 
+	
+	
+	private String unmarshall(RDF edm) throws JiBXException{
+
+			IBindingFactory bfact =  BindingDirectory.getFactory(RDF.class);
+			IMarshallingContext mctx = bfact.createMarshallingContext();
+			mctx.setIndent(2);
+			StringWriter stringWriter = new StringWriter();
+			mctx.setOutput(stringWriter);
+			mctx.marshalDocument(edm);
+			String edmstring = stringWriter.toString();
+
+		
+		return edmstring;
+		
+	}
+	
 	
 	/**
 	 * Extracts the locations of links from the imported JIBX representation of EDM

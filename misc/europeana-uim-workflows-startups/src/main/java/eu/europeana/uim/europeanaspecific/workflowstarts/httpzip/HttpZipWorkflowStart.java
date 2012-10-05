@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.api.ExecutionContext;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
@@ -46,6 +48,12 @@ import eu.europeana.uim.workflow.WorkflowStartFailedException;
  */
 public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 
+	/**
+	 * The deduplication service reference (null if not available)
+	 */
+	DeduplicationService dedup;
+	
+	
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
 
@@ -92,6 +100,21 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 		super(name, description);
 	}
 
+	
+	/**
+	 * Default constructor
+	 * 
+	 * @param name
+	 *            workflow name
+	 * @param description
+	 *            workflow description
+	 */
+	public HttpZipWorkflowStart(String name, String description,DeduplicationService dedup) {
+		super(name, description);
+		this.dedup = dedup;
+	}
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -218,7 +241,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 
 				ZipLoader loader = new ZipLoader(retriever.getNumber_of_recs(),
 						retriever, storage, request, context.getMonitor(),
-						context.getLoggingEngine());
+						context.getLoggingEngine(),dedup);
 
 				value.loader = loader;
 

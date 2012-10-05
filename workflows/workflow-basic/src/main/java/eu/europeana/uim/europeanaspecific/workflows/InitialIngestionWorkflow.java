@@ -20,6 +20,7 @@
  */
 package eu.europeana.uim.europeanaspecific.workflows;
 
+import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.europeanaspecific.workflowstarts.httpzip.HttpZipWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 import eu.europeana.uim.workflows.SysoutPlugin;
@@ -31,19 +32,25 @@ import eu.europeana.uim.workflows.SysoutPlugin;
  */
 public class InitialIngestionWorkflow extends AbstractWorkflow{
 
+	
+	
+	
 	/**
 	 * Initial Ingestion Workflow Constructor
 	 */
-	public InitialIngestionWorkflow() {
+	public InitialIngestionWorkflow(DeduplicationService service) {
 
 		super("(Re)Import Data from Mint Mapping Tool",
         "Populates a UIM collection with specific EDM data from Mint");
 
-        setStart(new HttpZipWorkflowStart("HttpZipWorkflowStart","Downloads zipped EDM file"));
+        setStart(new HttpZipWorkflowStart("HttpZipWorkflowStart","Downloads zipped EDM file",service));
 
         addStep(new SysoutPlugin());
 	}
 
+	
+
+	
 	
 	public boolean isMandatory(String arg0) {
 		return false;
