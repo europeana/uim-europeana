@@ -1,10 +1,10 @@
 package eu.europeana.uim.enrichment.service.impl;
 
+import java.net.URL;
 import java.util.List;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
-
 
 import eu.annocultor.converters.europeana.Entity;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
@@ -20,16 +20,11 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	private static String solrUrl="http://localhost:8282/";
 	private static String solrCore="apache-solr-3.5.0";
 
-
 	public EnrichmentServiceImpl(){
 		tagger = new EuropeanaEnrichmentTagger();
 		try {
-		solrServer = new CommonsHttpSolrServer(solrUrl+solrCore);
-		 solrServer.setSoTimeout(1000);  // socket read timeout
-		  solrServer.setConnectionTimeout(100);
-		  solrServer.setDefaultMaxConnectionsPerHost(100);
-		  solrServer.setMaxTotalConnections(100);
-		  solrServer.setFollowRedirects(false);
+			
+		solrServer = new CommonsHttpSolrServer(new URL(solrUrl)+solrCore);
 		//mongo  = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 		
 		
