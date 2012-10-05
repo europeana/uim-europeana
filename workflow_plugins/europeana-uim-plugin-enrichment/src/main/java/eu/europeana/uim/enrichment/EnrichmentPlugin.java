@@ -87,6 +87,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private static String collections;
 	private static Morphia morphia;
 	private static List<SolrInputDocument> solrList;
+	private static OsgiEdmMongoServer mongoServer;
+	private static Mongo mongo;
 
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
@@ -155,6 +157,14 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		try {
 			solrList= new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
+			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
+			mongoDB = enrichmentService.getMongoDB();
+			mongoServer = new OsgiEdmMongoServer(mongo,
+					mongoDB, "", "");
+			morphia = new Morphia();
+			
+
+			mongoServer.createDatastore(morphia);
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) context.getExecution()
 					.getDataSet();
@@ -176,12 +186,13 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		try {
 			solrServer.add(solrList);
 			System.out.println("Adding " + solrList.size() + " documents");
-			solrList = new ArrayList<SolrInputDocument>();
+			
 			solrServer.commit();
 			System.out.println("Committed in Solr Server");
 			solrServer.optimize();
 			System.out.println("Optimized");
-
+			solrList = new ArrayList<SolrInputDocument>();
+			mongoServer.close();
 		} catch (IOException e) {
 			context.getLoggingEngine().logFailed(
 					Level.SEVERE,
@@ -207,13 +218,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
-			morphia = new Morphia();
-			Mongo mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
-			mongoDB = enrichmentService.getMongoDB();
-			OsgiEdmMongoServer mongoServer = new OsgiEdmMongoServer(mongo,
-					mongoDB, "", "");
-
-			mongoServer.createDatastore(morphia);
+			
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();

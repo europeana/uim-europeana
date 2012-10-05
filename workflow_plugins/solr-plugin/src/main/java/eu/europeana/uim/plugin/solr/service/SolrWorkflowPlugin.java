@@ -805,6 +805,8 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			Datastore datastore, String field, String filter)
 			throws UnknownHostException, MongoException {
 		String[] splitName = filter.split("/");
+		//TODO: Fix
+		if(splitName.length>3){
 		String vocabularyName = splitName[0] + "/" + splitName[1] + "/"
 				+ splitName[2] + "/";
 		List<ControlledVocabularyImpl> vocabularies = datastore
@@ -820,6 +822,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			if (ruleController) {
 				return vocabulary;
 			}
+		}
 		}
 		return null;
 	}
