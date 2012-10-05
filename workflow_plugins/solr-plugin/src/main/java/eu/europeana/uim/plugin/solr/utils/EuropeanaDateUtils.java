@@ -3,6 +3,7 @@ package eu.europeana.uim.plugin.solr.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -45,11 +46,10 @@ public class EuropeanaDateUtils {
 			String contains = contains(input, patterns);
 			if (contains != null) {
 				dates.addAll(getDates(input, contains));
-			} else if (StringUtils.contains(input, "-")) {
-				dates.addAll(getDates(input, "-"));
-			}
+			} 
 		return dates;
 	}
+
 
 	private static String contains(String input, String[] filters) {
 		for (String filter : filters) {
