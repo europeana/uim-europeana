@@ -121,6 +121,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 
 			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID, collectionID, edmRecord, sessionid);
 			dedupres.setLookupresult(lookup);
+			deduplist.add(dedupres);
 		}
 		
 		

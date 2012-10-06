@@ -136,7 +136,7 @@ public class ZipLoader {
 
 
 				// First Check the record for duplicates 
-			    List<DeduplicationResult> reslist =  dedup.deduplicateRecord((String) request.getCollection().getId()
+			    List<DeduplicationResult> reslist =  dedup.deduplicateRecord((String) request.getCollection().getMnemonic()
 							,(String) request.getId(), rdfstring);
 			    
 			    for(DeduplicationResult dedupres : reslist){
