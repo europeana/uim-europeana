@@ -16,10 +16,17 @@
  */
 package eu.europeana.dedup.osgi.service;
 
+import java.io.StringWriter;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.JiBXException;
+
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
@@ -99,7 +106,11 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 		for(RDF result : decoupledResults){
 
 			DeduplicationResult dedupres = new DeduplicationResult();
-			dedupres.setEdm(result);
+			try {
+				dedupres.setEdm(unmarshall(result));
+			} catch (JiBXException e) {
+				throw new DeduplicationException("Unmarshalling of new deduplicated record failed",e);
+			}
 			
 			
 			List<Choice> choicelist = result.getChoiceList();
@@ -109,23 +120,42 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 			
 			for(Choice choice : choicelist){
 				if(choice.ifProxy()){
-					
-					ProxyType proxy = choice.getProxy();
-					
+					ProxyType proxy = choice.getProxy();					
 					nonUUID = proxy.getAbout();
-					dedupres.setDerivedRecordID(nonUUID);
-					
 					break;
 				}
 			}
 
 			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID, collectionID, edmRecord, sessionid);
 			dedupres.setLookupresult(lookup);
+			dedupres.setDerivedRecordID(lookup.getEuropeanaID());
 			deduplist.add(dedupres);
 		}
 		
 		
 		return deduplist;
-	}
+	}	
+	
+	
+	
+	
+	
+	
+	private String unmarshall(RDF edm) throws JiBXException{
+
+		IBindingFactory bfact =  BindingDirectory.getFactory(RDF.class);
+		IMarshallingContext mctx = bfact.createMarshallingContext();
+		mctx.setIndent(2);
+		StringWriter stringWriter = new StringWriter();
+		mctx.setOutput(stringWriter);
+		mctx.marshalDocument(edm);
+		String edmstring = stringWriter.toString();
+
+	
+	return edmstring;
+	
+}
+	
+	
 
 }

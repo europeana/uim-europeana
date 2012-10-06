@@ -16,7 +16,7 @@
  */
 package eu.europeana.dedup.osgi.service;
 
-import eu.europeana.corelib.definitions.jibx.RDF;
+
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
 
 /**
@@ -32,7 +32,7 @@ public class DeduplicationResult {
 	
 	private LookupResult lookupresult; 
 	
-	private RDF edm;
+	private String edm;
 	
 
 	
@@ -87,14 +87,14 @@ public class DeduplicationResult {
 	/**
 	 * @return the edm
 	 */
-	public RDF getEdm() {
+	public String getEdm() {
 		return edm;
 	}
 
 	/**
 	 * @param edm the edm to set
 	 */
-	public void setEdm(RDF edm) {
+	public void setEdm(String edm) {
 		this.edm = edm;
 	}
 

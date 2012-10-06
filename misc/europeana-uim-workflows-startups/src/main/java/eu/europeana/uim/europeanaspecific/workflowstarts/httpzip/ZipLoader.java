@@ -17,6 +17,7 @@
 
 package eu.europeana.uim.europeanaspecific.workflowstarts.httpzip;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,7 +135,6 @@ public class ZipLoader {
 
 			try {
 
-
 				// First Check the record for duplicates 
 			    List<DeduplicationResult> reslist =  dedup.deduplicateRecord((String) request.getCollection().getMnemonic()
 							,(String) request.getId(), rdfstring);
@@ -159,10 +159,10 @@ public class ZipLoader {
 				mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
 						new Date().toString());
 				
-				mdr.addValue(EuropeanaModelRegistry.EDMRECORD,unmarshall(dedupres.getEdm()));
+				mdr.addValue(EuropeanaModelRegistry.EDMRECORD,dedupres.getEdm());
 
 				//Add Links to be checked values here 
-				addLinkcheckingValues(dedupres.getEdm(),mdr);
+				addLinkcheckingValues(unmarshall(dedupres.getEdm()),mdr);
 				storage.updateMetaDataRecord(mdr);
 				result.add(mdr);
 				storage.addRequestRecord(request, mdr);
@@ -195,18 +195,22 @@ public class ZipLoader {
 
 	
 	
-	private String unmarshall(RDF edm) throws JiBXException{
+	private RDF unmarshall(String edm) throws JiBXException{
 
 			IBindingFactory bfact =  BindingDirectory.getFactory(RDF.class);
-			IMarshallingContext mctx = bfact.createMarshallingContext();
-			mctx.setIndent(2);
-			StringWriter stringWriter = new StringWriter();
-			mctx.setOutput(stringWriter);
-			mctx.marshalDocument(edm);
-			String edmstring = stringWriter.toString();
+			IUnmarshallingContext mctx = bfact.createUnmarshallingContext();
+			StringReader reader = new StringReader(edm);
+			
+			RDF rdf = (RDF) mctx.unmarshalDocument(reader, "UTF-8");
+			
+			//mctx.setIndent(2);
+			//StringWriter stringWriter = new StringWriter();
+			//mctx.setOutput(stringWriter);
+			//mctx.marshalDocument(edm);
+			//String edmstring = stringWriter.toString();
 
 		
-		return edmstring;
+		return rdf;
 		
 	}
 	
