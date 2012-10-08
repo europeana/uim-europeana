@@ -35,6 +35,12 @@ import com.rabbitmq.client.Envelope;
 
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientASync;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
+import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
+import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
+import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
+import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
+import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
