@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.jibx.runtime.IMarshallable;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.rabbitmq.client.AMQP;
@@ -34,12 +35,6 @@ import com.rabbitmq.client.Envelope;
 
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientASync;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
-import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
-import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
-import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
-import eu.europeana.uim.mintclient.jibxbindings.GetImportsCommand;
-import eu.europeana.uim.mintclient.jibxbindings.GetTransformationsCommand;
-import eu.europeana.uim.mintclient.jibxbindings.PublicationCommand;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
@@ -89,6 +84,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
+	@Ignore
 	@Test
 	public void createOrganizationTest() throws Exception{
 		log.info("CreateOrganizationTest:Sending request");
@@ -108,6 +104,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
+	@Ignore
 	@Test
 	public void createUserTest() throws Exception{
 		log.info("CreateUserTest : Sending request");
@@ -129,6 +126,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
+	@Ignore
 	@Test
 	public void createImportsTest() throws Exception{
 		log.info("CreateImportsTest : Sending request");
@@ -146,6 +144,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
+	@Ignore
 	@Test
 	public void getImportsTest() throws Exception{
 		log.info("GetImportsTest : Sending request");
@@ -157,6 +156,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
+	@Ignore
 	@Test
 	public void getTransformations() throws Exception{
 		log.info("GetTransformationsTest : Sending request");
@@ -171,6 +171,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
+	@Ignore
 	@Test
 	public void publishCollection() throws Exception{
 		log.info("PublishCollectionTest : Sending request");

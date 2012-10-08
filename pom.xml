@@ -32,9 +32,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.6.1</slf4j.version>
-		<spring.maven.artifact.version>3.0.5.RELEASE</spring.maven.artifact.version>
+		<spring.maven.artifact.version>3.1.2.RELEASE</spring.maven.artifact.version>
 		<spring.osgi.version>1.2.1</spring.osgi.version>
-		<spring.ws.version>2.0.0.RELEASE</spring.ws.version>
+		<spring.ws.version>2.1.0.RELEASE</spring.ws.version>
 		<spring.quartz.version>1.6.2</spring.quartz.version>
 		<equinox.ver>3.2.2</equinox.ver>
 		<jibx.version>1.2.3</jibx.version>

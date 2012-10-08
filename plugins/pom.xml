@@ -16,6 +16,7 @@
 
 	<modules>
 		<module>clientbindings</module>
+		<module>mintjmsclient</module>
 		<module>sugarcrmclient</module>
 		<module>repoxclient</module>
 	</modules>
