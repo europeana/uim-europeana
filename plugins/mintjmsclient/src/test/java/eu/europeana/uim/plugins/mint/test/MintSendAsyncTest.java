@@ -66,6 +66,7 @@ public class MintSendAsyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
+	@Ignore
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
 		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient(); 
@@ -78,6 +79,7 @@ public class MintSendAsyncTest {
 	 * 
 	 * @throws IOException 
 	 */
+	@Ignore
 	@AfterClass public static void tearDown() throws IOException {
 	   client.closeConnection();	
 	   client = null;

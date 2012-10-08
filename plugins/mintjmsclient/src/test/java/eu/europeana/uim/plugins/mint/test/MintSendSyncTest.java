@@ -84,6 +84,7 @@ public class MintSendSyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
+	@Ignore
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
 		client = (MintAMPQClientSync) factory.syncMode().createClient();  
@@ -95,6 +96,7 @@ public class MintSendSyncTest {
 	 * 
 	 * @throws IOException 
 	 */
+	@Ignore
 	@AfterClass public static void tearDown() throws IOException {
 		client.closeConnection();
 		client = null;
