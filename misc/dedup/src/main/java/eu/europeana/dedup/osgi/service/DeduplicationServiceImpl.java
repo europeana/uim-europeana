@@ -33,55 +33,57 @@ import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistryMongoServer;
+import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 import eu.europeana.dedup.utils.Decoupler;
 import eu.europeana.uim.common.BlockingInitializer;
 
-
 /**
- *
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 27 Sep 2012
  */
 public class DeduplicationServiceImpl implements DeduplicationService {
 
-    /**
-     * Set the Logging variable to use logging within this class
-     */
-    private static final Logger           log       = Logger.getLogger(DeduplicationServiceImpl.class.getName());
-	
+	/**
+	 * Set the Logging variable to use logging within this class
+	 */
+	private static final Logger log = Logger
+			.getLogger(DeduplicationServiceImpl.class.getName());
+
 	EuropeanaIdRegistryMongoServer mongoserver;
-	
-	
+
 	/**
 	 * 
 	 */
 	public DeduplicationServiceImpl() {
-		
+
 		try {
 			final Mongo mongo = new Mongo();
-			
-	        BlockingInitializer initializer = new BlockingInitializer() {
-	            @Override
-	            public void initializeInternal() {
-	                try {
-	                    status = STATUS_BOOTING;
-	                    mongoserver = new EuropeanaIdRegistryMongoServer(mongo, "EuropeanaIdRegistry");
 
-	                    boolean test = mongoserver.oldIdExists("something");
-	                    log.log(java.util.logging.Level.INFO,"OK");
-	                    status = STATUS_INITIALIZED;
-	                } catch (Throwable t) {
-	                    log.log(java.util.logging.Level.SEVERE,
-	                            "Failed to initialize Deduplication Service.", t);
-	                    status = STATUS_FAILED;
-	                }
-	            }
-	        };
-	        initializer.initialize(EuropeanaIdRegistryMongoServer.class.getClassLoader());
-			
-			
+			BlockingInitializer initializer = new BlockingInitializer() {
+				@Override
+				public void initializeInternal() {
+					try {
+						status = STATUS_BOOTING;
+						mongoserver = new EuropeanaIdRegistryMongoServer(mongo,
+								"EuropeanaIdRegistry");
+
+						boolean test = mongoserver.oldIdExists("something");
+						log.log(java.util.logging.Level.INFO, "OK");
+						status = STATUS_INITIALIZED;
+					} catch (Throwable t) {
+						log.log(java.util.logging.Level.SEVERE,
+								"Failed to initialize Deduplication Service.",
+								t);
+						status = STATUS_FAILED;
+					}
+				}
+			};
+			initializer.initialize(EuropeanaIdRegistryMongoServer.class
+					.getClassLoader());
+
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -89,61 +91,59 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#deduplicateRecord(java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.europeana.dedup.osgi.service.DeduplicationService#deduplicateRecord
+	 * (java.lang.String, java.lang.String)
 	 */
 	@Override
-	public List<DeduplicationResult> deduplicateRecord(String collectionID,String sessionid,String edmRecord) throws DeduplicationException {
-		
+	public List<DeduplicationResult> deduplicateRecord(String collectionID,
+			String sessionid, String edmRecord) throws DeduplicationException {
+
 		List<DeduplicationResult> deduplist = new ArrayList<DeduplicationResult>();
-		
-		List<RDF> decoupledResults = Decoupler.getInstance().decouple(edmRecord);
-		for(RDF result : decoupledResults){
+
+		List<RDF> decoupledResults = Decoupler.getInstance()
+				.decouple(edmRecord);
+		for (RDF result : decoupledResults) {
 
 			DeduplicationResult dedupres = new DeduplicationResult();
 			try {
 				dedupres.setEdm(unmarshall(result));
 			} catch (JiBXException e) {
-				throw new DeduplicationException("Unmarshalling of new deduplicated record failed",e);
+				throw new DeduplicationException(
+						"Unmarshalling of new deduplicated record failed", e);
 			}
-			
-			
+
 			List<Choice> choicelist = result.getChoiceList();
-		
+
 			String nonUUID = null;
-			
-			
-			for(Choice choice : choicelist){
-				if(choice.ifProxy()){
-					ProxyType proxy = choice.getProxy();					
+
+			for (Choice choice : choicelist) {
+				if (choice.ifProxy()) {
+					ProxyType proxy = choice.getProxy();
 					nonUUID = proxy.getAbout();
 					break;
 				}
 			}
 
-			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID, collectionID, edmRecord, sessionid);
+			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
+					collectionID, edmRecord, sessionid);
 			dedupres.setLookupresult(lookup);
 			dedupres.setDerivedRecordID(lookup.getEuropeanaID());
 			deduplist.add(dedupres);
 		}
-		
-		
-		return deduplist;
-	}	
-	
-	
-	
-	
-	
-	
-	private String unmarshall(RDF edm) throws JiBXException{
 
-		IBindingFactory bfact =  BindingDirectory.getFactory(RDF.class);
+		return deduplist;
+	}
+
+	private String unmarshall(RDF edm) throws JiBXException {
+
+		IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
 		StringWriter stringWriter = new StringWriter();
@@ -151,11 +151,14 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 		mctx.marshalDocument(edm);
 		String edmstring = stringWriter.toString();
 
-	
-	return edmstring;
-	
-}
-	
-	
+		return edmstring;
+
+	}
+
+	@Override
+	public List<FailedRecord> getFailedRecords(String collectionId) {
+		return mongoserver.getDatastore().find(FailedRecord.class)
+				.filter("collectionId", collectionId).asList();
+	}
 
 }

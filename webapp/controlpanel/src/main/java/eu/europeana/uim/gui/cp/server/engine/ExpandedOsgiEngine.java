@@ -22,6 +22,7 @@ package eu.europeana.uim.gui.cp.server.engine;
 
 import java.util.logging.Logger;
 
+import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
@@ -39,16 +40,19 @@ public class ExpandedOsgiEngine extends OsgiEngine {
 	    private final RepoxUIMService repoxService;
 	    
 	    private final SugarCrmService sugarCrmService;
+	    
+	    private final DeduplicationService dedupService;
 
 	    /**
 	     * Creates a new instance of this class.
 	     * 
 	     * @param registry
 	     */
-	    public ExpandedOsgiEngine(Registry registry,RepoxUIMService repoxService,SugarCrmService sugarCrmService) {
+	    public ExpandedOsgiEngine(Registry registry,RepoxUIMService repoxService,SugarCrmService sugarCrmService, DeduplicationService dedupService) {
 	    	super(registry);
 	       this.repoxService = repoxService;
 	       this.sugarCrmService = sugarCrmService;
+	       this.dedupService = dedupService;
 	    }
 
 		/**
@@ -65,6 +69,10 @@ public class ExpandedOsgiEngine extends OsgiEngine {
 			return sugarCrmService;
 		}
 		
+		
+		public DeduplicationService getDedupService(){
+			return dedupService;
+		}
 		
 	    /**
 	     * @return singleton instance of engine.

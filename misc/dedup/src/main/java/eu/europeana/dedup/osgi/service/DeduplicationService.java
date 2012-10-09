@@ -18,6 +18,8 @@ package eu.europeana.dedup.osgi.service;
 
 import java.util.List;
 
+import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistryMongoServer;
+import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 
 /**
@@ -36,4 +38,6 @@ public interface DeduplicationService {
 	 * @throws DeduplicationException
 	 */
 	public List<DeduplicationResult> deduplicateRecord(String collectionID,String sessionid, String edmRecord) throws DeduplicationException;
+	
+	public List<FailedRecord> getFailedRecords(String collectionId);
 }

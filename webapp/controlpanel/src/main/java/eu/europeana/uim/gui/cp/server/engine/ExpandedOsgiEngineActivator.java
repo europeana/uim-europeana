@@ -23,13 +23,15 @@ package eu.europeana.uim.gui.cp.server.engine;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+
+import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.api.Registry;
 import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 
 
 /**
- * Expanded Bundle Activator with support for SugarCrmService & RepoxUIMService
+ * Expanded Bundle Activator with support for SugarCrmService, RepoxUIMService, DeduplicationService
  * 
  * @author Georgios Markakis
  */
@@ -46,7 +48,7 @@ public class ExpandedOsgiEngineActivator implements BundleActivator {
         Registry registry = null;
         RepoxUIMService repoxService = null;
         SugarCrmService sugarCrmService = null;
-
+        DeduplicationService dedupService = null;
         int wait = 0;
         while (registry == null && wait++ < 10) {
             ServiceReference registryRef = bundleContext.getServiceReference("eu.europeana.uim.api.Registry");
@@ -73,7 +75,13 @@ public class ExpandedOsgiEngineActivator implements BundleActivator {
             Thread.sleep(1000);
         }
 
-        expengine = new ExpandedOsgiEngine(registry,repoxService,sugarCrmService);
+        while(dedupService == null && wait++ <10){
+        	ServiceReference dedupRef = bundleContext.getServiceReference("eu.europeana.dedup.osgi.service.DeduplicationService");
+        	if(dedupRef !=null){
+        		dedupService = (DeduplicationService) bundleContext.getService(dedupRef);
+        	}
+        }
+        expengine = new ExpandedOsgiEngine(registry,repoxService,sugarCrmService,dedupService);
         ExpandedOsgiEngine.setEngine(expengine);
 	}
 

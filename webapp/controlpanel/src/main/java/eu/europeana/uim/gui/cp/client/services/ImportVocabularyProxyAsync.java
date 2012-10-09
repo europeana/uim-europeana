@@ -8,7 +8,7 @@ import eu.europeana.uim.gui.cp.shared.ControlledVocabularyDTO;
 import eu.europeana.uim.gui.cp.shared.EdmFieldDTO;
 import eu.europeana.uim.gui.cp.shared.MappingDTO;
 /**
- * Class used for importing Controlled vocabularies (Async)
+ * Interface used for importing Controlled vocabularies (Async)
  * @author Yorgos.Mamakis@ kb.nl
  *
  */

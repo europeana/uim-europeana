@@ -6,6 +6,7 @@ import com.google.gwt.core.client.prefetch.RunAsyncCode;
 
 import eu.europeana.uim.gui.cp.client.europeanawidgets.CollectionManagement;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ExpandedResourceManagementWidget;
+import eu.europeana.uim.gui.cp.client.europeanawidgets.FailedRecordsWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportControlledVocabularyWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportResourcesWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkCachingWidget;
@@ -18,6 +19,8 @@ import eu.europeana.uim.gui.cp.client.services.CollectionManagementProxy;
 import eu.europeana.uim.gui.cp.client.services.CollectionManagementProxyAsync;
 import eu.europeana.uim.gui.cp.client.services.ExecutionService;
 import eu.europeana.uim.gui.cp.client.services.ExecutionServiceAsync;
+import eu.europeana.uim.gui.cp.client.services.FailedRecordService;
+import eu.europeana.uim.gui.cp.client.services.FailedRecordServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxy;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxyAsync;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxy;
@@ -53,8 +56,8 @@ public class EuropeanaIngestionControlPanel extends
 
 	@Override
 	protected void addMenuEntries(SidebarMenu treeModel) {
-		
-		// Initialize services here 
+
+		// Initialize services here
 		final RepositoryServiceAsync repositoryService = (RepositoryServiceAsync) GWT
 				.create(RepositoryService.class);
 		final ResourceServiceAsync resourceService = (ResourceServiceAsync) GWT
@@ -67,10 +70,13 @@ public class EuropeanaIngestionControlPanel extends
 				.create(ImportVocabularyProxy.class);
 		final CollectionManagementProxyAsync collectionManagement = (CollectionManagementProxyAsync) GWT
 				.create(CollectionManagementProxy.class);
-		final RetrievalServiceAsync retrievalService = (RetrievalServiceAsync)GWT.create(RetrievalService.class);
-		
-	    final ReportingServiceAsync reportService = (ReportingServiceAsync)GWT.create(ReportingService.class);
-		
+		final RetrievalServiceAsync retrievalService = (RetrievalServiceAsync) GWT
+				.create(RetrievalService.class);
+
+		final ReportingServiceAsync reportService = (ReportingServiceAsync) GWT
+				.create(ReportingService.class);
+		final FailedRecordServiceAsync failedRecordService = (FailedRecordServiceAsync) GWT
+				.create(FailedRecordService.class);
 		// Initialize Panel Components here
 		treeModel.addMenuEntry("Monitoring", new IngestionDetailWidget(
 				executionService), RunAsyncCode
@@ -87,21 +93,29 @@ public class EuropeanaIngestionControlPanel extends
 						resourceService, integrationService), RunAsyncCode
 						.runAsyncCode(ExpandedResourceManagementWidget.class));
 
-		treeModel.addMenuEntry("Validation", new LinkValidationWidget(repositoryService,
-                retrievalService), RunAsyncCode.runAsyncCode(LinkValidationWidget.class));
+		treeModel.addMenuEntry("Validation", new LinkValidationWidget(
+				repositoryService, retrievalService), RunAsyncCode
+				.runAsyncCode(LinkValidationWidget.class));
+		treeModel.addMenuEntry("Validation", new FailedRecordsWidget(
+				"Failed Records Report", "Failed Records Report",
+				repositoryService, failedRecordService), RunAsyncCode
+				.runAsyncCode(FailedRecordsWidget.class));
 
-		
-		treeModel.addMenuEntry("Link Checker/ Thumbler", new LinkReportingWidget(reportService,
-                "Link Validation", new String[] { "LinkCheckWorkflow" },
-                "linkcheck_overview.rptdesign", new String[] { "pdf" }),
-                RunAsyncCode.runAsyncCode(LinkReportingWidget.class));
-		
-		
-		treeModel.addMenuEntry("Link Checker/ Thumbler", new LinkCachingWidget(reportService,
-                "Link Caching", new String[] { "ImageCacheWorkflow" },
-                "thumbler_overview.rptdesign", new String[] { "pdf" }),
-                RunAsyncCode.runAsyncCode(LinkCachingWidget.class));
-		
+		treeModel
+				.addMenuEntry("Link Checker/ Thumbler",
+						new LinkReportingWidget(reportService,
+								"Link Validation",
+								new String[] { "LinkCheckWorkflow" },
+								"linkcheck_overview.rptdesign",
+								new String[] { "pdf" }), RunAsyncCode
+								.runAsyncCode(LinkReportingWidget.class));
+
+		treeModel.addMenuEntry("Link Checker/ Thumbler", new LinkCachingWidget(
+				reportService, "Link Caching",
+				new String[] { "ImageCacheWorkflow" },
+				"thumbler_overview.rptdesign", new String[] { "pdf" }),
+				RunAsyncCode.runAsyncCode(LinkCachingWidget.class));
+
 		treeModel.addMenuEntry("Importing", new ImportResourcesWidget(
 				repositoryService, resourceService, integrationService),
 				RunAsyncCode.runAsyncCode(ImportResourcesWidget.class));
@@ -110,6 +124,7 @@ public class EuropeanaIngestionControlPanel extends
 				new ImportControlledVocabularyWidget(repositoryService,
 						resourceService, importVocabulary), RunAsyncCode
 						.runAsyncCode(ImportControlledVocabularyWidget.class));
+
 		treeModel.addMenuEntry("Importing", new CollectionManagement(
 				repositoryService, resourceService, collectionManagement),
 				RunAsyncCode.runAsyncCode(CollectionManagement.class));
