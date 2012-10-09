@@ -17,42 +17,33 @@
 package eu.europeana.dedup.utils;
 
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.List;
-
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
-import eu.europeana.corelib.definitions.jibx.HasMet;
-import eu.europeana.corelib.definitions.jibx.HasType;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
-import eu.europeana.corelib.definitions.jibx.ProxyIn;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
-import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 
 /**
- * Helper Class that checks if a received EDM record contains 
+ * Helper Class that checks if a received EDM record contains
  * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 27 Sep 2012
@@ -60,165 +51,173 @@ import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 public class Decoupler {
 
 	private static Decoupler INSTANCE;
-	
-	
+
 	/**
 	 * Private constructor, instantiate via getInstance() method
 	 */
 	private Decoupler() {
 	}
 
-	
 	/**
-	 * Stat
-	 * @return
+	 * Static initialiser method
+	 * 
+	 * @return an instance of this class
 	 */
-	public static Decoupler getInstance(){
-		
-		if(INSTANCE == null){
+	public static Decoupler getInstance() {
+		if (INSTANCE == null) {
 			INSTANCE = new Decoupler();
 		}
-		
 		return INSTANCE;
 	}
-	
+
 	
 	/**
-	 * @param edmXML
-	 * @return
+	 * Method that performs the decoupling on a given EDM xml string. 
+	 *  
+	 * @param edmXML the edm xml
+	 * @return a list of the decoupled RDF jibx objects
 	 * @throws DeduplicationException
 	 */
 	public List<RDF> decouple(String edmXML) throws DeduplicationException {
 
-		if(edmXML == null){
-			throw new DeduplicationException("Parameter null passed as an argument in Decoupler.decouple(RDF edmXML) method");
-		}		
-		
+		if (edmXML == null) {
+			throw new DeduplicationException(
+					"Parameter null passed as an argument in Decoupler.decouple(RDF edmXML) method");
+		}
+
 		IBindingFactory context;
 
-			try {
-				
-				context = BindingDirectory.getFactory(RDF.class);
-				
-				IUnmarshallingContext uctx = context.createUnmarshallingContext();
-				RDF edmOBJ = (RDF) uctx.unmarshalDocument(new StringReader(edmXML));
-			
-			
+		try {
+
+			context = BindingDirectory.getFactory(RDF.class);
+
+			IUnmarshallingContext uctx = context.createUnmarshallingContext();
+			RDF edmOBJ = (RDF) uctx.unmarshalDocument(new StringReader(edmXML));
+
 			InfoStub stub = new InfoStub(edmOBJ);
 			stub.init();
-				
-			if(stub.proxyList.size() == 1){
+
+			if (stub.proxyList.size() == 1) {
 				ArrayList<RDF> list = new ArrayList<RDF>();
 				list.add(edmOBJ);
 				return list;
-			}
-			else{
+			} else {
 				return process(stub);
 			}
-			
-			} catch (JiBXException e) {
-				
-				throw new DeduplicationException(e);
-			}
+
+		} catch (JiBXException e) {
+
+			throw new DeduplicationException(e);
+		}
 
 	}
-		
-	
-	
+
 	
 	/**
-	 * @param stub
-	 * @return
+	 * Populates a given list of RDF resources given a populated 
+	 * "stub" object
+	 * 
+	 * @param stub an object used as information holder for the decoupling operation
+	 * @return a list of RDF resources
 	 */
-	private List<RDF> process(InfoStub stub){
-		Vector<RDF> agentList = new Vector<RDF>();
-		
-		
-		for (ProxyType proxy : stub.proxyList) {
+	private List<RDF> process(InfoStub stub) {
+		Vector<RDF> edmList = new Vector<RDF>();
 
+		for (ProxyType proxy : stub.proxyList) {
 			RDF cleandoc = new RDF();
-			Choice proxyChoice = new Choice(); 
+			Choice proxyChoice = new Choice();
 			proxyChoice.setProxy(proxy);
 			cleandoc.getChoiceList().add(proxyChoice);
-			populatePrCHOs(proxy,stub,cleandoc);
-			List<Aggregation> aggregations = appendAggregations(proxy,stub,cleandoc);
-			appendWebResources(aggregations,stub,cleandoc);
-			appendContextualEntities(proxy,stub, cleandoc);
-			
-			agentList.add(cleandoc);
-
+			appendPrCHOs(proxy, stub, cleandoc);
+			List<Aggregation> aggregations = appendAggregations(proxy, stub,
+					cleandoc);
+			appendWebResources(aggregations, stub, cleandoc);
+			appendContextualEntities(proxy, stub, cleandoc);
+			edmList.add(cleandoc);
 		}
-		
-		return agentList;
-		
+		return edmList;
 	}
-	
-		
+
 	/**
-	 * @param proxy
-	 * @param stub
-	 * @return
+	 * Appends the related Aggregations to an RDF document given a specific Proxy object
+	 * 
+	 * @param proxy the proxy object
+	 * @param stub an object used as information holder for the decoupling operation
+	 * @param cleandoc a JIBX representation of a reconstructed EDM document
+	 * @return a copy of the appended Aggregations
 	 */
-	private List<Aggregation> appendAggregations(ProxyType proxy,InfoStub stub,RDF cleandoc){
+	private List<Aggregation> appendAggregations(ProxyType proxy,
+			InfoStub stub, RDF cleandoc) {
 		// Get the Aggregator References
 		List<Aggregation> foundaggregationlist = new ArrayList<Aggregation>();
-				
-			Vector<Aggregation> aglist = stub.aggregationList;
-			
-			for(Aggregation agg : aglist){
-				if (agg.getAggregatedCHO().getResource().equals(proxy.getAbout()) ){
-					foundaggregationlist.add(agg);
-					Choice aggregationChoice = new Choice();
-					aggregationChoice.setAggregation(agg);
-					cleandoc.getChoiceList().add(aggregationChoice);
-					
-					if(stub.orphanEntities.contains(agg)){
-						stub.orphanEntities.remove(agg);
-					}
-					else{
-						stub.orphanEntities.add(agg);
-					}
+
+		Vector<Aggregation> aglist = stub.aggregationList;
+
+		for (Aggregation agg : aglist) {
+			// if the edm:aggregatedCHO property value  of the Aggregation equals the rdf:about
+			// value of the Proxy then append it to the RDF document
+			if (agg.getAggregatedCHO().getResource().equals(proxy.getAbout())) {
+				foundaggregationlist.add(agg);
+				Choice aggregationChoice = new Choice();
+				aggregationChoice.setAggregation(agg);
+				cleandoc.getChoiceList().add(aggregationChoice);
+
+				if (stub.orphanEntities.contains(agg)) {
+					stub.orphanEntities.remove(agg);
+				} else {
+					stub.orphanEntities.add(agg);
 				}
 			}
-			
+		}
+
 		return foundaggregationlist;
 	}
-	
+
 	
 	/**
-	 * @param aggregations
-	 * @param stub
+	 * Appends the related Aggregations to an RDF document given a list of Aggregations
+	 * 
+	 * @param aggregations the list of Aggregations to inspect
+	 * @param stub  an object used as information holder for the decoupling operation
 	 */
-	private void appendWebResources(List<Aggregation> aggregations,InfoStub stub,RDF cleandoc){
+	private void appendWebResources(List<Aggregation> aggregations,
+			InfoStub stub, RDF cleandoc) {
 		HashSet<String> refstring = new HashSet<String>();
-		
-		for(Aggregation agg : aggregations ){
-			
-			//First try to isolate any possible resource references to WebResources
-			if(agg.getObject() != null && agg.getObject().getResource() != null){
+
+		for (Aggregation agg : aggregations) {
+
+			// First try to isolate any possible resource references to
+			// WebResources by checking all relevant Aggregation fields
+			// (edm:object,edm:isShownBy,edm:isShownAt,edm:hasViewList)
+			// and add these references to a Set
+			if (agg.getObject() != null
+					&& agg.getObject().getResource() != null) {
 				String resource = agg.getObject().getResource();
 				refstring.add(resource);
 			}
-			if(agg.getIsShownBy() != null && agg.getIsShownBy().getResource() != null){
+			if (agg.getIsShownBy() != null
+					&& agg.getIsShownBy().getResource() != null) {
 				String resource = agg.getIsShownBy().getResource();
-				if(refstring.contains(resource))
-				refstring.add(resource);
+				if (refstring.contains(resource))
+					refstring.add(resource);
 			}
-			if(agg.getHasViewList() !=null && !agg.getHasViewList().isEmpty()){
-				 List<HasView> viewlist = agg.getHasViewList();
-				
-				 for(HasView view : viewlist){
-						if(refstring.contains(view.getResource()))
-							refstring.add(view.getResource());
-				 }
-			}	
+			if (agg.getHasViewList() != null && !agg.getHasViewList().isEmpty()) {
+				List<HasView> viewlist = agg.getHasViewList();
+
+				for (HasView view : viewlist) {
+					if (refstring.contains(view.getResource()))
+						refstring.add(view.getResource());
+				}
+			}
 		}
-		
-		
+
+		//Then for all registered Web resources in the "stub" object
+		//check if their rdf:about is contained in the refstring
+		//set. In case it does then append them to the document
 		Vector<WebResourceType> wrlist = stub.webresourceList;
-		
-		for(WebResourceType wtype : wrlist){
-			if(refstring.contains(wtype.getAbout())){
+
+		for (WebResourceType wtype : wrlist) {
+			if (refstring.contains(wtype.getAbout())) {
 				Choice webresourceChoice = new Choice();
 				webresourceChoice.setWebResource(wtype);
 				cleandoc.getChoiceList().add(webresourceChoice);
@@ -226,265 +225,281 @@ public class Decoupler {
 		}
 
 	}
-	
-	
-	
+
 	/**
-	 * @param proxy
-	 * @param stub
-	 * @param cleandoc
+	 * Appends the related ContextualEntities to an RDF document given a specific Proxy object
+	 * 
+	 * @param proxy the proxy object
+	 * @param stub an object used as information holder for the decoupling operation
+	 * @param cleandoc a JIBX representation of a reconstructed EDM document
 	 */
-	private void appendContextualEntities(ProxyType proxy,InfoStub stub,RDF cleandoc){
+	private void appendContextualEntities(ProxyType proxy, InfoStub stub,
+			RDF cleandoc) {
 		HashSet<String> refset = new HashSet<String>();
-		
-		List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> dclist = proxy.getChoiceList();
-		
-		for(eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice choiceitem : dclist){
-			if(choiceitem.ifAlternative()){
+
+		//First itearate the dc & dcterms elements of the given Proxy looking for references
+		//to contextual resources. Append these references to the refset HashSet.
+		List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> dclist = proxy
+				.getChoiceList();
+
+		for (eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice choiceitem : dclist) {
+			if (choiceitem.ifAlternative()) {
 				refset.add(returnResourceFromClass(choiceitem.getAlternative()));
 			}
-			if(choiceitem.ifConformsTo()){
+			if (choiceitem.ifConformsTo()) {
 				refset.add(returnResourceFromClass(choiceitem.getConformsTo()));
 			}
-			if(choiceitem.ifContributor()){
+			if (choiceitem.ifContributor()) {
 				refset.add(returnResourceFromClass(choiceitem.getContributor()));
 			}
-			if(choiceitem.ifCoverage()){
+			if (choiceitem.ifCoverage()) {
 				refset.add(returnResourceFromClass(choiceitem.getCoverage()));
 			}
-			if(choiceitem.ifCreated()){
+			if (choiceitem.ifCreated()) {
 				refset.add(returnResourceFromClass(choiceitem.getCreated()));
 			}
-			if(choiceitem.ifCreator()){
+			if (choiceitem.ifCreator()) {
 				refset.add(returnResourceFromClass(choiceitem.getCreator()));
 			}
-			if(choiceitem.ifDate()){
+			if (choiceitem.ifDate()) {
 				refset.add(returnResourceFromClass(choiceitem.getDate()));
 			}
-			if(choiceitem.ifDescription()){
+			if (choiceitem.ifDescription()) {
 				refset.add(returnResourceFromClass(choiceitem.getDescription()));
 			}
-			if(choiceitem.ifExtent()){
+			if (choiceitem.ifExtent()) {
 				refset.add(returnResourceFromClass(choiceitem.getExtent()));
 			}
-			if(choiceitem.ifFormat()){
+			if (choiceitem.ifFormat()) {
 				refset.add(returnResourceFromClass(choiceitem.getFormat()));
 			}
-			if(choiceitem.ifHasFormat()){
+			if (choiceitem.ifHasFormat()) {
 				refset.add(returnResourceFromClass(choiceitem.getHasFormat()));
 			}
-			if(choiceitem.ifHasPart()){
+			if (choiceitem.ifHasPart()) {
 				refset.add(returnResourceFromClass(choiceitem.getHasPart()));
 			}
-			if(choiceitem.ifHasVersion()){
+			if (choiceitem.ifHasVersion()) {
 				refset.add(returnResourceFromClass(choiceitem.getHasVersion()));
 			}
-			if(choiceitem.ifIdentifier()){
+			if (choiceitem.ifIdentifier()) {
 				refset.add(returnResourceFromClass(choiceitem.getIdentifier()));
 			}
-			if(choiceitem.ifIsFormatOf()){
+			if (choiceitem.ifIsFormatOf()) {
 				refset.add(returnResourceFromClass(choiceitem.getIsFormatOf()));
 			}
-			if(choiceitem.ifIsPartOf()){
+			if (choiceitem.ifIsPartOf()) {
 				refset.add(returnResourceFromClass(choiceitem.getIsPartOf()));
 			}
-			if(choiceitem.ifIsReferencedBy()){
-				refset.add(returnResourceFromClass(choiceitem.getIsReferencedBy()));
+			if (choiceitem.ifIsReferencedBy()) {
+				refset.add(returnResourceFromClass(choiceitem
+						.getIsReferencedBy()));
 			}
-			if(choiceitem.ifIsReplacedBy()){
+			if (choiceitem.ifIsReplacedBy()) {
 				refset.add(returnResourceFromClass(choiceitem.getIsReplacedBy()));
 			}
-			if(choiceitem.ifIssued()){
+			if (choiceitem.ifIssued()) {
 				refset.add(returnResourceFromClass(choiceitem.getIssued()));
 			}
-			if(choiceitem.ifIsVersionOf()){
+			if (choiceitem.ifIsVersionOf()) {
 				refset.add(returnResourceFromClass(choiceitem.getIsVersionOf()));
 			}
-			if(choiceitem.ifLanguage()){
+			if (choiceitem.ifLanguage()) {
 				refset.add(returnResourceFromClass(choiceitem.getLanguage()));
 			}
-			if(choiceitem.ifMedium()){
+			if (choiceitem.ifMedium()) {
 				refset.add(returnResourceFromClass(choiceitem.getMedium()));
 			}
-			if(choiceitem.ifProvenance()){
+			if (choiceitem.ifProvenance()) {
 				refset.add(returnResourceFromClass(choiceitem.getProvenance()));
 			}
-			if(choiceitem.ifPublisher()){
+			if (choiceitem.ifPublisher()) {
 				refset.add(returnResourceFromClass(choiceitem.getPublisher()));
 			}
-			if(choiceitem.ifReferences()){
+			if (choiceitem.ifReferences()) {
 				refset.add(returnResourceFromClass(choiceitem.getReferences()));
 			}
-			if(choiceitem.ifRelation()){
+			if (choiceitem.ifRelation()) {
 				refset.add(returnResourceFromClass(choiceitem.getRelation()));
 			}
-			if(choiceitem.ifReplaces()){
+			if (choiceitem.ifReplaces()) {
 				refset.add(returnResourceFromClass(choiceitem.getReplaces()));
 			}
-			if(choiceitem.ifRequires()){
+			if (choiceitem.ifRequires()) {
 				refset.add(returnResourceFromClass(choiceitem.getRequires()));
 			}
-			if(choiceitem.ifRights()){
+			if (choiceitem.ifRights()) {
 				refset.add(returnResourceFromClass(choiceitem.getRights()));
 			}
-			if(choiceitem.ifSpatial()){
+			if (choiceitem.ifSpatial()) {
 				refset.add(returnResourceFromClass(choiceitem.getSpatial()));
 			}
-			if(choiceitem.ifSubject()){
+			if (choiceitem.ifSubject()) {
 				refset.add(returnResourceFromClass(choiceitem.getSubject()));
 			}
-			if(choiceitem.ifSource()){
+			if (choiceitem.ifSource()) {
 				refset.add(returnResourceFromClass(choiceitem.getSource()));
 			}
-			if(choiceitem.ifTableOfContents()){
-				refset.add(returnResourceFromClass(choiceitem.getTableOfContents()));
+			if (choiceitem.ifTableOfContents()) {
+				refset.add(returnResourceFromClass(choiceitem
+						.getTableOfContents()));
 			}
-			if(choiceitem.ifTemporal()){
+			if (choiceitem.ifTemporal()) {
 				refset.add(returnResourceFromClass(choiceitem.getTemporal()));
 			}
-			if(choiceitem.ifTitle()){
+			if (choiceitem.ifTitle()) {
 				refset.add(returnResourceFromClass(choiceitem.getTitle()));
 			}
-			if(choiceitem.ifType()){
+			if (choiceitem.ifType()) {
 				refset.add(returnResourceFromClass(choiceitem.getType()));
 			}
 		}
-		
-		 
+
+		//Do the same for the remaining EDM elements in the Proxy
 		refset.add(returnResourceFromClass(proxy.getCurrentLocation()));
 
 		refset.addAll(returnResourceFromList(proxy.getHasTypeList()));
-		
+
 		refset.addAll(returnResourceFromList(proxy.getIncorporateList()));
-		
+
 		refset.addAll(returnResourceFromList(proxy.getIsDerivativeOfList()));
 
 		refset.add(returnResourceFromClass(proxy.getIsNextInSequence()));
-		 
+
 		refset.addAll(returnResourceFromList(proxy.getIsRelatedToList()));
-		
+
 		refset.addAll(returnResourceFromList(proxy.getIsRelatedToList()));
-		
+
 		refset.add(returnResourceFromClass(proxy.getIsRepresentationOf()));
-		
+
 		refset.addAll(returnResourceFromList(proxy.getIsSimilarToList()));
 
 		refset.addAll(returnResourceFromList(proxy.getIsSuccessorOfList()));
-		
-		refset.addAll(returnResourceFromList(proxy.getRealizeList()));	
-		
-		
-		populateContextualEntities(refset,stub,cleandoc);
+
+		refset.addAll(returnResourceFromList(proxy.getRealizeList()));
+
+		//Populate the contextualEntities given the references located in refset
+		populateContextualEntities(refset, stub, cleandoc);
 
 	}
-	
-	
+
 	/**
-	 * @param proxy
-	 * @param stub
-	 * @param cleandoc
+	 * Appends the related Povided CHOS to an RDF document given a specific Proxy object
+	 * 
+	 * @param proxy the proxy object
+	 * @param stub an object used as information holder for the decoupling operation
+	 * @param cleandoc a JIBX representation of a reconstructed EDM document
 	 */
-	private void populatePrCHOs(ProxyType proxy,InfoStub stub,RDF cleandoc){
-		
+	private void appendPrCHOs(ProxyType proxy, InfoStub stub, RDF cleandoc) {
+
 		Vector<ProvidedCHOType> cholist = stub.prchoList;
-		
+
 		String id = proxy.getAbout();
-		for(ProvidedCHOType cho : cholist){
-			if(id.equals(cho.getAbout())){
+		for (ProvidedCHOType cho : cholist) {
+			if (id.equals(cho.getAbout())) {
 				Choice choice = new Choice();
 				choice.setProvidedCHO(cho);
 				cleandoc.getChoiceList().add(choice);
 			}
 		}
-		
+
 	}
-	
-	
-	
+
 	/**
-	 * @param refset
-	 * @param stub
-	 * @param cleandoc
+	 * Appends the related ContextualEntities to an RDF document given a specific Set of references
+	 * to contextual entities.
+	 * 
+	 * @param refset a set of references to resources
+	 * @param stub an object used as information holder for the decoupling operation
+	 * @param cleandoc a JIBX representation of a reconstructed EDM document
 	 */
-	private void populateContextualEntities(Set<String> refset,InfoStub stub,RDF cleandoc){
-		
+	private void populateContextualEntities(Set<String> refset, InfoStub stub,
+			RDF cleandoc) {
+
+		//Check all contextual entities stored in the "stub" object and for each one of
+		//them check if they are present in the refset.
 		Vector<AgentType> agentlist = stub.agentList;
 		Vector<PlaceType> placelist = stub.placeList;
 		Vector<TimeSpanType> timelist = stub.timeList;
 		Vector<Concept> conceptlist = stub.conceptList;
-		
-		for(AgentType agtype : agentlist){
-			if(refset.contains(agtype.getAbout())){
+
+		for (AgentType agtype : agentlist) {
+			if (refset.contains(agtype.getAbout())) {
 				Choice choice = new Choice();
 				choice.setAgent(agtype);
 				cleandoc.getChoiceList().add(choice);
 			}
 		}
-		
-		for(PlaceType type : placelist){
-			if(refset.contains(type.getAbout())){
+
+		for (PlaceType type : placelist) {
+			if (refset.contains(type.getAbout())) {
 				Choice choice = new Choice();
 				choice.setPlace(type);
 				cleandoc.getChoiceList().add(choice);
 			}
 		}
-		
-		for(TimeSpanType type : timelist){
-			if(refset.contains(type.getAbout())){
+
+		for (TimeSpanType type : timelist) {
+			if (refset.contains(type.getAbout())) {
 				Choice choice = new Choice();
 				choice.setTimeSpan(type);
 				cleandoc.getChoiceList().add(choice);
 			}
 		}
-		
-		for(Concept type : conceptlist){
-			if(refset.contains(type.getAbout())){
+
+		for (Concept type : conceptlist) {
+			if (refset.contains(type.getAbout())) {
 				Choice choice = new Choice();
 				choice.setConcept(type);
 				cleandoc.getChoiceList().add(choice);
 			}
 		}
 	}
-	
+
 	
 	/**
-	 * @param list
+	 * Invokes the getResource method on a list of objects via reflection
+	 * 
+	 * @param list the list of objects where the operation needs to be applied
 	 * @return
 	 */
-	private <T> List<String> returnResourceFromList(List<T> list){
-		
-		if (list == null) return new ArrayList<String>();
-		
+	private <T> List<String> returnResourceFromList(List<T> list) {
+
+		if (list == null)
+			return new ArrayList<String>();
+
 		ArrayList<String> returnList = new ArrayList<String>();
-		
-		for(T object: list){
+
+		for (T object : list) {
 			String resource = returnResourceFromClass(object);
-			if(resource != null){
+			if (resource != null) {
 				returnList.add(resource);
 			}
 		}
-		
+
 		return returnList;
 	}
-	
+
 	
 	/**
+	 * Invokes the getResource method on an object via reflection
 	 * @param object
 	 * @return
 	 */
-	private <T> String returnResourceFromClass(T object){
-		
-		if(object == null) return null;
-		
+	private <T> String returnResourceFromClass(T object) {
+
+		if (object == null)
+			return null;
+
 		Method[] methods = object.getClass().getMethods();
-		
-		for(int i = 0; i <methods.length; i++){
-			
-			if(methods[i].getName().equals("getResource")){
-				
+
+		for (int i = 0; i < methods.length; i++) {
+
+			if (methods[i].getName().equals("getResource")) {
+
 				try {
 					String resource = (String) methods[i].invoke(object);
-					
+
 					return resource;
 				} catch (IllegalArgumentException e) {
 
@@ -494,24 +509,25 @@ public class Decoupler {
 
 				}
 			}
-			
+
 		}
 
 		return null;
-		
+
 	}
 
-	
-	
 	/**
-	 *
+	 * Inner Class that creates a "registry" of all the EDM entities contained in the
+	 * current decoupling process.
+	 * 
 	 * @author Georgios Markakis <gwarkx@hotmail.com>
 	 * @since 1 Oct 2012
 	 */
 	private class InfoStub {
 
-		
+		//A Set of orphan entities
 		HashSet<Object> orphanEntities = new HashSet<Object>();
+		//The original 
 		RDF edmXML;
 		Vector<ProvidedCHOType> prchoList = new Vector<ProvidedCHOType>();
 		Vector<ProxyType> proxyList = new Vector<ProxyType>();
@@ -523,10 +539,17 @@ public class Decoupler {
 		Vector<TimeSpanType> timeList = new Vector<TimeSpanType>();
 		Vector<WebResourceType> webresourceList = new Vector<WebResourceType>();
 
+		/**
+		 * Default constructor
+		 * @param edmXML
+		 */
 		public InfoStub(RDF edmXML) {
 			this.edmXML = edmXML;
 		}
 
+		/**
+		 * Initialize the object by appending all elements in the given  
+		 */
 		public void init() {
 			List<Choice> chlist = edmXML.getChoiceList();
 
@@ -571,9 +594,6 @@ public class Decoupler {
 				}
 
 			}
-			
-			
-
 
 		}
 
