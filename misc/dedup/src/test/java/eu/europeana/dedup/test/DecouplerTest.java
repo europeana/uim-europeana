@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.apache.commons.io.FileUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -55,6 +57,7 @@ public class DecouplerTest {
 		
 		List<RDF> entitylist = Decoupler.getInstance().decouple(rdf);
 		
+		Assert.assertEquals("", 6, entitylist.size());
 		
 	}
 	

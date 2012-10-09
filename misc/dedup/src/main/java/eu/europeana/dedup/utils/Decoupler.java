@@ -52,6 +52,7 @@ import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 
 /**
+ * Helper Class that checks if a received EDM record contains 
  * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 27 Sep 2012
@@ -62,14 +63,14 @@ public class Decoupler {
 	
 	
 	/**
-	 * 
+	 * Private constructor, instantiate via getInstance() method
 	 */
 	private Decoupler() {
-		// TODO Auto-generated constructor stub
 	}
 
 	
 	/**
+	 * Stat
 	 * @return
 	 */
 	public static Decoupler getInstance(){
@@ -139,6 +140,7 @@ public class Decoupler {
 			Choice proxyChoice = new Choice(); 
 			proxyChoice.setProxy(proxy);
 			cleandoc.getChoiceList().add(proxyChoice);
+			populatePrCHOs(proxy,stub,cleandoc);
 			List<Aggregation> aggregations = appendAggregations(proxy,stub,cleandoc);
 			appendWebResources(aggregations,stub,cleandoc);
 			appendContextualEntities(proxy,stub, cleandoc);
@@ -151,7 +153,7 @@ public class Decoupler {
 		
 	}
 	
-	
+		
 	/**
 	 * @param proxy
 	 * @param stub
@@ -159,10 +161,8 @@ public class Decoupler {
 	 */
 	private List<Aggregation> appendAggregations(ProxyType proxy,InfoStub stub,RDF cleandoc){
 		// Get the Aggregator References
-		List<ProxyIn> list = proxy.getProxyInList();
 		List<Aggregation> foundaggregationlist = new ArrayList<Aggregation>();
-		
-			
+				
 			Vector<Aggregation> aglist = stub.aggregationList;
 			
 			for(Aggregation agg : aglist){
@@ -181,8 +181,6 @@ public class Decoupler {
 				}
 			}
 			
-
-
 		return foundaggregationlist;
 	}
 	
@@ -379,6 +377,28 @@ public class Decoupler {
 		populateContextualEntities(refset,stub,cleandoc);
 
 	}
+	
+	
+	/**
+	 * @param proxy
+	 * @param stub
+	 * @param cleandoc
+	 */
+	private void populatePrCHOs(ProxyType proxy,InfoStub stub,RDF cleandoc){
+		
+		Vector<ProvidedCHOType> cholist = stub.prchoList;
+		
+		String id = proxy.getAbout();
+		for(ProvidedCHOType cho : cholist){
+			if(id.equals(cho.getAbout())){
+				Choice choice = new Choice();
+				choice.setProvidedCHO(cho);
+				cleandoc.getChoiceList().add(choice);
+			}
+		}
+		
+	}
+	
 	
 	
 	/**
