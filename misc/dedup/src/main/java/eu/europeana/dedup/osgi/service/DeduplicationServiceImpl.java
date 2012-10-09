@@ -29,6 +29,8 @@ import org.jibx.runtime.JiBXException;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+
+import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
@@ -55,7 +57,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	EuropeanaIdRegistryMongoServer mongoserver;
 
 	/**
-	 * 
+	 * Default Constructor
 	 */
 	public DeduplicationServiceImpl() {
 
@@ -112,6 +114,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 		for (RDF result : decoupledResults) {
 
 			DeduplicationResult dedupres = new DeduplicationResult();
+
 			try {
 				dedupres.setEdm(unmarshall(result));
 			} catch (JiBXException e) {
@@ -120,27 +123,77 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 			}
 
 			List<Choice> choicelist = result.getChoiceList();
-
+			
 			String nonUUID = null;
+			
+			for(Choice choice : choicelist){
+				if(choice.ifProxy()){
+					ProxyType proxy = choice.getProxy();					
 
-			for (Choice choice : choicelist) {
-				if (choice.ifProxy()) {
-					ProxyType proxy = choice.getProxy();
 					nonUUID = proxy.getAbout();
 					break;
 				}
 			}
 
-			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
-					collectionID, edmRecord, sessionid);
+			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID, collectionID, edmRecord, sessionid);
+			
+			updateInternalReferences(result,lookup.getEuropeanaID());
+			
+			try {
+				dedupres.setEdm(unmarshall(result));
+			} catch (JiBXException e) {
+				throw new DeduplicationException("Unmarshalling of new deduplicated record failed",e);
+			}
+			
 			dedupres.setLookupresult(lookup);
+
 			dedupres.setDerivedRecordID(lookup.getEuropeanaID());
+			
 			deduplist.add(dedupres);
 		}
 
 		return deduplist;
-	}
 
+	}	
+	
+	
+	
+	/**
+	 * Updates europeanaID references in the provided EDM JIBX representation
+	 * 
+	 * @param edm
+	 * @param newID
+	 */
+	private void updateInternalReferences(RDF edm,String newID){
+		List<Choice> choicelist = edm.getChoiceList();
+		
+		for(Choice choice : choicelist){
+			if(choice.ifProxy()){
+				choice.getProxy().setAbout(newID);					
+			}
+			
+			if(choice.ifAggregation()){
+				Aggregation aggregation = choice.getAggregation();
+				
+				aggregation.getAggregatedCHO().setResource(newID);
+			}
+			if(choice.ifProvidedCHO()){
+				choice.getProvidedCHO().setAbout(newID);
+			}
+			
+		}
+		
+		
+	}
+	
+	
+
+
+	/**
+	 * @param edm
+	 * @return
+	 * @throws JiBXException
+	 */
 	private String unmarshall(RDF edm) throws JiBXException {
 
 		IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
@@ -150,11 +203,15 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 		mctx.setOutput(stringWriter);
 		mctx.marshalDocument(edm);
 		String edmstring = stringWriter.toString();
+	
+	return edmstring;
+}
 
-		return edmstring;
 
-	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#getFailedRecords(java.lang.String)
+	 */
 	@Override
 	public List<FailedRecord> getFailedRecords(String collectionId) {
 		return mongoserver.getDatastore().find(FailedRecord.class)
