@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features name="uim-features">
 
-
-
     <feature name="uim-core-dev" version="1.3.1-SNAPSHOT">
         <bundle>mvn:eu.europeana/europeana-uim-common/1.3.1-SNAPSHOT</bundle>
         <bundle>mvn:eu.europeana/europeana-uim-api/1.3.1-SNAPSHOT</bundle>
@@ -15,10 +13,10 @@
          -->
                  <!-- Uncomment this if you want to use memory logging engine instead (for debugging purposes) 
         <bundle>mvn:eu.europeana/europeana-uim-logging-database/1.3.1-SNAPSHOT</bundle>
-                -->
+        -->
          
-        <bundle>mvn:eu.europeana/europeana-uim-logging-memory/1.3.1-SNAPSHOT</bundle>
-
+	<bundle>mvn:eu.europeana/europeana-uim-logging-memory/1.3.1-SNAPSHOT</bundle>
+        
     </feature>
 
 
@@ -53,7 +51,9 @@
     </feature>   
     
    <feature name="uim-europeana-complete" version="1.3.1.SNAPSHOT">
-        <feature version="3.0.5.RELEASE">spring</feature>
+        <feature version="2.1.0.RELEASE">spring-ws</feature>
+		<feature version="1.6.2">spring-quartz</feature>
+		<feature version="1.2.1">spring-dm</feature>
         <feature version="2.2.0">war</feature>
         <feature version="1.3.1-SNAPSHOT">uim-core-dev</feature>
         <feature version="1.3.1-SNAPSHOT">uim-europeana-definitions</feature>  
