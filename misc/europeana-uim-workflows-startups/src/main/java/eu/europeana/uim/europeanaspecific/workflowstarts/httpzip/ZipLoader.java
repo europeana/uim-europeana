@@ -135,14 +135,18 @@ public class ZipLoader {
 
 			try {
 
-				// First Check the record for duplicates 
+				// First Check the record for duplicates.
 			    List<DeduplicationResult> reslist =  dedup.deduplicateRecord((String) request.getCollection().getMnemonic()
 							,(String) request.getId(), rdfstring);
-			    
+
 			    for(DeduplicationResult dedupres : reslist){
 
 				MetaDataRecord<I> mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
 
+				//request.getCollection().
+				//storage.getMetaDataRecords(ids);
+				
+				
 				if (mdr == null) {
 					mdr = storage.createMetaDataRecord(request.getCollection(),
 							dedupres.getDerivedRecordID());
@@ -154,8 +158,11 @@ public class ZipLoader {
 					mdr.deleteValues(EuropeanaModelRegistry.EDMRECORD);
 					//Remove the previous registered links
 					mdr.deleteValues(EuropeanaModelRegistry.EUROPEANALINK);
+					
+					
 				}
-
+				
+				
 				mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
 						new Date().toString());
 				
@@ -202,13 +209,6 @@ public class ZipLoader {
 			StringReader reader = new StringReader(edm);
 			
 			RDF rdf = (RDF) mctx.unmarshalDocument(reader, "UTF-8");
-			
-			//mctx.setIndent(2);
-			//StringWriter stringWriter = new StringWriter();
-			//mctx.setOutput(stringWriter);
-			//mctx.marshalDocument(edm);
-			//String edmstring = stringWriter.toString();
-
 		
 		return rdf;
 		

@@ -56,6 +56,9 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
+	
+	/** Property which defines whether the records collection should be  */
+	public static final String purgecollection = "http.overwrite.zip.purgable";
 
 	/**
 	 * The parameters used by this WorkflowStart
@@ -64,6 +67,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 		private static final long serialVersionUID = 1L;
 		{
 			add(httpzipurl);
+			add(purgecollection);
 		}
 	};
 
@@ -222,6 +226,10 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 			URL url = null;
 			String httpzipurlprop = context.getProperties().getProperty(
 					httpzipurl);
+			
+			String should_be_purged = context.getProperties().getProperty(
+					purgecollection);
+			
 
 			try {
 
