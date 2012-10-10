@@ -45,7 +45,7 @@ public class InitialIngestionWorkflow extends AbstractWorkflow{
 
         setStart(new HttpZipWorkflowStart("HttpZipWorkflowStart","Downloads zipped EDM file",service));
 
-        addStep(new SysoutPlugin());
+        addStep(new DummyPlugin());
 	}
 
 	
