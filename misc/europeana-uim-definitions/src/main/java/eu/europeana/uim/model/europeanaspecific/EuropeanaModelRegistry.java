@@ -30,28 +30,30 @@ import eu.europeana.uim.common.TKey;
  */
 public final class EuropeanaModelRegistry {
 
-    /** The key for all sorts of concepts.
-     */
-    public static final TKey<EuropeanaModelRegistry, String>  UNCLASSIFIED  = TKey.register(
-    		                                                                 EuropeanaModelRegistry.class,
-                                                                             "unclassified",
-                                                                             String.class);
-    /** The key for a full EDM Record representation
-     */
-    public static final TKey<EuropeanaModelRegistry, String>  EDMRECORD  = TKey.register(
-    		                                                                 EuropeanaModelRegistry.class,
-                                                                             "edmrecord",
-                                                                             String.class);
-    
-    /** The key for a full EDM Record representation
-     */
-    public static final TKey<EuropeanaModelRegistry, String>  UIMINGESTIONDATE  = TKey.register(
-    		                                                                 EuropeanaModelRegistry.class,
-                                                                             "uimingestiondate",
-                                                                             String.class);
-    
+	/**
+	 * The key for all sorts of concepts.
+	 */
+	public static final TKey<EuropeanaModelRegistry, String> UNCLASSIFIED = TKey
+			.register(EuropeanaModelRegistry.class, "unclassified",
+					String.class);
+	/**
+	 * The key for a full EDM Record representation
+	 */
+	public static final TKey<EuropeanaModelRegistry, String> EDMRECORD = TKey
+			.register(EuropeanaModelRegistry.class, "edmrecord", String.class);
 
-    
-    
-	
+	/**
+	 * The key for a full EDM Record representation
+	 */
+	public static final TKey<EuropeanaModelRegistry, String> UIMINGESTIONDATE = TKey
+			.register(EuropeanaModelRegistry.class, "uimingestiondate",
+					String.class);
+
+	/**
+	 * The key for a dereferenced EDM Record
+	 */
+	public static final TKey<EuropeanaModelRegistry, String> EDMDEREFERENCEDRECORD = TKey
+			.register(EuropeanaModelRegistry.class, "edmdereferencedrecord",
+					String.class);
+
 }
