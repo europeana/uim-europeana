@@ -129,6 +129,7 @@
 							eu.europeana.uim.*,
 							eu.europeana.uim.workflow,
 							eu.europeana.uim.api,
+							eu.europeana.dedup.osgi.service.*,
 							org.apache.solr.*,
 							org.osgi.framework,
 							org.w3c.dom,
@@ -222,21 +223,25 @@
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>europeana-uim-dedup</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-uim-plugin-repox</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<scope>provided</scope>
-		</dependency>
+         <dependency>
+         	<groupId>${project.groupId}</groupId>
+         	<artifactId>europeana-uim-plugin-solrosgi</artifactId>
+         	<version>${project.version}</version>
+         </dependency>
 
 		<dependency>
 			<groupId>eu.europeana</groupId>
