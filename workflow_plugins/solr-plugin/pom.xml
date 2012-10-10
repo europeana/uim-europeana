@@ -17,12 +17,6 @@
 		<!-- JUnit dependencies -->
 
 		<dependency>
-			<groupId>${europeana.uim.groupId}</groupId>
-			<artifactId>europeana-uim-plugin-solr3</artifactId>
-			<version>${europeana.uim.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
@@ -50,6 +44,7 @@
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
+<!-- 			<version>0.99.1-SNAPSHOT</version> -->
 			<version>0.99</version>
 			<scope>compile</scope>
 		</dependency>
