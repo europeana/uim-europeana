@@ -52,10 +52,15 @@ public class FailedRecordServiceImpl extends IntegrationServicesProviderServlet
 						failedRecordDTO
 								.setLookupState("The record was encountered twice");
 					} else if (failedRecord.getLookupState().equals(
-							LookupState.DUPLICATE_ACROSS_COLLECTIONS)) {
+							LookupState.DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS)) {
 						failedRecordDTO
 								.setLookupState("The Europeana Identifier of the record was encountered twice for different records among split datasets");
-					} else {
+					} 
+					else if (failedRecord.getLookupState().equals(
+							LookupState.DUPLICATE_RECORD_ACROSS_COLLECTIONS)) {
+						failedRecordDTO
+								.setLookupState("The record was encountered twice for different records among split datasets");
+					}else {
 						failedRecordDTO
 								.setLookupState("The Europeana Identifier of the record was encountered twice for different records in the same dataset");
 					}

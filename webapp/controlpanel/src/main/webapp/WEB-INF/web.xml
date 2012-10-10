@@ -60,10 +60,17 @@
         <servlet-name>mongoImageViewServlet</servlet-name>
         <servlet-class>eu.europeana.uim.gui.cp.server.MongoImageViewServlet</servlet-class>
     </servlet>
-	
+	<servlet>
+		<servlet-name>failedRecordsService</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.FailedRecordServiceImpl</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>logFileService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/logfile</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>failedRecordsService</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/failedrecords</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>repositoryService</servlet-name>

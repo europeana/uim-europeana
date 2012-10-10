@@ -73,6 +73,8 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 								"EuropeanaIdRegistry");
 
 						boolean test = mongoserver.oldIdExists("something");
+						boolean test2 = mongoserver.getDatastore().find(FailedRecord.class)
+								.filter("collectionId", "test").asList()!=null;
 						log.log(java.util.logging.Level.INFO, "OK");
 						status = STATUS_INITIALIZED;
 					} catch (Throwable t) {
@@ -135,7 +137,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 				}
 			}
 
-			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID, collectionID, edmRecord, sessionid);
+			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID, collectionID, dedupres.getEdm(), sessionid);
 			
 			updateInternalReferences(result,lookup.getEuropeanaID());
 			

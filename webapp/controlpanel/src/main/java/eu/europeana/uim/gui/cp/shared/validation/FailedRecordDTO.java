@@ -1,6 +1,7 @@
 package eu.europeana.uim.gui.cp.shared.validation;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.google.gwt.view.client.ProvidesKey;
 
 public class FailedRecordDTO implements IsSerializable{
 
@@ -29,6 +30,16 @@ public class FailedRecordDTO implements IsSerializable{
 	 */
 	private String edm;
 
+    public static final ProvidesKey<FailedRecordDTO> KEY_PROVIDER = new ProvidesKey<FailedRecordDTO>() {
+        @Override
+        public Object getKey(
+                FailedRecordDTO item) {
+            return item == null
+                    ? null
+                    : item.getOriginalId();
+        }
+    }; 
+    
 	public String getEuropeanaId() {
 		return europeanaId;
 	}

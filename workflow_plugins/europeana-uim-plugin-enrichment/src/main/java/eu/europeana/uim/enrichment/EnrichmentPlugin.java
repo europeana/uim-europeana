@@ -323,6 +323,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
 						} else {
+							if(field.getValues()!=null){
 							for (Entry<String, List<String>> entry : field
 									.getValues().entrySet()) {
 								for (String str : entry.getValue()) {
@@ -330,6 +331,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 											field.getName(), str, "_@xml:lang",
 											entry.getKey());
 								}
+							}
 							}
 						}
 
@@ -409,6 +411,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
 						} else {
+							if (field.getValues()!=null){
 							for (Entry<String, List<String>> entry : field
 									.getValues().entrySet()) {
 								for (String str : entry.getValue()) {
@@ -416,6 +419,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 											field.getName(), str, "_@xml:lang",
 											entry.getKey());
 								}
+							}
 							}
 						}
 

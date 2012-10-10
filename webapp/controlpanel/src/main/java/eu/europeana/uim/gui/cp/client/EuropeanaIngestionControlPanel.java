@@ -97,7 +97,7 @@ public class EuropeanaIngestionControlPanel extends
 				repositoryService, retrievalService), RunAsyncCode
 				.runAsyncCode(LinkValidationWidget.class));
 		treeModel.addMenuEntry("Validation", new FailedRecordsWidget(
-				"Failed Records Report", "Failed Records Report",
+				"Failed Records Report", "This page allows you to preview the duplicate records that have not been ingested",
 				repositoryService, failedRecordService), RunAsyncCode
 				.runAsyncCode(FailedRecordsWidget.class));
 
