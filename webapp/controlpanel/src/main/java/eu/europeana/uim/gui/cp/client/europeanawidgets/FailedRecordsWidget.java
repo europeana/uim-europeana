@@ -24,8 +24,10 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.RangeChangeEvent;
@@ -318,10 +320,12 @@ public class FailedRecordsWidget extends IngestionWidget {
 								updateBox.setAnimationEnabled(true);
 								updateBox.setGlassEnabled(true);
 								updateBox.center();
+								 VerticalPanel dialogContents = new VerticalPanel();
+								 updateBox.add(dialogContents);
 								final TextArea xml = new TextArea();
 								xml.setCharacterWidth(100);
 								xml.setVisibleLines(20);
-								updateBox.add(xml);
+								dialogContents.add(xml);
 								xml.setText(record.getEdm());
 								final Button close = new Button("Close");
 								close.addClickHandler(new ClickHandler() {
@@ -332,7 +336,8 @@ public class FailedRecordsWidget extends IngestionWidget {
 										
 									}
 								});
-								updateBox.add(close);
+								dialogContents.add(close);
+								dialogContents.setCellHorizontalAlignment(close, HasHorizontalAlignment.ALIGN_RIGHT);
 								updateBox.show();
 							}
 						})) {
