@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.jibx.runtime.BindingDirectory;
@@ -215,9 +216,22 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#getFailedRecords(java.lang.String)
 	 */
 	@Override
-	public List<FailedRecord> getFailedRecords(String collectionId) {
-		return mongoserver.getDatastore().find(FailedRecord.class)
-				.filter("collectionId", collectionId).asList();
+	public List<Map<String,String>> getFailedRecords(String collectionId) {
+		
+		List<Map<String,String>> list = new ArrayList<Map<String,String>>();
+		ExtendedBlockingInitializer initializer = new ExtendedBlockingInitializer(collectionId,list) {
+			
+			@Override
+			protected void initializeInternal() {
+				list = mongoserver.getFailedRecords(str);
+				System.out.println(list.size());
+			}
+		};
+		 initializer.initialize(EuropeanaIdRegistryMongoServer.class
+					.getClassLoader());
+		 
+		 return initializer.getList();
 	}
 
+	
 }

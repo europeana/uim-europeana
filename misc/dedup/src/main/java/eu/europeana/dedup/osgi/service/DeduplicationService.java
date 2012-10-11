@@ -17,8 +17,8 @@
 package eu.europeana.dedup.osgi.service;
 
 import java.util.List;
+import java.util.Map;
 
-import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 
 /**
@@ -38,5 +38,5 @@ public interface DeduplicationService {
 	 */
 	public List<DeduplicationResult> deduplicateRecord(String collectionID,String sessionid, String edmRecord) throws DeduplicationException;
 	
-	public List<FailedRecord> getFailedRecords(String collectionId);
+	public List<Map<String,String>> getFailedRecords(String collectionId);
 }
