@@ -2,6 +2,9 @@ package eu.europeana.uim.gui.cp.server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.mongodb.MongoException;
 
@@ -27,7 +30,7 @@ public class FailedRecordServiceImpl extends IntegrationServicesProviderServlet
 		FailedRecordResultDTO result = null;
 		try {
 
-			List<FailedRecord> failedResults = engine.getDedupService()
+			List<Map<String,String>> failedResults = engine.getDedupService()
 					.getFailedRecords(collectionId);
 
 			int max = maxSize;
@@ -38,26 +41,26 @@ public class FailedRecordServiceImpl extends IntegrationServicesProviderServlet
 
 			if (max > 0) {
 				List<FailedRecordDTO> failedRecordDTOList = new ArrayList<FailedRecordDTO>();
-				for (FailedRecord failedRecord : failedResults.subList(offset,
+				for (Map<String,String> failedRecord : failedResults.subList(offset,
 						max)) {
 					FailedRecordDTO failedRecordDTO = new FailedRecordDTO();
 					failedRecordDTO.setCollectionId(failedRecord
-							.getCollectionId());
+							.get("collectionId"));
 					failedRecordDTO.setEuropeanaId(failedRecord
-							.getEuropeanaId());
-					failedRecordDTO.setOriginalId(failedRecord.getOriginalId());
-					failedRecordDTO.setEdm(failedRecord.getXml());
-					if (failedRecord.getLookupState().equals(
-							LookupState.IDENTICAL)) {
+							.get("europeanaId"));
+					failedRecordDTO.setOriginalId(failedRecord.get("originalId"));
+					failedRecordDTO.setEdm(failedRecord.get("edm"));
+					if (StringUtils.equals(failedRecord.get("lookupState"),
+							LookupState.IDENTICAL.toString())) {
 						failedRecordDTO
 								.setLookupState("The record was encountered twice");
-					} else if (failedRecord.getLookupState().equals(
-							LookupState.DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS)) {
+					} else if (StringUtils.equals(failedRecord.get("lookupState"),
+							LookupState.DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS.toString())) {
 						failedRecordDTO
 								.setLookupState("The Europeana Identifier of the record was encountered twice for different records among split datasets");
 					} 
-					else if (failedRecord.getLookupState().equals(
-							LookupState.DUPLICATE_RECORD_ACROSS_COLLECTIONS)) {
+					else if (StringUtils.equals(failedRecord.get("lookupState"),
+							LookupState.DUPLICATE_RECORD_ACROSS_COLLECTIONS.toString())) {
 						failedRecordDTO
 								.setLookupState("The record was encountered twice for different records among split datasets");
 					}else {

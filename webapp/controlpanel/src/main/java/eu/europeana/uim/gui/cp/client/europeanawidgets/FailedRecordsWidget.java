@@ -14,7 +14,6 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -28,11 +27,8 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.RangeChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SingleSelectionModel;
 
 import eu.europeana.uim.gui.cp.client.IngestionWidget;
 import eu.europeana.uim.gui.cp.client.services.FailedRecordServiceAsync;
@@ -41,7 +37,6 @@ import eu.europeana.uim.gui.cp.shared.CollectionDTO;
 import eu.europeana.uim.gui.cp.shared.ProviderDTO;
 import eu.europeana.uim.gui.cp.shared.validation.FailedRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.FailedRecordResultDTO;
-import eu.europeana.uim.gui.cp.shared.validation.MetaDataRecordDTO;
 
 public class FailedRecordsWidget extends IngestionWidget {
 
@@ -374,7 +369,6 @@ public class FailedRecordsWidget extends IngestionWidget {
 				new AsyncCallback<FailedRecordResultDTO>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Window.alert(caught.getMessage());
 						caught.printStackTrace();
 					}
 
@@ -382,11 +376,8 @@ public class FailedRecordsWidget extends IngestionWidget {
 					public void onSuccess(FailedRecordResultDTO result) {
 						records.clear();
 						cellTable.setRowCount(result.getNumberRecords());
-						Window.alert("adding row counts");
 						records.addAll(result.getRecords());
-						Window.alert("adding records");
 						cellTable.setRowData(offset, records);
-						Window.alert("setting row data");
 					}
 				});
 
