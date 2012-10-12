@@ -386,7 +386,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		EdmRecordDTO record = new EdmRecordDTO();
 		try {
 			
-			String query = "europeana_id:" + escapeChars(recordId);
+			String query = "europeana_id:" + recordId;
 			SolrQuery solrQuery = new SolrQuery().setQuery(query);
 
 			QueryResponse response = solrServer.query(solrQuery);
@@ -401,14 +401,6 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 			e.printStackTrace();
 		} 
 		return record;
-	}
-
-	@Deprecated
-	private String escapeChars(String recordId) {
-		recordId = StringUtils.replace(recordId, "/", "\\/");
-		recordId = StringUtils.replace(recordId, ":", "\\:");
-		recordId = StringUtils.replace(recordId, "#", "\\#");
-		return recordId;
 	}
 
 	private EdmFieldRecordDTO createMongoFiels(FullBeanImpl fullBean) {
