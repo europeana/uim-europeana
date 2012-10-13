@@ -25,20 +25,21 @@ import org.im4java.process.ProcessExecutor;
 import org.im4java.process.ProcessStarter;
 
 /**
-* Image Magick specific functionality used by the Thumbler plugin
-* 
-* @author Georgios Markakis <gwarkx@hotmail.com>
-* @since 12 Apr 2012
-*/
+ * Image Magick specific functionality used by the Thumbler plugin
+ * 
+ * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @since 12 Apr 2012
+ */
 
 public final class ImageMagickUtils {
 
 	private final static ProcessExecutor exec;
-	
-	//Static initialisation block used to initialise the exact location
-	//of the ImageMagick binaries invoked by Img4J.
-	static{
-		String myPath="C:\\Program Files\\ImageMagick-6.7.7-Q16\\;C:\\Software\\exiftool\\";
+
+	// Static initialisation block used to initialise the exact location
+	// of the ImageMagick binaries invoked by Img4J.
+	static {
+		String myPath = PropertyReader
+				.getProperty(UimConfigurationProperty.IMAGEMAGICK_PATH);
 		ProcessStarter.setGlobalSearchPath(myPath);
 		exec = new ProcessExecutor();
 	}
@@ -46,41 +47,39 @@ public final class ImageMagickUtils {
 	/**
 	 * Private Constructor, no instantiation allowed
 	 */
-	private ImageMagickUtils(){
-		
+	private ImageMagickUtils() {
+
 	}
-	
-	
-	
+
 	/**
-	 * Converts a given File object, which represents a downloaded
-	 * file from the linkchecking process (that can be a GIF,a TIFF
-	 * or a PDF file) into a JPEG file and returns it.
+	 * Converts a given File object, which represents a downloaded file from the
+	 * linkchecking process (that can be a GIF,a TIFF or a PDF file) into a JPEG
+	 * file and returns it.
 	 * 
 	 * @param img
 	 */
-	public static File convert(File img0){
+	public static File convert(File img0) {
 		ConvertCmd convert = new ConvertCmd();
 		String img = img0.getAbsolutePath() + "[0]";
 		String img2 = img0.getAbsolutePath() + ".jpg";
-		IMOperation  op = new IMOperation ();
+		IMOperation op = new IMOperation();
 		op.addImage(img);
-		op.resize(800,600);
+		op.resize(800, 600);
 		op.addImage(img2);
 
-			try {
-				convert.run(op);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IM4JavaException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return new File(img2);
+		try {
+			convert.run(op);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IM4JavaException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new File(img2);
 
 	}
 

@@ -40,6 +40,8 @@ import eu.europeana.corelib.definitions.model.ThumbSize;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.api.StorageEngineException;
 import eu.europeana.uim.gui.cp.server.engine.ExpandedOsgiEngine;
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.store.MetaDataRecord;
@@ -210,8 +212,13 @@ public class MongoImageViewServlet extends HttpServlet {
 		Morphia mor = new Morphia();
 		Mongo mongo;
 		try {
-			mongo = new Mongo();
-			String dbName = "imageUIMDB";
+			mongo = new Mongo(
+					PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+					Integer.parseInt(PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
+			String dbName = PropertyReader
+					.getProperty(UimConfigurationProperty.MONGO_DB_IMAGE);
 			Datastore store = mor.createDatastore(mongo, dbName);
 
 			@SuppressWarnings("unchecked")

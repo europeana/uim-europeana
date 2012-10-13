@@ -34,7 +34,14 @@
 			<artifactId>com.springsource.org.apache.commons.io</artifactId>
 			<version>1.4.0</version>
 		</dependency>
-		
+			<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+			<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
@@ -95,7 +102,7 @@
 							eu.europeana.uim.sugarcrm.model, 
 							eu.europeana.uim.util
 							</Import-Package>
-						<Embed-Dependency>europeana-uim-plugin-clientbindings,mongo-java-driver,amqp-client,com.springsource.org.apache.commons.io</Embed-Dependency>
+						<Embed-Dependency>europeana-uim-plugin-clientbindings,mongo-java-driver,amqp-client,com.springsource.org.apache.commons.io,commons-io,commons-lang</Embed-Dependency>
 
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>

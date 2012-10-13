@@ -14,10 +14,15 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
+
 /**
  * Servlet with upload capabilities for local files
+ * 
  * @author Yorgos.Mamakis@ kb.nl
- *
+ * 
  */
 public class UploadServlet extends HttpServlet {
 
@@ -26,9 +31,11 @@ public class UploadServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 8392834299256226392L;
 
-	private static String TMP_DIR_PATH = "/tmp";
+	private static String TMP_DIR_PATH = PropertyReader
+			.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION);
 	private File tmpDir;
-	private static String DESTINATION_DIR_PATH = "/export/repository";
+	private static String DESTINATION_DIR_PATH = PropertyReader
+			.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	private File destinationDir;
 
 	/**
@@ -40,8 +47,9 @@ public class UploadServlet extends HttpServlet {
 	}
 
 	/**
-	 * Method for handling GET requests. Left here for debugging reasons, 
-	 * will be removed in the final version as FileUploadServlet does NOT support GET requiests
+	 * Method for handling GET requests. Left here for debugging reasons, will
+	 * be removed in the final version as FileUploadServlet does NOT support GET
+	 * requiests
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -49,7 +57,8 @@ public class UploadServlet extends HttpServlet {
 	}
 
 	/**
-	 * Method for handling POST requests. It uses two repositories (a temp and a produxation)
+	 * Method for handling POST requests. It uses two repositories (a temp and a
+	 * produxation)
 	 */
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -78,17 +87,13 @@ public class UploadServlet extends HttpServlet {
 
 		ServletFileUpload uploadHandler = new ServletFileUpload(fileItemFactory);
 		try {
-			
-			
+
 			@SuppressWarnings("unchecked")
 			List<FileItem> items = uploadHandler.parseRequest(request);
 
 			for (FileItem item : items) {
 				if (item.isFormField())
 					continue;
-
-
-				
 
 				File file = new File(destinationDir, item.getName());
 				file.createNewFile();
@@ -97,7 +102,7 @@ public class UploadServlet extends HttpServlet {
 				response.getWriter()
 						.print("The file was created successfully.");
 				response.flushBuffer();
-				
+
 			}
 		} catch (FileUploadException ex) {
 			ex.printStackTrace();

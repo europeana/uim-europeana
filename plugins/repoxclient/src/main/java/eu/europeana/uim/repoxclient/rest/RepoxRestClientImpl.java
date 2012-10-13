@@ -39,6 +39,8 @@ import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.jibxbindings.HarvestingStatus;
 import eu.europeana.uim.repoxclient.jibxbindings._Error;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
+import eu.europeana.uim.repoxclient.utils.PropertyReader;
+import eu.europeana.uim.repoxclient.utils.UimConfigurationProperty;
 
 /**
  * Class implementing REST functionality for accessing REPOX
@@ -49,7 +51,7 @@ import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 public class RepoxRestClientImpl implements RepoxRestClient {
 
 	private RestTemplate restTemplate;
-	private String defaultURI;
+	private String defaultURI = PropertyReader.getProperty(UimConfigurationProperty.REPOX_HOST);
 	
 	private final static String unknown_error="Unidentified Repox Error";
 	private final static String idVar="id=";

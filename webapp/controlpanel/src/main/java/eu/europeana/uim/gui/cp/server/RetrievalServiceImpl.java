@@ -68,6 +68,8 @@ import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.uim.api.StorageEngine;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.gui.cp.client.services.RetrievalService;
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 import eu.europeana.uim.gui.cp.shared.validation.EdmFieldRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.EdmRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.FieldValueDTO;
@@ -112,9 +114,19 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		super();
 		try {
 			solrServer = new CommonsHttpSolrServer(
-					"http://localhost:8282/apache-solr-3.5.0");
-			mongoServer = new EdmMongoServerImpl(new Mongo("localhost", 27017),
-					"europeana", "", "");
+					PropertyReader
+							.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
+							+ PropertyReader
+									.getProperty(UimConfigurationProperty.SOLR_CORE));
+			mongoServer = new EdmMongoServerImpl(
+					new Mongo(
+							PropertyReader
+									.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+							Integer.parseInt(PropertyReader
+									.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
+					PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA),
+					"", "");
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage());
 		}
@@ -297,7 +309,8 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		return res;
 	}
 
-	private String getXml(String recordId, TKey<EuropeanaModelRegistry, String> edmrecord){
+	private String getXml(String recordId,
+			TKey<EuropeanaModelRegistry, String> edmrecord) {
 		String res = "";
 
 		StorageEngine<String> storage = (StorageEngine<String>) getEngine()
@@ -318,8 +331,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 						+ recordId + "'!");
 			} else {
 
-				res = metaDataRecord
-						.getFirstValue(edmrecord);
+				res = metaDataRecord.getFirstValue(edmrecord);
 
 				try {
 					DocumentBuilderFactory dbf = DocumentBuilderFactory
@@ -339,7 +351,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 
 		return res;
 	}
-	
+
 	@Override
 	public String getXmlRecord(String recordId) {
 		return getXml(recordId, EuropeanaModelRegistry.EDMRECORD);
@@ -347,11 +359,10 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 	}
 
 	@Override
-	public String getDereferencedRecord(String recordId){
-		return getXml(recordId,EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
+	public String getDereferencedRecord(String recordId) {
+		return getXml(recordId, EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
 	}
-	
-	
+
 	private String getFormattedXml(Document doc) throws Exception {
 		String xml = "";
 		TransformerFactory transFactory = TransformerFactory.newInstance();
@@ -385,7 +396,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 	public EdmRecordDTO getSearchRecord(String recordId) {
 		EdmRecordDTO record = new EdmRecordDTO();
 		try {
-			
+
 			String query = "europeana_id:" + recordId;
 			SolrQuery solrQuery = new SolrQuery().setQuery(query);
 
@@ -399,7 +410,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
-		} 
+		}
 		return record;
 	}
 

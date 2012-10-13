@@ -9,24 +9,23 @@ import org.apache.solr.common.SolrInputDocument;
 import eu.annocultor.converters.europeana.Entity;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
+import eu.europeana.uim.enrichment.utils.PropertyReader;
+import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 
 public class EnrichmentServiceImpl implements EnrichmentService {
 
 	public static EuropeanaEnrichmentTagger tagger;
 	private static CommonsHttpSolrServer solrServer;
-	private static String mongoDB="europeana";
-	private static String mongoHost="127.0.0.1";
-	private static String mongoPort="27017";
-	private static String solrUrl="http://localhost:8282/";
-	private static String solrCore="apache-solr-3.5.0";
+	private static String mongoDB=PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
+	private static String mongoHost=PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
+	private static String mongoPort= PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
+	private static String solrUrl= PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
+	private static String solrCore=PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 
 	public EnrichmentServiceImpl(){
 		tagger = new EuropeanaEnrichmentTagger();
 		try {
-			
 		solrServer = new CommonsHttpSolrServer(new URL(solrUrl)+solrCore);
-		//mongo  = new Mongo(mongoHost, Integer.parseInt(mongoPort));
-		
 		
 			tagger.init("Europeana");
 		} catch (Exception e) {

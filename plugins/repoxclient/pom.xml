@@ -71,7 +71,7 @@
                   			org.xmlpull.v1,
 							org.quartz,
 							!org.springframework.transaction,
-							!eu.europeana.uim.repoxclient.command,
+							!eu.europeana.uim.repoxclient.*,
 							*
 					    </Import-Package>
                         <Include-Resource>src/main/resources</Include-Resource>

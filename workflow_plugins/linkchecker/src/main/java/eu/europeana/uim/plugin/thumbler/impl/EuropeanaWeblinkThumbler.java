@@ -10,7 +10,9 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.logging.Logger;
+
 import javax.imageio.ImageIO;
+
 import org.apache.commons.io.FileUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -22,25 +24,28 @@ import org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer;
 import org.theeuropeanlibrary.uim.check.weblink.http.GuardedMetaDataRecordUrl;
 import org.theeuropeanlibrary.uim.check.weblink.http.HttpClientSetup;
 import org.theeuropeanlibrary.uim.check.weblink.http.Submission;
+
+import com.google.code.morphia.Datastore;
+import com.google.code.morphia.Morphia;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+
 import eu.europeana.corelib.db.dao.impl.NosqlDaoImpl;
 import eu.europeana.corelib.db.entity.nosql.ImageCache;
 import eu.europeana.corelib.db.exception.DatabaseException;
 import eu.europeana.corelib.db.service.ThumbnailService;
 import eu.europeana.corelib.db.service.impl.ThumbnailServiceImpl;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
-import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.plugin.thumbler.utils.ImageMagickUtils;
+import eu.europeana.uim.plugin.thumbler.utils.PropertyReader;
+import eu.europeana.uim.plugin.thumbler.utils.UimConfigurationProperty;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.UimDataSet;
-import com.google.code.morphia.Datastore;
-import com.google.code.morphia.Morphia;
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
 
 /**
  * HTTP Link checker with internal thread pool using the @see
@@ -67,8 +72,8 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 	private static IUnmarshallingContext uctx;
 
-	private static final String STORAGELOCATION = "C:\\tmpimages\\";
-	
+	private static final String STORAGELOCATION = PropertyReader
+			.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION);
 
 	/**
 	 * Private singleton constructor.
@@ -78,8 +83,16 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		Morphia mor = new Morphia();
 		Mongo mongo;
 		try {
-			mongo = new Mongo();
-			String dbName = "imageUIMDB";
+			mongo = new Mongo(
+					PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+					Integer.parseInt(PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
+			System.out.println(PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_HOSTURL));
+			System.out.println(Integer.parseInt(PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
+			String dbName = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_IMAGE);
 
 			Datastore store = mor.createDatastore(mongo, dbName);
 
@@ -105,7 +118,6 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 	}
 
-	
 	/**
 	 * @return the singleton thumbler instance
 	 */
@@ -116,8 +128,12 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		return instance;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer#shutdown()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer#shutdown
+	 * ()
 	 */
 	@Override
 	public void shutdown() {
@@ -125,15 +141,17 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		instance = null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer#createTask(org.theeuropeanlibrary.collections.guarded.Guarded)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer#
+	 * createTask(org.theeuropeanlibrary.collections.guarded.Guarded)
 	 */
 	@Override
 	public Runnable createTask(Guarded guarded) {
 		return new CacheTask((GuardedMetaDataRecordUrl<?>) guarded);
 	}
 
-	
 	/**
 	 * @author Andreas Juffinger (andreas.juffinger@kb.nl)
 	 * @since Jul 15, 2011
@@ -152,7 +170,6 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			}
 		}
 
-			
 		/**
 		 * Intitializes the entire store operation
 		 * 
@@ -171,12 +188,14 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				String objectIDURI = extractOrigDocumentId(edmRecord);
 				Link offeredlink = guarded.getLink();
 
-				
-				List<EuropeanaLink> europeanalinks = mdr.getValues(EuropeanaModelRegistry.EUROPEANALINK);
-				
-				for(EuropeanaLink eulink: europeanalinks){
-					if(offeredlink.getUrl().equals(eulink.getUrl()) && eulink.isCacheable()){
-						storefileInMongo(offeredlink.getUrl(),dataset,edmRecord);
+				List<EuropeanaLink> europeanalinks = mdr
+						.getValues(EuropeanaModelRegistry.EUROPEANALINK);
+
+				for (EuropeanaLink eulink : europeanalinks) {
+					if (offeredlink.getUrl().equals(eulink.getUrl())
+							&& eulink.isCacheable()) {
+						storefileInMongo(offeredlink.getUrl(), dataset,
+								edmRecord);
 					}
 				}
 
@@ -188,16 +207,15 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 					submission.incrExceptions();
 					submission.removeRemaining(guarded);
 				}
-				
-				log.info("Failed to store and process file locally" + guarded.getUrl() + ">");
+
+				log.info("Failed to store and process file locally"
+						+ guarded.getUrl() + ">");
 				guarded.processed(1, t.getMessage());
 				log.severe(t.getClass().getName());
 			}
 
 		}
 
-		
-		
 		/**
 		 * @param resource
 		 * @param dataset
@@ -205,17 +223,16 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		 * @throws IOException
 		 * @throws DatabaseException
 		 */
-		private void storefileInMongo(String resource,
-				UimDataSet<?> dataset,RDF edmRecord) throws IOException, DatabaseException{
-			
+		private void storefileInMongo(String resource, UimDataSet<?> dataset,
+				RDF edmRecord) throws IOException, DatabaseException {
+
 			File img = retrieveFile(resource);
 			File convimg = ImageMagickUtils.convert(img);
-			BufferedImage buff = ImageIO.read(convimg); 
+			BufferedImage buff = ImageIO.read(convimg);
 			Collection coll = (Collection) dataset;
-			thumbnailHandler.storeThumbnail(resource,(String) coll.getId(),
-						buff,resource,edmRecord);	
+			thumbnailHandler.storeThumbnail(resource, (String) coll.getId(),
+					buff, resource, edmRecord);
 		}
-		
 
 		/**
 		 * Retrieves a file given a URI
@@ -229,32 +246,32 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			File target = null;
 			int status = 0;
 			try {
-					String name =  guarded.getUrl().getFile();
-					
-					target = new File(STORAGELOCATION +URLEncoder.encode(name, "UTF-8"));
-					FileUtils.copyURLToFile(new URL(url), target, 10000000, 1000000000);
-					
-					guarded.processed(status,
-							"filename: " + target.getAbsolutePath());
-					
-					synchronized (submission) {
-						submission.incrStatus(status);
-						submission.incrProcessed();
-						submission.removeRemaining(guarded);
-					}
-					
-					return target;
+				String name = guarded.getUrl().getFile();
+
+				target = new File(STORAGELOCATION
+						+ URLEncoder.encode(name, "UTF-8"));
+				FileUtils.copyURLToFile(new URL(url), target, 10000000,
+						1000000000);
+
+				guarded.processed(status,
+						"filename: " + target.getAbsolutePath());
+
+				synchronized (submission) {
+					submission.incrStatus(status);
+					submission.incrProcessed();
+					submission.removeRemaining(guarded);
+				}
+
+				return target;
 
 			} catch (Throwable t) {
-				
+
 				log.info("Failed to retrieve url: <" + guarded.getUrl() + ">");
-				
-			} 
+
+			}
 
 			return target;
 		}
-		
-		
 
 		/**
 		 * Extracts the original document ID from the EDM document
@@ -270,17 +287,14 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 					Aggregation aggregation = element.getAggregation();
 					if (aggregation.getObject() != null) {
 						return aggregation.getObject().getResource();
-					}
-					else{
+					} else {
 						return "";
 					}
 				}
-		}
+			}
 			return null;
 
+		}
 	}
-	}
-
-
 
 }

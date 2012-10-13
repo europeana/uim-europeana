@@ -27,6 +27,8 @@ import com.rabbitmq.client.AMQP.BasicProperties.Builder;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
+import eu.europeana.uim.mintclient.utils.PropertyReader;
+import eu.europeana.uim.mintclient.utils.UimConfigurationProperty;
 
 
 
@@ -49,10 +51,10 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 	protected static Connection rabbitConnection;
 	protected static Channel sendChannel;
 	protected static Channel receiveChannel;
-	protected static String inbound = "MintInboundQueue";
-	protected static String outbound = "MintOutboundQueue";
+	protected static String inbound = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_INBOUNDQUEUE);
+	protected static String outbound = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_OUTBOUNDQUEUE);
 	
-	protected static String rpcQueue = "RPCQueue";
+	protected static String rpcQueue = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_RPCQUEUE);
 	protected static String rndReplyqueue;	
 	
 	
@@ -61,9 +63,9 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 	
 	static {
 		
-		username = "guest";
-		password = "guest";
-		host = "localhost";
+		username = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_USERNAME);
+		password = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_PASSWORD);
+		host = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_HOST);
 	    //host = "sip-manager.isti.cnr.it";
 		//host = "panic.image.ntua.gr";
 		

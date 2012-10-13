@@ -45,15 +45,13 @@
     </bean>
 
     <bean id="sugarWsClient" factory-bean="sugarWsClientFactory" factory-method="createInstance">
-       <constructor-arg value="${username}"/>
-       <constructor-arg value="${password}"/>
     </bean>
 
     <bean id="messageFactory" class="eu.europeana.uim.sugarcrmclient.internal.ExtendedSaajSoapMessageFactory"/>
 
     <bean id="webServiceTemplate" class="org.springframework.ws.client.core.WebServiceTemplate">
          <constructor-arg ref="messageFactory"/>
-         <property name="defaultUri" value="${host}" />
+         <!-- <property name="defaultUri" value="${host}" />-->
          <property name="marshaller" ref="jibxMarshaller" />
          <property name="unmarshaller" ref="jibxMarshaller" />
     </bean>

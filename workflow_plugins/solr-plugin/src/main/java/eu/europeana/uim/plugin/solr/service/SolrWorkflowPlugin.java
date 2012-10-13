@@ -46,7 +46,6 @@ import com.mongodb.MongoException;
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Concept;
-import eu.europeana.corelib.definitions.jibx.EdmType;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
 import eu.europeana.corelib.definitions.jibx.EuropeanaProxy;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
@@ -70,6 +69,8 @@ import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
 import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
+import eu.europeana.uim.plugin.solr.utils.PropertyReader;
+import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 import eu.europeana.uim.store.MetaDataRecord;
 
 /**
@@ -112,13 +113,18 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			Datastore datastore = null;
 			Morphia morphia;
 			try {
-				// Dereferencer.setServer(new OsgiVocabularyMongoServer(new
-				// Mongo("localhost",27017), "vocabulary"));
 
 				morphia = new Morphia();
 				morphia.map(ControlledVocabularyImpl.class);
-				datastore = morphia.createDatastore(new Mongo("localhost",
-						27017), "vocabulary");
+				datastore = morphia
+						.createDatastore(
+								new Mongo(
+										PropertyReader
+												.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+										Integer.parseInt(PropertyReader
+												.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
+								PropertyReader
+										.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
 				datastore.ensureIndexes();
 
 			} catch (MongoException e) {
@@ -210,7 +216,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 						&& choice.getProxy().getEuropeanaProxy()
 								.isEuropeanaProxy()) {
 					rdfFinal.getChoiceList().remove(choice);
-					
+
 				}
 			}
 			RDF.Choice choiceNew = new RDF.Choice();
@@ -805,24 +811,23 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 			Datastore datastore, String field, String filter)
 			throws UnknownHostException, MongoException {
 		String[] splitName = filter.split("/");
-		//TODO: Fix
-		if(splitName.length>3){
-		String vocabularyName = splitName[0] + "/" + splitName[1] + "/"
-				+ splitName[2] + "/";
-		List<ControlledVocabularyImpl> vocabularies = datastore
-				.find(ControlledVocabularyImpl.class)
-				.filter(field, vocabularyName).asList();
-		for (ControlledVocabularyImpl vocabulary : vocabularies) {
-			boolean ruleController = true;
-			for (String rule : vocabulary.getRules()) {
-				ruleController = ruleController
-						&& (filter.contains(rule) || StringUtils.equals(rule,
-								"*"));
+		if (splitName.length > 3) {
+			String vocabularyName = splitName[0] + "/" + splitName[1] + "/"
+					+ splitName[2] + "/";
+			List<ControlledVocabularyImpl> vocabularies = datastore
+					.find(ControlledVocabularyImpl.class)
+					.filter(field, vocabularyName).asList();
+			for (ControlledVocabularyImpl vocabulary : vocabularies) {
+				boolean ruleController = true;
+				for (String rule : vocabulary.getRules()) {
+					ruleController = ruleController
+							&& (filter.contains(rule) || StringUtils.equals(
+									rule, "*"));
+				}
+				if (ruleController) {
+					return vocabulary;
+				}
 			}
-			if (ruleController) {
-				return vocabulary;
-			}
-		}
 		}
 		return null;
 	}

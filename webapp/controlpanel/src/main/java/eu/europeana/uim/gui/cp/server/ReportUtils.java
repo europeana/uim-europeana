@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 
 import eu.europeana.uim.api.ResourceEngine;
 import eu.europeana.uim.gui.cp.server.engine.Engine;
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 
 /**
  * 
@@ -19,7 +21,7 @@ import eu.europeana.uim.gui.cp.server.engine.Engine;
  * @date Jul 19, 2011
  */
 public class ReportUtils {
-    final static String         BIRT_URL               = "http://127.0.0.1:8282/birt/";
+    final static String         BIRT_URL               = PropertyReader.getProperty(UimConfigurationProperty.BIRT_URL);
     final static String         REPORT_DOWNLOAD_PREFIX = "EuropeanaIngestionControlPanel/reportDownload";
 
     private final static Logger log                    = Logger.getLogger(ReportUtils.class.getName());

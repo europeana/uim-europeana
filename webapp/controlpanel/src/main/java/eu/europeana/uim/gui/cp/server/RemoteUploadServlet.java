@@ -18,6 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
+
 /**
  * Serlvet for uploading files from URLs
  * 
@@ -30,9 +33,9 @@ public class RemoteUploadServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 8392834299256226392L;
 
-	private static String TMP_DIR_PATH = "/tmp";
+	private static String TMP_DIR_PATH = PropertyReader.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION);
 	private File tmpDir;
-	private static String DESTINATION_DIR_PATH = "/export/repository";
+	private static String DESTINATION_DIR_PATH = PropertyReader.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	private File destinationDir;
 
 	/**

@@ -3,6 +3,8 @@ package eu.europeana.uim.sugarcrmclient.ws;
 import org.apache.log4j.Logger;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.internal.helpers.PropertyReader;
+import eu.europeana.uim.sugarcrmclient.internal.helpers.UimConfigurationProperty;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLoginFailureException;
 
 /**
@@ -23,9 +25,13 @@ public class ClientFactory {
 	 * @param password
 	 * @return
 	 */
-	public  SugarWsClientImpl createInstance(String userName, String password){
+	public  SugarWsClientImpl createInstance(){
 		
 		SugarWsClientImpl client = new SugarWsClientImpl();
+		String userName = PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_USERNAME);
+		String password = PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_PASSWORD);
+		String uri = PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_HOST);
+		webServiceTemplate.setDefaultUri(uri);
 		client.setUsername(userName);
 		client.setPassword(password);
 		client.setWebServiceTemplate(webServiceTemplate);

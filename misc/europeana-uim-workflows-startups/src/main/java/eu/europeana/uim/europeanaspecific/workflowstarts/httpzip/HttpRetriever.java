@@ -29,6 +29,10 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 
+import eu.europeana.uim.europeanaspecific.workflowstarts.util.PropertyReader;
+import eu.europeana.uim.europeanaspecific.workflowstarts.util.UimConfigurationProperty;
+
+
 
 /**
  * Retrieves the specified zip file over the remote http location and performs
@@ -87,7 +91,7 @@ public class HttpRetriever implements Iterator<String> {
 			generator =  new Random();
 		}
 		//First copy the remote URI to a 
-		File dest = new File("C:\\tmp\\"+new Integer(generator.nextInt()).toString());
+		File dest = new File(PropertyReader.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION)+new Integer(generator.nextInt()).toString());
 		FileUtils.copyURLToFile(url, dest, 100, 1000);
 
 		TarArchiveInputStream tarfile;

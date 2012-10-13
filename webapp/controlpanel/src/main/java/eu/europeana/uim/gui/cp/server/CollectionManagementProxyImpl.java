@@ -15,6 +15,8 @@ import com.mongodb.MongoException;
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.uim.gui.cp.client.services.CollectionManagementProxy;
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 import eu.europeana.uim.gui.cp.shared.CollectionMappingDTO;
 
 public class CollectionManagementProxyImpl extends
@@ -28,11 +30,10 @@ public class CollectionManagementProxyImpl extends
 	private static CollectionMongoServer collectionMongoServer;
 	private static Collection collection;
 
-	private static final String MONGO_HOST="127.0.0.1";
-	//private static final String MONGO_HOST="europeana-ese2.edm.isti.cnr.it";
-	private static final int MONGO_PORT = 27017;
-	private static final String MONGO_DB = "collections";
-	private static final String REPOSITORY = "/export/repository/";
+	private static final String MONGO_HOST= PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
+	private static final int MONGO_PORT = Integer.parseInt(PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT));
+	private static final String MONGO_DB = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
+	private static final String REPOSITORY = PropertyReader.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	@Override
 	public List<CollectionMappingDTO> retrieveCollections() {
 		List<CollectionMappingDTO> collections = new ArrayList<CollectionMappingDTO>();

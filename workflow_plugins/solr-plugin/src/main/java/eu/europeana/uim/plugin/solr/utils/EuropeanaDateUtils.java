@@ -18,7 +18,7 @@ public class EuropeanaDateUtils {
 		List<String> years = new ArrayList<String>();
 		try {
 			String bcList = FileUtils.readFileToString(new File(
-					"src/main/resources/bcList.txt"), "UTF-8");
+					PropertyReader.getProperty(UimConfigurationProperty.UIM_BCLIST_PATH)), "UTF-8");
 			String[] bc = StringUtils.split(bcList, "\n");
 			for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
 				if (choice.ifDate()) {

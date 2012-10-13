@@ -29,14 +29,26 @@ import com.mongodb.Mongo;
 import eu.annocultor.converters.europeana.Entity;
 import eu.annocultor.converters.europeana.Field;
 import eu.europeana.corelib.definitions.jibx.AgentType;
+import eu.europeana.corelib.definitions.jibx.AggregatedCHO;
 import eu.europeana.corelib.definitions.jibx.Concept;
+import eu.europeana.corelib.definitions.jibx.Country;
+import eu.europeana.corelib.definitions.jibx.Creator;
+import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
+import eu.europeana.corelib.definitions.jibx.HasMet;
+import eu.europeana.corelib.definitions.jibx.LandingPage;
+import eu.europeana.corelib.definitions.jibx.Language1;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
+import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
+import eu.europeana.corelib.definitions.jibx.ProxyFor;
+import eu.europeana.corelib.definitions.jibx.ProxyIn;
+import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
+import eu.europeana.corelib.definitions.jibx.Rights1;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
@@ -57,6 +69,8 @@ import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
+import eu.europeana.uim.enrichment.utils.PropertyReader;
+import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
@@ -65,30 +79,50 @@ import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugarcrm.SugarCrmRecord;
 import eu.europeana.uim.sugarcrm.SugarCrmService;
 
-//import eu.europeana.uim.enrichment.osgi.MongoConstructor;
-
+/**
+ * Enrichment plugin implementation
+ * 
+ * @author Yorgos.Mamakis@ kb.nl
+ * 
+ */
 public class EnrichmentPlugin extends AbstractIngestionPlugin {
-	private static String vocabularyDB;
 
 	private static CommonsHttpSolrServer solrServer;
 
 	private static String mongoDB;
-	private static String mongoHost = "127.0.0.1";
-	private static String mongoPort = "27017";
+	private static String mongoHost = PropertyReader
+			.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
+	private static String mongoPort = PropertyReader
+			.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
 	private static String solrUrl;
 	private static String solrCore;
 	private static int recordNumber;
-	private static String europeanaID;
+	private static String europeanaID = PropertyReader
+			.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA_ID);
 	private static final int RETRIES = 10;
-	private static String repository;
+	private static String repository = PropertyReader
+			.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	private static SugarCrmService sugarCrmService;
 	private static EnrichmentService enrichmentService;
 	private static String previewsOnlyInPortal;
-	private static String collections;
+	private static String collections = PropertyReader
+			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static Morphia morphia;
 	private static List<SolrInputDocument> solrList;
 	private static OsgiEdmMongoServer mongoServer;
 	private static Mongo mongo;
+	private final static String PORTALURL = "http:///www.europeana.eu/portal/record";
+	private final static String SUFFIX = ".html";
+
+	private static String country;
+	private static String creator;
+	private static String language;
+	private static String rights;
+
+	private final static String countryProperty = "edm:country";
+	private final static String creatorProperty = "dc:creator";
+	private final static String languageProperty = "edm:language";
+	private final static String rightsProperty = "edm:rights";
 
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
@@ -107,6 +141,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
+		{
+			add(countryProperty);
+			add(creatorProperty);
+			add(languageProperty);
+			add(rightsProperty);
+		}
 
 	};
 
@@ -155,14 +195,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		// TODO Auto-generated method stub
 
 		try {
-			solrList= new ArrayList<SolrInputDocument>();
+			solrList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
-			mongoServer = new OsgiEdmMongoServer(mongo,
-					mongoDB, "", "");
+			mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, "", "");
 			morphia = new Morphia();
-			
 
 			mongoServer.createDatastore(morphia);
 			@SuppressWarnings("rawtypes")
@@ -175,6 +213,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
+			country = context.getProperties().getProperty(countryProperty);
+			creator = context.getProperties().getProperty(creatorProperty);
+			language = context.getProperties().getProperty(languageProperty);
+			rights = context.getProperties().getProperty(rightsProperty);
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -186,7 +229,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		try {
 			solrServer.add(solrList);
 			System.out.println("Adding " + solrList.size() + " documents");
-			
+
 			solrServer.commit();
 			System.out.println("Committed in Solr Server");
 			solrServer.optimize();
@@ -218,7 +261,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
-			
+
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
@@ -230,6 +273,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					.enrich(new SolrConstructor().constructSolrDocument(rdf));
 			mergeEntities(rdf, entities);
 			RDF rdfFinal = cleanRDF(rdf);
+
 			SolrInputDocument solrInputDocument = new SolrConstructor()
 					.constructSolrDocument(rdfFinal);
 			FullBeanImpl fullBean = mongoConstructor.constructFullBean(
@@ -241,8 +285,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					.get(0)
 					.setEdmPreviewNoDistribute(
 							Boolean.parseBoolean(previewsOnlyInPortal));
-			
-			
+
 			String collectionId = (String) mdr.getCollection().getId();
 
 			String fileName = (String) mdr.getCollection().getName();
@@ -262,14 +305,14 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			while (retries < RETRIES) {
 				try {
 					solrList.add(solrInputDocument);
-					
-					retries++;
+
 					recordNumber++;
 					return true;
-				}  catch (SolrException e) {
+				} catch (SolrException e) {
 					log.log(Level.WARNING, "Solr Exception occured with error "
 							+ e.getMessage() + "\nRetrying");
 				}
+				retries++;
 			}
 			return false;
 
@@ -307,8 +350,29 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			throws SecurityException, IllegalArgumentException,
 			NoSuchMethodException, IllegalAccessException,
 			InvocationTargetException {
-
+		ProxyType europeanaProxy = null;
+		ProvidedCHOType cho = null;
 		List<RDF.Choice> choices = rdf.getChoiceList();
+		for (RDF.Choice choice : choices) {
+			if (choice.ifProvidedCHO()) {
+				cho = choice.getProvidedCHO();
+
+			}
+			if (choice.ifProxy()
+					&& choice.getProxy().getEuropeanaProxy() != null
+					&& choice.getProxy().getEuropeanaProxy().isEuropeanaProxy()) {
+				europeanaProxy = choice.getProxy();
+			}
+		}
+		europeanaProxy.setAbout("/proxy/europeana" + cho.getAbout());
+		ProxyFor pf = new ProxyFor();
+		pf.setResource(cho.getAbout());
+		europeanaProxy.setProxyFor(pf);
+		List<ProxyIn> pinList = new ArrayList<ProxyIn>();
+		ProxyIn pin = new ProxyIn();
+		pin.setResource("/aggregation/europeana" + cho.getAbout());
+		pinList.add(pin);
+		europeanaProxy.setProxyInList(pinList);
 		for (Entity entity : entities) {
 			RDF.Choice choice = new RDF.Choice();
 			if (StringUtils.equals(entity.getClassName(), "Concept")) {
@@ -322,16 +386,21 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
+							addToHasMetList(
+									europeanaProxy,
+									field.getValues()
+											.get(field.getValues().keySet()
+													.iterator().next()).get(0));
 						} else {
-							if(field.getValues()!=null){
-							for (Entry<String, List<String>> entry : field
-									.getValues().entrySet()) {
-								for (String str : entry.getValue()) {
-									appendConceptValue(concept,
-											field.getName(), str, "_@xml:lang",
-											entry.getKey());
+							if (field.getValues() != null) {
+								for (Entry<String, List<String>> entry : field
+										.getValues().entrySet()) {
+									for (String str : entry.getValue()) {
+										appendConceptValue(concept,
+												field.getName(), str,
+												"_@xml:lang", entry.getKey());
+									}
 								}
-							}
 							}
 						}
 
@@ -353,6 +422,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
+							addToHasMetList(
+									europeanaProxy,
+									field.getValues()
+											.get(field.getValues().keySet()
+													.iterator().next()).get(0));
 						} else {
 							for (Entry<String, List<String>> entry : field
 									.getValues().entrySet()) {
@@ -382,6 +456,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
+							addToHasMetList(
+									europeanaProxy,
+									field.getValues()
+											.get(field.getValues().keySet()
+													.iterator().next()).get(0));
 						} else {
 							for (Entry<String, List<String>> entry : field
 									.getValues().entrySet()) {
@@ -410,16 +489,21 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
+							addToHasMetList(
+									europeanaProxy,
+									field.getValues()
+											.get(field.getValues().keySet()
+													.iterator().next()).get(0));
 						} else {
-							if (field.getValues()!=null){
-							for (Entry<String, List<String>> entry : field
-									.getValues().entrySet()) {
-								for (String str : entry.getValue()) {
-									appendValue(PlaceType.class, ts,
-											field.getName(), str, "_@xml:lang",
-											entry.getKey());
+							if (field.getValues() != null) {
+								for (Entry<String, List<String>> entry : field
+										.getValues().entrySet()) {
+									for (String str : entry.getValue()) {
+										appendValue(PlaceType.class, ts,
+												field.getName(), str,
+												"_@xml:lang", entry.getKey());
+									}
 								}
-							}
 							}
 						}
 
@@ -431,7 +515,17 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 				}
 			}
 		}
+		RDF.Choice choice = new RDF.Choice();
+		choice.setProxy(europeanaProxy);
+	}
 
+	private void addToHasMetList(ProxyType europeanaProxy, String value) {
+		List<HasMet> hasMetList = europeanaProxy.getHasMetList() != null ? europeanaProxy
+				.getHasMetList() : new ArrayList<HasMet>();
+		HasMet hasMet = new HasMet();
+		hasMet.setString(value);
+		hasMetList.add(hasMet);
+		europeanaProxy.setHasMetList(hasMetList);
 	}
 
 	private RDF cleanRDF(RDF rdf) {
@@ -513,8 +607,43 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			choice.setConcept(concept);
 			choices.add(choice);
 		}
+		EuropeanaAggregationType europeanaAggregation = createEuropeanaAggregation(rdf);
+		RDF.Choice choice = new RDF.Choice();
+		choice.setEuropeanaAggregation(europeanaAggregation);
+		choices.add(choice);
 		rdfFinal.setChoiceList(choices);
 		return rdfFinal;
+	}
+
+	private EuropeanaAggregationType createEuropeanaAggregation(RDF rdf) {
+		EuropeanaAggregationType europeanaAggregation = new EuropeanaAggregationType();
+		List<RDF.Choice> rdfList = rdf.getChoiceList();
+		for (RDF.Choice ch : rdfList) {
+			if (ch.ifProvidedCHO()) {
+				ProvidedCHOType cho = ch.getProvidedCHO();
+				europeanaAggregation.setAbout("/aggregation/europeana/"
+						+ cho.getAbout());
+				LandingPage lp = new LandingPage();
+				lp.setResource(PORTALURL + cho.getAbout() + SUFFIX);
+				europeanaAggregation.setLandingPage(lp);
+				Country countryType = new Country();
+				countryType.setString(country);
+				europeanaAggregation.setCountry(countryType);
+				Creator creatorType = new Creator();
+				creatorType.setString(creator);
+				europeanaAggregation.setCreator(creatorType);
+				Language1 languageType = new Language1();
+				languageType.setString(language);
+				europeanaAggregation.setLanguage(languageType);
+				Rights1 rightsType = new Rights1();
+				rightsType.setResource(rights);
+				europeanaAggregation.setRights(rightsType);
+				AggregatedCHO aggrCHO = new AggregatedCHO();
+				aggrCHO.setResource(cho.getAbout());
+				europeanaAggregation.setAggregatedCHO(aggrCHO);
+			}
+		}
+		return europeanaAggregation;
 	}
 
 	public CommonsHttpSolrServer getSolrServer() {
@@ -547,14 +676,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 	public void setRepository(String repository) {
 		EnrichmentPlugin.repository = repository;
-	}
-
-	public void setVocabularyDB(String vocabularyDB) {
-		EnrichmentPlugin.vocabularyDB = vocabularyDB;
-	}
-
-	public String getVocabularyDB() {
-		return vocabularyDB;
 	}
 
 	public String getCollections() {
@@ -646,6 +767,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		return null;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <T> T appendValue(Class<T> clazz, T obj, String edmLabel,
 			String val, String edmAttr, String valAttr)
 			throws SecurityException, NoSuchMethodException,
@@ -659,107 +781,110 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		}
 
 		//
-		if(RDF!=null){
-		if (RDF.getMethodName().endsWith("List")) {
+		if (RDF != null) {
+			if (RDF.getMethodName().endsWith("List")) {
 
-			Method mthd = clazz.getMethod(RDF.getMethodName());
+				Method mthd = clazz.getMethod(RDF.getMethodName());
 
-			List lst = mthd.invoke(obj) != null ? (ArrayList) mthd.invoke(obj)
-					: new ArrayList();
-			if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(ResourceType.class)) {
+				List lst = mthd.invoke(obj) != null ? (ArrayList) mthd
+						.invoke(obj) : new ArrayList();
+				if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(ResourceType.class)) {
 
-				ResourceType rs = new ResourceType();
-				rs.setResource(val);
-				lst.add(RDF.returnObject(RDF.getClazz(), rs));
-
-			} else if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(ResourceOrLiteralType.class)) {
-				ResourceOrLiteralType rs = new ResourceOrLiteralType();
-				if (isURI(val)) {
+					ResourceType rs = new ResourceType();
 					rs.setResource(val);
-				} else {
-					rs.setString(val);
-				}
-				if (edmAttr != null
-						&& StringUtils.equals(
-								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
-					Lang lang = new Lang();
-					lang.setLang(valAttr);
-					rs.setLang(lang);
-				}
-				lst.add(RDF.returnObject(RDF.getClazz(), rs));
-			} else if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(LiteralType.class)) {
-				LiteralType rs = new LiteralType();
-				rs.setString(val);
-				if (edmAttr != null
-						&& StringUtils.equals(
-								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
-					LiteralType.Lang lang = new LiteralType.Lang();
-					lang.setLang(valAttr);
-					rs.setLang(lang);
-				}
-				lst.add(RDF.returnObject(RDF.getClazz(), rs));
-			}
+					lst.add(RDF.returnObject(RDF.getClazz(), rs));
 
-			Class<?>[] cls = new Class<?>[1];
-			cls[0] = List.class;
-			Method method = obj.getClass()
-					.getMethod(
+				} else if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(ResourceOrLiteralType.class)) {
+					ResourceOrLiteralType rs = new ResourceOrLiteralType();
+					if (isURI(val)) {
+						rs.setResource(val);
+					} else {
+						rs.setString(val);
+					}
+					if (edmAttr != null
+							&& StringUtils.equals(
+									StringUtils.split(edmAttr, "@")[1],
+									"xml:lang")) {
+						Lang lang = new Lang();
+						lang.setLang(valAttr);
+						rs.setLang(lang);
+					}
+					lst.add(RDF.returnObject(RDF.getClazz(), rs));
+				} else if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(LiteralType.class)) {
+					LiteralType rs = new LiteralType();
+					rs.setString(val);
+					if (edmAttr != null
+							&& StringUtils.equals(
+									StringUtils.split(edmAttr, "@")[1],
+									"xml:lang")) {
+						LiteralType.Lang lang = new LiteralType.Lang();
+						lang.setLang(valAttr);
+						rs.setLang(lang);
+					}
+					lst.add(RDF.returnObject(RDF.getClazz(), rs));
+				}
+
+				Class<?>[] cls = new Class<?>[1];
+				cls[0] = List.class;
+				Method method = obj.getClass().getMethod(
+						StringUtils.replace(RDF.getMethodName(), "get", "set"),
+						cls);
+				method.invoke(obj, lst);
+			} else {
+				if (RDF.getClazz().isAssignableFrom(ResourceType.class)) {
+					ResourceType rs = new ResourceType();
+					rs.setResource(val);
+					Class<?>[] cls = new Class<?>[1];
+					cls[0] = RDF.getClazz();
+					Method method = obj.getClass().getMethod(
 							StringUtils.replace(RDF.getMethodName(), "get",
 									"set"), cls);
-			method.invoke(obj, lst);
-		} else {
-			if (RDF.getClazz().isAssignableFrom(ResourceType.class)) {
-				ResourceType rs = new ResourceType();
-				rs.setResource(val);
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = RDF.getClazz();
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
-			} else if (RDF.getClazz().isAssignableFrom(LiteralType.class)) {
-				LiteralType rs = new LiteralType();
-				rs.setString(val);
-				if (edmAttr != null
-						&& StringUtils.equals(
-								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
-					LiteralType.Lang lang = new LiteralType.Lang();
-					lang.setLang(valAttr);
-					rs.setLang(lang);
-				}
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = RDF.getClazz();
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
-
-			} else if (RDF.getClazz().isAssignableFrom(
-					ResourceOrLiteralType.class)) {
-				ResourceOrLiteralType rs = new ResourceOrLiteralType();
-				if (isURI(val)) {
-					rs.setResource(val);
-				} else {
+					method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
+				} else if (RDF.getClazz().isAssignableFrom(LiteralType.class)) {
+					LiteralType rs = new LiteralType();
 					rs.setString(val);
+					if (edmAttr != null
+							&& StringUtils.equals(
+									StringUtils.split(edmAttr, "@")[1],
+									"xml:lang")) {
+						LiteralType.Lang lang = new LiteralType.Lang();
+						lang.setLang(valAttr);
+						rs.setLang(lang);
+					}
+					Class<?>[] cls = new Class<?>[1];
+					cls[0] = RDF.getClazz();
+					Method method = obj.getClass().getMethod(
+							StringUtils.replace(RDF.getMethodName(), "get",
+									"set"), cls);
+					method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
+
+				} else if (RDF.getClazz().isAssignableFrom(
+						ResourceOrLiteralType.class)) {
+					ResourceOrLiteralType rs = new ResourceOrLiteralType();
+					if (isURI(val)) {
+						rs.setResource(val);
+					} else {
+						rs.setString(val);
+					}
+					if (edmAttr != null
+							&& StringUtils.equals(
+									StringUtils.split(edmAttr, "@")[1],
+									"xml:lang")) {
+						Lang lang = new Lang();
+						lang.setLang(valAttr);
+						rs.setLang(lang);
+					}
+					Class<?>[] cls = new Class<?>[1];
+					cls[0] = clazz;
+					Method method = obj.getClass().getMethod(
+							StringUtils.replace(RDF.getMethodName(), "get",
+									"set"), cls);
+					method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 				}
-				if (edmAttr != null
-						&& StringUtils.equals(
-								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
-					Lang lang = new Lang();
-					lang.setLang(valAttr);
-					rs.setLang(lang);
-				}
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = clazz;
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 			}
-		}
 		}
 		//
 		return obj;

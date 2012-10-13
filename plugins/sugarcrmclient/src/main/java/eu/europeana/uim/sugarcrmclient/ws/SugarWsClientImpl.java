@@ -24,6 +24,8 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 
 import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.internal.helpers.PropertyReader;
+import eu.europeana.uim.sugarcrmclient.internal.helpers.UimConfigurationProperty;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
@@ -63,9 +65,9 @@ public class SugarWsClientImpl implements SugarWsClient {
 
 	private WebServiceTemplate webServiceTemplate;
 
-	private String username;
+	private String username = PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_USERNAME);
 	
-	private String password;
+	private String password ;
 	
 	private String sessionID;
 

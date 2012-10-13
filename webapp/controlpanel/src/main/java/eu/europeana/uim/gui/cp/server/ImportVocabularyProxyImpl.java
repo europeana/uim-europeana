@@ -18,6 +18,8 @@ import eu.europeana.corelib.dereference.impl.Extractor;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
 import eu.europeana.corelib.dereference.impl.VocabularyMongoServer;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxy;
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 import eu.europeana.uim.gui.cp.shared.ControlledVocabularyDTO;
 import eu.europeana.uim.gui.cp.shared.EdmFieldDTO;
 import eu.europeana.uim.gui.cp.shared.MappingDTO;
@@ -31,10 +33,13 @@ public class ImportVocabularyProxyImpl extends
 	private static final long serialVersionUID = 1L;
 	private static ControlledVocabularyImpl controlledVocabulary;
 
-	private final static String MONGO_HOST = "localhost";
-	private final static int MONGO_PORT = 27017;
-	private final static String MONGO_DB = "vocabulary";
+	private final static String MONGO_HOST = PropertyReader
+			.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
+	private final static int MONGO_PORT = Integer.parseInt(PropertyReader
+			.getProperty(UimConfigurationProperty.MONGO_HOSTPORT));
+	private final static String MONGO_DB = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY);
 	private static Extractor extractor;
+	private final static String repository = PropertyReader.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	private static VocabularyMongoServer mongo;
 
 	{
@@ -58,7 +63,8 @@ public class ImportVocabularyProxyImpl extends
 				vocabulary.getName());
 
 		controlledVocabulary.setURI(vocabulary.getUri());
-		controlledVocabulary.setLocation(vocabulary.getLocation());
+		controlledVocabulary.setLocation(repository
+				+ vocabulary.getLocation());
 		if (StringUtils.isNotEmpty(vocabulary.getSuffix())) {
 			controlledVocabulary.setSuffix(vocabulary.getSuffix());
 		}
@@ -74,7 +80,7 @@ public class ImportVocabularyProxyImpl extends
 
 		extractor = new Extractor(controlledVocabulary, mongo);
 		extractor.setMappedField(originalField,
-				EdmLabel.getEdmLabel(StringUtils.split(mappedField,"@")[0]));
+				EdmLabel.getEdmLabel(StringUtils.split(mappedField, "@")[0]));
 		OriginalFieldDTO originalFieldDTO = new OriginalFieldDTO();
 		originalFieldDTO.setField(originalField);
 		EdmFieldDTO edmFieldDTO = new EdmFieldDTO();
@@ -141,9 +147,12 @@ public class ImportVocabularyProxyImpl extends
 			EdmFieldDTO edmFieldDTO = new EdmFieldDTO();
 			edmFieldDTO.setField(edmField.getSolrField());
 			edmFields.add(edmFieldDTO);
-			if(edmField.getClazz().getSuperclass().isAssignableFrom(ResourceOrLiteralType.class)||edmField.getClazz().getSuperclass().isAssignableFrom(LiteralType.class)){
+			if (edmField.getClazz().getSuperclass()
+					.isAssignableFrom(ResourceOrLiteralType.class)
+					|| edmField.getClazz().getSuperclass()
+							.isAssignableFrom(LiteralType.class)) {
 				EdmFieldDTO edmFieldDTOAttr = new EdmFieldDTO();
-				edmFieldDTOAttr.setField(edmField.getSolrField()+"@xml:lang");
+				edmFieldDTOAttr.setField(edmField.getSolrField() + "@xml:lang");
 				edmFields.add(edmFieldDTOAttr);
 			}
 		}
