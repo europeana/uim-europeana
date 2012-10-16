@@ -59,7 +59,7 @@ public final class PropertyReader {
 		for(String str:lines){
 			if(!StringUtils.startsWith(str, "#")&&str.length()>0){
 				String[] vals = StringUtils.split(str,"=");
-				fields.put(vals[0].trim(),vals[1].trim());
+				fields.put(vals[0].trim(),vals.length>1?vals[1].trim():"");
 			}
 		}
 		return fields;

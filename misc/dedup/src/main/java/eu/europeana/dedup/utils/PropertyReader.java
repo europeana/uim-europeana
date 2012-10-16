@@ -1,4 +1,4 @@
-package eu.europeana.uim.sugarcrmclient.internal.helpers;
+package eu.europeana.dedup.utils;
 
 import java.io.File;
 import java.io.IOException;

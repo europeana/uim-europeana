@@ -40,6 +40,8 @@ import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 import eu.europeana.dedup.utils.Decoupler;
+import eu.europeana.dedup.utils.PropertyReader;
+import eu.europeana.dedup.utils.UimConfigurationProperty;
 import eu.europeana.uim.common.BlockingInitializer;
 
 /**
@@ -63,7 +65,11 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	public DeduplicationServiceImpl() {
 
 		try {
-			final Mongo mongo = new Mongo();
+			final Mongo mongo = new Mongo(
+					PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+					Integer.parseInt(PropertyReader
+							.getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
 
 			BlockingInitializer initializer = new BlockingInitializer() {
 				@Override
@@ -71,11 +77,12 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 					try {
 						status = STATUS_BOOTING;
 						mongoserver = new EuropeanaIdRegistryMongoServer(mongo,
-								"EuropeanaIdRegistry");
+								PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY));
 
 						boolean test = mongoserver.oldIdExists("something");
-						boolean test2 = mongoserver.getDatastore().find(FailedRecord.class)
-								.filter("collectionId", "test").asList()!=null;
+						boolean test2 = mongoserver.getDatastore()
+								.find(FailedRecord.class)
+								.filter("collectionId", "test").asList() != null;
 						log.log(java.util.logging.Level.INFO, "OK");
 						status = STATUS_INITIALIZED;
 					} catch (Throwable t) {
@@ -126,71 +133,67 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 			}
 
 			List<Choice> choicelist = result.getChoiceList();
-			
+
 			String nonUUID = null;
-			
-			for(Choice choice : choicelist){
-				if(choice.ifProxy()){
-					ProxyType proxy = choice.getProxy();					
+
+			for (Choice choice : choicelist) {
+				if (choice.ifProxy()) {
+					ProxyType proxy = choice.getProxy();
 
 					nonUUID = proxy.getAbout();
 					break;
 				}
 			}
 
-			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID, collectionID, dedupres.getEdm(), sessionid);
-			
-			updateInternalReferences(result,lookup.getEuropeanaID());
-			
+			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
+					collectionID, dedupres.getEdm(), sessionid);
+
+			updateInternalReferences(result, lookup.getEuropeanaID());
+
 			try {
 				dedupres.setEdm(unmarshall(result));
 			} catch (JiBXException e) {
-				throw new DeduplicationException("Unmarshalling of new deduplicated record failed",e);
+				throw new DeduplicationException(
+						"Unmarshalling of new deduplicated record failed", e);
 			}
-			
+
 			dedupres.setLookupresult(lookup);
 
 			dedupres.setDerivedRecordID(lookup.getEuropeanaID());
-			
+
 			deduplist.add(dedupres);
 		}
 
 		return deduplist;
 
-	}	
-	
-	
-	
+	}
+
 	/**
 	 * Updates europeanaID references in the provided EDM JIBX representation
 	 * 
 	 * @param edm
 	 * @param newID
 	 */
-	private void updateInternalReferences(RDF edm,String newID){
+	private void updateInternalReferences(RDF edm, String newID) {
 		List<Choice> choicelist = edm.getChoiceList();
-		
-		for(Choice choice : choicelist){
-			if(choice.ifProxy()){
-				choice.getProxy().setAbout(newID);					
+
+		for (Choice choice : choicelist) {
+			if (choice.ifProxy()) {
+				choice.getProxy().setAbout(newID);
 			}
-			
-			if(choice.ifAggregation()){
+
+			if (choice.ifAggregation()) {
 				Aggregation aggregation = choice.getAggregation();
-				
+
 				aggregation.getAggregatedCHO().setResource(newID);
 			}
-			if(choice.ifProvidedCHO()){
+			if (choice.ifProvidedCHO()) {
 				choice.getProvidedCHO().setAbout(newID);
 			}
-			
-		}
-		
-		
-	}
-	
-	
 
+		}
+
+	}
 
 	/**
 	 * @param edm
@@ -206,32 +209,33 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 		mctx.setOutput(stringWriter);
 		mctx.marshalDocument(edm);
 		String edmstring = stringWriter.toString();
-	
-	return edmstring;
-}
 
+		return edmstring;
+	}
 
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#getFailedRecords(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.europeana.dedup.osgi.service.DeduplicationService#getFailedRecords
+	 * (java.lang.String)
 	 */
 	@Override
-	public List<Map<String,String>> getFailedRecords(String collectionId) {
-		
-		List<Map<String,String>> list = new ArrayList<Map<String,String>>();
-		ExtendedBlockingInitializer initializer = new ExtendedBlockingInitializer(collectionId,list) {
-			
+	public List<Map<String, String>> getFailedRecords(String collectionId) {
+
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		ExtendedBlockingInitializer initializer = new ExtendedBlockingInitializer(
+				collectionId, list) {
+
 			@Override
 			protected void initializeInternal() {
 				list = mongoserver.getFailedRecords(str);
-				System.out.println(list.size());
 			}
 		};
-		 initializer.initialize(EuropeanaIdRegistryMongoServer.class
-					.getClassLoader());
-		 
-		 return initializer.getList();
+		initializer.initialize(EuropeanaIdRegistryMongoServer.class
+				.getClassLoader());
+
+		return initializer.getList();
 	}
 
-	
 }

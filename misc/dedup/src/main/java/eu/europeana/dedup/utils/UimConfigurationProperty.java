@@ -1,4 +1,4 @@
-package eu.europeana.uim.enrichment.utils;
+package eu.europeana.dedup.utils;
 
 /**
  * UIM configuration enumeration
@@ -9,14 +9,7 @@ public enum UimConfigurationProperty {
 
 	MONGO_HOSTURL("mongo.hostUrl"),
 	MONGO_HOSTPORT("mongo.hostPort"),
-	MONGO_USERNAME("mongo.username"),
-	MONGO_PASSWORD("mongo.password"),
-	MONGO_DB_EUROPEANA("mongo.db.europeana"),
-	SOLR_HOSTURL("solr.hostUrl"),
-	SOLR_CORE("solr.core"),
-	MONGO_DB_COLLECTIONS("mongo.db.collections"),
-	MONGO_DB_EUROPEANA_ID("mongo.db.europeanaId"),
-	UIM_REPOSITORY("uim.repository");
+	MONGO_DB_EUROPEANAIDREGISTRY("mongo.db.europeanaidregistry");
 	
 	String field;
 	private UimConfigurationProperty(String field){

@@ -199,7 +199,9 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			solrServer = enrichmentService.getSolrServer();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
-			mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, "", "");
+			String uname = PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME)!=null?PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME):"";
+			String pass = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD)!=null?PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD):"";
+			mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
 			morphia = new Morphia();
 
 			mongoServer.createDatastore(morphia);
