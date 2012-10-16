@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -11,6 +12,7 @@ import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.junit.Test;
@@ -59,8 +61,27 @@ public class DecouplerTest {
 		
 		Assert.assertEquals("", 6, entitylist.size());
 		
+		for(RDF rdfval :entitylist){
+			String out = unmarshallObject(rdfval);
+			System.out.println(out);
+		}
+		
 	}
 	
 
+	private static String unmarshallObject(Object jibxObject) throws JiBXException{
+		IBindingFactory context;
+		context = BindingDirectory.getFactory(jibxObject.getClass());
+
+		IMarshallingContext mctx = context.createMarshallingContext();
+		mctx.setIndent(2);
+		StringWriter stringWriter = new StringWriter();
+		mctx.setOutput(stringWriter);
+		mctx.marshalDocument(jibxObject);		
+		
+		String xmlContents = stringWriter.toString();
+		
+		return xmlContents;
+	}
 	
 }

@@ -205,7 +205,6 @@ public class Decoupler {
 				List<HasView> viewlist = agg.getHasViewList();
 
 				for (HasView view : viewlist) {
-					if (refstring.contains(view.getResource()))
 						refstring.add(view.getResource());
 				}
 			}
