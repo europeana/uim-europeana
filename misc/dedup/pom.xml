@@ -1,22 +1,29 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>europeana-uim-europeanaspecific</artifactId>
-	<groupId>eu.europeana.europeanauim</groupId>
-	<version>0.99-SNAPSHOT</version>
-  </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>europeana-uim-europeanaspecific</artifactId>
+		<groupId>eu.europeana.europeanauim</groupId>
+		<version>0.99-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>europeana-uim-dedup</artifactId>
-  <name>Europeana Unique Identifier - Deduplication Service</name>
-  
-  
-  <dependencies>
-  		<dependency>
+	<artifactId>europeana-uim-dedup</artifactId>
+	<name>Europeana Unique Identifier - Deduplication Service</name>
+
+
+	<dependencies>
+		<dependency>
 			<groupId>eu.europeana.corelib</groupId>
 			<artifactId>corelib-solr-tools</artifactId>
 			<version>${corelib.version}</version>
 		</dependency>
-  </dependencies>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+	</dependencies>
+
 	<!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->
 
 	<!-- see http://felix.apache.org/site/maven-bundle-plugin-bnd.html for more 
@@ -47,15 +54,16 @@
 					<instructions>
 						<Export-Package>eu.europeana.dedup.osgi.service.*</Export-Package>
 						<Import-Package>
-						    eu.europeana.uim.common,
-						    javax.net.*,
-						    javax.management.*,
+							eu.europeana.uim.common,
+							javax.net.*,
+							javax.management.*,
 							org.jibx.runtime; version=1.2.3,
-							org.jibx.runtime.impl; version=1.2.3,
+							org.jibx.runtime.impl;
+							version=1.2.3,
 							!*
-							</Import-Package>
-						<Embed-Dependency>corelib-solr-tools,morphia,mongo-java-driver,corelib-solr-definitions,corelib-solr-dereference,commons-codec,commons-lang</Embed-Dependency>
-                        <Embed-Transitive>true</Embed-Transitive>
+						</Import-Package>
+						<Embed-Dependency>corelib-solr-tools,morphia,mongo-java-driver,corelib-solr-definitions,corelib-solr-dereference,commons-codec,commons-lang,commons-io</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
 					</instructions>
@@ -113,5 +121,5 @@
 		</pluginManagement>
 	</build>
 
-  
+
 </project>
