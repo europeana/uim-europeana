@@ -53,7 +53,6 @@ import com.mongodb.Mongo;
 
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
@@ -224,13 +223,9 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 						RDF rdf = (RDF) uctx
 								.unmarshalDocument(new StringReader(edmxml));
 
-						List<Choice> rdfchoicelist = rdf.getChoiceList();
 
-						for (Choice choice : rdfchoicelist) {
 
-							if (choice.ifProxy()) {
-
-								ProxyType cho = choice.getProxy();
+								ProxyType cho = rdf.getProxyList().get(0);
 
 								List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> dctypelist = cho
 										.getChoiceList();
@@ -264,9 +259,6 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 
 									}
 								}
-
-							}
-						}
 
 					}
 

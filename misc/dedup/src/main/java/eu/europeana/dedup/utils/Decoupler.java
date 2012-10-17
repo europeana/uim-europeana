@@ -37,7 +37,6 @@ import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
@@ -125,9 +124,7 @@ public class Decoupler {
 
 		for (ProxyType proxy : stub.proxyList) {
 			RDF cleandoc = new RDF();
-			Choice proxyChoice = new Choice();
-			proxyChoice.setProxy(proxy);
-			cleandoc.getChoiceList().add(proxyChoice);
+			cleandoc.getProxyList().add(proxy);  
 			appendPrCHOs(proxy, stub, cleandoc);
 			List<Aggregation> aggregations = appendAggregations(proxy, stub,
 					cleandoc);
@@ -158,10 +155,8 @@ public class Decoupler {
 			// value of the Proxy then append it to the RDF document
 			if (agg.getAggregatedCHO().getResource().equals(proxy.getAbout())) {
 				foundaggregationlist.add(agg);
-				Choice aggregationChoice = new Choice();
-				aggregationChoice.setAggregation(agg);
-				cleandoc.getChoiceList().add(aggregationChoice);
-
+				cleandoc.getAggregationList().add(agg);  
+				
 				if (stub.orphanEntities.contains(agg)) {
 					stub.orphanEntities.remove(agg);
 				} else {
@@ -217,9 +212,7 @@ public class Decoupler {
 
 		for (WebResourceType wtype : wrlist) {
 			if (refstring.contains(wtype.getAbout())) {
-				Choice webresourceChoice = new Choice();
-				webresourceChoice.setWebResource(wtype);
-				cleandoc.getChoiceList().add(webresourceChoice);
+				cleandoc.getWebResourceList().add(wtype); 
 			}
 		}
 
@@ -396,9 +389,7 @@ public class Decoupler {
 		String id = proxy.getAbout();
 		for (ProvidedCHOType cho : cholist) {
 			if (id.equals(cho.getAbout())) {
-				Choice choice = new Choice();
-				choice.setProvidedCHO(cho);
-				cleandoc.getChoiceList().add(choice);
+				cleandoc.getProvidedCHOList().add(cho); 
 			}
 		}
 
@@ -424,33 +415,25 @@ public class Decoupler {
 
 		for (AgentType agtype : agentlist) {
 			if (refset.contains(agtype.getAbout())) {
-				Choice choice = new Choice();
-				choice.setAgent(agtype);
-				cleandoc.getChoiceList().add(choice);
+				cleandoc.getAgentList().add(agtype);
 			}
 		}
 
 		for (PlaceType type : placelist) {
 			if (refset.contains(type.getAbout())) {
-				Choice choice = new Choice();
-				choice.setPlace(type);
-				cleandoc.getChoiceList().add(choice);
+				cleandoc.getPlaceList().add(type);   
 			}
 		}
 
 		for (TimeSpanType type : timelist) {
 			if (refset.contains(type.getAbout())) {
-				Choice choice = new Choice();
-				choice.setTimeSpan(type);
-				cleandoc.getChoiceList().add(choice);
+				cleandoc.getTimeSpanList().add(type); 
 			}
 		}
 
 		for (Concept type : conceptlist) {
 			if (refset.contains(type.getAbout())) {
-				Choice choice = new Choice();
-				choice.setConcept(type);
-				cleandoc.getChoiceList().add(choice);
+				cleandoc.getConceptList().add(type);  
 			}
 		}
 	}
@@ -550,50 +533,15 @@ public class Decoupler {
 		 * Initialize the object by appending all elements in the given  
 		 */
 		public void init() {
-			List<Choice> chlist = edmXML.getChoiceList();
-
-			for (Choice element : chlist) {
-
-				if (element.ifProxy()) {
-					ProxyType proxy = element.getProxy();
-					proxyList.add(proxy);
-				}
-				if (element.ifAgent()) {
-					AgentType agent = element.getAgent();
-					agentList.add(agent);
-				}
-				if (element.ifAggregation()) {
-					Aggregation aggregation = element.getAggregation();
-					aggregationList.add(aggregation);
-				}
-				if (element.ifConcept()) {
-					Concept concept = element.getConcept();
-					conceptList.add(concept);
-				}
-				if (element.ifEuropeanaAggregation()) {
-					EuropeanaAggregationType euaggregation = element
-							.getEuropeanaAggregation();
-					euaggregationList.add(euaggregation);
-				}
-				if (element.ifPlace()) {
-					PlaceType place = element.getPlace();
-					placeList.add(place);
-				}
-				if (element.ifProvidedCHO()) {
-					ProvidedCHOType prcho = element.getProvidedCHO();
-					prchoList.add(prcho);
-				}
-				if (element.ifTimeSpan()) {
-					TimeSpanType time = element.getTimeSpan();
-					timeList.add(time);
-				}
-				if (element.ifWebResource()) {
-					WebResourceType webresource = element.getWebResource();
-					webresourceList.add(webresource);
-				}
-
-			}
-
+			proxyList.addAll(edmXML.getProxyList());
+			agentList.addAll(edmXML.getAgentList());
+			aggregationList.addAll(edmXML.getAggregationList());
+			conceptList.addAll(edmXML.getConceptList());
+			euaggregationList.addAll(edmXML.getEuropeanaAggregationList());
+			placeList.addAll(edmXML.getPlaceList());
+			prchoList.addAll(edmXML.getProvidedCHOList());
+			timeList.addAll(edmXML.getTimeSpanList());
+			webresourceList.addAll(edmXML.getWebResourceList());
 		}
 
 	}

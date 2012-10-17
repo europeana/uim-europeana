@@ -270,7 +270,7 @@ mvn clean install -DskipTests
 export ANNOCULTOR_HOME=/path/to/annocultor/converters/europeana (linux)
 set ANNOCULTOR_HOME=\path\to\annocultor\converters\europeana (windows)
 
-3. The UIM Europeana Specific Compoenents:
+3. The UIM Europeana Specific Compenents:
 svn co https://europeanalabs.eu/svn/europeana/trunk/uim europeanacomponents
 cd europeanacomponents
 mvn clean install -DskipTests

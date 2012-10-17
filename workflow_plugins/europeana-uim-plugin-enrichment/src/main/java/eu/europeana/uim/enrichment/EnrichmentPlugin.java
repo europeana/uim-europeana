@@ -44,7 +44,6 @@ import eu.europeana.corelib.definitions.jibx.ProxyFor;
 import eu.europeana.corelib.definitions.jibx.ProxyIn;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
@@ -353,19 +352,14 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			NoSuchMethodException, IllegalAccessException,
 			InvocationTargetException {
 		ProxyType europeanaProxy = null;
-		ProvidedCHOType cho = null;
-		List<RDF.Choice> choices = rdf.getChoiceList();
-		for (RDF.Choice choice : choices) {
-			if (choice.ifProvidedCHO()) {
-				cho = choice.getProvidedCHO();
+		ProxyType proxy = rdf.getProxyList().get(0);
+		ProvidedCHOType cho = rdf.getProvidedCHOList().get(0);
 
+			if (proxy.getEuropeanaProxy() != null
+					&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+				europeanaProxy = proxy;
 			}
-			if (choice.ifProxy()
-					&& choice.getProxy().getEuropeanaProxy() != null
-					&& choice.getProxy().getEuropeanaProxy().isEuropeanaProxy()) {
-				europeanaProxy = choice.getProxy();
-			}
-		}
+
 		europeanaProxy.setAbout("/proxy/europeana" + cho.getAbout());
 		ProxyFor pf = new ProxyFor();
 		pf.setResource(cho.getAbout());
@@ -376,7 +370,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		pinList.add(pin);
 		europeanaProxy.setProxyInList(pinList);
 		for (Entity entity : entities) {
-			RDF.Choice choice = new RDF.Choice();
 			if (StringUtils.equals(entity.getClassName(), "Concept")) {
 				Concept concept = new Concept();
 				List<Field> fields = entity.getFields();
@@ -408,9 +401,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 					}
 
-					choice.setConcept(concept);
-					choices.add(choice);
-					rdf.setChoiceList(choices);
+					rdf.getConceptList().add(concept);   
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Timespan")) {
 
@@ -441,10 +432,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-
-					choice.setTimeSpan(ts);
-					choices.add(choice);
-					rdf.setChoiceList(choices);
+					
+					rdf.getTimeSpanList().add(ts);   
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Agent")) {
 
@@ -476,9 +465,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 					}
 
-					choice.setAgent(ts);
-					choices.add(choice);
-					rdf.setChoiceList(choices);
+					rdf.getAgentList().add(ts); 
 				}
 			} else {
 				PlaceType ts = new PlaceType();
@@ -511,14 +498,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 					}
 
-					choice.setPlace(ts);
-					choices.add(choice);
-					rdf.setChoiceList(choices);
+					rdf.getPlaceList().add(ts);
 				}
 			}
 		}
-		RDF.Choice choice = new RDF.Choice();
-		choice.setProxy(europeanaProxy);
+		rdf.getProxyList().add(europeanaProxy);
+		
 	}
 
 	private void addToHasMetList(ProxyType europeanaProxy, String value) {
@@ -536,10 +521,10 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		List<TimeSpanType> timespans = new CopyOnWriteArrayList<TimeSpanType>();
 		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
 		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
-		List<RDF.Choice> choices = new ArrayList<RDF.Choice>();
-		for (RDF.Choice rdfChoice : rdf.getChoiceList()) {
-			if (rdfChoice.ifAgent()) {
-				AgentType newAgent = rdfChoice.getAgent();
+
+		
+		for (AgentType newAgent : rdf.getAgentList()) {
+
 				for (AgentType agent : agents) {
 					if (StringUtils.equals(agent.getAbout(),
 							newAgent.getAbout())) {
@@ -550,9 +535,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					}
 				}
 				agents.add(newAgent);
-			} else if (rdfChoice.ifConcept()) {
-				Concept newConcept = rdfChoice.getConcept();
-				for (Concept concept : concepts) {
+			} 
+		
+		
+		for ( Concept newConcept : rdf.getConceptList()) {
+                 for(Concept concept: concepts){
+                	 
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
 						if (concept.getChoiceList().size() <= newConcept
@@ -560,10 +548,10 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 							concepts.remove(concept);
 						}
 					}
-				}
-				concepts.add(newConcept);
-			} else if (rdfChoice.ifTimeSpan()) {
-				TimeSpanType newTs = rdfChoice.getTimeSpan();
+                }
+ 				concepts.add(newConcept);
+			}
+		for (TimeSpanType newTs  : rdf.getTimeSpanList()) {
 				for (TimeSpanType ts : timespans) {
 					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
 						if (ts.getIsPartOfList().size() <= newTs
@@ -573,8 +561,9 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					}
 				}
 				timespans.add(newTs);
-			} else if (rdfChoice.ifPlace()) {
-				PlaceType newPlace = rdfChoice.getPlace();
+			} 
+		
+		for (PlaceType newPlace : rdf.getPlaceList()) {
 				for (PlaceType place : places) {
 					if (StringUtils.equals(place.getAbout(),
 							newPlace.getAbout())) {
@@ -585,44 +574,22 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					}
 				}
 				places.add(newPlace);
-			} else {
-				choices.add(rdfChoice);
-			}
-		}
-		for (AgentType agent : agents) {
-			Choice choice = new Choice();
-			choice.setAgent(agent);
-			choices.add(choice);
-		}
-		for (PlaceType place : places) {
-			Choice choice = new Choice();
-			choice.setPlace(place);
-			choices.add(choice);
-		}
-		for (TimeSpanType timespan : timespans) {
-			Choice choice = new Choice();
-			choice.setTimeSpan(timespan);
-			choices.add(choice);
-		}
-		for (Concept concept : concepts) {
-			Choice choice = new Choice();
-			choice.setConcept(concept);
-			choices.add(choice);
-		}
-		EuropeanaAggregationType europeanaAggregation = createEuropeanaAggregation(rdf);
-		RDF.Choice choice = new RDF.Choice();
-		choice.setEuropeanaAggregation(europeanaAggregation);
-		choices.add(choice);
-		rdfFinal.setChoiceList(choices);
+			} 
+		
+
+		rdfFinal.getAgentList().addAll(agents);
+		rdfFinal.getPlaceList().addAll(places);
+		rdfFinal.getTimeSpanList().addAll(timespans);
+		rdfFinal.getConceptList().addAll(concepts);
+
 		return rdfFinal;
 	}
 
 	private EuropeanaAggregationType createEuropeanaAggregation(RDF rdf) {
 		EuropeanaAggregationType europeanaAggregation = new EuropeanaAggregationType();
-		List<RDF.Choice> rdfList = rdf.getChoiceList();
-		for (RDF.Choice ch : rdfList) {
-			if (ch.ifProvidedCHO()) {
-				ProvidedCHOType cho = ch.getProvidedCHO();
+		List<ProvidedCHOType> choList = rdf.getProvidedCHOList();
+		for (ProvidedCHOType cho : choList) {
+
 				europeanaAggregation.setAbout("/aggregation/europeana/"
 						+ cho.getAbout());
 				LandingPage lp = new LandingPage();
@@ -643,7 +610,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 				AggregatedCHO aggrCHO = new AggregatedCHO();
 				aggrCHO.setResource(cho.getAbout());
 				europeanaAggregation.setAggregatedCHO(aggrCHO);
-			}
 		}
 		return europeanaAggregation;
 	}

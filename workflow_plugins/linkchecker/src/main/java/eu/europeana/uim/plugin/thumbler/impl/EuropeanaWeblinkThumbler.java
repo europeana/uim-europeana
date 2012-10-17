@@ -4,8 +4,11 @@ package eu.europeana.uim.plugin.thumbler.impl;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -37,7 +41,6 @@ import eu.europeana.corelib.db.service.ThumbnailService;
 import eu.europeana.corelib.db.service.impl.ThumbnailServiceImpl;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.plugin.thumbler.utils.ImageMagickUtils;
@@ -248,6 +251,12 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			try {
 				String name = guarded.getUrl().getFile();
 
+				URLConnection urlConnection = new URL(name).openConnection();
+				
+				InputStream inputStream = urlConnection.getInputStream();
+				StringWriter writer = new StringWriter();
+				IOUtils.copy(inputStream, writer, "UTF-8");
+				
 				target = new File(STORAGELOCATION
 						+ URLEncoder.encode(name, "UTF-8"));
 				FileUtils.copyURLToFile(new URL(url), target, 10000000,
@@ -280,17 +289,14 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		 * @return
 		 */
 		private String extractOrigDocumentId(RDF edmRecord) {
-			List<Choice> elements = edmRecord.getChoiceList();
-			for (Choice element : elements) {
+			List<Aggregation> elements = edmRecord.getAggregationList();
+			for (Aggregation aggregation : elements) {
 				// Deal with Aggregation elements
-				if (element.ifAggregation()) {
-					Aggregation aggregation = element.getAggregation();
 					if (aggregation.getObject() != null) {
 						return aggregation.getObject().getResource();
 					} else {
 						return "";
 					}
-				}
 			}
 			return null;
 

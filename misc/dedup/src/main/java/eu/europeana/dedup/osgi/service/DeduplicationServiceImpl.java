@@ -32,9 +32,9 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
 import eu.europeana.corelib.definitions.jibx.Aggregation;
+import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistryMongoServer;
 import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
@@ -132,18 +132,14 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 						"Unmarshalling of new deduplicated record failed", e);
 			}
 
-			List<Choice> choicelist = result.getChoiceList();
+			List<ProxyType> proxylist = result.getProxyList();
 
 			String nonUUID = null;
 
-			for (Choice choice : choicelist) {
-				if (choice.ifProxy()) {
-					ProxyType proxy = choice.getProxy();
-
+			for (ProxyType proxy : proxylist) {
 					nonUUID = proxy.getAbout();
-					break;
 				}
-			}
+			
 
 			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
 					collectionID, dedupres.getEdm(), sessionid);
@@ -175,24 +171,22 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	 * @param newID
 	 */
 	private void updateInternalReferences(RDF edm, String newID) {
-		List<Choice> choicelist = edm.getChoiceList();
+		 List<ProxyType> proxylist = edm.getProxyList();
+		 List<Aggregation> aggregationlist = edm.getAggregationList();
+		 List<ProvidedCHOType> prcholist = edm.getProvidedCHOList();
 
-		for (Choice choice : choicelist) {
-			if (choice.ifProxy()) {
-				choice.getProxy().setAbout(newID);
-			}
-
-			if (choice.ifAggregation()) {
-				Aggregation aggregation = choice.getAggregation();
-
-				aggregation.getAggregatedCHO().setResource(newID);
-			}
-			if (choice.ifProvidedCHO()) {
-				choice.getProvidedCHO().setAbout(newID);
-			}
-
+		for (ProxyType proxy : proxylist) {
+			proxy.setAbout(newID);
 		}
-
+		
+		for (Aggregation aggregation : aggregationlist) {
+			aggregation.setAbout(newID);
+		}
+		
+		for (ProvidedCHOType cho : prcholist) {
+			cho.setAbout(newID);
+		}
+		
 	}
 
 	/**

@@ -151,6 +151,7 @@
 							com.ctc.wstx.stax.*,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
+							javax.xml.transform.dom,
 							!*
 						</Import-Package>
 

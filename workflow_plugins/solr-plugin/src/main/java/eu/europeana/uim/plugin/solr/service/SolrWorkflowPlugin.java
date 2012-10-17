@@ -54,7 +54,6 @@ import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.jibx.RDF.Choice;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
@@ -140,33 +139,36 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 					0);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			RDF rdfCopy = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			List<Choice> choices = rdf.getChoiceList();
-			for (Choice choice : choices) {
-				if (choice.ifAgent()) {
-					dereferenceAgent(rdfCopy, datastore, choice.getAgent());
-				} else if (choice.ifAggregation()) {
-					dereferenceAggregation(rdfCopy, datastore,
-							choice.getAggregation());
-				} else if (choice.ifConcept()) {
-					dereferenceConcept(rdfCopy, datastore, choice.getConcept());
-				} else if (choice.ifEuropeanaAggregation()) {
-					dereferenceEuropeanaAggregation(rdfCopy, datastore,
-							choice.getEuropeanaAggregation());
-				} else if (choice.ifPlace()) {
-					dereferencePlace(rdf, datastore, choice.getPlace());
-				} else if (choice.ifProvidedCHO()) {
-					dereferenceProvidedCHO(rdfCopy, datastore,
-							choice.getProvidedCHO());
-				} else if (choice.ifProxy()) {
-					dereferenceProxy(rdfCopy, datastore, choice.getProxy());
-				} else if (choice.ifTimeSpan()) {
-					dereferenceTimespan(rdfCopy, datastore,
-							choice.getTimeSpan());
-				} else if (choice.ifWebResource()) {
-					dereferenceWebResource(rdfCopy, datastore,
-							choice.getWebResource());
-				}
+			
+			for(AgentType agent: rdf.getAgentList() ){
+				dereferenceAgent(rdfCopy, datastore, agent);
 			}
+			for(Concept concept: rdf.getConceptList() ){
+				dereferenceConcept(rdfCopy, datastore, concept);
+			}
+			for(Aggregation aggregation: rdf.getAggregationList()){
+				dereferenceAggregation(rdfCopy, datastore, aggregation);
+			}
+			for(EuropeanaAggregationType euaggregation: rdf.getEuropeanaAggregationList()){
+				dereferenceEuropeanaAggregation(rdfCopy, datastore, euaggregation);
+			}
+			for(PlaceType place: rdf.getPlaceList()){
+				dereferencePlace(rdfCopy, datastore, place);
+			}
+			for(ProvidedCHOType place: rdf.getProvidedCHOList()){
+				dereferenceProvidedCHO(rdfCopy, datastore, place);
+			}
+
+		    dereferenceProxy(rdfCopy, datastore, rdf.getProxyList().get(0));
+
+			for(TimeSpanType timespan: rdf.getTimeSpanList()){
+				dereferenceTimespan(rdfCopy, datastore, timespan);
+			}
+			
+			for(WebResourceType webresource: rdf.getWebResourceList()){
+				dereferenceWebResource(rdfCopy, datastore, webresource);
+			}
+			
 
 			IBindingFactory bfact2 = BindingDirectory.getFactory(RDF.class);
 			IMarshallingContext marshallingContext = bfact2
@@ -177,26 +179,24 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 			ProxyType europeanaProxy = null;
 			List<String> years = new ArrayList<String>();
-			for (Choice choice : rdfFinal.getChoiceList()) {
-				if (choice.ifProxy()) {
-					if (choice.getProxy().getEuropeanaProxy() == null
-							|| !choice.getProxy().getEuropeanaProxy()
+			for (ProxyType  proxy: rdfFinal.getProxyList()) {
+
+					if (proxy.getEuropeanaProxy() == null
+							|| proxy.getEuropeanaProxy()
 									.isEuropeanaProxy()) {
 						if (europeanaProxy == null) {
 							europeanaProxy = new ProxyType();
 							EuropeanaProxy prx = new EuropeanaProxy();
 							prx.setEuropeanaProxy(true);
 							europeanaProxy.setEuropeanaProxy(prx);
-							europeanaProxy.setType(choice.getProxy().getType());
+							europeanaProxy.setType(proxy.getType());
 						}
 						years.addAll(EuropeanaDateUtils
-								.createEuropeanaYears(choice.getProxy()));
+								.createEuropeanaYears(proxy));
 					} else {
-						europeanaProxy = choice.getProxy();
+						europeanaProxy = proxy;
 					}
-
 				}
-			}
 
 			if (europeanaProxy != null) {
 				List<Year> yearList = new ArrayList<Year>();
@@ -210,18 +210,15 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 				}
 				europeanaProxy.setYearList(yearList);
 			}
-			for (RDF.Choice choice : rdfFinal.getChoiceList()) {
-				if (choice.ifProxy()
-						&& choice.getProxy().getEuropeanaProxy() != null
-						&& choice.getProxy().getEuropeanaProxy()
-								.isEuropeanaProxy()) {
-					rdfFinal.getChoiceList().remove(choice);
+
+			 ProxyType proxy = rdfFinal.getProxyList().get(0);
+				if (proxy != null && proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+					rdfFinal.getProxyList().remove(proxy);
 
 				}
-			}
-			RDF.Choice choiceNew = new RDF.Choice();
-			choiceNew.setProxy(europeanaProxy);
-			rdfFinal.getChoiceList().add(choiceNew);
+			
+
+			rdfFinal.getProxyList().add(europeanaProxy);
 			marshallingContext.marshalDocument(rdfFinal, "UTF-8", null, out);
 			String der = out.toString("UTF-8");
 			mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
@@ -270,10 +267,10 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		List<TimeSpanType> timespans = new CopyOnWriteArrayList<TimeSpanType>();
 		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
 		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
-		List<RDF.Choice> choices = new ArrayList<RDF.Choice>();
-		for (RDF.Choice rdfChoice : rdf.getChoiceList()) {
-			if (rdfChoice.ifAgent()) {
-				AgentType newAgent = rdfChoice.getAgent();
+
+		
+		for (AgentType newAgent : rdf.getAgentList()) {
+
 				for (AgentType agent : agents) {
 					if (StringUtils.equals(agent.getAbout(),
 							newAgent.getAbout())) {
@@ -284,9 +281,12 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 					}
 				}
 				agents.add(newAgent);
-			} else if (rdfChoice.ifConcept()) {
-				Concept newConcept = rdfChoice.getConcept();
-				for (Concept concept : concepts) {
+			} 
+		
+		
+		for ( Concept newConcept : rdf.getConceptList()) {
+                 for(Concept concept: concepts){
+                	 
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
 						if (concept.getChoiceList().size() <= newConcept
@@ -294,10 +294,10 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 							concepts.remove(concept);
 						}
 					}
-				}
-				concepts.add(newConcept);
-			} else if (rdfChoice.ifTimeSpan()) {
-				TimeSpanType newTs = rdfChoice.getTimeSpan();
+                }
+ 				concepts.add(newConcept);
+			}
+		for (TimeSpanType newTs  : rdf.getTimeSpanList()) {
 				for (TimeSpanType ts : timespans) {
 					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
 						if (ts.getIsPartOfList().size() <= newTs
@@ -307,8 +307,9 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 					}
 				}
 				timespans.add(newTs);
-			} else if (rdfChoice.ifPlace()) {
-				PlaceType newPlace = rdfChoice.getPlace();
+			} 
+		
+		for (PlaceType newPlace : rdf.getPlaceList()) {
 				for (PlaceType place : places) {
 					if (StringUtils.equals(place.getAbout(),
 							newPlace.getAbout())) {
@@ -319,31 +320,14 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 					}
 				}
 				places.add(newPlace);
-			} else {
-				choices.add(rdfChoice);
-			}
-		}
-		for (AgentType agent : agents) {
-			Choice choice = new Choice();
-			choice.setAgent(agent);
-			choices.add(choice);
-		}
-		for (PlaceType place : places) {
-			Choice choice = new Choice();
-			choice.setPlace(place);
-			choices.add(choice);
-		}
-		for (TimeSpanType timespan : timespans) {
-			Choice choice = new Choice();
-			choice.setTimeSpan(timespan);
-			choices.add(choice);
-		}
-		for (Concept concept : concepts) {
-			Choice choice = new Choice();
-			choice.setConcept(concept);
-			choices.add(choice);
-		}
-		rdfFinal.setChoiceList(choices);
+			} 
+		
+
+		rdfFinal.getAgentList().addAll(agents);
+		rdfFinal.getPlaceList().addAll(places);
+		rdfFinal.getTimeSpanList().addAll(timespans);
+		rdfFinal.getConceptList().addAll(concepts);
+
 		return rdfFinal;
 	}
 
@@ -710,31 +694,22 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		for (Entry<String, List> entry : denormalize.entrySet()) {
 			if (StringUtils.equals(entry.getKey(), "concepts")) {
 				for (Concept concept : (List<Concept>) entry.getValue()) {
-					Choice choice = new Choice();
-					choice.setConcept(concept);
-					rdf.getChoiceList().add(choice);
-				}
+					rdf.getConceptList().add(concept); 				}
 			}
 			if (StringUtils.equals(entry.getKey(), "agents")) {
 				for (AgentType agent : (List<AgentType>) entry.getValue()) {
-					Choice choice = new Choice();
-					choice.setAgent(agent);
-					rdf.getChoiceList().add(choice);
+					rdf.getAgentList().add(agent); 
 				}
 			}
 			if (StringUtils.equals(entry.getKey(), "timespans")) {
 				for (TimeSpanType timespan : (List<TimeSpanType>) entry
 						.getValue()) {
-					Choice choice = new Choice();
-					choice.setTimeSpan(timespan);
-					rdf.getChoiceList().add(choice);
+					rdf.getTimeSpanList().add(timespan); 
 				}
 			}
 			if (StringUtils.equals(entry.getKey(), "places")) {
 				for (PlaceType place : (List<PlaceType>) entry.getValue()) {
-					Choice choice = new Choice();
-					choice.setPlace(place);
-					rdf.getChoiceList().add(choice);
+					rdf.getPlaceList().add(place); 
 				}
 			}
 		}
