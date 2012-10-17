@@ -235,12 +235,12 @@ public class Decoupler {
 				.getChoiceList();
 
 		for (eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice choiceitem : dclist) {
-			if (choiceitem.ifAlternative()) {
-				refset.add(returnResourceFromClass(choiceitem.getAlternative()));
-			}
-			if (choiceitem.ifConformsTo()) {
-				refset.add(returnResourceFromClass(choiceitem.getConformsTo()));
-			}
+			//if (choiceitem.ifAlternative()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getAlternative()));
+			//}
+			//if (choiceitem.ifConformsTo()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getConformsTo()));
+			//}
 			if (choiceitem.ifContributor()) {
 				refset.add(returnResourceFromClass(choiceitem.getContributor()));
 			}
@@ -256,73 +256,73 @@ public class Decoupler {
 			if (choiceitem.ifDate()) {
 				refset.add(returnResourceFromClass(choiceitem.getDate()));
 			}
-			if (choiceitem.ifDescription()) {
-				refset.add(returnResourceFromClass(choiceitem.getDescription()));
-			}
-			if (choiceitem.ifExtent()) {
-				refset.add(returnResourceFromClass(choiceitem.getExtent()));
-			}
-			if (choiceitem.ifFormat()) {
-				refset.add(returnResourceFromClass(choiceitem.getFormat()));
-			}
-			if (choiceitem.ifHasFormat()) {
-				refset.add(returnResourceFromClass(choiceitem.getHasFormat()));
-			}
-			if (choiceitem.ifHasPart()) {
-				refset.add(returnResourceFromClass(choiceitem.getHasPart()));
-			}
-			if (choiceitem.ifHasVersion()) {
-				refset.add(returnResourceFromClass(choiceitem.getHasVersion()));
-			}
-			if (choiceitem.ifIdentifier()) {
-				refset.add(returnResourceFromClass(choiceitem.getIdentifier()));
-			}
-			if (choiceitem.ifIsFormatOf()) {
-				refset.add(returnResourceFromClass(choiceitem.getIsFormatOf()));
-			}
-			if (choiceitem.ifIsPartOf()) {
-				refset.add(returnResourceFromClass(choiceitem.getIsPartOf()));
-			}
-			if (choiceitem.ifIsReferencedBy()) {
-				refset.add(returnResourceFromClass(choiceitem
-						.getIsReferencedBy()));
-			}
-			if (choiceitem.ifIsReplacedBy()) {
-				refset.add(returnResourceFromClass(choiceitem.getIsReplacedBy()));
-			}
-			if (choiceitem.ifIssued()) {
-				refset.add(returnResourceFromClass(choiceitem.getIssued()));
-			}
-			if (choiceitem.ifIsVersionOf()) {
-				refset.add(returnResourceFromClass(choiceitem.getIsVersionOf()));
-			}
-			if (choiceitem.ifLanguage()) {
-				refset.add(returnResourceFromClass(choiceitem.getLanguage()));
-			}
-			if (choiceitem.ifMedium()) {
-				refset.add(returnResourceFromClass(choiceitem.getMedium()));
-			}
+			//if (choiceitem.ifDescription()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getDescription()));
+			//}
+			//if (choiceitem.ifExtent()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getExtent()));
+			//}
+			//if (choiceitem.ifFormat()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getFormat()));
+			//}
+			//if (choiceitem.ifHasFormat()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getHasFormat()));
+			//}
+			//if (choiceitem.ifHasPart()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getHasPart()));
+			//}
+			//if (choiceitem.ifHasVersion()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getHasVersion()));
+			//}
+			//if (choiceitem.ifIdentifier()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getIdentifier()));
+			//}
+			//if (choiceitem.ifIsFormatOf()) {
+			//	refset.add(returnResourceFromClass(choiceitem.getIsFormatOf()));
+			//}
+//			if (choiceitem.ifIsPartOf()) {
+//				refset.add(returnResourceFromClass(choiceitem.getIsPartOf()));
+//			}
+//			if (choiceitem.ifIsReferencedBy()) {
+//				refset.add(returnResourceFromClass(choiceitem
+//						.getIsReferencedBy()));
+//			}
+//			if (choiceitem.ifIsReplacedBy()) {
+//				refset.add(returnResourceFromClass(choiceitem.getIsReplacedBy()));
+//			}
+//			if (choiceitem.ifIssued()) {
+//				refset.add(returnResourceFromClass(choiceitem.getIssued()));
+//			}
+//			if (choiceitem.ifIsVersionOf()) {
+//				refset.add(returnResourceFromClass(choiceitem.getIsVersionOf()));
+//			}
+//			if (choiceitem.ifLanguage()) {
+//				refset.add(returnResourceFromClass(choiceitem.getLanguage()));
+//			}
+//			if (choiceitem.ifMedium()) {
+//				refset.add(returnResourceFromClass(choiceitem.getMedium()));
+//			}
 			if (choiceitem.ifProvenance()) {
 				refset.add(returnResourceFromClass(choiceitem.getProvenance()));
 			}
-			if (choiceitem.ifPublisher()) {
-				refset.add(returnResourceFromClass(choiceitem.getPublisher()));
-			}
-			if (choiceitem.ifReferences()) {
-				refset.add(returnResourceFromClass(choiceitem.getReferences()));
-			}
-			if (choiceitem.ifRelation()) {
-				refset.add(returnResourceFromClass(choiceitem.getRelation()));
-			}
-			if (choiceitem.ifReplaces()) {
-				refset.add(returnResourceFromClass(choiceitem.getReplaces()));
-			}
-			if (choiceitem.ifRequires()) {
-				refset.add(returnResourceFromClass(choiceitem.getRequires()));
-			}
-			if (choiceitem.ifRights()) {
-				refset.add(returnResourceFromClass(choiceitem.getRights()));
-			}
+//			if (choiceitem.ifPublisher()) {
+//				refset.add(returnResourceFromClass(choiceitem.getPublisher()));
+//			}
+//			if (choiceitem.ifReferences()) {
+//				refset.add(returnResourceFromClass(choiceitem.getReferences()));
+//			}
+//			if (choiceitem.ifRelation()) {
+//				refset.add(returnResourceFromClass(choiceitem.getRelation()));
+//			}
+//			if (choiceitem.ifReplaces()) {
+//				refset.add(returnResourceFromClass(choiceitem.getReplaces()));
+//			}
+//			if (choiceitem.ifRequires()) {
+//				refset.add(returnResourceFromClass(choiceitem.getRequires()));
+//			}
+//			if (choiceitem.ifRights()) {
+//				refset.add(returnResourceFromClass(choiceitem.getRights()));
+//			}
 			if (choiceitem.ifSpatial()) {
 				refset.add(returnResourceFromClass(choiceitem.getSpatial()));
 			}
@@ -332,43 +332,43 @@ public class Decoupler {
 			if (choiceitem.ifSource()) {
 				refset.add(returnResourceFromClass(choiceitem.getSource()));
 			}
-			if (choiceitem.ifTableOfContents()) {
-				refset.add(returnResourceFromClass(choiceitem
-						.getTableOfContents()));
-			}
+//			if (choiceitem.ifTableOfContents()) {
+//				refset.add(returnResourceFromClass(choiceitem
+//						.getTableOfContents()));
+//			}
 			if (choiceitem.ifTemporal()) {
 				refset.add(returnResourceFromClass(choiceitem.getTemporal()));
 			}
-			if (choiceitem.ifTitle()) {
-				refset.add(returnResourceFromClass(choiceitem.getTitle()));
-			}
-			if (choiceitem.ifType()) {
-				refset.add(returnResourceFromClass(choiceitem.getType()));
-			}
+//			if (choiceitem.ifTitle()) {
+//				refset.add(returnResourceFromClass(choiceitem.getTitle()));
+//			}
+//			if (choiceitem.ifType()) {
+//				refset.add(returnResourceFromClass(choiceitem.getType()));
+//			}
 		}
 
 		//Do the same for the remaining EDM elements in the Proxy
 		refset.add(returnResourceFromClass(proxy.getCurrentLocation()));
 
-		refset.addAll(returnResourceFromList(proxy.getHasTypeList()));
+		//refset.addAll(returnResourceFromList(proxy.getHasTypeList()));
 
-		refset.addAll(returnResourceFromList(proxy.getIncorporateList()));
-
-		refset.addAll(returnResourceFromList(proxy.getIsDerivativeOfList()));
-
-		refset.add(returnResourceFromClass(proxy.getIsNextInSequence()));
-
-		refset.addAll(returnResourceFromList(proxy.getIsRelatedToList()));
-
-		refset.addAll(returnResourceFromList(proxy.getIsRelatedToList()));
-
-		refset.add(returnResourceFromClass(proxy.getIsRepresentationOf()));
-
-		refset.addAll(returnResourceFromList(proxy.getIsSimilarToList()));
-
-		refset.addAll(returnResourceFromList(proxy.getIsSuccessorOfList()));
-
-		refset.addAll(returnResourceFromList(proxy.getRealizeList()));
+//		refset.addAll(returnResourceFromList(proxy.getIncorporateList()));
+//
+//		refset.addAll(returnResourceFromList(proxy.getIsDerivativeOfList()));
+//
+//		refset.add(returnResourceFromClass(proxy.getIsNextInSequence()));
+//
+//		refset.addAll(returnResourceFromList(proxy.getIsRelatedToList()));
+//
+//		refset.addAll(returnResourceFromList(proxy.getIsRelatedToList()));
+//
+//		refset.add(returnResourceFromClass(proxy.getIsRepresentationOf()));
+//
+//		refset.addAll(returnResourceFromList(proxy.getIsSimilarToList()));
+//
+//		refset.addAll(returnResourceFromList(proxy.getIsSuccessorOfList()));
+//
+//		refset.addAll(returnResourceFromList(proxy.getRealizeList()));
 
 		//Populate the contextualEntities given the references located in refset
 		populateContextualEntities(refset, stub, cleandoc);
