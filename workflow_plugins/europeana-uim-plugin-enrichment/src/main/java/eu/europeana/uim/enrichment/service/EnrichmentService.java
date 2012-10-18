@@ -17,5 +17,7 @@ public interface EnrichmentService {
 	CommonsHttpSolrServer getSolrServer();
 
 	String getMongoDB();
+	
+	public CommonsHttpSolrServer getSuggestionServer();
 
 }

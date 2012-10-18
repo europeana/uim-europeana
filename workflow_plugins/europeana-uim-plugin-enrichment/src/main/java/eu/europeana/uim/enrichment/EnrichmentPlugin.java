@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
@@ -69,6 +70,7 @@ import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
+import eu.europeana.uim.enrichment.utils.SuggestionField;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
@@ -87,7 +89,7 @@ import eu.europeana.uim.sugarcrm.SugarCrmService;
 public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 	private static CommonsHttpSolrServer solrServer;
-
+	private static CommonsHttpSolrServer suggestionServer;
 	private static String mongoDB;
 	private static String mongoHost = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
@@ -108,6 +110,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static Morphia morphia;
 	private static List<SolrInputDocument> solrList;
+	private static List<SolrInputDocument> suggestionList;
 	private static OsgiEdmMongoServer mongoServer;
 	private static Mongo mongo;
 	private final static String PORTALURL = "http:///www.europeana.eu/portal/record";
@@ -195,7 +198,9 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 		try {
 			solrList = new ArrayList<SolrInputDocument>();
+			suggestionList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
+			suggestionServer = enrichmentService.getSuggestionServer();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
 			String uname = PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME)!=null?PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME):"";
@@ -235,7 +240,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			System.out.println("Committed in Solr Server");
 			solrServer.optimize();
 			System.out.println("Optimized");
+			
+			suggestionServer.add(suggestionList);
+			suggestionServer.commit();
+			suggestionServer.optimize();
 			solrList = new ArrayList<SolrInputDocument>();
+			suggestionList = new ArrayList<SolrInputDocument>();
 			mongoServer.close();
 		} catch (IOException e) {
 			context.getLoggingEngine().logFailed(
@@ -277,6 +287,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 			SolrInputDocument solrInputDocument = new SolrConstructor()
 					.constructSolrDocument(rdfFinal);
+			SolrInputDocument suggestionDocument = constructSuggestionDocument(solrInputDocument);
+			
 			FullBeanImpl fullBean = mongoConstructor.constructFullBean(
 					rdfFinal, mongoServer);
 			solrInputDocument.addField(
@@ -306,7 +318,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			while (retries < RETRIES) {
 				try {
 					solrList.add(solrInputDocument);
-
+					suggestionList.add(suggestionDocument);
 					recordNumber++;
 					return true;
 				} catch (SolrException e) {
@@ -347,19 +359,31 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		return false;
 	}
 
+	private SolrInputDocument constructSuggestionDocument(
+			SolrInputDocument solrInputDocument) {
+		SolrInputDocument suggestionDocument = new SolrInputDocument();
+		for(SuggestionField sField:SuggestionField.values()){
+			suggestionDocument = sField.transferField(solrInputDocument, suggestionDocument);
+		}
+		return suggestionDocument;
+	}
+
 	private void mergeEntities(RDF rdf, List<Entity> entities)
 			throws SecurityException, IllegalArgumentException,
 			NoSuchMethodException, IllegalAccessException,
 			InvocationTargetException {
 		ProxyType europeanaProxy = null;
-		ProxyType proxy = rdf.getProxyList().get(0);
-		ProvidedCHOType cho = rdf.getProvidedCHOList().get(0);
-
-			if (proxy.getEuropeanaProxy() != null
-					&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+		ProvidedCHOType cho = null;
+		
+		List<ProvidedCHOType> providedChoList= rdf.getProvidedCHOList();
+		cho = providedChoList.get(0);
+		List<ProxyType> proxyList = rdf.getProxyList();
+		for(ProxyType proxy:proxyList){
+			if (proxy.getEuropeanaProxy()!=null && proxy.getEuropeanaProxy().isEuropeanaProxy()){
 				europeanaProxy = proxy;
 			}
-
+		}
+		
 		europeanaProxy.setAbout("/proxy/europeana" + cho.getAbout());
 		ProxyFor pf = new ProxyFor();
 		pf.setResource(cho.getAbout());
@@ -370,6 +394,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		pinList.add(pin);
 		europeanaProxy.setProxyInList(pinList);
 		for (Entity entity : entities) {
+			
 			if (StringUtils.equals(entity.getClassName(), "Concept")) {
 				Concept concept = new Concept();
 				List<Field> fields = entity.getFields();
@@ -400,8 +425,9 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-
-					rdf.getConceptList().add(concept);   
+					List<Concept> conceptList = rdf.getConceptList();
+					conceptList.add(concept);
+					rdf.setConceptList(conceptList);
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Timespan")) {
 
@@ -432,8 +458,9 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-					
-					rdf.getTimeSpanList().add(ts);   
+					List<TimeSpanType> timespans = rdf.getTimeSpanList();
+					timespans.add(ts);
+					rdf.setTimeSpanList(timespans);
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Agent")) {
 
@@ -464,8 +491,9 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-
-					rdf.getAgentList().add(ts); 
+					List<AgentType> agents = rdf.getAgentList();
+					agents.add(ts);
+					rdf.setAgentList(agents);
 				}
 			} else {
 				PlaceType ts = new PlaceType();
@@ -497,13 +525,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-
-					rdf.getPlaceList().add(ts);
+					List<PlaceType> places = rdf.getPlaceList();
+					places.add(ts);
+					rdf.setPlaceList(places);
 				}
 			}
 		}
-		rdf.getProxyList().add(europeanaProxy);
-		
 	}
 
 	private void addToHasMetList(ProxyType europeanaProxy, String value) {
@@ -521,10 +548,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		List<TimeSpanType> timespans = new CopyOnWriteArrayList<TimeSpanType>();
 		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
 		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
-
-		
 		for (AgentType newAgent : rdf.getAgentList()) {
-
 				for (AgentType agent : agents) {
 					if (StringUtils.equals(agent.getAbout(),
 							newAgent.getAbout())) {
@@ -535,12 +559,9 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					}
 				}
 				agents.add(newAgent);
-			} 
-		
-		
-		for ( Concept newConcept : rdf.getConceptList()) {
-                 for(Concept concept: concepts){
-                	 
+		}
+		for(Concept newConcept:rdf.getConceptList())
+				for (Concept concept : concepts) {
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
 						if (concept.getChoiceList().size() <= newConcept
@@ -548,10 +569,10 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 							concepts.remove(concept);
 						}
 					}
-                }
- 				concepts.add(newConcept);
-			}
-		for (TimeSpanType newTs  : rdf.getTimeSpanList()) {
+				
+				concepts.add(newConcept);
+				}
+		for(TimeSpanType newTs:rdf.getTimeSpanList()){
 				for (TimeSpanType ts : timespans) {
 					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
 						if (ts.getIsPartOfList().size() <= newTs
@@ -559,11 +580,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 							timespans.remove(ts);
 						}
 					}
+				
+				
 				}
 				timespans.add(newTs);
 			} 
-		
-		for (PlaceType newPlace : rdf.getPlaceList()) {
+			for(PlaceType newPlace:rdf.getPlaceList())
 				for (PlaceType place : places) {
 					if (StringUtils.equals(place.getAbout(),
 							newPlace.getAbout())) {
@@ -572,24 +594,24 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 							places.remove(place);
 						}
 					}
-				}
+				
 				places.add(newPlace);
 			} 
+			rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
+			rdfFinal.setAggregationList(rdf.getAggregationList());
+			rdfFinal.setWebResourceList(rdf.getWebResourceList());
+			
+			List<EuropeanaAggregationType> eTypeList = new ArrayList<EuropeanaAggregationType>();
+			
+			eTypeList.add(createEuropeanaAggregation(rdf));
 		
-
-		rdfFinal.getAgentList().addAll(agents);
-		rdfFinal.getPlaceList().addAll(places);
-		rdfFinal.getTimeSpanList().addAll(timespans);
-		rdfFinal.getConceptList().addAll(concepts);
-
+		rdfFinal.setEuropeanaAggregationList(eTypeList);
 		return rdfFinal;
 	}
 
 	private EuropeanaAggregationType createEuropeanaAggregation(RDF rdf) {
 		EuropeanaAggregationType europeanaAggregation = new EuropeanaAggregationType();
-		List<ProvidedCHOType> choList = rdf.getProvidedCHOList();
-		for (ProvidedCHOType cho : choList) {
-
+				ProvidedCHOType cho = rdf.getProvidedCHOList().get(0);
 				europeanaAggregation.setAbout("/aggregation/europeana/"
 						+ cho.getAbout());
 				LandingPage lp = new LandingPage();
@@ -610,7 +632,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 				AggregatedCHO aggrCHO = new AggregatedCHO();
 				aggrCHO.setResource(cho.getAbout());
 				europeanaAggregation.setAggregatedCHO(aggrCHO);
-		}
 		return europeanaAggregation;
 	}
 
