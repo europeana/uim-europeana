@@ -533,15 +533,43 @@ public class Decoupler {
 		 * Initialize the object by appending all elements in the given  
 		 */
 		public void init() {
-			proxyList.addAll(edmXML.getProxyList());
-			agentList.addAll(edmXML.getAgentList());
-			aggregationList.addAll(edmXML.getAggregationList());
-			conceptList.addAll(edmXML.getConceptList());
-			euaggregationList.addAll(edmXML.getEuropeanaAggregationList());
-			placeList.addAll(edmXML.getPlaceList());
-			prchoList.addAll(edmXML.getProvidedCHOList());
-			timeList.addAll(edmXML.getTimeSpanList());
-			webresourceList.addAll(edmXML.getWebResourceList());
+			if(edmXML.getProxyList() != null){
+				proxyList.addAll(edmXML.getProxyList());
+			}
+
+			if(edmXML.getAgentList() != null){
+				agentList.addAll(edmXML.getAgentList());
+			}
+			
+			
+			if(edmXML.getAggregationList() != null){
+				aggregationList.addAll(edmXML.getAggregationList());
+			}
+			
+			if(edmXML.getConceptList()!=null){
+				conceptList.addAll(edmXML.getConceptList());
+			}
+			
+			if(edmXML.getEuropeanaAggregationList()!=null){
+				euaggregationList.addAll(edmXML.getEuropeanaAggregationList());
+			}
+			
+			if(edmXML.getPlaceList()!=null){
+				placeList.addAll(edmXML.getPlaceList());
+			}
+				
+			if(edmXML.getProvidedCHOList()!=null){
+				prchoList.addAll(edmXML.getProvidedCHOList());
+			}
+			
+			if(edmXML.getTimeSpanList()!=null){
+				timeList.addAll(edmXML.getTimeSpanList());
+			}
+			
+			if(edmXML.getWebResourceList()!=null){
+				webresourceList.addAll(edmXML.getWebResourceList());
+			}
+
 		}
 
 	}

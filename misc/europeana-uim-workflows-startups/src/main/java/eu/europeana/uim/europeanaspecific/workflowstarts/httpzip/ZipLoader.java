@@ -138,8 +138,6 @@ public class ZipLoader {
 					MetaDataRecord<I> mdr = storage.getMetaDataRecord(dedupres
 							.getDerivedRecordID());
 
-					// request.getCollection().
-					// storage.getMetaDataRecords(ids);
 
 					if (mdr == null) {
 						mdr = storage.createMetaDataRecord(
@@ -221,6 +219,9 @@ public class ZipLoader {
 		Set<String> existingLinks = Collections
 				.synchronizedSet(new HashSet<String>());
 
+		
+		if(aggregations != null)
+		{
 		for (Aggregation aggregation : aggregations) {
 
 			List<HasView> has_views = aggregation.getHasViewList();
@@ -257,11 +258,16 @@ public class ZipLoader {
 				addLink(theObject, mdr, existingLinks, true);
 			}
 		}
-
-		for (WebResourceType wrtype : webresources) {
-			String about = wrtype.getAbout();
-			addLink(about, mdr, existingLinks, true);
 		}
+
+		if(webresources != null)
+		{
+			for (WebResourceType wrtype : webresources) {
+				String about = wrtype.getAbout();
+				addLink(about, mdr, existingLinks, true);
+			}
+		}
+
 
 	}
 
