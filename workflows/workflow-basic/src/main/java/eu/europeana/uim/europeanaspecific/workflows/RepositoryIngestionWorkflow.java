@@ -28,7 +28,7 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
 public class RepositoryIngestionWorkflow extends AbstractWorkflow{
 
 	public RepositoryIngestionWorkflow(){
-		super("Dereference Collection",
+		super("D: Dereference Collection",
 		        "Dereference functionality of UIM");
 
 		        setStart(new BatchWorkflowStart());

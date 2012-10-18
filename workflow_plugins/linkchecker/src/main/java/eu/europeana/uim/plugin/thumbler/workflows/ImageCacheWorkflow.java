@@ -35,7 +35,7 @@ public class ImageCacheWorkflow extends AbstractWorkflow{
 	 * Initialise the workflow by creating a new instance of this class.
 	 */
 	public ImageCacheWorkflow(){
-        super("Image Caching",
+        super("G: Image Caching",
                 "Workflow which is used to cache selected images into MongoDB.");
 
         //Load metadata records from storage engine and offer them

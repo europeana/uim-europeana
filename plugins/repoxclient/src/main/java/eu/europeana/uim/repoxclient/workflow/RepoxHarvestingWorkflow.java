@@ -31,7 +31,7 @@ public class RepoxHarvestingWorkflow extends AbstractWorkflow{
 	
 	public RepoxHarvestingWorkflow(RepoxUIMService repoxservice,
 			SugarCrmService sugarservice) {
-		super("Harvest Remote Repox Datasource", "Initiates a remote harvesting at " +
+		super("A: Harvest Remote Repox Datasource", "Initiates a remote harvesting at " +
 				"the remote Repox server");
 		
         setStart(new BatchWorkflowStart());

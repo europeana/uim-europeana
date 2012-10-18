@@ -40,7 +40,7 @@ public class InitialIngestionWorkflow extends AbstractWorkflow{
 	 */
 	public InitialIngestionWorkflow(DeduplicationService service) {
 
-		super("(Re)Import Data from Mint Mapping Tool",
+		super("C: (Re)Import Data from Mint Mapping Tool",
         "Populates a UIM collection with specific EDM data from Mint");
 
         setStart(new HttpZipWorkflowStart("HttpZipWorkflowStart","Downloads zipped EDM file",service));

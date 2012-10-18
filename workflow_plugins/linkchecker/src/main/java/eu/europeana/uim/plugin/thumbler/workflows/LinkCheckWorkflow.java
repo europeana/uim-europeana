@@ -34,7 +34,7 @@ public class LinkCheckWorkflow extends AbstractWorkflow {
      * Creates a new instance of this class.
      */
     public LinkCheckWorkflow() {
-        super("Link Validation",
+        super("F: Link Validation",
                 "Workflow which is used to submit links to be checked.");
 
         //Load metadata records from storage engine and offer them

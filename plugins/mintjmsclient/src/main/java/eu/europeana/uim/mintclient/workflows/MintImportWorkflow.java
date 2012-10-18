@@ -30,7 +30,7 @@ public class MintImportWorkflow extends AbstractWorkflow{
 
 	public MintImportWorkflow(MintUIMService mintservice,
 			SugarCrmService sugarservice) {
-		super("Import Repox data into Mint", "Imports data from Repox into Mint, thus creating a mapping session");
+		super("B: Import Repox data into Mint", "Imports data from Repox into Mint, thus creating a mapping session");
 	    setStart(new BatchWorkflowStart());
 	    addStep(new MintImportPlugin(mintservice, sugarservice,
         		"Mint Importer Plugin","Preforms the migration from Repox to Mint"));

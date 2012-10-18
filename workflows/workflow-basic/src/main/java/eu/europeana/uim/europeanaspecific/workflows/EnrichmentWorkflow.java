@@ -9,7 +9,7 @@ public class EnrichmentWorkflow extends AbstractWorkflow {
 
 
 	public EnrichmentWorkflow(){
-			super("Enrich Collection",
+			super("E: Enrich Collection",
 			        "Enrich and Ingest Records into SOLR and MONGODB");
 	
 			        setStart(new BatchWorkflowStart());
