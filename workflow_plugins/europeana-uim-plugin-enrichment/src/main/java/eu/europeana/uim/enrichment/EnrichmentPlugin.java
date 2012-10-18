@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
@@ -203,8 +202,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			suggestionServer = enrichmentService.getSuggestionServer();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
-			String uname = PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME)!=null?PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME):"";
-			String pass = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD)!=null?PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD):"";
+			String uname = PropertyReader
+					.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
+					.getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
+			String pass = PropertyReader
+					.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
+					.getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
 			mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
 			morphia = new Morphia();
 
@@ -240,7 +243,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			System.out.println("Committed in Solr Server");
 			solrServer.optimize();
 			System.out.println("Optimized");
-			
+
 			suggestionServer.add(suggestionList);
 			suggestionServer.commit();
 			suggestionServer.optimize();
@@ -288,7 +291,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			SolrInputDocument solrInputDocument = new SolrConstructor()
 					.constructSolrDocument(rdfFinal);
 			SolrInputDocument suggestionDocument = constructSuggestionDocument(solrInputDocument);
-			
+
 			FullBeanImpl fullBean = mongoConstructor.constructFullBean(
 					rdfFinal, mongoServer);
 			solrInputDocument.addField(
@@ -362,8 +365,9 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 	private SolrInputDocument constructSuggestionDocument(
 			SolrInputDocument solrInputDocument) {
 		SolrInputDocument suggestionDocument = new SolrInputDocument();
-		for(SuggestionField sField:SuggestionField.values()){
-			suggestionDocument = sField.transferField(solrInputDocument, suggestionDocument);
+		for (SuggestionField sField : SuggestionField.values()) {
+			suggestionDocument = sField.transferField(solrInputDocument,
+					suggestionDocument);
 		}
 		return suggestionDocument;
 	}
@@ -374,16 +378,17 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			InvocationTargetException {
 		ProxyType europeanaProxy = null;
 		ProvidedCHOType cho = null;
-		
-		List<ProvidedCHOType> providedChoList= rdf.getProvidedCHOList();
+
+		List<ProvidedCHOType> providedChoList = rdf.getProvidedCHOList();
 		cho = providedChoList.get(0);
 		List<ProxyType> proxyList = rdf.getProxyList();
-		for(ProxyType proxy:proxyList){
-			if (proxy.getEuropeanaProxy()!=null && proxy.getEuropeanaProxy().isEuropeanaProxy()){
+		for (ProxyType proxy : proxyList) {
+			if (proxy.getEuropeanaProxy() != null
+					&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
 				europeanaProxy = proxy;
 			}
 		}
-		
+
 		europeanaProxy.setAbout("/proxy/europeana" + cho.getAbout());
 		ProxyFor pf = new ProxyFor();
 		pf.setResource(cho.getAbout());
@@ -394,7 +399,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		pinList.add(pin);
 		europeanaProxy.setProxyInList(pinList);
 		for (Entity entity : entities) {
-			
+
 			if (StringUtils.equals(entity.getClassName(), "Concept")) {
 				Concept concept = new Concept();
 				List<Field> fields = entity.getFields();
@@ -425,7 +430,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-					List<Concept> conceptList = rdf.getConceptList();
+					List<Concept> conceptList = rdf.getConceptList() != null ? rdf
+							.getConceptList() : new ArrayList<Concept>();
 					conceptList.add(concept);
 					rdf.setConceptList(conceptList);
 				}
@@ -458,7 +464,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-					List<TimeSpanType> timespans = rdf.getTimeSpanList();
+					List<TimeSpanType> timespans = rdf.getTimeSpanList() != null ? rdf
+							.getTimeSpanList() : new ArrayList<TimeSpanType>();
 					timespans.add(ts);
 					rdf.setTimeSpanList(timespans);
 				}
@@ -491,7 +498,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-					List<AgentType> agents = rdf.getAgentList();
+					List<AgentType> agents = rdf.getAgentList() != null ? rdf
+							.getAgentList() : new ArrayList<AgentType>();
 					agents.add(ts);
 					rdf.setAgentList(agents);
 				}
@@ -525,7 +533,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 						}
 
 					}
-					List<PlaceType> places = rdf.getPlaceList();
+					List<PlaceType> places = rdf.getPlaceList() != null ? rdf
+							.getPlaceList() : new ArrayList<PlaceType>();
 					places.add(ts);
 					rdf.setPlaceList(places);
 				}
@@ -548,7 +557,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		List<TimeSpanType> timespans = new CopyOnWriteArrayList<TimeSpanType>();
 		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
 		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
-		for (AgentType newAgent : rdf.getAgentList()) {
+		if (rdf.getAgentList() != null) {
+			for (AgentType newAgent : rdf.getAgentList()) {
 				for (AgentType agent : agents) {
 					if (StringUtils.equals(agent.getAbout(),
 							newAgent.getAbout())) {
@@ -559,8 +569,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 					}
 				}
 				agents.add(newAgent);
+			}
+			rdfFinal.setAgentList(agents);
 		}
-		for(Concept newConcept:rdf.getConceptList())
+		if (rdf.getConceptList() != null) {
+			for (Concept newConcept : rdf.getConceptList())
 				for (Concept concept : concepts) {
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
@@ -569,10 +582,13 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 							concepts.remove(concept);
 						}
 					}
-				
-				concepts.add(newConcept);
+
+					concepts.add(newConcept);
 				}
-		for(TimeSpanType newTs:rdf.getTimeSpanList()){
+			rdfFinal.setConceptList(concepts);
+		}
+		if (rdf.getTimeSpanList() != null) {
+			for (TimeSpanType newTs : rdf.getTimeSpanList()) {
 				for (TimeSpanType ts : timespans) {
 					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
 						if (ts.getIsPartOfList().size() <= newTs
@@ -580,12 +596,14 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 							timespans.remove(ts);
 						}
 					}
-				
-				
+
 				}
 				timespans.add(newTs);
-			} 
-			for(PlaceType newPlace:rdf.getPlaceList())
+			}
+			rdfFinal.setTimeSpanList(timespans);
+		}
+		if (rdf.getPlaceList() != null) {
+			for (PlaceType newPlace : rdf.getPlaceList()){
 				for (PlaceType place : places) {
 					if (StringUtils.equals(place.getAbout(),
 							newPlace.getAbout())) {
@@ -594,44 +612,52 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 							places.remove(place);
 						}
 					}
-				
-				places.add(newPlace);
-			} 
-			rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
-			rdfFinal.setAggregationList(rdf.getAggregationList());
-			rdfFinal.setWebResourceList(rdf.getWebResourceList());
-			
-			List<EuropeanaAggregationType> eTypeList = new ArrayList<EuropeanaAggregationType>();
-			
-			eTypeList.add(createEuropeanaAggregation(rdf));
-		
+
+					places.add(newPlace);
+				}
+			rdfFinal.setPlaceList(places);
+		}
+		}
+		rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
+		rdfFinal.setAggregationList(rdf.getAggregationList());
+		rdfFinal.setWebResourceList(rdf.getWebResourceList());
+
+		List<EuropeanaAggregationType> eTypeList = new ArrayList<EuropeanaAggregationType>();
+
+		eTypeList.add(createEuropeanaAggregation(rdf));
+
 		rdfFinal.setEuropeanaAggregationList(eTypeList);
 		return rdfFinal;
 	}
 
 	private EuropeanaAggregationType createEuropeanaAggregation(RDF rdf) {
-		EuropeanaAggregationType europeanaAggregation = new EuropeanaAggregationType();
-				ProvidedCHOType cho = rdf.getProvidedCHOList().get(0);
-				europeanaAggregation.setAbout("/aggregation/europeana/"
-						+ cho.getAbout());
-				LandingPage lp = new LandingPage();
-				lp.setResource(PORTALURL + cho.getAbout() + SUFFIX);
-				europeanaAggregation.setLandingPage(lp);
-				Country countryType = new Country();
-				countryType.setString(country);
-				europeanaAggregation.setCountry(countryType);
-				Creator creatorType = new Creator();
-				creatorType.setString(creator);
-				europeanaAggregation.setCreator(creatorType);
-				Language1 languageType = new Language1();
-				languageType.setString(language);
-				europeanaAggregation.setLanguage(languageType);
-				Rights1 rightsType = new Rights1();
-				rightsType.setResource(rights);
-				europeanaAggregation.setRights(rightsType);
-				AggregatedCHO aggrCHO = new AggregatedCHO();
-				aggrCHO.setResource(cho.getAbout());
-				europeanaAggregation.setAggregatedCHO(aggrCHO);
+		EuropeanaAggregationType europeanaAggregation = null;
+		if(rdf.getEuropeanaAggregationList()!=null && rdf.getEuropeanaAggregationList().size()>0){
+			europeanaAggregation =  rdf.getEuropeanaAggregationList().get(0);
+		} else {
+			europeanaAggregation = new EuropeanaAggregationType();
+		}
+		ProvidedCHOType cho = rdf.getProvidedCHOList().get(0);
+		europeanaAggregation.setAbout("/aggregation/europeana/"
+				+ cho.getAbout());
+		LandingPage lp = new LandingPage();
+		lp.setResource(PORTALURL + cho.getAbout() + SUFFIX);
+		europeanaAggregation.setLandingPage(lp);
+		Country countryType = new Country();
+		countryType.setString(europeanaAggregation.getCountry()!=null?europeanaAggregation.getCountry().getString():country);
+		europeanaAggregation.setCountry(countryType);
+		Creator creatorType = new Creator();
+		creatorType.setString("Europeana");
+		europeanaAggregation.setCreator(creatorType);
+		Language1 languageType = new Language1();
+		languageType.setString(europeanaAggregation.getLanguage()!=null?europeanaAggregation.getLanguage().getString():language);
+		europeanaAggregation.setLanguage(languageType);
+		Rights1 rightsType = new Rights1();
+		rightsType.setResource(europeanaAggregation.getRights()!=null?europeanaAggregation.getRights().getResource():rights);
+		europeanaAggregation.setRights(rightsType);
+		AggregatedCHO aggrCHO = new AggregatedCHO();
+		aggrCHO.setResource(cho.getAbout());
+		europeanaAggregation.setAggregatedCHO(aggrCHO);
 		return europeanaAggregation;
 	}
 
