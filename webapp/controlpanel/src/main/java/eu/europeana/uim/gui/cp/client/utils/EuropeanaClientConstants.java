@@ -20,8 +20,9 @@
  */
 package eu.europeana.uim.gui.cp.client.utils;
 
-import eu.europeana.dedup.utils.PropertyReader;
-import eu.europeana.dedup.utils.UimConfigurationProperty;
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
+
 
 /**
  * String constants for GUI labels.
