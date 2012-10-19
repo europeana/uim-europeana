@@ -71,7 +71,7 @@ public class ImportVocabularyProxyImpl extends
 
 		controlledVocabulary.setRules(vocabulary.getRules());
 		extractor = new Extractor(controlledVocabulary, mongo);
-		vocabulary.setMapping(convertEdmMap(extractor.readSchema(vocabulary
+		vocabulary.setMapping(convertEdmMap(extractor.readSchema(repository+vocabulary
 				.getLocation())));
 		return vocabulary;
 	}

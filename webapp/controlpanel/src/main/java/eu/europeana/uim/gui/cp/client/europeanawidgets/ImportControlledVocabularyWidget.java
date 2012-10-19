@@ -554,11 +554,8 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		vocabulary.setLocation(retrieveFileName());
 		vocabulary.setUri(DOM.getElementById("vocabularyURI")
 				.<InputElement> cast().getValue());
-		Window.alert(DOM.getElementById("vocabularyRules")
-				.<InputElement> cast().getValue().split(" ")[0]);
 		vocabulary.setRules(DOM.getElementById("vocabularyRules")
 				.<InputElement> cast().getValue().split(" "));
-		Window.alert("just after");
 		importedVocabulary.importVocabulary(vocabulary,
 				new AsyncCallback<ControlledVocabularyDTO>() {
 					@Override
