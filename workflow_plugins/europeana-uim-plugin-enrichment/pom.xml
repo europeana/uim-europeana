@@ -164,8 +164,8 @@
 					<instructions>
 						<Export-Package>eu.europeana.uim.enrichment.*</Export-Package>
 						<Import-Package>
-							org.apache.solr.*;version="3.5.0",
-							org.apache.lucene.*;version="3.5.0",
+							org.apache.solr.*;version="4.0.0",
+							org.apache.lucene.*;version="4.0.0",
 							org.xmlpull.v1,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,

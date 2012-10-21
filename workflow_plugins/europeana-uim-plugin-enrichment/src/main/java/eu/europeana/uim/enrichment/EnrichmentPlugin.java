@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
@@ -87,8 +87,7 @@ import eu.europeana.uim.sugarcrm.SugarCrmService;
  */
 public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
-	private static CommonsHttpSolrServer solrServer;
-	private static CommonsHttpSolrServer suggestionServer;
+	private static HttpSolrServer solrServer;
 	private static String mongoDB;
 	private static String mongoHost = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
@@ -199,7 +198,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			solrList = new ArrayList<SolrInputDocument>();
 			suggestionList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
-			suggestionServer = enrichmentService.getSuggestionServer();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
 			String uname = PropertyReader
@@ -244,11 +242,8 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			solrServer.optimize();
 			System.out.println("Optimized");
 
-			suggestionServer.add(suggestionList);
-			suggestionServer.commit();
-			suggestionServer.optimize();
+			
 			solrList = new ArrayList<SolrInputDocument>();
-			suggestionList = new ArrayList<SolrInputDocument>();
 			mongoServer.close();
 		} catch (IOException e) {
 			context.getLoggingEngine().logFailed(
@@ -275,7 +270,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
-
+			if(solrServer.ping()==null){
+				log.log(Level.SEVERE,
+						"Solr server " + solrServer.getBaseURL() + " is not available. " +
+								"\nChange solr.host and solr.port properties in uim.properties and restart UIM");
+				return false;
+			}
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
@@ -290,7 +290,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 			SolrInputDocument solrInputDocument = new SolrConstructor()
 					.constructSolrDocument(rdfFinal);
-			SolrInputDocument suggestionDocument = constructSuggestionDocument(solrInputDocument);
 
 			FullBeanImpl fullBean = mongoConstructor.constructFullBean(
 					rdfFinal, mongoServer);
@@ -321,12 +320,12 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			while (retries < RETRIES) {
 				try {
 					solrList.add(solrInputDocument);
-					suggestionList.add(suggestionDocument);
 					recordNumber++;
 					return true;
 				} catch (SolrException e) {
 					log.log(Level.WARNING, "Solr Exception occured with error "
 							+ e.getMessage() + "\nRetrying");
+					
 				}
 				retries++;
 			}
@@ -362,15 +361,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		return false;
 	}
 
-	private SolrInputDocument constructSuggestionDocument(
-			SolrInputDocument solrInputDocument) {
-		SolrInputDocument suggestionDocument = new SolrInputDocument();
-		for (SuggestionField sField : SuggestionField.values()) {
-			suggestionDocument = sField.transferField(solrInputDocument,
-					suggestionDocument);
-		}
-		return suggestionDocument;
-	}
+	
 
 	private void mergeEntities(RDF rdf, List<Entity> entities)
 			throws SecurityException, IllegalArgumentException,
@@ -661,11 +652,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		return europeanaAggregation;
 	}
 
-	public CommonsHttpSolrServer getSolrServer() {
+	public HttpSolrServer getSolrServer() {
 		return solrServer;
 	}
 
-	public void setSolrServer(CommonsHttpSolrServer solrServer) {
+	public void setSolrServer(HttpSolrServer solrServer) {
 		EnrichmentPlugin.solrServer = solrServer;
 	}
 

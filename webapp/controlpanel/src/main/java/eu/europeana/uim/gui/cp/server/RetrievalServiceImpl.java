@@ -39,7 +39,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.jibx.runtime.BindingDirectory;
@@ -102,7 +102,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 	private final static Logger log = Logger
 			.getLogger(RetrievalServiceImpl.class.getName());
 
-	private static CommonsHttpSolrServer solrServer;
+	private static HttpSolrServer solrServer;
 	private static EdmMongoServerImpl mongoServer;
 
 	/**
@@ -112,7 +112,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 
 		super();
 		try {
-			solrServer = new CommonsHttpSolrServer(
+			solrServer = new HttpSolrServer(
 					PropertyReader
 							.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
 							+ PropertyReader

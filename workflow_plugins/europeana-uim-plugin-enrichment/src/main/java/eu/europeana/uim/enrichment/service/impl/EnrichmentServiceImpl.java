@@ -3,7 +3,7 @@ package eu.europeana.uim.enrichment.service.impl;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
 import eu.annocultor.converters.europeana.Entity;
@@ -15,8 +15,8 @@ import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 public class EnrichmentServiceImpl implements EnrichmentService {
 
 	public static EuropeanaEnrichmentTagger tagger;
-	private static CommonsHttpSolrServer solrServer;
-	private static CommonsHttpSolrServer suggestionServer;
+	private static HttpSolrServer solrServer;
+	private static HttpSolrServer suggestionServer;
 	private static String mongoDB=PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
 	private static String mongoHost=PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
 	private static String mongoPort= PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
@@ -27,8 +27,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	public EnrichmentServiceImpl(){
 		tagger = new EuropeanaEnrichmentTagger();
 		try {
-		solrServer = new CommonsHttpSolrServer(new URL(solrUrl)+solrCore);
-		suggestionServer = new CommonsHttpSolrServer(new URL(solrUrl)+solrCoreSuggestions);
+		solrServer = new HttpSolrServer(new URL(solrUrl)+solrCore);
+		suggestionServer = new HttpSolrServer(new URL(solrUrl)+solrCoreSuggestions);
 			tagger.init("Europeana");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -40,7 +40,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	
 
 	@Override
-	public  CommonsHttpSolrServer getSolrServer() {
+	public  HttpSolrServer getSolrServer() {
 		return solrServer;
 	}
 
@@ -95,7 +95,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
 	
 
-	public void setSolrServer(CommonsHttpSolrServer solrServer) {
+	public void setSolrServer(HttpSolrServer solrServer) {
 		EnrichmentServiceImpl.solrServer = solrServer;
 	}
 
@@ -108,7 +108,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	}
 
 	@Override
-	public CommonsHttpSolrServer getSuggestionServer(){
+	public HttpSolrServer getSuggestionServer(){
 		return EnrichmentServiceImpl.suggestionServer;
 	}
 
