@@ -69,7 +69,7 @@ public class MintSendAsyncTest {
 	@Ignore
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
-		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient(); 
+		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient("uim.properties");
 		log.info("Initialized test context & created Asynchronous Client");
 	}
 	    

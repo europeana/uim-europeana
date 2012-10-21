@@ -75,7 +75,7 @@ public class MintClientFactory {
 		 * @throws MintOSGIClientException
 		 * @throws MintRemoteException
 		 */
-		public MintAMPQClient createClient() throws MintOSGIClientException,
+		public MintAMPQClient createClient(String path) throws MintOSGIClientException,
 				MintRemoteException;
 	}
 
@@ -114,13 +114,13 @@ public class MintClientFactory {
 		 * createClient()
 		 */
 		@Override
-		public MintAMPQClientASync createClient()
+		public MintAMPQClientASync createClient(String path)
 				throws MintOSGIClientException {
 
 			if (listenerClass == null) {
-				return MintAMPQClientAsyncImpl.getClient();
+				return MintAMPQClientAsyncImpl.getClient(path);
 			} else {
-				return MintAMPQClientAsyncImpl.getClient(listenerClass);
+				return MintAMPQClientAsyncImpl.getClient(path,listenerClass);
 			}
 
 		}
@@ -143,8 +143,8 @@ public class MintClientFactory {
 		 * createClient()
 		 */
 		@Override
-		public MintAMPQClientSync createClient() throws MintOSGIClientException {
-			return MintAMPQClientSyncImpl.getClient();
+		public MintAMPQClientSync createClient(String path) throws MintOSGIClientException {
+			return MintAMPQClientSyncImpl.getClient(path);
 		}
 
 	}

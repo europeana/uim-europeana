@@ -87,7 +87,7 @@ public class MintSendSyncTest {
 	@Ignore
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
-		client = (MintAMPQClientSync) factory.syncMode().createClient();  
+		client = (MintAMPQClientSync) factory.syncMode().createClient("uim.properties"); 
 	}
 	    
 	/**

@@ -35,4 +35,6 @@ public interface MintAMPQClient {
 	 */
 	public void closeConnection() throws IOException;
 
+
+
 }

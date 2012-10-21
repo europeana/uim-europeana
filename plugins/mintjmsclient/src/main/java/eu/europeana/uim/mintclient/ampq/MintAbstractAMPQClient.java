@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -61,36 +63,9 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 	protected static Builder builder;
 	protected static BasicProperties pros;
 	
-	static {
-		
-		username = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_USERNAME);
-		password = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_PASSWORD);
-		host = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_HOST);
-	    //host = "sip-manager.isti.cnr.it";
-		//host = "panic.image.ntua.gr";
-		
-		/*
-		try {
-
-			URL url = ClassLoader.getSystemResource("mint.properties");
-			props.load(url.openStream());
-			username = props.getProperty("username");
-			password = props.getProperty("password");
-			host = props.getProperty("host");
-			
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-	}
 	
 	protected MintAbstractAMPQClient(){
-
+		setProperties("");
 	}
 
 	/**
@@ -157,4 +132,12 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 		rabbitConnection.close();	
 	}
 
+	public static void setProperties(String path){
+		if (!StringUtils.isBlank(path)){
+		PropertyReader.loadPropertiesFromFile(path);
+		}
+		username = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_USERNAME);
+		password = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_PASSWORD);
+		host = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_HOST);
+	}
 }

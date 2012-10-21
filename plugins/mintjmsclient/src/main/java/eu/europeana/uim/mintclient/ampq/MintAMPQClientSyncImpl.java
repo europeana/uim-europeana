@@ -90,7 +90,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 * @return an instance of this class
 	 * @throws MintOSGIClientException
 	 */
-	protected static MintAMPQClientSync getClient() throws MintOSGIClientException {
+	protected static MintAMPQClientSync getClient(String path) throws MintOSGIClientException {
 		
 		if(instance != null){
 			return instance;
@@ -98,7 +98,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		else{
 			ConnectionFactory factory = new ConnectionFactory();
 			builder = new Builder();
-
+			setProperties(path);
 			factory.setHost(getHost());
 			factory.setUsername(getUsername());
 			factory.setPassword(getPassword());

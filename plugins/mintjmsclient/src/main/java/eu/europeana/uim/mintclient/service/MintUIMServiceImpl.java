@@ -98,10 +98,10 @@ public class MintUIMServiceImpl implements MintUIMService {
 		MintClientFactory factory = new MintClientFactory();
 		try {
 			synchronousClient = (MintAMPQClientSync) factory.syncMode()
-					.createClient();
+					.createClient("");
 			asynchronousClient = (MintAMPQClientASync) factory.asyncMode(
 					MintUIMServiceImpl.UIMConsumerListener.class)
-					.createClient();
+					.createClient("");
 			return new MintUIMServiceImpl(registryref, orchestratorref, service);
 		} catch (MintOSGIClientException e) {
 			registryref.getLoggingEngine().logFailed(Level.SEVERE,
