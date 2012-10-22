@@ -115,7 +115,8 @@
 						<Embed-Dependency>
 							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,
 							corelib-solr,corelib-solr-tools,corelib-solr-dereference,corelib-definitions,corelib-utils,
-							corelib-solr-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core
+							corelib-solr-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
+							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
@@ -145,12 +146,14 @@
 							javax.servlet,
 							javax.servlet.http,
 							javax.net,
+							javax.net.ssl,
 							javax.management,
 							org.joda.time,
 							com.ctc.wstx.stax.*,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							javax.xml.transform.dom,
+							!org.slf4j.*,
 							!*
 						</Import-Package>
 
@@ -237,11 +240,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
-         <dependency>
-         	<groupId>${project.groupId}</groupId>
-         	<artifactId>europeana-uim-plugin-solrosgi</artifactId>
-         	<version>${project.version}</version>
-         </dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>europeana-uim-plugin-solrosgi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>eu.europeana</groupId>
@@ -315,10 +318,55 @@
 			<version>4.0.0</version>
 		</dependency>
 		<dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-core</artifactId>
-                <version>4.0.0</version>
-        </dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-core</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>1.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>1.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>1.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>20030805.205232</version>
+		</dependency>
 
 	</dependencies>
 
