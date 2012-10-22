@@ -124,15 +124,6 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 									.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
 									+ PropertyReader
 											.getProperty(UimConfigurationProperty.SOLR_CORE));
-					try {
-						solrServer.ping();
-					} catch (SolrServerException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 					
 				}
 			};
