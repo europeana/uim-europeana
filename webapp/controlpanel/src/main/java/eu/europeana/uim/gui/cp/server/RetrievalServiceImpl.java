@@ -65,6 +65,7 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.gui.cp.client.services.RetrievalService;
 import eu.europeana.uim.gui.cp.server.util.PropertyReader;
@@ -111,12 +112,22 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 	public RetrievalServiceImpl() {
 
 		super();
+		
 		try {
-			solrServer = new HttpSolrServer(
-					PropertyReader
-							.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
-							+ PropertyReader
-									.getProperty(UimConfigurationProperty.SOLR_CORE));
+			BlockingInitializer initializer = new BlockingInitializer() {
+				
+				@Override
+				protected void initializeInternal() {
+					solrServer = new HttpSolrServer(
+							PropertyReader
+									.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
+									+ PropertyReader
+											.getProperty(UimConfigurationProperty.SOLR_CORE));
+					
+				}
+			};
+			initializer.initialize(HttpSolrServer.class.getClassLoader());
+			
 			mongoServer = new EdmMongoServerImpl(
 					new Mongo(
 							PropertyReader
