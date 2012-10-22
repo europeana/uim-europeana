@@ -16,6 +16,7 @@
  */
 package eu.europeana.uim.gui.cp.server;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -123,6 +124,15 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 									.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
 									+ PropertyReader
 											.getProperty(UimConfigurationProperty.SOLR_CORE));
+					try {
+						solrServer.ping();
+					} catch (SolrServerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					
 				}
 			};
