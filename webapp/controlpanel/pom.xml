@@ -310,7 +310,16 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+		<dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-core</artifactId>
+                <version>4.0.0</version>
+        </dependency>
 
 	</dependencies>
 
