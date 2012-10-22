@@ -108,7 +108,7 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static Morphia morphia;
 	private static List<SolrInputDocument> solrList;
-	private static List<SolrInputDocument> suggestionList;
+	private final static int SUBMIT_SIZE=1000;
 	private static OsgiEdmMongoServer mongoServer;
 	private static Mongo mongo;
 	private final static String PORTALURL = "http:///www.europeana.eu/portal/record";
@@ -196,7 +196,6 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 		try {
 			solrList = new ArrayList<SolrInputDocument>();
-			suggestionList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
@@ -321,6 +320,11 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 				try {
 					solrList.add(solrInputDocument);
 					recordNumber++;
+					//Send records to SOLR by thousands
+					if(solrList.size()==SUBMIT_SIZE){
+						solrServer.add(solrList);
+						solrList = new ArrayList<SolrInputDocument>();
+					}
 					return true;
 				} catch (SolrException e) {
 					log.log(Level.WARNING, "Solr Exception occured with error "
