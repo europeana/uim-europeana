@@ -241,9 +241,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 									.getValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION));
 				}
 
-				Request<I> request = storage.createRequest(collection,
-						new Date());
-				storage.updateRequest(request);
+				Request<I> request = storage.createRequest(collection,new Date());
 
 				HttpRetriever retriever = HttpRetriever.createInstance(url);
 

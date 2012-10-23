@@ -128,8 +128,8 @@ public class DummyPlugin extends AbstractIngestionPlugin{
 	public <I> boolean processRecord(MetaDataRecord<I> mdr,
 			ExecutionContext<I> context) throws IngestionPluginFailedException,
 			CorruptedMetadataRecordException {
-		// TODO Auto-generated method stub
-		return false;
+
+		return true;
 	}
 
 }
