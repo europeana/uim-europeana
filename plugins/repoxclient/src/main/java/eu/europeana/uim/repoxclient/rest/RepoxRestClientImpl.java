@@ -51,7 +51,24 @@ import eu.europeana.uim.repoxclient.utils.UimConfigurationProperty;
 public class RepoxRestClientImpl implements RepoxRestClient {
 
 	private RestTemplate restTemplate;
-	private String defaultURI = PropertyReader.getProperty(UimConfigurationProperty.REPOX_HOST);
+	private String defaultURI;
+	
+	
+	/**
+	 * Default Constructor
+	 */
+	public RepoxRestClientImpl(){
+		defaultURI = PropertyReader.getProperty(UimConfigurationProperty.REPOX_HOST);
+	}
+	
+	
+	/**
+	 * Used for Unit/Integration testing
+	 * @param defaultURI
+	 */
+	public RepoxRestClientImpl(String defaultURI){
+		this.defaultURI = defaultURI;
+	}
 	
 	private final static String unknown_error="Unidentified Repox Error";
 	private final static String idVar="id=";
