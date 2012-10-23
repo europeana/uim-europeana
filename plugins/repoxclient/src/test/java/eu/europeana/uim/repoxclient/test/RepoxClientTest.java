@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import java.util.ArrayList;
 import javax.annotation.Resource;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -302,6 +303,7 @@ public void testCreateUpdateDeleteOAIDataSource() throws Exception{
  * 
  * @throws Exception
  */
+@Ignore
 @Test
 public void testCreateUpdateDeleteZ3950TimestampDataSource() throws Exception{
 	

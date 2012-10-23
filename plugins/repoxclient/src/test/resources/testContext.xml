@@ -5,7 +5,7 @@
 
     <bean id="repoxRestClient" class="eu.europeana.uim.repoxclient.rest.RepoxRestClientImpl">
         <property name="restTemplate" ref="restTemplate"/>
-        <property name="defaultURI" value="${host}"/>
+        <constructor-arg value="${host}"></constructor-arg> 
     </bean>
 
 
