@@ -65,12 +65,31 @@ public class SugarWsClientImpl implements SugarWsClient {
 
 	private WebServiceTemplate webServiceTemplate;
 
-	private String username = PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_USERNAME);
+	private String username;
 	
-	private String password ;
+	private String password;
 	
 	private String sessionID;
 
+	
+	/**
+	 * Default Constructor
+	 */
+	SugarWsClientImpl(){
+	}
+	
+	
+	/**
+	 * Used for unit/integration tests
+	 * @param username
+	 * @param password
+	 */
+	SugarWsClientImpl(String username,String password){
+	   this.username = username;
+	   this.password = password;
+	}
+	
+	
 	/**
 	 * Generic auxiliary method for marshalling and unmarshalling requests and
 	 * responses via Spring-WS

@@ -25,6 +25,36 @@ public class ClientFactory {
 	 * @param password
 	 * @return
 	 */
+	public  SugarWsClientImpl createInstance(String userName, String password){
+		
+		SugarWsClientImpl client = new SugarWsClientImpl(userName,password);
+		client.setUsername(userName);
+		client.setPassword(password);
+		client.setWebServiceTemplate(webServiceTemplate);
+		
+		try {
+			client.setSessionID(client.login(ClientUtils.createStandardLoginObject(userName,password)));
+		} catch (JIXBLoginFailureException e) {
+			client.setSessionID("-1");
+			e.printStackTrace();
+		} catch (Exception e){
+			LOGGER.info("======= Warning: could not connect to SugarCrm Server =====");
+
+			e.printStackTrace();
+		}
+	
+		
+		return client;
+	}
+	
+	
+	/**
+	 * Internal factory method used by Spring 
+	 * 
+	 * @param userName
+	 * @param password
+	 * @return
+	 */
 	public  SugarWsClientImpl createInstance(){
 		
 		SugarWsClientImpl client = new SugarWsClientImpl();
@@ -50,7 +80,6 @@ public class ClientFactory {
 		
 		return client;
 	}
-	
 	
 	
 	/**
