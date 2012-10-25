@@ -74,7 +74,7 @@ public class MintSendAsyncTest {
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
 		String proplocation = MintSendAsyncTest.class.getProtectionDomain().getCodeSource().getLocation() + "mintTest.properties";
-		String truncated = proplocation.substring(6);
+		String truncated = proplocation.replace("file:", "");
 		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient(truncated);
 		log.info("Initialized test context & created Asynchronous Client");
 	}

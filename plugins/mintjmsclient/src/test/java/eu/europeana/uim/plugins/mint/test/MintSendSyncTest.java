@@ -88,7 +88,7 @@ public class MintSendSyncTest {
 		MintClientFactory factory = new MintClientFactory();
 		
 		String proplocation = MintSendSyncTest.class.getProtectionDomain().getCodeSource().getLocation() + "mintTest.properties";
-		String truncated = proplocation.substring(6);
+		String truncated = proplocation.replace("file:", "");
 		client = (MintAMPQClientSync) factory.syncMode().createClient(truncated); 
 	}
 	    
