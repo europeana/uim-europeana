@@ -84,10 +84,9 @@ public class MintSendSyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	@Ignore
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
-		client = (MintAMPQClientSync) factory.syncMode().createClient("uim.properties"); 
+		client = (MintAMPQClientSync) factory.syncMode().createClient("D:\\SourceCode\\europeana\\trunk\\uim\\plugins\\mintjmsclient\\src\\test\\resources\\mintTest.properties"); 
 	}
 	    
 	/**
@@ -96,7 +95,6 @@ public class MintSendSyncTest {
 	 * 
 	 * @throws IOException 
 	 */
-	@Ignore
 	@AfterClass public static void tearDown() throws IOException {
 		client.closeConnection();
 		client = null;
@@ -110,7 +108,6 @@ public class MintSendSyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	@Ignore
 	@Test
 	public void createOrganizationTest() throws MintOSGIClientException, MintRemoteException{
 		CreateOrganizationCommand command = new CreateOrganizationCommand();
@@ -131,7 +128,6 @@ public class MintSendSyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	@Ignore
 	@Test
 	public void createUserTest() throws MintOSGIClientException, MintRemoteException{
 		CreateUserCommand command = new CreateUserCommand();
@@ -155,7 +151,6 @@ public class MintSendSyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	@Ignore
 	@Test
 	public void createImportsTest() throws MintOSGIClientException, MintRemoteException{
 		CreateImportCommand command = new CreateImportCommand();
@@ -177,7 +172,6 @@ public class MintSendSyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	@Ignore
 	@Test
 	public void getImportsTest() throws MintOSGIClientException, MintRemoteException{
 		GetImportsCommand command =  new GetImportsCommand();
@@ -193,7 +187,6 @@ public class MintSendSyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	@Ignore
 	@Test
 	public void getTransformations() throws MintOSGIClientException, MintRemoteException{
 		GetTransformationsCommand command = new GetTransformationsCommand();
@@ -209,7 +202,6 @@ public class MintSendSyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	@Ignore
 	@Test
 	public void publishCollection() throws MintOSGIClientException, MintRemoteException{
 		PublicationCommand command = new PublicationCommand();
@@ -229,7 +221,6 @@ public class MintSendSyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
 	@Test
 	public void organizationExists() throws Exception{
 		OrganizationExistsCommand command = new OrganizationExistsCommand();
@@ -246,7 +237,6 @@ public class MintSendSyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
 	@Test
 	public void userExists() throws Exception{
 		UserExistsCommand command = new UserExistsCommand();
@@ -262,7 +252,6 @@ public class MintSendSyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
 	@Test
 	public void importExists() throws Exception{
 		ImportExistsCommand command = new ImportExistsCommand();
@@ -280,7 +269,6 @@ public class MintSendSyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
 	@Test
 	public void organizationNotExists() throws Exception{
 		OrganizationExistsCommand command = new OrganizationExistsCommand();
@@ -297,7 +285,6 @@ public class MintSendSyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
 	@Test
 	public void userNotExists() throws Exception{
 		UserExistsCommand command = new UserExistsCommand();
@@ -313,7 +300,6 @@ public class MintSendSyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
 	@Test
 	public void importNotExists() throws Exception{
 		ImportExistsCommand command = new ImportExistsCommand();

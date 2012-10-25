@@ -79,7 +79,7 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 	 * @return an instance of this class
 	 * @throws MintOSGIClientException
 	 */
-	protected static <T extends DefaultConsumer> MintAMPQClientASync getClient(String path, Class<T> listenerClassType) throws MintOSGIClientException{
+	protected static <T extends DefaultConsumer> MintAMPQClientASync getClient(Class<T> listenerClassType) throws MintOSGIClientException{
 		
 		Constructor<T> con;
 			try {
@@ -105,7 +105,7 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
 						"Error in instantiating session listener");
 			}
-		return getClient(path);
+		return getClient();
 	}
 
 	/**
@@ -116,7 +116,7 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 	 * @return an instance of this class
 	 * @throws MintOSGIClientException
 	 */
-	protected static MintAMPQClientASync getClient(String path) throws MintOSGIClientException{
+	protected static MintAMPQClientASync getClient() throws MintOSGIClientException{
 		
 		if(instance != null){
 			return instance;
@@ -124,7 +124,6 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 		else{
 			ConnectionFactory factory = new ConnectionFactory();
 			builder = new Builder();
-			setProperties(path);
 			factory.setHost(getHost());
 			factory.setUsername(getUsername());
 			factory.setPassword(getPassword());

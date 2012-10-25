@@ -66,10 +66,10 @@ public class MintSendAsyncTest {
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
-	@Ignore
+
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
-		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient("uim.properties");
+		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient("D:\\SourceCode\\europeana\\trunk\\uim\\plugins\\mintjmsclient\\src\\test\\resources\\mintTest.properties");
 		log.info("Initialized test context & created Asynchronous Client");
 	}
 	    
@@ -79,7 +79,7 @@ public class MintSendAsyncTest {
 	 * 
 	 * @throws IOException 
 	 */
-	@Ignore
+
 	@AfterClass public static void tearDown() throws IOException {
 	   client.closeConnection();	
 	   client = null;
@@ -92,7 +92,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
+
 	@Test
 	public void createOrganizationTest() throws Exception{
 		log.info("CreateOrganizationTest:Sending request");
@@ -112,7 +112,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
+
 	@Test
 	public void createUserTest() throws Exception{
 		log.info("CreateUserTest : Sending request");
@@ -134,7 +134,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
+
 	@Test
 	public void createImportsTest() throws Exception{
 		log.info("CreateImportsTest : Sending request");
@@ -152,7 +152,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
+
 	@Test
 	public void getImportsTest() throws Exception{
 		log.info("GetImportsTest : Sending request");
@@ -164,7 +164,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
+
 	@Test
 	public void getTransformations() throws Exception{
 		log.info("GetTransformationsTest : Sending request");
@@ -179,7 +179,7 @@ public class MintSendAsyncTest {
 	/**
 	 * @throws Exception
 	 */
-	@Ignore
+
 	@Test
 	public void publishCollection() throws Exception{
 		log.info("PublishCollectionTest : Sending request");

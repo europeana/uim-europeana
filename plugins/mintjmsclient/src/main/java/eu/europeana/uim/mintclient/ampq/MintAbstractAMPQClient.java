@@ -17,21 +17,13 @@
 package eu.europeana.uim.mintclient.ampq;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Properties;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.AMQP.BasicProperties.Builder;
-
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.mintclient.utils.MintClientUtils;
-import eu.europeana.uim.mintclient.utils.PropertyReader;
-import eu.europeana.uim.mintclient.utils.UimConfigurationProperty;
-
 
 
 
@@ -43,20 +35,19 @@ import eu.europeana.uim.mintclient.utils.UimConfigurationProperty;
  */
 public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 
-	private final static  Properties props = new Properties();
-	private static  String username;
-	private static String password;
-	private static String host;
+	protected static  String username;
+	protected static String password;
+	protected static String host;
 	
 	protected final static String ADMINUSERID = "1000";
 	
 	protected static Connection rabbitConnection;
 	protected static Channel sendChannel;
 	protected static Channel receiveChannel;
-	protected static String inbound = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_INBOUNDQUEUE);
-	protected static String outbound = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_OUTBOUNDQUEUE);
+	protected static String inbound;
+	protected static String outbound;
 	
-	protected static String rpcQueue = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_RPCQUEUE);
+	protected static String rpcQueue;
 	protected static String rndReplyqueue;	
 	
 	
@@ -64,8 +55,10 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 	protected static BasicProperties pros;
 	
 	
+	/**
+	 * Default Constructor
+	 */
 	protected MintAbstractAMPQClient(){
-		setProperties("");
 	}
 
 	/**
@@ -132,12 +125,4 @@ public abstract class MintAbstractAMPQClient implements MintAMPQClient{
 		rabbitConnection.close();	
 	}
 
-	public static void setProperties(String path){
-		if (!StringUtils.isBlank(path)){
-		PropertyReader.loadPropertiesFromFile(path);
-		}
-		username = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_USERNAME);
-		password = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_PASSWORD);
-		host = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_HOST);
-	}
 }

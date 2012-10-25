@@ -19,6 +19,8 @@ package eu.europeana.uim.mintclient.ampq;
 import com.rabbitmq.client.DefaultConsumer;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
+import eu.europeana.uim.mintclient.utils.PropertyReader;
+import eu.europeana.uim.mintclient.utils.UimConfigurationProperty;
 
 
 /**
@@ -30,6 +32,8 @@ import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
  */
 public class MintClientFactory {
 
+	private static String propertiesFileLocation;
+	
 	/**
 	 * Creates a proxy that provides synchronous clients
 	 * 
@@ -77,6 +81,16 @@ public class MintClientFactory {
 		 */
 		public MintAMPQClient createClient(String path) throws MintOSGIClientException,
 				MintRemoteException;
+		
+		/**
+		 * Instantiates a single instance of a client
+		 * 
+		 * @return
+		 * @throws MintOSGIClientException
+		 * @throws MintRemoteException
+		 */
+		public MintAMPQClient createClient() throws MintOSGIClientException,
+				MintRemoteException;
 	}
 
 	/**
@@ -114,15 +128,26 @@ public class MintClientFactory {
 		 * createClient()
 		 */
 		@Override
-		public MintAMPQClientASync createClient(String path)
-				throws MintOSGIClientException {
+		public MintAMPQClientASync createClient(String propertiesPath)
+				throws MintOSGIClientException,	MintRemoteException {
+			propertiesFileLocation = propertiesPath;
+			return createClient();
+		}
+
+		/* (non-Javadoc)
+		 * @see eu.europeana.uim.mintclient.ampq.MintClientFactory.ProducerProxy#createClient()
+		 */
+		@Override
+		public MintAMPQClientASync createClient() throws MintOSGIClientException,
+				MintRemoteException {
+			
+			loadProperties();
 
 			if (listenerClass == null) {
-				return MintAMPQClientAsyncImpl.getClient(path);
+				return MintAMPQClientAsyncImpl.getClient();
 			} else {
-				return MintAMPQClientAsyncImpl.getClient(path,listenerClass);
+				return MintAMPQClientAsyncImpl.getClient(listenerClass);
 			}
-
 		}
 
 	}
@@ -143,9 +168,43 @@ public class MintClientFactory {
 		 * createClient()
 		 */
 		@Override
-		public MintAMPQClientSync createClient(String path) throws MintOSGIClientException {
-			return MintAMPQClientSyncImpl.getClient(path);
+		public MintAMPQClientSync createClient(String propertiesPath) throws MintOSGIClientException,MintRemoteException {
+			propertiesFileLocation = propertiesPath;
+			return createClient();
 		}
+
+		/* (non-Javadoc)
+		 * @see eu.europeana.uim.mintclient.ampq.MintClientFactory.ProducerProxy#createClient()
+		 */
+		@Override
+		public MintAMPQClientSync createClient() throws MintOSGIClientException,
+				MintRemoteException {
+			loadProperties();
+			
+			return MintAMPQClientSyncImpl.getClient();
+		}
+
+	}
+	
+	
+	/**
+	 * Static method that initializes the loading of properties from a properties file
+	 */
+	private static void loadProperties(){
+		
+		if(propertiesFileLocation != null){
+			PropertyReader.loadPropertiesFromFile(propertiesFileLocation);
+		}
+		else{
+			PropertyReader.loadPropertiesFromFile("uim.properties");
+		}
+		
+		MintAbstractAMPQClient.inbound = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_INBOUNDQUEUE);
+		MintAbstractAMPQClient.outbound = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_OUTBOUNDQUEUE);
+		MintAbstractAMPQClient.rpcQueue = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_RPCQUEUE);
+		MintAbstractAMPQClient.host = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_HOST);
+		MintAbstractAMPQClient.username =  PropertyReader.getProperty(UimConfigurationProperty.AMPQ_USERNAME);
+		MintAbstractAMPQClient.password = PropertyReader.getProperty(UimConfigurationProperty.AMPQ_PASSWORD);
 
 	}
 
