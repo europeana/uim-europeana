@@ -16,7 +16,7 @@
  */
 package eu.europeana.uim.gui.cp.server;
 
-import java.io.IOException;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -28,7 +28,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -36,8 +37,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -49,9 +48,8 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-
+import com.google.gwt.http.client.URL;
 import com.mongodb.Mongo;
-
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.model.EdmLabel;
@@ -107,6 +105,12 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 	private static HttpSolrServer solrServer;
 	private static EdmMongoServerImpl mongoServer;
 
+    // /** String PORTAL_SINGLE_RECORD_URL */
+    private static  String PORTAL_SINGLE_RECORD_URL = "http://www.europeana.eu/portal/record/";
+    private static  String REPOSITORY_PREVIEW_URL;
+	
+
+    
 	/**
 	 * Creates a new instance of this class.
 	 */
@@ -367,26 +371,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		return getXml(recordId, EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
 	}
 
-	private String getFormattedXml(Document doc) throws Exception {
-		String xml = "";
-		TransformerFactory transFactory = TransformerFactory.newInstance();
-		Transformer transformer = transFactory.newTransformer();
 
-		transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty(
-				"{http://xml.apache.org/xslt}indent-amount", "2");
-
-		StringWriter writer = new StringWriter();
-		StreamResult result = new StreamResult(writer);
-		DOMSource source = new DOMSource(doc);
-
-		transformer.transform(source, result);
-
-		xml = writer.toString();
-		return xml;
-	}
 
 	@Override
 	public SearchResultDTO searchIndex(String searchQuery, int offset,
@@ -539,10 +524,16 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		throw new UnsupportedOperationException("Not Implemented Yet");
 	}
 
+
+	
+	
 	@Override
 	public LinksResultDTO getLinks(String recordId) {
+		
+		determinelocaladress();
+			
 		ArrayList<LinkDTO> links = new ArrayList<LinkDTO>();
-
+		
 		StorageEngine<String> storage = (StorageEngine<String>) getEngine()
 				.getRegistry().getStorageEngine();
 		if (storage == null) {
@@ -560,6 +551,20 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				log.log(Level.WARNING, "Could not find record with id '"
 						+ recordId + "'!");
 			} else {
+				
+				
+				String collid = metaDataRecord.getCollection().getId();
+				String uencoderecordId = null;
+				try {
+					uencoderecordId = URLEncoder.encode(recordId,"UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+				
+				links.add(new LinkDTO(PORTAL_SINGLE_RECORD_URL + "/" + collid +"/" + uencoderecordId, "Record in portal"));
+				links.add(new LinkDTO(REPOSITORY_PREVIEW_URL + "?recordID=" + uencoderecordId, "Preview cahched images in repository"));
+
+				
 				List<QualifiedValue<EuropeanaLink>> qualifiedValues = metaDataRecord
 						.getQualifiedValues(EuropeanaModelRegistry.EUROPEANALINK);
 				if (qualifiedValues == null) {
@@ -581,5 +586,43 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 
 		LinksResultDTO linksResult = new LinksResultDTO(links);
 		return linksResult;
+	}
+	
+	
+	/**
+	 * Private method that determines the application context so that this does not have to be defined in configuration properties.
+	 * Ideally this should be put in the context of an overriden init() method but unfortunately it does not work there.
+	 */
+	private void determinelocaladress(){
+		
+		if(REPOSITORY_PREVIEW_URL == null){
+    	HttpServletRequest request = this.getThreadLocalRequest();
+        String scheme = request.getScheme();            
+        String serverName = request.getServerName();     
+        int serverPort = request.getServerPort();        
+        String contextPath = request.getContextPath();   
+        REPOSITORY_PREVIEW_URL = scheme+"://"+serverName+":"+serverPort+contextPath + "/EuropeanaIngestionControlPanel/mongoImageView";
+		}
+	}
+	
+	private String getFormattedXml(Document doc) throws Exception {
+		String xml = "";
+		TransformerFactory transFactory = TransformerFactory.newInstance();
+		Transformer transformer = transFactory.newTransformer();
+
+		transformer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty(
+				"{http://xml.apache.org/xslt}indent-amount", "2");
+
+		StringWriter writer = new StringWriter();
+		StreamResult result = new StreamResult(writer);
+		DOMSource source = new DOMSource(doc);
+
+		transformer.transform(source, result);
+
+		xml = writer.toString();
+		return xml;
 	}
 }
