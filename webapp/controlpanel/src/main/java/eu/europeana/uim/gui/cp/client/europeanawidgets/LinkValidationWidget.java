@@ -73,9 +73,7 @@ import com.google.gwt.http.client.URL;
  */
 public class LinkValidationWidget extends IngestionWidget {
 
-    // /** String PORTAL_SINGLE_RECORD_URL */
-    private static final String PORTAL_SINGLE_RECORD_URL = "http://www.europeana.eu/portal/record/";
-    private static final String REPOSITORY_PREVIEW_URL = "http://127.0.0.1:8181/gui/EuropeanaIngestionControlPanel/mongoImageView";
+
     /**
      * The UiBinder interface used by this example.
      */
@@ -528,20 +526,10 @@ public class LinkValidationWidget extends IngestionWidget {
         final int oldSelectedIdx = selectedIdx;
 
         // get the newly selected record
-
         final String recordId = (String)selected.getId();
-        
-        String collid = selected.getId().toString();
-
-        String uencoderecordId = URL.encodeQueryString(recordId);
-        
-
-        
+          
         linkList.clear();
-        linkList.add(new LinkDTO(PORTAL_SINGLE_RECORD_URL + "/" + collid +"/" + uencoderecordId, "Record in portal"));
-        linkList.add(new LinkDTO(REPOSITORY_PREVIEW_URL + "?recordID=" + uencoderecordId, "Preview cahched images in repository"));
-        
-        
+
         retrievalService.getLinks(recordId, new AsyncCallback<LinksResultDTO>() {
 
             @Override
