@@ -86,7 +86,10 @@ public class MintSendSyncTest {
 	 */
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
-		client = (MintAMPQClientSync) factory.syncMode().createClient("D:\\SourceCode\\europeana\\trunk\\uim\\plugins\\mintjmsclient\\src\\test\\resources\\mintTest.properties"); 
+		
+		String proplocation = MintSendSyncTest.class.getProtectionDomain().getCodeSource().getLocation() + "mintTest.properties";
+		String truncated = proplocation.substring(6);
+		client = (MintAMPQClientSync) factory.syncMode().createClient(truncated); 
 	}
 	    
 	/**

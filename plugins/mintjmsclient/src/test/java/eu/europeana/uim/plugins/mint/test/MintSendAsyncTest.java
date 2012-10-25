@@ -16,10 +16,13 @@
  */
 package eu.europeana.uim.plugins.mint.test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
 import org.jibx.runtime.IMarshallable;
@@ -60,6 +63,7 @@ public class MintSendAsyncTest {
 	private final static String colId= "09911";
 	private static Logger log = Logger.getLogger(MintSendAsyncTest.class);
 
+
 	/**
 	 * Create the client on test initialization
 	 * 
@@ -69,7 +73,9 @@ public class MintSendAsyncTest {
 
 	@BeforeClass public static void initclient() throws MintOSGIClientException, MintRemoteException {
 		MintClientFactory factory = new MintClientFactory();
-		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient("D:\\SourceCode\\europeana\\trunk\\uim\\plugins\\mintjmsclient\\src\\test\\resources\\mintTest.properties");
+		String proplocation = MintSendAsyncTest.class.getProtectionDomain().getCodeSource().getLocation() + "mintTest.properties";
+		String truncated = proplocation.substring(6);
+		client = (MintAMPQClientASync) factory.asyncMode(TestListener.class).createClient(truncated);
 		log.info("Initialized test context & created Asynchronous Client");
 	}
 	    
