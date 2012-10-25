@@ -53,15 +53,15 @@ public class EnrichmentTest {
 			+ "<edm:isShownAt rdf:resource=\"http://www.mimo-db.eu/GNM/728331\"></edm:isShownAt>"
 			+ "<edm:object rdf:resource=\"http://www.mimo-db.eu/media/GNM/IMAGE/MINe298_H_1304604690701_2.jpg\"></edm:object>"
 			+ "</ore:Aggregation>" + "</rdf:RDF>";
-	
+	@Ignore
 	@Test
 	public void testAnnocultorEnrichment(){
 		EuropeanaEnrichmentTagger tagger = new EuropeanaEnrichmentTagger();
 		try {
-			tagger.init("Europeana");
-			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
-			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(RECORD));
+//			tagger.init("Europeana");
+//			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
+//			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+//			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(RECORD));
 			//Temporary disabling
 //			SolrInputDocument solrInputDocument = tagger
 //					.tagDocument(new SolrConstructor().constructSolrDocument(rdf));
