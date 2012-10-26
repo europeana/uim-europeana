@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
@@ -122,12 +123,14 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	 */
 	@Override
 	public Widget onInitialize() {
-		importVocabulary = new TabLayoutPanel(2.5, Unit.PCT);
-		importVocabulary.setWidth("32em");
+		importVocabulary = new TabLayoutPanel(20, Unit.PX);
+		importVocabulary.setSize("1024px", "700px");
 		importVocabulary.add(createImportTable(), "Upload Vocabulary");
 		importVocabulary.add(createFieldMappingPage(), "Vocabulary Mapping");
 		Binder uiBinder = GWT.create(Binder.class);
 		Widget widget = (Widget) uiBinder.createAndBindUi(this);
+//		RootLayoutPanel.get().setHeight("650px");
+//		RootLayoutPanel.get().add(importVocabulary);
 		return widget;
 	}
 
@@ -143,6 +146,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		vpanel.addEast(createButtons(), 250);
 		vpanel.addEast(createMappedFieldsTable(), 250);
 		vpanel.add(createMappableFieldTable());
+		vpanel.setHeight("650px");
 		return vpanel;
 	}
 
@@ -319,10 +323,11 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	 */
 	protected SplitLayoutPanel createImportTable() {
 		SplitLayoutPanel split = new SplitLayoutPanel();
-		split.addNorth(createImportFields(), 150);
+		split.addNorth(createImportFields(), 200);
 
-		split.addSouth(createDeleteVocabulary(), 150);
+		split.addSouth(createDeleteVocabulary(), 60);
 		split.add(createUploadedVocabularies());
+		split.setHeight("700px");
 		return split;
 	}
 

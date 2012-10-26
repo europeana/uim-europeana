@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.RangeChangeEvent;
 
@@ -70,8 +71,9 @@ public class FailedRecordsWidget extends IngestionWidget {
      */
     @UiField(provided = true)
     SimplePager                           pager;
-
-
+    ListDataProvider<FailedRecordDTO> sortProvider;
+    
+    
 	interface Binder extends UiBinder<Widget, FailedRecordsWidget> {
 	}
 
@@ -117,7 +119,11 @@ public class FailedRecordsWidget extends IngestionWidget {
 			}
 		});
 		
-		
+		sortProvider = new ListDataProvider<FailedRecordDTO>();
+        sortProvider.setList(records);
+        //set the cellTable as the display for the provider!
+        sortProvider.addDataDisplay(cellTable);
+        
 	        SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
 	        pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
 	        pager.setDisplay(cellTable);
@@ -135,7 +141,7 @@ public class FailedRecordsWidget extends IngestionWidget {
 			public void onSuccess(List<ProviderDTO> result) {
 				providers.clear();
 				providerBox.clear();
-
+				
 				Collections.sort(result, new Comparator<ProviderDTO>() {
 					@Override
 					public int compare(ProviderDTO o1, ProviderDTO o2) {
@@ -348,6 +354,9 @@ public class FailedRecordsWidget extends IngestionWidget {
 		};
 		cellTable.addColumn(edmColumn, "Show EDM");
 		cellTable.setColumnWidth(edmColumn, 4, Unit.PCT);
+		
+	        
+	        
 	}
 
 	@Override
@@ -382,6 +391,7 @@ public class FailedRecordsWidget extends IngestionWidget {
 						records.clear();
 						cellTable.setRowCount(result.getNumberRecords());
 						records.addAll(result.getRecords());
+						
 						cellTable.setRowData(offset, records);
 					}
 				});
