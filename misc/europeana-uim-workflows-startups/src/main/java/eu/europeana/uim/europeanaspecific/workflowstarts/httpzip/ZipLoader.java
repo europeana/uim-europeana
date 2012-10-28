@@ -134,7 +134,7 @@ public class ZipLoader {
 						(String) request.getId(), rdfstring);
 
 				for (DeduplicationResult dedupres : reslist) {
-
+					
 					MetaDataRecord<I> mdr = storage.getMetaDataRecord(dedupres
 							.getDerivedRecordID());
 
@@ -163,27 +163,27 @@ public class ZipLoader {
 					addLinkcheckingValues(unmarshall(dedupres.getEdm()), mdr);
 					storage.updateMetaDataRecord(mdr);
 					result.add(mdr);
-					storage.addRequestRecord(request, mdr);
 
 				}
 
 				progress++;
 				totalProgress++;
 
-			} catch (JiBXException e) {
+			} 
+			catch (JiBXException e) {
 
 				if (loggingEngine != null) {
 
 					loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
 							"Error unmarshalling xml for object ");
 				}
-			} catch (StorageEngineException e) {
+				
+			}catch (StorageEngineException e) {
 				if (loggingEngine != null) {
 					loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
 							"Error storing object ");
 				}
 			} catch (DeduplicationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -191,6 +191,12 @@ public class ZipLoader {
 		return result;
 	}
 
+	
+	/**
+	 * @param edm
+	 * @return
+	 * @throws JiBXException
+	 */
 	private RDF unmarshall(String edm) throws JiBXException {
 
 		IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);

@@ -85,6 +85,8 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	 */
 	private final static class Data implements Serializable {
 
+		private static final long serialVersionUID = 1L;
+
 		public ZipLoader loader;
 		public Request<?> request;
 
@@ -146,7 +148,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	 */
 	@Override
 	public int getMaximumThreadCount() {
-		return 5;
+		return 15;
 	}
 
 	/*

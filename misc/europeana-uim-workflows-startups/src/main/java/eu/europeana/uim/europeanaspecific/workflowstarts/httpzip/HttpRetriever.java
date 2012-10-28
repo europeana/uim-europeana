@@ -28,10 +28,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
-
 import eu.europeana.uim.europeanaspecific.workflowstarts.util.PropertyReader;
 import eu.europeana.uim.europeanaspecific.workflowstarts.util.UimConfigurationProperty;
-
 
 
 /**
@@ -46,12 +44,11 @@ public class HttpRetriever implements Iterator<String> {
 
 	private List<String> filecontents;
 	
+	private TarArchiveInputStream tarInputstream;
+	
 	private Iterator<String> xmlentriesiterator;
 	
 	private static Random generator; 
-	
-	
-	
 
 	private int number_of_recs;
 
@@ -92,12 +89,14 @@ public class HttpRetriever implements Iterator<String> {
 		}
 		//First copy the remote URI to a 
 		File dest = new File(PropertyReader.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION)+new Integer(generator.nextInt()).toString());
-		FileUtils.copyURLToFile(url, dest, 100, 1000);
+		FileUtils.copyURLToFile(url, dest, 100, 100000);
 
 		TarArchiveInputStream tarfile;
 
 			tarfile =  new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(dest)));
 
+			tarfile.available();
+			
 			TarArchiveEntry  entry;
 			
 			while( (entry = tarfile.getNextTarEntry()) != null){
@@ -117,7 +116,10 @@ public class HttpRetriever implements Iterator<String> {
 				}
 			}
 			
+			
+			
 			tarfile.close();
+			
 		return new HttpRetriever(list);
 	}
 
@@ -152,8 +154,6 @@ public class HttpRetriever implements Iterator<String> {
 	}
 
 	// Getters & Setters
-
-
 
 	/**
 	 * @return the number_of_recs
