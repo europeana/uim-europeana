@@ -14,9 +14,16 @@ import eu.europeana.corelib.definitions.jibx.ProxyType;
 
 public class EuropeanaDateUtils {
 
+	
+	public static void setPath(String path){
+		PropertyReader.loadPropertiesFromFile(path);
+	}
+	
 	public static List<String> createEuropeanaYears(ProxyType proxy) {
 		List<String> years = new ArrayList<String>();
 		try {
+			
+		
 			String bcList = FileUtils.readFileToString(new File(
 					PropertyReader.getProperty(UimConfigurationProperty.UIM_BCLIST_PATH)), "UTF-8");
 			String[] bc = StringUtils.split(bcList, "\n");

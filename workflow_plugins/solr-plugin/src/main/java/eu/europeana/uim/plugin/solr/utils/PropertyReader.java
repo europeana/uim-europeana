@@ -38,7 +38,7 @@ public final class PropertyReader {
 		return fields.get(property.toString());
 	}
 	
-	public void loadPropertiesFromFile(String path){
+	public static void loadPropertiesFromFile(String path){
 		try{
 			fields = readFile(path);
 		}
@@ -54,6 +54,7 @@ public final class PropertyReader {
 	 * @throws IOException
 	 */
 	private static Map<String,String> readFile(String path) throws IOException{
+		
 		List<String> lines = FileUtils.readLines(new File(path));
 		Map<String,String> fields = new HashMap<String,String>();
 		for(String str:lines){
