@@ -185,7 +185,7 @@ Restart the Tomcat server for the changes to take effect...
 First intialize the database:
 CREATE USER mint2 WITH PASSWORD '<your password>';
 CREATE DATABASE mint2 ENCODING 'UTF-8' TEMPLATE template0  OWNER mint2;
-alter role mint set search_path to mint2,public;
+alter role mint2 set search_path to mint2,public;
 grant all on database mint2 to mint2;
 
 Execute the following 2 scripts:
@@ -236,6 +236,7 @@ Restart the Tomcat server for the changes to take effect...
 6.1) Install BIRT
 
 Download the latest BIRT runtime from here:
+http://www.eclipse.org/downloads/download.php?file=/birt/downloads/drops/R-R1-4_2_1-201209181113/birt-runtime-4_2_1.zip
 
 Unzip it and copy the birt.war file into your tomcat webapps folder
 
@@ -251,14 +252,25 @@ Get Karaf version 2.2.0
 
 wget http://archive.apache.org/dist/karaf/2.2.0/apache-karaf-2.2.0.tar.gz
 
-unzip it, check the permissions, you are done.
+unzip it, check the permissions.
+ 
+Setting up uim.properties
+
+In order for uim to work a new configuration file is required
+A sample of the file is accessible in:
+
+http://europeanalabs.eu/browser/europeana/uim/misc/deploy/uim.properties
+
+Just deploy and change the variables to the appropriate instances of the servers required
+place it on the karaf folder before you startup karaf
+
 
 /apache-karaf-2.2.0/bin/start to start it.
 
 
 8) Install UIM Core & Europeana Specifcic Plugins
 
-Chackoout from europeana svn:
+Chackout from europeana svn:
 1.The UIM Core
 svn co https://europeanalabs.eu/svn/uim/trunk/uim uim
 cd uim
@@ -270,13 +282,17 @@ mvn clean install -DskipTests
 export ANNOCULTOR_HOME=/path/to/annocultor/converters/europeana (linux)
 set ANNOCULTOR_HOME=\path\to\annocultor\converters\europeana (windows)
 
-3. The UIM Europeana Specific Compenents:
+3. Solr Plugin
+Solr plugin requires bcList.txt placed somewhere within the karaf installation folder. 
+Its location should be parameterized in uim.properties file
+
+4. The UIM Europeana Specific Compenents:
 svn co https://europeanalabs.eu/svn/europeana/trunk/uim europeanacomponents
 cd europeanacomponents
 mvn clean install -DskipTests
 
 
-4. Linkchecker:
+5. Linkchecker:
 Make sure that the following dependencies are dep-loyed locally and their 
 paths within UIM are properly defined:
 
