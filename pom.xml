@@ -24,6 +24,7 @@
 		<module>workflow_plugins/europeana-uim-plugin-enrichment</module>
 		<module>workflow_plugins/linkchecker</module>
 		<module>workflow_plugins/solr-plugin</module>
+		<module>workflow_plugins/deactivate</module>
 		<module>workflows/workflow-basic</module>
 		<module>webapp/controlpanel</module>
 	</modules>
