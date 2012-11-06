@@ -2,9 +2,9 @@ package eu.europeana.uim.deactivation;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -20,7 +20,6 @@ import eu.europeana.uim.api.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.deactivation.service.DeactivationService;
 import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
-import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 
 /**
@@ -33,6 +32,8 @@ public class DeactivatePlugin extends AbstractIngestionPlugin {
 
 
 	private static DeactivationService dService;
+	private static List<String> europeanaIds;
+	private final static int DELETE_THRESHOLD = 1000;
 
 	public DeactivatePlugin(DeactivationService serv, String name,
 			String description) {
@@ -43,7 +44,15 @@ public class DeactivatePlugin extends AbstractIngestionPlugin {
 	public <I> void completed(ExecutionContext<I> arg0)
 			throws IngestionPluginFailedException {
 		// TODO Auto-generated method stub
-
+		try {
+			dService.getSolrServer().deleteById(europeanaIds);
+		} catch (SolrServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public TKey<?, ?>[] getInputFields() {
@@ -83,18 +92,8 @@ public class DeactivatePlugin extends AbstractIngestionPlugin {
 
 	public <I> void initialize(ExecutionContext<I> arg0)
 			throws IngestionPluginFailedException {
-		@SuppressWarnings("rawtypes")
-		Collection coll = (Collection) arg0.getDataSet();
-		try {
-			dService.getSolrServer().deleteByQuery(
-					"europeana_collectionName:" + StringUtils.split(coll.getName(),"_")[0]+"*");
-		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+		europeanaIds = new ArrayList<String>();
 	}
 
 	public <I> boolean processRecord(MetaDataRecord<I> mdr,
@@ -115,11 +114,24 @@ public class DeactivatePlugin extends AbstractIngestionPlugin {
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			FullBean fBean = dService.getMongoServer().getFullBean(
 					rdf.getProvidedCHOList().get(0).getAbout());
+			europeanaIds.add(fBean.getAbout());
 			dService.getMongoServer().delete(fBean.getAggregations());
 			dService.getMongoServer().delete(fBean.getProvidedCHOs());
 			dService.getMongoServer().delete(fBean.getProxies());
 			dService.getMongoServer().delete(fBean.getEuropeanaAggregation());
 			dService.getMongoServer().delete(fBean);
+			if(europeanaIds.size()==DELETE_THRESHOLD){
+				try {
+					dService.getSolrServer().deleteById(europeanaIds);
+				} catch (SolrServerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				europeanaIds = new ArrayList<String>();
+			}
 			return true;
 		} catch (JiBXException e) {
 			// TODO Auto-generated catch block
