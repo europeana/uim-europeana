@@ -1,7 +1,6 @@
 package eu.europeana.uim.gui.cp.client.europeanawidgets;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -11,6 +10,8 @@ import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -29,7 +30,6 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
@@ -512,11 +512,27 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				form.submit();
 			}
 		});
-		table.setWidget(6, 1, submit);
+		TextBox vocabularyIterations = new TextBox();
+		vocabularyIterations.setName("vocabularyIteration");
+		vocabularyIterations.setValue("0");
+		vocabularyIterations.addKeyPressHandler(new KeyPressHandler() {
+			
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				if (!Character.isDigit(event.getCharCode())){
+					Window.alert("The value is not a digit");
+				}
+				
+			}
+		});
+		table.setWidget(6, 0, new Label(EuropeanaClientConstants.VOCITERATIONS));
+		table.setWidget(6, 1, vocabularyIterations);
+		table.setWidget(7, 1, submit);
 		TextBox vocabularyLocation = new TextBox();
 		vocabularyLocation.setName("vocabularyLocation");
-		vocabularyLocation.setVisible(false);
-		table.setWidget(6,0,vocabularyLocation);
+		vocabularyLocation.setVisible(true);
+		table.setWidget(7,0,vocabularyLocation);
+		
 		form.add(table);
 		form.addSubmitHandler(new SubmitHandler() {
 			@Override

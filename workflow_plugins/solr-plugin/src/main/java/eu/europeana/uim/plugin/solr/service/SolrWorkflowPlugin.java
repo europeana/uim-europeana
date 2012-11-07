@@ -650,46 +650,46 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 		extractor.setDatastore(datastore);
 		if (object instanceof String) {
 			if (isURI((String) object)) {
-				ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
+				ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
 						datastore, "URI", (String) object);
 
 				appendInRDF(rdf, extractor.denormalize((String) object,
-						controlVocabulary));
+						controlVocabulary,0,true));
 			}
 		} else if (object instanceof ResourceType) {
 
 			if (((ResourceType) object).getResource() != null) {
 
 				if (isURI(((ResourceType) object).getResource())) {
-					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
+					ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
 							datastore, "URI",
 							((ResourceType) object).getResource());
 					appendInRDF(rdf, extractor.denormalize(
 							((ResourceType) object).getResource(),
-							controlVocabulary));
+							controlVocabulary,0,true));
 				}
 			}
 		} else if (object instanceof ResourceOrLiteralType) {
 			if (((ResourceOrLiteralType) object).getResource() != null) {
 
 				if (isURI(((ResourceOrLiteralType) object).getResource())) {
-					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
+					ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
 							datastore, "URI",
 							((ResourceOrLiteralType) object).getResource());
 					appendInRDF(rdf, extractor.denormalize(
 							((ResourceOrLiteralType) object).getResource(),
-							controlVocabulary));
+							controlVocabulary,0,true));
 				}
 			}
 			if (((ResourceOrLiteralType) object).getString() != null) {
 
 				if (isURI(((ResourceOrLiteralType) object).getString())) {
-					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
+					ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
 							datastore, "URI",
 							((ResourceOrLiteralType) object).getString());
 					appendInRDF(rdf, extractor.denormalize(
 							((ResourceOrLiteralType) object).getString(),
-							controlVocabulary));
+							controlVocabulary,0,true));
 				}
 			}
 		} else if (object instanceof LiteralType) {
@@ -697,7 +697,7 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 				if (isURI(((LiteralType) object).getString())) {
 
-					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(
+					ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
 							datastore, "URI",
 							((LiteralType) object).getString());
 					appendInRDF(rdf, extractor.denormalize(
@@ -802,28 +802,5 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	}
 
-	private ControlledVocabularyImpl getControlledVocabulary(
-			Datastore datastore, String field, String filter)
-			throws UnknownHostException, MongoException {
-		String[] splitName = filter.split("/");
-		if (splitName.length > 3) {
-			String vocabularyName = splitName[0] + "/" + splitName[1] + "/"
-					+ splitName[2] + "/";
-			List<ControlledVocabularyImpl> vocabularies = datastore
-					.find(ControlledVocabularyImpl.class)
-					.filter(field, vocabularyName).asList();
-			for (ControlledVocabularyImpl vocabulary : vocabularies) {
-				boolean ruleController = true;
-				for (String rule : vocabulary.getRules()) {
-					ruleController = ruleController
-							&& (filter.contains(rule) || StringUtils.equals(
-									rule, "*"));
-				}
-				if (ruleController) {
-					return vocabulary;
-				}
-			}
-		}
-		return null;
-	}
+	
 }

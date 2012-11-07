@@ -88,6 +88,7 @@ public class EuropeanaClientConstants {
 	public final static String VOCDELETEVOCABULARY = "Delete Vocabulary";
 	public final static String VOCEDITVOCABULARY = "Edit Vocabulary";
 	public final static String VOCREFRESHVOCABULARY = "Refresh";
+	public final static String VOCITERATIONS = "# of iterations";
 	
 
 	 public final static String

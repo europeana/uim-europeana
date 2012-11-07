@@ -1,6 +1,5 @@
 package eu.europeana.uim.gui.cp.shared;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -24,6 +23,8 @@ public class ControlledVocabularyDTO implements IsSerializable {
 	private String location;
 	
 	private String[] rules;
+	
+	private int iterations;
 
 	// GETTERS AND SETTERS
 	
@@ -75,5 +76,14 @@ public class ControlledVocabularyDTO implements IsSerializable {
 		this.rules = rules;
 	}
 
+	public int getIterations() {
+		return iterations;
+	}
+
+	public void setIterations(int iterations) {
+		this.iterations = iterations;
+	}
+
+	
 	
 }
