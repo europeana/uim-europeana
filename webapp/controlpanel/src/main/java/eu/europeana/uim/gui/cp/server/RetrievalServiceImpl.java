@@ -63,7 +63,7 @@ import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
-import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.gui.cp.client.services.RetrievalService;

@@ -3,8 +3,6 @@ package eu.europeana.uim.gui.cp.server;
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
-
-
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.VocabularyMongoServer;
 

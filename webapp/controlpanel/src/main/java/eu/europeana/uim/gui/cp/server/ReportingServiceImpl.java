@@ -3,9 +3,7 @@ package eu.europeana.uim.gui.cp.server;
 
 import java.io.File;
 import java.util.List;
-
 import eu.europeana.uim.gui.cp.client.services.ReportingService;
-
 import eu.europeana.uim.gui.cp.server.ExecutionServiceImpl;
 import eu.europeana.uim.gui.cp.shared.ExecutionDTO;
 

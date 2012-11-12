@@ -23,9 +23,9 @@ package eu.europeana.uim.gui.cp.server.engine;
 import java.util.logging.Logger;
 
 import eu.europeana.dedup.osgi.service.DeduplicationService;
-import eu.europeana.uim.api.Registry;
+import eu.europeana.uim.Registry;
 import eu.europeana.uim.repox.RepoxUIMService;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.sugar.SugarCrmService;
 
 /**
  * Expanded version of the OsgiEngine giving access to SugarCRM and Repox services

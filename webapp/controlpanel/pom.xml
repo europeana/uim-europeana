@@ -8,7 +8,7 @@
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-		<version>0.99-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 
@@ -91,7 +91,6 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.1.0</version>
 				<extensions>true</extensions>
 				<executions>
 					<execution>
@@ -122,6 +121,10 @@
 						<Embed-StripVersion>true</Embed-StripVersion>
 						<Import-Package>
 							!eu.europeana.uim.gui.cp.*,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues,
+							eu.europeana.uim.orchestration,
+							eu.europeana.uim.plugin.ingestion,
+							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.common,
 							eu.europeana.uim.store,
 							eu.europeana.uim.store.mongo.decorators,
@@ -129,7 +132,6 @@
 							eu.europeana.uim.store.mongo.resourceentities,
 							eu.europeana.uim.*,
 							eu.europeana.uim.workflow,
-							eu.europeana.uim.api,
 							eu.europeana.dedup.osgi.service.*,
 							org.osgi.framework,
 							org.w3c.dom,

@@ -9,7 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 
-import eu.europeana.uim.api.ResourceEngine;
+import eu.europeana.uim.resource.ResourceEngine;
 import eu.europeana.uim.gui.cp.server.engine.Engine;
 import eu.europeana.uim.gui.cp.server.util.PropertyReader;
 import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
