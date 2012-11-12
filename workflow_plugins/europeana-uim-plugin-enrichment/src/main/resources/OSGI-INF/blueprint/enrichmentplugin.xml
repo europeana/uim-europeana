@@ -3,18 +3,18 @@ xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
     <bean id="enrichmentbean" class="eu.europeana.uim.enrichment.EnrichmentPlugin">
     	 <property name="sugarCrmService" ref="sugarcrm"/>
-    	 <property name="enrichmentService" ref="enrichment"/>
-    	
+    	 <property name="enrichmentService" ref="enrichment"/>    	
     </bean>
+    
     <bean id="enrichmentservicebean" class="eu.europeana.uim.enrichment.service.impl.EnrichmentServiceImpl">
- 
     </bean>
     
     <reference id="enrichment" interface="eu.europeana.uim.enrichment.service.EnrichmentService" availability="optional"/>
-    <reference id="sugarcrm" interface="eu.europeana.uim.sugarcrm.SugarCrmService"/>
     
-	<service id="enrichmentPlugin" ref="enrichmentbean" interface="eu.europeana.uim.api.IngestionPlugin" />
+    <reference id="sugarcrm" interface="eu.europeana.uim.sugar.SugarCrmService"/>
+	
+	<service id="enrichmentPlugin" ref="enrichmentbean" interface="eu.europeana.uim.plugin.ingestion.IngestionPlugin" />
+	
 	<service id="enrichmentService" ref="enrichmentservicebean" interface="eu.europeana.uim.enrichment.service.EnrichmentService"/>
 
- 
 </blueprint>

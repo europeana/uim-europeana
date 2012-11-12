@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -22,10 +21,8 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
-
 import eu.annocultor.converters.europeana.Entity;
 import eu.annocultor.converters.europeana.Field;
 import eu.europeana.corelib.definitions.jibx.AgentType;
@@ -61,10 +58,10 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.corelib.tools.utils.HashUtils;
 import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
 import eu.europeana.corelib.tools.utils.SipCreatorUtils;
-import eu.europeana.uim.api.AbstractIngestionPlugin;
-import eu.europeana.uim.api.CorruptedMetadataRecordException;
-import eu.europeana.uim.api.ExecutionContext;
-import eu.europeana.uim.api.IngestionPluginFailedException;
+import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
+import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
+import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
@@ -76,8 +73,8 @@ import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabulary
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
-import eu.europeana.uim.sugarcrm.SugarCrmRecord;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.sugar.SugarCrmRecord;
+import eu.europeana.uim.sugar.SugarCrmService;
 
 /**
  * Enrichment plugin implementation
@@ -85,7 +82,7 @@ import eu.europeana.uim.sugarcrm.SugarCrmService;
  * @author Yorgos.Mamakis@ kb.nl
  * 
  */
-public class EnrichmentPlugin extends AbstractIngestionPlugin {
+public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static HttpSolrServer solrServer;
 	private static String mongoDB;
@@ -126,12 +123,10 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
-		// TODO Auto-generated constructor stub
 	}
 
 	public EnrichmentPlugin() {
 		super("", "");
-		// TODO Auto-generated constructor stub
 	}
 
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
@@ -150,49 +145,74 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 	};
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getInputFields()
+	 */
+	@Override
 	public TKey<?, ?>[] getInputFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
+	 */
+	@Override
 	public TKey<?, ?>[] getOptionalFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOutputFields()
+	 */
+	@Override
 	public TKey<?, ?>[] getOutputFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#initialize()
+	 */
+	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
-
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#shutdown()
+	 */
+	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
-
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getParameters()
+	 */
+	@Override
 	public List<String> getParameters() {
-		// TODO Auto-generated method stub
 		return params;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getPreferredThreadCount()
+	 */
+	@Override
 	public int getPreferredThreadCount() {
-		// TODO Auto-generated method stub
 		return 1;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getMaximumThreadCount()
+	 */
+	@Override
 	public int getMaximumThreadCount() {
-		// TODO Auto-generated method stub
 		return 1;
 	}
 
-	public <I> void initialize(ExecutionContext<I> context)
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.orchestration.ExecutionContext)
+	 */
+	@Override
+	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
-		// TODO Auto-generated method stub
 
 		try {
 			solrList = new ArrayList<SolrInputDocument>();
@@ -225,12 +245,16 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 			rights = context.getProperties().getProperty(rightsProperty);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public <I> void completed(ExecutionContext<I> context)
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.orchestration.ExecutionContext)
+	 */
+	@Override
+	public void completed(ExecutionContext<MetaDataRecord<I>,I> context)
 			throws IngestionPluginFailedException {
 		try {
 			solrServer.add(solrList);
@@ -262,9 +286,13 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 
 	}
 
-	public <I> boolean processRecord(MetaDataRecord<I> mdr,
-			ExecutionContext<I> context) throws IngestionPluginFailedException,
-			CorruptedMetadataRecordException {
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana.uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
+	 */
+	@Override
+	public boolean process(MetaDataRecord<I> mdr,ExecutionContext<MetaDataRecord<I>,I> context) 
+			throws IngestionPluginFailedException, CorruptedDatasetException {
 		IBindingFactory bfact;
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
@@ -988,4 +1016,5 @@ public class EnrichmentPlugin extends AbstractIngestionPlugin {
 		}
 
 	}
+
 }
