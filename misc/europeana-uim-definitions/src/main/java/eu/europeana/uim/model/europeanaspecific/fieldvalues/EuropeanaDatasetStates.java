@@ -21,7 +21,7 @@
 package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
 import eu.europeana.uim.store.ControlledVocabularyKeyValue;
-import eu.europeana.uim.sugarcrm.model.DatasetStates;
+import eu.europeana.uim.sugar.model.DatasetStates;
 
 /**
  * This enumeration holds the State Descriptions for EuropeanaDatasets in Sugar CRM

@@ -21,7 +21,7 @@
 package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
 import eu.europeana.uim.store.ControlledVocabularyKeyValue;
-import eu.europeana.uim.sugarcrm.model.RetrievableField;
+import eu.europeana.uim.sugar.model.RetrievableField;
 
 
 /**

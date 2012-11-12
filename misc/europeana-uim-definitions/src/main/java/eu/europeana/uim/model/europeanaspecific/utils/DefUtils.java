@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * 
+ * Unmarshalling Utility class
  * @author Georgios Markakis
  */
 public class DefUtils {

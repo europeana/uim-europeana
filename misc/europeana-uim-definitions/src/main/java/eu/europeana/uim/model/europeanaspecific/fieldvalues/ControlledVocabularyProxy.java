@@ -20,7 +20,7 @@
  */
 package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
-import eu.europeana.uim.sugarcrm.model.SugarCrmField;
+import eu.europeana.uim.sugar.model.SugarCrmField;
 import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 
 /**

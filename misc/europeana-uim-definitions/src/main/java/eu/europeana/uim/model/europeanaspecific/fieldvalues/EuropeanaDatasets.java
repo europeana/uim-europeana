@@ -20,7 +20,7 @@
  */
 package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
-import eu.europeana.uim.sugarcrm.model.Datasets;
+import eu.europeana.uim.sugar.model.Datasets;
 
 /**
  * Enumerations holding the names of the system modules in sugarCRM currently being used
