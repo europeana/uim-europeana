@@ -6,7 +6,7 @@
 
 
 
-   <reference id="sugarcrmPluginService" interface="eu.europeana.uim.sugarcrm.SugarCrmService" availability="optional"/>
+   <reference id="sugarcrmPluginService" interface="eu.europeana.uim.sugar.SugarCrmService" availability="optional"/>
 
    <shell:command-bundle>
         <shell:command name="uim/sugarCrmAgent">

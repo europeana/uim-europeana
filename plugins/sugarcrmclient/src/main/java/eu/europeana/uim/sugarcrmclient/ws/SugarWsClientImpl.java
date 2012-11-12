@@ -22,7 +22,7 @@ package eu.europeana.uim.sugarcrmclient.ws;
 
 import org.springframework.ws.client.core.WebServiceTemplate;
 
-import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
+import eu.europeana.uim.sugar.GenericSugarCrmException;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.PropertyReader;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.UimConfigurationProperty;

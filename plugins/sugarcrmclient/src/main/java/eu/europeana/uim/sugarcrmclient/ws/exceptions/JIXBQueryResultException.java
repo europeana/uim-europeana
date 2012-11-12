@@ -4,7 +4,7 @@
 package eu.europeana.uim.sugarcrmclient.ws.exceptions;
 
 
-import eu.europeana.uim.sugarcrm.QueryResultException;
+import eu.europeana.uim.sugar.QueryResultException;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.ErrorValue;
 
 /**

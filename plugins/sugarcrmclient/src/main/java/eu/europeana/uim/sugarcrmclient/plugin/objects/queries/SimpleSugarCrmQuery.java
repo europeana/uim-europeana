@@ -21,11 +21,11 @@
 
 package eu.europeana.uim.sugarcrmclient.plugin.objects.queries;
 
-import eu.europeana.uim.sugarcrm.SugarCrmQuery;
-import eu.europeana.uim.sugarcrm.model.SugarCrmField;
+import eu.europeana.uim.sugar.SugarCrmQuery;
+import eu.europeana.uim.sugar.model.SugarCrmField;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
-import eu.europeana.uim.sugarcrm.model.DatasetStates;
+import eu.europeana.uim.sugar.model.DatasetStates;
 
 
 /**

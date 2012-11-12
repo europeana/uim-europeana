@@ -33,14 +33,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Element;
 
-import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
+import eu.europeana.uim.sugar.GenericSugarCrmException;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClient;
-
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBFileAttachmentException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLoginFailureException;
-import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLogoutFailureException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBQueryResultException;
-
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;
@@ -71,10 +67,7 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.UserAuth;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.LoginResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdmin;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.IsUserAdminResponse;
-
-
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
-
 import org.apache.log4j.Logger;
 
 

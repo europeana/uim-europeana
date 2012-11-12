@@ -84,15 +84,13 @@
 
    <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMServiceImpl">    
        <property name="sugarwsClient" ref="sugarWsClient"/>  
-       <property name="orchestrator" ref="orchestrator"/>  
        <property name="registry" ref="registry"/>  
    </bean>
 
     <!--Expose the SugarCRM plugin functionality as a service -->  
-   <osgi:service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugarcrm.SugarCrmService"/>
+   <osgi:service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugar.SugarCrmService"/>
    
-   <osgi:reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator"/>
-   <osgi:reference id="registry" interface="eu.europeana.uim.api.Registry"/>
+   <osgi:reference id="registry" interface="eu.europeana.uim.Registry"/>
    
 
 </beans>

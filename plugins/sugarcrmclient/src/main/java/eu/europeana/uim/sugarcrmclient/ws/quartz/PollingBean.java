@@ -28,10 +28,10 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
-import eu.europeana.uim.sugarcrm.PollingListener;
-import eu.europeana.uim.sugarcrm.SugarCrmRecord;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.sugar.GenericSugarCrmException;
+import eu.europeana.uim.sugar.PollingListener;
+import eu.europeana.uim.sugar.SugarCrmRecord;
+import eu.europeana.uim.sugar.SugarCrmService;
 
 
 /**

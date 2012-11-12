@@ -20,7 +20,7 @@
  */
 package eu.europeana.uim.sugarcrmclient.ws;
 
-import eu.europeana.uim.sugarcrm.GenericSugarCrmException;
+import eu.europeana.uim.sugar.GenericSugarCrmException;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModules;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetAvailableModulesResponse;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries;

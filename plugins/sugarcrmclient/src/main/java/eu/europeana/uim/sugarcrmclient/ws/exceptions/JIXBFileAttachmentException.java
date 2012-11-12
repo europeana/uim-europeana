@@ -21,7 +21,7 @@
 
 package eu.europeana.uim.sugarcrmclient.ws.exceptions;
 
-import eu.europeana.uim.sugarcrm.FileAttachmentException;
+import eu.europeana.uim.sugar.FileAttachmentException;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.ErrorValue;
 
 /**

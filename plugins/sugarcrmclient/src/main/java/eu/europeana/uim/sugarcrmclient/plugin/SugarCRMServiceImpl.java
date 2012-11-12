@@ -35,23 +35,24 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import eu.europeana.uim.api.ActiveExecution;
-import eu.europeana.uim.api.Orchestrator;
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.orchestration.ActiveExecution;
+import eu.europeana.uim.orchestration.Orchestrator;
+import eu.europeana.uim.Registry;
+import eu.europeana.uim.storage.StorageEngine;
+import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.sugarcrm.ConnectionStatus;
-import eu.europeana.uim.sugarcrm.FileAttachmentException;
-import eu.europeana.uim.sugarcrm.LoginFailureException;
-import eu.europeana.uim.sugarcrm.PollingListener;
-import eu.europeana.uim.sugarcrm.QueryResultException;
-import eu.europeana.uim.sugarcrm.SugarCrmQuery;
-import eu.europeana.uim.sugarcrm.SugarCrmRecord;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
-import eu.europeana.uim.sugarcrm.model.DatasetStates;
-import eu.europeana.uim.sugarcrm.model.UpdatableField;
+import eu.europeana.uim.store.UimDataSet;
+import eu.europeana.uim.sugar.ConnectionStatus;
+import eu.europeana.uim.sugar.FileAttachmentException;
+import eu.europeana.uim.sugar.LoginFailureException;
+import eu.europeana.uim.sugar.PollingListener;
+import eu.europeana.uim.sugar.QueryResultException;
+import eu.europeana.uim.sugar.SugarCrmQuery;
+import eu.europeana.uim.sugar.SugarCrmRecord;
+import eu.europeana.uim.sugar.SugarCrmService;
+import eu.europeana.uim.sugar.model.DatasetStates;
+import eu.europeana.uim.sugar.model.UpdatableField;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
@@ -86,7 +87,6 @@ import org.apache.commons.lang.StringUtils;
 public class SugarCRMServiceImpl implements SugarCrmService {
 
     private SugarWsClientImpl                      sugarwsClient;
-    private Orchestrator                           orchestrator;
     private Registry                               registry;
     private LinkedHashMap<String, PollingListener> pollingListeners;
     private static final String                    DSMODULENAME = "Opportunities";
@@ -125,7 +125,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
     	if(username == null){
     		username = sugarwsClient.getUsername();
     	}
-
+    	
     	if(password ==  null){
     		password = sugarwsClient.getPassword();
     	}
@@ -150,6 +150,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         alterSugarCRMItemStatus(recordId, state.getSysId());
     }
 
+    
     /*
      * (non-Javadoc)
      * 
@@ -299,15 +300,19 @@ public class SugarCRMServiceImpl implements SugarCrmService {
      * eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates)
      */
     @Override
-    public Workflow initWorkflowFromRecord(String worklfowName, SugarCrmRecord record,
+    public  Workflow initWorkflowFromRecord(String worklfowName, SugarCrmRecord record,
             DatasetStates endstate) throws QueryResultException, StorageEngineException {
 
         StorageEngine<?> engine = registry.getStorageEngine();
-        Workflow w = registry.getWorkflow(worklfowName);
+        @SuppressWarnings("unchecked")
+		Workflow<UimDataSet<String>, String> w = (Workflow<UimDataSet<String>, String>) registry.getWorkflow(worklfowName);
 
-        Collection<?> dataset = inferCollection(engine, record);
-
-        ActiveExecution<?> execution = orchestrator.executeWorkflow(w, dataset);
+        @SuppressWarnings("unchecked")
+		Collection<String> dataset = inferCollection(engine, record);
+        
+        Orchestrator<String> orch = (Orchestrator<String>) registry.getOrchestrator();
+        
+        ActiveExecution<UimDataSet<String>, String> execution = orch.executeWorkflow(w, dataset);   //executeWorkflow(w,dataset);
         alterSugarCRMItemStatus(dataset.getMnemonic(), endstate.getSysId());
 
         execution.waitUntilFinished();
@@ -324,10 +329,10 @@ public class SugarCRMServiceImpl implements SugarCrmService {
      * eu.europeana.uim.sugarcrmclient.plugin.objects.data.EuropeanaDatasetStates)
      */
     @Override
-    public List<Workflow> initWorkflowsFromRecords(String worklfowName, DatasetStates currentstate,
+    public List<Workflow<?,?>> initWorkflowsFromRecords(String worklfowName, DatasetStates currentstate,
             DatasetStates endstate) throws QueryResultException, StorageEngineException {
 
-        ArrayList<Workflow> wfs = new ArrayList<Workflow>();
+        List<Workflow<?, ?>> wfs = new ArrayList<Workflow<?, ?>>();
 
         SimpleSugarCrmQuery query = new SimpleSugarCrmQuery(currentstate);
         query.setMaxResults(1000);
@@ -730,7 +735,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
      * @param status
      * @throws JIXBQueryResultException
      */
-    protected void alterSugarCRMItemStatus(String id, String status) throws eu.europeana.uim.sugarcrm.QueryResultException {
+    protected void alterSugarCRMItemStatus(String id, String status) throws QueryResultException {
         SetEntry request = new SetEntry();
 
         NameValue nv0 = new NameValue();
@@ -768,13 +773,6 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         return sugarwsClient;
     }
 
-    public void setOrchestrator(Orchestrator orchestrator) {
-        this.orchestrator = orchestrator;
-    }
-
-    public Orchestrator getOrchestrator() {
-        return orchestrator;
-    }
 
     public void setRegistry(Registry registry) {
         this.registry = registry;

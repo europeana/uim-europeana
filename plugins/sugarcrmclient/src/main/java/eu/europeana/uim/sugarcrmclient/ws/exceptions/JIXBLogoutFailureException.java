@@ -3,7 +3,7 @@
  */
 package eu.europeana.uim.sugarcrmclient.ws.exceptions;
 
-import eu.europeana.uim.sugarcrm.LoginFailureException;
+import eu.europeana.uim.sugar.LoginFailureException;
 
 
 
