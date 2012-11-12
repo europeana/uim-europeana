@@ -16,6 +16,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
@@ -91,6 +92,7 @@ public class DeactivatePluginTest {
 	 * @throws NumberFormatException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Ignore
 	@Test
 	public void testDeactivation() throws NumberFormatException,
 			MongoDBException, UnknownHostException, MongoException {
