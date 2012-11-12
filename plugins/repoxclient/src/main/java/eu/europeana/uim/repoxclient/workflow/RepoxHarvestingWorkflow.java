@@ -17,7 +17,7 @@
 package eu.europeana.uim.repoxclient.workflow;
 
 import eu.europeana.uim.repox.RepoxUIMService;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.sugar.SugarCrmService;
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 

@@ -32,8 +32,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Function;
 
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
+import eu.europeana.uim.Registry;
+import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.repox.AggregatorOperationException;
 import eu.europeana.uim.repox.DataSourceOperationException;
 import eu.europeana.uim.repox.HarvestingOperationException;

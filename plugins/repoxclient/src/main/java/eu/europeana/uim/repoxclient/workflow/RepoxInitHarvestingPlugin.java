@@ -19,11 +19,10 @@ package eu.europeana.uim.repoxclient.workflow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-
-import eu.europeana.uim.api.AbstractIngestionPlugin;
-import eu.europeana.uim.api.CorruptedMetadataRecordException;
-import eu.europeana.uim.api.ExecutionContext;
-import eu.europeana.uim.api.IngestionPluginFailedException;
+import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
+import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
+import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
 import eu.europeana.uim.repox.DataSourceOperationException;
@@ -33,8 +32,9 @@ import eu.europeana.uim.repox.model.HarvestingState;
 import eu.europeana.uim.repox.model.RepoxHarvestingStatus;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
-import eu.europeana.uim.sugarcrm.QueryResultException;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.store.UimDataSet;
+import eu.europeana.uim.sugar.QueryResultException;
+import eu.europeana.uim.sugar.SugarCrmService;
 import eu.europeana.uim.util.BatchWorkflowStart;
 
 /**
@@ -78,7 +78,7 @@ public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
 	 * @see eu.europeana.uim.api.IngestionPlugin#completed(eu.europeana.uim.api.ExecutionContext)
 	 */
 	@Override
-	public <I> void completed(ExecutionContext<I> context)
+	public  void completed(ExecutionContext context)
 			throws IngestionPluginFailedException {
 		
 		Collection<?> coll =  (Collection<?>) context.getDataSet();
@@ -183,35 +183,25 @@ public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
 		return 10;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#initialize()
-	 */
-	@Override
-	public void initialize() {
-		// nothing done here
-	}
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#initialize(eu.europeana.uim.api.ExecutionContext)
-	 */
-	@Override
-	public <I> void initialize(ExecutionContext<I> arg0)
-			throws IngestionPluginFailedException {
-		// nothing done here
-	}
 
 	@Override
-	public <I> boolean processRecord(MetaDataRecord<I> arg0,
-			ExecutionContext<I> arg1) throws IngestionPluginFailedException,
-			CorruptedMetadataRecordException {
-	
-		//Does nothing
+	public boolean process(UimDataSet dataset, ExecutionContext context)
+			throws IngestionPluginFailedException, CorruptedDatasetException {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.api.IngestionPlugin#shutdown()
-	 */
+
+	@Override
+	public void initialize(ExecutionContext context)
+			throws IngestionPluginFailedException {
+	}
+
+
+	@Override
+	public void initialize() {		
+	}
+
+
 	@Override
 	public void shutdown() {		
 	}
