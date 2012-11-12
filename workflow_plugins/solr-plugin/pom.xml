@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-	    <version>0.99-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>europeana-uim-plugin-solrosgi</artifactId>
@@ -21,14 +21,14 @@
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-run</artifactId>
@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
-<!-- 			<version>0.99.1-SNAPSHOT</version> -->
+			<!-- <version>0.99.1-SNAPSHOT</version> -->
 			<version>0.99</version>
 			<scope>compile</scope>
 		</dependency>
@@ -143,14 +143,57 @@
 					<instructions>
 						<Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
 						<Import-Package>
-							eu.europeana.uim.solr3,
-							org.apache.solr.*;version="3.5.0",
-							org.apache.lucene.*;version="3.5.0",
-							org.xmlpull.v1,
-							org.jibx.runtime,
-							org.jibx.runtime.impl,
-							org.jibx.extras,
-							!net.vz.mongodb.jackson,
+							javax.annotation; version=0.0.0,
+							javax.imageio; version=0.0.0,
+							javax.management; version=0.0.0,
+							javax.naming; version=0.0.0,
+							javax.net; version=0.0.0,
+							javax.security.auth; version=0.0.0,
+							javax.swing; version=0.0.0,
+							javax.swing.border; version=0.0.0,
+							javax.swing.event; version=0.0.0,
+							javax.swing.text; version=0.0.0,
+							javax.xml.datatype; version=0.0.0,
+							javax.xml.namespace; version=0.0.0,
+							javax.xml.parsers; version=0.0.0,
+							javax.xml.transform; version=0.0.0,
+							javax.xml.transform.dom; version=0.0.0,
+							javax.xml.transform.sax; version=0.0.0,
+							javax.xml.transform.stream; version=0.0.0,
+							javax.xml.validation; version=0.0.0,
+							javax.xml.xpath; version=0.0.0,
+							org.w3c.dom; version=0.0.0,
+							org.w3c.dom.events; version=0.0.0,
+							org.w3c.dom.ls; version=0.0.0,
+							org.w3c.dom.ranges; version=0.0.0,
+							org.w3c.dom.xpath; version=0.0.0,
+							org.xml.sax; version=0.0.0,
+							org.xml.sax.ext; version=0.0.0,
+							org.xml.sax.helpers; version=0.0.0,
+							org.osgi.service.blueprint; version=1.0.1,
+							org.apache.commons.codec.digest; version=1.4.0,
+							org.xmlpull.v1; version=1.1.4,
+							org.jibx.runtime; version=1.2.3,
+							org.jibx.runtime.impl; version=1.2.3,
+							org.jibx.extras; version=1.2.3,
+							eu.europeana.uim.common; version=0.0.0,
+							eu.europeana.uim.store; version=0.0.0,
+							org.apache.commons.lang; version=2.4.0,
+							org.apache.commons.io; version=2.1.0,
+							org.joda.time; version=1.6.2,
+							eu.europeana.uim.logging; version=0.0.0,
+							eu.europeana.uim.orchestration; version=0.0.0,
+							eu.europeana.uim.plugin; version=0.0.0,
+							eu.europeana.uim.plugin.ingestion; version=0.0.0,
+							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.solr4,
+							org.apache.solr.common.util,
+							org.apache.solr.client.solrj.impl,
+							org.apache.solr.common,
+							org.apache.solr.client.solrj,
+							org.apache.solr.common.params,
+							org.apache.solr.client.solrj.response,
+							org.apache.solr.client.solrj.beans,
 							!org.springframework.*,
 							!javax.persistence.*,
 							!org.apache.sanselan.*,
@@ -173,7 +216,7 @@
 							!javax.ws.rs,
 							!javax.ws.rs.*,
 							!de.undercouch.bson4jackson.*,
-							*
+							!org.w3c.dom.traversal
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>

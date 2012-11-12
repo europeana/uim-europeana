@@ -2,8 +2,7 @@
 xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
     <bean id="solrbean" class="eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin">
-    	
     </bean>
-	<service id="solrPlugin" ref="solrbean" interface="eu.europeana.uim.api.IngestionPlugin" />
-
+    
+	<service id="solrPlugin" ref="solrbean" interface="eu.europeana.uim.plugin.ingestion.IngestionPlugin" />
 </blueprint>

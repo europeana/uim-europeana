@@ -30,19 +30,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-
 import org.apache.commons.lang.StringUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
-
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Concept;
@@ -61,10 +58,10 @@ import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.definitions.solr.entity.Proxy;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
-import eu.europeana.uim.api.AbstractIngestionPlugin;
-import eu.europeana.uim.api.CorruptedMetadataRecordException;
-import eu.europeana.uim.api.ExecutionContext;
-import eu.europeana.uim.api.IngestionPluginFailedException;
+import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
+import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
+import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
@@ -72,6 +69,7 @@ import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
 import eu.europeana.uim.plugin.solr.utils.PropertyReader;
 import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 import eu.europeana.uim.store.MetaDataRecord;
+import eu.europeana.uim.store.UimDataSet;
 
 /**
  * This is the main class implementing the UIM functionality for the solr
@@ -81,7 +79,7 @@ import eu.europeana.uim.store.MetaDataRecord;
  * @author Yorgos.Mamakis@ kb.nl
  * 
  */
-public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
+public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>, I>  {
 
 	private static int recordNumber;
 
@@ -93,6 +91,9 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	};
 
+	/**
+	 * 
+	 */
 	public SolrWorkflowPlugin() {
 		super("solr_workflow", "Solr Repository Ingestion Plugin");
 
@@ -104,9 +105,9 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.
 	 * MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
 	 */
-	public <I> boolean processRecord(MetaDataRecord<I> mdr,
-			ExecutionContext<I> context) throws IngestionPluginFailedException,
-			CorruptedMetadataRecordException {
+	@Override
+	public boolean process(MetaDataRecord<I> mdr,
+			ExecutionContext<MetaDataRecord<I>, I> context) throws IngestionPluginFailedException,CorruptedDatasetException{
 
 		try {
 
@@ -736,56 +737,85 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#initialize()
+	 */
+	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
-
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#shutdown()
+	 */
+	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
-
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.orchestration.ExecutionContext)
+	 */
+	@Override
+	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
+			throws IngestionPluginFailedException {		
+	}
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.orchestration.ExecutionContext)
+	 */
+	@Override
+	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
+			throws IngestionPluginFailedException {
+	}
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getPreferredThreadCount()
+	 */
+	@Override
 	public int getPreferredThreadCount() {
 		return 3;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getMaximumThreadCount()
+	 */
+	@Override
 	public int getMaximumThreadCount() {
 		return 5;
 	}
 
-	public <I> void initialize(ExecutionContext<I> context)
-			throws IngestionPluginFailedException {
 
-	}
-
-	public <I> void completed(ExecutionContext<I> context)
-			throws IngestionPluginFailedException {
-
-	}
-
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getInputFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getInputFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getOptionalFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOutputFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getOutputFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getParameters()
+	 */
 	@Override
 	public List<String> getParameters() {
 		return params;
 	}
+
 
 	public static int getRecords() {
 		return recordNumber;
@@ -803,4 +833,8 @@ public class SolrWorkflowPlugin extends AbstractIngestionPlugin {
 	}
 
 	
+
+
+
+
 }
