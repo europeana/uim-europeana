@@ -7,11 +7,11 @@
 
     <bp:reference id="dedup" interface="eu.europeana.dedup.osgi.service.DeduplicationService"/>
 
-    <bp:reference id="registry" interface="eu.europeana.uim.api.Registry"/>
+    <bp:reference id="registry" interface="eu.europeana.uim.Registry"/>
 
     <bean id="dm" class="eu.europeana.uim.europeanaspecific.workflows.DummyPlugin">
     </bean>
-    <service id="dummyPlugin" ref="dm" interface="eu.europeana.uim.api.IngestionPlugin" />
+    <service id="dummyPlugin" ref="dm" interface="eu.europeana.uim.plugin.ingestion.IngestionPlugin" />
 
     <bean id="iiwClient" class="eu.europeana.uim.europeanaspecific.workflows.InitialIngestionWorkflow">
       <argument ref="dedup"/>

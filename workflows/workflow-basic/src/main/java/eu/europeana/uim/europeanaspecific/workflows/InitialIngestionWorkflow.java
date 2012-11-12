@@ -22,19 +22,18 @@ package eu.europeana.uim.europeanaspecific.workflows;
 
 import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.europeanaspecific.workflowstarts.httpzip.HttpZipWorkflowStart;
+import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.workflow.AbstractWorkflow;
-import eu.europeana.uim.workflows.SysoutPlugin;
+
 
 /**
  * Workflow used to import material to europeana from scratch
  * 
  * @author Georgios Markakis
  */
-public class InitialIngestionWorkflow extends AbstractWorkflow{
+public class InitialIngestionWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>,I>{
 
-	
-	
-	
+
 	/**
 	 * Initial Ingestion Workflow Constructor
 	 */
@@ -43,20 +42,23 @@ public class InitialIngestionWorkflow extends AbstractWorkflow{
 		super("C: (Re)Import Data from Mint Mapping Tool",
         "Populates a UIM collection with specific EDM data from Mint");
 
-        setStart(new HttpZipWorkflowStart("HttpZipWorkflowStart","Downloads zipped EDM file",service));
+        setStart(new HttpZipWorkflowStart<I>("HttpZipWorkflowStart","Downloads zipped EDM file",service));
 
         addStep(new DummyPlugin());
 	}
 
 	
-
-	
-	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.workflow.Workflow#isMandatory(java.lang.String)
+	 */
 	public boolean isMandatory(String arg0) {
 		return false;
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.workflow.Workflow#isSavepoint(java.lang.String)
+	 */
 	public boolean isSavepoint(String arg0) {
 		return false;
 	}

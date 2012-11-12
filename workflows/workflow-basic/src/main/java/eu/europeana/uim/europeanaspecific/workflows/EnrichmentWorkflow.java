@@ -1,10 +1,13 @@
 package eu.europeana.uim.europeanaspecific.workflows;
 
 import eu.europeana.uim.enrichment.EnrichmentPlugin;
+import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
+import eu.europeana.uim.plugin.ingestion.IngestionPlugin;
+import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 
-public class EnrichmentWorkflow extends AbstractWorkflow {
+public class EnrichmentWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>,I> {
 
 
 
@@ -13,7 +16,7 @@ public class EnrichmentWorkflow extends AbstractWorkflow {
 			        "Enrich and Ingest Records into SOLR and MONGODB");
 	
 			        setStart(new BatchWorkflowStart());
-			        addStep(new EnrichmentPlugin());
+			        addStep((IngestionPlugin<MetaDataRecord<I>, I>) new EnrichmentPlugin());
 
 		}
 	

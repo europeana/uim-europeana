@@ -17,6 +17,7 @@
 package eu.europeana.uim.europeanaspecific.workflows;
 
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin;
+import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 
@@ -25,8 +26,11 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 23 May 2012
  */
-public class RepositoryIngestionWorkflow extends AbstractWorkflow{
+public class RepositoryIngestionWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>,I>{
 
+	/**
+	 * 
+	 */
 	public RepositoryIngestionWorkflow(){
 		super("D: Dereference Collection",
 		        "Dereference functionality of UIM");
@@ -37,11 +41,17 @@ public class RepositoryIngestionWorkflow extends AbstractWorkflow{
 		        isSavepoint(solrPlugin.getIdentifier());
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.workflow.Workflow#isSavepoint(java.lang.String)
+	 */
 	@Override
 	public boolean isSavepoint(String pluginIdentifier) {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.workflow.Workflow#isMandatory(java.lang.String)
+	 */
 	@Override
 	public boolean isMandatory(String pluginIdentifier) {
 		return false;
