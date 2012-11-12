@@ -23,21 +23,20 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import eu.europeana.dedup.osgi.service.DeduplicationService;
-import eu.europeana.uim.api.ExecutionContext;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.storage.StorageEngine;
+import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimDataSet;
-import eu.europeana.uim.workflow.AbstractWorkflowStart;
-import eu.europeana.uim.workflow.Task;
-import eu.europeana.uim.workflow.TaskCreator;
-import eu.europeana.uim.workflow.WorkflowStartFailedException;
+import eu.europeana.uim.plugin.source.AbstractWorkflowStart;
+import eu.europeana.uim.plugin.source.Task;
+import eu.europeana.uim.plugin.source.TaskCreator;
+import eu.europeana.uim.plugin.source.WorkflowStartFailedException;
 
 /**
  * Worflow start used in the current Mint implementation. It retrieves data from
@@ -46,7 +45,7 @@ import eu.europeana.uim.workflow.WorkflowStartFailedException;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 5 Mar 2012
  */
-public class HttpZipWorkflowStart extends AbstractWorkflowStart {
+public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecord<I>, I> {
 
 	/**
 	 * The deduplication service reference (null if not available)
@@ -159,13 +158,12 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	 * .api.ExecutionContext, eu.europeana.uim.api.StorageEngine)
 	 */
 	@Override
-	public <I> TaskCreator<I> createLoader(final ExecutionContext<I> context,
-			final StorageEngine<I> storage) throws WorkflowStartFailedException {
+	public TaskCreator<MetaDataRecord<I>, I> createLoader(final ExecutionContext<MetaDataRecord<I>, I> context) throws WorkflowStartFailedException {
 
 		final Data value = context.getValue(DATA_KEY);
 
 		if (!value.loader.isFinished()) {
-			return new TaskCreator<I>() {
+			return new TaskCreator<MetaDataRecord<I>, I>() {
 				@Override
 				public void run() {
 					try {
@@ -173,7 +171,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 								false);
 
 						for (MetaDataRecord<I> mdr : list) {
-							Task<I> task = new Task<I>(mdr, storage, context);
+							Task<MetaDataRecord<I>, I> task = new Task<MetaDataRecord<I>, I>(mdr,context);
 							synchronized (getQueue()) {
 								getQueue().offer(task);
 							}
@@ -201,8 +199,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	 * .ExecutionContext, eu.europeana.uim.api.StorageEngine)
 	 */
 	@Override
-	public <I> boolean isFinished(ExecutionContext<I> context,
-			StorageEngine<I> storage) {
+	public boolean isFinished(ExecutionContext<MetaDataRecord<I>, I> context) {
 		Data value = context.getValue(DATA_KEY);
 		boolean finished = value== null? true:value.loader.isFinished();
 		return finished;
@@ -216,10 +213,11 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	 * .ExecutionContext, eu.europeana.uim.api.StorageEngine)
 	 */
 	@Override
-	public <I> void initialize(ExecutionContext<I> context,
-			StorageEngine<I> storage) throws WorkflowStartFailedException {
+	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context) throws WorkflowStartFailedException {
 		Data value = new Data();
 
+		StorageEngine<I> storage = context.getStorageEngine();
+		
 		UimDataSet<I> dataset = context.getDataSet();
 		if (dataset instanceof Collection) {
 
@@ -279,8 +277,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	 * .ExecutionContext, eu.europeana.uim.api.StorageEngine)
 	 */
 	@Override
-	public <I> void completed(ExecutionContext<I> context,
-			StorageEngine<I> storage) throws WorkflowStartFailedException {
+	public void completed(ExecutionContext<MetaDataRecord<I>, I> context) throws WorkflowStartFailedException {
 		Data value = context.getValue(DATA_KEY);
 		value.loader.close();
 
@@ -298,7 +295,7 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 	 * .api.ExecutionContext)
 	 */
 	@Override
-	public <I> int getTotalSize(ExecutionContext<I> context) {
+	public int getTotalSize(ExecutionContext<MetaDataRecord<I>, I> context) {
 		Data value = context.getValue(DATA_KEY);
 		if (value == null)
 			return Integer.MAX_VALUE;
@@ -312,6 +309,22 @@ public class HttpZipWorkflowStart extends AbstractWorkflowStart {
 		}
 		return Integer.MAX_VALUE;
 
+	}
+
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#initialize()
+	 */
+	@Override
+	public void initialize() {		
+	}
+
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#shutdown()
+	 */
+	@Override
+	public void shutdown() {
 	}
 
 }

@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-	    <version>0.99-SNAPSHOT</version>
+	    <version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -62,12 +62,6 @@
 		</dependency> 
 
 		<dependency>
-			<groupId>${europeana.uim.groupId}</groupId>
-			<artifactId>europeana-uim-plugin-basic</artifactId>
-			<version>${europeana.uim.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
@@ -92,7 +86,7 @@
 				<configuration>
 					<instructions>
 						<Import-Package>
-							eu.europeana.uim.api,
+							eu.europeana.uim,
 							eu.europeana.uim.common,
 							eu.europeana.uim.store,
 							eu.europeana.uim.util,
@@ -118,6 +112,10 @@
 							eu.europeana.uim.model.europeanaspecific.utils,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues,
 							eu.europeana.dedup.osgi.service.*,
+							eu.europeana.uim.plugin.source,
+							eu.europeana.uim.storage,
+							eu.europeana.uim.common.progress,
+							eu.europeana.uim.orchestration,
 							!*
 						</Import-Package>
 						<Export-Package>
