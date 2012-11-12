@@ -16,7 +16,7 @@
  */
 package eu.europeana.uim.mintclient.service;
 
-import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.store.Collection;

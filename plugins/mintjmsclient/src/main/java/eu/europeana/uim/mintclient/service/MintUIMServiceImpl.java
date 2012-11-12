@@ -26,9 +26,7 @@ import com.rabbitmq.client.Envelope;
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientASync;
 import eu.europeana.uim.mintclient.ampq.MintAMPQClientSync;
 import eu.europeana.uim.mintclient.ampq.MintClientFactory;
-import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
-import eu.europeana.uim.mintclient.jibxbindings.CreateImportResponse;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationResponse;
@@ -44,11 +42,11 @@ import eu.europeana.uim.mintclient.utils.MintClientUtils;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.api.LoggingEngine;
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.Orchestrator;
-import eu.europeana.uim.api.StorageEngineException;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.logging.LoggingEngine;
+import eu.europeana.uim.Registry;
+import eu.europeana.uim.orchestration.Orchestrator;
+import eu.europeana.uim.storage.StorageEngineException;
+import eu.europeana.uim.sugar.SugarCrmService;
 
 /**
  * Base Class for implementing the UIM Mint connectivity
@@ -72,10 +70,9 @@ public class MintUIMServiceImpl implements MintUIMService {
 	/**
 	 * Private constructor, instantiated via private factory method
 	 */
-	public MintUIMServiceImpl(Registry registry, Orchestrator<?> orchestrator,
-			SugarCrmService sugservice) {
+	public MintUIMServiceImpl(Registry registry,SugarCrmService sugservice) {
 		MintUIMServiceImpl.registry = registry;
-		MintUIMServiceImpl.orchestrator = orchestrator;
+		MintUIMServiceImpl.orchestrator = registry.getOrchestrator();
 		MintUIMServiceImpl.sugservice = sugservice;
 		MintUIMServiceImpl.logger = (LoggingEngine<?>) (registry != null ? registry
 				.getLoggingEngine() : null);
@@ -92,8 +89,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 * @param service
 	 * @return
 	 */
-	public static MintUIMServiceImpl createService(Registry registryref,
-			Orchestrator<?> orchestratorref, SugarCrmService service) {
+	public static MintUIMServiceImpl createService(Registry registryref, SugarCrmService service) {
 
 		MintClientFactory factory = new MintClientFactory();
 		try {
@@ -102,7 +98,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 			asynchronousClient = (MintAMPQClientASync) factory.asyncMode(
 					MintUIMServiceImpl.UIMConsumerListener.class)
 					.createClient();
-			return new MintUIMServiceImpl(registryref, orchestratorref, service);
+			return new MintUIMServiceImpl(registryref,service);
 		} catch (MintOSGIClientException e) {
 			registryref.getLoggingEngine().logFailed(Level.SEVERE,
 					"MintUIMServiceImpl", e,

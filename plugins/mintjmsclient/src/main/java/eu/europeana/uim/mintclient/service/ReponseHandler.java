@@ -17,10 +17,10 @@
 package eu.europeana.uim.mintclient.service;
 
 import org.jibx.runtime.IMarshallable;
-import eu.europeana.uim.api.Orchestrator;
-import eu.europeana.uim.api.Registry;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.Registry;
+import eu.europeana.uim.orchestration.Orchestrator;
+import eu.europeana.uim.storage.StorageEngine;
+import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationAction;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserAction;
@@ -37,7 +37,7 @@ import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabulary
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.store.UimEntity;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.sugar.SugarCrmService;
 import eu.europeana.uim.workflow.Workflow;
 
 /**

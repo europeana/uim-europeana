@@ -17,7 +17,7 @@
 package eu.europeana.uim.mintclient.workflows;
 
 import eu.europeana.uim.mintclient.service.MintUIMService;
-import eu.europeana.uim.sugarcrm.SugarCrmService;
+import eu.europeana.uim.sugar.SugarCrmService;
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 

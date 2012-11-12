@@ -8,18 +8,15 @@
 	<bean id="mintbean" class="eu.europeana.uim.mintclient.service.MintUIMServiceImpl"
 	      factory-method="createService">
 	      <argument ref="registry"/>
-          <argument ref="orchestrator"/>
           <argument ref="sugarcrm"/>
 	</bean>
 
 	<service id="mintService" ref="mintbean"
 		interface="eu.europeana.uim.mintclient.service.MintUIMService" />
 
-	<bp:reference id="registry" interface="eu.europeana.uim.api.Registry" />
+	<bp:reference id="registry" interface="eu.europeana.uim.Registry" />
 	
-	<bp:reference id="orchestrator" interface="eu.europeana.uim.api.Orchestrator"/>
-	
-	<bp:reference id="sugarcrm" interface="eu.europeana.uim.sugarcrm.SugarCrmService"/>
+	<bp:reference id="sugarcrm" interface="eu.europeana.uim.sugar.SugarCrmService"/>
 
     <!-- Mint specific workflows  -->
     
