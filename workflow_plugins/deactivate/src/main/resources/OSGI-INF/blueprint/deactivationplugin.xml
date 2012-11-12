@@ -1,17 +1,18 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" 
-xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-    <bean id="delcollectionbean" class="eu.europeana.uim.deactivation.DeactivatePlugin">
-    	 <property name="dService" ref="deactivation"/>
-    	
-    </bean>
-    <bean id="deactivationservicebean" class="eu.europeana.uim.deactivation.service.DeactivationServiceImpl">
- 
-    </bean>
-    
+	<bean id="delcollectionbean" class="eu.europeana.uim.deactivation.DeactivatePlugin">
+		<argument ref="deactivation" />
+	</bean>
+
+	<bean id="deactivationservicebean"
+		class="eu.europeana.uim.deactivation.service.DeactivationServiceImpl">
+	</bean>
+
     <reference id="deactivation" interface="eu.europeana.uim.deactivation.service.DeactivationService" availability="optional"/>
-    
-	<service id="dService" ref="deactivationservicebean" interface="eu.europeana.uim.deactivation.service.DeactivationService"/>
 
- 
+	<service id="dService" ref="deactivationservicebean"
+		interface="eu.europeana.uim.deactivation.service.DeactivationService" />
+
+
 </blueprint>

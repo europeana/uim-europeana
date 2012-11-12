@@ -1,52 +1,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-		<version>0.99-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-  <artifactId>europeana-uim-plugin-deactivate</artifactId>
-  <packaging>bundle</packaging>
+	<artifactId>europeana-uim-plugin-deactivate</artifactId>
+	<packaging>bundle</packaging>
 
-  <name>Unified Ingestion Manager: Europeana Deactivation Plugin</name>
+	<name>Unified Ingestion Manager: Europeana Deactivation Plugin</name>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-  <dependencies>
-  
-  <dependency>
+	<dependencies>
+
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-  <dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-definitions</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-definitions</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-tools</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-dereference</artifactId>
-			<version>2.0-SNAPSHOT</version>
-		</dependency>
+
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
@@ -115,13 +91,13 @@
 			<artifactId>mongo-jackson-mapper</artifactId>
 			<version>1.4.2</version>
 		</dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <build>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
 		<resources>
 			<!-- standard Maven folder -->
 			<resource>
@@ -202,9 +178,9 @@
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>
-						 *;scope=compile|runtime;artifactId=!europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
+							*;scope=compile|runtime;artifactId=!europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
 						</Embed-Dependency>
-						
+
 					</instructions>
 				</configuration>
 			</plugin>

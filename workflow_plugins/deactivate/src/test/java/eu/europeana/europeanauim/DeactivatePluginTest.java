@@ -2,15 +2,12 @@ package eu.europeana.europeanauim;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
@@ -20,10 +17,8 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.junit.Assert;
 import org.junit.Test;
-
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
-
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
@@ -31,9 +26,9 @@ import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
 import eu.europeana.europeanauim.utils.PropertyReader;
 import eu.europeana.europeanauim.utils.UimConfigurationProperty;
-import eu.europeana.uim.api.ActiveExecution;
-import eu.europeana.uim.api.LoggingEngine;
-import eu.europeana.uim.api.LoggingEngineAdapter;
+import eu.europeana.uim.orchestration.ActiveExecution;
+import eu.europeana.uim.logging.LoggingEngine;
+import eu.europeana.uim.logging.LoggingEngineAdapter;
 import eu.europeana.uim.deactivation.DeactivatePlugin;
 import eu.europeana.uim.deactivation.service.DeactivationServiceImpl;
 import eu.europeana.uim.deactivation.service.ExtendedEdmMongoServer;
@@ -122,7 +117,7 @@ public class DeactivatePluginTest {
 		Properties properties = new Properties();
 		LoggingEngine logging = LoggingEngineAdapter.LONG;
 
-		DeactivatePlugin plugin = new DeactivatePlugin(dService, "test", "test");
+		DeactivatePlugin plugin = new DeactivatePlugin(dService);
 		when(context.getExecution()).thenReturn(execution);
 		when(context.getProperties()).thenReturn(properties);
 		when(context.getLoggingEngine()).thenReturn(logging);
@@ -152,7 +147,7 @@ public class DeactivatePluginTest {
 								"", ""));
 		plugin.initialize(context);
 
-		Assert.assertTrue(plugin.processRecord(mdr, context));
+		Assert.assertTrue(plugin.process(mdr, context));
 
 		plugin.completed(context);
 

@@ -9,7 +9,7 @@ public class DeactivationWorkflow extends AbstractWorkflow {
 	public DeactivationWorkflow(DeactivationService serv, String name, String description) {
 		super("H. Deactivate Collection", "Deactivate a specific collection");
 		setStart(new BatchWorkflowStart());
-		addStep(new DeactivatePlugin(serv, "Deactivate Collection Plugin", "Deactivate Collection Plugin"));
+		addStep(new DeactivatePlugin(serv));
 	}
 
 	public boolean isMandatory(String arg0) {
