@@ -49,14 +49,14 @@ import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimDataSet;
 import eu.europeana.uim.store.MetaDataRecord.QualifiedValue;
-import eu.europeana.uim.sugarcrm.SugarService;
-import eu.europeana.uim.api.ActiveExecution;
-import eu.europeana.uim.api.CorruptedMetadataRecordException;
-import eu.europeana.uim.api.ExecutionContext;
-import eu.europeana.uim.api.IngestionPluginFailedException;
-import eu.europeana.uim.api.LoggingEngine;
-import eu.europeana.uim.api.StorageEngine;
-import eu.europeana.uim.api.StorageEngineException;
+import eu.europeana.uim.sugar.SugarService;
+import eu.europeana.uim.orchestration.ActiveExecution;
+import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
+import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
+import eu.europeana.uim.logging.LoggingEngine;
+import eu.europeana.uim.storage.StorageEngine;
+import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.TKey;
 
 
@@ -72,7 +72,7 @@ import eu.europeana.uim.common.TKey;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 12 Apr 2012
  */
-public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
+public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
 
     private final static SimpleDateFormat df        = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     /**
@@ -101,8 +101,9 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.store.MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
 	 */
-	public   <I> boolean processRecord(MetaDataRecord<I> mdr, ExecutionContext<I> context)	
-    throws IngestionPluginFailedException, CorruptedMetadataRecordException{
+	@Override
+    public boolean process(MetaDataRecord<I> mdr, ExecutionContext<MetaDataRecord<I>, I> context)
+            throws IngestionPluginFailedException, CorruptedDatasetException {
 		
 		EuropeanaLinkData value = context.getValue(DATA);
 		
@@ -199,7 +200,8 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.api.IngestionPlugin#initialize(eu.europeana.uim.api.ExecutionContext)
 	 */
-	public <I> void initialize(ExecutionContext<I> context)
+	@Override
+	public void initialize(ExecutionContext<MetaDataRecord<I>,I> context)
 			throws IngestionPluginFailedException {
 		EuropeanaLinkData value = new EuropeanaLinkData();
 		
@@ -226,7 +228,7 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
      * @see org.theeuropeanlibrary.uim.check.weblink.AbstractLinkIngestionPlugin#completed(eu.europeana.uim.api.ExecutionContext)
      */
     @Override
-    public <I> void completed(ExecutionContext<I> context) throws IngestionPluginFailedException {
+    public void completed(ExecutionContext<MetaDataRecord<I>,I> context) throws IngestionPluginFailedException {
     	EuropeanaLinkData value = context.getValue(DATA);
 
 
@@ -263,7 +265,7 @@ public class ThumblerPlugin extends AbstractLinkIngestionPlugin {
                 //collection.putValue(SugarControlledVocabulary.COLLECTION_LINK_VALIDATION,
                 //        "" + context.getExecution().getId());
 
-                ((ActiveExecution<I>)context).getStorageEngine().updateCollection(collection);
+                ((ActiveExecution<MetaDataRecord<I>,I>)context).getStorageEngine().updateCollection(collection);
 
                 if (getSugarService() != null) {
                     getSugarService().updateCollection(collection);

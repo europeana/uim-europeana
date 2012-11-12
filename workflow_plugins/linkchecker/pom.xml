@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-	    <version>0.99-SNAPSHOT</version>
+	    <version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>europeana-uim-plugin-linkchecker</artifactId>
@@ -138,12 +138,16 @@
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
 						<Import-Package>
-							eu.europeana.uim.api,
+							eu.europeana.uim,
 							eu.europeana.uim.common,
+							eu.europeana.uim.plugin,
 							eu.europeana.uim.store,
 							eu.europeana.uim.util,
-							eu.europeana.uim.sugarcrm,
+							eu.europeana.uim.sugar,
 							eu.europeana.uim.workflow,
+							eu.europeana.uim.plugin.source,
+							eu.europeana.uim.plugin.ingestion,
+							eu.europeana.uim.orchestration,
 							org.theeuropeanlibrary.collections.guarded,
 							org.theeuropeanlibrary.model.common,
 							org.theeuropeanlibrary.model.common.qualifier,
