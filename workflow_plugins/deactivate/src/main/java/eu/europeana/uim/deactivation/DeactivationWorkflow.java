@@ -6,10 +6,12 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
 
 public class DeactivationWorkflow extends AbstractWorkflow {
 
-	public DeactivationWorkflow(DeactivationService serv, String name, String description) {
-		super("H. Deactivate Collection", "Deactivate a specific collection");
+	
+	
+	public DeactivationWorkflow(DeactivationService dService) {
+		super("H: Deactivate Collection", "Deactivate a specific collection");
 		setStart(new BatchWorkflowStart());
-		addStep(new DeactivatePlugin("Deactivate Collection Plugin", "Deactivate Collection Plugin"));
+		addStep(new DeactivatePlugin(dService,"Deactivate Collection Plugin", "Deactivate Collection Plugin"));
 	}
 
 	public boolean isMandatory(String arg0) {

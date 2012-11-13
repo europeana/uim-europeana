@@ -43,6 +43,13 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		super("","");
 	}
 
+	public DeactivatePlugin(DeactivationService dService, String name,
+			String description) {
+		super(name, description);
+		DeactivatePlugin.dService=dService;
+	}
+	
+	
 	
 	public TKey<?, ?>[] getInputFields() {
 		return null;
