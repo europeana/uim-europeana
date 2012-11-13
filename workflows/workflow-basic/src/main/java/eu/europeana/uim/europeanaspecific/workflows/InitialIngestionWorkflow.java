@@ -44,7 +44,7 @@ public class InitialIngestionWorkflow<I> extends AbstractWorkflow<MetaDataRecord
 
         setStart(new HttpZipWorkflowStart<I>("HttpZipWorkflowStart","Downloads zipped EDM file",service));
 
-        addStep(new DummyPlugin());
+        addStep(new DummyPlugin<I>());
 	}
 
 	

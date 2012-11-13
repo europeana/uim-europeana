@@ -35,8 +35,8 @@ public class RepositoryIngestionWorkflow<I> extends AbstractWorkflow<MetaDataRec
 		super("D: Dereference Collection",
 		        "Dereference functionality of UIM");
 
-		        setStart(new BatchWorkflowStart());
-		        SolrWorkflowPlugin solrPlugin = new SolrWorkflowPlugin();
+		        setStart(new BatchWorkflowStart<I>());
+		        SolrWorkflowPlugin<I> solrPlugin = new SolrWorkflowPlugin<I>();
 		        addStep(solrPlugin);
 		        isSavepoint(solrPlugin.getIdentifier());
 	}
