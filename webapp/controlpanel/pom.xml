@@ -126,6 +126,7 @@
 							eu.europeana.uim.plugin.ingestion,
 							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.common,
+							eu.europeana.uim.common.progress,
 							eu.europeana.uim.store,
 							eu.europeana.uim.store.mongo.decorators,
 							eu.europeana.uim.store.mongo,
