@@ -29,18 +29,16 @@ import eu.europeana.uim.mintclient.service.exceptions.MintOSGIClientException;
 import eu.europeana.uim.mintclient.service.exceptions.MintRemoteException;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
 import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Provider;
-import eu.europeana.uim.store.UimDataSet;
 import eu.europeana.uim.sugar.QueryResultException;
 import eu.europeana.uim.sugar.SugarCrmService;
 
 /**
- *
+ * Plugin that handles the import to UIM after completion
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 3 Apr 2012
  */
-public class MintImportPlugin extends AbstractIngestionPlugin{
+public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I>{
 
 	private static MintUIMService mintservice;
 	private static SugarCrmService sugarservice;
@@ -75,74 +73,97 @@ public class MintImportPlugin extends AbstractIngestionPlugin{
 
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getInputFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getInputFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getMaximumThreadCount()
+	 */
 	@Override
 	public int getMaximumThreadCount() {
 		return 10;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getOptionalFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOutputFields()
+	 */
 	@Override
 	public TKey<?, ?>[] getOutputFields() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getParameters()
+	 */
 	@Override
 	public List<String> getParameters() {
 		return params;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#getPreferredThreadCount()
+	 */
 	@Override
 	public int getPreferredThreadCount() {
-		// TODO Auto-generated method stub
 		return 5;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#initialize()
+	 */
 	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
-		
 	}
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.Plugin#shutdown()
+	 */
 	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
-		
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana.uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
+	 */
 	@Override
-	public boolean process(UimDataSet dataset, ExecutionContext context)
+	public boolean process(Collection<I> dataset, ExecutionContext<Collection<I>,I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.orchestration.ExecutionContext)
+	 */
 	@Override
-	public void initialize(ExecutionContext context)
-			throws IngestionPluginFailedException {
-		// TODO Auto-generated method stub
-		
+	public void initialize(ExecutionContext<Collection<I>,I> context)
+			throws IngestionPluginFailedException {		
 	}
 
 
 	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.orchestration.ExecutionContext)
+	 */
 	@Override
-	public void completed(ExecutionContext context)
+	public void completed(ExecutionContext<Collection<I>,I> context)
 			throws IngestionPluginFailedException {
-		Collection<String> collection = (Collection<String>) context.getDataSet();
-		Provider<String> provider = collection.getProvider();
+		Collection<I> collection = (Collection<I>) context.getDataSet();
+		Provider<I> provider = collection.getProvider();
 		
 		try {
 			

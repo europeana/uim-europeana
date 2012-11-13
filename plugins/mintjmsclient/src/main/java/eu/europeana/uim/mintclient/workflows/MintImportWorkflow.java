@@ -17,22 +17,24 @@
 package eu.europeana.uim.mintclient.workflows;
 
 import eu.europeana.uim.mintclient.service.MintUIMService;
+import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.sugar.SugarCrmService;
-import eu.europeana.uim.util.BatchWorkflowStart;
+import eu.europeana.uim.util.CollectionBatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 
 /**
- *
+ * Collection-based Workflow that initiates the import from Mint to UIM 
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 2 Apr 2012
  */
-public class MintImportWorkflow extends AbstractWorkflow{
+public class MintImportWorkflow<I> extends AbstractWorkflow<Collection<I>,I>{
 
 	public MintImportWorkflow(MintUIMService mintservice,
 			SugarCrmService sugarservice) {
 		super("B: Import Repox data into Mint", "Imports data from Repox into Mint, thus creating a mapping session");
-	    setStart(new BatchWorkflowStart());
-	    addStep(new MintImportPlugin(mintservice, sugarservice,
+		setStart(new CollectionBatchWorkflowStart<I>());
+	    addStep(new MintImportPlugin<I>(mintservice, sugarservice,
         		"Mint Importer Plugin","Preforms the migration from Repox to Mint"));
 	    
 	}
