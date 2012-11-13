@@ -42,10 +42,6 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 
 	private static MintUIMService mintservice;
 	private static SugarCrmService sugarservice;
-
-	
-	/** Property which allows to overwrite base url from collection/provider */
-	public static final String fullingest = "repox.fullingest";
 	
 	/**
 	 * The parameters used by this Plugin
@@ -53,7 +49,7 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
 		{
-			add(fullingest);
+
 		}
 	};
 	
