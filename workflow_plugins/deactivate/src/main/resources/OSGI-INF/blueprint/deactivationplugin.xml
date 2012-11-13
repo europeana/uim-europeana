@@ -2,7 +2,6 @@
 	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
 	<bean id="delcollectionbean" class="eu.europeana.uim.deactivation.DeactivatePlugin">
-		<argument ref="deactivation" />
 	</bean>
 
 	<bean id="deactivationservicebean"
@@ -13,6 +12,4 @@
 
 	<service id="dService" ref="deactivationservicebean"
 		interface="eu.europeana.uim.deactivation.service.DeactivationService" />
-<!-- <service id="deactivationPlugin" ref="delcollectionbean" interface="eu.europeana.uim.api.IngestionPlugin" /> -->
-
 </blueprint>
