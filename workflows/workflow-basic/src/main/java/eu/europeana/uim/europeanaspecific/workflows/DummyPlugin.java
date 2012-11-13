@@ -24,6 +24,7 @@ import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.MetaDataRecord;
 
 
 /**
@@ -32,7 +33,7 @@ import eu.europeana.uim.store.Collection;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 10 Oct 2012
  */
-public class DummyPlugin<I> extends AbstractIngestionPlugin<Collection<I>, I>{
+public class DummyPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,I>{
 
 	
 	private static final List<String> params = new ArrayList<String>() {
@@ -137,7 +138,7 @@ public class DummyPlugin<I> extends AbstractIngestionPlugin<Collection<I>, I>{
 	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.orchestration.ExecutionContext)
 	 */
 	@Override
-	public void initialize(ExecutionContext<Collection<I>, I> context)
+	public void initialize(ExecutionContext<MetaDataRecord<I>,I> context)
 			throws IngestionPluginFailedException {
 	}
 
@@ -145,7 +146,7 @@ public class DummyPlugin<I> extends AbstractIngestionPlugin<Collection<I>, I>{
 	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.orchestration.ExecutionContext)
 	 */
 	@Override
-	public void completed(ExecutionContext<Collection<I>, I> context)
+	public void completed(ExecutionContext<MetaDataRecord<I>,I> context)
 			throws IngestionPluginFailedException {		
 	}
 
@@ -155,8 +156,8 @@ public class DummyPlugin<I> extends AbstractIngestionPlugin<Collection<I>, I>{
 	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana.uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
 	 */
 	@Override
-	public boolean process(Collection<I> arg0,
-			ExecutionContext<Collection<I>, I> arg1)
+	public boolean process(MetaDataRecord<I> arg0,
+			ExecutionContext<MetaDataRecord<I>,I> arg1)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 
 		return true;
