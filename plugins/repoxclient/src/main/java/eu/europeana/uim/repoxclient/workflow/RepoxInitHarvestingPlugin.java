@@ -42,7 +42,7 @@ import eu.europeana.uim.util.BatchWorkflowStart;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 2 Apr 2012
  */
-public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
+public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I>{
 
 	private static RepoxUIMService repoxservice;
 	private static SugarCrmService sugarservice;
@@ -78,7 +78,7 @@ public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
 	 * @see eu.europeana.uim.api.IngestionPlugin#completed(eu.europeana.uim.api.ExecutionContext)
 	 */
 	@Override
-	public  void completed(ExecutionContext context)
+	public  void completed(ExecutionContext<Collection<I>,I> context)
 			throws IngestionPluginFailedException {
 		
 		Collection<?> coll =  (Collection<?>) context.getDataSet();
@@ -185,14 +185,14 @@ public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
 
 
 	@Override
-	public boolean process(UimDataSet dataset, ExecutionContext context)
+	public boolean process(Collection<I> dataset, ExecutionContext<Collection<I>,I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		return true;
 	}
 
 
 	@Override
-	public void initialize(ExecutionContext context)
+	public void initialize(ExecutionContext<Collection<I>,I> context)
 			throws IngestionPluginFailedException {
 	}
 
@@ -205,5 +205,8 @@ public class RepoxInitHarvestingPlugin extends AbstractIngestionPlugin{
 	@Override
 	public void shutdown() {		
 	}
+
+
+
 
 }
