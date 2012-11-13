@@ -33,14 +33,14 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 	private static List<String> europeanaIds;
 	private final static int DELETE_THRESHOLD = 1000;
 
-	/**
-	 * @param serv
-	 * @param name
-	 * @param description
-	 */
-	public DeactivatePlugin(DeactivationService dService) {
-		super("DeactivationPlugin", "Plugin used to remove collections from Solr and Mongo Repositories");
-		DeactivatePlugin.dService = dService;
+
+	public DeactivatePlugin(String name,
+			String description) {
+		super(name, description);
+	}
+	
+	public DeactivatePlugin(){
+		super("","");
 	}
 
 	
@@ -156,5 +156,15 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
 	}
+
+	public DeactivationService getdService() {
+		return dService;
+	}
+
+	public void setdService(DeactivationService dService) {
+		DeactivatePlugin.dService = dService;
+	}
+	
+	
 
 }

@@ -119,7 +119,9 @@ public class DeactivatePluginTest {
 		Properties properties = new Properties();
 		LoggingEngine logging = LoggingEngineAdapter.LONG;
 
-		DeactivatePlugin plugin = new DeactivatePlugin(dService);
+		DeactivatePlugin plugin = new DeactivatePlugin("test", "test");
+		plugin.setdService(dService);
+
 		when(context.getExecution()).thenReturn(execution);
 		when(context.getProperties()).thenReturn(properties);
 		when(context.getLoggingEngine()).thenReturn(logging);

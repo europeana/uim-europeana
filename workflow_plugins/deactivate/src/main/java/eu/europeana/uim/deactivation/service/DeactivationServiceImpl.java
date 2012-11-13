@@ -1,5 +1,6 @@
 package eu.europeana.uim.deactivation.service;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
@@ -51,7 +52,21 @@ public class DeactivationServiceImpl implements DeactivationService {
 			solrUrl= PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
 			solrCore=PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 			
-			solrServer = new HttpSolrServer(new URL(solrUrl)+solrCore);
+			
+			BlockingInitializer solrInit = new BlockingInitializer() {
+				
+				@Override
+				protected void initializeInternal() {
+					try {
+						solrServer = new HttpSolrServer(new URL(solrUrl)+solrCore);
+					} catch (MalformedURLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+			solrInit.initialize(HttpSolrServer.class.getClassLoader());
+			
 			BlockingInitializer initializer = new BlockingInitializer() {
 				
 				@Override
