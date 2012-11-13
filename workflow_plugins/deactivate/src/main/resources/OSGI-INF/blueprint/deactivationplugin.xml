@@ -13,6 +13,6 @@
 
 	<service id="dService" ref="deactivationservicebean"
 		interface="eu.europeana.uim.deactivation.service.DeactivationService" />
-
+<!-- <service id="deactivationPlugin" ref="delcollectionbean" interface="eu.europeana.uim.api.IngestionPlugin" /> -->
 
 </blueprint>
