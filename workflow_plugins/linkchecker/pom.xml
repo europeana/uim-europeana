@@ -148,6 +148,7 @@
 							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.plugin.ingestion,
 							eu.europeana.uim.orchestration,
+							eu.europeana.uim.logging,
 							org.theeuropeanlibrary.collections.guarded,
 							org.theeuropeanlibrary.model.common,
 							org.theeuropeanlibrary.model.common.qualifier,
