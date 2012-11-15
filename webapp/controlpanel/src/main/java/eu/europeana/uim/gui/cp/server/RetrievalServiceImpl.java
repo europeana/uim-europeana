@@ -37,6 +37,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -386,7 +388,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		EdmRecordDTO record = new EdmRecordDTO();
 		try {
 
-			String query = "europeana_id:" + recordId;
+			String query = "europeana_id:" + StringUtils.replace(recordId, "/", "\\/");
 			SolrQuery solrQuery = new SolrQuery().setQuery(query);
 
 			QueryResponse response = solrServer.query(solrQuery);
