@@ -107,11 +107,8 @@ public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
 		
 		EuropeanaLinkData value = context.getValue(DATA);
 		
-        // Adapter that ensures compatibility with the europeana datamodel 
-		Map<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>> strategies =  new HashMap<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>>();
-		strategies.put(ObjectModelRegistry.LINK, new EuropeanaLinkAdapterStrategy());
-		MetadataRecordAdapter<I, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = AdapterFactory.getAdapter(mdr, strategies);
-		 List<QualifiedValue<Link>> linkList = mdrad.getQualifiedValues(ObjectModelRegistry.LINK);
+		List<QualifiedValue<Link>> linkList = mdr.getQualifiedValues(ObjectModelRegistry.LINK);
+		
 	        int index = 0;
             for(QualifiedValue<Link> qlink : linkList){ 
             	

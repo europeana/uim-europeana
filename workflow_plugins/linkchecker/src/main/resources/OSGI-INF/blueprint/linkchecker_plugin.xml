@@ -50,5 +50,11 @@
 
 	<service id="linkadapterservice" ref="linkadapter"
 		interface="eu.europeana.uim.adapter.UimDatasetAdapter" />
+		
+	<bean id="thumbleradapter" class="eu.europeana.uim.plugin.thumbler.converters.ThumblerAdapter"/>
+
+	<service id="thumbleradapterservice" ref="thumbleradapter"
+		interface="eu.europeana.uim.adapter.UimDatasetAdapter" />	
+		
 
 </blueprint>

@@ -48,6 +48,7 @@ import eu.europeana.uim.plugin.thumbler.utils.PropertyReader;
 import eu.europeana.uim.plugin.thumbler.utils.UimConfigurationProperty;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
+import eu.europeana.uim.store.MetaDataRecord.QualifiedValue;
 import eu.europeana.uim.store.UimDataSet;
 
 /**
@@ -184,19 +185,18 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 				UimDataSet<?> dataset = guarded.getExecution().getDataSet();
 				MetaDataRecord<?> mdr = guarded.getMetaDataRecord();
-				String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
-						.get(0);
-				StringReader reader = new StringReader(value);
+				QualifiedValue<String> value = mdr.getFirstQualifiedValue(EuropeanaModelRegistry.EDMRECORD);
+				StringReader reader = new StringReader(value.getValue());
 				RDF edmRecord = (RDF) uctx.unmarshalDocument(reader);
 				String objectIDURI = extractOrigDocumentId(edmRecord);
 				Link offeredlink = guarded.getLink();
 
-				List<EuropeanaLink> europeanalinks = mdr
-						.getValues(EuropeanaModelRegistry.EUROPEANALINK);
+				List<QualifiedValue<EuropeanaLink>> europeanalinks = mdr
+						.getQualifiedValues(EuropeanaModelRegistry.EUROPEANALINK);
 
-				for (EuropeanaLink eulink : europeanalinks) {
-					if (offeredlink.getUrl().equals(eulink.getUrl())
-							&& eulink.isCacheable()) {
+				for (QualifiedValue<EuropeanaLink> eulink : europeanalinks) {
+					if (offeredlink.getUrl().equals(eulink.getValue().getUrl())
+							&& eulink.getValue().isCacheable()) {
 						storefileInMongo(offeredlink.getUrl(), dataset,
 								edmRecord);
 					}
@@ -251,7 +251,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			try {
 				String name = guarded.getUrl().getFile();
 
-				URLConnection urlConnection = new URL(name).openConnection();
+				URLConnection urlConnection = new URL(url).openConnection();
 				
 				InputStream inputStream = urlConnection.getInputStream();
 				StringWriter writer = new StringWriter();
