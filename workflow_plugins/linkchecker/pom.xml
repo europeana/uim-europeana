@@ -142,6 +142,7 @@
 							eu.europeana.uim.common,
 							eu.europeana.uim.plugin,
 							eu.europeana.uim.store,
+							eu.europeana.uim.storage,
 							eu.europeana.uim.util,
 							eu.europeana.uim.sugar,
 							eu.europeana.uim.workflow,
@@ -170,6 +171,7 @@
 							javax.xml.transform.stream,
 							org.xml.sax,
 							javax.net,
+							org.apache.commons.lang,
 							!*
 						</Import-Package>
 						<Embed-Dependency>tel-uim-plugin-check-link,commons-logging,corelib-db,
