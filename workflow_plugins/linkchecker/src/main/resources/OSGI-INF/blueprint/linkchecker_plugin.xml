@@ -46,5 +46,9 @@
 		</reference-listener>
 	</reference>
 
+    <bean id="linkadapter" class="eu.europeana.uim.plugin.thumbler.converters.LinkcheckerAdapter"/>
+
+	<service id="linkadapterservice" ref="linkadapter"
+		interface="eu.europeana.uim.adapter.UimDatasetAdapter" />
 
 </blueprint>
