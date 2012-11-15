@@ -351,7 +351,7 @@ public class IntegrationSeviceProxyImpl extends
 					}
 					
 					if(prov.getValue(ControlledVocabularyProxy.REPOXID) != null){
-						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/#EDIT_DP?id=" + prov.getValue(ControlledVocabularyProxy.REPOXID) );
+						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/?locale=en#EDIT_DP?id=" + prov.getValue(ControlledVocabularyProxy.REPOXID) );
 					}	
 
 					ControlledVocabularyProxy[] values = ControlledVocabularyProxy.values();
@@ -474,7 +474,7 @@ public class IntegrationSeviceProxyImpl extends
 					
 					
 					if(col.getValue(ControlledVocabularyProxy.REPOXID) != null){
-						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/#VIEW_DS?id=" + col.getValue("repoxID"));
+						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/?locale=en#VIEW_DS?id=" + col.getValue("repoxID"));
 					}	
 					
 				} catch (StorageEngineException e) {
