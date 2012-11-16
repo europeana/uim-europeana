@@ -628,7 +628,9 @@ public class OsgiExtractor extends Extractor {
 	private String retrieveValue(String resource) {
 		URLConnection urlConnection;
 		try {
-
+			if (vocabulary.getReplaceUrl()!=null){
+				resource = StringUtils.replace(resource, vocabulary.getURI(), vocabulary.getReplaceUrl());
+			}
 			urlConnection = new URL(resource).openConnection();
 
 			InputStream inputStream = urlConnection.getInputStream();

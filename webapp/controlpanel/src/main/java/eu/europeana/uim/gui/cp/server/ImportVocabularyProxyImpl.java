@@ -71,9 +71,11 @@ public class ImportVocabularyProxyImpl extends
 
 		controlledVocabulary.setRules(vocabulary.getRules());
 		controlledVocabulary.setIterations(vocabulary.getIterations());
+		
+		controlledVocabulary.setReplaceUrl(vocabulary.getReplaceUrl()!=null?vocabulary.getReplaceUrl():null);
 		extractor = new Extractor(controlledVocabulary, mongo);
 		vocabulary.setMapping(convertEdmMap(extractor.readSchema(repository+vocabulary
-				.getLocation())));
+				.getName())));
 		return vocabulary;
 	}
 
@@ -136,6 +138,7 @@ public class ImportVocabularyProxyImpl extends
 			vocabularyDTO.setMapping(convertEdmMap(controlledVocabulary
 					.getElements()));
 			vocabularyDTO.setRules(controlledVocabulary.getRules());
+			vocabularyDTO.setReplaceUrl(controlledVocabulary.getReplaceUrl());
 			vocabularyDTOs.add(vocabularyDTO);
 		}
 		return vocabularyDTOs;

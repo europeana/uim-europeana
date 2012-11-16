@@ -460,51 +460,63 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		final TextBox vocabularyUri = new TextBox();
 		setDOMID(vocabularyUri, "vocabularyURI");
 		vocabularyUri.setName("vocabularyURI");
+		table.setWidget(1, 1, vocabularyUri);
+		
+		table.setWidget(2,0, new Label(EuropeanaClientConstants.VOCREPLACEURL));
+		final TextBox vocabularyReplaceUrl = new TextBox();
+		setDOMID(vocabularyReplaceUrl, "vocabularyReplaceUrl");
+		vocabularyReplaceUrl.setName("vocabularyReplaceUrl");
+		table.setWidget(2, 1, vocabularyReplaceUrl);
+		saveAndUpload = new FileUpload();
+		//saveAndUpload.setEnabled(false);
+		saveAndUpload.setEnabled(true);
+		form.add(saveAndUpload);
 		final RadioButton radioButton = new RadioButton("file", "Local File");
 		radioButton.ensureDebugId("file-local");
 		radioButton.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				saveAndUpload.setEnabled(true);
+				//saveAndUpload.setEnabled(true);
 				url.setEnabled(false);
 			}
 		});
-		table.setWidget(2, 0, radioButton);
-		saveAndUpload = new FileUpload();
-		saveAndUpload.setEnabled(false);
+		table.setWidget(3, 0, radioButton);
+		
 		saveAndUpload.ensureDebugId("local");
+		saveAndUpload.setName("local");
+		setDOMID(saveAndUpload, "local");
 		saveAndUpload.setTitle(EuropeanaClientConstants.VOCSAVEANDUPLOAD);
-		table.setWidget(2, 1, saveAndUpload);
+		table.setWidget(3, 1, saveAndUpload);
 		final RadioButton radioButton1 = new RadioButton("file", "Remote File");
 		radioButton1.ensureDebugId("file-remote");
 		radioButton1.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				saveAndUpload.setEnabled(false);
+				//saveAndUpload.setEnabled(false);
 				url.setEnabled(true);
 			}
 		});
-		table.setWidget(3, 0, radioButton1);
+		table.setWidget(4, 0, radioButton1);
 
 		url.ensureDebugId("url");
 		setDOMID(url, "url");
 		url.setName("url");
-		table.setWidget(3, 1, url);
-		table.setWidget(1, 1, vocabularyUri);
-		table.setWidget(4, 0, new Label(
+		table.setWidget(4, 1, url);
+		
+		table.setWidget(5, 0, new Label(
 				EuropeanaClientConstants.VOCABULARYRULES));
 		final TextBox vocabularyRules = new TextBox();
 		setDOMID(vocabularyRules, "vocabularyRules");
 		vocabularyRules.setName("vocabularyRules");
-		table.setWidget(4, 1, vocabularyRules);
-		table.setWidget(5, 0, new Label(
+		table.setWidget(5, 1, vocabularyRules);
+		table.setWidget(6, 0, new Label(
 				EuropeanaClientConstants.VOCABULARYSUFFIX));
 		TextBox vocabularySuffix = new TextBox();
 		setDOMID(vocabularySuffix, "vocabularySuffix");
 		vocabularySuffix.setName("vocabularySuffix");
-		table.setWidget(5, 1, vocabularySuffix);
+		table.setWidget(6, 1, vocabularySuffix);
 		Button submit = new Button(EuropeanaClientConstants.VOCSAVEANDUPLOAD);
 		submit.addClickHandler(new ClickHandler() {
 			@Override
@@ -525,13 +537,14 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				
 			}
 		});
-		table.setWidget(6, 0, new Label(EuropeanaClientConstants.VOCITERATIONS));
-		table.setWidget(6, 1, vocabularyIterations);
-		table.setWidget(7, 1, submit);
+		table.setWidget(7, 0, new Label(EuropeanaClientConstants.VOCITERATIONS));
+		table.setWidget(7, 1, vocabularyIterations);
+		table.setWidget(9, 1, submit);
+		table.setWidget(8, 0, new Label(EuropeanaClientConstants.VOCLOCATION));
 		TextBox vocabularyLocation = new TextBox();
 		vocabularyLocation.setName("vocabularyLocation");
 		vocabularyLocation.setVisible(true);
-		table.setWidget(7,0,vocabularyLocation);
+		table.setWidget(8,1,vocabularyLocation);
 		
 		form.add(table);
 		form.addSubmitHandler(new SubmitHandler() {
@@ -577,6 +590,10 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				.<InputElement> cast().getValue());
 		vocabulary.setRules(DOM.getElementById("vocabularyRules")
 				.<InputElement> cast().getValue().split(" "));
+		vocabulary.setReplaceUrl(DOM.getElementById("vocabularyReplaceUrl")
+				.<InputElement> cast().getValue());
+		
+		
 		importedVocabulary.importVocabulary(vocabulary,
 				new AsyncCallback<ControlledVocabularyDTO>() {
 					@Override

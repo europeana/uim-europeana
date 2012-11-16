@@ -14,6 +14,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang.StringUtils;
 
 import eu.europeana.uim.gui.cp.server.util.PropertyReader;
 import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
@@ -90,12 +91,17 @@ public class UploadServlet extends HttpServlet {
 
 			@SuppressWarnings("unchecked")
 			List<FileItem> items = uploadHandler.parseRequest(request);
-
+			String vocName = "";
 			for (FileItem item : items) {
-				if (item.isFormField())
+				if (item.isFormField()){
+					if(StringUtils.equals(item.getFieldName(),"vocabularyName")){
+						vocName = item.getString();
+					}
 					continue;
+				}
+					
 
-				File file = new File(destinationDir, item.getName());
+				File file = new File(destinationDir, vocName);
 				file.createNewFile();
 				item.write(file);
 				response.setStatus(HttpServletResponse.SC_CREATED);

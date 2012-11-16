@@ -97,7 +97,7 @@ public class RemoteUploadServlet extends HttpServlet {
 
 				InputStream inputStream = urlConnection.getInputStream();
 				OutputStream fileOutputStream = new BufferedOutputStream(
-						new FileOutputStream(DESTINATION_DIR_PATH + "/" + name));
+						new FileOutputStream(DESTINATION_DIR_PATH + name));
 				byte[] buffer = new byte[1024];
 				while ((in = inputStream.read(buffer)) != -1) {
 					fileOutputStream.write(buffer, 0, in);
