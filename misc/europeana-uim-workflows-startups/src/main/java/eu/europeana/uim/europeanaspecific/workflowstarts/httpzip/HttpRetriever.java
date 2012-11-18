@@ -19,6 +19,7 @@ package eu.europeana.uim.europeanaspecific.workflowstarts.httpzip;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -93,6 +94,11 @@ public class HttpRetriever implements Iterator<String> {
 
 		TarArchiveInputStream tarfile;
 
+
+		
+		//InputStreamReader isr = new InputStreamReader();
+
+		
 			tarfile =  new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(dest)));
 
 			tarfile.available();
@@ -110,7 +116,7 @@ public class HttpRetriever implements Iterator<String> {
 					
 					tarfile.read(content, 0, (int) entry.getSize());
 
-					String xml = new String(content);
+					String xml = new String(content,"UTF-8");
 					
 					list.add(xml);
 				}
