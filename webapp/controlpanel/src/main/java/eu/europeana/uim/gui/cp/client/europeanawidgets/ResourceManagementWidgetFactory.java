@@ -6,8 +6,6 @@ package eu.europeana.uim.gui.cp.client.europeanawidgets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -22,8 +20,6 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxyAsync;
 import eu.europeana.uim.gui.cp.client.utils.EuropeanaClientConstants;
 import eu.europeana.uim.gui.cp.client.utils.RepoxOperationType;
@@ -321,15 +317,15 @@ public class ResourceManagementWidgetFactory {
 				resourcePropertiesTable.setWidget(13, 1, new HTML(status.getResourceProperties().get("SETSPEC")));   
 			}
 
-			resourcePropertiesTable.setWidget(14, 0, new HTML("<hr></hr>"));           		    	
-			resourcePropertiesTable.setWidget(14, 0, new HTML("Permitted operations:"));
+			//resourcePropertiesTable.setWidget(14, 0, new HTML("<hr></hr>"));           		    	
+			//resourcePropertiesTable.setWidget(14, 0, new HTML("Permitted operations:"));
 		
-			GeneralInfoCommandMenu command = this.new GeneralInfoCommandMenu(status);
+			//GeneralInfoCommandMenu command = this.new GeneralInfoCommandMenu(status);
 			
-			resourcePropertiesTable.setWidget(14, 1, command.getOperationsListBox());
+			//resourcePropertiesTable.setWidget(14, 1, command.getOperationsListBox());
 			// Create a table to layout the content
 
-			resourcePropertiesTable.setWidget(14, 2, command.generateRepoxCommandButton());
+			//resourcePropertiesTable.setWidget(14, 2, command.generateRepoxCommandButton());
 			
 			break;
 			
