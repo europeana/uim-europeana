@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -89,7 +90,9 @@ public class ImportVocabularyProxyImpl extends
 		EdmFieldDTO edmFieldDTO = new EdmFieldDTO();
 		edmFieldDTO.setField(mappedField);
 		MappingDTO mapping = new MappingDTO();
-		mapping.setMapped(edmFieldDTO);
+		List<EdmFieldDTO> lst = new ArrayList<EdmFieldDTO>();
+		lst.add(edmFieldDTO);
+		mapping.setMapped(lst);
 		mapping.setOriginal(originalFieldDTO);
 		return mapping;
 	}
@@ -102,7 +105,7 @@ public class ImportVocabularyProxyImpl extends
 		return false;
 	}
 
-	private List<MappingDTO> convertEdmMap(Map<String, EdmLabel> readSchema) {
+	private List<MappingDTO> convertEdmMap(Map<String, List<EdmLabel>> readSchema) {
 		List<MappingDTO> returnMap = new ArrayList<MappingDTO>();
 
 		for (String key : readSchema.keySet()) {
@@ -110,10 +113,15 @@ public class ImportVocabularyProxyImpl extends
 			OriginalFieldDTO original = new OriginalFieldDTO();
 			original.setField(key);
 			map.setOriginal(original);
-			EdmFieldDTO edmField = new EdmFieldDTO();
-			edmField.setField(StringUtils.isNotEmpty(readSchema.get(key)
-					.toString()) ? readSchema.get(key).toString() : null);
-			map.setMapped(edmField);
+			List<EdmFieldDTO> lst = new ArrayList<EdmFieldDTO>();
+			if(readSchema.get(key)!=null){
+			for(EdmLabel entry:readSchema.get(key)){
+				EdmFieldDTO edmField = new EdmFieldDTO();
+				edmField.setField(entry.toString());
+				lst.add(edmField);
+			}
+			}
+			map.setMapped(lst);
 			returnMap.add(map);
 		}
 		return returnMap;

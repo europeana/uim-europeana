@@ -1,5 +1,7 @@
 package eu.europeana.uim.gui.cp.shared;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -12,7 +14,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class MappingDTO implements IsSerializable {
 
 	private OriginalFieldDTO original;
-	private EdmFieldDTO mapped;
+	private List<EdmFieldDTO> mapped;
 
 	public OriginalFieldDTO getOriginal() {
 		return original;
@@ -22,11 +24,11 @@ public class MappingDTO implements IsSerializable {
 		this.original = original;
 	}
 
-	public EdmFieldDTO getMapped() {
+	public List<EdmFieldDTO> getMapped() {
 		return mapped;
 	}
 
-	public void setMapped(EdmFieldDTO mapped) {
+	public void setMapped(List<EdmFieldDTO> mapped) {
 		this.mapped = mapped;
 	}
 

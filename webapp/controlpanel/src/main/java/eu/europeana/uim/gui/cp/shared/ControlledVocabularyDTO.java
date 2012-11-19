@@ -26,6 +26,9 @@ public class ControlledVocabularyDTO implements IsSerializable {
 	
 	private int iterations;
 
+	private String replaceUrl;
+	
+	
 	// GETTERS AND SETTERS
 	
 	public String getLocation() {
@@ -82,6 +85,14 @@ public class ControlledVocabularyDTO implements IsSerializable {
 
 	public void setIterations(int iterations) {
 		this.iterations = iterations;
+	}
+
+	public String getReplaceUrl() {
+		return replaceUrl;
+	}
+
+	public void setReplaceUrl(String replaceUrl) {
+		this.replaceUrl = replaceUrl;
 	}
 
 	

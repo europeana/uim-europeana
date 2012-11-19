@@ -734,8 +734,11 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 			sb.appendHtmlConstant("<table><tr><td>");
 			sb.appendHtmlConstant(value.getOriginal().getField()
 					+ "</td><td>-></td><td>");
-			sb.appendHtmlConstant(value.getMapped().getField()
-					+ "</td></tr></table>");
+			for(EdmFieldDTO field : value.getMapped()){
+			sb.appendHtmlConstant(field.getField()
+					+ "\n");
+			}
+			sb.appendHtmlConstant("</td></tr></table>");
 		}
 	}
 
