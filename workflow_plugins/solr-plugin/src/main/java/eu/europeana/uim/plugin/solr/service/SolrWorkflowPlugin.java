@@ -180,11 +180,11 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 					dereferenceTimespan(rdfCopy, datastore, timespan);
 				}
 			}
-
+			if(rdf.getWebResourceList()!=null){
 			for (WebResourceType webresource : rdf.getWebResourceList()) {
 				dereferenceWebResource(rdfCopy, datastore, webresource);
 			}
-
+			}
 			IBindingFactory bfact2 = BindingDirectory.getFactory(RDF.class);
 			IMarshallingContext marshallingContext = bfact2
 					.createMarshallingContext();
@@ -714,23 +714,49 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 		for (Entry<String, List> entry : denormalize.entrySet()) {
 			if (StringUtils.equals(entry.getKey(), "concepts")) {
 				for (Concept concept : (List<Concept>) entry.getValue()) {
-					rdf.getConceptList().add(concept);
+					if(rdf.getConceptList()!=null){
+						rdf.getConceptList().add(concept);
+					} else {
+						List<Concept> concepts = new ArrayList<Concept>();
+						concepts.add(concept);
+						rdf.setConceptList(concepts);
+					}
 				}
 			}
 			if (StringUtils.equals(entry.getKey(), "agents")) {
 				for (AgentType agent : (List<AgentType>) entry.getValue()) {
+					if(rdf.getAgentList()!=null){
 					rdf.getAgentList().add(agent);
+					} else {
+						List<AgentType> agents = new ArrayList<AgentType>();
+						agents.add(agent);
+						rdf.setAgentList(agents);
+					}
 				}
 			}
 			if (StringUtils.equals(entry.getKey(), "timespans")) {
 				for (TimeSpanType timespan : (List<TimeSpanType>) entry
 						.getValue()) {
+					if(rdf.getTimeSpanList()!=null){
 					rdf.getTimeSpanList().add(timespan);
+					}
+					else {
+						List<TimeSpanType> timespans = new ArrayList<TimeSpanType>();
+						timespans.add(timespan);
+						rdf.setTimeSpanList(timespans);
+					}
 				}
 			}
 			if (StringUtils.equals(entry.getKey(), "places")) {
 				for (PlaceType place : (List<PlaceType>) entry.getValue()) {
+					if(rdf.getPlaceList()!=null){
 					rdf.getPlaceList().add(place);
+					}
+					else {
+						List<PlaceType> places = new ArrayList<PlaceType>();
+						places.add(place);
+						rdf.setPlaceList(places);
+					}
 				}
 			}
 		}

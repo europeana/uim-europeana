@@ -56,8 +56,12 @@ public class OsgiExtractor extends Extractor {
 
 	public List<EdmLabel> getEdmLabel(String field) {
 
-		return vocabulary != null ? vocabulary.getElements().get(field)
-				 : new ArrayList<EdmLabel>();
+		if(vocabulary!=null){
+			if (vocabulary.getElements().get(field)!=null){
+				return vocabulary.getElements().get(field);
+			}
+		}
+		return new ArrayList<EdmLabel>();
 	}
 
 	private ControlledVocabularyImpl vocabulary;
@@ -119,7 +123,9 @@ public class OsgiExtractor extends Extractor {
 							+ sElem.getName().getLocalPart();
 					// If it is mapped then
 					if (isMapped(element)) {
+						
 						for(EdmLabel edmLabel: getEdmLabel(element)){
+							
 						if (sElem.getAttributes().hasNext()) {
 							Attribute attr = (Attribute) sElem
 									.getAttributes().next();
@@ -924,15 +930,12 @@ public class OsgiExtractor extends Extractor {
 					.find(ControlledVocabularyImpl.class)
 					.filter(field, vocabularyName).asList();
 			for (ControlledVocabularyImpl vocabulary : vocabularies) {
-				boolean ruleController = true;
 				for (String rule : vocabulary.getRules()) {
-					ruleController = ruleController
-							&& (filter.contains(rule) || StringUtils.equals(
-									rule, "*"));
+					if (StringUtils.equals(rule, "*")||StringUtils.contains(filter,rule)){
+						return vocabulary;
+					}
 				}
-				if (ruleController) {
-					return vocabulary;
-				}
+				
 			}
 		}
 		return null;
