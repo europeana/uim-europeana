@@ -73,6 +73,7 @@ public class OsgiExtractor extends Extractor {
 
 		
 		if (controlledVocabulary != null) {
+			vocabulary = controlledVocabulary;
 			String suffix = controlledVocabulary.getSuffix() != null ? controlledVocabulary
 					.getSuffix() : "";
 			int iters = iterFromVocabulary?controlledVocabulary.getIterations():iterations;
@@ -82,7 +83,7 @@ public class OsgiExtractor extends Extractor {
 			
 
 			if (xmlString.length() > 0) {
-				vocabulary = controlledVocabulary;
+				
 				return createDereferencingMap(xmlString,iterations);
 			}
 			
@@ -556,7 +557,7 @@ public class OsgiExtractor extends Extractor {
 			for (Entry<String, List<EdmLabel>> entry : vocabulary.getElements()
 					.entrySet()) {
 				if (StringUtils.contains(entry.getKey(), field)
-						&& !entry.getValue().equals(EdmLabel.NULL)) {
+						&& entry.getValue()!=null) {
 					return true;
 				}
 			}
@@ -597,8 +598,10 @@ public class OsgiExtractor extends Extractor {
 
 	private String retrieveValue(String resource) {
 		URLConnection urlConnection;
+		if(resource!=null&&vocabulary!=null){
 		try {
-			if (vocabulary.getReplaceUrl()!=null){
+			
+			if (StringUtils.isNotBlank(vocabulary.getReplaceUrl())){
 				resource = StringUtils.replace(resource, vocabulary.getURI(), vocabulary.getReplaceUrl());
 			}
 			urlConnection = new URL(resource).openConnection();
@@ -607,11 +610,15 @@ public class OsgiExtractor extends Extractor {
 			StringWriter writer = new StringWriter();
 			IOUtils.copy(inputStream, writer, "UTF-8");
 			return writer.toString();
+			
+			
 		} catch (MalformedURLException e) {
 			return "";
 		} catch (IOException e) {
 			return "";
 		}
+		}
+		return "";
 	}
 
 	private <T> T createNewEntity(Class<T> clazz, String val)
