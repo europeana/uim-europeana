@@ -92,6 +92,7 @@ public class UploadServlet extends HttpServlet {
 			@SuppressWarnings("unchecked")
 			List<FileItem> items = uploadHandler.parseRequest(request);
 			String vocName = "";
+			System.out.println("In file upload");
 			for (FileItem item : items) {
 				if (item.isFormField()){
 					if(StringUtils.equals(item.getFieldName(),"vocabularyName")){

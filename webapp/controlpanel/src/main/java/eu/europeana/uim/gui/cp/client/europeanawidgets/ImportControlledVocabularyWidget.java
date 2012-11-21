@@ -481,6 +481,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				url.setEnabled(false);
 			}
 		});
+		
 		table.setWidget(3, 0, radioButton);
 		
 		saveAndUpload.ensureDebugId("local");
