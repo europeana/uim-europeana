@@ -100,7 +100,7 @@ public class UploadServlet extends HttpServlet {
 					continue;
 				}
 					
-
+				System.out.println("Saving file in " +destinationDir +"/"+vocName);
 				File file = new File(destinationDir, vocName);
 				file.createNewFile();
 				item.write(file);
