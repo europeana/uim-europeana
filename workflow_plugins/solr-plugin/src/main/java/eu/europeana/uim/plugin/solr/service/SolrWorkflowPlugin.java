@@ -97,8 +97,10 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 	public SolrWorkflowPlugin() {
 		super("solr_workflow", "Solr Repository Ingestion Plugin");
 
+	
 	}
-
+	Datastore datastore = null;
+	Morphia morphia;
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -111,30 +113,8 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 
 		try {
 
-			Datastore datastore = null;
-			Morphia morphia;
-			try {
-
-				morphia = new Morphia();
-				morphia.map(ControlledVocabularyImpl.class);
-				datastore = morphia
-						.createDatastore(
-								new Mongo(
-										PropertyReader
-												.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-										Integer.parseInt(PropertyReader
-												.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-								PropertyReader
-										.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
-				datastore.ensureIndexes();
-
-			} catch (MongoException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
+			
 			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
@@ -791,6 +771,28 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
+		try {
+
+			morphia = new Morphia();
+			morphia.map(ControlledVocabularyImpl.class);
+			datastore = morphia
+					.createDatastore(
+							new Mongo(
+									PropertyReader
+											.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+									Integer.parseInt(PropertyReader
+											.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
+							PropertyReader
+									.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
+			datastore.ensureIndexes();
+
+		} catch (MongoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/* (non-Javadoc)
