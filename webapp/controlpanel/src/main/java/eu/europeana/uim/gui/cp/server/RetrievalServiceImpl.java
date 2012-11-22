@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +53,8 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import com.google.gwt.http.client.URL;
 import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.model.EdmLabel;
@@ -64,6 +67,7 @@ import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
+import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.common.BlockingInitializer;
@@ -135,15 +139,36 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 			};
 			initializer.initialize(HttpSolrServer.class.getClassLoader());
 			
-			mongoServer = new EdmMongoServerImpl(
-					new Mongo(
-							PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-							Integer.parseInt(PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-					PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA),
-					"", "");
+			BlockingInitializer mongoInitializer = new BlockingInitializer() {
+				
+				@Override
+				protected void initializeInternal() {
+					try {
+						mongoServer = new EdmMongoServerImpl(
+								new Mongo(
+										PropertyReader
+												.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+										Integer.parseInt(PropertyReader
+												.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
+								PropertyReader
+										.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA),
+								"", "");
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (MongoDBException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (MongoException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+			mongoInitializer.initialize(EdmMongoServerImpl.class.getClassLoader());
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage());
 		}
