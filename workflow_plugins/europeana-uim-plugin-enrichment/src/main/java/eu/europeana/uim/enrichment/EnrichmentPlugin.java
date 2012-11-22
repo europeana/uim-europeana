@@ -262,6 +262,8 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 
 			solrServer.commit();
 			System.out.println("Committed in Solr Server");
+			
+			//TODO:optimize must be done in a seperate plugin it is getting slow and should be done on request
 			solrServer.optimize();
 			System.out.println("Optimized");
 
@@ -641,6 +643,7 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			rdfFinal.setPlaceList(places);
 		}
 		}
+		rdfFinal.setProxyList(rdf.getProxyList());
 		rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
 		rdfFinal.setAggregationList(rdf.getAggregationList());
 		rdfFinal.setWebResourceList(rdf.getWebResourceList());
