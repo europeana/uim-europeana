@@ -99,8 +99,7 @@ public class ImportVocabularyProxyImpl extends
 
 	public boolean saveMapping() {
 		if (extractor != null) {
-			extractor.saveMapping();
-			return true;
+			return extractor.saveMapping();
 		}
 		return false;
 	}

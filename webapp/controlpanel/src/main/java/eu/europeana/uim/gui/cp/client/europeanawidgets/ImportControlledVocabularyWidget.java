@@ -207,7 +207,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		deleteMapping.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				importedVocabulary.mapField(originalField, "null",
+				importedVocabulary.mapField(originalField, "",
 						new AsyncCallback<MappingDTO>() {
 							@Override
 							public void onSuccess(MappingDTO result) {
