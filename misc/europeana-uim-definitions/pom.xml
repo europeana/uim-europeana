@@ -101,6 +101,7 @@
 							org.joda.time, 
 							org.w3c.dom,
 							org.xmlpull.v1,
+							gnu.trove.set.hash,
 							!org.dom4j, 
 							!org.jdom, 
 							!com.sun.javadoc, 
