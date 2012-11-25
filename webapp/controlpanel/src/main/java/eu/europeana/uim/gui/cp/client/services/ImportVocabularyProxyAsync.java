@@ -17,6 +17,7 @@ public interface ImportVocabularyProxyAsync {
 	public void mapField(String originalField,String mappedField,AsyncCallback<MappingDTO> result);
 	public void saveMapping(AsyncCallback<Boolean> result);
 	public void retrieveVocabularies(AsyncCallback<List<ControlledVocabularyDTO>> vocabularies);
-	public void retrieveEdmFields(AsyncCallback<List<EdmFieldDTO>> edmFields);
+	public void retrieveEdmFields( AsyncCallback<List<EdmFieldDTO>> edmFields);
 	public void removeVocabulary(String vocabularyName, AsyncCallback<Boolean> result);
+	public void setVocabulary(String vocabularyName, AsyncCallback<Boolean> result);
 }

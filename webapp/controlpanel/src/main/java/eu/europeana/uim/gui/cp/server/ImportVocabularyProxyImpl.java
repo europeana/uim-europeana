@@ -83,8 +83,12 @@ public class ImportVocabularyProxyImpl extends
 	public MappingDTO mapField(String originalField, String mappedField) {
 
 		extractor = new Extractor(controlledVocabulary, mongo);
+		if(!StringUtils.equals(mappedField,"")){
 		extractor.setMappedField(originalField,
 				EdmLabel.getEdmLabel(StringUtils.split(mappedField, "@")[0]));
+		} else {
+			extractor.setMappedField(originalField, null);
+		}
 		OriginalFieldDTO originalFieldDTO = new OriginalFieldDTO();
 		originalFieldDTO.setField(originalField);
 		EdmFieldDTO edmFieldDTO = new EdmFieldDTO();
@@ -179,4 +183,10 @@ public class ImportVocabularyProxyImpl extends
 		return false;
 	}
 
+	@Override
+	public boolean setVocabulary(String vocabularyName) {
+		controlledVocabulary = (ControlledVocabularyImpl) extractor.findVocabularyByName(vocabularyName);
+		return true;
+	}
+	
 }

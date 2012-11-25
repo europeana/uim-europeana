@@ -368,6 +368,20 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		editVocabulary.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				importedVocabulary.setVocabulary(vocabulary.getName(), new AsyncCallback<Boolean>() {
+					
+					@Override
+					public void onSuccess(Boolean result) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
 				fillMappingTables();
 				importVocabulary.selectTab(1);
 			}
