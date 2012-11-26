@@ -9,7 +9,7 @@ public class DeactivationWorkflow extends AbstractWorkflow {
 	
 	
 	public DeactivationWorkflow(DeactivationService dService) {
-		super("H: Deactivate Collection", "Deactivate a specific collection");
+		super("I: Deactivate Collection", "Deactivate a specific collection");
 		setStart(new BatchWorkflowStart());
 		addStep(new DeactivatePlugin(dService,"Deactivate Collection Plugin", "Deactivate Collection Plugin"));
 	}

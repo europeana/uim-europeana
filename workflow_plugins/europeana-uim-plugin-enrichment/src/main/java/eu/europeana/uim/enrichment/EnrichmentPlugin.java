@@ -263,7 +263,7 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			solrServer.commit();
 			System.out.println("Committed in Solr Server");
 			
-			//TODO:optimize must be done in a seperate plugin it is getting slow and should be done on request
+			//TODO:optimize must be done in a separate plugin it is getting slow and should be done on request
 //			solrServer.optimize();
 //			System.out.println("Optimized");
 

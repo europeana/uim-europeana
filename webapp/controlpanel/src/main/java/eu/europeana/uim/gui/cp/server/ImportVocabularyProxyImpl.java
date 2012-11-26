@@ -185,7 +185,7 @@ public class ImportVocabularyProxyImpl extends
 
 	@Override
 	public boolean setVocabulary(String vocabularyName) {
-		controlledVocabulary = (ControlledVocabularyImpl) extractor.findVocabularyByName(vocabularyName);
+		controlledVocabulary = extractor.findVocabularyByName(vocabularyName);
 		return true;
 	}
 	
