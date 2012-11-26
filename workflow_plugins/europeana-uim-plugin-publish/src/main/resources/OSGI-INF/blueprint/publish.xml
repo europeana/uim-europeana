@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:bp="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+
+	<bean id="publishbean" class="eu.europeana.europeanauim.publish.service.PublishServiceImpl">
+	</bean>
+
+	<service id="publishService" ref="publishbean"
+		interface="eu.europeana.europeanauim.publish.service.PublishService" />
+
+<bean id="publishWorkflowBean" class="eu.europeana.europeanauim.publish.PublishWorkflow">
+       <argument ref="publishbean"/>
+     </bean>
+     
+     <service id="publishWorkflow" ref="publishWorkflowBean"
+		interface="eu.europeana.uim.workflow.Workflow" />
+
+</blueprint>
