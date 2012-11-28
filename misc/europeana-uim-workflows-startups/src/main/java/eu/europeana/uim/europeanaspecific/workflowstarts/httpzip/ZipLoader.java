@@ -35,15 +35,19 @@ import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.progress.ProgressMonitor;
+import eu.europeana.uim.europeanaspecific.workflowstarts.httpzip.HttpZipWorkflowStart.Data;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
+import eu.europeana.corelib.tools.lookuptable.LookupResult;
+import eu.europeana.corelib.tools.lookuptable.LookupState;
 import eu.europeana.dedup.osgi.service.DeduplicationResult;
 import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
 
@@ -52,9 +56,10 @@ import eu.europeana.uim.store.Request;
  * the storage engine
  * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @param <I>
  * @since 5 Mar 2012
  */
-public class ZipLoader {
+public class ZipLoader<I> {
 
 	@SuppressWarnings("rawtypes")
 	private StorageEngine storage;
@@ -66,9 +71,13 @@ public class ZipLoader {
 	private ProgressMonitor monitor;
 	private Iterator<String> zipiterator;
 
+	private ExecutionContext<MetaDataRecord<I>, I> context;
+	
 	private int totalProgress = 0;
 	private int expectedRecords = 0;
 
+	private boolean forceUpdate;
+	
 	private DeduplicationService dedup;
 
 	/**
@@ -87,18 +96,22 @@ public class ZipLoader {
 	 * @param loggingEngine
 	 *            A reference to the logging engine
 	 */
-	public <I> ZipLoader(int expectedRecords, Iterator<String> zipiterator,
-			StorageEngine<I> storage, Request<I> request,
-			ProgressMonitor monitor, LoggingEngine<I> loggingEngine,
-			DeduplicationService dedup) {
+	public ZipLoader(int expectedRecords, Iterator<String> zipiterator,
+			ExecutionContext<MetaDataRecord<I>, I> context,Request<I> request,
+			DeduplicationService dedup,String forceupdate) {
 		super();
 		this.expectedRecords = expectedRecords;
 		this.zipiterator = zipiterator;
-		this.storage = storage;
+		this.storage = context.getStorageEngine();
 		this.request = request;
-		this.monitor = monitor;
-		this.loggingEngine = loggingEngine;
+		this.monitor = context.getMonitor();
+		this.loggingEngine = context.getLoggingEngine();
 		this.dedup = dedup;
+		this.context = context;
+		
+		if(forceupdate !=null && forceupdate.toLowerCase().equals("true")){
+			forceUpdate = true;
+		}
 	}
 
 	/**
@@ -112,11 +125,13 @@ public class ZipLoader {
 	 *            Should they be saved to the index?
 	 * @return list of loaded Metadata records
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	public synchronized <I> List<MetaDataRecord<I>> doNext(int batchSize,
 			boolean save) {
 		List<MetaDataRecord<I>> result = new ArrayList<MetaDataRecord<I>>();
 		int progress = 0;
+		
+		HttpZipWorkflowStart.Data value = context.getValue(HttpZipWorkflowStart.DATA_KEY);
 
 		while (zipiterator.hasNext()) {
 
@@ -134,51 +149,65 @@ public class ZipLoader {
 						(String) request.getId(), rdfstring);
 
 				for (DeduplicationResult dedupres : reslist) {
-					
-					MetaDataRecord<I> mdr = storage.getMetaDataRecord(dedupres
-							.getDerivedRecordID());
 
+					LookupState state = dedupres.getLookupresult().getState();
 
-					if (mdr == null) {
-						mdr = storage.createMetaDataRecord(
-								request.getCollection(),
-								dedupres.getDerivedRecordID());
-					} else {
-						// Remove the previous ingestion date
-						mdr.deleteValues(EuropeanaModelRegistry.UIMINGESTIONDATE);
-						// Remove the previous instances of EDM Records
-						mdr.deleteValues(EuropeanaModelRegistry.EDMRECORD);
-						// Remove the previous registered links
-						mdr.deleteValues(EuropeanaModelRegistry.EUROPEANALINK);
+					MetaDataRecord<I> mdr = null;
 
+					switch(state){
+					case ID_REGISTERED:
+						processrecord(mdr,dedupres);
+					break;
+					case COLLECTION_CHANGED:
+						break;
+					case DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS:
+						break;
+					case DUPLICATE_INCOLLECTION:
+						synchronized(value.deletioncandidates){
+							value.deletioncandidates.remove(dedupres.getDerivedRecordID());
+						}
+						break;
+					case DUPLICATE_RECORD_ACROSS_COLLECTIONS:
+						break;
+					case IDENTICAL:
+						synchronized(value.deletioncandidates){
+							value.deletioncandidates.remove(dedupres.getDerivedRecordID());
+						}
+						if(forceUpdate){
+							mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
+							processrecord(mdr,dedupres);
+						}
+						
+						break;
+					case UPDATE:
+						mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
+						processrecord(mdr,dedupres);
+						break;
+					default:
+						break;
 					}
-
-					mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
-							new Date().toString());
-
-					mdr.addValue(EuropeanaModelRegistry.EDMRECORD,
-							dedupres.getEdm());
-
-					// Add Links to be checked values here
-					addLinkcheckingValues(unmarshall(dedupres.getEdm()), mdr);
+					
+					processrecord(mdr,dedupres);
 					storage.updateMetaDataRecord(mdr);
-					result.add(mdr);
-
+					
+					if(result != null){
+						result.add(mdr);
+					}
+					
 				}
 
 				progress++;
 				totalProgress++;
 
-			} 
-			catch (JiBXException e) {
+			} catch (JiBXException e) {
 
 				if (loggingEngine != null) {
 
 					loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
 							"Error unmarshalling xml for object ");
 				}
-				
-			}catch (StorageEngineException e) {
+
+			} catch (StorageEngineException e) {
 				if (loggingEngine != null) {
 					loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
 							"Error storing object ");
@@ -191,7 +220,41 @@ public class ZipLoader {
 		return result;
 	}
 
-	
+	/**
+	 * @param mdr
+	 * @param dedupres
+	 * @return
+	 * @throws StorageEngineException
+	 * @throws JiBXException
+	 */
+	@SuppressWarnings("unchecked")
+	private <I> void processrecord(MetaDataRecord<I> mdr,
+			DeduplicationResult dedupres) throws StorageEngineException,
+			JiBXException {
+
+		if (mdr == null) {
+			mdr = storage.createMetaDataRecord(request.getCollection(),
+					dedupres.getDerivedRecordID());
+		} else {
+			// Remove the previous ingestion date
+			mdr.deleteValues(EuropeanaModelRegistry.UIMINGESTIONDATE);
+			// Remove the previous instances of EDM Records
+			mdr.deleteValues(EuropeanaModelRegistry.EDMRECORD);
+			// Remove the previous registered links
+			mdr.deleteValues(EuropeanaModelRegistry.EUROPEANALINK);
+
+		}
+
+		mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
+				new Date().toString());
+
+		mdr.addValue(EuropeanaModelRegistry.EDMRECORD, dedupres.getEdm());
+
+		// Add Links to be checked values here
+		addLinkcheckingValues(unmarshall(dedupres.getEdm()), mdr);
+		storage.updateMetaDataRecord(mdr);
+	}
+
 	/**
 	 * @param edm
 	 * @return
@@ -225,55 +288,51 @@ public class ZipLoader {
 		Set<String> existingLinks = Collections
 				.synchronizedSet(new HashSet<String>());
 
-		
-		if(aggregations != null)
-		{
-		for (Aggregation aggregation : aggregations) {
+		if (aggregations != null) {
+			for (Aggregation aggregation : aggregations) {
 
-			List<HasView> has_views = aggregation.getHasViewList();
+				List<HasView> has_views = aggregation.getHasViewList();
 
-			if (has_views != null) {
+				if (has_views != null) {
 
-				for (HasView view : has_views) {
-					String resource = view.getResource();
-					addLink(resource, mdr, existingLinks, false);
+					for (HasView view : has_views) {
+						String resource = view.getResource();
+						addLink(resource, mdr, existingLinks, false);
+					}
+				}
+
+				List<HasView> edm_has_view = aggregation.getHasViewList();
+
+				if (edm_has_view != null) {
+					for (HasView view : edm_has_view) {
+						String hasView = view.getResource();
+						addLink(hasView, mdr, existingLinks, true);
+					}
+				}
+
+				if (aggregation.getIsShownAt() != null) {
+					String isShownAt = aggregation.getIsShownAt().getResource();
+					addLink(isShownAt, mdr, existingLinks, false);
+				}
+
+				if (aggregation.getIsShownBy() != null) {
+					String isShownBy = aggregation.getIsShownBy().getResource();
+					addLink(isShownBy, mdr, existingLinks, true);
+				}
+
+				if (aggregation.getObject() != null) {
+					String theObject = aggregation.getObject().getResource();
+					addLink(theObject, mdr, existingLinks, true);
 				}
 			}
-
-			List<HasView> edm_has_view = aggregation.getHasViewList();
-
-			if (edm_has_view != null) {
-				for (HasView view : edm_has_view) {
-					String hasView = view.getResource();
-					addLink(hasView, mdr, existingLinks, true);
-				}
-			}
-
-			if (aggregation.getIsShownAt() != null) {
-				String isShownAt = aggregation.getIsShownAt().getResource();
-				addLink(isShownAt, mdr, existingLinks, false);
-			}
-
-			if (aggregation.getIsShownBy() != null) {
-				String isShownBy = aggregation.getIsShownBy().getResource();
-				addLink(isShownBy, mdr, existingLinks, true);
-			}
-
-			if (aggregation.getObject() != null) {
-				String theObject = aggregation.getObject().getResource();
-				addLink(theObject, mdr, existingLinks, true);
-			}
-		}
 		}
 
-		if(webresources != null)
-		{
+		if (webresources != null) {
 			for (WebResourceType wrtype : webresources) {
 				String about = wrtype.getAbout();
 				addLink(about, mdr, existingLinks, true);
 			}
 		}
-
 
 	}
 

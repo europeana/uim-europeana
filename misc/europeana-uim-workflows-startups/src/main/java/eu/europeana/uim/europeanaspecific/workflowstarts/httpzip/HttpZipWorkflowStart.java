@@ -22,17 +22,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
 import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.TKey;
+import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimDataSet;
+import eu.europeana.uim.store.mongo.MongoStorageEngine;
 import eu.europeana.uim.plugin.source.AbstractWorkflowStart;
 import eu.europeana.uim.plugin.source.Task;
 import eu.europeana.uim.plugin.source.TaskCreator;
@@ -56,8 +61,8 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
 	
-	/** Property which defines whether the records collection should be  */
-	public static final String purgecollection = "http.overwrite.zip.purgable";
+	/** Property which forces records tobe overwritten even if identical  */
+	public static final String importidenticals = "http.overwrite.even.if.identical";
 
 	/**
 	 * The parameters used by this WorkflowStart
@@ -66,14 +71,14 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		private static final long serialVersionUID = 1L;
 		{
 			add(httpzipurl);
-			add(purgecollection);
+			add(importidenticals);
 		}
 	};
 
 	/**
 	 * TKEY used for storing the Data class in the execution context
 	 */
-	private static TKey<HttpZipWorkflowStart, Data> DATA_KEY = TKey.register(
+	protected static TKey<HttpZipWorkflowStart, Data> DATA_KEY = TKey.register(
 			HttpZipWorkflowStart.class, "data", Data.class);
 
 	/**
@@ -82,7 +87,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 	 * @author Georgios Markakis <gwarkx@hotmail.com>
 	 * @since 5 Mar 2012
 	 */
-	private final static class Data implements Serializable {
+	protected final static class Data implements Serializable {
 
 		private static final long serialVersionUID = 1L;
 
@@ -91,6 +96,8 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 
 		public int maxrecords = 0;
 		public int expected = 0;
+		
+		public HashSet<String> deletioncandidates;
 	}
 
 	/**
@@ -171,6 +178,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 								false);
 
 						for (MetaDataRecord<I> mdr : list) {
+							
 							Task<MetaDataRecord<I>, I> task = new Task<MetaDataRecord<I>, I>(mdr,context);
 							synchronized (getQueue()) {
 								getQueue().offer(task);
@@ -214,7 +222,8 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 	 */
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context) throws WorkflowStartFailedException {
-		Data value = new Data();
+		
+
 
 		StorageEngine<I> storage = context.getStorageEngine();
 		
@@ -223,12 +232,29 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 
 			Collection<I> collection = (Collection<I>) dataset;
 
+			//
+			Data value = new Data();
+			value.deletioncandidates = new HashSet<String>();
+			
+			try {
+				I[] availableMDRs = storage.getByCollection(collection);
+				
+				for(int i=0; i<availableMDRs.length; i++){
+					value.deletioncandidates.add((String) availableMDRs[i]);
+				}
+				
+			} catch (StorageEngineException e) {
+				e.printStackTrace();
+			}
+			
+			
+			
 			URL url = null;
 			String httpzipurlprop = context.getProperties().getProperty(
 					httpzipurl);
 			
-			String should_be_purged = context.getProperties().getProperty(
-					purgecollection);
+			String forceupdate = context.getProperties().getProperty(
+					importidenticals);
 			
 
 			try {
@@ -245,9 +271,8 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 
 				HttpRetriever retriever = HttpRetriever.createInstance(url);
 
-				ZipLoader loader = new ZipLoader(retriever.getNumber_of_recs(),
-						retriever, storage, request, context.getMonitor(),
-						context.getLoggingEngine(),dedup);
+				ZipLoader<I> loader = new ZipLoader<I>(retriever.getNumber_of_recs(),
+						retriever,context,request,dedup,forceupdate);
 
 				value.loader = loader;
 
@@ -281,9 +306,31 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		Data value = context.getValue(DATA_KEY);
 		value.loader.close();
 
+		StorageEngine<I> uimengine = context.getStorageEngine();
+		
+		if(!value.deletioncandidates.isEmpty()){
+			Iterator<String> it = value.deletioncandidates.iterator();
+			
+			while(it.hasNext()){
+				try {
+					MetaDataRecord<I> mdr = uimengine.getMetaDataRecord((I) it.next());
+					mdr.deleteValues(EuropeanaModelRegistry.STATUS);
+					mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
+					uimengine.updateMetaDataRecord(mdr);
+				} catch (StorageEngineException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		
 		if (context.getExecution().isCanceled()) {
 			value.request.setFailed(true);
 		}
+		
+		MongoStorageEngine mgengine = new MongoStorageEngine();
+		mgengine.initialize();
+		mgengine.flushCollectionMDRS((String) context.getDataSet().getId());
 
 	}
 

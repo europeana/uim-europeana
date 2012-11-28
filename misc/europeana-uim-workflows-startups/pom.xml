@@ -45,6 +45,12 @@
 
 		<dependency>
 			<groupId>${europeana.uim.groupId}</groupId>
+			<artifactId>europeana-uim-storage-mongo</artifactId>
+			<version>${europeana.uim.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-model-tel</artifactId>
 			<version>${europeana.uim.version}</version>
 		</dependency>
@@ -91,9 +97,11 @@
 							eu.europeana.uim.store,
 							eu.europeana.uim.util,
 							eu.europeana.uim.workflow,
+							eu.europeana.uim.store.mongo,
 							org.osgi.service.blueprint,
 							org.apache.commons.lang,
 							org.apache.commons.io,
+							eu.europeana.corelib.tools.lookuptable,
 							org.w3c.dom,
 							org.w3c.dom.traversal,
 							org.w3c.dom.ls,
