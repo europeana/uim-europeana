@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 import java.util.List;
@@ -193,8 +194,12 @@ public class Decoupler {
 			if (agg.getIsShownBy() != null
 					&& agg.getIsShownBy().getResource() != null) {
 				String resource = agg.getIsShownBy().getResource();
-				if (refstring.contains(resource))
-					refstring.add(resource);
+				refstring.add(resource);
+			}
+			if (agg.getIsShownAt() != null
+					&& agg.getIsShownAt().getResource() != null) {
+				String resource = agg.getIsShownAt().getResource();
+				refstring.add(resource);
 			}
 			if (agg.getHasViewList() != null && !agg.getHasViewList().isEmpty()) {
 				List<HasView> viewlist = agg.getHasViewList();
@@ -210,13 +215,18 @@ public class Decoupler {
 		//set. In case it does then append them to the document
 		Vector<WebResourceType> wrlist = stub.webresourceList;
 
+		
 		for (WebResourceType wtype : wrlist) {
 			if (refstring.contains(wtype.getAbout())) {
 				cleandoc.getWebResourceList().add(wtype); 
 			}
 		}
+		}
 
-	}
+
+
+
+
 
 	/**
 	 * Appends the related ContextualEntities to an RDF document given a specific Proxy object
