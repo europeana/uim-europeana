@@ -170,27 +170,39 @@ public class ZipLoader<I> {
 					case DUPLICATE_RECORD_ACROSS_COLLECTIONS:
 						break;
 					case IDENTICAL:
-						synchronized(value.deletioncandidates){
-							value.deletioncandidates.remove(dedupres.getDerivedRecordID());
-						}
+
 						if(forceUpdate){
-							mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
-							processrecord(mdr,dedupres);
+							
+							try{
+								mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
+								processrecord(mdr,dedupres);
+							}
+							catch(StorageEngineException e){
+								processrecord(mdr,dedupres);
+							}
+
+						}
+						else{
+							synchronized(value.deletioncandidates){
+								value.deletioncandidates.remove(dedupres.getDerivedRecordID());
+							}
 						}
 						
 						break;
 					case UPDATE:
-						mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
-						processrecord(mdr,dedupres);
+						try{
+							mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
+							processrecord(mdr,dedupres);
+						}
+						catch(StorageEngineException e){
+							processrecord(mdr,dedupres);
+						}
 						break;
 					default:
 						break;
 					}
-					
-					processrecord(mdr,dedupres);
-					storage.updateMetaDataRecord(mdr);
-					
-					if(result != null){
+							
+					if(mdr != null){
 						result.add(mdr);
 					}
 					
@@ -229,8 +241,7 @@ public class ZipLoader<I> {
 	 */
 	@SuppressWarnings("unchecked")
 	private <I> void processrecord(MetaDataRecord<I> mdr,
-			DeduplicationResult dedupres) throws StorageEngineException,
-			JiBXException {
+			DeduplicationResult dedupres) throws JiBXException, StorageEngineException {
 
 		if (mdr == null) {
 			mdr = storage.createMetaDataRecord(request.getCollection(),
