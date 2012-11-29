@@ -31,6 +31,7 @@ import org.jibx.runtime.JiBXException;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
+import eu.europeana.corelib.definitions.jibx.AggregatedCHO;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
@@ -179,12 +180,18 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 			proxy.setAbout(newID);
 		}
 		
-		for (Aggregation aggregation : aggregationlist) {
-			aggregation.setAbout(newID);
-		}
+
 		
 		for (ProvidedCHOType cho : prcholist) {
+			String origId = cho.getAbout();
 			cho.setAbout(newID);
+			
+			for (Aggregation aggregation : aggregationlist) {
+				 AggregatedCHO aggrcho = aggregation.getAggregatedCHO();
+				 if(aggrcho != null && origId.equals(aggrcho.getResource())){
+					 aggregation.getAggregatedCHO().setResource(newID);
+				 }				 
+			}
 		}
 		
 	}
