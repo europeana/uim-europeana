@@ -52,7 +52,7 @@
 				<configuration>
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
-						<Export-Package>eu.europeana.dedup.osgi.service.*</Export-Package>
+						<Export-Package>eu.europeana.dedup.osgi.service.*,eu.europeana.corelib.tools.lookuptable</Export-Package>
 						<Import-Package>
 							eu.europeana.uim.common,
 							javax.net.*,
@@ -60,6 +60,7 @@
 							org.jibx.runtime; version=1.2.3,
 							org.jibx.runtime.impl;
 							version=1.2.3,
+							gnu.trove.set.hash,
 							!*
 						</Import-Package>
 						<Embed-Dependency>corelib-solr-tools,morphia,mongo-java-driver,corelib-solr-definitions,corelib-solr-dereference,commons-codec,commons-lang,commons-io</Embed-Dependency>
