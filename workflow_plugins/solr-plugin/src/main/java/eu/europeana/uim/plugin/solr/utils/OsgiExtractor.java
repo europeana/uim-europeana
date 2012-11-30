@@ -47,62 +47,84 @@ import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EntityImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
+import eu.europeana.uim.common.BlockingInitializer;
 
 public class OsgiExtractor extends Extractor {
-
-	public OsgiExtractor() {
-
+	
+	private static OsgiExtractor extractor;
+	
+	private OsgiExtractor() {
+		
 	}
 
+	public static OsgiExtractor getInstance(final Datastore datastore){
+	
+		if(extractor == null){
+			extractor= new OsgiExtractor();
+			memCache = new HashMap<String, EntityImpl>();
+		
+		}
+		return extractor;
+	}
+	
 	public List<EdmLabel> getEdmLabel(String field) {
 
-		if(vocabulary!=null){
-			if (vocabulary.getElements().get(field)!=null){
+		if (vocabulary != null) {
+			if (vocabulary.getElements().get(field) != null) {
 				return vocabulary.getElements().get(field);
 			}
 		}
 		return new ArrayList<EdmLabel>();
 	}
 
+	private static Map<String, EntityImpl> memCache;
 	private ControlledVocabularyImpl vocabulary;
 	private Datastore datastore;
 	private final static long UPDATETIMESTAMP = 5184000000l;
 
 	@SuppressWarnings("rawtypes")
 	public Map<String, List> denormalize(String resource,
-			ControlledVocabularyImpl controlledVocabulary, int iterations, boolean iterFromVocabulary)
-			throws SecurityException, IllegalArgumentException,
-			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
+			ControlledVocabularyImpl controlledVocabulary, int iterations,
+			boolean iterFromVocabulary) throws SecurityException,
+			IllegalArgumentException, InstantiationException,
+			IllegalAccessException, NoSuchMethodException,
+			InvocationTargetException {
 
-		
 		if (controlledVocabulary != null) {
 			vocabulary = controlledVocabulary;
 			String suffix = controlledVocabulary.getSuffix() != null ? controlledVocabulary
 					.getSuffix() : "";
-			int iters = iterFromVocabulary?controlledVocabulary.getIterations():iterations;
-			String xmlString = retrieveValueFromResource(resource + suffix != null ? resource
+			int iters = iterFromVocabulary ? controlledVocabulary
+					.getIterations() : iterations;
+
+			EntityImpl entity = retrieveValueFromResource(resource + suffix != null ? resource
 					+ suffix
 					: "");
-			
 
-			if (xmlString.length() > 0) {
-				
-				return createDereferencingMap(xmlString,iterations);
+			if (entity != null && entity.getContent().length() > 0) {
+				memCache.put(entity.getUri(), entity);
+				return createDereferencingMap(entity.getContent(), iterations);
 			}
-			
+
 		}
 		return new HashMap<String, List>();
 	}
 
-	private Map<String, List> createDereferencingMap(String xmlString, int iterations) throws SecurityException, IllegalArgumentException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public Map<String, EntityImpl> getMemCache() {
+		return memCache;
+	}
+
+	private Map<String, List> createDereferencingMap(String xmlString,
+			int iterations) throws SecurityException, IllegalArgumentException,
+			InstantiationException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
 		XMLInputFactory inFactory = new WstxInputFactory();
 		Map<String, List> denormalizedValues = new HashMap<String, List>();
 		List<Concept> concepts = new ArrayList<Concept>();
 		List<AgentType> agents = new ArrayList<AgentType>();
 		List<TimeSpanType> timespans = new ArrayList<TimeSpanType>();
 		List<PlaceType> places = new ArrayList<PlaceType>();
-		
+
 		Concept lastConcept = null;
 		AgentType lastAgent = null;
 		TimeSpanType lastTimespan = null;
@@ -118,289 +140,271 @@ public class OsgiExtractor extends Extractor {
 				if (evt.isStartElement()) {
 					StartElement sElem = evt.asStartElement();
 					element = (sElem.getName().getPrefix() != null ? sElem
-							.getName().getPrefix() + ":"
-							: "")
+							.getName().getPrefix() + ":" : "")
 							+ sElem.getName().getLocalPart();
 					// If it is mapped then
 					if (isMapped(element)) {
-						
-						for(EdmLabel edmLabel: getEdmLabel(element)){
-							
-						if (sElem.getAttributes().hasNext()) {
-							Attribute attr = (Attribute) sElem
-									.getAttributes().next();
-							String attribute = attr.getName()
-									.getPrefix()
 
-							+ ":" + attr.getName().getLocalPart();
-							// Is the attribute mapped?
-							if (isMapped(element + "_" + attribute)) {
-								for(EdmLabel label: getEdmLabel(element + "_" + attribute)){
-								String attrVal = attr.getValue();
-								String elem = null;
-								if (xml.peek().isCharacters()) {
-									elem = xml.nextEvent()
-											.asCharacters().getData();
+						for (EdmLabel edmLabel : getEdmLabel(element)) {
+
+							if (sElem.getAttributes().hasNext()) {
+								Attribute attr = (Attribute) sElem
+										.getAttributes().next();
+								String attribute = attr.getName().getPrefix()
+
+								+ ":" + attr.getName().getLocalPart();
+								// Is the attribute mapped?
+								if (isMapped(element + "_" + attribute)) {
+									for (EdmLabel label : getEdmLabel(element
+											+ "_" + attribute)) {
+										String attrVal = attr.getValue();
+										String elem = null;
+										if (xml.peek().isCharacters()) {
+											elem = xml.nextEvent()
+													.asCharacters().getData();
+										}
+
+										if (StringUtils.equals(
+												label.toString(),
+												"skos_concept")) {
+											if (lastConcept != null) {
+												concepts.add(lastConcept);
+											}
+
+											lastConcept = createNewEntity(
+													Concept.class, attrVal);
+										} else
+
+										if (StringUtils.equals(
+												label.toString(), "edm_agent")) {
+											if (lastAgent != null) {
+												agents.add(lastAgent);
+											}
+
+											lastAgent = createNewEntity(
+													AgentType.class, attrVal);
+										} else
+
+										if (StringUtils.equals(
+												label.toString(),
+												"edm_timespan")) {
+											if (lastTimespan != null) {
+												timespans.add(lastTimespan);
+											}
+
+											lastTimespan = createNewEntity(
+													TimeSpanType.class, attrVal);
+										} else
+
+										if (StringUtils.equals(
+												label.toString(), "edm_place")) {
+											if (lastPlace != null) {
+												places.add(lastPlace);
+											}
+											lastPlace = createNewEntity(
+													PlaceType.class, attrVal);
+										} else {
+											if (StringUtils.startsWith(
+													label.toString(), "cc")) {
+
+												appendConceptValue(lastConcept,
+														edmLabel.toString(),
+														elem, label.toString(),
+														attrVal, iterations);
+											}
+
+											else if (StringUtils.startsWith(
+													label.toString(), "ts")) {
+
+												appendValue(TimeSpanType.class,
+														lastTimespan,
+														edmLabel.toString(),
+														elem, label.toString(),
+														attrVal, iterations);
+											} else if (StringUtils.startsWith(
+													label.toString(), "ag")) {
+
+												appendValue(AgentType.class,
+														lastAgent,
+														edmLabel.toString(),
+														elem, label.toString(),
+														attrVal, iterations);
+											} else if (StringUtils.startsWith(
+													label.toString(), "pl")) {
+
+												appendValue(PlaceType.class,
+														lastPlace,
+														edmLabel.toString(),
+														elem, label.toString(),
+														attrVal, iterations);
+											}
+										}
+									}
 								}
+								// Since the attribute is not mapped
+								else {
 
-								if (StringUtils.equals(
-										label.toString(),
-										"skos_concept")) {
-									if (lastConcept != null) {
-										concepts.add(lastConcept);
+									if (StringUtils.equals(edmLabel.toString(),
+											"skos_concept")) {
+										if (lastConcept != null) {
+											concepts.add(lastConcept);
+										}
+										lastConcept = createNewEntity(
+												Concept.class,
+												xml.getElementText());
+
+									} else if (StringUtils.equals(
+											edmLabel.toString(), "edm_agent")) {
+										if (lastAgent != null) {
+											agents.add(lastAgent);
+										}
+										lastAgent = createNewEntity(
+												AgentType.class,
+												xml.getElementText());
+
+									} else if (StringUtils
+											.equals(edmLabel.toString(),
+													"edm_timespan")) {
+										if (lastTimespan != null) {
+											timespans.add(lastTimespan);
+										}
+										lastTimespan = createNewEntity(
+												TimeSpanType.class,
+												xml.getElementText());
+
+									} else if (StringUtils.equals(
+											edmLabel.toString(), "edm_place")) {
+										if (lastPlace != null) {
+											places.add(lastPlace);
+										}
+										lastPlace = createNewEntity(
+												PlaceType.class,
+												xml.getElementText());
+
 									}
-
-									lastConcept = createNewEntity(
-											Concept.class, attrVal);
-								} else
-
-								if (StringUtils.equals(
-										label.toString(),
-										"edm_agent")) {
-									if (lastAgent != null) {
-										agents.add(lastAgent);
-									}
-
-									lastAgent = createNewEntity(
-											AgentType.class, attrVal);
-								} else
-
-								if (StringUtils.equals(
-										label.toString(),
-										"edm_timespan")) {
-									if (lastTimespan != null) {
-										timespans.add(lastTimespan);
-									}
-
-									lastTimespan = createNewEntity(
-											TimeSpanType.class, attrVal);
-								} else
-
-								if (StringUtils.equals(
-										label.toString(),
-										"edm_place")) {
-									if (lastPlace != null) {
-										places.add(lastPlace);
-									}
-									lastPlace = createNewEntity(
-											PlaceType.class, attrVal);
-								} else {
 									if (StringUtils.startsWith(
-											label.toString(), "cc")) {
-
+											edmLabel.toString(), "cc")) {
 										appendConceptValue(lastConcept,
 												edmLabel.toString(),
-												elem,
-												label.toString(),
-												attrVal,iterations);
+												xml.getElementText(), null,
+												null, iterations);
 									}
 
 									else if (StringUtils.startsWith(
-											label.toString(), "ts")) {
-
+											edmLabel.toString(), "ts")) {
 										appendValue(TimeSpanType.class,
 												lastTimespan,
 												edmLabel.toString(),
-												elem,
-												label.toString(),
-												attrVal,iterations);
+												xml.getElementText(), null,
+												null, iterations);
 									} else if (StringUtils.startsWith(
-											label.toString(), "ag")) {
-
-										appendValue(AgentType.class,
-												lastAgent,
+											edmLabel.toString(), "ag")) {
+										appendValue(AgentType.class, lastAgent,
 												edmLabel.toString(),
-												elem,
-												label.toString(),
-												attrVal,iterations);
+												xml.getElementText(), null,
+												null, iterations);
 									} else if (StringUtils.startsWith(
-											label.toString(), "pl")) {
-
-										appendValue(PlaceType.class,
-												lastPlace,
+											edmLabel.toString(), "pl")) {
+										appendValue(PlaceType.class, lastPlace,
 												edmLabel.toString(),
-												elem,
-												label.toString(),
-												attrVal,iterations);
+												xml.getElementText(), null,
+												null, iterations);
+
 									}
 								}
-								}
+
 							}
-							// Since the attribute is not mapped
+							// Since it does not have attributes
 							else {
+								XMLEvent evt2 = xml.nextEvent();
+								if (evt2.isCharacters()) {
+									if (StringUtils.equals(edmLabel.toString(),
+											"skos_concept")) {
+										if (lastConcept != null) {
+											concepts.add(lastConcept);
+										}
+										lastConcept = createNewEntity(
+												Concept.class, evt2
+														.asCharacters()
+														.getData());
 
-								if (StringUtils.equals(
-										edmLabel.toString(),
-										"skos_concept")) {
-									if (lastConcept != null) {
-										concepts.add(lastConcept);
+									} else if (StringUtils.equals(
+											edmLabel.toString(), "edm_agent")) {
+										if (lastAgent != null) {
+											agents.add(lastAgent);
+										}
+										lastAgent = createNewEntity(
+												AgentType.class, evt2
+														.asCharacters()
+														.getData());
+
+									} else if (StringUtils
+											.equals(edmLabel.toString(),
+													"edm_timespan")) {
+										if (lastTimespan != null) {
+											timespans.add(lastTimespan);
+										}
+										lastTimespan = createNewEntity(
+												TimeSpanType.class, evt2
+														.asCharacters()
+														.getData());
+
+									} else if (StringUtils.equals(
+											edmLabel.toString(), "edm_place")) {
+										if (lastPlace != null) {
+											places.add(lastPlace);
+										}
+										lastPlace = createNewEntity(
+												PlaceType.class, evt2
+														.asCharacters()
+														.getData());
+
 									}
-									lastConcept = createNewEntity(
-											Concept.class,
-											xml.getElementText());
 
-								} else if (StringUtils.equals(
-										edmLabel.toString(),
-										"edm_agent")) {
-									if (lastAgent != null) {
-										agents.add(lastAgent);
+									if (StringUtils.startsWith(
+											edmLabel.toString(), "cc")) {
+										appendConceptValue(lastConcept,
+												edmLabel.toString(), evt2
+														.asCharacters()
+														.getData(), null, null,
+												iterations);
 									}
-									lastAgent = createNewEntity(
-											AgentType.class,
-											xml.getElementText());
 
-								} else if (StringUtils.equals(
-										edmLabel.toString(),
-										"edm_timespan")) {
-									if (lastTimespan != null) {
-										timespans.add(lastTimespan);
+									else if (StringUtils.startsWith(
+											edmLabel.toString(), "ts")) {
+										appendValue(TimeSpanType.class,
+												lastTimespan,
+
+												edmLabel.toString(), evt2
+														.asCharacters()
+														.getData(), null, null,
+												iterations);
+									} else if (StringUtils.startsWith(
+											edmLabel.toString(), "ag")) {
+										appendValue(AgentType.class, lastAgent,
+												edmLabel.toString(), evt2
+														.asCharacters()
+														.getData(), null, null,
+												iterations);
+									} else if (StringUtils.startsWith(
+											edmLabel.toString(), "pl")) {
+										appendValue(PlaceType.class, lastPlace,
+												edmLabel.toString(), evt2
+														.asCharacters()
+														.getData(), null, null,
+												iterations);
 									}
-									lastTimespan = createNewEntity(
-											TimeSpanType.class,
-											xml.getElementText());
-
-								} else if (StringUtils.equals(
-										edmLabel.toString(),
-										"edm_place")) {
-									if (lastPlace != null) {
-										places.add(lastPlace);
-									}
-									lastPlace = createNewEntity(
-											PlaceType.class,
-											xml.getElementText());
-
-								}
-								if (StringUtils.startsWith(
-										edmLabel.toString(), "cc")) {
-									appendConceptValue(lastConcept,
-											edmLabel.toString(),
-											xml.getElementText(), null,
-											null,iterations);
-								}
-
-								else if (StringUtils.startsWith(
-										edmLabel.toString(), "ts")) {
-									appendValue(TimeSpanType.class,
-											lastTimespan,
-											edmLabel.toString(),
-											xml.getElementText(), null,
-											null,iterations);
-								} else if (StringUtils.startsWith(
-										edmLabel.toString(), "ag")) {
-									appendValue(AgentType.class,
-											lastAgent,
-											edmLabel.toString(),
-											xml.getElementText(), null,
-											null,iterations);
-								} else if (StringUtils.startsWith(
-										edmLabel.toString(), "pl")) {
-									appendValue(PlaceType.class,
-											lastPlace,
-											edmLabel.toString(),
-											xml.getElementText(), null,
-											null,iterations);
-
-								}
-							}
-
-						}
-						// Since it does not have attributes
-						else {
-							XMLEvent evt2 = xml.nextEvent();
-							if (evt2.isCharacters()) {
-								if (StringUtils.equals(
-										edmLabel.toString(),
-										"skos_concept")) {
-									if (lastConcept != null) {
-										concepts.add(lastConcept);
-									}
-									lastConcept = createNewEntity(
-											Concept.class, evt2
-													.asCharacters()
-													.getData());
-
-								} else if (StringUtils.equals(
-										edmLabel.toString(),
-										"edm_agent")) {
-									if (lastAgent != null) {
-										agents.add(lastAgent);
-									}
-									lastAgent = createNewEntity(
-											AgentType.class, evt2
-													.asCharacters()
-													.getData());
-
-								} else if (StringUtils.equals(
-										edmLabel.toString(),
-										"edm_timespan")) {
-									if (lastTimespan != null) {
-										timespans.add(lastTimespan);
-									}
-									lastTimespan = createNewEntity(
-											TimeSpanType.class, evt2
-													.asCharacters()
-													.getData());
-
-								} else if (StringUtils.equals(
-										edmLabel.toString(),
-										"edm_place")) {
-									if (lastPlace != null) {
-										places.add(lastPlace);
-									}
-									lastPlace = createNewEntity(
-											PlaceType.class, evt2
-													.asCharacters()
-													.getData());
-
-								}
-
-								if (StringUtils.startsWith(
-										edmLabel.toString(), "cc")) {
-									appendConceptValue(lastConcept,
-											edmLabel.toString(), evt2
-													.asCharacters()
-													.getData(), null,
-											null,iterations);
-								}
-
-								else if (StringUtils.startsWith(
-										edmLabel.toString(), "ts")) {
-									appendValue(TimeSpanType.class,
-											lastTimespan,
-
-											edmLabel.toString(), evt2
-													.asCharacters()
-													.getData(), null,
-											null,iterations);
-								} else if (StringUtils.startsWith(
-										edmLabel.toString(), "ag")) {
-									appendValue(AgentType.class,
-											lastAgent,
-											edmLabel.toString(), evt2
-													.asCharacters()
-													.getData(), null,
-											null,iterations);
-								} else if (StringUtils.startsWith(
-										edmLabel.toString(), "pl")) {
-									appendValue(PlaceType.class,
-											lastPlace,
-											edmLabel.toString(), evt2
-													.asCharacters()
-													.getData(), null,
-											null,iterations);
 								}
 							}
-						}
 						}
 					}
 					// The element is not mapped, but does it have any
 					// mapped attributes?
 					else {
 						if (sElem.getAttributes().hasNext()) {
-							Attribute attr = (Attribute) sElem
-									.getAttributes().next();
-							String attribute = attr.getName()
-									.getPrefix()
+							Attribute attr = (Attribute) sElem.getAttributes()
+									.next();
+							String attribute = attr.getName().getPrefix()
 
 							+ ":" + attr.getName().getLocalPart();
 							// Is the attribute mapped?
@@ -408,125 +412,110 @@ public class OsgiExtractor extends Extractor {
 
 							// Is the attribute mapped?
 							if (isMapped(element + "_" + attribute)) {
-								for(EdmLabel label:getEdmLabel(element + "_" + attribute)){
-								if (StringUtils.equals(
-										label.toString(),
-										"skos_concept")) {
-									if (lastConcept != null) {
-										concepts.add(lastConcept);
-									}
-
-									lastConcept = createNewEntity(
-											Concept.class,
-											attr.getValue());
-								} else
-
-								if (StringUtils.equals(
-										label.toString(),
-										"edm_agent")) {
-									if (lastAgent != null) {
-										agents.add(lastAgent);
-									}
-
-									lastAgent = createNewEntity(
-											AgentType.class,
-											attr.getValue());
-								} else
-
-								if (StringUtils.equals(
-										label.toString(),
-										"edm_timespan")) {
-									if (lastTimespan != null) {
-										timespans.add(lastTimespan);
-									}
-
-									lastTimespan = createNewEntity(
-											TimeSpanType.class,
-											attr.getValue());
-								} else
-
-								if (StringUtils.equals(
-										label.toString(),
-										"edm_place")) {
-									if (lastPlace != null) {
-										places.add(lastPlace);
-									}
-									lastPlace = createNewEntity(
-											PlaceType.class,
-											attr.getValue());
-								} else {
-									if (StringUtils.startsWith(
-											label.toString(), "cc")) {
-										String elem = null;
-										if (xml.peek().isCharacters()) {
-											elem = xml.nextEvent()
-													.asCharacters()
-													.getData();
+								for (EdmLabel label : getEdmLabel(element + "_"
+										+ attribute)) {
+									if (StringUtils.equals(label.toString(),
+											"skos_concept")) {
+										if (lastConcept != null) {
+											concepts.add(lastConcept);
 										}
-										String attrVal = attr
-												.getValue();
 
-										appendConceptValue(lastConcept,
-												null,
-												elem,
-												label.toString(),
-												attrVal,iterations);
-									}
+										lastConcept = createNewEntity(
+												Concept.class, attr.getValue());
+									} else
 
-									else if (StringUtils.startsWith(
-											label.toString(), "ts")) {
-										String elem = null;
-										if (xml.peek().isCharacters()) {
-											elem = xml.nextEvent()
-													.asCharacters()
-													.getData();
+									if (StringUtils.equals(label.toString(),
+											"edm_agent")) {
+										if (lastAgent != null) {
+											agents.add(lastAgent);
 										}
-										String attrVal = attr
-												.getValue();
 
-										appendValue(TimeSpanType.class,
-												lastTimespan,
-												null,
-												elem,
-												label.toString(),
-												attrVal,iterations);
-									} else if (StringUtils.startsWith(
-											label.toString(), "ag")) {
-										String elem = null;
-										if (xml.peek().isCharacters()) {
-											elem = xml.nextEvent()
-													.asCharacters()
-													.getData();
+										lastAgent = createNewEntity(
+												AgentType.class,
+												attr.getValue());
+									} else
+
+									if (StringUtils.equals(label.toString(),
+											"edm_timespan")) {
+										if (lastTimespan != null) {
+											timespans.add(lastTimespan);
 										}
-										String attrVal = attr
-												.getValue();
 
-										appendValue(AgentType.class,
-												lastAgent,
-												null,
-												elem,
-												label.toString(),
-												attrVal,iterations);
-									} else if (StringUtils.startsWith(
-											label.toString(), "pl")) {
-										String elem = null;
-										if (xml.peek().isCharacters()) {
-											elem = xml.nextEvent()
-													.asCharacters()
-													.getData();
+										lastTimespan = createNewEntity(
+												TimeSpanType.class,
+												attr.getValue());
+									} else
+
+									if (StringUtils.equals(label.toString(),
+											"edm_place")) {
+										if (lastPlace != null) {
+											places.add(lastPlace);
 										}
-										String attrVal = attr
-												.getValue();
+										lastPlace = createNewEntity(
+												PlaceType.class,
+												attr.getValue());
+									} else {
+										if (StringUtils.startsWith(
+												label.toString(), "cc")) {
+											String elem = null;
+											if (xml.peek().isCharacters()) {
+												elem = xml.nextEvent()
+														.asCharacters()
+														.getData();
+											}
+											String attrVal = attr.getValue();
 
-										appendValue(PlaceType.class,
-												lastPlace,
-												null,
-												elem,
-												label.toString(),
-												attrVal,iterations);
+											appendConceptValue(lastConcept,
+													null, elem,
+													label.toString(), attrVal,
+													iterations);
+										}
+
+										else if (StringUtils.startsWith(
+												label.toString(), "ts")) {
+											String elem = null;
+											if (xml.peek().isCharacters()) {
+												elem = xml.nextEvent()
+														.asCharacters()
+														.getData();
+											}
+											String attrVal = attr.getValue();
+
+											appendValue(TimeSpanType.class,
+													lastTimespan, null, elem,
+													label.toString(), attrVal,
+													iterations);
+										} else if (StringUtils.startsWith(
+												label.toString(), "ag")) {
+											String elem = null;
+											if (xml.peek().isCharacters()) {
+												elem = xml.nextEvent()
+														.asCharacters()
+														.getData();
+											}
+											String attrVal = attr.getValue();
+
+											appendValue(AgentType.class,
+													lastAgent, null, elem,
+													label.toString(), attrVal,
+													iterations);
+										} else if (StringUtils.startsWith(
+												label.toString(), "pl")) {
+											String elem = null;
+											if (xml.peek().isCharacters()) {
+												elem = xml.nextEvent()
+														.asCharacters()
+														.getData();
+											}
+											String attrVal = attr.getValue();
+
+											appendValue(PlaceType.class,
+													lastPlace, null, elem,
+													label.toString(), attrVal,
+													iterations);
+										}
 									}
 								}
-							}
 							}
 						}
 					}
@@ -545,7 +534,7 @@ public class OsgiExtractor extends Extractor {
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
 		}
-		
+
 		denormalizedValues.put("concepts", concepts);
 		denormalizedValues.put("agents", agents);
 		denormalizedValues.put("timespans", timespans);
@@ -563,7 +552,7 @@ public class OsgiExtractor extends Extractor {
 			for (Entry<String, List<EdmLabel>> entry : vocabulary.getElements()
 					.entrySet()) {
 				if (StringUtils.contains(entry.getKey(), field)
-						&& entry.getValue()!=null) {
+						&& entry.getValue() != null) {
 					return true;
 				}
 			}
@@ -571,10 +560,14 @@ public class OsgiExtractor extends Extractor {
 		return false;
 	}
 
-	private String retrieveValueFromResource(String resource) {
-
-		EntityImpl entity = datastore.find(EntityImpl.class)
-				.filter("uri", resource).get();
+	private EntityImpl retrieveValueFromResource(String resource) {
+		EntityImpl entity;
+		if (memCache.containsKey(resource)) {
+			return memCache.get(resource);
+		} else {
+			entity = datastore.find(EntityImpl.class).filter("uri", resource)
+					.get();
+		}
 		if (entity == null) {
 			String val = retrieveValue(resource);
 			if (val.length() > 0) {
@@ -583,11 +576,12 @@ public class OsgiExtractor extends Extractor {
 				newEntity.setTimestamp(new Date().getTime());
 				newEntity.setContent(val);
 				datastore.save(newEntity);
+				return newEntity;
 			}
-			return val;
+			return null;
 		} else {
 			if (new Date().getTime() - entity.getTimestamp() < UPDATETIMESTAMP) {
-				return entity.getContent();
+				return entity;
 			} else {
 				String val = retrieveValue(resource);
 				Query<EntityImpl> updateQuery = datastore
@@ -597,32 +591,33 @@ public class OsgiExtractor extends Extractor {
 						.createUpdateOperations(EntityImpl.class).set(
 								"content", val);
 				datastore.update(updateQuery, ops);
-				return val;
+				entity.setContent(val);
+				return entity;
 			}
 		}
 	}
 
 	private String retrieveValue(String resource) {
 		URLConnection urlConnection;
-		if(resource!=null&&vocabulary!=null){
-		try {
-			
-			if (StringUtils.isNotBlank(vocabulary.getReplaceUrl())){
-				resource = StringUtils.replace(resource, vocabulary.getURI(), vocabulary.getReplaceUrl());
-			}
-			urlConnection = new URL(resource).openConnection();
+		if (resource != null && vocabulary != null) {
+			try {
 
-			InputStream inputStream = urlConnection.getInputStream();
-			StringWriter writer = new StringWriter();
-			IOUtils.copy(inputStream, writer, "UTF-8");
-			return writer.toString();
-			
-			
-		} catch (MalformedURLException e) {
-			return "";
-		} catch (IOException e) {
-			return "";
-		}
+				if (StringUtils.isNotBlank(vocabulary.getReplaceUrl())) {
+					resource = StringUtils.replace(resource,
+							vocabulary.getURI(), vocabulary.getReplaceUrl());
+				}
+				urlConnection = new URL(resource).openConnection();
+
+				InputStream inputStream = urlConnection.getInputStream();
+				StringWriter writer = new StringWriter();
+				IOUtils.copy(inputStream, writer, "UTF-8");
+				return writer.toString();
+
+			} catch (MalformedURLException e) {
+				return "";
+			} catch (IOException e) {
+				return "";
+			}
 		}
 		return "";
 	}
@@ -665,8 +660,8 @@ public class OsgiExtractor extends Extractor {
 
 				ResourceType rs = new ResourceType();
 				rs.setResource(val != null ? val : valAttr);
-				if(isURI(rs.getResource())){
-					denormalize(rs.getResource(),iterations-1);
+				if (isURI(rs.getResource())) {
+					denormalize(rs.getResource(), iterations - 1);
 				}
 				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 
@@ -675,7 +670,7 @@ public class OsgiExtractor extends Extractor {
 				ResourceOrLiteralType rs = new ResourceOrLiteralType();
 				if (isURI(val)) {
 					rs.setResource(val);
-					denormalize(val,iterations-1);
+					denormalize(val, iterations - 1);
 				} else {
 					rs.setString(val);
 				}
@@ -712,8 +707,8 @@ public class OsgiExtractor extends Extractor {
 			if (RDF.getClazz().isAssignableFrom(ResourceType.class)) {
 				ResourceType rs = new ResourceType();
 				rs.setResource(val != null ? val : valAttr);
-				if(isURI(rs.getResource())){
-					denormalize(rs.getResource(),iterations-1);
+				if (isURI(rs.getResource())) {
+					denormalize(rs.getResource(), iterations - 1);
 				}
 				Class<?>[] cls = new Class<?>[1];
 				cls[0] = RDF.getClazz();
@@ -724,8 +719,8 @@ public class OsgiExtractor extends Extractor {
 			} else if (RDF.getClazz().isAssignableFrom(LiteralType.class)) {
 				LiteralType rs = new LiteralType();
 				rs.setString(val);
-				if(isURI(val)){
-					denormalize(val, iterations-1);
+				if (isURI(val)) {
+					denormalize(val, iterations - 1);
 				}
 				if (edmAttr != null
 						&& StringUtils.equals(
@@ -746,7 +741,7 @@ public class OsgiExtractor extends Extractor {
 				ResourceOrLiteralType rs = new ResourceOrLiteralType();
 				if (isURI(val)) {
 					rs.setResource(val);
-						denormalize(val,iterations-1);
+					denormalize(val, iterations - 1);
 				} else {
 					rs.setString(val);
 				}
@@ -771,7 +766,7 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	private Concept appendConceptValue(Concept concept, String edmLabel,
-			String val, String edmAttr, String valAttr,int iterations)
+			String val, String edmAttr, String valAttr, int iterations)
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
@@ -788,8 +783,8 @@ public class OsgiExtractor extends Extractor {
 
 			ResourceType obj = new ResourceType();
 			obj.setResource(val != null ? val : valAttr);
-			if(isURI(obj.getResource())){
-				denormalize(obj.getResource(),iterations-1);
+			if (isURI(obj.getResource())) {
+				denormalize(obj.getResource(), iterations - 1);
 			}
 			Class<?>[] cls = new Class<?>[1];
 			cls[0] = RDF.getClazz();
@@ -808,7 +803,7 @@ public class OsgiExtractor extends Extractor {
 
 			if (isURI(val)) {
 				obj.setResource(val);
-					denormalize(val,iterations-1);
+				denormalize(val, iterations - 1);
 			} else {
 				obj.setString(val);
 			}
@@ -833,8 +828,8 @@ public class OsgiExtractor extends Extractor {
 				.isAssignableFrom(LiteralType.class)) {
 			LiteralType obj = new LiteralType();
 			obj.setString(val);
-			if(isURI(val)){
-				denormalize(val,iterations-1);
+			if (isURI(val)) {
+				denormalize(val, iterations - 1);
 			}
 			if (edmAttr != null) {
 				LiteralType.Lang lang = new LiteralType.Lang();
@@ -857,8 +852,9 @@ public class OsgiExtractor extends Extractor {
 
 	private Map<String, List> denormalize(String val, int iterations) {
 		try {
-			ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(datastore, "URI", val);
-			return denormalize(val, controlledVocabulary,iterations,false);
+			ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
+					datastore, "URI", val);
+			return denormalize(val, controlledVocabulary, iterations, false);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -902,10 +898,10 @@ public class OsgiExtractor extends Extractor {
 		HashMap<String, List<EdmLabel>> elements = vocabulary.getElements() != null ? (HashMap<String, List<EdmLabel>>) vocabulary
 				.getElements() : new HashMap<String, List<EdmLabel>>();
 		List<EdmLabel> element = elements.get(fieldToMap);
-		if(!element.contains(europeanaField)){
+		if (!element.contains(europeanaField)) {
 			element.add(europeanaField);
 			elements.put(fieldToMap, element);
-		vocabulary.setElements(elements);
+			vocabulary.setElements(elements);
 		}
 
 	}
@@ -918,7 +914,7 @@ public class OsgiExtractor extends Extractor {
 		}
 		return null;
 	}
-	
+
 	public ControlledVocabularyImpl getControlledVocabulary(
 			Datastore datastore, String field, String filter)
 			throws UnknownHostException, MongoException {
@@ -931,13 +927,29 @@ public class OsgiExtractor extends Extractor {
 					.filter(field, vocabularyName).asList();
 			for (ControlledVocabularyImpl vocabulary : vocabularies) {
 				for (String rule : vocabulary.getRules()) {
-					if (StringUtils.equals(rule, "*")||StringUtils.contains(filter,rule)){
+					if (StringUtils.equals(rule, "*")
+							|| StringUtils.contains(filter, rule)) {
 						return vocabulary;
 					}
 				}
-				
+
 			}
 		}
 		return null;
 	}
+
+	/**
+	 * Retrieve all the stored controlled vocabularies
+	 * 
+	 * @return A list with all the stored controlled vocabularies
+	 */
+	
+	public List<ControlledVocabularyImpl> getControlledVocabularies(final Datastore datastore) {
+		
+		
+		return datastore.find(ControlledVocabularyImpl.class) != null ? datastore.find(ControlledVocabularyImpl.class).asList()
+				: null;
+	}
+	
+	
 }

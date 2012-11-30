@@ -1,8 +1,26 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:bp="http://www.osgi.org/xmlns/blueprint/v1.0.0" 
 xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-    <bean id="solrbean" class="eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin">
-    </bean>
+<!--     <bean id="solrbean" class="eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin"> -->
+<!--     </bean> -->
     
-	<service id="solrPlugin" ref="solrbean" interface="eu.europeana.uim.plugin.ingestion.IngestionPlugin" />
+<!-- 	<service id="solrPlugin" ref="solrbean" interface="eu.europeana.uim.plugin.ingestion.IngestionPlugin" /> -->
+	
+	
+	
+	
+	
+	<bean id="solrbean" class="eu.europeana.uim.plugin.solr.service.SolrWorkflowServiceImpl">
+	</bean>
+
+	<service id="solrService" ref="solrbean"
+		interface="eu.europeana.uim.plugin.solr.service.SolrWorkflowService" />
+
+<bean id="solrWorkflowBean" class="eu.europeana.uim.plugin.solr.service.RepositoryIngestionWorkflow">
+       <argument ref="solrbean"/>
+     </bean>
+     
+     <service id="solrWorkflow" ref="solrWorkflowBean"
+		interface="eu.europeana.uim.workflow.Workflow" />
+	
 </blueprint>

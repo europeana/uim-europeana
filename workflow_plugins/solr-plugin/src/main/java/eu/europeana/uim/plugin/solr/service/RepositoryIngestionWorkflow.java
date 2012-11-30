@@ -14,9 +14,8 @@
  *  See the Licence for the specific language governing permissions and limitations under
  *  the Licence.
  */
-package eu.europeana.uim.europeanaspecific.workflows;
+package eu.europeana.uim.plugin.solr.service;
 
-import eu.europeana.uim.plugin.solr.service.SolrWorkflowPlugin;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
@@ -31,12 +30,12 @@ public class RepositoryIngestionWorkflow<I> extends AbstractWorkflow<MetaDataRec
 	/**
 	 * 
 	 */
-	public RepositoryIngestionWorkflow(){
+	public RepositoryIngestionWorkflow(SolrWorkflowService solrWorkflowService){
 		super("D: Dereference Collection",
 		        "Dereference functionality of UIM");
 
 		        setStart(new BatchWorkflowStart<I>());
-		        SolrWorkflowPlugin<I> solrPlugin = new SolrWorkflowPlugin<I>();
+		        SolrWorkflowPlugin solrPlugin = new SolrWorkflowPlugin(solrWorkflowService);
 		        addStep(solrPlugin);
 		        isSavepoint(solrPlugin.getIdentifier());
 	}

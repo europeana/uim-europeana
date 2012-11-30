@@ -25,21 +25,26 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+
 import org.apache.commons.lang.StringUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.tel.cluster.Hash;
+
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Concept;
@@ -56,20 +61,20 @@ import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.Year;
-import eu.europeana.corelib.definitions.solr.entity.Proxy;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
-import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
-import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
-import eu.europeana.uim.orchestration.ExecutionContext;
-import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
+import eu.europeana.corelib.dereference.impl.EntityImpl;
+import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
+import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
+import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
 import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
 import eu.europeana.uim.plugin.solr.utils.PropertyReader;
 import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 import eu.europeana.uim.store.MetaDataRecord;
-import eu.europeana.uim.store.UimDataSet;
 
 /**
  * This is the main class implementing the UIM functionality for the solr
@@ -79,10 +84,13 @@ import eu.europeana.uim.store.UimDataSet;
  * @author Yorgos.Mamakis@ kb.nl
  * 
  */
-public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>, I>  {
+public class SolrWorkflowPlugin<I> extends
+		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static int recordNumber;
+	private static Map<String, List<ControlledVocabularyImpl>> vocMemCache;
 
+	private static SolrWorkflowService solrWorkflowService;
 	/**
 	 * The parameters used by this WorkflowStart
 	 */
@@ -94,13 +102,14 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 	/**
 	 * 
 	 */
-	public SolrWorkflowPlugin() {
+	public SolrWorkflowPlugin(SolrWorkflowService solrWorkflowService) {
 		super("solr_workflow", "Solr Repository Ingestion Plugin");
-
-	
+		SolrWorkflowPlugin.solrWorkflowService = solrWorkflowService;
 	}
+
 	Datastore datastore = null;
 	Morphia morphia;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -109,12 +118,29 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 	 */
 	@Override
 	public boolean process(MetaDataRecord<I> mdr,
-			ExecutionContext<MetaDataRecord<I>, I> context) throws IngestionPluginFailedException,CorruptedDatasetException{
-
+			ExecutionContext<MetaDataRecord<I>, I> context)
+			throws IngestionPluginFailedException, CorruptedDatasetException {
+		datastore = solrWorkflowService.getDatastore();
 		try {
 
-			
-			
+			if (vocMemCache == null) {
+				OsgiExtractor extractor = solrWorkflowService.getExtractor();
+
+				
+				List<ControlledVocabularyImpl> vocs = extractor
+						.getControlledVocabularies(datastore);
+				vocMemCache = new HashMap<String, List<ControlledVocabularyImpl>>();
+				List<ControlledVocabularyImpl> vocsInMap;
+				for (ControlledVocabularyImpl voc : vocs) {
+					if (vocMemCache.containsKey(voc.getURI())) {
+						vocsInMap = vocMemCache.get(voc.getURI());
+					} else {
+						vocsInMap = new ArrayList<ControlledVocabularyImpl>();
+					}
+					vocsInMap.add(voc);
+					vocMemCache.put(voc.getURI(), vocsInMap);
+				}
+			}
 			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
@@ -160,10 +186,10 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 					dereferenceTimespan(rdfCopy, datastore, timespan);
 				}
 			}
-			if(rdf.getWebResourceList()!=null){
-			for (WebResourceType webresource : rdf.getWebResourceList()) {
-				dereferenceWebResource(rdfCopy, datastore, webresource);
-			}
+			if (rdf.getWebResourceList() != null) {
+				for (WebResourceType webresource : rdf.getWebResourceList()) {
+					dereferenceWebResource(rdfCopy, datastore, webresource);
+				}
 			}
 			IBindingFactory bfact2 = BindingDirectory.getFactory(RDF.class);
 			IMarshallingContext marshallingContext = bfact2
@@ -214,7 +240,6 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 			marshallingContext.marshalDocument(rdfFinal, "UTF-8", null, out);
 			String der = out.toString("UTF-8");
 			mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
-			System.out.println(der);
 			return true;
 
 		} catch (JiBXException e) {
@@ -627,66 +652,99 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 			SecurityException, IllegalArgumentException,
 			InstantiationException, IllegalAccessException,
 			NoSuchMethodException, InvocationTargetException {
-		OsgiExtractor extractor = new OsgiExtractor();
-		extractor.setDatastore(datastore);
+		OsgiExtractor extractor = solrWorkflowService.getExtractor();
+		extractor.setDatastore(solrWorkflowService.getDatastore());
 		if (object instanceof String) {
-			if (isURI((String) object)) {
-				ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
-						datastore, "URI", (String) object);
 
-				appendInRDF(rdf, extractor.denormalize((String) object,
-						controlVocabulary,0,true));
+			if (isURI((String) object)) {
+
+				ControlledVocabularyImpl controlVocabulary = getControlledVocabulary((String) object);
+				if (controlVocabulary != null) {
+
+					appendInRDF(rdf, extractor.denormalize((String) object,
+							controlVocabulary, 0, true));
+
+				}
 			}
 		} else if (object instanceof ResourceType) {
 
 			if (((ResourceType) object).getResource() != null) {
 
 				if (isURI(((ResourceType) object).getResource())) {
-					ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
-							datastore, "URI",
-							((ResourceType) object).getResource());
-					appendInRDF(rdf, extractor.denormalize(
-							((ResourceType) object).getResource(),
-							controlVocabulary,0,true));
+					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(((ResourceType) object)
+							.getResource());
+					if (controlVocabulary != null) {
+						appendInRDF(rdf, extractor.denormalize(
+								((ResourceType) object).getResource(),
+								controlVocabulary, 0, true));
+					}
 				}
 			}
 		} else if (object instanceof ResourceOrLiteralType) {
 			if (((ResourceOrLiteralType) object).getResource() != null) {
 
 				if (isURI(((ResourceOrLiteralType) object).getResource())) {
-					ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
-							datastore, "URI",
-							((ResourceOrLiteralType) object).getResource());
-					appendInRDF(rdf, extractor.denormalize(
-							((ResourceOrLiteralType) object).getResource(),
-							controlVocabulary,0,true));
+					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(((ResourceOrLiteralType) object)
+							.getResource());
+					if (controlVocabulary != null) {
+						appendInRDF(rdf, extractor.denormalize(
+								((ResourceOrLiteralType) object).getResource(),
+								controlVocabulary, 0, true));
+
+					}
 				}
 			}
 			if (((ResourceOrLiteralType) object).getString() != null) {
 
 				if (isURI(((ResourceOrLiteralType) object).getString())) {
-					ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
-							datastore, "URI",
-							((ResourceOrLiteralType) object).getString());
-					appendInRDF(rdf, extractor.denormalize(
-							((ResourceOrLiteralType) object).getString(),
-							controlVocabulary,0,true));
+					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(((ResourceOrLiteralType) object)
+							.getString());
+					if (controlVocabulary != null) {
+						appendInRDF(rdf, extractor.denormalize(
+								((ResourceOrLiteralType) object).getString(),
+								controlVocabulary, 0, true));
+
+					}
 				}
 			}
 		} else if (object instanceof LiteralType) {
 			if (((LiteralType) object).getString() != null) {
 
 				if (isURI(((LiteralType) object).getString())) {
+					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(((LiteralType) object)
+							.getString());
+					if (controlVocabulary != null) {
+						appendInRDF(rdf, extractor.denormalize(
+								((LiteralType) object).getString(),
+								controlVocabulary, 0, true));
+					}
 
-					ControlledVocabularyImpl controlVocabulary = extractor.getControlledVocabulary(
-							datastore, "URI",
-							((LiteralType) object).getString());
-					appendInRDF(rdf, extractor.denormalize(
-							((LiteralType) object).getString(),
-							controlVocabulary));
 				}
 			}
 		}
+		
+	}
+
+	private ControlledVocabularyImpl getControlledVocabulary(String str) {
+		String[] splitName = str.split("/");
+		if (splitName.length > 3) {
+			String vocabularyName = splitName[0] + "/" + splitName[1] + "/"
+					+ splitName[2] + "/";
+			if (vocMemCache.containsKey(vocabularyName)) {
+				for (ControlledVocabularyImpl vocabulary : vocMemCache
+						.get(vocabularyName)) {
+					for (String rule : vocabulary.getRules()) {
+						if (StringUtils.equals(rule, "*")
+								|| StringUtils.contains(str, rule)) {
+							return vocabulary;
+						}
+					}
+
+				}
+			}
+
+		}
+		return null;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -694,7 +752,7 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 		for (Entry<String, List> entry : denormalize.entrySet()) {
 			if (StringUtils.equals(entry.getKey(), "concepts")) {
 				for (Concept concept : (List<Concept>) entry.getValue()) {
-					if(rdf.getConceptList()!=null){
+					if (rdf.getConceptList() != null) {
 						rdf.getConceptList().add(concept);
 					} else {
 						List<Concept> concepts = new ArrayList<Concept>();
@@ -705,8 +763,8 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 			}
 			if (StringUtils.equals(entry.getKey(), "agents")) {
 				for (AgentType agent : (List<AgentType>) entry.getValue()) {
-					if(rdf.getAgentList()!=null){
-					rdf.getAgentList().add(agent);
+					if (rdf.getAgentList() != null) {
+						rdf.getAgentList().add(agent);
 					} else {
 						List<AgentType> agents = new ArrayList<AgentType>();
 						agents.add(agent);
@@ -717,10 +775,9 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 			if (StringUtils.equals(entry.getKey(), "timespans")) {
 				for (TimeSpanType timespan : (List<TimeSpanType>) entry
 						.getValue()) {
-					if(rdf.getTimeSpanList()!=null){
-					rdf.getTimeSpanList().add(timespan);
-					}
-					else {
+					if (rdf.getTimeSpanList() != null) {
+						rdf.getTimeSpanList().add(timespan);
+					} else {
 						List<TimeSpanType> timespans = new ArrayList<TimeSpanType>();
 						timespans.add(timespan);
 						rdf.setTimeSpanList(timespans);
@@ -729,10 +786,9 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 			}
 			if (StringUtils.equals(entry.getKey(), "places")) {
 				for (PlaceType place : (List<PlaceType>) entry.getValue()) {
-					if(rdf.getPlaceList()!=null){
-					rdf.getPlaceList().add(place);
-					}
-					else {
+					if (rdf.getPlaceList() != null) {
+						rdf.getPlaceList().add(place);
+					} else {
 						List<PlaceType> places = new ArrayList<PlaceType>();
 						places.add(place);
 						rdf.setPlaceList(places);
@@ -743,59 +799,55 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#initialize()
 	 */
 	@Override
 	public void initialize() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#shutdown()
 	 */
 	@Override
 	public void shutdown() {
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.orchestration.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.
+	 * orchestration.ExecutionContext)
 	 */
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
-			throws IngestionPluginFailedException {		
+			throws IngestionPluginFailedException {
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.orchestration.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.
+	 * orchestration.ExecutionContext)
 	 */
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		try {
 
-			morphia = new Morphia();
-			morphia.map(ControlledVocabularyImpl.class);
-			datastore = morphia
-					.createDatastore(
-							new Mongo(
-									PropertyReader
-											.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-									Integer.parseInt(PropertyReader
-											.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-							PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
-			datastore.ensureIndexes();
-
 		} catch (MongoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#getPreferredThreadCount()
 	 */
 	@Override
@@ -803,7 +855,9 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 		return 3;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#getMaximumThreadCount()
 	 */
 	@Override
@@ -811,8 +865,9 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 		return 5;
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getInputFields()
 	 */
 	@Override
@@ -820,15 +875,20 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
 	 */
 	@Override
 	public TKey<?, ?>[] getOptionalFields() {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOutputFields()
 	 */
 	@Override
@@ -836,14 +896,15 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#getParameters()
 	 */
 	@Override
 	public List<String> getParameters() {
 		return params;
 	}
-
 
 	public static int getRecords() {
 		return recordNumber;
@@ -859,10 +920,5 @@ public class SolrWorkflowPlugin<I> extends AbstractIngestionPlugin<MetaDataRecor
 		}
 
 	}
-
-	
-
-
-
 
 }
