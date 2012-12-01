@@ -50,23 +50,23 @@ import eu.europeana.corelib.dereference.impl.Extractor;
 import eu.europeana.uim.common.BlockingInitializer;
 
 public class OsgiExtractor extends Extractor {
-	
+
 	private static OsgiExtractor extractor;
-	
+
 	private OsgiExtractor() {
-		
+
 	}
 
-	public static OsgiExtractor getInstance(final Datastore datastore){
-	
-		if(extractor == null){
-			extractor= new OsgiExtractor();
+	public static OsgiExtractor getInstance(final Datastore datastore) {
+
+		if (extractor == null) {
+			extractor = new OsgiExtractor();
 			memCache = new HashMap<String, EntityImpl>();
-		
+
 		}
 		return extractor;
 	}
-	
+
 	public List<EdmLabel> getEdmLabel(String field) {
 
 		if (vocabulary != null) {
@@ -163,52 +163,88 @@ public class OsgiExtractor extends Extractor {
 											elem = xml.nextEvent()
 													.asCharacters().getData();
 										}
-
+										
 										if (StringUtils.equals(
 												label.toString(),
 												"skos_concept")) {
 											if (lastConcept != null) {
-												concepts.add(lastConcept);
+												if (lastConcept.getAbout() != null) {
+													concepts.add(lastConcept);
+													lastConcept = createNewEntity(
+															Concept.class,
+															attrVal);
+												} else {
+													lastConcept
+															.setAbout(attrVal);
+												}
+											} else {
+												lastConcept = createNewEntity(
+														Concept.class, attrVal);
 											}
 
-											lastConcept = createNewEntity(
-													Concept.class, attrVal);
-										} else
-
-										if (StringUtils.equals(
+										} else if (StringUtils.equals(
 												label.toString(), "edm_agent")) {
 											if (lastAgent != null) {
-												agents.add(lastAgent);
+												if (lastAgent.getAbout() != null) {
+													agents.add(lastAgent);
+
+													lastAgent = createNewEntity(
+															AgentType.class,
+															attrVal);
+												} else {
+													lastAgent.setAbout(attrVal);
+												}
+											} else {
+												lastAgent = createNewEntity(
+														AgentType.class,
+														attrVal);
 											}
 
-											lastAgent = createNewEntity(
-													AgentType.class, attrVal);
-										} else
-
-										if (StringUtils.equals(
+										} else if (StringUtils.equals(
 												label.toString(),
 												"edm_timespan")) {
 											if (lastTimespan != null) {
-												timespans.add(lastTimespan);
+												if (lastTimespan.getAbout() != null) {
+													timespans.add(lastTimespan);
+													lastTimespan = createNewEntity(
+															TimeSpanType.class,
+															attrVal);
+												} else {
+													lastTimespan
+															.setAbout(attrVal);
+												}
+
+											} else {
+												lastTimespan = createNewEntity(
+														TimeSpanType.class,
+														attrVal);
 											}
 
-											lastTimespan = createNewEntity(
-													TimeSpanType.class, attrVal);
-										} else
-
-										if (StringUtils.equals(
+										} else if (StringUtils.equals(
 												label.toString(), "edm_place")) {
 											if (lastPlace != null) {
-												places.add(lastPlace);
+												if (lastPlace.getAbout() != null) {
+													places.add(lastPlace);
+													lastPlace = createNewEntity(
+															PlaceType.class,
+															attrVal);
+												} else {
+													lastPlace.setAbout(attrVal);
+												}
+											} else {
+												lastPlace = createNewEntity(
+														PlaceType.class,
+														attrVal);
 											}
-											lastPlace = createNewEntity(
-													PlaceType.class, attrVal);
+
 										} else {
 											if (StringUtils.startsWith(
 													label.toString(), "cc")) {
 
-												appendConceptValue(lastConcept,
-														edmLabel.toString(),
+												appendConceptValue(
+														lastConcept == null ? new Concept()
+																: lastConcept,
+														label.toString(),
 														elem, label.toString(),
 														attrVal, iterations);
 											}
@@ -216,25 +252,31 @@ public class OsgiExtractor extends Extractor {
 											else if (StringUtils.startsWith(
 													label.toString(), "ts")) {
 
-												appendValue(TimeSpanType.class,
-														lastTimespan,
-														edmLabel.toString(),
+												appendValue(
+														TimeSpanType.class,
+														lastTimespan == null ? new TimeSpanType()
+																: lastTimespan,
+														label.toString(),
 														elem, label.toString(),
 														attrVal, iterations);
 											} else if (StringUtils.startsWith(
 													label.toString(), "ag")) {
 
-												appendValue(AgentType.class,
-														lastAgent,
-														edmLabel.toString(),
+												appendValue(
+														AgentType.class,
+														lastAgent == null ? new AgentType()
+																: lastAgent,
+														label.toString(),
 														elem, label.toString(),
 														attrVal, iterations);
 											} else if (StringUtils.startsWith(
 													label.toString(), "pl")) {
 
-												appendValue(PlaceType.class,
-														lastPlace,
-														edmLabel.toString(),
+												appendValue(
+														PlaceType.class,
+														lastPlace == null ? new PlaceType()
+																: lastPlace,
+														label.toString(),
 														elem, label.toString(),
 														attrVal, iterations);
 											}
@@ -247,69 +289,118 @@ public class OsgiExtractor extends Extractor {
 									if (StringUtils.equals(edmLabel.toString(),
 											"skos_concept")) {
 										if (lastConcept != null) {
-											concepts.add(lastConcept);
+											if (lastConcept.getAbout() != null) {
+												concepts.add(lastConcept);
+												lastConcept = createNewEntity(
+														Concept.class,
+														xml.getElementText());
+											} else {
+												lastConcept.setAbout(xml
+														.getElementText());
+											}
+
+										} else {
+											lastConcept = createNewEntity(
+													Concept.class,
+													xml.getElementText());
 										}
-										lastConcept = createNewEntity(
-												Concept.class,
-												xml.getElementText());
 
 									} else if (StringUtils.equals(
 											edmLabel.toString(), "edm_agent")) {
 										if (lastAgent != null) {
-											agents.add(lastAgent);
+											if (lastAgent.getAbout() != null) {
+												agents.add(lastAgent);
+												lastAgent = createNewEntity(
+														AgentType.class,
+														xml.getElementText());
+											} else {
+												lastAgent.setAbout(xml
+														.getElementText());
+											}
+
+										} else {
+											lastAgent = createNewEntity(
+													AgentType.class,
+													xml.getElementText());
 										}
-										lastAgent = createNewEntity(
-												AgentType.class,
-												xml.getElementText());
 
 									} else if (StringUtils
 											.equals(edmLabel.toString(),
 													"edm_timespan")) {
 										if (lastTimespan != null) {
-											timespans.add(lastTimespan);
+											if (lastTimespan.getAbout() != null) {
+												timespans.add(lastTimespan);
+												lastTimespan = createNewEntity(
+														TimeSpanType.class,
+														xml.getElementText());
+											} else {
+												lastTimespan.setAbout(xml
+														.getElementText());
+											}
+										} else {
+											lastTimespan = createNewEntity(
+													TimeSpanType.class,
+													xml.getElementText());
 										}
-										lastTimespan = createNewEntity(
-												TimeSpanType.class,
-												xml.getElementText());
 
 									} else if (StringUtils.equals(
 											edmLabel.toString(), "edm_place")) {
 										if (lastPlace != null) {
-											places.add(lastPlace);
+											if (lastPlace.getAbout() != null) {
+												places.add(lastPlace);
+												lastPlace = createNewEntity(
+														PlaceType.class,
+														xml.getElementText());
+											} else {
+												lastPlace.setAbout(xml
+														.getElementText());
+											}
+										} else {
+											lastPlace = createNewEntity(
+													PlaceType.class,
+													xml.getElementText());
 										}
-										lastPlace = createNewEntity(
-												PlaceType.class,
-												xml.getElementText());
 
-									}
-									if (StringUtils.startsWith(
-											edmLabel.toString(), "cc")) {
-										appendConceptValue(lastConcept,
-												edmLabel.toString(),
-												xml.getElementText(), null,
-												null, iterations);
-									}
+									} else {
+										if (StringUtils.startsWith(
+												edmLabel.toString(), "cc")) {
+											appendConceptValue(
+													lastConcept == null ? new Concept()
+															: lastConcept,
+													edmLabel.toString(),
+													xml.getElementText(), null,
+													null, iterations);
+										}
 
-									else if (StringUtils.startsWith(
-											edmLabel.toString(), "ts")) {
-										appendValue(TimeSpanType.class,
-												lastTimespan,
-												edmLabel.toString(),
-												xml.getElementText(), null,
-												null, iterations);
-									} else if (StringUtils.startsWith(
-											edmLabel.toString(), "ag")) {
-										appendValue(AgentType.class, lastAgent,
-												edmLabel.toString(),
-												xml.getElementText(), null,
-												null, iterations);
-									} else if (StringUtils.startsWith(
-											edmLabel.toString(), "pl")) {
-										appendValue(PlaceType.class, lastPlace,
-												edmLabel.toString(),
-												xml.getElementText(), null,
-												null, iterations);
+										else if (StringUtils.startsWith(
+												edmLabel.toString(), "ts")) {
+											appendValue(
+													TimeSpanType.class,
+													lastTimespan == null ? new TimeSpanType()
+															: lastTimespan,
+													edmLabel.toString(),
+													xml.getElementText(), null,
+													null, iterations);
+										} else if (StringUtils.startsWith(
+												edmLabel.toString(), "ag")) {
+											appendValue(
+													AgentType.class,
+													lastAgent == null ? new AgentType()
+															: lastAgent,
+													edmLabel.toString(),
+													xml.getElementText(), null,
+													null, iterations);
+										} else if (StringUtils.startsWith(
+												edmLabel.toString(), "pl")) {
+											appendValue(
+													PlaceType.class,
+													lastPlace == null ? new PlaceType()
+															: lastPlace,
+													edmLabel.toString(),
+													xml.getElementText(), null,
+													null, iterations);
 
+										}
 									}
 								}
 
@@ -331,68 +422,114 @@ public class OsgiExtractor extends Extractor {
 									} else if (StringUtils.equals(
 											edmLabel.toString(), "edm_agent")) {
 										if (lastAgent != null) {
-											agents.add(lastAgent);
-										}
-										lastAgent = createNewEntity(
-												AgentType.class, evt2
+											if (lastAgent.getAbout() != null) {
+												agents.add(lastAgent);
+												lastAgent = createNewEntity(
+														AgentType.class, evt2
+																.asCharacters()
+																.getData());
+											} else {
+												lastAgent.setAbout(evt2
 														.asCharacters()
 														.getData());
+											}
+										}
 
+										else {
+											lastAgent = createNewEntity(
+													AgentType.class, evt2
+															.asCharacters()
+															.getData());
+										}
 									} else if (StringUtils
 											.equals(edmLabel.toString(),
 													"edm_timespan")) {
 										if (lastTimespan != null) {
-											timespans.add(lastTimespan);
-										}
-										lastTimespan = createNewEntity(
-												TimeSpanType.class, evt2
+											if (lastTimespan.getAbout() != null) {
+												timespans.add(lastTimespan);
+												lastTimespan = createNewEntity(
+														TimeSpanType.class,
+														evt2.asCharacters()
+																.getData());
+											} else {
+												lastTimespan.setAbout(evt2
 														.asCharacters()
 														.getData());
+											}
+
+										} else {
+											lastTimespan = createNewEntity(
+													TimeSpanType.class, evt2
+															.asCharacters()
+															.getData());
+										}
 
 									} else if (StringUtils.equals(
 											edmLabel.toString(), "edm_place")) {
 										if (lastPlace != null) {
-											places.add(lastPlace);
-										}
-										lastPlace = createNewEntity(
-												PlaceType.class, evt2
+											if (lastPlace.getAbout() != null) {
+												places.add(lastPlace);
+												lastPlace = createNewEntity(
+														PlaceType.class, evt2
+																.asCharacters()
+																.getData());
+											} else {
+												lastPlace.setAbout(evt2
 														.asCharacters()
 														.getData());
+											}
+										} else {
+											lastPlace = createNewEntity(
+													PlaceType.class, evt2
+															.asCharacters()
+															.getData());
+										}
 
-									}
+									} else {
 
-									if (StringUtils.startsWith(
-											edmLabel.toString(), "cc")) {
-										appendConceptValue(lastConcept,
-												edmLabel.toString(), evt2
-														.asCharacters()
-														.getData(), null, null,
-												iterations);
-									}
+										if (StringUtils.startsWith(
+												edmLabel.toString(), "cc")) {
+											appendConceptValue(
+													lastConcept == null ? new Concept()
+															: lastConcept,
+													edmLabel.toString(), evt2
+															.asCharacters()
+															.getData(), null,
+													null, iterations);
+										}
 
-									else if (StringUtils.startsWith(
-											edmLabel.toString(), "ts")) {
-										appendValue(TimeSpanType.class,
-												lastTimespan,
+										else if (StringUtils.startsWith(
+												edmLabel.toString(), "ts")) {
+											appendValue(
+													TimeSpanType.class,
+													lastTimespan == null ? new TimeSpanType()
+															: lastTimespan,
 
-												edmLabel.toString(), evt2
-														.asCharacters()
-														.getData(), null, null,
-												iterations);
-									} else if (StringUtils.startsWith(
-											edmLabel.toString(), "ag")) {
-										appendValue(AgentType.class, lastAgent,
-												edmLabel.toString(), evt2
-														.asCharacters()
-														.getData(), null, null,
-												iterations);
-									} else if (StringUtils.startsWith(
-											edmLabel.toString(), "pl")) {
-										appendValue(PlaceType.class, lastPlace,
-												edmLabel.toString(), evt2
-														.asCharacters()
-														.getData(), null, null,
-												iterations);
+													edmLabel.toString(), evt2
+															.asCharacters()
+															.getData(), null,
+													null, iterations);
+										} else if (StringUtils.startsWith(
+												edmLabel.toString(), "ag")) {
+											appendValue(
+													AgentType.class,
+													lastAgent == null ? new AgentType()
+															: lastAgent,
+													edmLabel.toString(), evt2
+															.asCharacters()
+															.getData(), null,
+													null, iterations);
+										} else if (StringUtils.startsWith(
+												edmLabel.toString(), "pl")) {
+											appendValue(
+													PlaceType.class,
+													lastPlace == null ? new PlaceType()
+															: lastPlace,
+													edmLabel.toString(), evt2
+															.asCharacters()
+															.getData(), null,
+													null, iterations);
+										}
 									}
 								}
 							}
@@ -417,43 +554,83 @@ public class OsgiExtractor extends Extractor {
 									if (StringUtils.equals(label.toString(),
 											"skos_concept")) {
 										if (lastConcept != null) {
-											concepts.add(lastConcept);
+											if (lastConcept.getAbout() != null) {
+												concepts.add(lastConcept);
+												lastConcept = createNewEntity(
+														Concept.class,
+														attr.getValue());
+											} else {
+												lastConcept.setAbout(attr
+														.getValue());
+											}
+										} else {
+											lastConcept = createNewEntity(
+													Concept.class,
+													attr.getValue());
 										}
+									}
 
-										lastConcept = createNewEntity(
-												Concept.class, attr.getValue());
-									} else
+									else
 
 									if (StringUtils.equals(label.toString(),
 											"edm_agent")) {
 										if (lastAgent != null) {
-											agents.add(lastAgent);
+											if (lastAgent.getAbout() != null) {
+												agents.add(lastAgent);
+												lastAgent = createNewEntity(
+														AgentType.class,
+														attr.getValue());
+											} else {
+												lastAgent.setAbout(attr
+														.getValue());
+											}
+										} else {
+											lastAgent = createNewEntity(
+													AgentType.class,
+													attr.getValue());
 										}
 
-										lastAgent = createNewEntity(
-												AgentType.class,
-												attr.getValue());
 									} else
 
 									if (StringUtils.equals(label.toString(),
 											"edm_timespan")) {
 										if (lastTimespan != null) {
-											timespans.add(lastTimespan);
+											if (lastTimespan.getAbout() != null) {
+												timespans.add(lastTimespan);
+												lastTimespan = createNewEntity(
+														TimeSpanType.class,
+														attr.getValue());
+											} else {
+												lastTimespan.setAbout(attr
+														.getValue());
+											}
+										} else {
+											lastTimespan = createNewEntity(
+													TimeSpanType.class,
+													attr.getValue());
 										}
 
-										lastTimespan = createNewEntity(
-												TimeSpanType.class,
-												attr.getValue());
 									} else
 
 									if (StringUtils.equals(label.toString(),
 											"edm_place")) {
 										if (lastPlace != null) {
-											places.add(lastPlace);
+											if (lastPlace.getAbout() != null) {
+												places.add(lastPlace);
+												lastPlace = createNewEntity(
+														PlaceType.class,
+														attr.getValue());
+											} else {
+												lastPlace.setAbout(attr
+														.getValue());
+											}
+
+										} else {
+											lastPlace = createNewEntity(
+													PlaceType.class,
+													attr.getValue());
 										}
-										lastPlace = createNewEntity(
-												PlaceType.class,
-												attr.getValue());
+
 									} else {
 										if (StringUtils.startsWith(
 												label.toString(), "cc")) {
@@ -465,7 +642,9 @@ public class OsgiExtractor extends Extractor {
 											}
 											String attrVal = attr.getValue();
 
-											appendConceptValue(lastConcept,
+											appendConceptValue(
+													lastConcept == null ? new Concept()
+															: lastConcept,
 													null, elem,
 													label.toString(), attrVal,
 													iterations);
@@ -481,8 +660,11 @@ public class OsgiExtractor extends Extractor {
 											}
 											String attrVal = attr.getValue();
 
-											appendValue(TimeSpanType.class,
-													lastTimespan, null, elem,
+											appendValue(
+													TimeSpanType.class,
+													lastTimespan == null ? new TimeSpanType()
+															: lastTimespan,
+													null, elem,
 													label.toString(), attrVal,
 													iterations);
 										} else if (StringUtils.startsWith(
@@ -495,10 +677,12 @@ public class OsgiExtractor extends Extractor {
 											}
 											String attrVal = attr.getValue();
 
-											appendValue(AgentType.class,
-													lastAgent, null, elem,
-													label.toString(), attrVal,
-													iterations);
+											appendValue(
+													AgentType.class,
+													lastAgent == null ? new AgentType()
+															: lastAgent, null,
+													elem, label.toString(),
+													attrVal, iterations);
 										} else if (StringUtils.startsWith(
 												label.toString(), "pl")) {
 											String elem = null;
@@ -509,10 +693,12 @@ public class OsgiExtractor extends Extractor {
 											}
 											String attrVal = attr.getValue();
 
-											appendValue(PlaceType.class,
-													lastPlace, null, elem,
-													label.toString(), attrVal,
-													iterations);
+											appendValue(
+													PlaceType.class,
+													lastPlace == null ? new PlaceType()
+															: lastPlace, null,
+													elem, label.toString(),
+													attrVal, iterations);
 										}
 									}
 								}
@@ -640,13 +826,15 @@ public class OsgiExtractor extends Extractor {
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
+
 		RdfMethod RDF = null;
+
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
 				RDF = rdfMethod;
 			}
 		}
-
+		
 		//
 		if (RDF.getMethodName().endsWith("List")) {
 
@@ -674,24 +862,30 @@ public class OsgiExtractor extends Extractor {
 				} else {
 					rs.setString(val);
 				}
-				if (edmAttr != null
-						&& StringUtils.equals(
+				if (edmAttr != null) {
+					if (StringUtils.split(edmAttr, "@").length > 1) {
+						if (StringUtils.equals(
 								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
-					Lang lang = new Lang();
-					lang.setLang(valAttr);
-					rs.setLang(lang);
+							Lang lang = new Lang();
+							lang.setLang(valAttr);
+							rs.setLang(lang);
+						}
+					}
 				}
 				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 			} else if (RDF.getClazz().getSuperclass()
 					.isAssignableFrom(LiteralType.class)) {
 				LiteralType rs = new LiteralType();
 				rs.setString(val);
-				if (edmAttr != null
-						&& StringUtils.equals(
+				if (edmAttr != null) {
+					if (StringUtils.split(edmAttr, "@").length > 1) {
+						if (StringUtils.equals(
 								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
-					LiteralType.Lang lang = new LiteralType.Lang();
-					lang.setLang(valAttr);
-					rs.setLang(lang);
+							LiteralType.Lang lang = new LiteralType.Lang();
+							lang.setLang(valAttr);
+							rs.setLang(lang);
+						}
+					}
 				}
 				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 			}
@@ -722,12 +916,15 @@ public class OsgiExtractor extends Extractor {
 				if (isURI(val)) {
 					denormalize(val, iterations - 1);
 				}
-				if (edmAttr != null
-						&& StringUtils.equals(
+				if (edmAttr != null) {
+					if (StringUtils.split(edmAttr, "@").length > 1) {
+						if (StringUtils.equals(
 								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
-					LiteralType.Lang lang = new LiteralType.Lang();
-					lang.setLang(valAttr);
-					rs.setLang(lang);
+							LiteralType.Lang lang = new LiteralType.Lang();
+							lang.setLang(valAttr);
+							rs.setLang(lang);
+						}
+					}
 				}
 				Class<?>[] cls = new Class<?>[1];
 				cls[0] = RDF.getClazz();
@@ -745,12 +942,15 @@ public class OsgiExtractor extends Extractor {
 				} else {
 					rs.setString(val);
 				}
-				if (edmAttr != null
-						&& StringUtils.equals(
+				if (edmAttr != null) {
+					if (StringUtils.split(edmAttr, "@").length > 1) {
+						if (StringUtils.equals(
 								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
-					Lang lang = new Lang();
-					lang.setLang(valAttr);
-					rs.setLang(lang);
+							Lang lang = new Lang();
+							lang.setLang(valAttr);
+							rs.setLang(lang);
+						}
+					}
 				}
 				Class<?>[] cls = new Class<?>[1];
 				cls[0] = clazz;
@@ -760,7 +960,6 @@ public class OsgiExtractor extends Extractor {
 				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 			}
 		}
-
 		//
 		return obj;
 	}
@@ -770,6 +969,7 @@ public class OsgiExtractor extends Extractor {
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
+
 		RdfMethod RDF = null;
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
@@ -807,12 +1007,15 @@ public class OsgiExtractor extends Extractor {
 			} else {
 				obj.setString(val);
 			}
-			if (edmAttr != null
-					&& StringUtils.equals(StringUtils.split(edmAttr, "@")[1],
+			if (edmAttr != null) {
+				if (StringUtils.split(edmAttr, "@").length > 1) {
+					if (StringUtils.equals(StringUtils.split(edmAttr, "@")[1],
 							"xml:lang")) {
-				Lang lang = new Lang();
-				lang.setLang(valAttr);
-				obj.setLang(lang);
+						Lang lang = new Lang();
+						lang.setLang(valAttr);
+						obj.setLang(lang);
+					}
+				}
 			}
 			Class<?>[] cls = new Class<?>[1];
 			cls[0] = RDF.getClazz();
@@ -832,9 +1035,14 @@ public class OsgiExtractor extends Extractor {
 				denormalize(val, iterations - 1);
 			}
 			if (edmAttr != null) {
-				LiteralType.Lang lang = new LiteralType.Lang();
-				lang.setLang(valAttr);
-				obj.setLang(lang);
+				if (StringUtils.split(edmAttr, "@").length > 1) {
+					if (StringUtils.equals(StringUtils.split(edmAttr, "@")[1],
+							"xml:lang")) {
+						LiteralType.Lang lang = new LiteralType.Lang();
+						lang.setLang(valAttr);
+						obj.setLang(lang);
+					}
+				}
 			}
 			Class<?>[] cls = new Class<?>[1];
 			cls[0] = RDF.getClazz();
@@ -943,13 +1151,12 @@ public class OsgiExtractor extends Extractor {
 	 * 
 	 * @return A list with all the stored controlled vocabularies
 	 */
-	
-	public List<ControlledVocabularyImpl> getControlledVocabularies(final Datastore datastore) {
-		
-		
-		return datastore.find(ControlledVocabularyImpl.class) != null ? datastore.find(ControlledVocabularyImpl.class).asList()
-				: null;
+
+	public List<ControlledVocabularyImpl> getControlledVocabularies(
+			final Datastore datastore) {
+
+		return datastore.find(ControlledVocabularyImpl.class) != null ? datastore
+				.find(ControlledVocabularyImpl.class).asList() : null;
 	}
-	
-	
+
 }

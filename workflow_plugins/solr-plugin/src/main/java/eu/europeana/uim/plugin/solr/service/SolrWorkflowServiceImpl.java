@@ -41,6 +41,7 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 					datastore.ensureIndexes();
 					}
 					extractor = OsgiExtractor.getInstance(datastore);
+					extractor.getControlledVocabularies();
 				} catch (NumberFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
