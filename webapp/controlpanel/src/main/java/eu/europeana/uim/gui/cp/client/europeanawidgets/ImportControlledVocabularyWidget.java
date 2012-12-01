@@ -368,7 +368,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		editVocabulary.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				importedVocabulary.setVocabulary(vocabulary.getName(), new AsyncCallback<Boolean>() {
+				importedVocabulary.setVocabulary(vocabulary.getName(), vocabulary.getUri(), new AsyncCallback<Boolean>() {
 					
 					@Override
 					public void onSuccess(Boolean result) {

@@ -19,5 +19,5 @@ public interface ImportVocabularyProxyAsync {
 	public void retrieveVocabularies(AsyncCallback<List<ControlledVocabularyDTO>> vocabularies);
 	public void retrieveEdmFields( AsyncCallback<List<EdmFieldDTO>> edmFields);
 	public void removeVocabulary(String vocabularyName, AsyncCallback<Boolean> result);
-	public void setVocabulary(String vocabularyName, AsyncCallback<Boolean> result);
+	public void setVocabulary(String vocabularyName, String vocabularyUri, AsyncCallback<Boolean> result);
 }

@@ -14,6 +14,7 @@ import com.mongodb.MongoException;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
+import eu.europeana.corelib.dereference.exceptions.VocabularyNotFoundException;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
@@ -184,9 +185,14 @@ public class ImportVocabularyProxyImpl extends
 	}
 
 	@Override
-	public boolean setVocabulary(String vocabularyName) {
-		controlledVocabulary = extractor.findVocabularyByName(vocabularyName);
-		return true;
+	public boolean setVocabulary(String vocabularyName, String vocabularyUri) {
+		try{
+			controlledVocabulary = extractor.findVocabularyByName(vocabularyName, vocabularyUri);
+			return true;
+		} catch (VocabularyNotFoundException e){
+			return false;
+		}
+		
 	}
 	
 }

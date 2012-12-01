@@ -58,5 +58,5 @@ public interface ImportVocabularyProxy extends RemoteService{
 	 */
 	public boolean removeVocabulary(String vocabularyName);
 	
-	public boolean setVocabulary(String vocabularyName);
+	public boolean setVocabulary(String vocabularyName, String vocabularyUri);
 }
