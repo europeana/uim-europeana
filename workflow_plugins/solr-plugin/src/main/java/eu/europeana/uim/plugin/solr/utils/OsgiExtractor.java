@@ -705,18 +705,19 @@ public class OsgiExtractor extends Extractor {
 							}
 						}
 					}
-				} else if (evt.isEndDocument()) {
-					if (lastConcept != null)
-						concepts.add(lastConcept);
-					if (lastAgent != null)
-						agents.add(lastAgent);
-					if (lastTimespan != null)
-						timespans.add(lastTimespan);
-					if (lastPlace != null)
-						places.add(lastPlace);
-				}
+				} 
+				
+				
 
 			}
+			if (lastConcept != null)
+				concepts.add(lastConcept);
+			if (lastAgent != null)
+				agents.add(lastAgent);
+			if (lastTimespan != null)
+				timespans.add(lastTimespan);
+			if (lastPlace != null)
+				places.add(lastPlace);
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
 		}
@@ -1133,6 +1134,7 @@ public class OsgiExtractor extends Extractor {
 			List<ControlledVocabularyImpl> vocabularies = datastore
 					.find(ControlledVocabularyImpl.class)
 					.filter(field, vocabularyName).asList();
+			vocabularies.addAll(datastore.find(ControlledVocabularyImpl.class).filter("replaceUrl", vocabularyName).asList());
 			for (ControlledVocabularyImpl vocabulary : vocabularies) {
 				for (String rule : vocabulary.getRules()) {
 					if (StringUtils.equals(rule, "*")

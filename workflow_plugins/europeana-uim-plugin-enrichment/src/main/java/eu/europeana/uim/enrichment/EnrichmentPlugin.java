@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -21,8 +22,12 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+
 import com.google.code.morphia.Morphia;
+import com.google.code.morphia.query.Query;
+import com.google.code.morphia.query.UpdateOperations;
 import com.mongodb.Mongo;
+
 import eu.annocultor.converters.europeana.Entity;
 import eu.annocultor.converters.europeana.Field;
 import eu.europeana.corelib.definitions.jibx.AgentType;
@@ -47,9 +52,14 @@ import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.Rights1;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
+import eu.europeana.corelib.definitions.solr.DocType;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.corelib.solr.entity.AgentImpl;
+import eu.europeana.corelib.solr.entity.ConceptImpl;
+import eu.europeana.corelib.solr.entity.PlaceImpl;
+import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
@@ -58,19 +68,18 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.corelib.tools.utils.HashUtils;
 import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
 import eu.europeana.corelib.tools.utils.SipCreatorUtils;
-import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
-import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
-import eu.europeana.uim.orchestration.ExecutionContext;
-import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
-import eu.europeana.uim.enrichment.utils.SuggestionField;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
+import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
+import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
+import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugar.SugarCrmRecord;
@@ -343,6 +352,10 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 
 				mongoServer.getDatastore().save(fullBean);
+			} else {
+				updateFullBean(fullBean);
+				
+				
 			}
 
 			int retries = 0;
@@ -396,6 +409,30 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 	}
 
 	
+
+	private void updateFullBean(FullBeanImpl fullBean) {
+		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
+				.createQuery(FullBeanImpl.class).field("about").equal(fullBean.getAbout());
+		UpdateOperations<FullBeanImpl> ops = mongoServer.getDatastore().createUpdateOperations(FullBeanImpl.class);
+		ops.set("title", fullBean.getTitle()!=null?fullBean.getTitle():new String[]{});
+		ops.set("year", fullBean.getYear()!=null?fullBean.getYear():new String[]{});
+		ops.set("provider", fullBean.getProvider()!=null?fullBean.getProvider():new String[]{});
+		ops.set("language", fullBean.getLanguage()!=null?fullBean.getLanguage():new String[]{});
+		ops.set("type", fullBean.getType()!=null?fullBean.getType():DocType.IMAGE);
+		ops.set("europeanaCompleteness",fullBean.getEuropeanaCompleteness());
+		ops.set("optOut",fullBean.isOptedOut());
+//		ops.set("places", fullBean.getPlaces()!=null?fullBean.getPlaces():new ArrayList<PlaceImpl>());
+//		ops.set("agents", fullBean.getAgents()!=null?fullBean.getAgents():new ArrayList<AgentImpl>());
+//		ops.set("timespans", fullBean.getTimespans()!=null?fullBean.getTimespans():new ArrayList<TimespanImpl>());
+//		ops.set("concepts", fullBean.getConcepts()!=null?fullBean.getConcepts():new ArrayList<ConceptImpl>());
+//		ops.set("aggregations", fullBean.getAggregations());
+//		ops.set("providedCHOs", fullBean.getProvidedCHOs());
+//		ops.set("europeanaAggregation", fullBean.getEuropeanaAggregation());
+//		ops.set("proxies",fullBean.getProxies());
+		ops.set("country", fullBean.getCountry()!=null?fullBean.getCountry():new String[]{});
+		ops.set("europeanaCollectionName", fullBean.getEuropeanaCollectionName());
+		mongoServer.getDatastore().update(updateQuery, ops);
+	}
 
 	private void mergeEntities(RDF rdf, List<Entity> entities)
 			throws SecurityException, IllegalArgumentException,
@@ -598,7 +635,7 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			rdfFinal.setAgentList(agents);
 		}
 		if (rdf.getConceptList() != null) {
-			for (Concept newConcept : rdf.getConceptList())
+			for (Concept newConcept : rdf.getConceptList()){
 				for (Concept concept : concepts) {
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
@@ -607,7 +644,8 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 							concepts.remove(concept);
 						}
 					}
-
+					
+				}
 					concepts.add(newConcept);
 				}
 			rdfFinal.setConceptList(concepts);

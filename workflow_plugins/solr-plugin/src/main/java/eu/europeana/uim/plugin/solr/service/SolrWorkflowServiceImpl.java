@@ -16,49 +16,64 @@ import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 	private static OsgiExtractor extractor;
 	private static Datastore datastore;
+
 	@Override
 	public OsgiExtractor getExtractor() {
-		
-		
-		BlockingInitializer initializer = new BlockingInitializer() {
-			
+
+		BlockingInitializer datastoreInitializer = new BlockingInitializer() {
+
 			@Override
 			protected void initializeInternal() {
 				Morphia morphia = new Morphia();
 				morphia.map(ControlledVocabularyImpl.class);
-				
-				try {
-					if(datastore==null){
-					datastore = morphia
-							.createDatastore(
-									new Mongo(
-											PropertyReader
-													.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-											Integer.parseInt(PropertyReader
-													.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-									PropertyReader
-											.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
-					datastore.ensureIndexes();
+				if (datastore == null) {
+					try {
+						datastore = morphia
+								.createDatastore(
+										new Mongo(
+												PropertyReader
+														.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+												Integer.parseInt(PropertyReader
+														.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
+										PropertyReader
+												.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (MongoException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-					extractor = OsgiExtractor.getInstance(datastore);
-					extractor.getControlledVocabularies();
-				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (MongoException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					datastore.ensureIndexes();
 				}
-				
-				
+
+			}
+		};
+		datastoreInitializer.initialize(Datastore.class.getClassLoader());
+		BlockingInitializer initializer = new BlockingInitializer() {
+
+			@Override
+			protected void initializeInternal() {
+				extractor = OsgiExtractor.getInstance(datastore);
 			}
 		};
 		initializer.initialize(OsgiExtractor.class.getClassLoader());
+		BlockingInitializer vocInitializer = new BlockingInitializer() {
+
+			@Override
+			protected void initializeInternal() {
+				// TODO Auto-generated method stub
+				extractor.getControlledVocabularies(datastore);
+			}
+		};
+		vocInitializer.initialize(ControlledVocabularyImpl.class
+				.getClassLoader());
 		return extractor;
 	}
+
 	@Override
 	public Datastore getDatastore() {
 		return datastore;
