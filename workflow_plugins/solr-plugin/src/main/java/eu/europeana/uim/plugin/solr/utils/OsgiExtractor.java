@@ -51,21 +51,21 @@ import eu.europeana.uim.common.BlockingInitializer;
 
 public class OsgiExtractor extends Extractor {
 
-	private static OsgiExtractor extractor;
+	// private static OsgiExtractor extractor;
 
-	private OsgiExtractor() {
-
+	public OsgiExtractor() {
+		memCache = MemCache.getInstance();
 	}
 
-	public static OsgiExtractor getInstance(final Datastore datastore) {
-
-		if (extractor == null) {
-			extractor = new OsgiExtractor();
-			memCache = new HashMap<String, EntityImpl>();
-
-		}
-		return extractor;
-	}
+	// public static OsgiExtractor getInstance(final Datastore datastore) {
+	//
+	// if (extractor == null) {
+	// extractor = new OsgiExtractor();
+	//
+	//
+	// }
+	// return extractor;
+	// }
 
 	public List<EdmLabel> getEdmLabel(String field) {
 
@@ -77,7 +77,7 @@ public class OsgiExtractor extends Extractor {
 		return new ArrayList<EdmLabel>();
 	}
 
-	private static Map<String, EntityImpl> memCache;
+	private static MemCache memCache;
 	private ControlledVocabularyImpl vocabulary;
 	private Datastore datastore;
 	private final static long UPDATETIMESTAMP = 5184000000l;
@@ -96,22 +96,26 @@ public class OsgiExtractor extends Extractor {
 					.getSuffix() : "";
 			int iters = iterFromVocabulary ? controlledVocabulary
 					.getIterations() : iterations;
+			if (resource + suffix != null) {
+				String fullUri = resource+suffix;
+				if(!fullUri.contains("/.")){
+				EntityImpl entity = retrieveValueFromResource(fullUri);
 
-			EntityImpl entity = retrieveValueFromResource(resource + suffix != null ? resource
-					+ suffix
-					: "");
+				if (entity != null && entity.getContent().length() > 0) {
 
-			if (entity != null && entity.getContent().length() > 0) {
-				memCache.put(entity.getUri(), entity);
-				return createDereferencingMap(entity.getContent(), iterations);
+					memCache.getMemcache().put(entity.getUri(), entity);
+					return createDereferencingMap(entity.getContent(),
+							iterations);
+				}
+				}
 			}
-
 		}
+
 		return new HashMap<String, List>();
 	}
 
 	public Map<String, EntityImpl> getMemCache() {
-		return memCache;
+		return memCache.getMemcache();
 	}
 
 	private Map<String, List> createDereferencingMap(String xmlString,
@@ -163,7 +167,7 @@ public class OsgiExtractor extends Extractor {
 											elem = xml.nextEvent()
 													.asCharacters().getData();
 										}
-										
+
 										if (StringUtils.equals(
 												label.toString(),
 												"skos_concept")) {
@@ -244,8 +248,8 @@ public class OsgiExtractor extends Extractor {
 												appendConceptValue(
 														lastConcept == null ? new Concept()
 																: lastConcept,
+														label.toString(), elem,
 														label.toString(),
-														elem, label.toString(),
 														attrVal, iterations);
 											}
 
@@ -256,8 +260,8 @@ public class OsgiExtractor extends Extractor {
 														TimeSpanType.class,
 														lastTimespan == null ? new TimeSpanType()
 																: lastTimespan,
+														label.toString(), elem,
 														label.toString(),
-														elem, label.toString(),
 														attrVal, iterations);
 											} else if (StringUtils.startsWith(
 													label.toString(), "ag")) {
@@ -266,8 +270,8 @@ public class OsgiExtractor extends Extractor {
 														AgentType.class,
 														lastAgent == null ? new AgentType()
 																: lastAgent,
+														label.toString(), elem,
 														label.toString(),
-														elem, label.toString(),
 														attrVal, iterations);
 											} else if (StringUtils.startsWith(
 													label.toString(), "pl")) {
@@ -276,8 +280,8 @@ public class OsgiExtractor extends Extractor {
 														PlaceType.class,
 														lastPlace == null ? new PlaceType()
 																: lastPlace,
+														label.toString(), elem,
 														label.toString(),
-														elem, label.toString(),
 														attrVal, iterations);
 											}
 										}
@@ -705,9 +709,7 @@ public class OsgiExtractor extends Extractor {
 							}
 						}
 					}
-				} 
-				
-				
+				}
 
 			}
 			if (lastConcept != null)
@@ -749,11 +751,12 @@ public class OsgiExtractor extends Extractor {
 
 	private EntityImpl retrieveValueFromResource(String resource) {
 		EntityImpl entity;
-		if (memCache.containsKey(resource)) {
-			return memCache.get(resource);
+		if (memCache.getMemcache().containsKey(resource)) {
+			return memCache.getMemcache().get(resource);
 		} else {
 			entity = datastore.find(EntityImpl.class).filter("uri", resource)
 					.get();
+
 		}
 		if (entity == null) {
 			String val = retrieveValue(resource);
@@ -835,7 +838,7 @@ public class OsgiExtractor extends Extractor {
 				RDF = rdfMethod;
 			}
 		}
-		
+
 		//
 		if (RDF.getMethodName().endsWith("List")) {
 
@@ -1134,7 +1137,8 @@ public class OsgiExtractor extends Extractor {
 			List<ControlledVocabularyImpl> vocabularies = datastore
 					.find(ControlledVocabularyImpl.class)
 					.filter(field, vocabularyName).asList();
-			vocabularies.addAll(datastore.find(ControlledVocabularyImpl.class).filter("replaceUrl", vocabularyName).asList());
+			vocabularies.addAll(datastore.find(ControlledVocabularyImpl.class)
+					.filter("replaceUrl", vocabularyName).asList());
 			for (ControlledVocabularyImpl vocabulary : vocabularies) {
 				for (String rule : vocabulary.getRules()) {
 					if (StringUtils.equals(rule, "*")

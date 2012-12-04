@@ -57,7 +57,8 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 
 			@Override
 			protected void initializeInternal() {
-				extractor = OsgiExtractor.getInstance(datastore);
+				extractor = new OsgiExtractor();
+				extractor.setDatastore(datastore);
 			}
 		};
 		initializer.initialize(OsgiExtractor.class.getClassLoader());
