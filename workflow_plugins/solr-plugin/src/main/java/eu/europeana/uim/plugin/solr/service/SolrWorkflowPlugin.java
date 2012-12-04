@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,13 +142,14 @@ public class SolrWorkflowPlugin<I> extends
 					vocMemCache.put(voc.getURI(), vocsInMap);
 				}
 			}
+			
 			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
 					0);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			RDF rdfCopy = (RDF) uctx.unmarshalDocument(new StringReader(value));
-
+			long start = new Date().getTime();
 			if (rdf.getAgentList() != null) {
 				for (AgentType agent : rdf.getAgentList()) {
 					dereferenceAgent(rdfCopy, datastore, agent);
@@ -158,27 +160,29 @@ public class SolrWorkflowPlugin<I> extends
 					dereferenceConcept(rdfCopy, datastore, concept);
 				}
 			}
-			for (Aggregation aggregation : rdf.getAggregationList()) {
-				dereferenceAggregation(rdfCopy, datastore, aggregation);
-			}
-			if (rdf.getEuropeanaAggregationList() != null) {
-				for (EuropeanaAggregationType euaggregation : rdf
-						.getEuropeanaAggregationList()) {
-					dereferenceEuropeanaAggregation(rdfCopy, datastore,
-							euaggregation);
-				}
-			}
+//			for (Aggregation aggregation : rdf.getAggregationList()) {
+//				dereferenceAggregation(rdfCopy, datastore, aggregation);
+//			}
+//			if (rdf.getEuropeanaAggregationList() != null) {
+//				for (EuropeanaAggregationType euaggregation : rdf
+//						.getEuropeanaAggregationList()) {
+//					dereferenceEuropeanaAggregation(rdfCopy, datastore,
+//							euaggregation);
+//				}
+//			}
 			if (rdf.getPlaceList() != null) {
 				for (PlaceType place : rdf.getPlaceList()) {
 					dereferencePlace(rdfCopy, datastore, place);
 				}
 			}
 
-			for (ProvidedCHOType place : rdf.getProvidedCHOList()) {
-				dereferenceProvidedCHO(rdfCopy, datastore, place);
-			}
+//			for (ProvidedCHOType place : rdf.getProvidedCHOList()) {
+//				dereferenceProvidedCHO(rdfCopy, datastore, place);
+//			}
 			for (ProxyType proxy : rdf.getProxyList()) {
-				dereferenceProxy(rdfCopy, datastore, proxy);
+				if(proxy.getEuropeanaProxy()==null||!proxy.getEuropeanaProxy().isEuropeanaProxy()){
+						dereferenceProxy(rdfCopy, datastore, proxy);
+				}
 			}
 
 			if (rdf.getTimeSpanList() != null) {
@@ -191,6 +195,7 @@ public class SolrWorkflowPlugin<I> extends
 					dereferenceWebResource(rdfCopy, datastore, webresource);
 				}
 			}
+			System.out.println("dereferencing took " + (new Date().getTime()-start) + " ms");
 			IBindingFactory bfact2 = BindingDirectory.getFactory(RDF.class);
 			IMarshallingContext marshallingContext = bfact2
 					.createMarshallingContext();
@@ -361,23 +366,23 @@ public class SolrWorkflowPlugin<I> extends
 			IOException, SecurityException, IllegalArgumentException,
 			InstantiationException, IllegalAccessException,
 			NoSuchMethodException, InvocationTargetException {
-		derefResourceOrLiteralList(rdf, datastore,
-				webResource.getConformsToList());
+//		derefResourceOrLiteralList(rdf, datastore,
+//				webResource.getConformsToList());
 		derefResourceOrLiteralList(rdf, datastore, webResource.getCreatedList());
-		derefResourceOrLiteralList(rdf, datastore,
-				webResource.getDescriptionList());
+//		derefResourceOrLiteralList(rdf, datastore,
+//				webResource.getDescriptionList());
 		derefResourceOrLiteralList(rdf, datastore, webResource.getExtentList());
 		derefResourceOrLiteralList(rdf, datastore, webResource.getFormatList());
 		derefResourceOrLiteralList(rdf, datastore, webResource.getHasPartList());
 		derefResourceOrLiteralList(rdf, datastore,
 				webResource.getIsFormatOfList());
 		derefResourceOrLiteralList(rdf, datastore, webResource.getIssuedList());
-		derefResourceOrLiteralList(rdf, datastore, webResource.getRightList());
-		derefResourceOrLiteralList(rdf, datastore, webResource.getSourceList());
-		derefResourceOrLiteral(rdf, datastore,
-				webResource.getIsNextInSequence());
-		derefResourceOrLiteral(rdf, datastore, webResource.getRights());
-		derefResourceOrLiteral(rdf, datastore, webResource.getAbout());
+//		derefResourceOrLiteralList(rdf, datastore, webResource.getRightList());
+//		derefResourceOrLiteralList(rdf, datastore, webResource.getSourceList());
+//		derefResourceOrLiteral(rdf, datastore,
+//				webResource.getIsNextInSequence());
+//		derefResourceOrLiteral(rdf, datastore, webResource.getRights());
+//		derefResourceOrLiteral(rdf, datastore, webResource.getAbout());
 	}
 
 	private void dereferenceTimespan(RDF rdf, Datastore datastore,
@@ -385,11 +390,11 @@ public class SolrWorkflowPlugin<I> extends
 			SecurityException, IllegalArgumentException,
 			InstantiationException, IllegalAccessException,
 			NoSuchMethodException, InvocationTargetException {
-		derefResourceOrLiteralList(rdf, datastore, timeSpan.getAltLabelList());
-		derefResourceOrLiteralList(rdf, datastore, timeSpan.getPrefLabelList());
+//		derefResourceOrLiteralList(rdf, datastore, timeSpan.getAltLabelList());
+//		derefResourceOrLiteralList(rdf, datastore, timeSpan.getPrefLabelList());
 		derefResourceOrLiteralList(rdf, datastore, timeSpan.getHasPartList());
 		derefResourceOrLiteralList(rdf, datastore, timeSpan.getIsPartOfList());
-		derefResourceOrLiteralList(rdf, datastore, timeSpan.getNoteList());
+//		derefResourceOrLiteralList(rdf, datastore, timeSpan.getNoteList());
 		derefResourceOrLiteralList(rdf, datastore, timeSpan.getSameAList());
 		derefResourceOrLiteral(rdf, datastore, timeSpan.getAbout());
 		derefResourceOrLiteral(rdf, datastore, timeSpan.getBegin());
@@ -409,24 +414,24 @@ public class SolrWorkflowPlugin<I> extends
 		derefResourceOrLiteralList(rdf, datastore, proxy.getIsRelatedToList());
 		derefResourceOrLiteralList(rdf, datastore, proxy.getIsSimilarToList());
 		derefResourceOrLiteralList(rdf, datastore, proxy.getIsSuccessorOfList());
-		derefResourceOrLiteralList(rdf, datastore, proxy.getProxyInList());
+//		derefResourceOrLiteralList(rdf, datastore, proxy.getProxyInList());
 		derefResourceOrLiteralList(rdf, datastore, proxy.getRealizeList());
-		derefResourceOrLiteralList(rdf, datastore, proxy.getUserTagList());
+//		derefResourceOrLiteralList(rdf, datastore, proxy.getUserTagList());
 		derefResourceOrLiteralList(rdf, datastore, proxy.getYearList());
-		derefResourceOrLiteral(rdf, datastore, proxy.getAbout());
+//		derefResourceOrLiteral(rdf, datastore, proxy.getAbout());
 		derefResourceOrLiteral(rdf, datastore, proxy.getCurrentLocation());
-		derefResourceOrLiteral(rdf, datastore, proxy.getProxyFor());
-		derefResourceOrLiteral(rdf, datastore, proxy.getType());
+//		derefResourceOrLiteral(rdf, datastore, proxy.getProxyFor());
+//		derefResourceOrLiteral(rdf, datastore, proxy.getType());
 		List<eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice> choices = proxy
 				.getChoiceList();
 		if (choices != null) {
 			for (eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice choice : choices) {
-				if (choice.ifAlternative())
-					derefResourceOrLiteral(rdf, datastore,
-							choice.getAlternative());
-				if (choice.ifConformsTo())
-					derefResourceOrLiteral(rdf, datastore,
-							choice.getConformsTo());
+//				if (choice.ifAlternative())
+//					derefResourceOrLiteral(rdf, datastore,
+//							choice.getAlternative());
+//				if (choice.ifConformsTo())
+//					derefResourceOrLiteral(rdf, datastore,
+//							choice.getConformsTo());
 				if (choice.ifContributor())
 					derefResourceOrLiteral(rdf, datastore,
 							choice.getContributor());
@@ -438,9 +443,9 @@ public class SolrWorkflowPlugin<I> extends
 					derefResourceOrLiteral(rdf, datastore, choice.getCreator());
 				if (choice.ifDate())
 					derefResourceOrLiteral(rdf, datastore, choice.getDate());
-				if (choice.ifDescription())
-					derefResourceOrLiteral(rdf, datastore,
-							choice.getDescription());
+//				if (choice.ifDescription())
+//					derefResourceOrLiteral(rdf, datastore,
+//							choice.getDescription());
 				if (choice.ifExtent())
 					derefResourceOrLiteral(rdf, datastore, choice.getExtent());
 				if (choice.ifFormat())
@@ -479,9 +484,9 @@ public class SolrWorkflowPlugin<I> extends
 					derefResourceOrLiteral(rdf, datastore, choice.getLanguage());
 				if (choice.ifMedium())
 					derefResourceOrLiteral(rdf, datastore, choice.getMedium());
-				if (choice.ifProvenance())
-					derefResourceOrLiteral(rdf, datastore,
-							choice.getProvenance());
+//				if (choice.ifProvenance())
+//					derefResourceOrLiteral(rdf, datastore,
+//							choice.getProvenance());
 				if (choice.ifPublisher())
 					derefResourceOrLiteral(rdf, datastore,
 							choice.getPublisher());
@@ -492,17 +497,17 @@ public class SolrWorkflowPlugin<I> extends
 					derefResourceOrLiteral(rdf, datastore, choice.getRelation());
 				if (choice.ifReplaces())
 					derefResourceOrLiteral(rdf, datastore, choice.getReplaces());
-				if (choice.ifRights())
-					derefResourceOrLiteral(rdf, datastore, choice.getRights());
+//				if (choice.ifRights())
+//					derefResourceOrLiteral(rdf, datastore, choice.getRights());
 				if (choice.ifSource())
 					derefResourceOrLiteral(rdf, datastore, choice.getSource());
 				if (choice.ifSpatial())
 					derefResourceOrLiteral(rdf, datastore, choice.getSpatial());
 				if (choice.ifSubject())
 					derefResourceOrLiteral(rdf, datastore, choice.getSubject());
-				if (choice.ifTableOfContents())
-					derefResourceOrLiteral(rdf, datastore,
-							choice.getTableOfContents());
+//				if (choice.ifTableOfContents())
+//					derefResourceOrLiteral(rdf, datastore,
+//							choice.getTableOfContents());
 				if (choice.ifTemporal())
 					derefResourceOrLiteral(rdf, datastore, choice.getTemporal());
 				if (choice.ifTitle())
@@ -513,14 +518,14 @@ public class SolrWorkflowPlugin<I> extends
 		}
 	}
 
-	private void dereferenceProvidedCHO(RDF rdf, Datastore datastore,
-			ProvidedCHOType providedCHO) throws MalformedURLException,
-			IOException, SecurityException, IllegalArgumentException,
-			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
-		derefResourceOrLiteral(rdf, datastore, providedCHO.getAbout());
-		derefResourceOrLiteralList(rdf, datastore, providedCHO.getSameAList());
-	}
+//	private void dereferenceProvidedCHO(RDF rdf, Datastore datastore,
+//			ProvidedCHOType providedCHO) throws MalformedURLException,
+//			IOException, SecurityException, IllegalArgumentException,
+//			InstantiationException, IllegalAccessException,
+//			NoSuchMethodException, InvocationTargetException {
+//		derefResourceOrLiteral(rdf, datastore, providedCHO.getAbout());
+//		derefResourceOrLiteralList(rdf, datastore, providedCHO.getSameAList());
+//	}
 
 	private void dereferencePlace(RDF rdf, Datastore datastore, PlaceType place)
 			throws MalformedURLException, IOException, SecurityException,
@@ -528,14 +533,15 @@ public class SolrWorkflowPlugin<I> extends
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
 		derefResourceOrLiteral(rdf, datastore, place.getAbout());
-		derefResourceOrLiteral(rdf, datastore, place.getAlt());
-		derefResourceOrLiteral(rdf, datastore, place.getLat());
-		derefResourceOrLiteral(rdf, datastore, place.getLong());
-		derefResourceOrLiteralList(rdf, datastore, place.getAltLabelList());
-		derefResourceOrLiteralList(rdf, datastore, place.getPrefLabelList());
+//		derefResourceOrLiteral(rdf, datastore, place.getAlt());
+//		derefResourceOrLiteral(rdf, datastore, place.getLat());
+//		derefResourceOrLiteral(rdf, datastore, place.getLong());
+//		derefResourceOrLiteralList(rdf, datastore, place.getAltLabelList());
+//		derefResourceOrLiteralList(rdf, datastore, place.getPrefLabelList());
 		derefResourceOrLiteralList(rdf, datastore, place.getIsPartOfList());
-		derefResourceOrLiteralList(rdf, datastore, place.getNoteList());
+//		derefResourceOrLiteralList(rdf, datastore, place.getNoteList());
 		derefResourceOrLiteralList(rdf, datastore, place.getSameAList());
+		derefResourceOrLiteralList(rdf, datastore, place.getHasPartList());
 	}
 
 	private void dereferenceConcept(RDF rdf, Datastore datastore,
@@ -546,10 +552,10 @@ public class SolrWorkflowPlugin<I> extends
 		derefResourceOrLiteral(rdf, datastore, concept.getAbout());
 		for (eu.europeana.corelib.definitions.jibx.Concept.Choice choice : concept
 				.getChoiceList()) {
-			if (choice.ifAltLabel())
-				derefResourceOrLiteral(rdf, datastore, choice.getAltLabel());
-			if (choice.ifPrefLabel())
-				derefResourceOrLiteral(rdf, datastore, choice.getPrefLabel());
+//			if (choice.ifAltLabel())
+//				derefResourceOrLiteral(rdf, datastore, choice.getAltLabel());
+//			if (choice.ifPrefLabel())
+//				derefResourceOrLiteral(rdf, datastore, choice.getPrefLabel());
 			if (choice.ifBroader())
 				derefResourceOrLiteral(rdf, datastore, choice.getBroader());
 			if (choice.ifBroadMatch())
@@ -562,10 +568,10 @@ public class SolrWorkflowPlugin<I> extends
 				derefResourceOrLiteral(rdf, datastore, choice.getNarrower());
 			if (choice.ifNarrowMatch())
 				derefResourceOrLiteral(rdf, datastore, choice.getNarrowMatch());
-			if (choice.ifNote())
-				derefResourceOrLiteral(rdf, datastore, choice.getNote());
-			if (choice.ifNotation())
-				derefResourceOrLiteral(rdf, datastore, choice.getNotation());
+//			if (choice.ifNote())
+//				derefResourceOrLiteral(rdf, datastore, choice.getNote());
+//			if (choice.ifNotation())
+//				derefResourceOrLiteral(rdf, datastore, choice.getNotation());
 			if (choice.ifRelated())
 				derefResourceOrLiteral(rdf, datastore, choice.getRelated());
 			if (choice.ifRelatedMatch())
@@ -573,41 +579,41 @@ public class SolrWorkflowPlugin<I> extends
 		}
 	}
 
-	private void dereferenceEuropeanaAggregation(RDF rdf, Datastore datastore,
-			EuropeanaAggregationType aggregation) throws MalformedURLException,
-			IOException, SecurityException, IllegalArgumentException,
-			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
-		derefResourceOrLiteral(rdf, datastore, aggregation.getAbout());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getAggregatedCHO());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getCountry());
-		derefResourceOrLiteralList(rdf, datastore, aggregation.getHasViewList());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getCreator());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownBy());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getLandingPage());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getLanguage());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getRights());
-		derefResourceOrLiteralList(rdf, datastore,
-				aggregation.getAggregateList());
-	}
+//	private void dereferenceEuropeanaAggregation(RDF rdf, Datastore datastore,
+//			EuropeanaAggregationType aggregation) throws MalformedURLException,
+//			IOException, SecurityException, IllegalArgumentException,
+//			InstantiationException, IllegalAccessException,
+//			NoSuchMethodException, InvocationTargetException {
+//		derefResourceOrLiteral(rdf, datastore, aggregation.getAbout());
+//		derefResourceOrLiteral(rdf, datastore, aggregation.getAggregatedCHO());
+//		derefResourceOrLiteral(rdf, datastore, aggregation.getCountry());
+//		derefResourceOrLiteralList(rdf, datastore, aggregation.getHasViewList());
+//		derefResourceOrLiteral(rdf, datastore, aggregation.getCreator());
+//		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownBy());
+//		derefResourceOrLiteral(rdf, datastore, aggregation.getLandingPage());
+//		derefResourceOrLiteral(rdf, datastore, aggregation.getLanguage());
+//		derefResourceOrLiteral(rdf, datastore, aggregation.getRights());
+//		derefResourceOrLiteralList(rdf, datastore,
+//				aggregation.getAggregateList());
+//	}
 
-	private void dereferenceAggregation(RDF rdf, Datastore datastore,
-			Aggregation aggregation) throws MalformedURLException, IOException,
-			SecurityException, IllegalArgumentException,
-			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
-		derefResourceOrLiteral(rdf, datastore, aggregation.getAbout());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getAggregatedCHO());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getDataProvider());
-		derefResourceOrLiteralList(rdf, datastore, aggregation.getHasViewList());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownAt());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownBy());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getObject());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getProvider());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getRights());
-		derefResourceOrLiteral(rdf, datastore, aggregation.getUgc());
-		derefResourceOrLiteralList(rdf, datastore, aggregation.getRightList());
-	}
+//	private void dereferenceAggregation(RDF rdf, Datastore datastore,
+//			Aggregation aggregation) throws MalformedURLException, IOException,
+//			SecurityException, IllegalArgumentException,
+//			InstantiationException, IllegalAccessException,
+//			NoSuchMethodException, InvocationTargetException {
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getAbout());
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getAggregatedCHO());
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getDataProvider());
+////		derefResourceOrLiteralList(rdf, datastore, aggregation.getHasViewList());
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownAt());
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getIsShownBy());
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getObject());
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getProvider());
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getRights());
+////		derefResourceOrLiteral(rdf, datastore, aggregation.getUgc());
+//		derefResourceOrLiteralList(rdf, datastore, aggregation.getRightList());
+//	}
 
 	private void dereferenceAgent(RDF rdf, Datastore datastore, AgentType agent)
 			throws MalformedURLException, IOException, SecurityException,
@@ -615,24 +621,24 @@ public class SolrWorkflowPlugin<I> extends
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
 		derefResourceOrLiteral(rdf, datastore, agent.getAbout());
-		derefResourceOrLiteralList(rdf, datastore, agent.getAltLabelList());
-		derefResourceOrLiteralList(rdf, datastore, agent.getDateList());
+//		derefResourceOrLiteralList(rdf, datastore, agent.getAltLabelList());
+//		derefResourceOrLiteralList(rdf, datastore, agent.getDateList());
 		derefResourceOrLiteralList(rdf, datastore, agent.getHasMetList());
-		derefResourceOrLiteralList(rdf, datastore, agent.getIdentifierList());
+//		derefResourceOrLiteralList(rdf, datastore, agent.getIdentifierList());
 		derefResourceOrLiteralList(rdf, datastore, agent.getIsRelatedToList());
-		derefResourceOrLiteralList(rdf, datastore, agent.getNameList());
-		derefResourceOrLiteralList(rdf, datastore, agent.getNoteList());
-		derefResourceOrLiteralList(rdf, datastore, agent.getPrefLabelList());
-		derefResourceOrLiteralList(rdf, datastore, agent.getSameAList());
-		derefResourceOrLiteral(rdf, datastore, agent.getBegin());
-		derefResourceOrLiteral(rdf, datastore, agent.getEnd());
-		derefResourceOrLiteral(rdf, datastore,
-				agent.getBiographicalInformation());
-		derefResourceOrLiteral(rdf, datastore, agent.getDateOfBirth());
-		derefResourceOrLiteral(rdf, datastore, agent.getDateOfDeath());
-		derefResourceOrLiteral(rdf, datastore, agent.getDateOfEstablishment());
-		derefResourceOrLiteral(rdf, datastore, agent.getDateOfTermination());
-		derefResourceOrLiteral(rdf, datastore, agent.getGender());
+//		derefResourceOrLiteralList(rdf, datastore, agent.getNameList());
+//		derefResourceOrLiteralList(rdf, datastore, agent.getNoteList());
+//		derefResourceOrLiteralList(rdf, datastore, agent.getPrefLabelList());
+//		derefResourceOrLiteralList(rdf, datastore, agent.getSameAList());
+//		derefResourceOrLiteral(rdf, datastore, agent.getBegin());
+//		derefResourceOrLiteral(rdf, datastore, agent.getEnd());
+//		derefResourceOrLiteral(rdf, datastore,
+//				agent.getBiographicalInformation());
+//		derefResourceOrLiteral(rdf, datastore, agent.getDateOfBirth());
+//		derefResourceOrLiteral(rdf, datastore, agent.getDateOfDeath());
+//		derefResourceOrLiteral(rdf, datastore, agent.getDateOfEstablishment());
+//		derefResourceOrLiteral(rdf, datastore, agent.getDateOfTermination());
+//		derefResourceOrLiteral(rdf, datastore, agent.getGender());
 	}
 
 	private void derefResourceOrLiteralList(RDF rdf, Datastore datastore,
@@ -852,7 +858,7 @@ public class SolrWorkflowPlugin<I> extends
 	 */
 	@Override
 	public int getPreferredThreadCount() {
-		return 3;
+		return 12;
 	}
 
 	/*
@@ -862,7 +868,7 @@ public class SolrWorkflowPlugin<I> extends
 	 */
 	@Override
 	public int getMaximumThreadCount() {
-		return 5;
+		return 15;
 	}
 
 	/*

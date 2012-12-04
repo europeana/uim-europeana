@@ -1,14 +1,13 @@
 package eu.europeana.uim.plugin.solr.utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import eu.europeana.corelib.dereference.impl.EntityImpl;
 
 public class MemCache {
 
-	private static Map<String,EntityImpl> memcache;
 	private static MemCache mCache;
+	private static Map<String,Map<String,List>> entityCache;
 	private MemCache(){
 		
 	}
@@ -16,18 +15,20 @@ public class MemCache {
 	public static MemCache getInstance(){
 		if(mCache == null){
 			mCache = new MemCache();
-			memcache = new HashMap<String,EntityImpl>();
+			entityCache = new HashMap<String,Map<String,List>>();
 			
 		}
 		return mCache;
 	}
 
-	public  Map<String, EntityImpl> getMemcache() {
-		return memcache;
+	
+
+	public  Map<String, Map<String,List>> getEntityCache() {
+		return entityCache;
 	}
 
-	public  void setMemcache(Map<String, EntityImpl> memcache) {
-		MemCache.memcache = memcache;
+	public void setEntityCache(Map<String, Map<String,List>> entityCache) {
+		MemCache.entityCache = entityCache;
 	}
 	
 	

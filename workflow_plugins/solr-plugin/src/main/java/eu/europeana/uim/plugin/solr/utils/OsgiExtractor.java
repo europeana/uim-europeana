@@ -97,16 +97,22 @@ public class OsgiExtractor extends Extractor {
 			int iters = iterFromVocabulary ? controlledVocabulary
 					.getIterations() : iterations;
 			if (resource + suffix != null) {
-				String fullUri = resource+suffix;
-				if(!fullUri.contains("/.")){
-				EntityImpl entity = retrieveValueFromResource(fullUri);
+				String fullUri = resource + suffix;
+				if (!fullUri.contains("/.")) {
+					Map<String, List> retMap = retrieveMapFromCache(fullUri);
+					if (retMap != null) {
+						return retMap;
+					}
+					EntityImpl entity = retrieveValueFromResource(fullUri);
 
-				if (entity != null && entity.getContent().length() > 0) {
+					if (entity != null && entity.getContent().length() > 0) {
 
-					memCache.getMemcache().put(entity.getUri(), entity);
-					return createDereferencingMap(entity.getContent(),
-							iterations);
-				}
+						Map<String, List> entityCache = createDereferencingMap(
+								entity.getContent(), iterations);
+						memCache.getEntityCache().put(entity.getUri(),
+								entityCache);
+						return entityCache;
+					}
 				}
 			}
 		}
@@ -114,8 +120,8 @@ public class OsgiExtractor extends Extractor {
 		return new HashMap<String, List>();
 	}
 
-	public Map<String, EntityImpl> getMemCache() {
-		return memCache.getMemcache();
+	private Map<String, List> retrieveMapFromCache(String fullUri) {
+		return memCache.getEntityCache().containsKey(fullUri)?memCache.getEntityCache().get(fullUri):null;
 	}
 
 	private Map<String, List> createDereferencingMap(String xmlString,
@@ -728,6 +734,7 @@ public class OsgiExtractor extends Extractor {
 		denormalizedValues.put("agents", agents);
 		denormalizedValues.put("timespans", timespans);
 		denormalizedValues.put("places", places);
+
 		return denormalizedValues;
 	}
 
@@ -750,14 +757,10 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	private EntityImpl retrieveValueFromResource(String resource) {
-		EntityImpl entity;
-		if (memCache.getMemcache().containsKey(resource)) {
-			return memCache.getMemcache().get(resource);
-		} else {
-			entity = datastore.find(EntityImpl.class).filter("uri", resource)
-					.get();
 
-		}
+		EntityImpl entity = datastore.find(EntityImpl.class)
+				.filter("uri", resource).get();
+
 		if (entity == null) {
 			String val = retrieveValue(resource);
 			if (val.length() > 0) {
@@ -832,7 +835,6 @@ public class OsgiExtractor extends Extractor {
 			InvocationTargetException {
 
 		RdfMethod RDF = null;
-
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
 				RDF = rdfMethod;
@@ -964,7 +966,6 @@ public class OsgiExtractor extends Extractor {
 				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 			}
 		}
-		//
 		return obj;
 	}
 
@@ -973,7 +974,6 @@ public class OsgiExtractor extends Extractor {
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
-
 		RdfMethod RDF = null;
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
@@ -1064,9 +1064,12 @@ public class OsgiExtractor extends Extractor {
 
 	private Map<String, List> denormalize(String val, int iterations) {
 		try {
-			ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
-					datastore, "URI", val);
-			return denormalize(val, controlledVocabulary, iterations, false);
+			if (iterations > 0) {
+				ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
+						datastore, "URI", val);
+				return denormalize(val, controlledVocabulary, iterations, false);
+			}
+			return new HashMap<String, List>();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
