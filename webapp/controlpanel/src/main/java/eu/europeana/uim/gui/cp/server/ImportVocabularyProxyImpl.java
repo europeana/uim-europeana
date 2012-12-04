@@ -85,6 +85,7 @@ public class ImportVocabularyProxyImpl extends
 
 		extractor = new Extractor(controlledVocabulary, mongo);
 		if(!StringUtils.equals(mappedField,"")){
+			
 		extractor.setMappedField(originalField,
 				EdmLabel.getEdmLabel(StringUtils.split(mappedField, "@")[0]));
 		} else {
