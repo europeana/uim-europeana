@@ -69,6 +69,7 @@ import eu.europeana.corelib.tools.utils.HashUtils;
 import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
 import eu.europeana.corelib.tools.utils.SipCreatorUtils;
 import eu.europeana.uim.common.TKey;
+import eu.europeana.uim.enrichment.enums.OriginalField;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
@@ -91,7 +92,8 @@ import eu.europeana.uim.sugar.SugarCrmService;
  * @author Yorgos.Mamakis@ kb.nl
  * 
  */
-public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>, I> {
+public class EnrichmentPlugin<I> extends
+		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static HttpSolrServer solrServer;
 	private static String mongoDB;
@@ -114,7 +116,7 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static Morphia morphia;
 	private static List<SolrInputDocument> solrList;
-	private final static int SUBMIT_SIZE=1000;
+	private final static int SUBMIT_SIZE = 1000;
 	private static OsgiEdmMongoServer mongoServer;
 	private static Mongo mongo;
 	private final static String PORTALURL = "http:///www.europeana.eu/portal/record";
@@ -154,7 +156,9 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 
 	};
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getInputFields()
 	 */
 	@Override
@@ -162,15 +166,20 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
 	 */
 	@Override
 	public TKey<?, ?>[] getOptionalFields() {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOutputFields()
 	 */
 	@Override
@@ -178,21 +187,27 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#initialize()
 	 */
 	@Override
 	public void initialize() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#shutdown()
 	 */
 	@Override
 	public void shutdown() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#getParameters()
 	 */
 	@Override
@@ -200,7 +215,9 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		return params;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#getPreferredThreadCount()
 	 */
 	@Override
@@ -208,7 +225,9 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		return 1;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#getMaximumThreadCount()
 	 */
 	@Override
@@ -216,8 +235,11 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		return 1;
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.orchestration.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.
+	 * orchestration.ExecutionContext)
 	 */
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
@@ -258,12 +280,14 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		}
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.orchestration.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.
+	 * orchestration.ExecutionContext)
 	 */
 	@Override
-	public void completed(ExecutionContext<MetaDataRecord<I>,I> context)
+	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		try {
 			solrServer.add(solrList);
@@ -271,12 +295,12 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 
 			solrServer.commit();
 			System.out.println("Committed in Solr Server");
-			
-			//TODO:optimize must be done in a separate plugin it is getting slow and should be done on request
-//			solrServer.optimize();
-//			System.out.println("Optimized");
 
-			
+			// TODO:optimize must be done in a separate plugin it is getting
+			// slow and should be done on request
+			// solrServer.optimize();
+			// System.out.println("Optimized");
+
 			solrList = new ArrayList<SolrInputDocument>();
 			mongoServer.close();
 		} catch (IOException e) {
@@ -297,21 +321,27 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana.uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana
+	 * .uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
 	 */
 	@Override
-	public boolean process(MetaDataRecord<I> mdr,ExecutionContext<MetaDataRecord<I>,I> context) 
+	public boolean process(MetaDataRecord<I> mdr,
+			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		IBindingFactory bfact;
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
-			if(solrServer.ping()==null){
+			if (solrServer.ping() == null) {
 				log.log(Level.SEVERE,
-						"Solr server " + solrServer.getBaseURL() + " is not available. " +
-								"\nChange solr.host and solr.port properties in uim.properties and restart UIM");
+						"Solr server "
+								+ solrServer.getBaseURL()
+								+ " is not available. "
+								+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
 				return false;
 			}
 			bfact = BindingDirectory.getFactory(RDF.class);
@@ -354,8 +384,7 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 				mongoServer.getDatastore().save(fullBean);
 			} else {
 				updateFullBean(fullBean);
-				
-				
+
 			}
 
 			int retries = 0;
@@ -363,8 +392,8 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 				try {
 					solrList.add(solrInputDocument);
 					recordNumber++;
-					//Send records to SOLR by thousands
-					if(solrList.size()==SUBMIT_SIZE){
+					// Send records to SOLR by thousands
+					if (solrList.size() == SUBMIT_SIZE) {
 						solrServer.add(solrList);
 						solrList = new ArrayList<SolrInputDocument>();
 					}
@@ -372,7 +401,7 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 				} catch (SolrException e) {
 					log.log(Level.WARNING, "Solr Exception occured with error "
 							+ e.getMessage() + "\nRetrying");
-					
+
 				}
 				retries++;
 			}
@@ -408,29 +437,45 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		return false;
 	}
 
-	
-
 	private void updateFullBean(FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
-				.createQuery(FullBeanImpl.class).field("about").equal(fullBean.getAbout());
-		UpdateOperations<FullBeanImpl> ops = mongoServer.getDatastore().createUpdateOperations(FullBeanImpl.class);
-		ops.set("title", fullBean.getTitle()!=null?fullBean.getTitle():new String[]{});
-		ops.set("year", fullBean.getYear()!=null?fullBean.getYear():new String[]{});
-		ops.set("provider", fullBean.getProvider()!=null?fullBean.getProvider():new String[]{});
-		ops.set("language", fullBean.getLanguage()!=null?fullBean.getLanguage():new String[]{});
-		ops.set("type", fullBean.getType()!=null?fullBean.getType():DocType.IMAGE);
-		ops.set("europeanaCompleteness",fullBean.getEuropeanaCompleteness());
-		ops.set("optOut",fullBean.isOptedOut());
-//		ops.set("places", fullBean.getPlaces()!=null?fullBean.getPlaces():new ArrayList<PlaceImpl>());
-//		ops.set("agents", fullBean.getAgents()!=null?fullBean.getAgents():new ArrayList<AgentImpl>());
-//		ops.set("timespans", fullBean.getTimespans()!=null?fullBean.getTimespans():new ArrayList<TimespanImpl>());
-//		ops.set("concepts", fullBean.getConcepts()!=null?fullBean.getConcepts():new ArrayList<ConceptImpl>());
-//		ops.set("aggregations", fullBean.getAggregations());
-//		ops.set("providedCHOs", fullBean.getProvidedCHOs());
-//		ops.set("europeanaAggregation", fullBean.getEuropeanaAggregation());
-//		ops.set("proxies",fullBean.getProxies());
-		ops.set("country", fullBean.getCountry()!=null?fullBean.getCountry():new String[]{});
-		ops.set("europeanaCollectionName", fullBean.getEuropeanaCollectionName());
+				.createQuery(FullBeanImpl.class).field("about")
+				.equal(fullBean.getAbout());
+		UpdateOperations<FullBeanImpl> ops = mongoServer.getDatastore()
+				.createUpdateOperations(FullBeanImpl.class);
+		ops.set("title", fullBean.getTitle() != null ? fullBean.getTitle()
+				: new String[] {});
+		ops.set("year", fullBean.getYear() != null ? fullBean.getYear()
+				: new String[] {});
+		ops.set("provider",
+				fullBean.getProvider() != null ? fullBean.getProvider()
+						: new String[] {});
+		ops.set("language",
+				fullBean.getLanguage() != null ? fullBean.getLanguage()
+						: new String[] {});
+		ops.set("type", fullBean.getType() != null ? fullBean.getType()
+				: DocType.IMAGE);
+		ops.set("europeanaCompleteness", fullBean.getEuropeanaCompleteness());
+		ops.set("optOut", fullBean.isOptedOut());
+		// ops.set("places", fullBean.getPlaces()!=null?fullBean.getPlaces():new
+		// ArrayList<PlaceImpl>());
+		// ops.set("agents", fullBean.getAgents()!=null?fullBean.getAgents():new
+		// ArrayList<AgentImpl>());
+		// ops.set("timespans",
+		// fullBean.getTimespans()!=null?fullBean.getTimespans():new
+		// ArrayList<TimespanImpl>());
+		// ops.set("concepts",
+		// fullBean.getConcepts()!=null?fullBean.getConcepts():new
+		// ArrayList<ConceptImpl>());
+		// ops.set("aggregations", fullBean.getAggregations());
+		// ops.set("providedCHOs", fullBean.getProvidedCHOs());
+		// ops.set("europeanaAggregation", fullBean.getEuropeanaAggregation());
+		// ops.set("proxies",fullBean.getProxies());
+		ops.set("country",
+				fullBean.getCountry() != null ? fullBean.getCountry()
+						: new String[] {});
+		ops.set("europeanaCollectionName",
+				fullBean.getEuropeanaCollectionName());
 		mongoServer.getDatastore().update(updateQuery, ops);
 	}
 
@@ -496,6 +541,10 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 							.getConceptList() : new ArrayList<Concept>();
 					conceptList.add(concept);
 					rdf.setConceptList(conceptList);
+					europeanaProxy = OriginalField.getOriginalField(
+							entity.getOriginalField()).appendField(
+							europeanaProxy, concept.getAbout());
+
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Timespan")) {
 
@@ -530,6 +579,9 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 							.getTimeSpanList() : new ArrayList<TimeSpanType>();
 					timespans.add(ts);
 					rdf.setTimeSpanList(timespans);
+					europeanaProxy = OriginalField.getOriginalField(
+							entity.getOriginalField()).appendField(
+							europeanaProxy, ts.getAbout());
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Agent")) {
 
@@ -564,6 +616,9 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 							.getAgentList() : new ArrayList<AgentType>();
 					agents.add(ts);
 					rdf.setAgentList(agents);
+					europeanaProxy = OriginalField.getOriginalField(
+							entity.getOriginalField()).appendField(
+							europeanaProxy, ts.getAbout());
 				}
 			} else {
 				PlaceType ts = new PlaceType();
@@ -599,6 +654,9 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 							.getPlaceList() : new ArrayList<PlaceType>();
 					places.add(ts);
 					rdf.setPlaceList(places);
+					europeanaProxy = OriginalField.getOriginalField(
+							entity.getOriginalField()).appendField(
+							europeanaProxy, ts.getAbout());
 				}
 			}
 		}
@@ -635,7 +693,7 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			rdfFinal.setAgentList(agents);
 		}
 		if (rdf.getConceptList() != null) {
-			for (Concept newConcept : rdf.getConceptList()){
+			for (Concept newConcept : rdf.getConceptList()) {
 				for (Concept concept : concepts) {
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
@@ -644,10 +702,10 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 							concepts.remove(concept);
 						}
 					}
-					
+
 				}
-					concepts.add(newConcept);
-				}
+				concepts.add(newConcept);
+			}
 			rdfFinal.setConceptList(concepts);
 		}
 		if (rdf.getTimeSpanList() != null) {
@@ -666,7 +724,7 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			rdfFinal.setTimeSpanList(timespans);
 		}
 		if (rdf.getPlaceList() != null) {
-			for (PlaceType newPlace : rdf.getPlaceList()){
+			for (PlaceType newPlace : rdf.getPlaceList()) {
 				for (PlaceType place : places) {
 					if (StringUtils.equals(place.getAbout(),
 							newPlace.getAbout())) {
@@ -678,8 +736,8 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 
 					places.add(newPlace);
 				}
-			rdfFinal.setPlaceList(places);
-		}
+				rdfFinal.setPlaceList(places);
+			}
 		}
 		rdfFinal.setProxyList(rdf.getProxyList());
 		rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
@@ -696,8 +754,9 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 
 	private EuropeanaAggregationType createEuropeanaAggregation(RDF rdf) {
 		EuropeanaAggregationType europeanaAggregation = null;
-		if(rdf.getEuropeanaAggregationList()!=null && rdf.getEuropeanaAggregationList().size()>0){
-			europeanaAggregation =  rdf.getEuropeanaAggregationList().get(0);
+		if (rdf.getEuropeanaAggregationList() != null
+				&& rdf.getEuropeanaAggregationList().size() > 0) {
+			europeanaAggregation = rdf.getEuropeanaAggregationList().get(0);
 		} else {
 			europeanaAggregation = new EuropeanaAggregationType();
 		}
@@ -708,16 +767,22 @@ public class EnrichmentPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		lp.setResource(PORTALURL + cho.getAbout() + SUFFIX);
 		europeanaAggregation.setLandingPage(lp);
 		Country countryType = new Country();
-		countryType.setString(europeanaAggregation.getCountry()!=null?europeanaAggregation.getCountry().getString():country);
+		countryType
+				.setString(europeanaAggregation.getCountry() != null ? europeanaAggregation
+						.getCountry().getString() : country);
 		europeanaAggregation.setCountry(countryType);
 		Creator creatorType = new Creator();
 		creatorType.setString("Europeana");
 		europeanaAggregation.setCreator(creatorType);
 		Language1 languageType = new Language1();
-		languageType.setString(europeanaAggregation.getLanguage()!=null?europeanaAggregation.getLanguage().getString():language);
+		languageType
+				.setString(europeanaAggregation.getLanguage() != null ? europeanaAggregation
+						.getLanguage().getString() : language);
 		europeanaAggregation.setLanguage(languageType);
 		Rights1 rightsType = new Rights1();
-		rightsType.setResource(europeanaAggregation.getRights()!=null?europeanaAggregation.getRights().getResource():rights);
+		rightsType
+				.setResource(europeanaAggregation.getRights() != null ? europeanaAggregation
+						.getRights().getResource() : rights);
 		europeanaAggregation.setRights(rightsType);
 		AggregatedCHO aggrCHO = new AggregatedCHO();
 		aggrCHO.setResource(cho.getAbout());
