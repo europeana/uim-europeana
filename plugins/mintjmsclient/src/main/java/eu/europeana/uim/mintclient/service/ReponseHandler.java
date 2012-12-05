@@ -159,10 +159,13 @@ public class ReponseHandler {
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) entity;
 			PublishTransformationAction action = (PublishTransformationAction) response;
-			
-			//TODO: Rename this temporarily until MINT fixes the bug
+
 			String ziplocation = action.getPublishTransformationResponse().getUrl();
 
+			String transformationID = action.getPublishTransformationResponse().getTransformationId();
+			
+			collection.putValue(ControlledVocabularyProxy.LATESTMINTMAPPINGID,transformationID);
+			
 			collection.putValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION,
 					ziplocation);
 			storage.updateCollection(collection);
