@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -16,6 +15,7 @@ import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.exceptions.VocabularyNotFoundException;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
+import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.Extractor;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
 import eu.europeana.corelib.dereference.impl.VocabularyMongoServer;
@@ -85,11 +85,15 @@ public class ImportVocabularyProxyImpl extends
 
 		extractor = new Extractor(controlledVocabulary, mongo);
 		if(!StringUtils.equals(mappedField,"")){
-			
+		String attribute=null;
+		String[] elems = StringUtils.split(mappedField, "@");
+		if(elems.length>1){
+			attribute = elems[1];
+		}
 		extractor.setMappedField(originalField,
-				EdmLabel.getEdmLabel(StringUtils.split(mappedField, "@")[0]));
+				EdmLabel.getEdmLabel(elems[0]),attribute);
 		} else {
-			extractor.setMappedField(originalField, null);
+			extractor.setMappedField(originalField, null,null);
 		}
 		OriginalFieldDTO originalFieldDTO = new OriginalFieldDTO();
 		originalFieldDTO.setField(originalField);
@@ -110,7 +114,7 @@ public class ImportVocabularyProxyImpl extends
 		return false;
 	}
 
-	private List<MappingDTO> convertEdmMap(Map<String, List<EdmLabel>> readSchema) {
+	private List<MappingDTO> convertEdmMap(Map<String, List<EdmMappedField>> readSchema) {
 		List<MappingDTO> returnMap = new ArrayList<MappingDTO>();
 
 		for (String key : readSchema.keySet()) {
@@ -120,9 +124,13 @@ public class ImportVocabularyProxyImpl extends
 			map.setOriginal(original);
 			List<EdmFieldDTO> lst = new ArrayList<EdmFieldDTO>();
 			if(readSchema.get(key)!=null){
-			for(EdmLabel entry:readSchema.get(key)){
+			for(EdmMappedField entry:readSchema.get(key)){
 				EdmFieldDTO edmField = new EdmFieldDTO();
-				edmField.setField(entry.toString());
+				String field = entry.getLabel().toString();
+				if(entry.getAttribute()!=null){
+					field = field+ "@" +entry.getAttribute();
+				}
+				edmField.setField(field);
 				lst.add(edmField);
 			}
 			}

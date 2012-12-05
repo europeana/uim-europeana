@@ -45,9 +45,9 @@ import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
+import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.EntityImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
-import eu.europeana.uim.common.BlockingInitializer;
 
 public class OsgiExtractor extends Extractor {
 
@@ -67,14 +67,14 @@ public class OsgiExtractor extends Extractor {
 	// return extractor;
 	// }
 
-	public List<EdmLabel> getEdmLabel(String field) {
+	public List<EdmMappedField> getEdmLabel(String field) {
 
 		if (vocabulary != null) {
 			if (vocabulary.getElements().get(field) != null) {
 				return vocabulary.getElements().get(field);
 			}
 		}
-		return new ArrayList<EdmLabel>();
+		return new ArrayList<EdmMappedField>();
 	}
 
 	private static MemCache memCache;
@@ -121,7 +121,8 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	private Map<String, List> retrieveMapFromCache(String fullUri) {
-		return memCache.getEntityCache().containsKey(fullUri)?memCache.getEntityCache().get(fullUri):null;
+		return memCache.getEntityCache().containsKey(fullUri) ? memCache
+				.getEntityCache().get(fullUri) : null;
 	}
 
 	private Map<String, List> createDereferencingMap(String xmlString,
@@ -155,7 +156,7 @@ public class OsgiExtractor extends Extractor {
 					// If it is mapped then
 					if (isMapped(element)) {
 
-						for (EdmLabel edmLabel : getEdmLabel(element)) {
+						for (EdmMappedField edmLabel : getEdmLabel(element)) {
 
 							if (sElem.getAttributes().hasNext()) {
 								Attribute attr = (Attribute) sElem
@@ -165,7 +166,7 @@ public class OsgiExtractor extends Extractor {
 								+ ":" + attr.getName().getLocalPart();
 								// Is the attribute mapped?
 								if (isMapped(element + "_" + attribute)) {
-									for (EdmLabel label : getEdmLabel(element
+									for (EdmMappedField label : getEdmLabel(element
 											+ "_" + attribute)) {
 										String attrVal = attr.getValue();
 										String elem = null;
@@ -174,9 +175,8 @@ public class OsgiExtractor extends Extractor {
 													.asCharacters().getData();
 										}
 
-										if (StringUtils.equals(
-												label.toString(),
-												"skos_concept")) {
+										if (StringUtils.equals(label.getLabel()
+												.toString(), "skos_concept")) {
 											if (lastConcept != null) {
 												if (lastConcept.getAbout() != null) {
 													concepts.add(lastConcept);
@@ -192,8 +192,9 @@ public class OsgiExtractor extends Extractor {
 														Concept.class, attrVal);
 											}
 
-										} else if (StringUtils.equals(
-												label.toString(), "edm_agent")) {
+										} else if (StringUtils.equals(label
+												.getLabel().toString(),
+												"edm_agent")) {
 											if (lastAgent != null) {
 												if (lastAgent.getAbout() != null) {
 													agents.add(lastAgent);
@@ -210,8 +211,8 @@ public class OsgiExtractor extends Extractor {
 														attrVal);
 											}
 
-										} else if (StringUtils.equals(
-												label.toString(),
+										} else if (StringUtils.equals(label
+												.getLabel().toString(),
 												"edm_timespan")) {
 											if (lastTimespan != null) {
 												if (lastTimespan.getAbout() != null) {
@@ -230,8 +231,9 @@ public class OsgiExtractor extends Extractor {
 														attrVal);
 											}
 
-										} else if (StringUtils.equals(
-												label.toString(), "edm_place")) {
+										} else if (StringUtils.equals(label
+												.getLabel().toString(),
+												"edm_place")) {
 											if (lastPlace != null) {
 												if (lastPlace.getAbout() != null) {
 													places.add(lastPlace);
@@ -249,36 +251,38 @@ public class OsgiExtractor extends Extractor {
 
 										} else {
 											if (StringUtils.startsWith(
-													label.toString(), "cc")) {
+													label.getLabel().toString(), "cc")) {
 
 												appendConceptValue(
 														lastConcept == null ? new Concept()
 																: lastConcept,
-														label.toString(), elem,
-														label.toString(),
+														label.getLabel()
+																.toString(),
+														elem,
+														label.getAttribute(),
 														attrVal, iterations);
 											}
 
 											else if (StringUtils.startsWith(
-													label.toString(), "ts")) {
+													label.getLabel().toString(), "ts")) {
 
 												appendValue(
 														TimeSpanType.class,
 														lastTimespan == null ? new TimeSpanType()
 																: lastTimespan,
-														label.toString(), elem,
-														label.toString(),
-														attrVal, iterations);
+														label.getLabel().toString(), elem,
+														label.getAttribute(), attrVal,
+														iterations);
 											} else if (StringUtils.startsWith(
-													label.toString(), "ag")) {
+													label.getLabel().toString(), "ag")) {
 
 												appendValue(
 														AgentType.class,
 														lastAgent == null ? new AgentType()
 																: lastAgent,
-														label.toString(), elem,
-														label.toString(),
-														attrVal, iterations);
+														label.getLabel().toString(), elem,
+														label.getAttribute(), attrVal,
+														iterations);
 											} else if (StringUtils.startsWith(
 													label.toString(), "pl")) {
 
@@ -286,9 +290,9 @@ public class OsgiExtractor extends Extractor {
 														PlaceType.class,
 														lastPlace == null ? new PlaceType()
 																: lastPlace,
-														label.toString(), elem,
-														label.toString(),
-														attrVal, iterations);
+														label.getLabel().toString(), elem,
+														label.getAttribute(), attrVal,
+														iterations);
 											}
 										}
 									}
@@ -296,7 +300,7 @@ public class OsgiExtractor extends Extractor {
 								// Since the attribute is not mapped
 								else {
 
-									if (StringUtils.equals(edmLabel.toString(),
+									if (StringUtils.equals(edmLabel.getLabel().toString(),
 											"skos_concept")) {
 										if (lastConcept != null) {
 											if (lastConcept.getAbout() != null) {
@@ -316,7 +320,7 @@ public class OsgiExtractor extends Extractor {
 										}
 
 									} else if (StringUtils.equals(
-											edmLabel.toString(), "edm_agent")) {
+											edmLabel.getLabel().toString(), "edm_agent")) {
 										if (lastAgent != null) {
 											if (lastAgent.getAbout() != null) {
 												agents.add(lastAgent);
@@ -335,7 +339,7 @@ public class OsgiExtractor extends Extractor {
 										}
 
 									} else if (StringUtils
-											.equals(edmLabel.toString(),
+											.equals(edmLabel.getLabel().toString(),
 													"edm_timespan")) {
 										if (lastTimespan != null) {
 											if (lastTimespan.getAbout() != null) {
@@ -354,7 +358,7 @@ public class OsgiExtractor extends Extractor {
 										}
 
 									} else if (StringUtils.equals(
-											edmLabel.toString(), "edm_place")) {
+											edmLabel.getLabel().toString(), "edm_place")) {
 										if (lastPlace != null) {
 											if (lastPlace.getAbout() != null) {
 												places.add(lastPlace);
@@ -373,41 +377,41 @@ public class OsgiExtractor extends Extractor {
 
 									} else {
 										if (StringUtils.startsWith(
-												edmLabel.toString(), "cc")) {
+												edmLabel.getLabel().toString(), "cc")) {
 											appendConceptValue(
 													lastConcept == null ? new Concept()
 															: lastConcept,
-													edmLabel.toString(),
-													xml.getElementText(), null,
+															edmLabel.getLabel().toString(),
+													xml.getElementText(), "",
 													null, iterations);
 										}
 
 										else if (StringUtils.startsWith(
-												edmLabel.toString(), "ts")) {
+												edmLabel.getLabel().toString(), "ts")) {
 											appendValue(
 													TimeSpanType.class,
 													lastTimespan == null ? new TimeSpanType()
 															: lastTimespan,
-													edmLabel.toString(),
-													xml.getElementText(), null,
+															edmLabel.getLabel().toString(),
+													xml.getElementText(), "",
 													null, iterations);
 										} else if (StringUtils.startsWith(
-												edmLabel.toString(), "ag")) {
+												edmLabel.getLabel().toString(), "ag")) {
 											appendValue(
 													AgentType.class,
 													lastAgent == null ? new AgentType()
 															: lastAgent,
-													edmLabel.toString(),
-													xml.getElementText(), null,
+															edmLabel.getLabel().toString(),
+													xml.getElementText(), "",
 													null, iterations);
 										} else if (StringUtils.startsWith(
-												edmLabel.toString(), "pl")) {
+												edmLabel.getLabel().toString(), "pl")) {
 											appendValue(
 													PlaceType.class,
 													lastPlace == null ? new PlaceType()
 															: lastPlace,
-													edmLabel.toString(),
-													xml.getElementText(), null,
+															edmLabel.getLabel().toString(),
+													xml.getElementText(), "",
 													null, iterations);
 
 										}
@@ -419,7 +423,7 @@ public class OsgiExtractor extends Extractor {
 							else {
 								XMLEvent evt2 = xml.nextEvent();
 								if (evt2.isCharacters()) {
-									if (StringUtils.equals(edmLabel.toString(),
+									if (StringUtils.equals(edmLabel.getLabel().toString(),
 											"skos_concept")) {
 										if (lastConcept != null) {
 											concepts.add(lastConcept);
@@ -430,7 +434,7 @@ public class OsgiExtractor extends Extractor {
 														.getData());
 
 									} else if (StringUtils.equals(
-											edmLabel.toString(), "edm_agent")) {
+											edmLabel.getLabel().toString(), "edm_agent")) {
 										if (lastAgent != null) {
 											if (lastAgent.getAbout() != null) {
 												agents.add(lastAgent);
@@ -452,7 +456,7 @@ public class OsgiExtractor extends Extractor {
 															.getData());
 										}
 									} else if (StringUtils
-											.equals(edmLabel.toString(),
+											.equals(edmLabel.getLabel().toString(),
 													"edm_timespan")) {
 										if (lastTimespan != null) {
 											if (lastTimespan.getAbout() != null) {
@@ -475,7 +479,7 @@ public class OsgiExtractor extends Extractor {
 										}
 
 									} else if (StringUtils.equals(
-											edmLabel.toString(), "edm_place")) {
+											edmLabel.getLabel().toString(), "edm_place")) {
 										if (lastPlace != null) {
 											if (lastPlace.getAbout() != null) {
 												places.add(lastPlace);
@@ -498,46 +502,46 @@ public class OsgiExtractor extends Extractor {
 									} else {
 
 										if (StringUtils.startsWith(
-												edmLabel.toString(), "cc")) {
+												edmLabel.getLabel().toString(), "cc")) {
 											appendConceptValue(
 													lastConcept == null ? new Concept()
 															: lastConcept,
-													edmLabel.toString(), evt2
+															edmLabel.getLabel().toString(), evt2
 															.asCharacters()
-															.getData(), null,
+															.getData(), "",
 													null, iterations);
 										}
 
 										else if (StringUtils.startsWith(
-												edmLabel.toString(), "ts")) {
+												edmLabel.getLabel().toString(), "ts")) {
 											appendValue(
 													TimeSpanType.class,
 													lastTimespan == null ? new TimeSpanType()
 															: lastTimespan,
 
-													edmLabel.toString(), evt2
+															edmLabel.getLabel().toString(), evt2
 															.asCharacters()
-															.getData(), null,
+															.getData(), "",
 													null, iterations);
 										} else if (StringUtils.startsWith(
-												edmLabel.toString(), "ag")) {
+												edmLabel.getLabel().toString(), "ag")) {
 											appendValue(
 													AgentType.class,
 													lastAgent == null ? new AgentType()
 															: lastAgent,
-													edmLabel.toString(), evt2
+															edmLabel.getLabel().toString(), evt2
 															.asCharacters()
-															.getData(), null,
+															.getData(), "",
 													null, iterations);
 										} else if (StringUtils.startsWith(
-												edmLabel.toString(), "pl")) {
+												edmLabel.getLabel().toString(), "pl")) {
 											appendValue(
 													PlaceType.class,
 													lastPlace == null ? new PlaceType()
 															: lastPlace,
-													edmLabel.toString(), evt2
+															edmLabel.getLabel().toString(), evt2
 															.asCharacters()
-															.getData(), null,
+															.getData(), "",
 													null, iterations);
 										}
 									}
@@ -559,9 +563,9 @@ public class OsgiExtractor extends Extractor {
 
 							// Is the attribute mapped?
 							if (isMapped(element + "_" + attribute)) {
-								for (EdmLabel label : getEdmLabel(element + "_"
+								for (EdmMappedField label : getEdmLabel(element + "_"
 										+ attribute)) {
-									if (StringUtils.equals(label.toString(),
+									if (StringUtils.equals(label.getLabel().toString(),
 											"skos_concept")) {
 										if (lastConcept != null) {
 											if (lastConcept.getAbout() != null) {
@@ -582,7 +586,7 @@ public class OsgiExtractor extends Extractor {
 
 									else
 
-									if (StringUtils.equals(label.toString(),
+									if (StringUtils.equals(label.getLabel().toString(),
 											"edm_agent")) {
 										if (lastAgent != null) {
 											if (lastAgent.getAbout() != null) {
@@ -602,7 +606,7 @@ public class OsgiExtractor extends Extractor {
 
 									} else
 
-									if (StringUtils.equals(label.toString(),
+									if (StringUtils.equals(label.getLabel().toString(),
 											"edm_timespan")) {
 										if (lastTimespan != null) {
 											if (lastTimespan.getAbout() != null) {
@@ -622,7 +626,7 @@ public class OsgiExtractor extends Extractor {
 
 									} else
 
-									if (StringUtils.equals(label.toString(),
+									if (StringUtils.equals(label.getLabel().toString(),
 											"edm_place")) {
 										if (lastPlace != null) {
 											if (lastPlace.getAbout() != null) {
@@ -643,7 +647,7 @@ public class OsgiExtractor extends Extractor {
 
 									} else {
 										if (StringUtils.startsWith(
-												label.toString(), "cc")) {
+												label.getLabel().toString(), "cc")) {
 											String elem = null;
 											if (xml.peek().isCharacters()) {
 												elem = xml.nextEvent()
@@ -655,13 +659,12 @@ public class OsgiExtractor extends Extractor {
 											appendConceptValue(
 													lastConcept == null ? new Concept()
 															: lastConcept,
-													null, elem,
-													label.toString(), attrVal,
-													iterations);
+													null, elem, label.getAttribute(),
+													attrVal, iterations);
 										}
 
 										else if (StringUtils.startsWith(
-												label.toString(), "ts")) {
+												label.getLabel().toString(), "ts")) {
 											String elem = null;
 											if (xml.peek().isCharacters()) {
 												elem = xml.nextEvent()
@@ -674,11 +677,10 @@ public class OsgiExtractor extends Extractor {
 													TimeSpanType.class,
 													lastTimespan == null ? new TimeSpanType()
 															: lastTimespan,
-													null, elem,
-													label.toString(), attrVal,
-													iterations);
+													null, elem, label.getAttribute(),
+													attrVal, iterations);
 										} else if (StringUtils.startsWith(
-												label.toString(), "ag")) {
+												label.getLabel().toString(), "ag")) {
 											String elem = null;
 											if (xml.peek().isCharacters()) {
 												elem = xml.nextEvent()
@@ -691,8 +693,8 @@ public class OsgiExtractor extends Extractor {
 													AgentType.class,
 													lastAgent == null ? new AgentType()
 															: lastAgent, null,
-													elem, label.toString(),
-													attrVal, iterations);
+													elem, label.getAttribute(), attrVal,
+													iterations);
 										} else if (StringUtils.startsWith(
 												label.toString(), "pl")) {
 											String elem = null;
@@ -707,8 +709,8 @@ public class OsgiExtractor extends Extractor {
 													PlaceType.class,
 													lastPlace == null ? new PlaceType()
 															: lastPlace, null,
-													elem, label.toString(),
-													attrVal, iterations);
+													elem, label.getAttribute(), attrVal,
+													iterations);
 										}
 									}
 								}
@@ -745,7 +747,7 @@ public class OsgiExtractor extends Extractor {
 	public boolean isMapped(String field) {
 
 		if (vocabulary != null) {
-			for (Entry<String, List<EdmLabel>> entry : vocabulary.getElements()
+			for (Entry<String, List<EdmMappedField>> entry : vocabulary.getElements()
 					.entrySet()) {
 				if (StringUtils.contains(entry.getKey(), field)
 						&& entry.getValue() != null) {
@@ -869,14 +871,14 @@ public class OsgiExtractor extends Extractor {
 					rs.setString(val);
 				}
 				if (edmAttr != null) {
-					if (StringUtils.split(edmAttr, "@").length > 1) {
+					
 						if (StringUtils.equals(
-								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
+								edmAttr, "xml:lang")) {
 							Lang lang = new Lang();
 							lang.setLang(valAttr);
 							rs.setLang(lang);
 						}
-					}
+					
 				}
 				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 			} else if (RDF.getClazz().getSuperclass()
@@ -884,13 +886,12 @@ public class OsgiExtractor extends Extractor {
 				LiteralType rs = new LiteralType();
 				rs.setString(val);
 				if (edmAttr != null) {
-					if (StringUtils.split(edmAttr, "@").length > 1) {
+					
 						if (StringUtils.equals(
-								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
+								edmAttr, "xml:lang")) {
 							LiteralType.Lang lang = new LiteralType.Lang();
 							lang.setLang(valAttr);
 							rs.setLang(lang);
-						}
 					}
 				}
 				lst.add(RDF.returnObject(RDF.getClazz(), rs));
@@ -923,13 +924,13 @@ public class OsgiExtractor extends Extractor {
 					denormalize(val, iterations - 1);
 				}
 				if (edmAttr != null) {
-					if (StringUtils.split(edmAttr, "@").length > 1) {
+					
 						if (StringUtils.equals(
-								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
+								edmAttr, "xml:lang")) {
 							LiteralType.Lang lang = new LiteralType.Lang();
 							lang.setLang(valAttr);
 							rs.setLang(lang);
-						}
+						
 					}
 				}
 				Class<?>[] cls = new Class<?>[1];
@@ -949,13 +950,12 @@ public class OsgiExtractor extends Extractor {
 					rs.setString(val);
 				}
 				if (edmAttr != null) {
-					if (StringUtils.split(edmAttr, "@").length > 1) {
+				
 						if (StringUtils.equals(
-								StringUtils.split(edmAttr, "@")[1], "xml:lang")) {
+								edmAttr, "xml:lang")) {
 							Lang lang = new Lang();
 							lang.setLang(valAttr);
 							rs.setLang(lang);
-						}
 					}
 				}
 				Class<?>[] cls = new Class<?>[1];
@@ -1012,13 +1012,11 @@ public class OsgiExtractor extends Extractor {
 				obj.setString(val);
 			}
 			if (edmAttr != null) {
-				if (StringUtils.split(edmAttr, "@").length > 1) {
-					if (StringUtils.equals(StringUtils.split(edmAttr, "@")[1],
-							"xml:lang")) {
-						Lang lang = new Lang();
-						lang.setLang(valAttr);
-						obj.setLang(lang);
-					}
+
+				if (StringUtils.equals(edmAttr, "xml:lang")) {
+					Lang lang = new Lang();
+					lang.setLang(valAttr);
+					obj.setLang(lang);
 				}
 			}
 			Class<?>[] cls = new Class<?>[1];
@@ -1039,13 +1037,11 @@ public class OsgiExtractor extends Extractor {
 				denormalize(val, iterations - 1);
 			}
 			if (edmAttr != null) {
-				if (StringUtils.split(edmAttr, "@").length > 1) {
-					if (StringUtils.equals(StringUtils.split(edmAttr, "@")[1],
-							"xml:lang")) {
-						LiteralType.Lang lang = new LiteralType.Lang();
-						lang.setLang(valAttr);
-						obj.setLang(lang);
-					}
+
+				if (StringUtils.equals(edmAttr, "xml:lang")) {
+					LiteralType.Lang lang = new LiteralType.Lang();
+					lang.setLang(valAttr);
+					obj.setLang(lang);
 				}
 			}
 			Class<?>[] cls = new Class<?>[1];
@@ -1109,19 +1105,26 @@ public class OsgiExtractor extends Extractor {
 
 	}
 
-	public void setMappedField(String fieldToMap, EdmLabel europeanaField) {
-		HashMap<String, List<EdmLabel>> elements = vocabulary.getElements() != null ? (HashMap<String, List<EdmLabel>>) vocabulary
-				.getElements() : new HashMap<String, List<EdmLabel>>();
-		List<EdmLabel> element = elements.get(fieldToMap);
+	public void setMappedField(String fieldToMap, EdmLabel europeanaField,
+			String attribute) {
+		HashMap<String, List<EdmMappedField>> elements = vocabulary
+				.getElements() != null ? (HashMap<String, List<EdmMappedField>>) vocabulary
+				.getElements() : new HashMap<String, List<EdmMappedField>>();
+		List<EdmMappedField> element = elements.get(fieldToMap);
 		if (!element.contains(europeanaField)) {
-			element.add(europeanaField);
+			EdmMappedField edmField = new EdmMappedField();
+			edmField.setLabel(europeanaField);
+			edmField.setAttribute(StringUtils.isNotBlank(attribute) ? attribute
+					: "");
+
+			element.add(edmField);
 			elements.put(fieldToMap, element);
 			vocabulary.setElements(elements);
 		}
 
 	}
 
-	public String getMappedField(EdmLabel europeanaField) {
+	public String getMappedField(EdmMappedField europeanaField) {
 		for (String key : vocabulary.getElements().keySet()) {
 			if (europeanaField.equals(vocabulary.getElements().get(key))) {
 				return key;
