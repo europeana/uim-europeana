@@ -164,7 +164,7 @@ public class ReponseHandler {
 
 			String transformationID = action.getPublishTransformationResponse().getTransformationId();
 			
-			collection.putValue(ControlledVocabularyProxy.LATESTMINTMAPPINGID,transformationID);
+			collection.putValue(ControlledVocabularyProxy.LATESTMINTTRANSFORMATIONID,transformationID);
 			
 			collection.putValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION,
 					ziplocation);
