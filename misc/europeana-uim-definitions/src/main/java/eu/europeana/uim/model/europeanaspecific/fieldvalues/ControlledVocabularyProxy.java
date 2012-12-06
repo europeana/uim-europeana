@@ -33,8 +33,6 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	SUGARCRMID("sugarCRMID"),
 	MINTID("mintID"),
 	
-	
-	
 	//Provider Specific (Existing only on Provider level)
 	PROVIDERDESCRIPTION("providerDescription"),
 	PROVIDERWEBSITE("providerWebsite"),
@@ -42,19 +40,20 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	PROVIDERCOUNTRY("providerCountry"),
 	PROVIDERDEASENT("providerdeaSent"),
 	PROVIDERDEASIGNED("providerdeaSigned"),
+
 	//Provider Mint Specific Fields
 	PROVIDERMINTUSERID("mintUserID"),
 	PROVIDERMINTUSERPASSWORD("mintUserPWD"),
 	PROVIDERMINTUSERFIRSTNAME("mintFirstName"),
 	PROVIDERMINTUSERLASTNAME("mintLastName"),
 	PROVIDERMINTPHONE("mintPhone"),
-	//Collection Feilds
+
+	//Collection Mint Specific Fields
 	MINTPUBLICATIONLOCATION("mintPubLoc"),
 	LATESTMINTMAPPINGID("latestMintMapID"),
+	LATESTMINTTRANSFORMATIONID("latestMintTransformationID"),
 	
 	//Ingestion Results
-	
-	
 	AMOUNT(EuropeanaUpdatableField.AMOUNT), 
 	TOTAL_INGESTED(EuropeanaUpdatableField.TOTAL_INGESTED), 
 	INGESTED_SOUND(EuropeanaUpdatableField.INGESTED_SOUND), 
@@ -104,7 +103,6 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	DATE_OF_REPLICATION(EuropeanaUpdatableField.DATE_OF_REPLICATION),
 	PREVIEWS_ONLY_IN_PORTAL(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
-	;
 
 	private String fieldId;
 
