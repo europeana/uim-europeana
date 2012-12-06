@@ -388,7 +388,7 @@ public class OsgiExtractor extends Extractor {
 
 										else if (StringUtils.startsWith(
 												edmLabel.getLabel().toString(), "ts")) {
-											appendValue(
+											lastTimespan = appendValue(
 													TimeSpanType.class,
 													lastTimespan == null ? new TimeSpanType()
 															: lastTimespan,
@@ -397,7 +397,7 @@ public class OsgiExtractor extends Extractor {
 													null, iterations);
 										} else if (StringUtils.startsWith(
 												edmLabel.getLabel().toString(), "ag")) {
-											appendValue(
+											lastAgent = appendValue(
 													AgentType.class,
 													lastAgent == null ? new AgentType()
 															: lastAgent,
@@ -406,7 +406,7 @@ public class OsgiExtractor extends Extractor {
 													null, iterations);
 										} else if (StringUtils.startsWith(
 												edmLabel.getLabel().toString(), "pl")) {
-											appendValue(
+										lastPlace= 	appendValue(
 													PlaceType.class,
 													lastPlace == null ? new PlaceType()
 															: lastPlace,
@@ -514,7 +514,7 @@ public class OsgiExtractor extends Extractor {
 
 										else if (StringUtils.startsWith(
 												edmLabel.getLabel().toString(), "ts")) {
-											appendValue(
+											lastTimespan = appendValue(
 													TimeSpanType.class,
 													lastTimespan == null ? new TimeSpanType()
 															: lastTimespan,
@@ -525,7 +525,7 @@ public class OsgiExtractor extends Extractor {
 													null, iterations);
 										} else if (StringUtils.startsWith(
 												edmLabel.getLabel().toString(), "ag")) {
-											appendValue(
+											lastAgent = appendValue(
 													AgentType.class,
 													lastAgent == null ? new AgentType()
 															: lastAgent,
@@ -535,7 +535,7 @@ public class OsgiExtractor extends Extractor {
 													null, iterations);
 										} else if (StringUtils.startsWith(
 												edmLabel.getLabel().toString(), "pl")) {
-											appendValue(
+											lastPlace= appendValue(
 													PlaceType.class,
 													lastPlace == null ? new PlaceType()
 															: lastPlace,
@@ -673,7 +673,7 @@ public class OsgiExtractor extends Extractor {
 											}
 											String attrVal = attr.getValue();
 
-											appendValue(
+											lastTimespan = appendValue(
 													TimeSpanType.class,
 													lastTimespan == null ? new TimeSpanType()
 															: lastTimespan,
@@ -689,7 +689,7 @@ public class OsgiExtractor extends Extractor {
 											}
 											String attrVal = attr.getValue();
 
-											appendValue(
+											lastAgent = appendValue(
 													AgentType.class,
 													lastAgent == null ? new AgentType()
 															: lastAgent, null,
@@ -705,7 +705,7 @@ public class OsgiExtractor extends Extractor {
 											}
 											String attrVal = attr.getValue();
 
-											appendValue(
+											lastPlace = appendValue(
 													PlaceType.class,
 													lastPlace == null ? new PlaceType()
 															: lastPlace, null,
@@ -856,9 +856,9 @@ public class OsgiExtractor extends Extractor {
 
 				ResourceType rs = new ResourceType();
 				rs.setResource(val != null ? val : valAttr);
-				if (isURI(rs.getResource())) {
-					denormalize(rs.getResource(), iterations - 1);
-				}
+				//if (isURI(rs.getResource())) {
+				//	denormalize(rs.getResource(), iterations - 1);
+				//}
 				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 
 			} else if (RDF.getClazz().getSuperclass()
@@ -866,7 +866,7 @@ public class OsgiExtractor extends Extractor {
 				ResourceOrLiteralType rs = new ResourceOrLiteralType();
 				if (isURI(val)) {
 					rs.setResource(val);
-					denormalize(val, iterations - 1);
+					//denormalize(val, iterations - 1);
 				} else {
 					rs.setString(val);
 				}
@@ -908,9 +908,9 @@ public class OsgiExtractor extends Extractor {
 			if (RDF.getClazz().isAssignableFrom(ResourceType.class)) {
 				ResourceType rs = new ResourceType();
 				rs.setResource(val != null ? val : valAttr);
-				if (isURI(rs.getResource())) {
-					denormalize(rs.getResource(), iterations - 1);
-				}
+				//if (isURI(rs.getResource())) {
+				//	denormalize(rs.getResource(), iterations - 1);
+				//}
 				Class<?>[] cls = new Class<?>[1];
 				cls[0] = RDF.getClazz();
 				Method method = obj.getClass().getMethod(
@@ -920,9 +920,9 @@ public class OsgiExtractor extends Extractor {
 			} else if (RDF.getClazz().isAssignableFrom(LiteralType.class)) {
 				LiteralType rs = new LiteralType();
 				rs.setString(val);
-				if (isURI(val)) {
-					denormalize(val, iterations - 1);
-				}
+				//if (isURI(val)) {
+					//denormalize(val, iterations - 1);
+				//}
 				if (edmAttr != null) {
 					
 						if (StringUtils.equals(
@@ -945,7 +945,7 @@ public class OsgiExtractor extends Extractor {
 				ResourceOrLiteralType rs = new ResourceOrLiteralType();
 				if (isURI(val)) {
 					rs.setResource(val);
-					denormalize(val, iterations - 1);
+					//denormalize(val, iterations - 1);
 				} else {
 					rs.setString(val);
 				}
@@ -966,6 +966,7 @@ public class OsgiExtractor extends Extractor {
 				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 			}
 		}
+		
 		return obj;
 	}
 

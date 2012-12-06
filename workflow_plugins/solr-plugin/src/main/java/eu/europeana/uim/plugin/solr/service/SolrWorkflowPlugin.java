@@ -141,8 +141,6 @@ public class SolrWorkflowPlugin<I> extends
 					vocMemCache.put(voc.getURI(), vocsInMap);
 				}
 			}
-			System.out.println("vocMemCache is " + vocMemCache == null);
-			System.out.println("vocMemCache size is " + vocMemCache.size());
 			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
@@ -196,8 +194,6 @@ public class SolrWorkflowPlugin<I> extends
 					dereferenceWebResource(rdfCopy, datastore, webresource);
 				}
 			}
-			System.out.println("dereferencing took "
-					+ (new Date().getTime() - start) + " ms");
 			IBindingFactory bfact2 = BindingDirectory.getFactory(RDF.class);
 			IMarshallingContext marshallingContext = bfact2
 					.createMarshallingContext();
@@ -297,9 +293,11 @@ public class SolrWorkflowPlugin<I> extends
 				for (AgentType agent : agents) {
 					if (StringUtils.equals(agent.getAbout(),
 							newAgent.getAbout())) {
+						if(agent.getPrefLabelList()!=null){
 						if (agent.getPrefLabelList().size() <= newAgent
 								.getPrefLabelList().size()) {
 							agents.remove(agent);
+						}
 						}
 					}
 				}
@@ -314,9 +312,11 @@ public class SolrWorkflowPlugin<I> extends
 
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
+						if(concept.getChoiceList()!=null){
 						if (concept.getChoiceList().size() <= newConcept
 								.getChoiceList().size()) {
 							concepts.remove(concept);
+						}
 						}
 					}
 				}
@@ -328,9 +328,11 @@ public class SolrWorkflowPlugin<I> extends
 			for (TimeSpanType newTs : rdf.getTimeSpanList()) {
 				for (TimeSpanType ts : timespans) {
 					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
+						if(ts.getIsPartOfList()!=null){
 						if (ts.getIsPartOfList().size() <= newTs
 								.getIsPartOfList().size()) {
 							timespans.remove(ts);
+						}
 						}
 					}
 				}
@@ -343,9 +345,11 @@ public class SolrWorkflowPlugin<I> extends
 				for (PlaceType place : places) {
 					if (StringUtils.equals(place.getAbout(),
 							newPlace.getAbout())) {
+						if(place.getPrefLabelList()!=null){
 						if (place.getPrefLabelList().size() <= newPlace
 								.getPrefLabelList().size()) {
 							places.remove(place);
+						}
 						}
 					}
 				}
