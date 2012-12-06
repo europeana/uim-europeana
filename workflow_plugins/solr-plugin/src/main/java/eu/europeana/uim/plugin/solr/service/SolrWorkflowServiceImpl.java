@@ -1,6 +1,7 @@
 package eu.europeana.uim.plugin.solr.service;
 
 import java.net.UnknownHostException;
+import java.util.List;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
@@ -67,7 +68,7 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 			@Override
 			protected void initializeInternal() {
 				// TODO Auto-generated method stub
-				extractor.getControlledVocabularies(datastore);
+				List<ControlledVocabularyImpl> vocs = extractor.getControlledVocabularies(datastore);
 			}
 		};
 		vocInitializer.initialize(ControlledVocabularyImpl.class

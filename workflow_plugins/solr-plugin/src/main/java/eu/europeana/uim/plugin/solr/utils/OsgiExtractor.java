@@ -284,7 +284,7 @@ public class OsgiExtractor extends Extractor {
 														label.getAttribute(), attrVal,
 														iterations);
 											} else if (StringUtils.startsWith(
-													label.toString(), "pl")) {
+													label.getLabel().toString(), "pl")) {
 
 												appendValue(
 														PlaceType.class,
