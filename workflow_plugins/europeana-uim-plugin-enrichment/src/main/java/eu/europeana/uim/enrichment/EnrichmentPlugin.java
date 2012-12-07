@@ -682,9 +682,12 @@ public class EnrichmentPlugin<I> extends
 				for (AgentType agent : agents) {
 					if (StringUtils.equals(agent.getAbout(),
 							newAgent.getAbout())) {
+						if(agent.getPrefLabelList()!=null && newAgent
+								.getPrefLabelList()!=null){
 						if (agent.getPrefLabelList().size() <= newAgent
 								.getPrefLabelList().size()) {
 							agents.remove(agent);
+						}
 						}
 					}
 				}
@@ -697,9 +700,11 @@ public class EnrichmentPlugin<I> extends
 				for (Concept concept : concepts) {
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
+						if(concept.getChoiceList()!=null && newConcept.getChoiceList()!=null){
 						if (concept.getChoiceList().size() <= newConcept
 								.getChoiceList().size()) {
 							concepts.remove(concept);
+						}
 						}
 					}
 
@@ -712,9 +717,11 @@ public class EnrichmentPlugin<I> extends
 			for (TimeSpanType newTs : rdf.getTimeSpanList()) {
 				for (TimeSpanType ts : timespans) {
 					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
+						if(newTs.getIsPartOfList()!=null&& ts.getIsPartOfList()!=null){
 						if (ts.getIsPartOfList().size() <= newTs
 								.getIsPartOfList().size()) {
 							timespans.remove(ts);
+						}
 						}
 					}
 
@@ -728,16 +735,19 @@ public class EnrichmentPlugin<I> extends
 				for (PlaceType place : places) {
 					if (StringUtils.equals(place.getAbout(),
 							newPlace.getAbout())) {
+						if(place.getPrefLabelList()!=null&&newPlace.getPrefLabelList()!=null){
 						if (place.getPrefLabelList().size() <= newPlace
 								.getPrefLabelList().size()) {
 							places.remove(place);
 						}
+						}
 					}
 
-					places.add(newPlace);
+					
 				}
-				rdfFinal.setPlaceList(places);
+				places.add(newPlace);
 			}
+			rdfFinal.setPlaceList(places);
 		}
 		rdfFinal.setProxyList(rdf.getProxyList());
 		rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
