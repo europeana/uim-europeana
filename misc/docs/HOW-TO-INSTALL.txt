@@ -40,6 +40,8 @@ sudo apt-get install postgresql-9.1
 nano /etc/apt/sources.list
 Add the following line
 deb http://backports.debian.org/debian-backports squeeze-backports main
+apt-get update
+apt-get upgrade
 apt-get -t squeeze-backports install postgresql-9.1
 
 6)Install Mongo
