@@ -126,7 +126,7 @@ public class ZipLoader<I> {
 	 * @return list of loaded Metadata records
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public synchronized <I> List<MetaDataRecord<I>> doNext(int batchSize,
+	public synchronized  List<MetaDataRecord<I>> doNext(int batchSize,
 			boolean save) {
 		List<MetaDataRecord<I>> result = new ArrayList<MetaDataRecord<I>>();
 		int progress = 0;
@@ -156,7 +156,7 @@ public class ZipLoader<I> {
 
 					switch(state){
 					case ID_REGISTERED:
-						processrecord(mdr,dedupres);
+						mdr = processrecord(mdr,dedupres);
 					break;
 					case COLLECTION_CHANGED:
 						break;
@@ -174,11 +174,13 @@ public class ZipLoader<I> {
 						if(forceUpdate){
 							
 							try{
+								
 								mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
 								processrecord(mdr,dedupres);
 							}
 							catch(StorageEngineException e){
-								processrecord(mdr,dedupres);
+								e.printStackTrace();
+								mdr = processrecord(mdr,dedupres);
 							}
 
 						}
@@ -195,7 +197,8 @@ public class ZipLoader<I> {
 							processrecord(mdr,dedupres);
 						}
 						catch(StorageEngineException e){
-							processrecord(mdr,dedupres);
+							e.printStackTrace();
+							mdr = processrecord(mdr,dedupres);
 						}
 						break;
 					default:
@@ -240,7 +243,7 @@ public class ZipLoader<I> {
 	 * @throws JiBXException
 	 */
 	@SuppressWarnings("unchecked")
-	private <I> void processrecord(MetaDataRecord<I> mdr,
+	private MetaDataRecord<I> processrecord(MetaDataRecord<I> mdr,
 			DeduplicationResult dedupres) throws JiBXException, StorageEngineException {
 
 		if (mdr == null) {
@@ -264,6 +267,8 @@ public class ZipLoader<I> {
 		// Add Links to be checked values here
 		addLinkcheckingValues(unmarshall(dedupres.getEdm()), mdr);
 		storage.updateMetaDataRecord(mdr);
+		
+		return mdr;
 	}
 
 	/**
@@ -289,7 +294,7 @@ public class ZipLoader<I> {
 	 * 
 	 * @param validedmrecord
 	 */
-	private <I> void addLinkcheckingValues(RDF validedmrecord,
+	private void addLinkcheckingValues(RDF validedmrecord,
 			MetaDataRecord<I> mdr) {
 
 		List<Aggregation> aggregations = validedmrecord.getAggregationList();
@@ -351,9 +356,8 @@ public class ZipLoader<I> {
 	 * Attach a EuropeanaLink object to the specific MDR (if it is not declared
 	 * twice in the EDM record context)
 	 * 
-	 * @param <I>
 	 */
-	private <I> void addLink(String link, MetaDataRecord<I> mdr,
+	private void addLink(String link, MetaDataRecord<I> mdr,
 			Set<String> existingLinks, boolean isCacheable) {
 
 		if (!existingLinks.contains(link)) {
