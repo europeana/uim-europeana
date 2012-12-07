@@ -348,24 +348,58 @@ public class ResourceManagementWidgetFactory {
 	private  ScrollPanel createMintTabContent(IntegrationStatusDTO status){
 		ScrollPanel container =new ScrollPanel();
 
+		int placecounter =0;
+		
 		FlexTable resourcePropertiesTable = new FlexTable();
 		container.add(resourcePropertiesTable);
 		
 		switch(status.getType()){
 		  case COLLECTION:
-				resourcePropertiesTable.setWidget(0, 0, new HTML("Mint ID:"));
-				resourcePropertiesTable.setWidget(0, 1, new HTML(status.getMintID()));   
-				
-				resourcePropertiesTable.setWidget(1, 0, new HTML("Location of latest published data:"));
-				resourcePropertiesTable.setWidget(1, 1, new HTML(status.getResourceProperties().get("MINTPUBLICATIONLOCATION")));   
-				
-				resourcePropertiesTable.setWidget(2, 0, new HTML("ID of latest mapping used:"));
-				resourcePropertiesTable.setWidget(2, 1, new HTML(status.getResourceProperties().get("LATESTMINTMAPPINGID"))); 
+			    if(status.getMintID() != null){
+					resourcePropertiesTable.setWidget(placecounter, 0, new HTML("Mint ID:"));
+					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(status.getMintID()));  
+					
+					placecounter ++;
+			    }
+			    
+			    if(status.getMintID() != null && status.getResourceProperties().get("LATESTMINTMAPPINGID") != null){
+			    	resourcePropertiesTable.setWidget(placecounter, 0, new HTML("Mint Mapping Session URI:"));
+			    	
+			    	StringBuffer sessionuri = new StringBuffer();
+			    	sessionuri.append(status.getMintURL());
+			    	sessionuri.append("Home.action?kConnector=html.page&url=DoMapping.action?mapid=");
+			    	sessionuri.append(status.getResourceProperties().get("LATESTMINTMAPPINGID"));
+			    	sessionuri.append("&uploadId=");
+			    	sessionuri.append(status.getMintID());
+			    	sessionuri.append("&kTitle=Mapping Tool");
+			    	
+					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(sessionuri.toString())); 
+					placecounter ++;
+			    }
+ 
+			    String mintpublocation = status.getResourceProperties().get("MINTPUBLICATIONLOCATION");
+				if(mintpublocation != null){
+					resourcePropertiesTable.setWidget(placecounter, 0, new HTML("Location of latest published data:"));
+					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(mintpublocation)); 
+					placecounter ++;
+				}
+				  
+				String latestMappingID = status.getResourceProperties().get("LATESTMINTMAPPINGID"); 
+				if(latestMappingID != null){
+					resourcePropertiesTable.setWidget(placecounter, 0, new HTML("ID of latest mapping used:"));
+					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(latestMappingID)); 
+					placecounter ++;
+				}
+
 			  break;
 			  
 		  case PROVIDER:
-				resourcePropertiesTable.setWidget(0, 0, new HTML("Mint ID:"));
-				resourcePropertiesTable.setWidget(0, 1, new HTML(status.getMintID()));   
+			    if(status.getMintID() != null){
+					resourcePropertiesTable.setWidget(placecounter, 0, new HTML("Mint ID:"));
+					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(status.getMintID()));  
+					
+					placecounter ++;
+			    }
 			  break;
 		}
 		

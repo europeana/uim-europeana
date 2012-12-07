@@ -19,7 +19,8 @@ public enum UimConfigurationProperty {
 	SOLR_HOSTURL("solr.hostUrl"),
 	BIRT_URL("birt.url"),
 	LOCAL_SERVER("local.server"),
-	LOCAL_PORT("local.port");
+	LOCAL_PORT("local.port"),
+	MINT_URI("mint.hostUrl");
 	
 	String field;
 	private UimConfigurationProperty(String field){

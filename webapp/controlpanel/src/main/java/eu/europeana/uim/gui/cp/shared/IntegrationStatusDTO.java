@@ -63,6 +63,8 @@ public class IntegrationStatusDTO implements IsSerializable {
 	
 	private String sugarURL;
 	
+	private String mintURL;
+	
 	private HashMap<String,String> resourceProperties;
 	
 	
@@ -242,6 +244,22 @@ public class IntegrationStatusDTO implements IsSerializable {
 	 */
 	public void setMintID(String mintID) {
 		this.mintID = mintID;
+	}
+
+
+	/**
+	 * @return
+	 */
+	public String getMintURL() {
+		return mintURL;
+	}
+
+
+	/**
+	 * @param mintURL
+	 */
+	public void setMintURL(String mintURL) {
+		this.mintURL = mintURL;
 	}
 	
 	

@@ -25,12 +25,15 @@ import java.util.HashSet;
 import java.util.List;
 import org.joda.time.DateTime;
 import com.google.gwt.user.client.ui.DialogBox;
+
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxy;
 import eu.europeana.uim.gui.cp.client.utils.EuropeanaClientConstants;
 import eu.europeana.uim.gui.cp.client.utils.RepoxOperationType;
 import eu.europeana.uim.gui.cp.server.engine.ExpandedOsgiEngine;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 import eu.europeana.uim.gui.cp.shared.HarvestingStatusDTO;
 import eu.europeana.uim.gui.cp.shared.HarvestingStatusDTO.STATUS;
 import eu.europeana.uim.gui.cp.shared.ImportResultDTO;
@@ -71,8 +74,9 @@ public class IntegrationSeviceProxyImpl extends
 		IntegrationServicesProviderServlet implements IntegrationSeviceProxy {
 
 	private static final long serialVersionUID = 1L;
-	private String repoxURL;
-	private String sugarCrmURL;	
+	private static String repoxURL;
+	private static String sugarCrmURL;	
+	private static String mintURL;	
 	DialogBox importDialog;
 
 	/*
@@ -318,6 +322,9 @@ public class IntegrationSeviceProxyImpl extends
 			SugarCrmService sugService = engine.getSugarCrmService();
 			sugarCrmURL = sugService.showConnectionStatus().getDefaultURI();
 		}
+		if(mintURL == null){
+			mintURL = PropertyReader.getProperty(UimConfigurationProperty.MINT_URI);
+		}
 		
 		StorageEngine<?> stengine = engine.getRegistry().getStorageEngine();
 		IntegrationStatusDTO ret = new IntegrationStatusDTO();
@@ -354,6 +361,8 @@ public class IntegrationSeviceProxyImpl extends
 						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/?locale=en#EDIT_DP?id=" + prov.getValue(ControlledVocabularyProxy.REPOXID) );
 					}	
 
+					ret.setMintURL(mintURL);
+					
 					ControlledVocabularyProxy[] values = ControlledVocabularyProxy.values();
 					
 					for(int i=0;i<values.length;i++){
@@ -476,6 +485,8 @@ public class IntegrationSeviceProxyImpl extends
 					if(col.getValue(ControlledVocabularyProxy.REPOXID) != null){
 						ret.setRepoxURL(repoxURL.split("/rest")[0] + "/?locale=en#VIEW_DS?id=" + col.getValue("repoxID"));
 					}	
+
+						ret.setMintURL(mintURL);
 					
 				} catch (StorageEngineException e) {
 
