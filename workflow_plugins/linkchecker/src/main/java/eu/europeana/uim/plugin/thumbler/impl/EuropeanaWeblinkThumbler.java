@@ -79,11 +79,10 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 	private static final String STORAGELOCATION = PropertyReader
 			.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION);
 
-	/**
-	 * Private singleton constructor.
-	 */
-	public EuropeanaWeblinkThumbler() {
-
+	
+	//Static inializer block for Morphia
+	static{
+		
 		Morphia mor = new Morphia();
 		Mongo mongo;
 		try {
@@ -119,6 +118,13 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		} catch (JiBXException e) {
 			log.severe(e.getMessage());
 		}
+		
+	}
+	
+	/**
+	 * Private singleton constructor.
+	 */
+	private EuropeanaWeblinkThumbler() {
 
 	}
 
