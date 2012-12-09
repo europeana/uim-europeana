@@ -307,16 +307,6 @@ public class ZipLoader<I> {
 		if (aggregations != null) {
 			for (Aggregation aggregation : aggregations) {
 
-				List<HasView> has_views = aggregation.getHasViewList();
-
-				if (has_views != null) {
-
-					for (HasView view : has_views) {
-						String resource = view.getResource();
-						addLink(resource, mdr, existingLinks, false);
-					}
-				}
-
 				List<HasView> edm_has_view = aggregation.getHasViewList();
 
 				if (edm_has_view != null) {
