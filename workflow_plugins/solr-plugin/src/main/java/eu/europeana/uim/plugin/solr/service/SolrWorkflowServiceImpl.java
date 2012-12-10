@@ -15,12 +15,12 @@ import eu.europeana.uim.plugin.solr.utils.PropertyReader;
 import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 
 public class SolrWorkflowServiceImpl implements SolrWorkflowService {
-	private static OsgiExtractor extractor;
+	private OsgiExtractor extractor;
 	private static Datastore datastore;
 
+	
 	@Override
 	public OsgiExtractor getExtractor() {
-
 		BlockingInitializer datastoreInitializer = new BlockingInitializer() {
 
 			@Override
@@ -54,6 +54,8 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 			}
 		};
 		datastoreInitializer.initialize(Datastore.class.getClassLoader());
+		
+		
 		BlockingInitializer initializer = new BlockingInitializer() {
 
 			@Override

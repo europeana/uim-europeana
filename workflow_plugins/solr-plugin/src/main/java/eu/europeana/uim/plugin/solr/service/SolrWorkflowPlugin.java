@@ -23,7 +23,6 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,22 +38,16 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import org.theeuropeanlibrary.model.tel.cluster.Hash;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
 
 import eu.europeana.corelib.definitions.jibx.AgentType;
-import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Concept;
-import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
 import eu.europeana.corelib.definitions.jibx.EuropeanaProxy;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.LiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
-import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
@@ -63,8 +56,6 @@ import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
-import eu.europeana.corelib.dereference.impl.EntityImpl;
-import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.orchestration.ExecutionContext;
@@ -72,9 +63,8 @@ import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
+import eu.europeana.uim.plugin.solr.utils.JibxUtils;
 import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
-import eu.europeana.uim.plugin.solr.utils.PropertyReader;
-import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 import eu.europeana.uim.store.MetaDataRecord;
 
 /**
@@ -121,10 +111,11 @@ public class SolrWorkflowPlugin<I> extends
 	public boolean process(MetaDataRecord<I> mdr,
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
+		mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
 		datastore = solrWorkflowService.getDatastore();
 		try {
 
-			if (vocMemCache == null||vocMemCache.size()>0) {
+			if (vocMemCache == null || vocMemCache.size() > 0) {
 				OsgiExtractor extractor = solrWorkflowService.getExtractor();
 
 				List<ControlledVocabularyImpl> vocs = extractor
@@ -287,75 +278,92 @@ public class SolrWorkflowPlugin<I> extends
 		List<TimeSpanType> timespans = new CopyOnWriteArrayList<TimeSpanType>();
 		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
 		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
+		JibxUtils utils = new JibxUtils();
+		
 		if (rdf.getAgentList() != null) {
-			for (AgentType newAgent : rdf.getAgentList()) {
-
-				for (AgentType agent : agents) {
-					if (StringUtils.equals(agent.getAbout(),
-							newAgent.getAbout())) {
-						if(agent.getPrefLabelList()!=null){
-						if (agent.getPrefLabelList().size() <= newAgent
-								.getPrefLabelList().size()) {
-							agents.remove(agent);
-						}
-						}
+			
+			
+			
+			agents.addAll(rdf.getAgentList());
+			
+			for (int i=0;i<agents.size()-1;i++) {
+				AgentType sAgent = agents.get(i);
+				for(int k=i+1;k<agents.size();k++){
+					AgentType fAgent = agents.get(k);
+					if (StringUtils.contains(fAgent.getAbout(),
+							sAgent.getAbout())
+							|| StringUtils.contains(fAgent.getAbout(),
+									sAgent.getAbout())) {
+						
+						
+						agents.set(i,utils.mergeAgentFields(fAgent, sAgent));
+						sAgent = agents.get(i);
+						agents.remove(k);
+						k--;
 					}
 				}
-				agents.add(newAgent);
+					
 			}
-
 			rdfFinal.setAgentList(agents);
 		}
 		if (rdf.getConceptList() != null) {
-			for (Concept newConcept : rdf.getConceptList()) {
-				for (Concept concept : concepts) {
-
-					if (StringUtils.equals(concept.getAbout(),
-							newConcept.getAbout())) {
-						if(concept.getChoiceList()!=null){
-						if (concept.getChoiceList().size() <= newConcept
-								.getChoiceList().size()) {
-							concepts.remove(concept);
-						}
-						}
+			concepts.addAll(rdf.getConceptList());
+			for (int i=0;i<concepts.size()-1;i++){
+				Concept sConcept = concepts.get(i);
+				for(int k=i+1;k<concepts.size();k++){
+					Concept fConcept = concepts.get(k);
+					if (StringUtils.contains(fConcept.getAbout(),
+							sConcept.getAbout())
+							|| StringUtils.contains(sConcept.getAbout(),
+									fConcept.getAbout())) {
+						concepts.set(i, utils.mergeConceptsField(fConcept,sConcept));
+						sConcept = concepts.get(i);
+						agents.remove(k);
+						k--;
 					}
 				}
-				concepts.add(newConcept);
 			}
+		
 			rdfFinal.setConceptList(concepts);
 		}
 		if (rdf.getTimeSpanList() != null) {
-			for (TimeSpanType newTs : rdf.getTimeSpanList()) {
-				for (TimeSpanType ts : timespans) {
-					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
-						if(ts.getIsPartOfList()!=null){
-						if (ts.getIsPartOfList().size() <= newTs
-								.getIsPartOfList().size()) {
-							timespans.remove(ts);
-						}
-						}
+			timespans.addAll(rdf.getTimeSpanList());
+			for(int i=0;i<timespans.size()-1;i++){
+				TimeSpanType sTs = timespans.get(i);
+				for(int k=i+1;k<timespans.size();k++){
+					TimeSpanType fTs = timespans.get(k);
+					if (StringUtils.contains(fTs.getAbout(), sTs.getAbout())
+							|| StringUtils.contains(sTs.getAbout(),
+									fTs.getAbout())) {
+						timespans.set(i, utils.mergeTimespanFields(fTs,sTs));
+						sTs = timespans.get(i);
+						timespans.remove(k);
+						k--;
 					}
 				}
-				timespans.add(newTs);
 			}
 			rdfFinal.setTimeSpanList(timespans);
 		}
 		if (rdf.getPlaceList() != null) {
-			for (PlaceType newPlace : rdf.getPlaceList()) {
-				for (PlaceType place : places) {
-					if (StringUtils.equals(place.getAbout(),
-							newPlace.getAbout())) {
-						if(place.getPrefLabelList()!=null){
-						if (place.getPrefLabelList().size() <= newPlace
-								.getPrefLabelList().size()) {
-							places.remove(place);
-						}
-						}
+			places.addAll(rdf.getPlaceList());
+			
+			for(int i = 0; i<places.size()-1;i++){
+				PlaceType sPlace = places.get(i);
+				for(int k=i+1;k<places.size();k++){
+					PlaceType fPlace = places.get(k);
+					if (StringUtils.equals(fPlace.getAbout(),
+							sPlace.getAbout())
+							|| StringUtils.contains(sPlace.getAbout(),
+									fPlace.getAbout())) {
+						places.set(i, utils.mergePlacesFields(fPlace,sPlace));
+						sPlace = places.get(i);
+						places.remove(k);
+						k--;
 					}
 				}
-				places.add(newPlace);
 			}
-
+			
+			
 			rdfFinal.setPlaceList(places);
 		}
 		rdfFinal.setAggregationList(rdf.getAggregationList());
@@ -886,7 +894,6 @@ public class SolrWorkflowPlugin<I> extends
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 
-		
 	}
 
 	/*
@@ -965,4 +972,6 @@ public class SolrWorkflowPlugin<I> extends
 
 	}
 
+	
+	
 }
