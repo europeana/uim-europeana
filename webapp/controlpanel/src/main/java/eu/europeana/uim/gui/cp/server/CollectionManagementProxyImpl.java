@@ -34,12 +34,26 @@ public class CollectionManagementProxyImpl extends
 	private static final int MONGO_PORT = Integer.parseInt(PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT));
 	private static final String MONGO_DB = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static final String REPOSITORY = PropertyReader.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
-	@Override
-	public List<CollectionMappingDTO> retrieveCollections() {
-		List<CollectionMappingDTO> collections = new ArrayList<CollectionMappingDTO>();
+	
+	static{
 		try {
 			collectionMongoServer = new CollectionMongoServer(new Mongo(
 					MONGO_HOST, MONGO_PORT), MONGO_DB);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MongoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	@Override
+	public List<CollectionMappingDTO> retrieveCollections() {
+		List<CollectionMappingDTO> collections = new ArrayList<CollectionMappingDTO>();
+
 			for (Collection collection : collectionMongoServer
 					.retrieveAllCollections()) {
 				CollectionMappingDTO collectionDTO = new CollectionMappingDTO();
@@ -49,15 +63,14 @@ public class CollectionManagementProxyImpl extends
 				collections.add(collectionDTO);
 			}
 			collectionMongoServer.close();
-		} catch (UnknownHostException e) {
-			collections = new ArrayList<CollectionMappingDTO>();
-		} catch (MongoException e) {
-			collections = new ArrayList<CollectionMappingDTO>();
-		}
+
 		return collections;
 
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.gui.cp.client.services.CollectionManagementProxy#saveOneCollection(eu.europeana.uim.gui.cp.shared.CollectionMappingDTO)
+	 */
 	@Override
 	public Boolean saveOneCollection(CollectionMappingDTO collectionDTO) {
 		try {
@@ -77,11 +90,12 @@ public class CollectionManagementProxyImpl extends
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.gui.cp.client.services.CollectionManagementProxy#saveCollections(java.util.List)
+	 */
 	@Override
 	public Boolean saveCollections(List<CollectionMappingDTO> collections) {
-		try {
-			collectionMongoServer = new CollectionMongoServer(new Mongo(
-					MONGO_HOST, MONGO_PORT), MONGO_DB);
+
 			for (CollectionMappingDTO collectionDTO : collections) {
 				
 				Collection collection = new Collection();
@@ -92,14 +106,13 @@ public class CollectionManagementProxyImpl extends
 				collectionMongoServer.saveCollection(collection);
 			}
 			collectionMongoServer.close();
-		} catch (UnknownHostException e) {
-			return false;
-		} catch (MongoException e) {
-			return false;
-		}
+
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.gui.cp.client.services.CollectionManagementProxy#retrieveCsvCollections(java.lang.String, java.lang.String)
+	 */
 	@Override
 	public List<CollectionMappingDTO> retrieveCsvCollections(String location,
 			String delimiter) {
@@ -121,6 +134,11 @@ public class CollectionManagementProxyImpl extends
 		return collections;
 	}
 
+	/**
+	 * @param location
+	 * @return
+	 * @throws IOException
+	 */
 	private String[] readCsv(String location) throws IOException {
 		String strFileContents = "";
 		FileInputStream fin;

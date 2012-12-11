@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -51,7 +50,6 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import com.google.gwt.http.client.URL;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -115,7 +113,9 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
     private static  String PORTAL_SINGLE_RECORD_URL = "http://www.europeana.eu/portal/record/";
     private static  String REPOSITORY_PREVIEW_URL;
 	
+    private static IUnmarshallingContext uctx;
 
+    private static DocumentBuilder db; 
     
 	/**
 	 * Creates a new instance of this class.
@@ -123,8 +123,20 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 	public RetrievalServiceImpl() {
 
 		super();
-		
+
 		try {
+			
+			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
+
+			uctx = bfact
+					.createUnmarshallingContext();
+			
+			DocumentBuilderFactory dbf = DocumentBuilderFactory
+					.newInstance();
+			db = dbf.newDocumentBuilder();
+			
+			
+			
 			BlockingInitializer initializer = new BlockingInitializer() {
 				
 				@Override
@@ -252,12 +264,8 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				MetaDataRecordDTO record = new MetaDataRecordDTO();
 				record.setId(metaDataRecord.getId());
 
-				IBindingFactory bfact;
 				try {
-					bfact = BindingDirectory.getFactory(RDF.class);
 
-					IUnmarshallingContext uctx = bfact
-							.createUnmarshallingContext();
 
 					String edmxml = metaDataRecord
 							.getFirstValue(EuropeanaModelRegistry.EDMRECORD);
@@ -344,6 +352,11 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		return res;
 	}
 
+	/**
+	 * @param recordId
+	 * @param edmrecord
+	 * @return
+	 */
 	private String getXml(String recordId,
 			TKey<EuropeanaModelRegistry, String> edmrecord) {
 		String res = "";
@@ -369,12 +382,13 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				res = metaDataRecord.getFirstValue(edmrecord);
 
 				try {
-					DocumentBuilderFactory dbf = DocumentBuilderFactory
-							.newInstance();
-					DocumentBuilder db = dbf.newDocumentBuilder();
 					InputSource is = new InputSource(new StringReader(res));
-					Document doc = db.parse(is);
-					res = getFormattedXml(doc);
+					synchronized(db){
+						Document doc = db.parse(is);
+						res = getFormattedXml(doc);
+					}
+					
+					
 				} catch (Throwable t) {
 					log.log(Level.WARNING, "Could not format xml for '"
 							+ recordId + "'!", t);

@@ -44,6 +44,8 @@ public class ImportVocabularyProxyImpl extends
 	private final static String repository = PropertyReader.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	private static VocabularyMongoServer mongo;
 
+	
+	// Statically initializing VocabularyMongoServer
 	{
 		try {
 			mongo = new VocabularyMongoServer(
