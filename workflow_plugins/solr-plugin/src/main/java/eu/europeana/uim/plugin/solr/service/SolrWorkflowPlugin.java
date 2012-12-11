@@ -56,6 +56,7 @@ import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
+import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.orchestration.ExecutionContext;
@@ -318,7 +319,7 @@ public class SolrWorkflowPlugin<I> extends
 									fConcept.getAbout())) {
 						concepts.set(i, utils.mergeConceptsField(fConcept,sConcept));
 						sConcept = concepts.get(i);
-						agents.remove(k);
+						concepts.remove(k);
 						k--;
 					}
 				}
