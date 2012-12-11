@@ -313,8 +313,8 @@ public class OsgiExtractor extends Extractor {
 								}
 								// Since the attribute is not mapped
 								else {
-									XMLEvent evt2 = xml.nextEvent();
-									if (evt2.isCharacters()) {
+									if (xml.peek().isCharacters()) {
+										
 										if (StringUtils.equals(edmLabel
 												.getLabel().toString(),
 												"skos_concept")) {
