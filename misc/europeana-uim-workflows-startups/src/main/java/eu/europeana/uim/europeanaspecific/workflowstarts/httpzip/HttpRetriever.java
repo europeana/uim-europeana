@@ -91,14 +91,8 @@ public class HttpRetriever implements Iterator<String> {
 		//First copy the remote URI to a 
 		File dest = new File(PropertyReader.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION)+new Integer(generator.nextInt()).toString());
 		FileUtils.copyURLToFile(url, dest, 100, 100000);
-
 		TarArchiveInputStream tarfile;
 
-
-		
-		//InputStreamReader isr = new InputStreamReader();
-
-		
 			tarfile =  new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(dest)));
 
 			tarfile.available();

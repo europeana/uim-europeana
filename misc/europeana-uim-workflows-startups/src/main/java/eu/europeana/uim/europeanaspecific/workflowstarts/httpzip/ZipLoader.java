@@ -35,12 +35,10 @@ import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.progress.ProgressMonitor;
-import eu.europeana.uim.europeanaspecific.workflowstarts.httpzip.HttpZipWorkflowStart.Data;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
-import eu.europeana.corelib.tools.lookuptable.LookupResult;
 import eu.europeana.corelib.tools.lookuptable.LookupState;
 import eu.europeana.dedup.osgi.service.DeduplicationResult;
 import eu.europeana.dedup.osgi.service.DeduplicationService;
@@ -80,6 +78,24 @@ public class ZipLoader<I> {
 	
 	private DeduplicationService dedup;
 
+	private static IUnmarshallingContext mctx;
+	
+	
+	//Unmarshalling context initialization
+	static{
+		
+		IBindingFactory bfact;
+		try {
+			bfact = BindingDirectory.getFactory(RDF.class);
+			mctx = bfact.createUnmarshallingContext();
+		} catch (JiBXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	/**
 	 * Default constructor for this class
 	 * 
@@ -277,15 +293,9 @@ public class ZipLoader<I> {
 	 * @throws JiBXException
 	 */
 	private RDF unmarshall(String edm) throws JiBXException {
-
-		IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
-		IUnmarshallingContext mctx = bfact.createUnmarshallingContext();
 		StringReader reader = new StringReader(edm);
-
 		RDF rdf = (RDF) mctx.unmarshalDocument(reader, "UTF-8");
-
 		return rdf;
-
 	}
 
 	/**
