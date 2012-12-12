@@ -86,6 +86,10 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		Morphia mor = new Morphia();
 		Mongo mongo;
 		try {
+			bfact = BindingDirectory.getFactory(RDF.class);
+			uctx = bfact.createUnmarshallingContext();
+			
+			
 			mongo = new Mongo(
 					PropertyReader
 							.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
@@ -108,8 +112,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 
 			thumbnailHandler = thumbnailService;
 
-			bfact = BindingDirectory.getFactory(RDF.class);
-			uctx = bfact.createUnmarshallingContext();
+
 
 		} catch (UnknownHostException e) {
 			log.severe(e.getMessage());
@@ -256,12 +259,6 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			int status = 0;
 			try {
 				String name = guarded.getUrl().getFile();
-
-				URLConnection urlConnection = new URL(url).openConnection();
-				
-				InputStream inputStream = urlConnection.getInputStream();
-				StringWriter writer = new StringWriter();
-				IOUtils.copy(inputStream, writer, "UTF-8");
 				
 				target = new File(STORAGELOCATION
 						+ URLEncoder.encode(name, "UTF-8"));
