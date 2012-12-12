@@ -1148,7 +1148,7 @@ public class OsgiExtractor extends Extractor {
 		List<EdmMappedField> element = elements.get(fieldToMap);
 		if (!element.contains(europeanaField)) {
 			EdmMappedField edmField = new EdmMappedField();
-			edmField.setLabel(europeanaField);
+			edmField.setLabel(europeanaField.toString());
 			edmField.setAttribute(StringUtils.isNotBlank(attribute) ? attribute
 					: "");
 
