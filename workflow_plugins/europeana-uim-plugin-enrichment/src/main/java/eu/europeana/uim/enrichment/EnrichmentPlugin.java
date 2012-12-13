@@ -296,11 +296,7 @@ public class EnrichmentPlugin<I> extends
 			solrServer.commit();
 			System.out.println("Committed in Solr Server");
 
-			// TODO:optimize must be done in a separate plugin it is getting
-			// slow and should be done on request
-			// solrServer.optimize();
-			// System.out.println("Optimized");
-
+			
 			solrList = new ArrayList<SolrInputDocument>();
 			mongoServer.close();
 		} catch (IOException e) {
@@ -457,20 +453,20 @@ public class EnrichmentPlugin<I> extends
 				: DocType.IMAGE);
 		ops.set("europeanaCompleteness", fullBean.getEuropeanaCompleteness());
 		ops.set("optOut", fullBean.isOptedOut());
-		// ops.set("places", fullBean.getPlaces()!=null?fullBean.getPlaces():new
-		// ArrayList<PlaceImpl>());
-		// ops.set("agents", fullBean.getAgents()!=null?fullBean.getAgents():new
-		// ArrayList<AgentImpl>());
-		// ops.set("timespans",
-		// fullBean.getTimespans()!=null?fullBean.getTimespans():new
-		// ArrayList<TimespanImpl>());
-		// ops.set("concepts",
-		// fullBean.getConcepts()!=null?fullBean.getConcepts():new
-		// ArrayList<ConceptImpl>());
-		// ops.set("aggregations", fullBean.getAggregations());
-		// ops.set("providedCHOs", fullBean.getProvidedCHOs());
-		// ops.set("europeanaAggregation", fullBean.getEuropeanaAggregation());
-		// ops.set("proxies",fullBean.getProxies());
+		 ops.set("places", fullBean.getPlaces()!=null?fullBean.getPlaces():new
+		 ArrayList<PlaceImpl>());
+		 ops.set("agents", fullBean.getAgents()!=null?fullBean.getAgents():new
+		 ArrayList<AgentImpl>());
+		 ops.set("timespans",
+		 fullBean.getTimespans()!=null?fullBean.getTimespans():new
+		 ArrayList<TimespanImpl>());
+		 ops.set("concepts",
+		 fullBean.getConcepts()!=null?fullBean.getConcepts():new
+		 ArrayList<ConceptImpl>());
+		 ops.set("aggregations", fullBean.getAggregations());
+		 ops.set("providedCHOs", fullBean.getProvidedCHOs());
+		 ops.set("europeanaAggregation", fullBean.getEuropeanaAggregation());
+		 ops.set("proxies",fullBean.getProxies());
 		ops.set("country",
 				fullBean.getCountry() != null ? fullBean.getCountry()
 						: new String[] {});
