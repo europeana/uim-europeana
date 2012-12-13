@@ -17,6 +17,9 @@
 package eu.europeana.uim.plugin.thumbler.workflows;
 
 import org.theeuropeanlibrary.uim.check.weblink.LinkCheckIngestionPlugin;
+
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.util.LoggingIngestionPlugin;
 import eu.europeana.uim.workflow.AbstractWorkflow;
@@ -29,7 +32,7 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 11 Jun 2012
  */
-public class LinkCheckWorkflow extends AbstractWorkflow {
+public class LinkCheckWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>,I> {
     /**
      * Creates a new instance of this class.
      */
@@ -40,9 +43,9 @@ public class LinkCheckWorkflow extends AbstractWorkflow {
         //Load metadata records from storage engine and offer them
         //to the declared plugins in batches. The size of the batch 
         //is determined by the relevant property defined by the batch workflow.
-        setStart(new BatchWorkflowStart());
+        setStart(new BatchWorkflowStart<I>());
         //Add the Link Checking Plugin as a step
-        addStep(new LinkCheckIngestionPlugin());
+        addStep(new LinkCheckIngestionPlugin<I>());
         //Performs logging of TKey<LoggingIngestionPlugin, Data> DATA_KEY 
         //typed key values, previously stored by the Linkchecking plugin.
         //These values are used in a later phase in order to generate 
@@ -50,7 +53,7 @@ public class LinkCheckWorkflow extends AbstractWorkflow {
         //both logging engine implementations (memory & database), you
         //should use the database (postgres specific module) in order for
         //this to work properly.
-        addStep(new LoggingIngestionPlugin());
+        addStep(new LoggingIngestionPlugin<MetaDataRecord<I>,I>());
     }
 
 	/* (non-Javadoc)

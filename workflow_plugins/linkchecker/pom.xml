@@ -156,6 +156,7 @@
 							org.theeuropeanlibrary.model.common.qualifier,
 							org.theeuropeanlibrary.model.tel,
 							eu.europeana.uim.model.europeana,
+							eu.europeana.uim.common.progress,
 							eu.europeana.uim.model.adapters.*,
 							org.osgi.service.blueprint,
 							org.apache.commons.io,

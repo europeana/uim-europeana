@@ -17,8 +17,11 @@
 package eu.europeana.uim.plugin.thumbler.workflows;
 
 import eu.europeana.uim.plugin.thumbler.service.ThumblerPlugin;
+import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.util.BatchWorkflowStart;
+import eu.europeana.uim.util.CollectionBatchWorkflowStart;
 import eu.europeana.uim.util.LoggingIngestionPlugin;
+import eu.europeana.uim.util.RecordAwareCBWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 
 /**
@@ -27,8 +30,8 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
  * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 11 Jun 2012
- */
-public class ImageCacheWorkflow extends AbstractWorkflow{
+ */  
+public class ImageCacheWorkflow<I> extends AbstractWorkflow<Collection<I>,I>{
 	
 	
 	/**
@@ -41,9 +44,9 @@ public class ImageCacheWorkflow extends AbstractWorkflow{
         //Load metadata records from storage engine and offer them
         //to the declared plugins in batches. The size of the batch 
         //is determined by the relevant property defined by the batch workflow.
-        setStart(new BatchWorkflowStart());
+        setStart(new RecordAwareCBWorkflowStart<I>());
         //Add the Link Checking Plugin as a step
-        addStep(new ThumblerPlugin());
+        addStep(new ThumblerPlugin<I>());
         //Performs logging of TKey<LoggingIngestionPlugin, Data> DATA_KEY 
         //typed key values, previously stored by the ThumblerPlugin plugin.
         //These values are used in a later phase in order to generate 

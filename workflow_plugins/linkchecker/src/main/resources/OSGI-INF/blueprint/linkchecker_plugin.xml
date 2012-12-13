@@ -7,6 +7,7 @@
 		blueprint definition, both the Linchecking and Thumbler (image caching) workflows 
 		are exported. -->
 	<bean id="thumbler" class="eu.europeana.uim.plugin.thumbler.service.ThumblerPlugin">
+	  <argument ref="registry" />
 	</bean>
 
 	<!-- Export the thumblerPlugin as a service -->
@@ -38,6 +39,7 @@
 	<service id="imageCacheWorkflow" ref="thw"
 		interface="eu.europeana.uim.workflow.Workflow" />
 
+	<reference id="registry" interface="eu.europeana.uim.Registry" />
 
 	<reference id="sugar" interface="eu.europeana.uim.sugar.SugarService"
 		availability="optional">
@@ -50,11 +52,12 @@
 
 	<service id="linkadapterservice" ref="linkadapter"
 		interface="eu.europeana.uim.adapter.UimDatasetAdapter" />
-		
+	
+	<!-- 	
 	<bean id="thumbleradapter" class="eu.europeana.uim.plugin.thumbler.converters.ThumblerAdapter"/>
 
 	<service id="thumbleradapterservice" ref="thumbleradapter"
 		interface="eu.europeana.uim.adapter.UimDatasetAdapter" />	
-		
+	 -->	
 
 </blueprint>

@@ -24,7 +24,7 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.collections.guarded.Guarded;
 import org.theeuropeanlibrary.model.common.Link;
-import org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer;
+//import org.theeuropeanlibrary.uim.check.weblink.http.AbstractWeblinkServer;
 import org.theeuropeanlibrary.uim.check.weblink.http.GuardedMetaDataRecordUrl;
 import org.theeuropeanlibrary.uim.check.weblink.http.HttpClientSetup;
 import org.theeuropeanlibrary.uim.check.weblink.http.Submission;

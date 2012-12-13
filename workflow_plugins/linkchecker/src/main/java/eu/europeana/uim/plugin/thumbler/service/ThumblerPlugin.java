@@ -25,19 +25,25 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.lang.ArrayUtils;
 import org.theeuropeanlibrary.model.common.Link;
 import org.theeuropeanlibrary.model.common.qualifier.LinkStatus;
 import org.theeuropeanlibrary.model.tel.ObjectModelRegistry;
 import org.theeuropeanlibrary.uim.check.weblink.AbstractLinkIngestionPlugin;
 import org.theeuropeanlibrary.uim.check.weblink.http.GuardedMetaDataRecordUrl;
 import org.theeuropeanlibrary.uim.check.weblink.http.Submission;
+
+import eu.europeana.uim.Registry;
 import eu.europeana.uim.model.adapters.AdapterFactory;
 import eu.europeana.uim.model.adapters.MetadataRecordAdapter;
 import eu.europeana.uim.model.adapters.QValueAdapterStrategy;
@@ -52,12 +58,17 @@ import eu.europeana.uim.store.MetaDataRecord.QualifiedValue;
 import eu.europeana.uim.sugar.SugarService;
 import eu.europeana.uim.orchestration.ActiveExecution;
 import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.orchestration.Orchestrator;
+import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.TKey;
+import eu.europeana.uim.common.progress.MemoryProgressMonitor;
+import eu.europeana.uim.common.progress.RevisableProgressMonitor;
+import eu.europeana.uim.common.progress.RevisingProgressMonitor;
 
 
 
@@ -72,7 +83,7 @@ import eu.europeana.uim.common.TKey;
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 12 Apr 2012
  */
-public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
+public class ThumblerPlugin<I>  extends AbstractIngestionPlugin<Collection<I>,I> {
 
     private final static SimpleDateFormat df        = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     /**
@@ -82,6 +93,9 @@ public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
     
     
     private static SugarService           sugarService;
+    
+    private static Registry               registry;
+    
     
     protected static final TKey<ThumblerPlugin, EuropeanaLinkData> DATA = TKey.register(
     		ThumblerPlugin.class,
@@ -96,96 +110,184 @@ public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
 		super("thumbler_plugin", "store remote thumbnails into MongoDB ");
 	}
 
+	
+	public ThumblerPlugin(Registry registry) {
+		super("thumbler_plugin", "store remote thumbnails into MongoDB ");
+		ThumblerPlugin.registry = registry;
+	}
 
 
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.store.MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-    public boolean process(MetaDataRecord<I> mdr, ExecutionContext<MetaDataRecord<I>, I> context)
+    public boolean process(Collection<I> collection, ExecutionContext<Collection<I>, I> context)
             throws IngestionPluginFailedException, CorruptedDatasetException {
+				
+		Orchestrator<I> orchestrator = (Orchestrator<I>) registry.getOrchestrator();
+		ActiveExecution<?, Serializable> ae =  (ActiveExecution<?, Serializable>) orchestrator.getActiveExecution(context.getExecution().getId());
+		
+		RevisableProgressMonitor monitor = ae.getMonitor();
+		RevisingProgressMonitor revisingProgressMonitor = new MemoryProgressMonitor();
+		monitor.addListener(revisingProgressMonitor);
 		
 		EuropeanaLinkData value = context.getValue(DATA);
+		int threshold = 100;
 		
-		List<QualifiedValue<Link>> linkList = mdr.getQualifiedValues(ObjectModelRegistry.LINK);
+		I[] recs = null;
 		
-	        int index = 0;
-            for(QualifiedValue<Link> qlink : linkList){ 
-            	
-            	synchronized (value) {
-                    value.submitted++;
-                }
-            	
-                final LoggingEngine<I> loggingEngine = context.getLoggingEngine();
-                try {
-					EuropeanaWeblinkThumbler.getShared().offer(
-					        new GuardedMetaDataRecordUrl<I>(context.getExecution(), mdr, qlink.getValue(), index++,
-					                new URL(qlink.getValue().getUrl())) {
-					            @SuppressWarnings("unchecked")
-					            @Override
-					            public void processed(int status, String message) {
-					                LinkStatus state = null;
-					                
-					                if (status == 0) {
-					                    state = LinkStatus.CACHED;
-					                } else if (status == 1) {
-					                    state = LinkStatus.FAILED_CONNECTION;
-					                } 
+		try {
+			 recs = context.getStorageEngine().getByCollection(collection);			 
+			 ae.incrementScheduled(recs.length -1);
 
-					                getLink().setLastChecked(new Date());
-					                getLink().setLinkStatus(state);
-
-					                String time = df.format(getLink().getLastChecked());
-
-					                Execution<I> execution = getExecution();
-
-					                loggingEngine.logLink(execution, "thumbler", getMetaDataRecord(),
-					                        getLink().getUrl(), status, time, message,
-					                        getUrl().getHost(), getUrl().getPath());
-
-					                Submission submission = EuropeanaWeblinkThumbler.getShared().getSubmission(
-					                        execution);
-
-					                if (submission != null) {
-					                    synchronized (submission) {
-					                        execution.putValue("thumbler.processed",
-					                                "" + submission.getProcessed());
-					                        
-					                        if (!execution.isActive()) {
-					                            
-					                            // need to store our own
-					                            try {
-					                                if (submission.getProcessed() % 500 == 0) {
-					                                    if (((StorageEngine<I>)submission.getStorageEngine()) != null) {
-					                                        ((StorageEngine<I>)submission.getStorageEngine()).updateExecution(execution);
-					                                    }
-					                                } else if (!submission.hasRemaining()) {
-					                                    if (((StorageEngine<I>)submission.getStorageEngine()) != null) {
-					                                        ((StorageEngine<I>)submission.getStorageEngine()).updateExecution(execution);
-					                                    }
-					                                }
-					                            } catch (StorageEngineException e) {
-					                                throw new RuntimeException(
-					                                        "Caused by StorageEngineException", e);
-					                            }
-					                            
-					                        }
-					                    }
-					                }
-
-					                log.info("Checked <" + getLink().getUrl() + ">" + message);
-					            }
-					        }, context);
+		} catch (StorageEngineException e1) {
+			e1.printStackTrace();
+		}
+		
+		LinkedBlockingQueue<I> refQueue = new LinkedBlockingQueue<I>(Arrays.asList(recs));
+		
+		
+		Submission submission = EuropeanaWeblinkThumbler.getShared().getSubmission(context.getExecution());
+		
+		int processed =0;
+		int failed = 0;
+		
+		while(!refQueue.isEmpty()){
+			
+			if(submission == null || submission.getRemaining() < threshold){
+				try {
+					
+					MetaDataRecord<I> mdr = context.getStorageEngine().getMetaDataRecord(refQueue.remove());
+					
+					offerRecord(mdr,context,value);
+					
+					submission = EuropeanaWeblinkThumbler.getShared().getSubmission(context.getExecution());
+					//revisingProgressMonitor.worked(1);
+					
 				} catch (MalformedURLException e) {
+
+					//ae.
+					context.getExecution().setFailureCount(failed++);
+				} catch (StorageEngineException e) {
+					context.getExecution().setFailureCount(failed++);
+				}
+				
+				
+				ae.incrementCompleted(1);				
+			    }
+			else{
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-
-            }
-
+			}
+		}
+            
 		return false;
 	}
 		
 
+	
+	/**
+	 * @param mdr
+	 * @param context
+	 * @param value
+	 * @throws MalformedURLException
+	 */
+	private void offerRecord(MetaDataRecord<I> mdr,ExecutionContext<Collection<I>, I> context,EuropeanaLinkData value) throws MalformedURLException{
+		
+		List<QualifiedValue<Link>> linkList = mdr.getQualifiedValues(ObjectModelRegistry.LINK);
+		
+		
+        if (linkList.size() == 0) {
+        // Adapter that ensures compatibility with the europeana datamodel
+        Map<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>> strategies = new HashMap<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>>();
+
+        strategies.put(ObjectModelRegistry.LINK, new EuropeanaLinkAdapterStrategy());
+
+        MetadataRecordAdapter<I, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = AdapterFactory.getAdapter(
+               mdr, strategies);
+       // get all links
+       linkList = mdrad.getQualifiedValues(ObjectModelRegistry.LINK);
+      }
+		
+		
+		
+        int index = 0;
+        for(QualifiedValue<Link> qlink : linkList){ 
+        	
+        	synchronized (value) {
+                value.submitted++;
+            }
+        	 
+            final LoggingEngine<I> loggingEngine = context.getLoggingEngine();
+
+            
+            EuropeanaWeblinkThumbler.getShared().offer(new GuardedMetaDataRecordUrl<I>(context.getExecution(), mdr, qlink.getValue(), index++,
+	                new URL(qlink.getValue().getUrl())) {
+	            @SuppressWarnings("unchecked")
+	            @Override
+	            public void processed(int status, String message) {
+	                LinkStatus state = null;
+	                
+	                if (status == 0) {
+	                    state = LinkStatus.CACHED;
+	                } else if (status == 1) {
+	                    state = LinkStatus.FAILED_CONNECTION;
+	                } 
+
+	                getLink().setLastChecked(new Date());
+	                getLink().setLinkStatus(state);
+
+	                String time = df.format(getLink().getLastChecked());
+
+	                Execution<I> execution = getExecution();
+
+	                loggingEngine.logLink(execution, "thumbler", getMetaDataRecord(),
+	                        getLink().getUrl(), status, time, message,
+	                        getUrl().getHost(), getUrl().getPath());
+
+	                Submission submission = EuropeanaWeblinkThumbler.getShared().getSubmission(
+	                        execution);
+
+	                if (submission != null) {
+	                    synchronized (submission) {
+	                        execution.putValue("thumbler.processed",
+	                                "" + submission.getProcessed());
+	                        
+	                        if (!execution.isActive()) {
+	                            
+	                            // need to store our own
+	                            try {
+	                                if (submission.getProcessed() % 500 == 0) {
+	                                    if (((StorageEngine<I>)submission.getStorageEngine()) != null) {
+	                                        ((StorageEngine<I>)submission.getStorageEngine()).updateExecution(execution);
+	                                    }
+	                                } else if (!submission.hasRemaining()) {
+	                                    if (((StorageEngine<I>)submission.getStorageEngine()) != null) {
+	                                        ((StorageEngine<I>)submission.getStorageEngine()).updateExecution(execution);
+	                                    }
+	                                }
+	                            } catch (StorageEngineException e) {
+	                                throw new RuntimeException(
+	                                        "Caused by StorageEngineException", e);
+	                            }
+	                            
+	                        }
+	                    }
+	                }
+
+	                log.info("Checked <" + getLink().getUrl() + ">" + message);
+	            }
+	        }, context);
+            
+            
+        }
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.api.IngestionPlugin#getParameters()
 	 */
@@ -198,7 +300,7 @@ public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
 	 * @see eu.europeana.uim.api.IngestionPlugin#initialize(eu.europeana.uim.api.ExecutionContext)
 	 */
 	@Override
-	public void initialize(ExecutionContext<MetaDataRecord<I>,I> context)
+	public void initialize(ExecutionContext<Collection<I>,I> context)
 			throws IngestionPluginFailedException {
 		EuropeanaLinkData value = new EuropeanaLinkData();
 		
@@ -225,7 +327,7 @@ public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
      * @see org.theeuropeanlibrary.uim.check.weblink.AbstractLinkIngestionPlugin#completed(eu.europeana.uim.api.ExecutionContext)
      */
     @Override
-    public void completed(ExecutionContext<MetaDataRecord<I>,I> context) throws IngestionPluginFailedException {
+    public void completed(ExecutionContext<Collection<I>,I> context) throws IngestionPluginFailedException {
     	EuropeanaLinkData value = context.getValue(DATA);
 
 
@@ -262,7 +364,7 @@ public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
                 //collection.putValue(SugarControlledVocabulary.COLLECTION_LINK_VALIDATION,
                 //        "" + context.getExecution().getId());
 
-                ((ActiveExecution<MetaDataRecord<I>,I>)context).getStorageEngine().updateCollection(collection);
+                context.getStorageEngine().updateCollection(collection);
 
                 if (getSugarService() != null) {
                     getSugarService().updateCollection(collection);
@@ -313,6 +415,49 @@ public class ThumblerPlugin<I> extends AbstractLinkIngestionPlugin<I> {
 
         File            directory;
     }
+
+
+    @Override
+    public TKey<?, ?>[] getInputFields() {
+        return new TKey[0];
+    }
+
+    @Override
+    public TKey<?, ?>[] getOptionalFields() {
+        return new TKey[0];
+    }
+
+    @Override
+    public TKey<?, ?>[] getOutputFields() {
+        return new TKey[0];
+    }
+
+
+
+	@Override
+	public int getMaximumThreadCount() {
+		return 10;
+	}
+
+
+
+	@Override
+	public int getPreferredThreadCount() {
+		return 0;
+	}
+
+
+
+	@Override
+	public void initialize() {
+		
+	}
+
+
+
+	@Override
+	public void shutdown() {
+	}
 
 
 }
