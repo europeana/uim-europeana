@@ -15,7 +15,7 @@ import eu.europeana.uim.plugin.solr.utils.PropertyReader;
 import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 
 public class SolrWorkflowServiceImpl implements SolrWorkflowService {
-	private OsgiExtractor extractor;
+	private static OsgiExtractor extractor;
 	private static Datastore datastore;
 
 	
@@ -25,9 +25,10 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 
 			@Override
 			protected void initializeInternal() {
-				Morphia morphia = new Morphia();
-				morphia.map(ControlledVocabularyImpl.class);
+			
 				if (datastore == null) {
+					Morphia morphia = new Morphia();
+					morphia.map(ControlledVocabularyImpl.class);
 					try {
 						datastore = morphia
 								.createDatastore(
@@ -60,7 +61,9 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 
 			@Override
 			protected void initializeInternal() {
-				extractor = new OsgiExtractor();
+				if(extractor == null){
+					extractor = new OsgiExtractor();
+				}
 				extractor.setDatastore(datastore);
 			}
 		};

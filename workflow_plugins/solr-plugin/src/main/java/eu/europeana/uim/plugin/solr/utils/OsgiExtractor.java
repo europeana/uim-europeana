@@ -36,13 +36,16 @@ import com.google.code.morphia.query.UpdateOperations;
 import com.mongodb.MongoException;
 
 import eu.europeana.corelib.definitions.jibx.AgentType;
+import eu.europeana.corelib.definitions.jibx.Alt;
 import eu.europeana.corelib.definitions.jibx.Concept;
+import eu.europeana.corelib.definitions.jibx.Lat;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
+import eu.europeana.corelib.definitions.jibx._Long;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EdmMappedField;
@@ -83,7 +86,7 @@ public class OsgiExtractor extends Extractor {
 	private final static long UPDATETIMESTAMP = 5184000000l;
 
 	@SuppressWarnings("rawtypes")
-	public Map<String, List> denormalize(String resource,
+	public synchronized Map<String, List> denormalize(String resource,
 			ControlledVocabularyImpl controlledVocabulary, int iterations,
 			boolean iterFromVocabulary) throws SecurityException,
 			IllegalArgumentException, InstantiationException,
@@ -141,6 +144,7 @@ public class OsgiExtractor extends Extractor {
 		AgentType lastAgent = null;
 		TimeSpanType lastTimespan = null;
 		PlaceType lastPlace = null;
+		
 		try {
 			Source source = new StreamSource(new ByteArrayInputStream(
 					xmlString.getBytes()), "UTF-8");
@@ -154,6 +158,7 @@ public class OsgiExtractor extends Extractor {
 					element = (sElem.getName().getPrefix() != null ? sElem
 							.getName().getPrefix() + ":" : "")
 							+ sElem.getName().getLocalPart();
+					
 					// If it is mapped then
 					if (isMapped(element)) {
 
@@ -880,8 +885,6 @@ public class OsgiExtractor extends Extractor {
 				RDF = rdfMethod;
 			}
 		}
-
-		//
 		if (RDF.getMethodName().endsWith("List")) {
 
 			Method mthd = clazz.getMethod(RDF.getMethodName());
@@ -998,6 +1001,27 @@ public class OsgiExtractor extends Extractor {
 						StringUtils.replace(RDF.getMethodName(), "get", "set"),
 						cls);
 				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
+			} 
+			else if(RDF.getClazz().isAssignableFrom(_Long.class)){
+				Float rs = Float.parseFloat(val);
+				_Long lng = new _Long();
+				lng.setLong(rs);
+				((PlaceType)obj).setLong(lng);
+				
+			}
+			else if(RDF.getClazz().isAssignableFrom(Lat.class)){
+				Float rs = Float.parseFloat(val);
+				Lat lng = new Lat();
+				lng.setLat(rs);
+				((PlaceType)obj).setLat(lng);
+				
+			}
+			else if(RDF.getClazz().isAssignableFrom(Alt.class)){
+				Float rs = Float.parseFloat(val);
+				Alt lng = new Alt();
+				lng.setAlt(rs);
+				((PlaceType)obj).setAlt(lng);
+				
 			}
 		}
 

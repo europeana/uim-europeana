@@ -131,7 +131,7 @@ public class EnrichmentPlugin<I> extends
 	private final static String creatorProperty = "dc:creator";
 	private final static String languageProperty = "edm:language";
 	private final static String rightsProperty = "edm:rights";
-
+	private static IBindingFactory bfact;
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
 	}
@@ -140,6 +140,17 @@ public class EnrichmentPlugin<I> extends
 		super("", "");
 	}
 
+	static {
+		try {
+			bfact = BindingDirectory.getFactory(RDF.class);
+			
+		} catch (JiBXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+	}
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
 			.getName());
 	/**
@@ -222,7 +233,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	@Override
 	public int getPreferredThreadCount() {
-		return 1;
+		return 5;
 	}
 
 	/*
@@ -232,7 +243,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	@Override
 	public int getMaximumThreadCount() {
-		return 1;
+		return 12;
 	}
 
 	/*
@@ -275,6 +286,8 @@ public class EnrichmentPlugin<I> extends
 			language = context.getProperties().getProperty(languageProperty);
 			rights = context.getProperties().getProperty(rightsProperty);
 
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -293,7 +306,7 @@ public class EnrichmentPlugin<I> extends
 			solrServer.add(solrList);
 			System.out.println("Adding " + solrList.size() + " documents");
 
-			solrServer.commit();
+			//solrServer.commit();
 			System.out.println("Committed in Solr Server");
 
 			
@@ -328,7 +341,7 @@ public class EnrichmentPlugin<I> extends
 	public boolean process(MetaDataRecord<I> mdr,
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
-		IBindingFactory bfact;
+		
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
@@ -340,12 +353,11 @@ public class EnrichmentPlugin<I> extends
 								+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
 				return false;
 			}
-			bfact = BindingDirectory.getFactory(RDF.class);
-
-			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+			
 
 			String value = mdr.getValues(
 					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
+			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			List<Entity> entities = enrichmentService
 					.enrich(new SolrConstructor().constructSolrDocument(rdf));

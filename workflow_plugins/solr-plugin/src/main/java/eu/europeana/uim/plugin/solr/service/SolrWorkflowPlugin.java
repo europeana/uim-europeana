@@ -83,6 +83,8 @@ public class SolrWorkflowPlugin<I> extends
 	private static Map<String, List<ControlledVocabularyImpl>> vocMemCache;
 
 	private static SolrWorkflowService solrWorkflowService;
+	private static Datastore datastore = null;
+	private static IBindingFactory bfact;
 	/**
 	 * The parameters used by this WorkflowStart
 	 */
@@ -97,10 +99,19 @@ public class SolrWorkflowPlugin<I> extends
 	public SolrWorkflowPlugin(SolrWorkflowService solrWorkflowService) {
 		super("solr_workflow", "Solr Repository Ingestion Plugin");
 		SolrWorkflowPlugin.solrWorkflowService = solrWorkflowService;
+
+		try {
+			bfact = BindingDirectory.getFactory(RDF.class);
+			datastore =solrWorkflowService.getDatastore();
+		} catch (JiBXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
-	Datastore datastore = null;
-	Morphia morphia;
+	
 
 	/*
 	 * (non-Javadoc)
@@ -133,13 +144,15 @@ public class SolrWorkflowPlugin<I> extends
 					vocMemCache.put(voc.getURI(), vocsInMap);
 				}
 			}
-			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
-			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
 					0);
+			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+			IMarshallingContext marshallingContext = bfact.createMarshallingContext();
+			marshallingContext.setIndent(2);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			RDF rdfCopy = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			long start = new Date().getTime();
+			
 			if (rdf.getAgentList() != null) {
 				for (AgentType agent : rdf.getAgentList()) {
 					dereferenceAgent(rdfCopy, datastore, agent);
@@ -186,10 +199,7 @@ public class SolrWorkflowPlugin<I> extends
 					dereferenceWebResource(rdfCopy, datastore, webresource);
 				}
 			}
-			IBindingFactory bfact2 = BindingDirectory.getFactory(RDF.class);
-			IMarshallingContext marshallingContext = bfact2
-					.createMarshallingContext();
-			marshallingContext.setIndent(2);
+
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			RDF rdfFinal = cleanRDF(rdfCopy);
 
@@ -280,63 +290,61 @@ public class SolrWorkflowPlugin<I> extends
 		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
 		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
 		JibxUtils utils = new JibxUtils();
-		
+
 		if (rdf.getAgentList() != null) {
-			
-			
-			
+
 			agents.addAll(rdf.getAgentList());
-			
-			for (int i=0;i<agents.size()-1;i++) {
+
+			for (int i = 0; i < agents.size() - 1; i++) {
 				AgentType sAgent = agents.get(i);
-				for(int k=i+1;k<agents.size();k++){
+				for (int k = i + 1; k < agents.size(); k++) {
 					AgentType fAgent = agents.get(k);
 					if (StringUtils.contains(fAgent.getAbout(),
 							sAgent.getAbout())
 							|| StringUtils.contains(fAgent.getAbout(),
 									sAgent.getAbout())) {
-						
-						
-						agents.set(i,utils.mergeAgentFields(fAgent, sAgent));
+
+						agents.set(i, utils.mergeAgentFields(fAgent, sAgent));
 						sAgent = agents.get(i);
 						agents.remove(k);
 						k--;
 					}
 				}
-					
+
 			}
 			rdfFinal.setAgentList(agents);
 		}
 		if (rdf.getConceptList() != null) {
 			concepts.addAll(rdf.getConceptList());
-			for (int i=0;i<concepts.size()-1;i++){
+			for (int i = 0; i < concepts.size() - 1; i++) {
 				Concept sConcept = concepts.get(i);
-				for(int k=i+1;k<concepts.size();k++){
+				for (int k = i + 1; k < concepts.size(); k++) {
 					Concept fConcept = concepts.get(k);
 					if (StringUtils.contains(fConcept.getAbout(),
 							sConcept.getAbout())
 							|| StringUtils.contains(sConcept.getAbout(),
 									fConcept.getAbout())) {
-						concepts.set(i, utils.mergeConceptsField(fConcept,sConcept));
+						concepts.set(i,
+								utils.mergeConceptsField(fConcept, sConcept));
 						sConcept = concepts.get(i);
 						concepts.remove(k);
 						k--;
 					}
 				}
 			}
-		
+
 			rdfFinal.setConceptList(concepts);
 		}
 		if (rdf.getTimeSpanList() != null) {
 			timespans.addAll(rdf.getTimeSpanList());
-			for(int i=0;i<timespans.size()-1;i++){
+			for (int i = 0; i < timespans.size() - 1; i++) {
 				TimeSpanType sTs = timespans.get(i);
-				for(int k=i+1;k<timespans.size();k++){
+				for (int k = i + 1; k < timespans.size(); k++) {
 					TimeSpanType fTs = timespans.get(k);
 					if (StringUtils.contains(fTs.getAbout(), sTs.getAbout())
 							|| StringUtils.contains(sTs.getAbout(),
 									fTs.getAbout())) {
-						timespans.set(i, utils.mergeTimespanFields(fTs,sTs));
+						timespans.set(i, utils.mergeTimespanFields(fTs, sTs));
 						sTs = timespans.get(i);
 						timespans.remove(k);
 						k--;
@@ -347,24 +355,23 @@ public class SolrWorkflowPlugin<I> extends
 		}
 		if (rdf.getPlaceList() != null) {
 			places.addAll(rdf.getPlaceList());
-			
-			for(int i = 0; i<places.size()-1;i++){
+
+			for (int i = 0; i < places.size() - 1; i++) {
 				PlaceType sPlace = places.get(i);
-				for(int k=i+1;k<places.size();k++){
+				for (int k = i + 1; k < places.size(); k++) {
 					PlaceType fPlace = places.get(k);
-					if (StringUtils.equals(fPlace.getAbout(),
-							sPlace.getAbout())
+					if (StringUtils
+							.equals(fPlace.getAbout(), sPlace.getAbout())
 							|| StringUtils.contains(sPlace.getAbout(),
 									fPlace.getAbout())) {
-						places.set(i, utils.mergePlacesFields(fPlace,sPlace));
+						places.set(i, utils.mergePlacesFields(fPlace, sPlace));
 						sPlace = places.get(i);
 						places.remove(k);
 						k--;
 					}
 				}
 			}
-			
-			
+
 			rdfFinal.setPlaceList(places);
 		}
 		rdfFinal.setAggregationList(rdf.getAggregationList());
@@ -973,6 +980,4 @@ public class SolrWorkflowPlugin<I> extends
 
 	}
 
-	
-	
 }
