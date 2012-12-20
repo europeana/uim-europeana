@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
 import eu.annocultor.converters.europeana.Entity;
+import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 
 
 public interface EnrichmentService {
@@ -19,4 +20,5 @@ public interface EnrichmentService {
 	
 	public HttpSolrServer getSuggestionServer();
 
+	public CollectionMongoServer getCollectionMongoServer();
 }

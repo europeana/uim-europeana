@@ -233,7 +233,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	@Override
 	public int getPreferredThreadCount() {
-		return 5;
+		return 1;
 	}
 
 	/*
@@ -243,7 +243,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	@Override
 	public int getMaximumThreadCount() {
-		return 12;
+		return 1;
 	}
 
 	/*
@@ -378,8 +378,15 @@ public class EnrichmentPlugin<I> extends
 							Boolean.parseBoolean(previewsOnlyInPortal));
 
 			String collectionId = (String) mdr.getCollection().getId();
-
-			String fileName = (String) mdr.getCollection().getName();
+			String fileName;
+			String oldCollectionId = enrichmentService.getCollectionMongoServer().findOldCollectionId(collectionId);
+			if(oldCollectionId!=null){
+				collectionId = oldCollectionId;
+				fileName = oldCollectionId;
+			} else {
+				fileName = (String) mdr.getCollection().getName();
+			}
+			
 			String hash = hashExists(collectionId, fileName, fullBean);
 
 			if (StringUtils.isNotEmpty(hash)) {
