@@ -24,12 +24,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +39,6 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
 import com.google.code.morphia.Datastore;
-import com.google.code.morphia.Morphia;
 
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Concept;
@@ -56,7 +54,6 @@ import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
-import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.orchestration.ExecutionContext;
@@ -285,12 +282,12 @@ public class SolrWorkflowPlugin<I> extends
 
 	private RDF cleanRDF(RDF rdf) {
 		RDF rdfFinal = new RDF();
-		List<AgentType> agents = new CopyOnWriteArrayList<AgentType>();
-		List<TimeSpanType> timespans = new CopyOnWriteArrayList<TimeSpanType>();
-		List<PlaceType> places = new CopyOnWriteArrayList<PlaceType>();
-		List<Concept> concepts = new CopyOnWriteArrayList<Concept>();
+		List<AgentType> agents = new ArrayList<AgentType>();
+		List<TimeSpanType> timespans = new ArrayList<TimeSpanType>();
+		List<PlaceType> places = new ArrayList<PlaceType>();
+		List<Concept> concepts = new ArrayList<Concept>();
 		JibxUtils utils = new JibxUtils();
-
+		
 		if (rdf.getAgentList() != null) {
 
 			agents.addAll(rdf.getAgentList());

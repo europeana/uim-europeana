@@ -15,6 +15,7 @@ public class EuropeanaDateUtilsTest {
 
 	@Test
 	public void testUtils(){
+
 		ProxyType proxy = new ProxyType();
 		List<EuropeanaType.Choice> dates = new ArrayList<EuropeanaType.Choice>();
 		String dcDateString1 = "-150 / -70"; //should give -150 and -70

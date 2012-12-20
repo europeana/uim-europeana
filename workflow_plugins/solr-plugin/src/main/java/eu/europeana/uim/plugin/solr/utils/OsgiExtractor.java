@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +52,7 @@ import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.EntityImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
+import eu.europeana.uim.common.BlockingInitializer;
 
 public class OsgiExtractor extends Extractor {
 
@@ -58,6 +60,7 @@ public class OsgiExtractor extends Extractor {
 
 	public OsgiExtractor() {
 		memCache = MemCache.getInstance();
+		
 	}
 
 	// public static OsgiExtractor getInstance(final Datastore datastore) {
@@ -86,7 +89,7 @@ public class OsgiExtractor extends Extractor {
 	private final static long UPDATETIMESTAMP = 5184000000l;
 
 	@SuppressWarnings("rawtypes")
-	public synchronized Map<String, List> denormalize(String resource,
+	public  Map<String, List> denormalize(String resource,
 			ControlledVocabularyImpl controlledVocabulary, int iterations,
 			boolean iterFromVocabulary) throws SecurityException,
 			IllegalArgumentException, InstantiationException,

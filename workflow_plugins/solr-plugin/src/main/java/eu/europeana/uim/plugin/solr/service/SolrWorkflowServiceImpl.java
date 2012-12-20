@@ -18,9 +18,7 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 	private static OsgiExtractor extractor;
 	private static Datastore datastore;
 
-	
-	@Override
-	public OsgiExtractor getExtractor() {
+	public SolrWorkflowServiceImpl() {
 		BlockingInitializer datastoreInitializer = new BlockingInitializer() {
 
 			@Override
@@ -65,19 +63,26 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 					extractor = new OsgiExtractor();
 				}
 				extractor.setDatastore(datastore);
+				BlockingInitializer vocInitializer = new BlockingInitializer() {
+
+					@Override
+					protected void initializeInternal() {
+						// TODO Auto-generated method stub
+						ControlledVocabularyImpl voc = new ControlledVocabularyImpl();
+						
+					}
+				};
+				vocInitializer.initialize(ControlledVocabularyImpl.class
+						.getClassLoader());
 			}
 		};
 		initializer.initialize(OsgiExtractor.class.getClassLoader());
-		BlockingInitializer vocInitializer = new BlockingInitializer() {
-
-			@Override
-			protected void initializeInternal() {
-				// TODO Auto-generated method stub
-				List<ControlledVocabularyImpl> vocs = extractor.getControlledVocabularies(datastore);
-			}
-		};
-		vocInitializer.initialize(ControlledVocabularyImpl.class
-				.getClassLoader());
+		
+		
+	}
+	
+	@Override
+	public OsgiExtractor getExtractor() {
 		return extractor;
 	}
 
