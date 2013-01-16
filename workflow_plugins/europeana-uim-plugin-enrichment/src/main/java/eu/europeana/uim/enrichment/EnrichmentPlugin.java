@@ -22,6 +22,7 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.query.Query;
@@ -142,10 +143,10 @@ public class EnrichmentPlugin<I> extends
 
 	static {
 		try {
+			//Should be placed in a static block for performance reasons
 			bfact = BindingDirectory.getFactory(RDF.class);
 			
 		} catch (JiBXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -233,7 +234,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	@Override
 	public int getPreferredThreadCount() {
-		return 1;
+		return 12;
 	}
 
 	/*
@@ -243,7 +244,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	@Override
 	public int getMaximumThreadCount() {
-		return 1;
+		return 15;
 	}
 
 	/*
@@ -341,7 +342,7 @@ public class EnrichmentPlugin<I> extends
 	public boolean process(MetaDataRecord<I> mdr,
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
-		
+		if(!mdr.getValues(EuropeanaModelRegistry.STATUS).get(0).equals(Status.DELETED)){
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
@@ -450,8 +451,27 @@ public class EnrichmentPlugin<I> extends
 			e.printStackTrace();
 		}
 		return false;
+		} else {
+			String value = mdr.getValues(
+					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
+			IUnmarshallingContext uctx;
+			try {
+				uctx = bfact.createUnmarshallingContext();
+				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+				FullBean fBean = mongoServer.getFullBean(rdf.getProvidedCHOList().get(0).getAbout());
+				if(fBean!=null){
+					mongoServer.getDatastore().delete(fBean);
+				}
+			} catch (JiBXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		}
+		return true;
 	}
 
+	//update a FullBean
 	private void updateFullBean(FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
 				.createQuery(FullBeanImpl.class).field("about")
@@ -494,6 +514,9 @@ public class EnrichmentPlugin<I> extends
 		mongoServer.getDatastore().update(updateQuery, ops);
 	}
 
+	/*
+	 * Merge Contextual Entities
+	 */
 	private void mergeEntities(RDF rdf, List<Entity> entities)
 			throws SecurityException, IllegalArgumentException,
 			NoSuchMethodException, IllegalAccessException,
@@ -686,6 +709,7 @@ public class EnrichmentPlugin<I> extends
 		europeanaProxy.setHasMetList(hasMetList);
 	}
 
+	//Clean duplicate contextual entities
 	private RDF cleanRDF(RDF rdf) {
 		RDF rdfFinal = new RDF();
 		List<AgentType> agents = new CopyOnWriteArrayList<AgentType>();
@@ -917,6 +941,7 @@ public class EnrichmentPlugin<I> extends
 
 	}
 
+	//check if the hash of the record exists
 	private String hashExists(String collectionId, String fileName,
 			FullBean fullBean) {
 		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
@@ -936,6 +961,7 @@ public class EnrichmentPlugin<I> extends
 		return null;
 	}
 
+	//append the rest of the contextual entities
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <T> T appendValue(Class<T> clazz, T obj, String edmLabel,
 			String val, String edmAttr, String valAttr)
@@ -1059,6 +1085,7 @@ public class EnrichmentPlugin<I> extends
 		return obj;
 	}
 
+	//Append concepts
 	private Concept appendConceptValue(Concept concept, String edmLabel,
 			String val, String edmAttr, String valAttr)
 			throws SecurityException, NoSuchMethodException,
@@ -1137,6 +1164,11 @@ public class EnrichmentPlugin<I> extends
 		return concept;
 	}
 
+	/**
+	 * Check if a String is a URI
+	 * @param uri
+	 * @return
+	 */
 	private static boolean isURI(String uri) {
 
 		try {

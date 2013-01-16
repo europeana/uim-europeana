@@ -100,8 +100,8 @@ public class OsgiExtractor extends Extractor {
 			vocabulary = controlledVocabulary;
 			String suffix = controlledVocabulary.getSuffix() != null ? controlledVocabulary
 					.getSuffix() : "";
-			int iters = iterFromVocabulary ? controlledVocabulary
-					.getIterations() : iterations;
+//			int iters = iterFromVocabulary ? controlledVocabulary
+//					.getIterations() : iterations;
 			if (resource + suffix != null) {
 				String fullUri = resource + suffix;
 				if (!fullUri.contains("/.")) {
@@ -1120,6 +1120,7 @@ public class OsgiExtractor extends Extractor {
 		return concept;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private Map<String, List> denormalize(String val, int iterations) {
 		try {
 			if (iterations > 0) {
