@@ -25,19 +25,19 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
 	public static EuropeanaEnrichmentTagger tagger;
 	private static HttpSolrServer solrServer;
-	private static HttpSolrServer suggestionServer;
+	private static HttpSolrServer migrationServer;
 	private static String mongoDB=PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
 	private static String mongoHost=PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
 	private static String mongoPort= PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
 	private static String solrUrl= PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
 	private static String solrCore=PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
-	private static String solrCoreSuggestions = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE_SUGGESTIONS);
+	private static String solrCoreMigration = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE_MIGRATION);
 	private static CollectionMongoServer cmServer;
 	public EnrichmentServiceImpl(){
 		tagger = new EuropeanaEnrichmentTagger();
 		try {
 		solrServer = new HttpSolrServer(new URL(solrUrl)+solrCore);
-		suggestionServer = new HttpSolrServer(new URL(solrUrl)+solrCoreSuggestions);
+		migrationServer = new HttpSolrServer(new URL(solrUrl)+solrCoreMigration);
 			tagger.init("Europeana");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -152,8 +152,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	}
 
 	@Override
-	public HttpSolrServer getSuggestionServer(){
-		return EnrichmentServiceImpl.suggestionServer;
+	public HttpSolrServer getMigrationServer(){
+		return EnrichmentServiceImpl.migrationServer;
 	}
 
 

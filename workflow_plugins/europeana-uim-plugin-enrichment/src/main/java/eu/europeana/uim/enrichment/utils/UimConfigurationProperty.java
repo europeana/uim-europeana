@@ -14,7 +14,7 @@ public enum UimConfigurationProperty {
 	MONGO_DB_EUROPEANA("mongo.db.europeana"),
 	SOLR_HOSTURL("solr.hostUrl"),
 	SOLR_CORE("solr.core"),
-	SOLR_CORE_SUGGESTIONS("solr.core.suggestions"),
+	SOLR_CORE_MIGRATION("solr.core.migration"),
 	MONGO_DB_COLLECTIONS("mongo.db.collections"),
 	MONGO_DB_EUROPEANA_ID("mongo.db.europeanaId"),
 	UIM_REPOSITORY("uim.repository");

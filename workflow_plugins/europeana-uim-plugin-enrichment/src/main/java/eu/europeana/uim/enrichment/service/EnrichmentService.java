@@ -18,7 +18,8 @@ public interface EnrichmentService {
 
 	String getMongoDB();
 	
-	public HttpSolrServer getSuggestionServer();
+	public HttpSolrServer getMigrationServer();
 
 	public CollectionMongoServer getCollectionMongoServer();
+	
 }

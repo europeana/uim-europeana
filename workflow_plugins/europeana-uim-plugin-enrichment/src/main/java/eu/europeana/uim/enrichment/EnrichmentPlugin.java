@@ -97,6 +97,7 @@ public class EnrichmentPlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static HttpSolrServer solrServer;
+	private static HttpSolrServer migrationSolrServer;
 	private static String mongoDB;
 	private static String mongoHost = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
@@ -117,6 +118,7 @@ public class EnrichmentPlugin<I> extends
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static Morphia morphia;
 	private static List<SolrInputDocument> solrList;
+	private static List<SolrInputDocument> migrationSolrList;
 	private final static int SUBMIT_SIZE = 1000;
 	private static OsgiEdmMongoServer mongoServer;
 	private static Mongo mongo;
@@ -259,7 +261,9 @@ public class EnrichmentPlugin<I> extends
 
 		try {
 			solrList = new ArrayList<SolrInputDocument>();
+			migrationSolrList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
+			migrationSolrServer = enrichmentService.getMigrationServer();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
 			String uname = PropertyReader
@@ -342,7 +346,9 @@ public class EnrichmentPlugin<I> extends
 	public boolean process(MetaDataRecord<I> mdr,
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
-		if(!mdr.getValues(EuropeanaModelRegistry.STATUS).get(0).equals(Status.DELETED)){
+		if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+				.equals(Status.DELETED)){
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
@@ -360,8 +366,10 @@ public class EnrichmentPlugin<I> extends
 					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+			SolrInputDocument basicDocument = new SolrConstructor().constructSolrDocument(rdf);
+			migrationSolrList.add(basicDocument);
 			List<Entity> entities = enrichmentService
-					.enrich(new SolrConstructor().constructSolrDocument(rdf));
+					.enrich(basicDocument);
 			mergeEntities(rdf, entities);
 			RDF rdfFinal = cleanRDF(rdf);
 
@@ -410,6 +418,9 @@ public class EnrichmentPlugin<I> extends
 					recordNumber++;
 					// Send records to SOLR by thousands
 					if (solrList.size() == SUBMIT_SIZE) {
+						//TODO: think this over
+//						migrationSolrServer.add(migrationSolrList);
+//						migrationSolrList = new ArrayList<SolrInputDocument>();
 						solrServer.add(solrList);
 						solrList = new ArrayList<SolrInputDocument>();
 					}
