@@ -115,6 +115,9 @@ public class OsgiExtractor extends Extractor {
 
 						Map<String, List> entityCache = createDereferencingMap(
 								entity.getContent(), iterations);
+						for(Entry<String,List> entry: entityCache.entrySet()){
+							System.out.println(entry.getKey());
+						}
 						memCache.getEntityCache().put(entity.getUri(),
 								entityCache);
 						return entityCache;
@@ -807,7 +810,6 @@ public class OsgiExtractor extends Extractor {
 
 		EntityImpl entity = datastore.find(EntityImpl.class)
 				.filter("uri", resource).get();
-		System.out.println("Found URI to dereference: "+ resource);
 		if (entity == null) {
 			String val = retrieveValue(resource);
 			if (val.length() > 0) {
@@ -822,7 +824,6 @@ public class OsgiExtractor extends Extractor {
 			return null;
 		} else {
 			if (new Date().getTime() - entity.getTimestamp() < UPDATETIMESTAMP) {
-				System.out.println(entity.getContent());
 				return entity;
 			} else {
 				String val = retrieveValue(resource);
