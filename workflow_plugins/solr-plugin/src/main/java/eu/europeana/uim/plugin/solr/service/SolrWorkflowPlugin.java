@@ -123,6 +123,7 @@ public class SolrWorkflowPlugin<I> extends
 				|| mdr.getValues(EuropeanaModelRegistry.STATUS).size() > 0)
 				&& !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
 						.equals(Status.DELETED)) {
+			System.out.println("Dereferencing record");
 			datastore = solrWorkflowService.getDatastore();
 			try {
 
