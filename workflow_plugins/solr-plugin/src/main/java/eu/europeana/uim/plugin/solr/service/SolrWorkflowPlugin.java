@@ -100,16 +100,13 @@ public class SolrWorkflowPlugin<I> extends
 
 		try {
 			bfact = BindingDirectory.getFactory(RDF.class);
-			datastore =solrWorkflowService.getDatastore();
+			datastore = solrWorkflowService.getDatastore();
 		} catch (JiBXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-	}
 
-	
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -122,164 +119,172 @@ public class SolrWorkflowPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
-		if(mdr.getValues(EuropeanaModelRegistry.STATUS)==null||mdr.getValues(EuropeanaModelRegistry.STATUS).size()>0||!mdr.getValues(EuropeanaModelRegistry.STATUS).get(0).equals(Status.DELETED)){
-		datastore = solrWorkflowService.getDatastore();
-		try {
+		if ((mdr.getValues(EuropeanaModelRegistry.STATUS) == null
+				|| mdr.getValues(EuropeanaModelRegistry.STATUS).size() > 0)
+				&& !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+						.equals(Status.DELETED)) {
+			datastore = solrWorkflowService.getDatastore();
+			try {
 
-			if (vocMemCache == null || vocMemCache.size() > 0) {
-				OsgiExtractor extractor = solrWorkflowService.getExtractor();
+				if (vocMemCache == null || vocMemCache.size() > 0) {
+					OsgiExtractor extractor = solrWorkflowService
+							.getExtractor();
 
-				List<ControlledVocabularyImpl> vocs = extractor
-						.getControlledVocabularies(datastore);
-				vocMemCache = new HashMap<String, List<ControlledVocabularyImpl>>();
-				List<ControlledVocabularyImpl> vocsInMap;
-				for (ControlledVocabularyImpl voc : vocs) {
-					if (vocMemCache.containsKey(voc.getURI())) {
-						vocsInMap = vocMemCache.get(voc.getURI());
+					List<ControlledVocabularyImpl> vocs = extractor
+							.getControlledVocabularies(datastore);
+					vocMemCache = new HashMap<String, List<ControlledVocabularyImpl>>();
+					List<ControlledVocabularyImpl> vocsInMap;
+					for (ControlledVocabularyImpl voc : vocs) {
+						if (vocMemCache.containsKey(voc.getURI())) {
+							vocsInMap = vocMemCache.get(voc.getURI());
+						} else {
+							vocsInMap = new ArrayList<ControlledVocabularyImpl>();
+						}
+						vocsInMap.add(voc);
+						vocMemCache.put(voc.getURI(), vocsInMap);
+					}
+				}
+
+				String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
+						.get(0);
+				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+				IMarshallingContext marshallingContext = bfact
+						.createMarshallingContext();
+				marshallingContext.setIndent(2);
+				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+				RDF rdfCopy = (RDF) uctx.unmarshalDocument(new StringReader(
+						value));
+
+				if (rdf.getAgentList() != null) {
+					for (AgentType agent : rdf.getAgentList()) {
+						dereferenceAgent(rdfCopy, datastore, agent);
+					}
+				}
+				if (rdf.getConceptList() != null) {
+					for (Concept concept : rdf.getConceptList()) {
+						dereferenceConcept(rdfCopy, datastore, concept);
+					}
+				}
+				// for (Aggregation aggregation : rdf.getAggregationList()) {
+				// dereferenceAggregation(rdfCopy, datastore, aggregation);
+				// }
+				// if (rdf.getEuropeanaAggregationList() != null) {
+				// for (EuropeanaAggregationType euaggregation : rdf
+				// .getEuropeanaAggregationList()) {
+				// dereferenceEuropeanaAggregation(rdfCopy, datastore,
+				// euaggregation);
+				// }
+				// }
+				if (rdf.getPlaceList() != null) {
+					for (PlaceType place : rdf.getPlaceList()) {
+						dereferencePlace(rdfCopy, datastore, place);
+					}
+				}
+
+				// for (ProvidedCHOType place : rdf.getProvidedCHOList()) {
+				// dereferenceProvidedCHO(rdfCopy, datastore, place);
+				// }
+				for (ProxyType proxy : rdf.getProxyList()) {
+					if (proxy.getEuropeanaProxy() == null
+							|| !proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+						dereferenceProxy(rdfCopy, datastore, proxy);
+					}
+				}
+
+				if (rdf.getTimeSpanList() != null) {
+					for (TimeSpanType timespan : rdf.getTimeSpanList()) {
+						dereferenceTimespan(rdfCopy, datastore, timespan);
+					}
+				}
+				if (rdf.getWebResourceList() != null) {
+					for (WebResourceType webresource : rdf.getWebResourceList()) {
+						dereferenceWebResource(rdfCopy, datastore, webresource);
+					}
+				}
+
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				RDF rdfFinal = cleanRDF(rdfCopy);
+
+				ProxyType europeanaProxy = null;
+				List<String> years = new ArrayList<String>();
+				for (ProxyType proxy : rdfFinal.getProxyList()) {
+
+					if (proxy.getEuropeanaProxy() == null
+							|| proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+						if (europeanaProxy == null) {
+							europeanaProxy = new ProxyType();
+							EuropeanaProxy prx = new EuropeanaProxy();
+							prx.setEuropeanaProxy(true);
+							europeanaProxy.setEuropeanaProxy(prx);
+							europeanaProxy.setType(proxy.getType());
+						}
+						years.addAll(EuropeanaDateUtils
+								.createEuropeanaYears(proxy));
 					} else {
-						vocsInMap = new ArrayList<ControlledVocabularyImpl>();
+						europeanaProxy = proxy;
 					}
-					vocsInMap.add(voc);
-					vocMemCache.put(voc.getURI(), vocsInMap);
 				}
-			}
 
-			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
-					0);
-			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			IMarshallingContext marshallingContext = bfact.createMarshallingContext();
-			marshallingContext.setIndent(2);
-			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			RDF rdfCopy = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			
-			if (rdf.getAgentList() != null) {
-				for (AgentType agent : rdf.getAgentList()) {
-					dereferenceAgent(rdfCopy, datastore, agent);
-				}
-			}
-			if (rdf.getConceptList() != null) {
-				for (Concept concept : rdf.getConceptList()) {
-					dereferenceConcept(rdfCopy, datastore, concept);
-				}
-			}
-			// for (Aggregation aggregation : rdf.getAggregationList()) {
-			// dereferenceAggregation(rdfCopy, datastore, aggregation);
-			// }
-			// if (rdf.getEuropeanaAggregationList() != null) {
-			// for (EuropeanaAggregationType euaggregation : rdf
-			// .getEuropeanaAggregationList()) {
-			// dereferenceEuropeanaAggregation(rdfCopy, datastore,
-			// euaggregation);
-			// }
-			// }
-			if (rdf.getPlaceList() != null) {
-				for (PlaceType place : rdf.getPlaceList()) {
-					dereferencePlace(rdfCopy, datastore, place);
-				}
-			}
-
-			// for (ProvidedCHOType place : rdf.getProvidedCHOList()) {
-			// dereferenceProvidedCHO(rdfCopy, datastore, place);
-			// }
-			for (ProxyType proxy : rdf.getProxyList()) {
-				if (proxy.getEuropeanaProxy() == null
-						|| !proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-					dereferenceProxy(rdfCopy, datastore, proxy);
-				}
-			}
-
-			if (rdf.getTimeSpanList() != null) {
-				for (TimeSpanType timespan : rdf.getTimeSpanList()) {
-					dereferenceTimespan(rdfCopy, datastore, timespan);
-				}
-			}
-			if (rdf.getWebResourceList() != null) {
-				for (WebResourceType webresource : rdf.getWebResourceList()) {
-					dereferenceWebResource(rdfCopy, datastore, webresource);
-				}
-			}
-
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			RDF rdfFinal = cleanRDF(rdfCopy);
-
-			ProxyType europeanaProxy = null;
-			List<String> years = new ArrayList<String>();
-			for (ProxyType proxy : rdfFinal.getProxyList()) {
-
-				if (proxy.getEuropeanaProxy() == null
-						|| proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-					if (europeanaProxy == null) {
-						europeanaProxy = new ProxyType();
-						EuropeanaProxy prx = new EuropeanaProxy();
-						prx.setEuropeanaProxy(true);
-						europeanaProxy.setEuropeanaProxy(prx);
-						europeanaProxy.setType(proxy.getType());
+				if (europeanaProxy != null) {
+					List<Year> yearList = new ArrayList<Year>();
+					for (String year : years) {
+						Year yearObj = new Year();
+						Lang lang = new Lang();
+						lang.setLang("eur");
+						yearObj.setLang(lang);
+						yearObj.setString(year);
+						yearList.add(yearObj);
 					}
-					years.addAll(EuropeanaDateUtils.createEuropeanaYears(proxy));
-				} else {
-					europeanaProxy = proxy;
+					europeanaProxy.setYearList(yearList);
 				}
-			}
 
-			if (europeanaProxy != null) {
-				List<Year> yearList = new ArrayList<Year>();
-				for (String year : years) {
-					Year yearObj = new Year();
-					Lang lang = new Lang();
-					lang.setLang("eur");
-					yearObj.setLang(lang);
-					yearObj.setString(year);
-					yearList.add(yearObj);
+				for (ProxyType proxy : rdfFinal.getProxyList()) {
+					if (proxy != null && proxy.getEuropeanaProxy() != null
+							&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+						rdfFinal.getProxyList().remove(proxy);
+					}
 				}
-				europeanaProxy.setYearList(yearList);
-			}
+				rdfFinal.getProxyList().add(europeanaProxy);
+				marshallingContext
+						.marshalDocument(rdfFinal, "UTF-8", null, out);
+				String der = out.toString("UTF-8");
+				mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
+				return true;
 
-			for (ProxyType proxy : rdfFinal.getProxyList()) {
-				if (proxy != null && proxy.getEuropeanaProxy() != null
-						&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-					rdfFinal.getProxyList().remove(proxy);
-				}
+			} catch (JiBXException e) {
+				context.getLoggingEngine().logFailed(
+						Level.SEVERE,
+						this,
+						e,
+						"JiBX unmarshalling has failed with the following error: "
+								+ e.getMessage());
+				e.printStackTrace();
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			rdfFinal.getProxyList().add(europeanaProxy);
-			marshallingContext.marshalDocument(rdfFinal, "UTF-8", null, out);
-			String der = out.toString("UTF-8");
-			mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
-			return true;
-
-		} catch (JiBXException e) {
-			context.getLoggingEngine().logFailed(
-					Level.SEVERE,
-					this,
-					e,
-					"JiBX unmarshalling has failed with the following error: "
-							+ e.getMessage());
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
+			return false;
 		}
 		return true;
 	}
@@ -291,7 +296,7 @@ public class SolrWorkflowPlugin<I> extends
 		List<PlaceType> places = new ArrayList<PlaceType>();
 		List<Concept> concepts = new ArrayList<Concept>();
 		JibxUtils utils = new JibxUtils();
-		
+
 		if (rdf.getAgentList() != null) {
 
 			agents.addAll(rdf.getAgentList());
