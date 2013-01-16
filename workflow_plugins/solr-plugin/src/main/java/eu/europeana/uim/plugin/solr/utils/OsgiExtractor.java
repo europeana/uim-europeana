@@ -77,6 +77,7 @@ public class OsgiExtractor extends Extractor {
 
 		if (vocabulary != null) {
 			if (vocabulary.getElements().get(field) != null) {
+				System.out.println(vocabulary.getElements().get(field));
 				return vocabulary.getElements().get(field);
 			}
 		}
