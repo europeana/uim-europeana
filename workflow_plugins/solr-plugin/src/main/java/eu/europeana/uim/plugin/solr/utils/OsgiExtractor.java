@@ -807,7 +807,7 @@ public class OsgiExtractor extends Extractor {
 
 		EntityImpl entity = datastore.find(EntityImpl.class)
 				.filter("uri", resource).get();
-
+		System.out.println("Found URI to dereference: "+ resource);
 		if (entity == null) {
 			String val = retrieveValue(resource);
 			if (val.length() > 0) {
