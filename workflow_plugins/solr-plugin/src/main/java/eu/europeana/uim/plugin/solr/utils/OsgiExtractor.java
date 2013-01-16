@@ -891,7 +891,7 @@ public class OsgiExtractor extends Extractor {
 
 		RdfMethod RDF = null;
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
-			if (StringUtils.equalsIgnoreCase(rdfMethod.getSolrField(), edmLabel)) {
+			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel.toLowerCase())) {
 				RDF = rdfMethod;
 			}
 		}
@@ -1044,9 +1044,9 @@ public class OsgiExtractor extends Extractor {
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
 		RdfMethod RDF = null;
-		System.out.println(edmLabel);
+		
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
-			if (StringUtils.equalsIgnoreCase(rdfMethod.getSolrField(), edmLabel)) {
+			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel.toLowerCase())) {
 				RDF = rdfMethod;
 				break;
 			}
