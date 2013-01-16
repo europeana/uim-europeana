@@ -167,7 +167,6 @@ public class OsgiExtractor extends Extractor {
 					if (isMapped(element)) {
 
 						for (EdmMappedField edmLabel : getEdmLabel(element)) {
-							System.out.println(edmLabel.getLabel());
 							if (sElem.getAttributes().hasNext()) {
 								Attribute attr = (Attribute) sElem
 										.getAttributes().next();
@@ -178,7 +177,6 @@ public class OsgiExtractor extends Extractor {
 								if (isMapped(element + "_" + attribute)) {
 									for (EdmMappedField label : getEdmLabel(element
 											+ "_" + attribute)) {
-										System.out.println(label.getLabel());
 										String attrVal = attr.getValue();
 										String elem = null;
 										if (xml.peek().isCharacters()) {
@@ -186,8 +184,9 @@ public class OsgiExtractor extends Extractor {
 													.asCharacters().getData();
 										}
 
-										if (StringUtils.equals(label.getLabel()
+										if (StringUtils.equalsIgnoreCase(label.getLabel()
 												.toString(), "skos_concept")) {
+											System.out.println(lastConcept==null);
 											if (lastConcept != null) {
 												if (lastConcept.getAbout() != null) {
 													System.out
@@ -197,17 +196,20 @@ public class OsgiExtractor extends Extractor {
 															Concept.class,
 															attrVal);
 												} else {
+													System.out
+															.println("Setting about from value "+ attrVal);
 													lastConcept
 															.setAbout(attrVal);
 												}
 											} else {
 												System.out
-														.println("Creating Concept from " + attrVal);
+														.println("Creating new concept");
 												lastConcept = createNewEntity(
 														Concept.class, attrVal);
+												
 											}
 
-										} else if (StringUtils.equals(label
+										} else if (StringUtils.equalsIgnoreCase(label
 												.getLabel().toString(),
 												"edm_agent")) {
 											if (lastAgent != null) {
@@ -226,7 +228,7 @@ public class OsgiExtractor extends Extractor {
 														attrVal);
 											}
 
-										} else if (StringUtils.equals(label
+										} else if (StringUtils.equalsIgnoreCase(label
 												.getLabel().toString(),
 												"edm_timespan")) {
 											if (lastTimespan != null) {
@@ -246,7 +248,7 @@ public class OsgiExtractor extends Extractor {
 														attrVal);
 											}
 
-										} else if (StringUtils.equals(label
+										} else if (StringUtils.equalsIgnoreCase(label
 												.getLabel().toString(),
 												"edm_place")) {
 											if (lastPlace != null) {
@@ -265,7 +267,7 @@ public class OsgiExtractor extends Extractor {
 											}
 
 										} else {
-											if (StringUtils.startsWith(label
+											if (StringUtils.startsWithIgnoreCase(label
 													.getLabel().toString(),
 													"cc")) {
 
@@ -280,7 +282,7 @@ public class OsgiExtractor extends Extractor {
 											}
 
 											else if (StringUtils
-													.startsWith(label
+													.startsWithIgnoreCase(label
 															.getLabel()
 															.toString(), "ts")) {
 
@@ -294,7 +296,7 @@ public class OsgiExtractor extends Extractor {
 														label.getAttribute(),
 														attrVal, iterations);
 											} else if (StringUtils
-													.startsWith(label
+													.startsWithIgnoreCase(label
 															.getLabel()
 															.toString(), "ag")) {
 
@@ -308,7 +310,7 @@ public class OsgiExtractor extends Extractor {
 														label.getAttribute(),
 														attrVal, iterations);
 											} else if (StringUtils
-													.startsWith(label
+													.startsWithIgnoreCase(label
 															.getLabel()
 															.toString(), "pl")) {
 
@@ -329,7 +331,7 @@ public class OsgiExtractor extends Extractor {
 								else {
 									if (xml.peek().isCharacters()) {
 										
-										if (StringUtils.equals(edmLabel
+										if (StringUtils.equalsIgnoreCase(edmLabel
 												.getLabel().toString(),
 												"skos_concept")) {
 											if (lastConcept != null) {
@@ -349,7 +351,7 @@ public class OsgiExtractor extends Extractor {
 														xml.getElementText());
 											}
 
-										} else if (StringUtils.equals(edmLabel
+										} else if (StringUtils.equalsIgnoreCase(edmLabel
 												.getLabel().toString(),
 												"edm_agent")) {
 											if (lastAgent != null) {
@@ -369,7 +371,7 @@ public class OsgiExtractor extends Extractor {
 														xml.getElementText());
 											}
 
-										} else if (StringUtils.equals(edmLabel
+										} else if (StringUtils.equalsIgnoreCase(edmLabel
 												.getLabel().toString(),
 												"edm_timespan")) {
 											if (lastTimespan != null) {
@@ -388,7 +390,7 @@ public class OsgiExtractor extends Extractor {
 														xml.getElementText());
 											}
 
-										} else if (StringUtils.equals(edmLabel
+										} else if (StringUtils.equalsIgnoreCase(edmLabel
 												.getLabel().toString(),
 												"edm_place")) {
 											if (lastPlace != null) {
@@ -408,7 +410,7 @@ public class OsgiExtractor extends Extractor {
 											}
 
 										} else {
-											if (StringUtils.startsWith(edmLabel
+											if (StringUtils.startsWithIgnoreCase(edmLabel
 													.getLabel().toString(),
 													"cc")) {
 												appendConceptValue(
@@ -420,7 +422,7 @@ public class OsgiExtractor extends Extractor {
 														"", null, iterations);
 											}
 
-											else if (StringUtils.startsWith(
+											else if (StringUtils.startsWithIgnoreCase(
 													edmLabel.getLabel()
 															.toString(), "ts")) {
 												lastTimespan = appendValue(
@@ -431,7 +433,7 @@ public class OsgiExtractor extends Extractor {
 																.toString(),
 														xml.getElementText(),
 														"", null, iterations);
-											} else if (StringUtils.startsWith(
+											} else if (StringUtils.startsWithIgnoreCase(
 													edmLabel.getLabel()
 															.toString(), "ag")) {
 												lastAgent = appendValue(
@@ -442,7 +444,7 @@ public class OsgiExtractor extends Extractor {
 																.toString(),
 														xml.getElementText(),
 														"", null, iterations);
-											} else if (StringUtils.startsWith(
+											} else if (StringUtils.startsWithIgnoreCase(
 													edmLabel.getLabel()
 															.toString(), "pl")) {
 												lastPlace = appendValue(
@@ -463,7 +465,7 @@ public class OsgiExtractor extends Extractor {
 							else {
 								XMLEvent evt2 = xml.nextEvent();
 								if (evt2.isCharacters()) {
-									if (StringUtils.equals(edmLabel.getLabel()
+									if (StringUtils.equalsIgnoreCase(edmLabel.getLabel()
 											.toString(), "skos_concept")) {
 										if (lastConcept != null) {
 											concepts.add(lastConcept);
@@ -474,7 +476,7 @@ public class OsgiExtractor extends Extractor {
 														.getData());
 
 									} else if (StringUtils
-											.equals(edmLabel.getLabel()
+											.equalsIgnoreCase(edmLabel.getLabel()
 													.toString(), "edm_agent")) {
 										if (lastAgent != null) {
 											if (lastAgent.getAbout() != null) {
@@ -496,7 +498,7 @@ public class OsgiExtractor extends Extractor {
 															.asCharacters()
 															.getData());
 										}
-									} else if (StringUtils.equals(edmLabel
+									} else if (StringUtils.equalsIgnoreCase(edmLabel
 											.getLabel().toString(),
 											"edm_timespan")) {
 										if (lastTimespan != null) {
@@ -520,7 +522,7 @@ public class OsgiExtractor extends Extractor {
 										}
 
 									} else if (StringUtils
-											.equals(edmLabel.getLabel()
+											.equalsIgnoreCase(edmLabel.getLabel()
 													.toString(), "edm_place")) {
 										if (lastPlace != null) {
 											if (lastPlace.getAbout() != null) {
@@ -543,7 +545,7 @@ public class OsgiExtractor extends Extractor {
 
 									} else {
 
-										if (StringUtils.startsWith(edmLabel
+										if (StringUtils.startsWithIgnoreCase(edmLabel
 												.getLabel().toString(), "cc")) {
 											appendConceptValue(
 													lastConcept == null ? new Concept()
@@ -555,7 +557,7 @@ public class OsgiExtractor extends Extractor {
 													null, iterations);
 										}
 
-										else if (StringUtils.startsWith(
+										else if (StringUtils.startsWithIgnoreCase(
 												edmLabel.getLabel().toString(),
 												"ts")) {
 											lastTimespan = appendValue(
@@ -568,7 +570,7 @@ public class OsgiExtractor extends Extractor {
 															.asCharacters()
 															.getData(), "",
 													null, iterations);
-										} else if (StringUtils.startsWith(
+										} else if (StringUtils.startsWithIgnoreCase(
 												edmLabel.getLabel().toString(),
 												"ag")) {
 											lastAgent = appendValue(
@@ -580,7 +582,7 @@ public class OsgiExtractor extends Extractor {
 															.asCharacters()
 															.getData(), "",
 													null, iterations);
-										} else if (StringUtils.startsWith(
+										} else if (StringUtils.startsWithIgnoreCase(
 												edmLabel.getLabel().toString(),
 												"pl")) {
 											lastPlace = appendValue(
