@@ -188,6 +188,8 @@ public class OsgiExtractor extends Extractor {
 												.toString(), "skos_concept")) {
 											if (lastConcept != null) {
 												if (lastConcept.getAbout() != null) {
+													System.out
+															.println("Adding concept " + lastConcept.getAbout());
 													concepts.add(lastConcept);
 													lastConcept = createNewEntity(
 															Concept.class,
@@ -197,6 +199,8 @@ public class OsgiExtractor extends Extractor {
 															.setAbout(attrVal);
 												}
 											} else {
+												System.out
+														.println("Creating Concept from " + attrVal);
 												lastConcept = createNewEntity(
 														Concept.class, attrVal);
 											}
