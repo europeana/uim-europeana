@@ -820,6 +820,8 @@ public class SolrWorkflowPlugin<I> extends
 	private void appendInRDF(RDF rdf, Map<String, List> denormalize) {
 		for (Entry<String, List> entry : denormalize.entrySet()) {
 			if (StringUtils.equals(entry.getKey(), "concepts")) {
+				System.out.println(entry.getValue().size());
+				System.out.println(((Concept)entry.getValue().get(0)).getAbout());
 				for (Concept concept : (List<Concept>) entry.getValue()) {
 					if (rdf.getConceptList() != null) {
 						rdf.getConceptList().add(concept);

@@ -115,9 +115,6 @@ public class OsgiExtractor extends Extractor {
 
 						Map<String, List> entityCache = createDereferencingMap(
 								entity.getContent(), iterations);
-						for(Entry<String,List> entry: entityCache.entrySet()){
-							System.out.println(entry.getKey());
-						}
 						memCache.getEntityCache().put(entity.getUri(),
 								entityCache);
 						return entityCache;
