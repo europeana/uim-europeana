@@ -122,7 +122,7 @@ public class SolrWorkflowPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
-		if(!mdr.getValues(EuropeanaModelRegistry.STATUS).get(0).equals(Status.DELETED)){
+		if(mdr.getValues(EuropeanaModelRegistry.STATUS)==null||mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)==null||!mdr.getValues(EuropeanaModelRegistry.STATUS).get(0).equals(Status.DELETED)){
 		datastore = solrWorkflowService.getDatastore();
 		try {
 
