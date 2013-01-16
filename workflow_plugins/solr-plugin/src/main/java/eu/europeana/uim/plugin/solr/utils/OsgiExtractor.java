@@ -822,6 +822,7 @@ public class OsgiExtractor extends Extractor {
 			return null;
 		} else {
 			if (new Date().getTime() - entity.getTimestamp() < UPDATETIMESTAMP) {
+				System.out.println(entity.getContent());
 				return entity;
 			} else {
 				String val = retrieveValue(resource);
