@@ -891,7 +891,7 @@ public class OsgiExtractor extends Extractor {
 
 		RdfMethod RDF = null;
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
-			if (StringUtils.equals(rdfMethod.toString(), edmLabel.toLowerCase())) {
+			if (StringUtils.equals(rdfMethod.toString(), edmLabel)) {
 				RDF = rdfMethod;
 			}
 		}
@@ -1046,7 +1046,7 @@ public class OsgiExtractor extends Extractor {
 		RdfMethod RDF = null;
 		
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
-			if (StringUtils.equals(rdfMethod.toString(), edmLabel.toLowerCase())) {
+			if (StringUtils.equals(rdfMethod.toString(), edmLabel)) {
 				RDF = rdfMethod;
 				break;
 			}
