@@ -167,7 +167,7 @@ public class OsgiExtractor extends Extractor {
 					if (isMapped(element)) {
 
 						for (EdmMappedField edmLabel : getEdmLabel(element)) {
-
+							System.out.println(edmLabel.getLabel());
 							if (sElem.getAttributes().hasNext()) {
 								Attribute attr = (Attribute) sElem
 										.getAttributes().next();
@@ -178,6 +178,7 @@ public class OsgiExtractor extends Extractor {
 								if (isMapped(element + "_" + attribute)) {
 									for (EdmMappedField label : getEdmLabel(element
 											+ "_" + attribute)) {
+										System.out.println(label.getLabel());
 										String attrVal = attr.getValue();
 										String elem = null;
 										if (xml.peek().isCharacters()) {
