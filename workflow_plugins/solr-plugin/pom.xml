@@ -191,6 +191,7 @@
 							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.util,
 							eu.europeana.uim.workflow,
+							org.theeuropeanlibrary.model.common.qualifier,
 							org.apache.solr.common.util,
 							org.apache.solr.client.solrj.impl,
 							org.apache.solr.common,
