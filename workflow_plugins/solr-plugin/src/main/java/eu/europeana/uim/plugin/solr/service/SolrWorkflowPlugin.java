@@ -369,13 +369,15 @@ public class SolrWorkflowPlugin<I> extends
 							.equals(fPlace.getAbout(), sPlace.getAbout())
 							|| StringUtils.contains(sPlace.getAbout(),
 									fPlace.getAbout())) {
-						PlaceType pl = utils.mergePlacesFields(fPlace, sPlace);
-						if (pl.getAbout() != null) {
-							places.set(i, pl);
-							sPlace = places.get(i);
-							places.remove(k);
-							k--;
+						if (fPlace.getAbout() != null
+								&& sPlace.getAbout() != null) {
+							places.set(i,
+									utils.mergePlacesFields(fPlace, sPlace));
 						}
+						sPlace = places.get(i);
+						places.remove(k);
+						k--;
+
 					}
 				}
 			}
@@ -770,7 +772,8 @@ public class SolrWorkflowPlugin<I> extends
 
 	}
 
-	private ControlledVocabularyImpl getControlledVocabulary(String str) {
+	private synchronized ControlledVocabularyImpl getControlledVocabulary(
+			String str) {
 		String[] splitName = str.split("/");
 		if (splitName.length > 3) {
 			String vocabularyUri = splitName[0] + "/" + splitName[1] + "/"

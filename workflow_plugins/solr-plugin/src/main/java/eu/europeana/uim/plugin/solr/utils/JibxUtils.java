@@ -17,7 +17,7 @@ import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 
 public class JibxUtils {
 
-	public AgentType mergeAgentFields(AgentType fAgent, AgentType sAgent) {
+	public synchronized AgentType mergeAgentFields(AgentType fAgent, AgentType sAgent) {
 		AgentType agent = new AgentType();
 		agent.setAbout(fAgent.getAbout().length() < sAgent.getAbout().length() ? fAgent
 				.getAbout() : sAgent.getAbout());
@@ -212,7 +212,7 @@ public class JibxUtils {
 		return agent;
 	}
 
-	public Concept mergeConceptsField(Concept fConcept, Concept sConcept) {
+	public synchronized Concept mergeConceptsField(Concept fConcept, Concept sConcept) {
 		Concept concept = new Concept();
 		concept.setAbout(fConcept.getAbout().length() < sConcept.getAbout()
 				.length() ? fConcept.getAbout() : sConcept.getAbout());
@@ -225,7 +225,7 @@ public class JibxUtils {
 		return concept;
 	}
 
-	public TimeSpanType mergeTimespanFields(TimeSpanType fTs, TimeSpanType sTs) {
+	public synchronized TimeSpanType mergeTimespanFields(TimeSpanType fTs, TimeSpanType sTs) {
 		TimeSpanType ts = new TimeSpanType();
 		ts.setAbout(fTs.getAbout().length() < sTs.getAbout().length() ? fTs
 				.getAbout() : sTs.getAbout());
@@ -332,9 +332,9 @@ public class JibxUtils {
 		return ts;
 	}
 
-	public PlaceType mergePlacesFields(PlaceType fPlace, PlaceType sPlace) {
+	public synchronized PlaceType mergePlacesFields(PlaceType fPlace, PlaceType sPlace) {
 		PlaceType place = new PlaceType();
-		if(fPlace.getAbout()!=null&&sPlace.getAbout()!=null){
+		
 		place.setAbout(fPlace.getAbout().length()<sPlace.getAbout().length()?fPlace.getAbout():sPlace.getAbout());
 		
 		
@@ -440,7 +440,6 @@ public class JibxUtils {
 		
 		if(fPlace.getAlt()!=null||sPlace.getAlt()!=null){
 			place.setAlt(fPlace.getAlt()!=null?fPlace.getAlt():sPlace.getAlt());
-		}
 		}
 		return place;
 	}
