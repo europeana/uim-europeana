@@ -334,6 +334,7 @@ public class JibxUtils {
 
 	public PlaceType mergePlacesFields(PlaceType fPlace, PlaceType sPlace) {
 		PlaceType place = new PlaceType();
+		if(fPlace.getAbout()!=null&&sPlace.getAbout()!=null){
 		place.setAbout(fPlace.getAbout().length()<sPlace.getAbout().length()?fPlace.getAbout():sPlace.getAbout());
 		
 		
@@ -439,6 +440,7 @@ public class JibxUtils {
 		
 		if(fPlace.getAlt()!=null||sPlace.getAlt()!=null){
 			place.setAlt(fPlace.getAlt()!=null?fPlace.getAlt():sPlace.getAlt());
+		}
 		}
 		return place;
 	}

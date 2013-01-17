@@ -369,10 +369,13 @@ public class SolrWorkflowPlugin<I> extends
 							.equals(fPlace.getAbout(), sPlace.getAbout())
 							|| StringUtils.contains(sPlace.getAbout(),
 									fPlace.getAbout())) {
-						places.set(i, utils.mergePlacesFields(fPlace, sPlace));
-						sPlace = places.get(i);
-						places.remove(k);
-						k--;
+						PlaceType pl = utils.mergePlacesFields(fPlace, sPlace);
+						if (pl.getAbout() != null) {
+							places.set(i, pl);
+							sPlace = places.get(i);
+							places.remove(k);
+							k--;
+						}
 					}
 				}
 			}
@@ -775,16 +778,19 @@ public class SolrWorkflowPlugin<I> extends
 
 			if (vocMemCache.containsKey(vocabularyUri)
 					|| hasReplaceUri(vocabularyUri)) {
-				for (ControlledVocabularyImpl vocabulary : vocMemCache
+				List<ControlledVocabularyImpl> vocabularies = vocMemCache
 						.get(vocabularyUri) != null ? vocMemCache
-						.get(vocabularyUri) : getReplaceUri(vocabularyUri)) {
-					for (String rule : vocabulary.getRules()) {
-						if (StringUtils.equals(rule, "*")
-								|| StringUtils.contains(str, rule)) {
-							return vocabulary;
+						.get(vocabularyUri) : getReplaceUri(vocabularyUri);
+				if (vocabularies != null) {
+					for (ControlledVocabularyImpl vocabulary : vocabularies) {
+						for (String rule : vocabulary.getRules()) {
+							if (StringUtils.equals(rule, "*")
+									|| StringUtils.contains(str, rule)) {
+								return vocabulary;
+							}
 						}
-					}
 
+					}
 				}
 			}
 

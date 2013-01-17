@@ -60,7 +60,7 @@ public class OsgiExtractor extends Extractor {
 
 	public OsgiExtractor() {
 		memCache = MemCache.getInstance();
-		
+
 	}
 
 	// public static OsgiExtractor getInstance(final Datastore datastore) {
@@ -77,7 +77,6 @@ public class OsgiExtractor extends Extractor {
 
 		if (vocabulary != null) {
 			if (vocabulary.getElements().get(field) != null) {
-				System.out.println(vocabulary.getElements().get(field));
 				return vocabulary.getElements().get(field);
 			}
 		}
@@ -90,7 +89,7 @@ public class OsgiExtractor extends Extractor {
 	private final static long UPDATETIMESTAMP = 5184000000l;
 
 	@SuppressWarnings("rawtypes")
-	public  Map<String, List> denormalize(String resource,
+	public Map<String, List> denormalize(String resource,
 			ControlledVocabularyImpl controlledVocabulary, int iterations,
 			boolean iterFromVocabulary) throws SecurityException,
 			IllegalArgumentException, InstantiationException,
@@ -101,8 +100,8 @@ public class OsgiExtractor extends Extractor {
 			vocabulary = controlledVocabulary;
 			String suffix = controlledVocabulary.getSuffix() != null ? controlledVocabulary
 					.getSuffix() : "";
-//			int iters = iterFromVocabulary ? controlledVocabulary
-//					.getIterations() : iterations;
+			// int iters = iterFromVocabulary ? controlledVocabulary
+			// .getIterations() : iterations;
 			if (resource + suffix != null) {
 				String fullUri = resource + suffix;
 				if (!fullUri.contains("/.")) {
@@ -148,7 +147,7 @@ public class OsgiExtractor extends Extractor {
 		AgentType lastAgent = null;
 		TimeSpanType lastTimespan = null;
 		PlaceType lastPlace = null;
-		
+
 		try {
 			Source source = new StreamSource(new ByteArrayInputStream(
 					xmlString.getBytes()), "UTF-8");
@@ -162,438 +161,497 @@ public class OsgiExtractor extends Extractor {
 					element = (sElem.getName().getPrefix() != null ? sElem
 							.getName().getPrefix() + ":" : "")
 							+ sElem.getName().getLocalPart();
-					
+
 					// If it is mapped then
 					if (isMapped(element)) {
+						List<EdmMappedField> edmList = getEdmLabel(element);
+						if (edmList!=null&& edmList.size() > 0) {
+							for (EdmMappedField edmLabel : edmList) {
+								if (sElem.getAttributes().hasNext()) {
+									Attribute attr = (Attribute) sElem
+											.getAttributes().next();
+									String attribute = attr.getName()
+											.getPrefix()
 
-						for (EdmMappedField edmLabel : getEdmLabel(element)) {
-							if (sElem.getAttributes().hasNext()) {
-								Attribute attr = (Attribute) sElem
-										.getAttributes().next();
-								String attribute = attr.getName().getPrefix()
+									+ ":" + attr.getName().getLocalPart();
+									// Is the attribute mapped?
+									if (isMapped(element + "_" + attribute)) {
+										List<EdmMappedField> edmListWithAttr = getEdmLabel(element
+												+ "_" + attribute);
+										if(edmListWithAttr!=null){
+										for (EdmMappedField label : edmListWithAttr) {
+											String attrVal = attr.getValue();
+											String elem = null;
+											if (xml.peek().isCharacters()) {
+												elem = xml.nextEvent()
+														.asCharacters()
+														.getData();
+											}
 
-								+ ":" + attr.getName().getLocalPart();
-								// Is the attribute mapped?
-								if (isMapped(element + "_" + attribute)) {
-									for (EdmMappedField label : getEdmLabel(element
-											+ "_" + attribute)) {
-										String attrVal = attr.getValue();
-										String elem = null;
-										if (xml.peek().isCharacters()) {
-											elem = xml.nextEvent()
-													.asCharacters().getData();
-										}
-
-										if (StringUtils.equalsIgnoreCase(label.getLabel()
-												.toString(), "skos_concept")) {
-											System.out.println(lastConcept==null);
-											if (lastConcept != null) {
-												if (lastConcept.getAbout() != null) {
-													System.out
-															.println("Adding concept " + lastConcept.getAbout());
-													concepts.add(lastConcept);
+											if (StringUtils
+													.equalsIgnoreCase(label
+															.getLabel()
+															.toString(),
+															"skos_concept")) {
+												if (lastConcept != null) {
+													if (lastConcept.getAbout() != null) {
+														System.out
+																.println("Adding concept "
+																		+ lastConcept
+																				.getAbout());
+														concepts.add(lastConcept);
+														lastConcept = createNewEntity(
+																Concept.class,
+																attrVal);
+													} else {
+														lastConcept
+																.setAbout(attrVal);
+													}
+												} else {
 													lastConcept = createNewEntity(
 															Concept.class,
 															attrVal);
-												} else {
-													System.out
-															.println("Setting about from value "+ attrVal);
-													lastConcept
-															.setAbout(attrVal);
+
 												}
-											} else {
-												System.out
-														.println("Creating new concept");
-												lastConcept = createNewEntity(
-														Concept.class, attrVal);
-												
-											}
 
-										} else if (StringUtils.equalsIgnoreCase(label
-												.getLabel().toString(),
-												"edm_agent")) {
-											if (lastAgent != null) {
-												if (lastAgent.getAbout() != null) {
-													agents.add(lastAgent);
+											} else if (StringUtils
+													.equalsIgnoreCase(label
+															.getLabel()
+															.toString(),
+															"edm_agent")) {
+												if (lastAgent != null) {
+													if (lastAgent.getAbout() != null) {
+														agents.add(lastAgent);
 
+														lastAgent = createNewEntity(
+																AgentType.class,
+																attrVal);
+													} else {
+														lastAgent
+																.setAbout(attrVal);
+													}
+												} else {
 													lastAgent = createNewEntity(
 															AgentType.class,
 															attrVal);
-												} else {
-													lastAgent.setAbout(attrVal);
 												}
-											} else {
-												lastAgent = createNewEntity(
-														AgentType.class,
-														attrVal);
-											}
 
-										} else if (StringUtils.equalsIgnoreCase(label
-												.getLabel().toString(),
-												"edm_timespan")) {
-											if (lastTimespan != null) {
-												if (lastTimespan.getAbout() != null) {
-													timespans.add(lastTimespan);
+											} else if (StringUtils
+													.equalsIgnoreCase(label
+															.getLabel()
+															.toString(),
+															"edm_timespan")) {
+												if (lastTimespan != null) {
+													if (lastTimespan.getAbout() != null) {
+														timespans
+																.add(lastTimespan);
+														lastTimespan = createNewEntity(
+																TimeSpanType.class,
+																attrVal);
+													} else {
+														lastTimespan
+																.setAbout(attrVal);
+													}
+
+												} else {
 													lastTimespan = createNewEntity(
 															TimeSpanType.class,
 															attrVal);
-												} else {
-													lastTimespan
-															.setAbout(attrVal);
 												}
 
-											} else {
-												lastTimespan = createNewEntity(
-														TimeSpanType.class,
-														attrVal);
-											}
-
-										} else if (StringUtils.equalsIgnoreCase(label
-												.getLabel().toString(),
-												"edm_place")) {
-											if (lastPlace != null) {
-												if (lastPlace.getAbout() != null) {
-													places.add(lastPlace);
+											} else if (StringUtils
+													.equalsIgnoreCase(label
+															.getLabel()
+															.toString(),
+															"edm_place")) {
+												if (lastPlace != null) {
+													if (lastPlace.getAbout() != null) {
+														places.add(lastPlace);
+														lastPlace = createNewEntity(
+																PlaceType.class,
+																attrVal);
+													} else {
+														lastPlace
+																.setAbout(attrVal);
+													}
+												} else {
 													lastPlace = createNewEntity(
 															PlaceType.class,
 															attrVal);
-												} else {
-													lastPlace.setAbout(attrVal);
 												}
+
 											} else {
-												lastPlace = createNewEntity(
-														PlaceType.class,
-														attrVal);
+												if (StringUtils
+														.startsWithIgnoreCase(
+																label.getLabel()
+																		.toString(),
+																"cc")) {
+
+													appendConceptValue(
+															lastConcept == null ? new Concept()
+																	: lastConcept,
+															label.getLabel()
+																	.toString(),
+															elem,
+															label.getAttribute(),
+															attrVal, iterations);
+												}
+
+												else if (StringUtils
+														.startsWithIgnoreCase(
+																label.getLabel()
+																		.toString(),
+																"ts")) {
+
+													appendValue(
+															TimeSpanType.class,
+															lastTimespan == null ? new TimeSpanType()
+																	: lastTimespan,
+															label.getLabel()
+																	.toString(),
+															elem,
+															label.getAttribute(),
+															attrVal, iterations);
+												} else if (StringUtils
+														.startsWithIgnoreCase(
+																label.getLabel()
+																		.toString(),
+																"ag")) {
+
+													appendValue(
+															AgentType.class,
+															lastAgent == null ? new AgentType()
+																	: lastAgent,
+															label.getLabel()
+																	.toString(),
+															elem,
+															label.getAttribute(),
+															attrVal, iterations);
+												} else if (StringUtils
+														.startsWithIgnoreCase(
+																label.getLabel()
+																		.toString(),
+																"pl")) {
+
+													appendValue(
+															PlaceType.class,
+															lastPlace == null ? new PlaceType()
+																	: lastPlace,
+															label.getLabel()
+																	.toString(),
+															elem,
+															label.getAttribute(),
+															attrVal, iterations);
+												}
 											}
+										}
+										}
+									}
+									// Since the attribute is not mapped
+									else {
+										if (xml.peek().isCharacters()) {
 
-										} else {
-											if (StringUtils.startsWithIgnoreCase(label
-													.getLabel().toString(),
-													"cc")) {
+											if (StringUtils.equalsIgnoreCase(
+													edmLabel.getLabel()
+															.toString(),
+													"skos_concept")) {
+												if (lastConcept != null) {
+													if (lastConcept.getAbout() != null) {
+														concepts.add(lastConcept);
+														lastConcept = createNewEntity(
+																Concept.class,
+																xml.getElementText());
+													} else {
+														lastConcept
+																.setAbout(xml
+																		.getElementText());
+													}
 
-												appendConceptValue(
-														lastConcept == null ? new Concept()
-																: lastConcept,
-														label.getLabel()
-																.toString(),
-														elem,
-														label.getAttribute(),
-														attrVal, iterations);
-											}
+												} else {
+													lastConcept = createNewEntity(
+															Concept.class,
+															xml.getElementText());
+												}
 
-											else if (StringUtils
-													.startsWithIgnoreCase(label
-															.getLabel()
-															.toString(), "ts")) {
-
-												appendValue(
-														TimeSpanType.class,
-														lastTimespan == null ? new TimeSpanType()
-																: lastTimespan,
-														label.getLabel()
-																.toString(),
-														elem,
-														label.getAttribute(),
-														attrVal, iterations);
 											} else if (StringUtils
-													.startsWithIgnoreCase(label
+													.equalsIgnoreCase(edmLabel
 															.getLabel()
-															.toString(), "ag")) {
+															.toString(),
+															"edm_agent")) {
+												if (lastAgent != null) {
+													if (lastAgent.getAbout() != null) {
+														agents.add(lastAgent);
+														lastAgent = createNewEntity(
+																AgentType.class,
+																xml.getElementText());
+													} else {
+														lastAgent
+																.setAbout(xml
+																		.getElementText());
+													}
 
-												appendValue(
-														AgentType.class,
-														lastAgent == null ? new AgentType()
-																: lastAgent,
-														label.getLabel()
-																.toString(),
-														elem,
-														label.getAttribute(),
-														attrVal, iterations);
+												} else {
+													lastAgent = createNewEntity(
+															AgentType.class,
+															xml.getElementText());
+												}
+
 											} else if (StringUtils
-													.startsWithIgnoreCase(label
+													.equalsIgnoreCase(edmLabel
 															.getLabel()
-															.toString(), "pl")) {
+															.toString(),
+															"edm_timespan")) {
+												if (lastTimespan != null) {
+													if (lastTimespan.getAbout() != null) {
+														timespans
+																.add(lastTimespan);
+														lastTimespan = createNewEntity(
+																TimeSpanType.class,
+																xml.getElementText());
+													} else {
+														lastTimespan
+																.setAbout(xml
+																		.getElementText());
+													}
+												} else {
+													lastTimespan = createNewEntity(
+															TimeSpanType.class,
+															xml.getElementText());
+												}
 
-												appendValue(
-														PlaceType.class,
-														lastPlace == null ? new PlaceType()
-																: lastPlace,
-														label.getLabel()
-																.toString(),
-														elem,
-														label.getAttribute(),
-														attrVal, iterations);
+											} else if (StringUtils
+													.equalsIgnoreCase(edmLabel
+															.getLabel()
+															.toString(),
+															"edm_place")) {
+												if (lastPlace != null) {
+													if (lastPlace.getAbout() != null) {
+														places.add(lastPlace);
+														lastPlace = createNewEntity(
+																PlaceType.class,
+																xml.getElementText());
+													} else {
+														lastPlace
+																.setAbout(xml
+																		.getElementText());
+													}
+												} else {
+													lastPlace = createNewEntity(
+															PlaceType.class,
+															xml.getElementText());
+												}
+
+											} else {
+												if (StringUtils
+														.startsWithIgnoreCase(
+																edmLabel.getLabel()
+																		.toString(),
+																"cc")) {
+													appendConceptValue(
+															lastConcept == null ? new Concept()
+																	: lastConcept,
+															edmLabel.getLabel()
+																	.toString(),
+															xml.getElementText(),
+															"", null,
+															iterations);
+												}
+
+												else if (StringUtils
+														.startsWithIgnoreCase(
+																edmLabel.getLabel()
+																		.toString(),
+																"ts")) {
+													lastTimespan = appendValue(
+															TimeSpanType.class,
+															lastTimespan == null ? new TimeSpanType()
+																	: lastTimespan,
+															edmLabel.getLabel()
+																	.toString(),
+															xml.getElementText(),
+															"", null,
+															iterations);
+												} else if (StringUtils
+														.startsWithIgnoreCase(
+																edmLabel.getLabel()
+																		.toString(),
+																"ag")) {
+													lastAgent = appendValue(
+															AgentType.class,
+															lastAgent == null ? new AgentType()
+																	: lastAgent,
+															edmLabel.getLabel()
+																	.toString(),
+															xml.getElementText(),
+															"", null,
+															iterations);
+												} else if (StringUtils
+														.startsWithIgnoreCase(
+																edmLabel.getLabel()
+																		.toString(),
+																"pl")) {
+													lastPlace = appendValue(
+															PlaceType.class,
+															lastPlace == null ? new PlaceType()
+																	: lastPlace,
+															edmLabel.getLabel()
+																	.toString(),
+															xml.getElementText(),
+															"", null,
+															iterations);
+
+												}
 											}
 										}
 									}
 								}
-								// Since the attribute is not mapped
+								// Since it does not have attributes
 								else {
-									if (xml.peek().isCharacters()) {
-										
-										if (StringUtils.equalsIgnoreCase(edmLabel
-												.getLabel().toString(),
+									XMLEvent evt2 = xml.nextEvent();
+									if (evt2.isCharacters()) {
+										if (StringUtils.equalsIgnoreCase(
+												edmLabel.getLabel().toString(),
 												"skos_concept")) {
 											if (lastConcept != null) {
-												if (lastConcept.getAbout() != null) {
-													concepts.add(lastConcept);
-													lastConcept = createNewEntity(
-															Concept.class,
-															xml.getElementText());
-												} else {
-													lastConcept.setAbout(xml
-															.getElementText());
-												}
-
-											} else {
-												lastConcept = createNewEntity(
-														Concept.class,
-														xml.getElementText());
+												concepts.add(lastConcept);
 											}
+											lastConcept = createNewEntity(
+													Concept.class, evt2
+															.asCharacters()
+															.getData());
 
-										} else if (StringUtils.equalsIgnoreCase(edmLabel
-												.getLabel().toString(),
-												"edm_agent")) {
+										} else if (StringUtils
+												.equalsIgnoreCase(edmLabel
+														.getLabel().toString(),
+														"edm_agent")) {
 											if (lastAgent != null) {
 												if (lastAgent.getAbout() != null) {
 													agents.add(lastAgent);
 													lastAgent = createNewEntity(
 															AgentType.class,
-															xml.getElementText());
+															evt2.asCharacters()
+																	.getData());
 												} else {
-													lastAgent.setAbout(xml
-															.getElementText());
+													lastAgent.setAbout(evt2
+															.asCharacters()
+															.getData());
 												}
-
-											} else {
-												lastAgent = createNewEntity(
-														AgentType.class,
-														xml.getElementText());
 											}
 
-										} else if (StringUtils.equalsIgnoreCase(edmLabel
-												.getLabel().toString(),
-												"edm_timespan")) {
+											else {
+												lastAgent = createNewEntity(
+														AgentType.class, evt2
+																.asCharacters()
+																.getData());
+											}
+										} else if (StringUtils
+												.equalsIgnoreCase(edmLabel
+														.getLabel().toString(),
+														"edm_timespan")) {
 											if (lastTimespan != null) {
 												if (lastTimespan.getAbout() != null) {
 													timespans.add(lastTimespan);
 													lastTimespan = createNewEntity(
 															TimeSpanType.class,
-															xml.getElementText());
+															evt2.asCharacters()
+																	.getData());
 												} else {
-													lastTimespan.setAbout(xml
-															.getElementText());
+													lastTimespan.setAbout(evt2
+															.asCharacters()
+															.getData());
 												}
+
 											} else {
 												lastTimespan = createNewEntity(
 														TimeSpanType.class,
-														xml.getElementText());
+														evt2.asCharacters()
+																.getData());
 											}
 
-										} else if (StringUtils.equalsIgnoreCase(edmLabel
-												.getLabel().toString(),
-												"edm_place")) {
+										} else if (StringUtils
+												.equalsIgnoreCase(edmLabel
+														.getLabel().toString(),
+														"edm_place")) {
 											if (lastPlace != null) {
 												if (lastPlace.getAbout() != null) {
 													places.add(lastPlace);
 													lastPlace = createNewEntity(
 															PlaceType.class,
-															xml.getElementText());
+															evt2.asCharacters()
+																	.getData());
 												} else {
-													lastPlace.setAbout(xml
-															.getElementText());
+													lastPlace.setAbout(evt2
+															.asCharacters()
+															.getData());
 												}
 											} else {
 												lastPlace = createNewEntity(
-														PlaceType.class,
-														xml.getElementText());
+														PlaceType.class, evt2
+																.asCharacters()
+																.getData());
 											}
 
 										} else {
-											if (StringUtils.startsWithIgnoreCase(edmLabel
-													.getLabel().toString(),
-													"cc")) {
+
+											if (StringUtils
+													.startsWithIgnoreCase(
+															edmLabel.getLabel()
+																	.toString(),
+															"cc")) {
 												appendConceptValue(
 														lastConcept == null ? new Concept()
 																: lastConcept,
 														edmLabel.getLabel()
 																.toString(),
-														xml.getElementText(),
-														"", null, iterations);
+														evt2.asCharacters()
+																.getData(), "",
+														null, iterations);
 											}
 
-											else if (StringUtils.startsWithIgnoreCase(
-													edmLabel.getLabel()
-															.toString(), "ts")) {
+											else if (StringUtils
+													.startsWithIgnoreCase(
+															edmLabel.getLabel()
+																	.toString(),
+															"ts")) {
 												lastTimespan = appendValue(
 														TimeSpanType.class,
 														lastTimespan == null ? new TimeSpanType()
 																: lastTimespan,
+
 														edmLabel.getLabel()
 																.toString(),
-														xml.getElementText(),
-														"", null, iterations);
-											} else if (StringUtils.startsWithIgnoreCase(
-													edmLabel.getLabel()
-															.toString(), "ag")) {
+														evt2.asCharacters()
+																.getData(), "",
+														null, iterations);
+											} else if (StringUtils
+													.startsWithIgnoreCase(
+															edmLabel.getLabel()
+																	.toString(),
+															"ag")) {
 												lastAgent = appendValue(
 														AgentType.class,
 														lastAgent == null ? new AgentType()
 																: lastAgent,
 														edmLabel.getLabel()
 																.toString(),
-														xml.getElementText(),
-														"", null, iterations);
-											} else if (StringUtils.startsWithIgnoreCase(
-													edmLabel.getLabel()
-															.toString(), "pl")) {
+														evt2.asCharacters()
+																.getData(), "",
+														null, iterations);
+											} else if (StringUtils
+													.startsWithIgnoreCase(
+															edmLabel.getLabel()
+																	.toString(),
+															"pl")) {
 												lastPlace = appendValue(
 														PlaceType.class,
 														lastPlace == null ? new PlaceType()
 																: lastPlace,
 														edmLabel.getLabel()
 																.toString(),
-														xml.getElementText(),
-														"", null, iterations);
-
-											}
-										}
-									}
-								}
-							}
-							// Since it does not have attributes
-							else {
-								XMLEvent evt2 = xml.nextEvent();
-								if (evt2.isCharacters()) {
-									if (StringUtils.equalsIgnoreCase(edmLabel.getLabel()
-											.toString(), "skos_concept")) {
-										if (lastConcept != null) {
-											concepts.add(lastConcept);
-										}
-										lastConcept = createNewEntity(
-												Concept.class, evt2
-														.asCharacters()
-														.getData());
-
-									} else if (StringUtils
-											.equalsIgnoreCase(edmLabel.getLabel()
-													.toString(), "edm_agent")) {
-										if (lastAgent != null) {
-											if (lastAgent.getAbout() != null) {
-												agents.add(lastAgent);
-												lastAgent = createNewEntity(
-														AgentType.class, evt2
-																.asCharacters()
-																.getData());
-											} else {
-												lastAgent.setAbout(evt2
-														.asCharacters()
-														.getData());
-											}
-										}
-
-										else {
-											lastAgent = createNewEntity(
-													AgentType.class, evt2
-															.asCharacters()
-															.getData());
-										}
-									} else if (StringUtils.equalsIgnoreCase(edmLabel
-											.getLabel().toString(),
-											"edm_timespan")) {
-										if (lastTimespan != null) {
-											if (lastTimespan.getAbout() != null) {
-												timespans.add(lastTimespan);
-												lastTimespan = createNewEntity(
-														TimeSpanType.class,
 														evt2.asCharacters()
-																.getData());
-											} else {
-												lastTimespan.setAbout(evt2
-														.asCharacters()
-														.getData());
+																.getData(), "",
+														null, iterations);
 											}
-
-										} else {
-											lastTimespan = createNewEntity(
-													TimeSpanType.class, evt2
-															.asCharacters()
-															.getData());
-										}
-
-									} else if (StringUtils
-											.equalsIgnoreCase(edmLabel.getLabel()
-													.toString(), "edm_place")) {
-										if (lastPlace != null) {
-											if (lastPlace.getAbout() != null) {
-												places.add(lastPlace);
-												lastPlace = createNewEntity(
-														PlaceType.class, evt2
-																.asCharacters()
-																.getData());
-											} else {
-												lastPlace.setAbout(evt2
-														.asCharacters()
-														.getData());
-											}
-										} else {
-											lastPlace = createNewEntity(
-													PlaceType.class, evt2
-															.asCharacters()
-															.getData());
-										}
-
-									} else {
-
-										if (StringUtils.startsWithIgnoreCase(edmLabel
-												.getLabel().toString(), "cc")) {
-											appendConceptValue(
-													lastConcept == null ? new Concept()
-															: lastConcept,
-													edmLabel.getLabel()
-															.toString(), evt2
-															.asCharacters()
-															.getData(), "",
-													null, iterations);
-										}
-
-										else if (StringUtils.startsWithIgnoreCase(
-												edmLabel.getLabel().toString(),
-												"ts")) {
-											lastTimespan = appendValue(
-													TimeSpanType.class,
-													lastTimespan == null ? new TimeSpanType()
-															: lastTimespan,
-
-													edmLabel.getLabel()
-															.toString(), evt2
-															.asCharacters()
-															.getData(), "",
-													null, iterations);
-										} else if (StringUtils.startsWithIgnoreCase(
-												edmLabel.getLabel().toString(),
-												"ag")) {
-											lastAgent = appendValue(
-													AgentType.class,
-													lastAgent == null ? new AgentType()
-															: lastAgent,
-													edmLabel.getLabel()
-															.toString(), evt2
-															.asCharacters()
-															.getData(), "",
-													null, iterations);
-										} else if (StringUtils.startsWithIgnoreCase(
-												edmLabel.getLabel().toString(),
-												"pl")) {
-											lastPlace = appendValue(
-													PlaceType.class,
-													lastPlace == null ? new PlaceType()
-															: lastPlace,
-													edmLabel.getLabel()
-															.toString(), evt2
-															.asCharacters()
-															.getData(), "",
-													null, iterations);
 										}
 									}
 								}
@@ -823,7 +881,6 @@ public class OsgiExtractor extends Extractor {
 				newEntity.setTimestamp(new Date().getTime());
 				newEntity.setContent(val);
 				datastore.save(newEntity);
-				System.out.println("New Entity :" + newEntity.getUri());
 				return newEntity;
 			}
 			return null;
@@ -1011,27 +1068,24 @@ public class OsgiExtractor extends Extractor {
 						StringUtils.replace(RDF.getMethodName(), "get", "set"),
 						cls);
 				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
-			} 
-			else if(RDF.getClazz().isAssignableFrom(_Long.class)){
+			} else if (RDF.getClazz().isAssignableFrom(_Long.class)) {
 				Float rs = Float.parseFloat(val);
 				_Long lng = new _Long();
 				lng.setLong(rs);
-				((PlaceType)obj).setLong(lng);
-				
-			}
-			else if(RDF.getClazz().isAssignableFrom(Lat.class)){
+				((PlaceType) obj).setLong(lng);
+
+			} else if (RDF.getClazz().isAssignableFrom(Lat.class)) {
 				Float rs = Float.parseFloat(val);
 				Lat lng = new Lat();
 				lng.setLat(rs);
-				((PlaceType)obj).setLat(lng);
-				
-			}
-			else if(RDF.getClazz().isAssignableFrom(Alt.class)){
+				((PlaceType) obj).setLat(lng);
+
+			} else if (RDF.getClazz().isAssignableFrom(Alt.class)) {
 				Float rs = Float.parseFloat(val);
 				Alt lng = new Alt();
 				lng.setAlt(rs);
-				((PlaceType)obj).setAlt(lng);
-				
+				((PlaceType) obj).setAlt(lng);
+
 			}
 		}
 
@@ -1044,7 +1098,7 @@ public class OsgiExtractor extends Extractor {
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
 		RdfMethod RDF = null;
-		
+
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.toString(), edmLabel)) {
 				RDF = rdfMethod;
