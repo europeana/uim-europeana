@@ -31,6 +31,7 @@ import com.mongodb.Mongo;
 
 import eu.annocultor.converters.europeana.Entity;
 import eu.annocultor.converters.europeana.Field;
+import eu.annocultor.converters.europeana.RecordCompletenessRanking;
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.AggregatedCHO;
 import eu.europeana.corelib.definitions.jibx.Concept;
@@ -346,9 +347,9 @@ public class EnrichmentPlugin<I> extends
 	public boolean process(MetaDataRecord<I> mdr,
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
-		if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-				.equals(Status.DELETED)){
+//		if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+//				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+//				.equals(Status.DELETED)){
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
@@ -381,11 +382,14 @@ public class EnrichmentPlugin<I> extends
 			solrInputDocument.addField(
 					EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
 					previewsOnlyInPortal);
+			
 			fullBean.getAggregations()
 					.get(0)
 					.setEdmPreviewNoDistribute(
 							Boolean.parseBoolean(previewsOnlyInPortal));
-
+			int completeness = RecordCompletenessRanking.rankRecordCompleteness(solrInputDocument);
+			fullBean.setEuropeanaCompleteness(completeness);
+			solrInputDocument.addField(EdmLabel.EUROPEANA_COMPLETENESS.toString(), completeness);
 			String collectionId = (String) mdr.getCollection().getId();
 			String fileName;
 			String oldCollectionId = enrichmentService.getCollectionMongoServer().findOldCollectionId(collectionId);
@@ -462,25 +466,27 @@ public class EnrichmentPlugin<I> extends
 			e.printStackTrace();
 		}
 		return false;
-		} else {
-			String value = mdr.getValues(
-					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
-			IUnmarshallingContext uctx;
-			try {
-				uctx = bfact.createUnmarshallingContext();
-				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-				FullBean fBean = mongoServer.getFullBean(rdf.getProvidedCHOList().get(0).getAbout());
-				if(fBean!=null){
-					mongoServer.getDatastore().delete(fBean);
-				}
-			} catch (JiBXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		
-		}
-		return true;
+//		} else {
+//			String value = mdr.getValues(
+//					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
+//			IUnmarshallingContext uctx;
+//			try {
+//				uctx = bfact.createUnmarshallingContext();
+//				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+//				FullBean fBean = mongoServer.getFullBean(rdf.getProvidedCHOList().get(0).getAbout());
+//				if(fBean!=null){
+//					mongoServer.getDatastore().delete(fBean);
+//				}
+//			} catch (JiBXException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		
+//		}
+//		return true;
 	}
+
+	
 
 	//update a FullBean
 	private void updateFullBean(FullBeanImpl fullBean) {
