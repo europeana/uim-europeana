@@ -19,6 +19,7 @@
 
 	<bean id="linkchecker"
 		class="org.theeuropeanlibrary.uim.check.weblink.LinkCheckIngestionPlugin">
+		<argument ref="registry" />
 	</bean>
 
 	<!-- Export the linkCheckerPlugin as a service -->
@@ -29,7 +30,7 @@
 	<!-- Workflows Definitions -->
 	<!-- Export the LinckCheckingWorkfow as a service -->
 	<bean id="lcw"
-		class="eu.europeana.uim.plugin.thumbler.workflows.LinkCheckWorkflow" />
+		class="org.theeuropeanlibrary.uim.check.weblink.LinkCheckWorkflow" />
 	<service id="linkCheckingWorkflow" ref="lcw"
 		interface="eu.europeana.uim.workflow.Workflow" />
 

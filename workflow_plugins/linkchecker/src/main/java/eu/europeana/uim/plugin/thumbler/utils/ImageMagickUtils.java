@@ -63,9 +63,12 @@ public final class ImageMagickUtils {
 		String img = img0.getAbsolutePath() + "[0]";
 		String img2 = img0.getAbsolutePath() + ".jpg";
 		IMOperation op = new IMOperation();
+		//op.openOperation();
 		op.addImage(img);
-		op.resize(800, 600);
+		op.resize(200);
+		op.compress("LosslessJPEG");
 		op.addImage(img2);
+		//op.closeOperation();
 
 		try {
 			convert.run(op);

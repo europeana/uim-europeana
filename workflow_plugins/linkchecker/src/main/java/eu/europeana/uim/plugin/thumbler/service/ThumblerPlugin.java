@@ -139,7 +139,7 @@ public class ThumblerPlugin<I>  extends AbstractIngestionPlugin<Collection<I>,I>
 		
 		try {
 			 recs = context.getStorageEngine().getByCollection(collection);			 
-			 ae.incrementScheduled(recs.length -1);
+			 ae.incrementScheduled(recs.length);
 
 		} catch (StorageEngineException e1) {
 			e1.printStackTrace();
@@ -156,18 +156,12 @@ public class ThumblerPlugin<I>  extends AbstractIngestionPlugin<Collection<I>,I>
 		while(!refQueue.isEmpty()){
 			
 			if(submission == null || submission.getRemaining() < threshold){
-				try {
-					
-					MetaDataRecord<I> mdr = context.getStorageEngine().getMetaDataRecord(refQueue.remove());
-					
-					offerRecord(mdr,context,value);
-					
+				try {					
+					MetaDataRecord<I> mdr = context.getStorageEngine().getMetaDataRecord(refQueue.remove());					
+					offerRecord(mdr,context,value);					
 					submission = EuropeanaWeblinkThumbler.getShared().getSubmission(context.getExecution());
-					//revisingProgressMonitor.worked(1);
 					
 				} catch (MalformedURLException e) {
-
-					//ae.
 					context.getExecution().setFailureCount(failed++);
 				} catch (StorageEngineException e) {
 					context.getExecution().setFailureCount(failed++);

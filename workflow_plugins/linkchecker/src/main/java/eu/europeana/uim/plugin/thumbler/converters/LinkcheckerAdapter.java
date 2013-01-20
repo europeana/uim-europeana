@@ -16,11 +16,13 @@ import eu.europeana.uim.model.adapters.MetadataRecordAdapter;
 import eu.europeana.uim.model.adapters.QValueAdapterStrategy;
 import eu.europeana.uim.model.adapters.europeana.EuropeanaLinkAdapterStrategy;
 import eu.europeana.uim.store.MetaDataRecord;
+import eu.europeana.uim.store.UimDataSet;
 
 /**
  * Adapter used for Tel's implementation of LinkChecker plugin
+ * @param <I>
  */
-public class LinkcheckerAdapter implements UimDatasetAdapter<MetaDataRecord<String>, String>{
+public class LinkcheckerAdapter <U extends UimDataSet<I>, I> implements UimDatasetAdapter<U,I>{
 
 	private static String pluginIdentifier = new LinkCheckIngestionPlugin<String>().getIdentifier();
 	
@@ -28,16 +30,24 @@ public class LinkcheckerAdapter implements UimDatasetAdapter<MetaDataRecord<Stri
 	 * @see eu.europeana.uim.adapter.UimDatasetAdapter#adapt(eu.europeana.uim.store.UimDataSet)
 	 */
 	@Override
-	public MetaDataRecord<String> adapt(MetaDataRecord<String> mdr) {
+	public U adapt(U ds) {
+		
+		if(ds instanceof MetaDataRecord){
+		
+	    MetaDataRecord<?> mdr = (MetaDataRecord<?>) ds;
+		//ds = (MetaDataRecord<?>) ds;
+		
         // Adapter that ensures compatibility with the europeana datamodel
         Map<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>> strategies = new HashMap<TKey<?, ?>, QValueAdapterStrategy<?, ?, ?, ?>>();
 
         strategies.put(ObjectModelRegistry.LINK, new EuropeanaLinkAdapterStrategy());
 
-        MetadataRecordAdapter<String, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = AdapterFactory.getAdapter(
-                mdr, strategies);
+        MetadataRecordAdapter<String, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = (MetadataRecordAdapter<String, QValueAdapterStrategy<?, ?, ?, ?>>) AdapterFactory.getAdapter(
+        		mdr, strategies);
         
-		return mdrad;
+        return (U) mdrad;
+		}
+		return ds;
 	}
 
 	/* (non-Javadoc)
@@ -52,11 +62,17 @@ public class LinkcheckerAdapter implements UimDatasetAdapter<MetaDataRecord<Stri
 	 * @see eu.europeana.uim.adapter.UimDatasetAdapter#unadapt(eu.europeana.uim.store.UimDataSet)
 	 */
 	@Override
-	public MetaDataRecord<String> unadapt(MetaDataRecord<String> mdr) {
-		@SuppressWarnings("unchecked")
-		MetadataRecordAdapter<String, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = (MetadataRecordAdapter<String, QValueAdapterStrategy<?, ?, ?, ?>>) mdr;
+	public U unadapt(U ds) {
 		
-		return mdrad.getAdaptedRecord();
+		if(ds instanceof MetaDataRecord){
+		@SuppressWarnings("unchecked")
+		MetadataRecordAdapter<String, QValueAdapterStrategy<?, ?, ?, ?>> mdrad = (MetadataRecordAdapter<String, QValueAdapterStrategy<?, ?, ?, ?>>) ds;
+		
+		ds = (U) mdrad.getAdaptedRecord();
+		//return mdrad.getAdaptedRecord();
+		}
+		
+		return ds;
 	}
 
 }
