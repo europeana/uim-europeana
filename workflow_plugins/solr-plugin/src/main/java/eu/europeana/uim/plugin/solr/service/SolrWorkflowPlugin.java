@@ -694,7 +694,7 @@ public class SolrWorkflowPlugin<I> extends
 		}
 	}
 
-	private void derefResourceOrLiteral(RDF rdf, Datastore datastore,
+	private synchronized void derefResourceOrLiteral(RDF rdf, Datastore datastore,
 			Object object) throws MalformedURLException, IOException,
 			SecurityException, IllegalArgumentException,
 			InstantiationException, IllegalAccessException,
