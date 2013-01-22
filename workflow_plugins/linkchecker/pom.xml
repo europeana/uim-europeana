@@ -22,7 +22,7 @@
 
 		<dependency>
 			<groupId>org.theeuropeanlibrary</groupId>
-			<artifactId>tel-uim-plugin-check-link</artifactId>
+			<artifactId>tel-uim-plugin-check-link-collection</artifactId>
 			<version>${europeana.uim.version}</version>
 		</dependency>
 
