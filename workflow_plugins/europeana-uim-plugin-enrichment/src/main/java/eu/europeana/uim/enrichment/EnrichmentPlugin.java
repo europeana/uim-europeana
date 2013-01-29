@@ -1,5 +1,6 @@
 package eu.europeana.uim.enrichment;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -22,7 +24,6 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.query.Query;
@@ -34,6 +35,7 @@ import eu.annocultor.converters.europeana.Field;
 import eu.annocultor.converters.europeana.RecordCompletenessRanking;
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.AggregatedCHO;
+import eu.europeana.corelib.definitions.jibx.Alt;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.Country;
 import eu.europeana.corelib.definitions.jibx.Creator;
@@ -41,6 +43,7 @@ import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
 import eu.europeana.corelib.definitions.jibx.HasMet;
 import eu.europeana.corelib.definitions.jibx.LandingPage;
 import eu.europeana.corelib.definitions.jibx.Language1;
+import eu.europeana.corelib.definitions.jibx.Lat;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
@@ -49,6 +52,7 @@ import eu.europeana.corelib.definitions.jibx.ProxyIn;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
+import eu.europeana.corelib.definitions.jibx._Long;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.Rights1;
@@ -62,6 +66,7 @@ import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
+import eu.europeana.corelib.solr.utils.EDMUtils;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
@@ -414,7 +419,7 @@ public class EnrichmentPlugin<I> extends
 				updateFullBean(fullBean);
 
 			}
-
+			FileUtils.write(new File("/home/gmamakis/"+fullBean.getAbout().replace("/", "_")+".xml"), EDMUtils.toEDM(fullBean));
 			int retries = 0;
 			while (retries < RETRIES) {
 				try {
@@ -553,7 +558,7 @@ public class EnrichmentPlugin<I> extends
 
 		europeanaProxy.setAbout("/proxy/europeana" + cho.getAbout());
 		ProxyFor pf = new ProxyFor();
-		pf.setResource(cho.getAbout());
+		pf.setResource("/item"+cho.getAbout());
 		europeanaProxy.setProxyFor(pf);
 		List<ProxyIn> pinList = new ArrayList<ProxyIn>();
 		ProxyIn pin = new ProxyIn();
@@ -1095,6 +1100,24 @@ public class EnrichmentPlugin<I> extends
 							StringUtils.replace(RDF.getMethodName(), "get",
 									"set"), cls);
 					method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
+				} else if (RDF.getClazz().isAssignableFrom(_Long.class)) {
+					Float rs = Float.parseFloat(val);
+					_Long lng = new _Long();
+					lng.setLong(rs);
+					((PlaceType) obj).setLong(lng);
+
+				} else if (RDF.getClazz().isAssignableFrom(Lat.class)) {
+					Float rs = Float.parseFloat(val);
+					Lat lng = new Lat();
+					lng.setLat(rs);
+					((PlaceType) obj).setLat(lng);
+
+				} else if (RDF.getClazz().isAssignableFrom(Alt.class)) {
+					Float rs = Float.parseFloat(val);
+					Alt lng = new Alt();
+					lng.setAlt(rs);
+					((PlaceType) obj).setAlt(lng);
+
 				}
 			}
 		}

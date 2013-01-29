@@ -76,6 +76,7 @@ public class OsgiExtractor extends Extractor {
 	public List<EdmMappedField> getEdmLabel(String field) {
 
 		if (vocabulary != null) {
+			
 			if (vocabulary.getElements().get(field) != null) {
 				return vocabulary.getElements().get(field);
 			}
@@ -164,6 +165,7 @@ public class OsgiExtractor extends Extractor {
 
 					// If it is mapped then
 					if (isMapped(element)) {
+						
 						List<EdmMappedField> edmList = getEdmLabel(element);
 						if (edmList!=null&& edmList.size() > 0) {
 							for (EdmMappedField edmLabel : edmList) {
@@ -195,10 +197,6 @@ public class OsgiExtractor extends Extractor {
 															"skos_concept")) {
 												if (lastConcept != null) {
 													if (lastConcept.getAbout() != null) {
-														System.out
-																.println("Adding concept "
-																		+ lastConcept
-																				.getAbout());
 														concepts.add(lastConcept);
 														lastConcept = createNewEntity(
 																Concept.class,
@@ -948,7 +946,7 @@ public class OsgiExtractor extends Extractor {
 
 		RdfMethod RDF = null;
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
-			if (StringUtils.equals(rdfMethod.toString(), edmLabel)) {
+			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
 				RDF = rdfMethod;
 			}
 		}
@@ -1100,7 +1098,7 @@ public class OsgiExtractor extends Extractor {
 		RdfMethod RDF = null;
 
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
-			if (StringUtils.equals(rdfMethod.toString(), edmLabel)) {
+			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
 				RDF = rdfMethod;
 				break;
 			}

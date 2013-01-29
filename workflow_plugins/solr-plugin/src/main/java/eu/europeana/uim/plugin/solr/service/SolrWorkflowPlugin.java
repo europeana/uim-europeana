@@ -119,9 +119,9 @@ public class SolrWorkflowPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
-		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-						.equals(Status.DELETED)) {
+//		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+//				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+//						.equals(Status.DELETED)) {
 			datastore = solrWorkflowService.getDatastore();
 			try {
 
@@ -283,8 +283,8 @@ public class SolrWorkflowPlugin<I> extends
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return false;
-		}
+//			return false;
+////		}
 		return true;
 	}
 
