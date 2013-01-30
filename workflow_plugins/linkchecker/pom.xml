@@ -175,7 +175,7 @@
 							org.apache.commons.lang,
 							!*
 						</Import-Package>
-						<Embed-Dependency>tel-uim-plugin-check-link,commons-logging,corelib-db,
+						<Embed-Dependency>tel-uim-plugin-check-link-collection,commons-logging,corelib-db,
 							commons-codec,httpcore,httpclient,commons-httpclient,mongo-java-driver,morphia,
 							corelib-definitions,corelib-solr-definitions,spring-test,im4java,jibx-run,
 							corelib-utils,imgscalr-lib,sanselan
