@@ -20,7 +20,9 @@ public enum UimConfigurationProperty {
 	BIRT_URL("birt.url"),
 	LOCAL_SERVER("local.server"),
 	LOCAL_PORT("local.port"),
-	MINT_URI("mint.hostUrl");
+	MINT_URI("mint.hostUrl"),
+	PORTAL_URI("europeana.portal.uri"),
+	TESTPORTAL_URI("europeana.testportal.uri");
 	
 	String field;
 	private UimConfigurationProperty(String field){

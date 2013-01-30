@@ -111,6 +111,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 
     // /** String PORTAL_SINGLE_RECORD_URL */
     private static  String PORTAL_SINGLE_RECORD_URL = "http://www.europeana.eu/portal/record/";
+    private static  String PORTAL_PREVIEW_URL;
     private static  String REPOSITORY_PREVIEW_URL;
 	
     private static IUnmarshallingContext uctx;
@@ -124,6 +125,10 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 
 		super();
 
+		PORTAL_SINGLE_RECORD_URL = PropertyReader.getProperty(UimConfigurationProperty.PORTAL_URI);
+		
+		PORTAL_PREVIEW_URL = PropertyReader.getProperty(UimConfigurationProperty.TESTPORTAL_URI);
+		
 		try {
 			
 			IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
@@ -594,7 +599,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 			} else {
 				
 				
-				String collid = metaDataRecord.getCollection().getId();
+				String collid = metaDataRecord.getCollection().getMnemonic();
 				String uencoderecordId = null;
 				try {
 					uencoderecordId = URLEncoder.encode(recordId,"UTF-8");
@@ -602,7 +607,10 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 					e.printStackTrace();
 				}
 				
-				links.add(new LinkDTO(PORTAL_SINGLE_RECORD_URL + "/" + collid +"/" + uencoderecordId, "Record in portal"));
+				links.add(new LinkDTO(PORTAL_SINGLE_RECORD_URL + "record"+ recordId +".html", "Record in portal"));
+				
+				links.add(new LinkDTO(PORTAL_PREVIEW_URL + "record" + recordId +".html", "Preview Record in test portal"));
+				
 				links.add(new LinkDTO(REPOSITORY_PREVIEW_URL + "?recordID=" + uencoderecordId, "Preview cahched images in repository"));
 
 				
