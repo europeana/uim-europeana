@@ -35,12 +35,14 @@ import eu.annocultor.converters.europeana.Field;
 import eu.annocultor.converters.europeana.RecordCompletenessRanking;
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.AggregatedCHO;
+import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Alt;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.Country;
 import eu.europeana.corelib.definitions.jibx.Creator;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
 import eu.europeana.corelib.definitions.jibx.HasMet;
+import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.LandingPage;
 import eu.europeana.corelib.definitions.jibx.Language1;
 import eu.europeana.corelib.definitions.jibx.Lat;
@@ -52,11 +54,12 @@ import eu.europeana.corelib.definitions.jibx.ProxyIn;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
-import eu.europeana.corelib.definitions.jibx._Long;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.Rights1;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
+import eu.europeana.corelib.definitions.jibx.WebResourceType;
+import eu.europeana.corelib.definitions.jibx._Long;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.DocType;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
@@ -141,6 +144,7 @@ public class EnrichmentPlugin<I> extends
 	private final static String languageProperty = "edm:language";
 	private final static String rightsProperty = "edm:rights";
 	private static IBindingFactory bfact;
+
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
 	}
@@ -151,14 +155,13 @@ public class EnrichmentPlugin<I> extends
 
 	static {
 		try {
-			//Should be placed in a static block for performance reasons
+			// Should be placed in a static block for performance reasons
 			bfact = BindingDirectory.getFactory(RDF.class);
-			
+
 		} catch (JiBXException e) {
 			e.printStackTrace();
 		}
 
-		
 	}
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
 			.getName());
@@ -297,8 +300,6 @@ public class EnrichmentPlugin<I> extends
 			language = context.getProperties().getProperty(languageProperty);
 			rights = context.getProperties().getProperty(rightsProperty);
 
-			
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -317,10 +318,9 @@ public class EnrichmentPlugin<I> extends
 			solrServer.add(solrList);
 			System.out.println("Adding " + solrList.size() + " documents");
 
-			//solrServer.commit();
+			// solrServer.commit();
 			System.out.println("Committed in Solr Server");
 
-			
 			solrList = new ArrayList<SolrInputDocument>();
 			mongoServer.close();
 		} catch (IOException e) {
@@ -352,9 +352,9 @@ public class EnrichmentPlugin<I> extends
 	public boolean process(MetaDataRecord<I> mdr,
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
-//		if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-//				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-//				.equals(Status.DELETED)){
+		// if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+		// || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+		// .equals(Status.DELETED)){
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
@@ -366,19 +366,17 @@ public class EnrichmentPlugin<I> extends
 								+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
 				return false;
 			}
-			
 
 			String value = mdr.getValues(
 					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			SolrInputDocument basicDocument = new SolrConstructor().constructSolrDocument(rdf);
+			SolrInputDocument basicDocument = new SolrConstructor()
+					.constructSolrDocument(rdf);
 			migrationSolrList.add(basicDocument);
-			List<Entity> entities = enrichmentService
-					.enrich(basicDocument);
+			List<Entity> entities = enrichmentService.enrich(basicDocument);
 			mergeEntities(rdf, entities);
 			RDF rdfFinal = cleanRDF(rdf);
-
 			SolrInputDocument solrInputDocument = new SolrConstructor()
 					.constructSolrDocument(rdfFinal);
 
@@ -387,24 +385,28 @@ public class EnrichmentPlugin<I> extends
 			solrInputDocument.addField(
 					EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
 					previewsOnlyInPortal);
-			
+
 			fullBean.getAggregations()
 					.get(0)
 					.setEdmPreviewNoDistribute(
 							Boolean.parseBoolean(previewsOnlyInPortal));
-			int completeness = RecordCompletenessRanking.rankRecordCompleteness(solrInputDocument);
+			int completeness = RecordCompletenessRanking
+					.rankRecordCompleteness(solrInputDocument);
 			fullBean.setEuropeanaCompleteness(completeness);
-			solrInputDocument.addField(EdmLabel.EUROPEANA_COMPLETENESS.toString(), completeness);
+			solrInputDocument.addField(
+					EdmLabel.EUROPEANA_COMPLETENESS.toString(), completeness);
 			String collectionId = (String) mdr.getCollection().getId();
 			String fileName;
-			String oldCollectionId = enrichmentService.getCollectionMongoServer().findOldCollectionId(collectionId);
-			if(oldCollectionId!=null){
+			String oldCollectionId = enrichmentService
+					.getCollectionMongoServer().findOldCollectionId(
+							collectionId);
+			if (oldCollectionId != null) {
 				collectionId = oldCollectionId;
 				fileName = oldCollectionId;
 			} else {
 				fileName = (String) mdr.getCollection().getName();
 			}
-			
+
 			String hash = hashExists(collectionId, fileName, fullBean);
 
 			if (StringUtils.isNotEmpty(hash)) {
@@ -419,7 +421,9 @@ public class EnrichmentPlugin<I> extends
 				updateFullBean(fullBean);
 
 			}
-			FileUtils.write(new File("/home/gmamakis/"+fullBean.getAbout().replace("/", "_")+".xml"), EDMUtils.toEDM(fullBean));
+			FileUtils.write(new File("/home/gmamakis/"
+					+ fullBean.getAbout().replace("/", "_") + ".xml"),
+					EDMUtils.toEDM(fullBean));
 			int retries = 0;
 			while (retries < RETRIES) {
 				try {
@@ -427,9 +431,10 @@ public class EnrichmentPlugin<I> extends
 					recordNumber++;
 					// Send records to SOLR by thousands
 					if (solrList.size() == SUBMIT_SIZE) {
-						//TODO: think this over
-//						migrationSolrServer.add(migrationSolrList);
-//						migrationSolrList = new ArrayList<SolrInputDocument>();
+						// TODO: think this over
+						// migrationSolrServer.add(migrationSolrList);
+						// migrationSolrList = new
+						// ArrayList<SolrInputDocument>();
 						solrServer.add(solrList);
 						solrList = new ArrayList<SolrInputDocument>();
 					}
@@ -471,29 +476,28 @@ public class EnrichmentPlugin<I> extends
 			e.printStackTrace();
 		}
 		return false;
-//		} else {
-//			String value = mdr.getValues(
-//					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
-//			IUnmarshallingContext uctx;
-//			try {
-//				uctx = bfact.createUnmarshallingContext();
-//				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-//				FullBean fBean = mongoServer.getFullBean(rdf.getProvidedCHOList().get(0).getAbout());
-//				if(fBean!=null){
-//					mongoServer.getDatastore().delete(fBean);
-//				}
-//			} catch (JiBXException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		
-//		}
-//		return true;
+		// } else {
+		// String value = mdr.getValues(
+		// EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
+		// IUnmarshallingContext uctx;
+		// try {
+		// uctx = bfact.createUnmarshallingContext();
+		// RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+		// FullBean fBean =
+		// mongoServer.getFullBean(rdf.getProvidedCHOList().get(0).getAbout());
+		// if(fBean!=null){
+		// mongoServer.getDatastore().delete(fBean);
+		// }
+		// } catch (JiBXException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		//
+		// }
+		// return true;
 	}
 
-	
-
-	//update a FullBean
+	// update a FullBean
 	private void updateFullBean(FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
 				.createQuery(FullBeanImpl.class).field("about")
@@ -514,20 +518,20 @@ public class EnrichmentPlugin<I> extends
 				: DocType.IMAGE);
 		ops.set("europeanaCompleteness", fullBean.getEuropeanaCompleteness());
 		ops.set("optOut", fullBean.isOptedOut());
-		 ops.set("places", fullBean.getPlaces()!=null?fullBean.getPlaces():new
-		 ArrayList<PlaceImpl>());
-		 ops.set("agents", fullBean.getAgents()!=null?fullBean.getAgents():new
-		 ArrayList<AgentImpl>());
-		 ops.set("timespans",
-		 fullBean.getTimespans()!=null?fullBean.getTimespans():new
-		 ArrayList<TimespanImpl>());
-		 ops.set("concepts",
-		 fullBean.getConcepts()!=null?fullBean.getConcepts():new
-		 ArrayList<ConceptImpl>());
-		 ops.set("aggregations", fullBean.getAggregations());
-		 ops.set("providedCHOs", fullBean.getProvidedCHOs());
-		 ops.set("europeanaAggregation", fullBean.getEuropeanaAggregation());
-		 ops.set("proxies",fullBean.getProxies());
+		ops.set("places", fullBean.getPlaces() != null ? fullBean.getPlaces()
+				: new ArrayList<PlaceImpl>());
+		ops.set("agents", fullBean.getAgents() != null ? fullBean.getAgents()
+				: new ArrayList<AgentImpl>());
+		ops.set("timespans",
+				fullBean.getTimespans() != null ? fullBean.getTimespans()
+						: new ArrayList<TimespanImpl>());
+		ops.set("concepts",
+				fullBean.getConcepts() != null ? fullBean.getConcepts()
+						: new ArrayList<ConceptImpl>());
+		ops.set("aggregations", fullBean.getAggregations());
+		ops.set("providedCHOs", fullBean.getProvidedCHOs());
+		ops.set("europeanaAggregation", fullBean.getEuropeanaAggregation());
+		ops.set("proxies", fullBean.getProxies());
 		ops.set("country",
 				fullBean.getCountry() != null ? fullBean.getCountry()
 						: new String[] {});
@@ -558,7 +562,7 @@ public class EnrichmentPlugin<I> extends
 
 		europeanaProxy.setAbout("/proxy/europeana" + cho.getAbout());
 		ProxyFor pf = new ProxyFor();
-		pf.setResource("/item"+cho.getAbout());
+		pf.setResource("/item" + cho.getAbout());
 		europeanaProxy.setProxyFor(pf);
 		List<ProxyIn> pinList = new ArrayList<ProxyIn>();
 		ProxyIn pin = new ProxyIn();
@@ -601,9 +605,13 @@ public class EnrichmentPlugin<I> extends
 							.getConceptList() : new ArrayList<Concept>();
 					conceptList.add(concept);
 					rdf.setConceptList(conceptList);
-					europeanaProxy = OriginalField.getOriginalField(
-							entity.getOriginalField()).appendField(
-							europeanaProxy, concept.getAbout());
+					try {
+						europeanaProxy = OriginalField.getOriginalField(
+								entity.getOriginalField()).appendField(
+								europeanaProxy, concept.getAbout());
+					} catch (IllegalArgumentException e) {
+
+					}
 
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Timespan")) {
@@ -639,9 +647,13 @@ public class EnrichmentPlugin<I> extends
 							.getTimeSpanList() : new ArrayList<TimeSpanType>();
 					timespans.add(ts);
 					rdf.setTimeSpanList(timespans);
-					europeanaProxy = OriginalField.getOriginalField(
-							entity.getOriginalField()).appendField(
-							europeanaProxy, ts.getAbout());
+					try {
+						europeanaProxy = OriginalField.getOriginalField(
+								entity.getOriginalField()).appendField(
+								europeanaProxy, ts.getAbout());
+					} catch (IllegalArgumentException e) {
+
+					}
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Agent")) {
 
@@ -676,9 +688,13 @@ public class EnrichmentPlugin<I> extends
 							.getAgentList() : new ArrayList<AgentType>();
 					agents.add(ts);
 					rdf.setAgentList(agents);
-					europeanaProxy = OriginalField.getOriginalField(
-							entity.getOriginalField()).appendField(
-							europeanaProxy, ts.getAbout());
+					try {
+						europeanaProxy = OriginalField.getOriginalField(
+								entity.getOriginalField()).appendField(
+								europeanaProxy, ts.getAbout());
+					} catch (IllegalArgumentException e) {
+
+					}
 				}
 			} else {
 				PlaceType ts = new PlaceType();
@@ -714,9 +730,13 @@ public class EnrichmentPlugin<I> extends
 							.getPlaceList() : new ArrayList<PlaceType>();
 					places.add(ts);
 					rdf.setPlaceList(places);
-					europeanaProxy = OriginalField.getOriginalField(
-							entity.getOriginalField()).appendField(
-							europeanaProxy, ts.getAbout());
+					try {
+						europeanaProxy = OriginalField.getOriginalField(
+								entity.getOriginalField()).appendField(
+								europeanaProxy, ts.getAbout());
+					} catch (IllegalArgumentException e) {
+
+					}
 				}
 			}
 		}
@@ -731,7 +751,7 @@ public class EnrichmentPlugin<I> extends
 		europeanaProxy.setHasMetList(hasMetList);
 	}
 
-	//Clean duplicate contextual entities
+	// Clean duplicate contextual entities
 	private RDF cleanRDF(RDF rdf) {
 		RDF rdfFinal = new RDF();
 		List<AgentType> agents = new CopyOnWriteArrayList<AgentType>();
@@ -743,12 +763,12 @@ public class EnrichmentPlugin<I> extends
 				for (AgentType agent : agents) {
 					if (StringUtils.equals(agent.getAbout(),
 							newAgent.getAbout())) {
-						if(agent.getPrefLabelList()!=null && newAgent
-								.getPrefLabelList()!=null){
-						if (agent.getPrefLabelList().size() <= newAgent
-								.getPrefLabelList().size()) {
-							agents.remove(agent);
-						}
+						if (agent.getPrefLabelList() != null
+								&& newAgent.getPrefLabelList() != null) {
+							if (agent.getPrefLabelList().size() <= newAgent
+									.getPrefLabelList().size()) {
+								agents.remove(agent);
+							}
 						}
 					}
 				}
@@ -761,11 +781,12 @@ public class EnrichmentPlugin<I> extends
 				for (Concept concept : concepts) {
 					if (StringUtils.equals(concept.getAbout(),
 							newConcept.getAbout())) {
-						if(concept.getChoiceList()!=null && newConcept.getChoiceList()!=null){
-						if (concept.getChoiceList().size() <= newConcept
-								.getChoiceList().size()) {
-							concepts.remove(concept);
-						}
+						if (concept.getChoiceList() != null
+								&& newConcept.getChoiceList() != null) {
+							if (concept.getChoiceList().size() <= newConcept
+									.getChoiceList().size()) {
+								concepts.remove(concept);
+							}
 						}
 					}
 
@@ -778,11 +799,12 @@ public class EnrichmentPlugin<I> extends
 			for (TimeSpanType newTs : rdf.getTimeSpanList()) {
 				for (TimeSpanType ts : timespans) {
 					if (StringUtils.equals(ts.getAbout(), newTs.getAbout())) {
-						if(newTs.getIsPartOfList()!=null&& ts.getIsPartOfList()!=null){
-						if (ts.getIsPartOfList().size() <= newTs
-								.getIsPartOfList().size()) {
-							timespans.remove(ts);
-						}
+						if (newTs.getIsPartOfList() != null
+								&& ts.getIsPartOfList() != null) {
+							if (ts.getIsPartOfList().size() <= newTs
+									.getIsPartOfList().size()) {
+								timespans.remove(ts);
+							}
 						}
 					}
 
@@ -796,15 +818,15 @@ public class EnrichmentPlugin<I> extends
 				for (PlaceType place : places) {
 					if (StringUtils.equals(place.getAbout(),
 							newPlace.getAbout())) {
-						if(place.getPrefLabelList()!=null&&newPlace.getPrefLabelList()!=null){
-						if (place.getPrefLabelList().size() <= newPlace
-								.getPrefLabelList().size()) {
-							places.remove(place);
-						}
+						if (place.getPrefLabelList() != null
+								&& newPlace.getPrefLabelList() != null) {
+							if (place.getPrefLabelList().size() <= newPlace
+									.getPrefLabelList().size()) {
+								places.remove(place);
+							}
 						}
 					}
 
-					
 				}
 				places.add(newPlace);
 			}
@@ -813,7 +835,36 @@ public class EnrichmentPlugin<I> extends
 		rdfFinal.setProxyList(rdf.getProxyList());
 		rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
 		rdfFinal.setAggregationList(rdf.getAggregationList());
+
 		rdfFinal.setWebResourceList(rdf.getWebResourceList());
+		List<WebResourceType> webResources = new ArrayList<WebResourceType>();
+		for (Aggregation aggr : rdf.getAggregationList()) {
+			if (aggr.getIsShownAt() != null) {
+				WebResourceType wr = new WebResourceType();
+				wr.setAbout(aggr.getIsShownAt().getResource());
+				webResources.add(wr);
+			}
+			if (aggr.getIsShownBy() != null) {
+				WebResourceType wr = new WebResourceType();
+				wr.setAbout(aggr.getIsShownBy().getResource());
+				webResources.add(wr);
+			}
+			if (aggr.getObject() != null) {
+				WebResourceType wr = new WebResourceType();
+				wr.setAbout(aggr.getObject().getResource());
+				webResources.add(wr);
+			}
+			if (aggr.getHasViewList() != null) {
+				for (HasView hasView : aggr.getHasViewList()) {
+					WebResourceType wr = new WebResourceType();
+					wr.setAbout(hasView.getResource());
+					webResources.add(wr);
+				}
+			}
+		}
+		if (webResources.size() > 0) {
+			rdfFinal.getWebResourceList().addAll(webResources);
+		}
 
 		List<EuropeanaAggregationType> eTypeList = new ArrayList<EuropeanaAggregationType>();
 
@@ -963,7 +1014,7 @@ public class EnrichmentPlugin<I> extends
 
 	}
 
-	//check if the hash of the record exists
+	// check if the hash of the record exists
 	private String hashExists(String collectionId, String fileName,
 			FullBean fullBean) {
 		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
@@ -983,7 +1034,7 @@ public class EnrichmentPlugin<I> extends
 		return null;
 	}
 
-	//append the rest of the contextual entities
+	// append the rest of the contextual entities
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <T> T appendValue(Class<T> clazz, T obj, String edmLabel,
 			String val, String edmAttr, String valAttr)
@@ -1125,7 +1176,7 @@ public class EnrichmentPlugin<I> extends
 		return obj;
 	}
 
-	//Append concepts
+	// Append concepts
 	private Concept appendConceptValue(Concept concept, String edmLabel,
 			String val, String edmAttr, String valAttr)
 			throws SecurityException, NoSuchMethodException,
@@ -1206,6 +1257,7 @@ public class EnrichmentPlugin<I> extends
 
 	/**
 	 * Check if a String is a URI
+	 * 
 	 * @param uri
 	 * @return
 	 */
