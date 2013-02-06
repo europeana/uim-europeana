@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -131,18 +132,10 @@ public class EnrichmentPlugin<I> extends
 	private final static int SUBMIT_SIZE = 1000;
 	private static OsgiEdmMongoServer mongoServer;
 	private static Mongo mongo;
-	private final static String PORTALURL = "http:///www.europeana.eu/portal/record";
+	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
 
-	private static String country;
-	private static String creator;
-	private static String language;
-	private static String rights;
-
-	private final static String countryProperty = "edm:country";
-	private final static String creatorProperty = "dc:creator";
-	private final static String languageProperty = "edm:language";
-	private final static String rightsProperty = "edm:rights";
+	
 	private static IBindingFactory bfact;
 
 	public EnrichmentPlugin(String name, String description) {
@@ -170,12 +163,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-		{
-			add(countryProperty);
-			add(creatorProperty);
-			add(languageProperty);
-			add(rightsProperty);
-		}
+		
 
 	};
 
@@ -269,7 +257,7 @@ public class EnrichmentPlugin<I> extends
 			throws IngestionPluginFailedException {
 
 		try {
-			solrList = new ArrayList<SolrInputDocument>();
+			solrList = Collections.synchronizedList(new ArrayList<SolrInputDocument>());
 			migrationSolrList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
 			migrationSolrServer = enrichmentService.getMigrationServer();
@@ -295,10 +283,7 @@ public class EnrichmentPlugin<I> extends
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
-			country = context.getProperties().getProperty(countryProperty);
-			creator = context.getProperties().getProperty(creatorProperty);
-			language = context.getProperties().getProperty(languageProperty);
-			rights = context.getProperties().getProperty(rightsProperty);
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -373,7 +358,7 @@ public class EnrichmentPlugin<I> extends
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			SolrInputDocument basicDocument = new SolrConstructor()
 					.constructSolrDocument(rdf);
-			migrationSolrList.add(basicDocument);
+			//migrationSolrList.add(basicDocument);
 			List<Entity> entities = enrichmentService.enrich(basicDocument);
 			mergeEntities(rdf, entities);
 			RDF rdfFinal = cleanRDF(rdf);
@@ -421,22 +406,23 @@ public class EnrichmentPlugin<I> extends
 				updateFullBean(fullBean);
 
 			}
-			FileUtils.write(new File("/home/gmamakis/"
-					+ fullBean.getAbout().replace("/", "_") + ".xml"),
-					EDMUtils.toEDM(fullBean));
+//			FileUtils.write(new File("/home/gmamakis/"
+//					+ fullBean.getAbout().replace("/", "_") + ".xml"),
+//					EDMUtils.toEDM(fullBean));
 			int retries = 0;
 			while (retries < RETRIES) {
 				try {
 					solrList.add(solrInputDocument);
 					recordNumber++;
 					// Send records to SOLR by thousands
-					if (solrList.size() == SUBMIT_SIZE) {
+					if (solrList.size() >= SUBMIT_SIZE) {
 						// TODO: think this over
 						// migrationSolrServer.add(migrationSolrList);
 						// migrationSolrList = new
 						// ArrayList<SolrInputDocument>();
+						//System.out.println("Saving in SOLR");
 						solrServer.add(solrList);
-						solrList = new ArrayList<SolrInputDocument>();
+						solrList.clear();
 					}
 					return true;
 				} catch (SolrException e) {
@@ -863,7 +849,11 @@ public class EnrichmentPlugin<I> extends
 			}
 		}
 		if (webResources.size() > 0) {
-			rdfFinal.getWebResourceList().addAll(webResources);
+			if(rdfFinal.getWebResourceList()!=null){
+				rdfFinal.getWebResourceList().addAll(webResources);
+			} else {
+				rdfFinal.setWebResourceList(webResources);
+			}
 		}
 
 		List<EuropeanaAggregationType> eTypeList = new ArrayList<EuropeanaAggregationType>();
@@ -891,7 +881,7 @@ public class EnrichmentPlugin<I> extends
 		Country countryType = new Country();
 		countryType
 				.setString(europeanaAggregation.getCountry() != null ? europeanaAggregation
-						.getCountry().getString() : country);
+						.getCountry().getString() : "eu");
 		europeanaAggregation.setCountry(countryType);
 		Creator creatorType = new Creator();
 		creatorType.setString("Europeana");
@@ -899,12 +889,12 @@ public class EnrichmentPlugin<I> extends
 		Language1 languageType = new Language1();
 		languageType
 				.setString(europeanaAggregation.getLanguage() != null ? europeanaAggregation
-						.getLanguage().getString() : language);
+						.getLanguage().getString() : "eu");
 		europeanaAggregation.setLanguage(languageType);
 		Rights1 rightsType = new Rights1();
 		rightsType
 				.setResource(europeanaAggregation.getRights() != null ? europeanaAggregation
-						.getRights().getResource() : rights);
+						.getRights().getResource() : "http://creativecommons.org/licenses/by-sa/3.0/");
 		europeanaAggregation.setRights(rightsType);
 		AggregatedCHO aggrCHO = new AggregatedCHO();
 		aggrCHO.setResource(cho.getAbout());
