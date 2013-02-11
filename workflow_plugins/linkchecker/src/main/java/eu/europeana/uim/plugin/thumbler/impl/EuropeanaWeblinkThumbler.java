@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -210,6 +211,13 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 								edmRecord);
 					}
 				}
+				
+				Submission submission = getSubmission(guarded.getExecution());
+				
+				synchronized (submission) {
+					submission.incrStatus(1);
+					submission.removeRemaining(guarded);
+				}
 
 			} catch (Throwable t) {
 				Submission submission = getSubmission(guarded.getExecution());
@@ -220,7 +228,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 					submission.removeRemaining(guarded);
 				}
 
-				log.info("Failed to store and process file locally"
+				log.severe("Failed to store and process file locally"
 						+ guarded.getUrl() + ">");
 				guarded.processed(1, t.getMessage());
 				log.severe(t.getClass().getName());
@@ -251,13 +259,15 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 		 * 
 		 * @param url
 		 * @return
+		 * @throws IOException 
+		 * @throws MalformedURLException 
 		 */
-		private File retrieveFile(String url) {
+		private File retrieveFile(String url) throws MalformedURLException, IOException {
 
 			Submission submission = getSubmission(guarded.getExecution());
 			File target = null;
 			int status = 0;
-			try {
+
 				String name = guarded.getUrl().getFile();
 				
 				target = new File(STORAGELOCATION
@@ -268,21 +278,7 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 				guarded.processed(status,
 						"filename: " + target.getAbsolutePath());
 
-				synchronized (submission) {
-					submission.incrStatus(status);
-					submission.incrProcessed();
-					submission.removeRemaining(guarded);
-				}
-
 				return target;
-
-			} catch (Throwable t) {
-
-				log.info("Failed to retrieve url: <" + guarded.getUrl() + ">");
-
-			}
-
-			return target;
 		}
 
 		/**

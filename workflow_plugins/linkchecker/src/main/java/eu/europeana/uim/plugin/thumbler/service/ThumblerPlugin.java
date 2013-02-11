@@ -152,6 +152,7 @@ public class ThumblerPlugin<I>  extends AbstractIngestionPlugin<Collection<I>,I>
 		
 		int processed =0;
 		int failed = 0;
+
 		
 		while(!refQueue.isEmpty()){
 			
@@ -167,12 +168,15 @@ public class ThumblerPlugin<I>  extends AbstractIngestionPlugin<Collection<I>,I>
 					context.getExecution().setFailureCount(failed++);
 				}
 				
+				ae.incrementCompleted(1);
 				
-				ae.incrementCompleted(1);				
 			    }
 			else{
 				try {
-					Thread.sleep(1000);
+					
+					Thread.sleep(60000);
+					
+					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
