@@ -202,37 +202,25 @@ public class SolrWorkflowPlugin<I> extends
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			RDF rdfFinal = cleanRDF(rdfCopy);
 
-			ProxyType europeanaProxy = null;
+			ProxyType europeanaProxy = new ProxyType();
+			EuropeanaProxy prx = new EuropeanaProxy();
+			prx.setEuropeanaProxy(true);
+			europeanaProxy.setEuropeanaProxy(prx);
 			List<String> years = new ArrayList<String>();
 			for (ProxyType proxy : rdfFinal.getProxyList()) {
-
-				if (proxy.getEuropeanaProxy() == null
-						|| proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-					if (europeanaProxy == null) {
-						europeanaProxy = new ProxyType();
-						EuropeanaProxy prx = new EuropeanaProxy();
-						prx.setEuropeanaProxy(true);
-						europeanaProxy.setEuropeanaProxy(prx);
-						europeanaProxy.setType(proxy.getType());
-					}
-					years.addAll(EuropeanaDateUtils.createEuropeanaYears(proxy));
-				} else {
-					europeanaProxy = proxy;
-				}
+				years.addAll(EuropeanaDateUtils.createEuropeanaYears(proxy));
+				europeanaProxy.setType(proxy.getType());
+			}
+			List<Year> yearList = new ArrayList<Year>();
+			for (String year : years) {
+				Year yearObj = new Year();
+				Lang lang = new Lang();
+				lang.setLang("eur");
+				yearObj.setLang(lang);
+				yearObj.setString(year);
+				yearList.add(yearObj);
 			}
 
-			if (europeanaProxy != null) {
-				List<Year> yearList = new ArrayList<Year>();
-				for (String year : years) {
-					Year yearObj = new Year();
-					Lang lang = new Lang();
-					lang.setLang("eur");
-					yearObj.setLang(lang);
-					yearObj.setString(year);
-					yearList.add(yearObj);
-				}
-				europeanaProxy.setYearList(yearList);
-			}
 
 			for (ProxyType proxy : rdfFinal.getProxyList()) {
 				if (proxy != null && proxy.getEuropeanaProxy() != null

@@ -400,9 +400,12 @@ public class EnrichmentPlugin<I> extends
 
 			fullBean.setEuropeanaCollectionName(new String[] { fileName });
 			if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
-
+				System.out.println("Saving bean " + fullBean.getAbout());
 				mongoServer.getDatastore().save(fullBean);
 			} else {
+				System.out.println(mongoHost);
+				System.out.println(mongoPort);
+				System.out.println("Updating bean "+ fullBean.getAbout());
 				updateFullBean(fullBean);
 
 			}
@@ -487,7 +490,7 @@ public class EnrichmentPlugin<I> extends
 	private void updateFullBean(FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
 				.createQuery(FullBeanImpl.class).field("about")
-				.equal(fullBean.getAbout());
+				.equal(fullBean.getAbout().replace("/item",""));
 		UpdateOperations<FullBeanImpl> ops = mongoServer.getDatastore()
 				.createUpdateOperations(FullBeanImpl.class);
 		ops.set("title", fullBean.getTitle() != null ? fullBean.getTitle()
@@ -568,11 +571,11 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-							addToHasMetList(
-									europeanaProxy,
-									field.getValues()
-											.get(field.getValues().keySet()
-													.iterator().next()).get(0));
+//							addToHasMetList(
+//									europeanaProxy,
+//									field.getValues()
+//											.get(field.getValues().keySet()
+//													.iterator().next()).get(0));
 						} else {
 							if (field.getValues() != null) {
 								for (Entry<String, List<String>> entry : field
@@ -612,11 +615,11 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-							addToHasMetList(
-									europeanaProxy,
-									field.getValues()
-											.get(field.getValues().keySet()
-													.iterator().next()).get(0));
+//							addToHasMetList(
+//									europeanaProxy,
+//									field.getValues()
+//											.get(field.getValues().keySet()
+//													.iterator().next()).get(0));
 						} else {
 							for (Entry<String, List<String>> entry : field
 									.getValues().entrySet()) {
@@ -653,11 +656,11 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-							addToHasMetList(
-									europeanaProxy,
-									field.getValues()
-											.get(field.getValues().keySet()
-													.iterator().next()).get(0));
+//							addToHasMetList(
+//									europeanaProxy,
+//									field.getValues()
+//											.get(field.getValues().keySet()
+//													.iterator().next()).get(0));
 						} else {
 							for (Entry<String, List<String>> entry : field
 									.getValues().entrySet()) {
@@ -693,11 +696,11 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-							addToHasMetList(
-									europeanaProxy,
-									field.getValues()
-											.get(field.getValues().keySet()
-													.iterator().next()).get(0));
+//							addToHasMetList(
+//									europeanaProxy,
+//									field.getValues()
+//											.get(field.getValues().keySet()
+//													.iterator().next()).get(0));
 						} else {
 							if (field.getValues() != null) {
 								for (Entry<String, List<String>> entry : field
@@ -728,14 +731,14 @@ public class EnrichmentPlugin<I> extends
 		}
 	}
 
-	private void addToHasMetList(ProxyType europeanaProxy, String value) {
-		List<HasMet> hasMetList = europeanaProxy.getHasMetList() != null ? europeanaProxy
-				.getHasMetList() : new ArrayList<HasMet>();
-		HasMet hasMet = new HasMet();
-		hasMet.setString(value);
-		hasMetList.add(hasMet);
-		europeanaProxy.setHasMetList(hasMetList);
-	}
+//	private void addToHasMetList(ProxyType europeanaProxy, String value) {
+//		List<HasMet> hasMetList = europeanaProxy.getHasMetList() != null ? europeanaProxy
+//				.getHasMetList() : new ArrayList<HasMet>();
+//		HasMet hasMet = new HasMet();
+//		hasMet.setString(value);
+//		hasMetList.add(hasMet);
+//		europeanaProxy.setHasMetList(hasMetList);
+//	}
 
 	// Clean duplicate contextual entities
 	private RDF cleanRDF(RDF rdf) {
