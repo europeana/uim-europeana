@@ -42,17 +42,17 @@ import eu.europeana.uim.europeanaspecific.workflowstarts.util.UimConfigurationPr
  */
 public class HttpRetriever implements Iterator<String> {
 
-
-	private List<String> filecontents;
 	
 	private TarArchiveInputStream tarInputstream;
-	
-	private Iterator<String> xmlentriesiterator;
 	
 	private static Random generator; 
 
 	private int number_of_recs;
 
+	private int records_read;
+	
+	private static String dest;
+	
 	/**
 	 * Private Class constructor (can be instantiated only with factory method)
 	 * 
@@ -63,13 +63,28 @@ public class HttpRetriever implements Iterator<String> {
 	 * @param zipentries
 	 *            References to the zipped files
 	 */
-	private HttpRetriever(List<String> filecontents) {
-		this.filecontents = filecontents;
-		this.number_of_recs = filecontents.size();
-		this.xmlentriesiterator = filecontents.iterator();
-		
+	private HttpRetriever() {
+	
 	}
 
+	
+	
+	/**
+	 * @param url
+	 * @param dest
+	 * @return
+	 * @throws IOException
+	 */
+	public synchronized static  HttpRetriever createInstance(URL url,String dest)
+			throws IOException {
+		HttpRetriever.dest = dest;
+		HttpRetriever ret = createInstance(url);
+
+		
+		return ret;
+	}
+	
+	
 	/**
 	 * Static synchronized factory method that returns an instance of this
 	 * class. It first copies the remote file locally and then instantiates the
@@ -82,14 +97,23 @@ public class HttpRetriever implements Iterator<String> {
 	 */
 	public synchronized static HttpRetriever createInstance(URL url)
 			throws IOException {
-
-		List<String> list = new ArrayList<String>();
+		
+		HttpRetriever retriever = new HttpRetriever();
 		
 		if(generator == null){
 			generator =  new Random();
 		}
+		
+		File dest;
+		
 		//First copy the remote URI to a 
-		File dest = new File(PropertyReader.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION)+new Integer(generator.nextInt()).toString());
+		if(HttpRetriever.dest == null){
+		   dest = new File(PropertyReader.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION)+new Integer(generator.nextInt()).toString());
+		}
+		else{
+		   dest = new File(HttpRetriever.dest);
+		}
+
 		FileUtils.copyURLToFile(url, dest, 100, 100000);
 		TarArchiveInputStream tarfile;
 
@@ -104,23 +128,22 @@ public class HttpRetriever implements Iterator<String> {
 				if(entry.isDirectory()){
 
 				}
-				else{
-					
-					byte[] content = new byte[(int) entry.getSize()];
-					
-					tarfile.read(content, 0, (int) entry.getSize());
-
-					String xml = new String(content,"UTF-8");
-					
-					list.add(xml);
+				else
+				{	
+					retriever.number_of_recs++;
 				}
 			}
-			
-			
-			
+
 			tarfile.close();
 			
-		return new HttpRetriever(list);
+			TarArchiveInputStream iterabletarfile = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(dest)));
+			
+			iterabletarfile.available();
+			
+			retriever.tarInputstream = iterabletarfile;
+			
+			
+		return retriever;
 	}
 
 	/*
@@ -130,7 +153,12 @@ public class HttpRetriever implements Iterator<String> {
 	 */
 	@Override
 	public boolean hasNext() {
-		return xmlentriesiterator.hasNext();
+		if(number_of_recs <= records_read ){
+			return false;
+		}
+		else{
+			return true;
+		}
 	}
 
 	/*
@@ -140,7 +168,26 @@ public class HttpRetriever implements Iterator<String> {
 	 */
 	@Override
 	public String next() {
-       return xmlentriesiterator.next();
+		
+		TarArchiveEntry entry;
+		try {
+			entry = tarInputstream.getNextTarEntry();
+			
+			while(entry.isDirectory()){
+				entry = tarInputstream.getNextTarEntry();
+			}
+			
+			byte[] content = new byte[(int) entry.getSize()];
+			
+			tarInputstream.read(content, 0, (int) entry.getSize());
+
+			String xml = new String(content,"UTF-8");
+			records_read ++;
+			return xml;
+		} catch (IOException e) {
+			records_read ++;
+			return "";
+		}
 	}
 
 	/*
