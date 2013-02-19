@@ -678,7 +678,7 @@ public class SolrWorkflowPlugin<I> extends
 		}
 	}
 
-	private synchronized void derefResourceOrLiteral(RDF rdf,
+	private void derefResourceOrLiteral(RDF rdf,
 			Datastore datastore, Object object) throws MalformedURLException,
 			IOException, SecurityException, IllegalArgumentException,
 			InstantiationException, IllegalAccessException,
@@ -769,7 +769,6 @@ public class SolrWorkflowPlugin<I> extends
 						.get(vocabularyUri) != null ? vocMemCache
 						.get(vocabularyUri) : getReplaceUri(vocabularyUri);
 				if (vocabularies != null) {
-					synchronized (vocabularies) {
 						for (ControlledVocabularyImpl vocabulary : vocabularies) {
 							for (String rule : vocabulary.getRules()) {
 								if (StringUtils.equals(rule, "*")
@@ -779,7 +778,6 @@ public class SolrWorkflowPlugin<I> extends
 							}
 
 						}
-					}
 				}
 			}
 
