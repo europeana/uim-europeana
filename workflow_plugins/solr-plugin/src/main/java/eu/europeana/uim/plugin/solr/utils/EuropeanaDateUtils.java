@@ -14,19 +14,22 @@ import eu.europeana.corelib.definitions.jibx.ProxyType;
 
 public class EuropeanaDateUtils {
 
-	
+	public static String bcList;
+	public static String[] bc;
 	public static void setPath(String path){
 		PropertyReader.loadPropertiesFromFile(path);
 	}
 	
-	public static List<String> createEuropeanaYears(ProxyType proxy) {
+	public List<String> createEuropeanaYears(ProxyType proxy) {
 		List<String> years = new ArrayList<String>();
 		try {
 			
-		
-			String bcList = FileUtils.readFileToString(new File(
+			if(bcList==null){
+				bcList = FileUtils.readFileToString(new File(
 					PropertyReader.getProperty(UimConfigurationProperty.UIM_BCLIST_PATH)), "UTF-8");
-			String[] bc = StringUtils.split(bcList, "\n");
+				bc = StringUtils.split(bcList, "\n");
+			}
+			if(proxy.getChoiceList()!=null){
 			for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
 				if (choice.ifDate()) {
 					
@@ -40,6 +43,7 @@ public class EuropeanaDateUtils {
 						years.addAll(refineDates(bc, choice.getTemporal().getString()));
 				}
 			}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -47,7 +51,7 @@ public class EuropeanaDateUtils {
 		return years;
 	}
 
-	private static List<String> refineDates(String[] patterns,
+	private List<String> refineDates(String[] patterns,
 			String input) {
 		List<String> dates = new ArrayList<String>();
 			String contains = contains(input, patterns);
@@ -58,7 +62,7 @@ public class EuropeanaDateUtils {
 	}
 
 
-	private static String contains(String input, String[] filters) {
+	private String contains(String input, String[] filters) {
 		for (String filter : filters) {
 			if (StringUtils.containsIgnoreCase(input, filter)) {
 				return filter;
@@ -68,7 +72,7 @@ public class EuropeanaDateUtils {
 	}
 
 	//TODO: not used for the time being as it created problems
-	private static List<String> clean(String inputField) {
+	private List<String> clean(String inputField) {
 		List<String> dates = new ArrayList<String>();
 		StringBuffer sb = new StringBuffer();
 		char[] chars = inputField.toCharArray();
@@ -88,7 +92,7 @@ public class EuropeanaDateUtils {
 		return dates;
 	}
 
-	private static List<String> getDates(String input, String remove) {
+	private List<String> getDates(String input, String remove) {
 		List<String> dates = new ArrayList<String>();
 		String[] left = StringUtils.splitByWholeSeparator(input, remove);
 		List<Character> chars = new ArrayList<Character>();
