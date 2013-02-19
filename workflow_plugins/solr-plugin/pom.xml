@@ -199,6 +199,7 @@
 							org.apache.solr.common.params,
 							org.apache.solr.client.solrj.response,
 							org.apache.solr.client.solrj.beans,
+							org.apache.commons.lang.time,
 							!org.springframework.*,
 							!javax.persistence.*,
 							!org.apache.sanselan.*,
