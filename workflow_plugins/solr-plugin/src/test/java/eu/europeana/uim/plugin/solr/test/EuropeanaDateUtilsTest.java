@@ -40,7 +40,7 @@ public class EuropeanaDateUtilsTest {
 		String proplocation = EuropeanaDateUtilsTest.class.getProtectionDomain().getCodeSource().getLocation() + "uimTest.properties";
 		String truncated = proplocation.replace("file:", "");
 		EuropeanaDateUtils.setPath(truncated);
-		List<String> filteredDates = EuropeanaDateUtils.createEuropeanaYears(proxy);
+		List<String> filteredDates = new EuropeanaDateUtils().createEuropeanaYears(proxy);
 		Assert.assertTrue(filteredDates.size()==1);
 		//TEMPORARILY REMOVED
 //		Assert.assertTrue(filteredDates.contains("-150"));
