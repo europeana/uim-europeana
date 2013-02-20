@@ -116,8 +116,10 @@ public class OsgiExtractor extends Extractor {
 
 						Map<String, List> entityCache = createDereferencingMap(
 								entity.getContent(), iterations);
+						synchronized(memCache){
 						memCache.getEntityCache().put(entity.getUri(),
 								entityCache);
+						}
 						return entityCache;
 					}
 				}
@@ -127,12 +129,12 @@ public class OsgiExtractor extends Extractor {
 		return new HashMap<String, List>();
 	}
 
-	private synchronized Map<String, List> retrieveMapFromCache(String fullUri) {
+	private Map<String, List> retrieveMapFromCache(String fullUri) {
 		return memCache.getEntityCache().containsKey(fullUri) ? memCache
 				.getEntityCache().get(fullUri) : null;
 	}
 
-	private synchronized Map<String, List> createDereferencingMap(
+	private Map<String, List> createDereferencingMap(
 			String xmlString, int iterations) throws SecurityException,
 			IllegalArgumentException, InstantiationException,
 			IllegalAccessException, NoSuchMethodException,
@@ -867,7 +869,7 @@ public class OsgiExtractor extends Extractor {
 		return false;
 	}
 
-	private synchronized EntityImpl retrieveValueFromResource(String resource) {
+	private EntityImpl retrieveValueFromResource(String resource) {
 
 		EntityImpl entity = datastore.find(EntityImpl.class)
 				.filter("uri", resource).get();

@@ -129,7 +129,8 @@ public class SolrWorkflowPlugin<I> extends
 					.createMarshallingContext();
 			marshallingContext.setIndent(2);
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			//RDF rdfCopy = (RDF) uctx.unmarshalDocument(new StringReader(value));
+			// RDF rdfCopy = (RDF) uctx.unmarshalDocument(new
+			// StringReader(value));
 			RDF rdfCopy = clone(rdf);
 			if (rdf.getAgentList() != null) {
 				for (AgentType agent : rdf.getAgentList()) {
@@ -234,53 +235,54 @@ public class SolrWorkflowPlugin<I> extends
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// return false;
+		return false;
 		// // }
-		return true;
+		// return true;
 	}
 
 	private RDF clone(RDF rdf) {
 		RDF rdfCopy = new RDF();
-		if(rdf.getAgentList()!=null){
+		if (rdf.getAgentList() != null) {
 			rdfCopy.setAgentList(copyList(rdf.getAgentList()));
 		}
-		if(rdf.getPlaceList()!=null){
+		if (rdf.getPlaceList() != null) {
 			rdfCopy.setPlaceList(copyList(rdf.getPlaceList()));
 		}
-		if(rdf.getConceptList()!=null){
+		if (rdf.getConceptList() != null) {
 			rdfCopy.setConceptList(copyList(rdf.getConceptList()));
 		}
-		if(rdf.getEuropeanaAggregationList()!=null){
-			rdfCopy.setEuropeanaAggregationList(copyList(rdf.getEuropeanaAggregationList()));
+		if (rdf.getEuropeanaAggregationList() != null) {
+			rdfCopy.setEuropeanaAggregationList(copyList(rdf
+					.getEuropeanaAggregationList()));
 		}
-		if(rdf.getAggregationList()!=null){
+		if (rdf.getAggregationList() != null) {
 			rdfCopy.setAggregationList(copyList(rdf.getAggregationList()));
 		}
-		if(rdf.getProvidedCHOList()!=null){
+		if (rdf.getProvidedCHOList() != null) {
 			rdfCopy.setProvidedCHOList(copyList(rdf.getProvidedCHOList()));
 		}
-		if(rdf.getProxyList()!=null){
+		if (rdf.getProxyList() != null) {
 			rdfCopy.setProxyList(copyList(rdf.getProxyList()));
 		}
-		if(rdf.getTimeSpanList()!=null){
+		if (rdf.getTimeSpanList() != null) {
 			rdfCopy.setTimeSpanList(rdf.getTimeSpanList());
 		}
-		if(rdf.getWebResourceList()!=null){
+		if (rdf.getWebResourceList() != null) {
 			rdfCopy.setWebResourceList(copyList(rdf.getWebResourceList()));
 		}
 		return rdfCopy;
 	}
 
-	private  <T>  List<T>  copyList(List<T> originalList){
+	private <T> List<T> copyList(List<T> originalList) {
 		List<T> copy = new ArrayList<T>(originalList.size());
-		for (int i=0;i<originalList.size();i++){
-			
+		for (int i = 0; i < originalList.size(); i++) {
+
 			copy.add(originalList.get(0));
 		}
 		Collections.copy(copy, originalList);
 		return copy;
 	}
-	
+
 	private RDF cleanRDF(RDF rdf) {
 		RDF rdfFinal = new RDF();
 		List<AgentType> agents = new ArrayList<AgentType>();

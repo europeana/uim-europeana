@@ -15,7 +15,7 @@ import eu.europeana.uim.plugin.solr.utils.PropertyReader;
 import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 
 public class SolrWorkflowServiceImpl implements SolrWorkflowService {
-	private static OsgiExtractor extractor;
+//	private static OsgiExtractor extractor;
 	private static Datastore datastore;
 
 	public SolrWorkflowServiceImpl() {
@@ -59,9 +59,9 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 
 			@Override
 			protected void initializeInternal() {
-				if(extractor == null){
-					extractor = new OsgiExtractor();
-				}
+//				if(extractor == null){
+					OsgiExtractor extractor = new OsgiExtractor();
+//				}
 				extractor.setDatastore(datastore);
 				BlockingInitializer vocInitializer = new BlockingInitializer() {
 
@@ -83,6 +83,8 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 	
 	@Override
 	public OsgiExtractor getExtractor() {
+		OsgiExtractor extractor = new OsgiExtractor();
+		extractor.setDatastore(datastore);
 		return extractor;
 	}
 
