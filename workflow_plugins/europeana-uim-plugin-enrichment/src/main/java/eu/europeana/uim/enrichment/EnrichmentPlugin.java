@@ -353,7 +353,7 @@ public class EnrichmentPlugin<I> extends
 			}
 
 			String value = mdr.getValues(
-					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
+					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null? mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0): mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			SolrInputDocument basicDocument = new SolrConstructor()
