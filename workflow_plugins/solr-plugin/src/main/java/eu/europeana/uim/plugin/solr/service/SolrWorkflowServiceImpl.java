@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
+import com.hp.hpl.jena.rdf.model.RDFReaderF;
+import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -78,7 +80,15 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 		};
 		initializer.initialize(OsgiExtractor.class.getClassLoader());
 		
-		
+		BlockingInitializer rdfReaderInitializer = new BlockingInitializer() {
+			
+			@Override
+			protected void initializeInternal() {
+				new RDFReaderFImpl();
+				
+			}
+		};
+		rdfReaderInitializer.initialize(RDFReaderFImpl.class.getClassLoader());
 	}
 	
 	@Override
@@ -91,6 +101,11 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 	@Override
 	public Datastore getDatastore() {
 		return datastore;
+	}
+
+	@Override
+	public RDFReaderF getRDFReaderF() {
+		return new RDFReaderFImpl();
 	}
 
 }

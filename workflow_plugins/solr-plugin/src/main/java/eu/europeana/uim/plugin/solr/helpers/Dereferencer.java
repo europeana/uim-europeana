@@ -191,6 +191,7 @@ public abstract class Dereferencer {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void appendInRDF(RDF rdf, Map<String, List> denormalize) {
+		if(denormalize!=null){
 		for (Entry<String, List> entry : denormalize.entrySet()) {
 			if (StringUtils.equals(entry.getKey(), "concepts")) {
 				for (Concept concept : (List<Concept>) entry.getValue()) {
@@ -237,6 +238,7 @@ public abstract class Dereferencer {
 					}
 				}
 			}
+		}
 		}
 	}
 

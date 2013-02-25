@@ -111,6 +111,33 @@
 			<artifactId>mongo-jackson-mapper</artifactId>
 			<version>1.4.2</version>
 		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.apache.jena</groupId> -->
+<!-- 			<artifactId>apache-jena</artifactId> -->
+<!-- 			<type>pom</type> -->
+<!-- 			<version>2.7.4</version> -->
+<!-- 		</dependency> -->
+
+<dependency>
+	<groupId>com.hp.hpl.jena</groupId>
+	<artifactId>jena</artifactId>
+	<version>2.6.4</version>
+</dependency>
+<dependency>
+	<groupId>com.hp.hpl.jena</groupId>
+	<artifactId>iri</artifactId>
+	<version>0.8</version>
+</dependency>
+<dependency>
+	<groupId>com.ibm.icu</groupId>
+	<artifactId>icu4j</artifactId>
+	<version>50.1.1</version>
+</dependency>
+   <dependency>
+	<groupId>com.hp.hpl.jena</groupId>
+	<artifactId>arq</artifactId>
+	<version>2.8.8</version>
+</dependency>         
 	</dependencies>
 
 
@@ -222,7 +249,10 @@
 							!javax.ws.rs,
 							!javax.ws.rs.*,
 							!de.undercouch.bson4jackson.*,
-							!org.w3c.dom.traversal
+							org.w3c.dom.traversal,
+							!org.apache.log4j.*, 
+							!org.apache.lucene.*, 
+							org.slf4j.*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>
