@@ -93,7 +93,7 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 	
 	@Override
 	public OsgiExtractor getExtractor() {
-		OsgiExtractor extractor = new OsgiExtractor();
+		OsgiExtractor extractor = new OsgiExtractor(this);
 		extractor.setDatastore(datastore);
 		return extractor;
 	}

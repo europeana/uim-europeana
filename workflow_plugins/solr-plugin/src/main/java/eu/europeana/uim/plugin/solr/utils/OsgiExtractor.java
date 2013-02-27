@@ -61,22 +61,21 @@ import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.EntityImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
 import eu.europeana.uim.common.BlockingInitializer;
+import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
 
 public class OsgiExtractor extends Extractor {
 
 	// private static OsgiExtractor extractor;
 
-	public OsgiExtractor() {
+	public static SolrWorkflowService solrWorkFlowService;
+	
+	public OsgiExtractor(){
+		
+	}
+	
+	public OsgiExtractor(SolrWorkflowService solrWorkflowService) {
 		memCache = MemCache.getInstance();
-		BlockingInitializer rb = new BlockingInitializer() {
-			
-			@Override
-			protected void initializeInternal() {
-				new RDFReaderFImpl();
-				
-			}
-		};
-		rb.initialize(RDFReaderFImpl.class.getClassLoader());
+		OsgiExtractor.solrWorkFlowService=solrWorkflowService;
 	}
 
 	// public static OsgiExtractor getInstance(final Datastore datastore) {
@@ -169,7 +168,7 @@ public class OsgiExtractor extends Extractor {
 		TimeSpanType lastTimespan = null;
 		PlaceType lastPlace = null;
 
-		RDFReaderF rdfReader = new RDFReaderFImpl();
+		RDFReaderF rdfReader = solrWorkFlowService.getRDFReaderF();
 		Model model = ModelFactory.createDefaultModel();
 		rdfReader.getReader().read(model,
 				new ByteArrayInputStream(xmlString.getBytes()), "");
