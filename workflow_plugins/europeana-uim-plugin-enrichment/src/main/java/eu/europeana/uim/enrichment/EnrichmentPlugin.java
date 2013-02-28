@@ -1,6 +1,5 @@
 package eu.europeana.uim.enrichment;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
@@ -8,14 +7,12 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -42,7 +39,6 @@ import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.Country;
 import eu.europeana.corelib.definitions.jibx.Creator;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
-import eu.europeana.corelib.definitions.jibx.HasMet;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.LandingPage;
 import eu.europeana.corelib.definitions.jibx.Language1;
@@ -70,7 +66,6 @@ import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
-import eu.europeana.corelib.solr.utils.EDMUtils;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
@@ -84,6 +79,7 @@ import eu.europeana.uim.enrichment.enums.OriginalField;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
+import eu.europeana.uim.enrichment.utils.SolrList;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
@@ -127,15 +123,14 @@ public class EnrichmentPlugin<I> extends
 	private static String collections = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static Morphia morphia;
-	private static List<SolrInputDocument> solrList;
+	private static SolrList solrList;
 	private static List<SolrInputDocument> migrationSolrList;
-	private final static int SUBMIT_SIZE = 1000;
+	private final static int SUBMIT_SIZE = 10000;
 	private static OsgiEdmMongoServer mongoServer;
 	private static Mongo mongo;
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
 
-	
 	private static IBindingFactory bfact;
 
 	public EnrichmentPlugin(String name, String description) {
@@ -163,7 +158,6 @@ public class EnrichmentPlugin<I> extends
 	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-		
 
 	};
 
@@ -257,7 +251,7 @@ public class EnrichmentPlugin<I> extends
 			throws IngestionPluginFailedException {
 
 		try {
-			solrList = Collections.synchronizedList(new ArrayList<SolrInputDocument>());
+			solrList = SolrList.getInstance();
 			migrationSolrList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
 			migrationSolrServer = enrichmentService.getMigrationServer();
@@ -283,8 +277,6 @@ public class EnrichmentPlugin<I> extends
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 
-
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -300,13 +292,12 @@ public class EnrichmentPlugin<I> extends
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		try {
-			solrServer.add(solrList);
-			System.out.println("Adding " + solrList.size() + " documents");
+			solrServer.add(solrList.getQueue());
+			System.out.println("Adding " + recordNumber + " documents");
 
 			// solrServer.commit();
 			System.out.println("Committed in Solr Server");
 
-			solrList = new ArrayList<SolrInputDocument>();
 			mongoServer.close();
 		} catch (IOException e) {
 			context.getLoggingEngine().logFailed(
@@ -352,13 +343,16 @@ public class EnrichmentPlugin<I> extends
 				return false;
 			}
 
-			String value = mdr.getValues(
-					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null? mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0): mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
+			String value = mdr
+					.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null ? mdr
+					.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+					.get(0) : mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
+					.get(0);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			SolrInputDocument basicDocument = new SolrConstructor()
 					.constructSolrDocument(rdf);
-			//migrationSolrList.add(basicDocument);
+			// migrationSolrList.add(basicDocument);
 			List<Entity> entities = enrichmentService.enrich(basicDocument);
 			mergeEntities(rdf, entities);
 			RDF rdfFinal = cleanRDF(rdf);
@@ -400,33 +394,23 @@ public class EnrichmentPlugin<I> extends
 
 			fullBean.setEuropeanaCollectionName(new String[] { fileName });
 			if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
-				System.out.println("Saving bean " + fullBean.getAbout());
 				mongoServer.getDatastore().save(fullBean);
 			} else {
-				System.out.println(mongoHost);
-				System.out.println(mongoPort);
-				System.out.println("Updating bean "+ fullBean.getAbout());
 				updateFullBean(fullBean);
 
 			}
-//			FileUtils.write(new File("/home/gmamakis/"
-//					+ fullBean.getAbout().replace("/", "_") + ".xml"),
-//					EDMUtils.toEDM(fullBean));
+			// FileUtils.write(new File("/home/gmamakis/"
+			// + fullBean.getAbout().replace("/", "_") + ".xml"),
+			// EDMUtils.toEDM(fullBean));
 			int retries = 0;
 			while (retries < RETRIES) {
 				try {
-					solrList.add(solrInputDocument);
+					solrList.addToQueue(solrServer,solrInputDocument);
 					recordNumber++;
 					// Send records to SOLR by thousands
-					if (solrList.size() >= SUBMIT_SIZE) {
-						// TODO: think this over
-						// migrationSolrServer.add(migrationSolrList);
-						// migrationSolrList = new
-						// ArrayList<SolrInputDocument>();
-						//System.out.println("Saving in SOLR");
-						solrServer.add(solrList);
-						solrList.clear();
-					}
+
+				
+
 					return true;
 				} catch (SolrException e) {
 					log.log(Level.WARNING, "Solr Exception occured with error "
@@ -490,7 +474,7 @@ public class EnrichmentPlugin<I> extends
 	private void updateFullBean(FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
 				.createQuery(FullBeanImpl.class).field("about")
-				.equal(fullBean.getAbout().replace("/item",""));
+				.equal(fullBean.getAbout().replace("/item", ""));
 		UpdateOperations<FullBeanImpl> ops = mongoServer.getDatastore()
 				.createUpdateOperations(FullBeanImpl.class);
 		ops.set("title", fullBean.getTitle() != null ? fullBean.getTitle()
@@ -571,11 +555,11 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-//							addToHasMetList(
-//									europeanaProxy,
-//									field.getValues()
-//											.get(field.getValues().keySet()
-//													.iterator().next()).get(0));
+							// addToHasMetList(
+							// europeanaProxy,
+							// field.getValues()
+							// .get(field.getValues().keySet()
+							// .iterator().next()).get(0));
 						} else {
 							if (field.getValues() != null) {
 								for (Entry<String, List<String>> entry : field
@@ -615,11 +599,11 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-//							addToHasMetList(
-//									europeanaProxy,
-//									field.getValues()
-//											.get(field.getValues().keySet()
-//													.iterator().next()).get(0));
+							// addToHasMetList(
+							// europeanaProxy,
+							// field.getValues()
+							// .get(field.getValues().keySet()
+							// .iterator().next()).get(0));
 						} else {
 							for (Entry<String, List<String>> entry : field
 									.getValues().entrySet()) {
@@ -656,11 +640,11 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-//							addToHasMetList(
-//									europeanaProxy,
-//									field.getValues()
-//											.get(field.getValues().keySet()
-//													.iterator().next()).get(0));
+							// addToHasMetList(
+							// europeanaProxy,
+							// field.getValues()
+							// .get(field.getValues().keySet()
+							// .iterator().next()).get(0));
 						} else {
 							for (Entry<String, List<String>> entry : field
 									.getValues().entrySet()) {
@@ -696,11 +680,11 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-//							addToHasMetList(
-//									europeanaProxy,
-//									field.getValues()
-//											.get(field.getValues().keySet()
-//													.iterator().next()).get(0));
+							// addToHasMetList(
+							// europeanaProxy,
+							// field.getValues()
+							// .get(field.getValues().keySet()
+							// .iterator().next()).get(0));
 						} else {
 							if (field.getValues() != null) {
 								for (Entry<String, List<String>> entry : field
@@ -731,14 +715,15 @@ public class EnrichmentPlugin<I> extends
 		}
 	}
 
-//	private void addToHasMetList(ProxyType europeanaProxy, String value) {
-//		List<HasMet> hasMetList = europeanaProxy.getHasMetList() != null ? europeanaProxy
-//				.getHasMetList() : new ArrayList<HasMet>();
-//		HasMet hasMet = new HasMet();
-//		hasMet.setString(value);
-//		hasMetList.add(hasMet);
-//		europeanaProxy.setHasMetList(hasMetList);
-//	}
+	// private void addToHasMetList(ProxyType europeanaProxy, String value) {
+	// List<HasMet> hasMetList = europeanaProxy.getHasMetList() != null ?
+	// europeanaProxy
+	// .getHasMetList() : new ArrayList<HasMet>();
+	// HasMet hasMet = new HasMet();
+	// hasMet.setString(value);
+	// hasMetList.add(hasMet);
+	// europeanaProxy.setHasMetList(hasMetList);
+	// }
 
 	// Clean duplicate contextual entities
 	private RDF cleanRDF(RDF rdf) {
@@ -852,7 +837,7 @@ public class EnrichmentPlugin<I> extends
 			}
 		}
 		if (webResources.size() > 0) {
-			if(rdfFinal.getWebResourceList()!=null){
+			if (rdfFinal.getWebResourceList() != null) {
 				rdfFinal.getWebResourceList().addAll(webResources);
 			} else {
 				rdfFinal.setWebResourceList(webResources);
@@ -897,7 +882,8 @@ public class EnrichmentPlugin<I> extends
 		Rights1 rightsType = new Rights1();
 		rightsType
 				.setResource(europeanaAggregation.getRights() != null ? europeanaAggregation
-						.getRights().getResource() : "http://creativecommons.org/licenses/by-sa/3.0/");
+						.getRights().getResource()
+						: "http://creativecommons.org/licenses/by-sa/3.0/");
 		europeanaAggregation.setRights(rightsType);
 		AggregatedCHO aggrCHO = new AggregatedCHO();
 		aggrCHO.setResource(cho.getAbout());
