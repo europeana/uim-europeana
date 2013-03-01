@@ -88,14 +88,14 @@ public class EuropeanaClientConstants {
 	public final static String VOCDELETEVOCABULARY = "Delete Vocabulary";
 	public final static String VOCEDITVOCABULARY = "Edit Vocabulary";
 	public final static String VOCREFRESHVOCABULARY = "Refresh";
-	public final static String VOCITERATIONS = "# of iterations";
+	public final static String VOCITERATIONS = "# of broader iterations";
 	public final static String VOCREPLACEURL = "Vocabulary Replace URL";
 	public final static String VOCLOCATION = "Vocabulary Location";
-
+	
 	 public final static String
-	 UPLOAD_SERVLET_URL="http://sip-manager.isti.cnr.it:8181/gui/EuropeanaIngestionControlPanel/uploadservlet";
+	 UPLOAD_SERVLET_URL="http://localhost:8181/gui/EuropeanaIngestionControlPanel/uploadservlet";
 	 public final static String
-	 REMOTE_UPLOAD_SERVLET_URL="http://sip-manager.isti.cnr.it:8181/gui/EuropeanaIngestionControlPanel/remoteuploadservlet";
+	 REMOTE_UPLOAD_SERVLET_URL="http://localhost:8181/gui/EuropeanaIngestionControlPanel/remoteuploadservlet";
 	// public final static String
 	// UPLOAD_SERVLET_URL="http://localhost:8181/gui/EuropeanaIngestionControlPanel/uploadservlet";
 	// public final static String

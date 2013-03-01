@@ -64,6 +64,11 @@
 		<servlet-name>failedRecordsService</servlet-name>
 		<servlet-class>eu.europeana.uim.gui.cp.server.FailedRecordServiceImpl</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>previewService</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.PreviewServiceImpl</servlet-class>
+	</servlet>
+	
 	<servlet-mapping>
 		<servlet-name>logFileService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/logfile</url-pattern>
@@ -124,7 +129,10 @@
         <servlet-name>mongoImageViewServlet</servlet-name>
         <url-pattern>/EuropeanaIngestionControlPanel/mongoImageView</url-pattern>
     </servlet-mapping>
-    
+    <servlet-mapping>
+    	<servlet-name>previewService</servlet-name>
+    	<url-pattern>/EuropeanaIngestionControlPanel/previewService</url-pattern>
+    </servlet-mapping>
     <!-- Default page to serve -->
     <welcome-file-list>
         <welcome-file>EuropeanaIngestionControlPanel.html</welcome-file>
