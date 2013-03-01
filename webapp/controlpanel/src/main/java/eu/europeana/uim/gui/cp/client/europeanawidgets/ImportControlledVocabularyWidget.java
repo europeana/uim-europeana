@@ -75,7 +75,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	List<MappingDTO> mappings;
 	private final ImportVocabularyProxyAsync importedVocabulary;
 	ControlledVocabularyDTO vocabulary;
-
+	TextBox vocabularyIterations;
 	// temporary fields
 	MappingDTO mappedField;
 	String originalField;
@@ -187,7 +187,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		saveMapping.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				importedVocabulary.saveMapping(new AsyncCallback<Boolean>() {
+				importedVocabulary.saveMapping(Integer.parseInt(vocabularyIterations.getValue()), new AsyncCallback<Boolean>() {
 					@Override
 					public void onSuccess(Boolean result) {
 						Window.alert("The mapping was saved successfully");
@@ -229,9 +229,23 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 						});
 			}
 		});
-		buttons.setWidget(0, 0, createMapping);
-		buttons.setWidget(1, 0, saveMapping);
-		buttons.setWidget(2, 0, deleteMapping);
+		buttons.setWidget(0, 0, new Label(EuropeanaClientConstants.VOCITERATIONS));
+		vocabularyIterations = new TextBox();
+		vocabularyIterations.setName("vocabularyIteration");
+		vocabularyIterations.addKeyPressHandler(new KeyPressHandler() {
+			
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				if (!Character.isDigit(event.getCharCode())){
+					Window.alert("The value is not a digit");
+				}
+				
+			}
+		});
+		buttons.setWidget(1, 0, vocabularyIterations);
+		buttons.setWidget(2, 0, createMapping);
+		buttons.setWidget(3, 0, saveMapping);
+		buttons.setWidget(4, 0, deleteMapping);
 		return buttons;
 	}
 
@@ -539,27 +553,15 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				form.submit();
 			}
 		});
-		TextBox vocabularyIterations = new TextBox();
-		vocabularyIterations.setName("vocabularyIteration");
-		vocabularyIterations.setValue("0");
-		vocabularyIterations.addKeyPressHandler(new KeyPressHandler() {
-			
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (!Character.isDigit(event.getCharCode())){
-					Window.alert("The value is not a digit");
-				}
-				
-			}
-		});
-		table.setWidget(7, 0, new Label(EuropeanaClientConstants.VOCITERATIONS));
-		table.setWidget(7, 1, vocabularyIterations);
-		table.setWidget(9, 1, submit);
-		table.setWidget(8, 0, new Label(EuropeanaClientConstants.VOCLOCATION));
+	
+		
+		
+		table.setWidget(8, 1, submit);
+		table.setWidget(7, 0, new Label(EuropeanaClientConstants.VOCLOCATION));
 		TextBox vocabularyLocation = new TextBox();
 		vocabularyLocation.setName("vocabularyLocation");
 		vocabularyLocation.setVisible(true);
-		table.setWidget(8,1,vocabularyLocation);
+		table.setWidget(7,1,vocabularyLocation);
 		
 		form.add(table);
 		form.addSubmitHandler(new SubmitHandler() {
@@ -654,6 +656,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		}
 		originalFields.setRowData(originals);
 		mappedFields.setRowData(vocabulary.getMapping());
+		vocabularyIterations.setValue(Integer.toString(vocabulary.getIterations()));
 		retrieveEdmFields();
 	}
 

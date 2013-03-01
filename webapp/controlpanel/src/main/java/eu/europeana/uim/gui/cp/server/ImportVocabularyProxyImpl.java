@@ -109,9 +109,10 @@ public class ImportVocabularyProxyImpl extends
 		return mapping;
 	}
 
-	public boolean saveMapping() {
+	public boolean saveMapping(int iterations) {
 		if (extractor != null) {
-			return extractor.saveMapping();
+			
+			return extractor.saveMapping(iterations);
 		}
 		return false;
 	}
@@ -162,6 +163,7 @@ public class ImportVocabularyProxyImpl extends
 					.getElements()));
 			vocabularyDTO.setRules(controlledVocabulary.getRules());
 			vocabularyDTO.setReplaceUrl(controlledVocabulary.getReplaceUrl());
+			vocabularyDTO.setIterations(controlledVocabulary.getIterations());
 			vocabularyDTOs.add(vocabularyDTO);
 		}
 		return vocabularyDTOs;
