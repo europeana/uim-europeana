@@ -25,13 +25,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.LinkStatus;
-import eu.europeana.uim.logging.LoggingEngine;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
+
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.progress.ProgressMonitor;
@@ -49,6 +49,10 @@ import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
 /**
  * This class uses the private zipiterator in order to batch load records into
  * the storage engine
@@ -62,40 +66,53 @@ public class ZipLoader<I> {
 	@SuppressWarnings("rawtypes")
 	private StorageEngine storage;
 
-	private LoggingEngine<?> loggingEngine;
 	@SuppressWarnings("rawtypes")
 	private Request request;
+
 	@SuppressWarnings("unused")
 	private ProgressMonitor monitor;
+	
 	private Iterator<String> zipiterator;
 
 	private ExecutionContext<MetaDataRecord<I>, I> context;
-	
+
 	private int totalProgress = 0;
+	
 	private int expectedRecords = 0;
 
 	private boolean forceUpdate;
-	
+
+	/**
+	 * Reference to Deduplication service
+	 */
 	private DeduplicationService dedup;
 
+	/**
+	 * Static unmarshalling context used for all EDM unmarshalling operations
+	 */
 	private static IUnmarshallingContext mctx;
+
+	/**
+	 * Static Logger reference
+	 */
+	private static final Logger LOGGER = Logger.getLogger(ZipLoader.class.getName());
 	
+
 	
-	//Unmarshalling context initialization
-	static{
-		
+	// Unmarshalling context initialization
+	static {
+
 		IBindingFactory bfact;
 		try {
 			bfact = BindingDirectory.getFactory(RDF.class);
 			mctx = bfact.createUnmarshallingContext();
 		} catch (JiBXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"ZipLoader:Error intializing static unmarshalling context",e);
+
 		}
-		
+
 	}
-	
-	
+
 	/**
 	 * Default constructor for this class
 	 * 
@@ -113,19 +130,18 @@ public class ZipLoader<I> {
 	 *            A reference to the logging engine
 	 */
 	public ZipLoader(int expectedRecords, Iterator<String> zipiterator,
-			ExecutionContext<MetaDataRecord<I>, I> context,Request<I> request,
-			DeduplicationService dedup,String forceupdate) {
+			ExecutionContext<MetaDataRecord<I>, I> context, Request<I> request,
+			DeduplicationService dedup, String forceupdate) {
 		super();
 		this.expectedRecords = expectedRecords;
 		this.zipiterator = zipiterator;
 		this.storage = context.getStorageEngine();
 		this.request = request;
 		this.monitor = context.getMonitor();
-		this.loggingEngine = context.getLoggingEngine();
 		this.dedup = dedup;
 		this.context = context;
-		
-		if(forceupdate !=null && forceupdate.toLowerCase().equals("true")){
+
+		if (forceupdate != null && forceupdate.toLowerCase().equals("true")) {
 			forceUpdate = true;
 		}
 	}
@@ -142,12 +158,13 @@ public class ZipLoader<I> {
 	 * @return list of loaded Metadata records
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public synchronized  List<MetaDataRecord<I>> doNext(int batchSize,
+	public synchronized List<MetaDataRecord<I>> doNext(int batchSize,
 			boolean save) {
 		List<MetaDataRecord<I>> result = new ArrayList<MetaDataRecord<I>>();
 		int progress = 0;
-		
-		HttpZipWorkflowStart.Data value = context.getValue(HttpZipWorkflowStart.DATA_KEY);
+
+		HttpZipWorkflowStart.Data value = context
+				.getValue(HttpZipWorkflowStart.DATA_KEY);
 
 		while (zipiterator.hasNext()) {
 
@@ -170,81 +187,93 @@ public class ZipLoader<I> {
 
 					MetaDataRecord<I> mdr = null;
 
-					switch(state){
-					case ID_REGISTERED:
-						mdr = processrecord(mdr,dedupres);
-					break;
+					switch (state) {
+					case ID_REGISTERED:						
+						mdr = processrecord(mdr, dedupres, Status.CREATED);
+						LOGGER.log(Level.INFO,"Unique Identifier in ID_REGISTERED state for record with ID " + dedupres
+								.getDerivedRecordID());
+						
+						value.deletioncandidates.remove(dedupres
+								.getDerivedRecordID());
+						break;
 					case COLLECTION_CHANGED:
+						LOGGER.log(Level.INFO,"Unique Identifier in COLLECTION_CHANGED state for record with ID " + dedupres
+								.getDerivedRecordID());
 						break;
 					case DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS:
+						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS state for record with ID " + dedupres
+								.getDerivedRecordID());
 						break;
-					case DUPLICATE_INCOLLECTION:
-						synchronized(value.deletioncandidates){
-							value.deletioncandidates.remove(dedupres.getDerivedRecordID());
-						}
+					case DUPLICATE_INCOLLECTION:						
+						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_INCOLLECTION state for record with ID " + dedupres
+							.getDerivedRecordID());
+						
 						break;
 					case DUPLICATE_RECORD_ACROSS_COLLECTIONS:
+						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_RECORD_ACROSS_COLLECTIONS state for record with ID " + dedupres
+								.getDerivedRecordID());
 						break;
 					case IDENTICAL:
 
-						if(forceUpdate){
-							
-							try{
-								
-								mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
-								processrecord(mdr,dedupres);
-							}
-							catch(StorageEngineException e){
+						if (forceUpdate) {
+							LOGGER.log(Level.INFO,"Unique Identifier in IDENTICAL (forceupdate) state for record with ID " + dedupres
+									.getDerivedRecordID());
+							try {
+								mdr = storage.getMetaDataRecord(dedupres
+										.getDerivedRecordID());
+								processrecord(mdr,dedupres,Status.UPDATED);
+								value.deletioncandidates.remove(dedupres
+										.getDerivedRecordID());
+							} catch (StorageEngineException e) {
 								e.printStackTrace();
-								mdr = processrecord(mdr,dedupres);
+								mdr = processrecord(mdr,dedupres,Status.UPDATED);
+								value.deletioncandidates.remove(dedupres
+										.getDerivedRecordID());
 							}
 
+						} else {
+							LOGGER.log(Level.INFO,"Unique Identifier in IDENTICAL (ignore identical) state for record with ID " + dedupres
+									.getDerivedRecordID());
+							value.deletioncandidates.remove(dedupres
+									.getDerivedRecordID());
 						}
-						else{
-							synchronized(value.deletioncandidates){
-								value.deletioncandidates.remove(dedupres.getDerivedRecordID());
-							}
-						}
-						
+
 						break;
 					case UPDATE:
-						try{
-							mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
-							processrecord(mdr,dedupres);
-						}
-						catch(StorageEngineException e){
+						try {
+							LOGGER.log(Level.INFO,"Unique Identifier in UPDATE state for record with ID " + dedupres
+									.getDerivedRecordID());
+							mdr = storage.getMetaDataRecord(dedupres
+									.getDerivedRecordID());
+							processrecord(mdr, dedupres,Status.UPDATED);
+							value.deletioncandidates.remove(dedupres
+									.getDerivedRecordID());
+						} catch (StorageEngineException e) {
 							e.printStackTrace();
-							mdr = processrecord(mdr,dedupres);
+							mdr = processrecord(mdr,dedupres,Status.UPDATED);
+							value.deletioncandidates.remove(dedupres
+									.getDerivedRecordID());
 						}
 						break;
 					default:
 						break;
 					}
-							
-					if(mdr != null){
+
+					if (mdr != null) {
 						result.add(mdr);
 					}
-					
+
 				}
 
 				progress++;
 				totalProgress++;
 
 			} catch (JiBXException e) {
-
-				if (loggingEngine != null) {
-
-					loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
-							"Error unmarshalling xml for object ");
-				}
-
+				LOGGER.log(Level.WARNING,"ZipLoader:Error unmarshalling xml for object",e);
 			} catch (StorageEngineException e) {
-				if (loggingEngine != null) {
-					loggingEngine.logFailed(Level.SEVERE, "ZipLoader", e,
-							"Error storing object ");
-				}
+				LOGGER.log(Level.WARNING,"ZipLoader:Storage engine error",e);
 			} catch (DeduplicationException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"ZipLoader:Deduplication Exception",e);
 			}
 		}
 
@@ -260,7 +289,8 @@ public class ZipLoader<I> {
 	 */
 	@SuppressWarnings("unchecked")
 	private MetaDataRecord<I> processrecord(MetaDataRecord<I> mdr,
-			DeduplicationResult dedupres) throws JiBXException, StorageEngineException {
+			DeduplicationResult dedupres,Status status) throws JiBXException,
+			StorageEngineException {
 
 		if (mdr == null) {
 			mdr = storage.createMetaDataRecord(request.getCollection(),
@@ -272,7 +302,8 @@ public class ZipLoader<I> {
 			mdr.deleteValues(EuropeanaModelRegistry.EDMRECORD);
 			// Remove the previous registered links
 			mdr.deleteValues(EuropeanaModelRegistry.EUROPEANALINK);
-
+            // Remove all previous STATUS information
+			mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 		}
 
 		mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
@@ -282,8 +313,11 @@ public class ZipLoader<I> {
 
 		// Add Links to be checked values here
 		addLinkcheckingValues(unmarshall(dedupres.getEdm()), mdr);
-		storage.updateMetaDataRecord(mdr);
 		
+		mdr.addValue(EuropeanaModelRegistry.STATUS, status);
+		
+		storage.updateMetaDataRecord(mdr);
+
 		return mdr;
 	}
 
@@ -304,8 +338,7 @@ public class ZipLoader<I> {
 	 * 
 	 * @param validedmrecord
 	 */
-	private void addLinkcheckingValues(RDF validedmrecord,
-			MetaDataRecord<I> mdr) {
+	private void addLinkcheckingValues(RDF validedmrecord, MetaDataRecord<I> mdr) {
 
 		List<Aggregation> aggregations = validedmrecord.getAggregationList();
 		List<WebResourceType> webresources = validedmrecord
@@ -400,7 +433,6 @@ public class ZipLoader<I> {
 		this.storage = null;
 		this.request = null;
 		this.monitor = null;
-		this.loggingEngine = null;
 	}
 
 }

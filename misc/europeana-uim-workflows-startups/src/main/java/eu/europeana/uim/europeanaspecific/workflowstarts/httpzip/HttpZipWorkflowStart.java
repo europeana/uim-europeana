@@ -25,6 +25,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.orchestration.ExecutionContext;
@@ -52,6 +55,13 @@ import eu.europeana.uim.plugin.source.WorkflowStartFailedException;
  */
 public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecord<I>, I> {
 
+	
+	/**
+	 * Static Logger reference
+	 */
+	private static Logger LOGGER = Logger.getLogger(HttpZipWorkflowStart.class.getName());
+	
+	
 	/**
 	 * The deduplication service reference (null if not available)
 	 */
@@ -317,12 +327,15 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 					mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 					mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
 					uimengine.updateMetaDataRecord(mdr);
+					LOGGER.info("Record" + mdr.getId() + "Deleted" );
 				} catch (StorageEngineException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING,"HttpZipWorkflowStart:",e );
 				}
 			}
 		}
 		
+		
+		LOGGER.info("Number of deleted Records: " + value.deletioncandidates.size() );
 		
 		if (context.getExecution().isCanceled()) {
 			value.request.setFailed(true);
