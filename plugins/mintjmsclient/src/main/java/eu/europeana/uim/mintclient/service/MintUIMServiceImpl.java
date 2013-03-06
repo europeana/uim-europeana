@@ -135,7 +135,6 @@ public class MintUIMServiceImpl implements MintUIMService {
 				
 				OrganizationExistsResponse orgresp = synchronousClient.organizationExists(org);
 
-				synchronousClient.organizationExists(org );
 				if(!orgresp.isExists()){
 					performOrgCreation(provider);
 			    }
