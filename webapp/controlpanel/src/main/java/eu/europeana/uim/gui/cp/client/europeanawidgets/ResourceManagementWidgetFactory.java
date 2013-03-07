@@ -231,7 +231,7 @@ public class ResourceManagementWidgetFactory {
     		
 			Anchor hyper = new Anchor();
 			hyper.setName("");
-			hyper.setText(status.getSugarURL());
+			hyper.setText("Click here to visit the relevant SugarCRM entry.");
 			hyper.setHref(status.getSugarURL());
 			hyper.setTarget("NEW");
 			resourcePropertiesTable.setWidget(2, 1, hyper);
@@ -274,7 +274,7 @@ public class ResourceManagementWidgetFactory {
     		
 			Anchor hyper = new Anchor();
 			hyper.setName("RepoxLink");
-			hyper.setText(status.getRepoxURL());
+			hyper.setText("Click here to edit/view dataset info in Repox.");
 			hyper.setHref(status.getRepoxURL());
 			hyper.setTarget("NEW");
 			
@@ -362,35 +362,39 @@ public class ResourceManagementWidgetFactory {
 					placecounter ++;
 			    }
 			    
-			    if(status.getMintID() != null && status.getResourceProperties().get("LATESTMINTMAPPINGID") != null){
+			    if(status.getMintID() != null && status.getResourceProperties().get("LATESTMINTTRANSFORMATIONID") != null){
 			    	resourcePropertiesTable.setWidget(placecounter, 0, new HTML("Mint Mapping Session URI:"));
 			    	
 			    	StringBuffer sessionuri = new StringBuffer();
 			    	sessionuri.append(status.getMintURL());
-			    	sessionuri.append("Home.action?kConnector=html.page&url=DoMapping.action?mapid=");
-			    	sessionuri.append(status.getResourceProperties().get("LATESTMINTMAPPINGID"));
-			    	sessionuri.append("&uploadId=");
-			    	sessionuri.append(status.getMintID());
+			    	sessionuri.append("Single?action=DoMapping.action&transformationId=");
+			    	sessionuri.append(status.getResourceProperties().get("LATESTMINTTRANSFORMATIONID"));
 			    	sessionuri.append("&kTitle=Mapping Tool");
 			    	
-					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(sessionuri.toString())); 
+					Anchor hyper = new Anchor();
+					hyper.setName("MintLink");
+					hyper.setText("Resume mapping session.");
+					hyper.setHref(sessionuri.toString());
+					hyper.setTarget("NEW");
+			    	
+					resourcePropertiesTable.setWidget(placecounter, 1, hyper); 
 					placecounter ++;
 			    }
  
 			    String mintpublocation = status.getResourceProperties().get("MINTPUBLICATIONLOCATION");
 				if(mintpublocation != null){
 					resourcePropertiesTable.setWidget(placecounter, 0, new HTML("Location of latest published data:"));
-					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(mintpublocation)); 
+					
+					Anchor hyper = new Anchor();
+					hyper.setName("MintDataLink");
+					hyper.setText("Download zipped file.");
+					hyper.setHref(mintpublocation.toString());
+					hyper.setTarget("NEW");
+					
+					resourcePropertiesTable.setWidget(placecounter, 1, hyper); 
 					placecounter ++;
 				}
 				  
-				String latestMappingID = status.getResourceProperties().get("LATESTMINTMAPPINGID"); 
-				if(latestMappingID != null){
-					resourcePropertiesTable.setWidget(placecounter, 0, new HTML("ID of latest mapping used:"));
-					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(latestMappingID)); 
-					placecounter ++;
-				}
-
 			  break;
 			  
 		  case PROVIDER:
