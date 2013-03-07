@@ -327,7 +327,9 @@ public abstract class AbstractReportingWidget extends IngestionWidget {
 
                                 @Override
                                 public void onSuccess(String reportURL) {
+                            
                                     Window.open(reportURL, "_blank", "enabled");
+                                   
                                 }
 
                                 @Override

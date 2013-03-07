@@ -3,6 +3,9 @@ package eu.europeana.uim.gui.cp.server;
 
 import java.io.File;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import eu.europeana.uim.gui.cp.client.services.ReportingService;
 import eu.europeana.uim.gui.cp.server.ExecutionServiceImpl;
 import eu.europeana.uim.gui.cp.shared.ExecutionDTO;
@@ -19,6 +22,8 @@ public class ReportingServiceImpl extends ExecutionServiceImpl implements Report
 
 	private static final long serialVersionUID = 1L;
 
+	private String serverURL;
+	
 	/**
      * Creates a new instance of this class.
      */
@@ -40,7 +45,18 @@ public class ReportingServiceImpl extends ExecutionServiceImpl implements Report
     public String getReport(String reportDesign, String exeuctionID, String filetype) {
         File reportFile = ReportUtils.getReportFile(reportDesign, exeuctionID, filetype);
         if (!reportFile.exists()) { return null; }
-        return ReportUtils.generateDownloadURL(reportDesign, exeuctionID, filetype);
+        
+        
+		if(serverURL == null){
+	    	HttpServletRequest request = this.getThreadLocalRequest();
+	        String scheme = request.getScheme();            
+	        String serverName = request.getServerName();     
+	        int serverPort = request.getServerPort();        
+	        String contextPath = request.getContextPath();   
+	        serverURL = scheme+"://"+serverName+":"+serverPort+contextPath + "/";
+			}
+        
+        return serverURL + ReportUtils.generateDownloadURL(reportDesign, exeuctionID, filetype);
     }
 
     @Override
