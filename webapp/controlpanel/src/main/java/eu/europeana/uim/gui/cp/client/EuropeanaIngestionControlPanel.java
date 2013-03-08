@@ -12,7 +12,6 @@ import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportResourcesWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkCachingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkReportingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkValidationWidget;
-import eu.europeana.uim.gui.cp.client.europeanawidgets.PreviewCommitWidget;
 import eu.europeana.uim.gui.cp.client.management.IngestionTriggerWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionDetailWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionHistoryWidget;
@@ -26,8 +25,6 @@ import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxy;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxyAsync;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxy;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxyAsync;
-import eu.europeana.uim.gui.cp.client.services.PreviewService;
-import eu.europeana.uim.gui.cp.client.services.PreviewServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.ReportingService;
 import eu.europeana.uim.gui.cp.client.services.ReportingServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.RepositoryService;
@@ -78,7 +75,6 @@ public class EuropeanaIngestionControlPanel extends
 
 		final ReportingServiceAsync reportService = (ReportingServiceAsync) GWT
 				.create(ReportingService.class);
-		final PreviewServiceAsync previewService = (PreviewServiceAsync) GWT.create(PreviewService.class);
 		final FailedRecordServiceAsync failedRecordService = (FailedRecordServiceAsync) GWT
 				.create(FailedRecordService.class);
 		// Initialize Panel Components here
@@ -96,7 +92,6 @@ public class EuropeanaIngestionControlPanel extends
 				new ExpandedResourceManagementWidget(repositoryService,
 						resourceService, integrationService), RunAsyncCode
 						.runAsyncCode(ExpandedResourceManagementWidget.class));
-		treeModel.addMenuEntry("Managing", new PreviewCommitWidget("Enable Preview", "Enable preview in test portal", previewService), RunAsyncCode.runAsyncCode(PreviewCommitWidget.class));
 		treeModel.addMenuEntry("Validation", new LinkValidationWidget(
 				repositoryService, retrievalService), RunAsyncCode
 				.runAsyncCode(LinkValidationWidget.class));
