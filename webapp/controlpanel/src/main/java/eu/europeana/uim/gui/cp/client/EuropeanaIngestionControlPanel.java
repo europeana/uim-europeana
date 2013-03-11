@@ -13,6 +13,7 @@ import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkCachingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkReportingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkValidationWidget;
 import eu.europeana.uim.gui.cp.client.management.IngestionTriggerWidget;
+import eu.europeana.uim.gui.cp.client.monitoring.FilteredIngestionHistoryWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionDetailWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionHistoryWidget;
 import eu.europeana.uim.gui.cp.client.services.CollectionManagementProxy;
@@ -81,10 +82,9 @@ public class EuropeanaIngestionControlPanel extends
 		treeModel.addMenuEntry("Monitoring", new IngestionDetailWidget(
 				executionService), RunAsyncCode
 				.runAsyncCode(IngestionDetailWidget.class));
-		treeModel.addMenuEntry("Monitoring", new IngestionHistoryWidget(
-				executionService), RunAsyncCode
-				.runAsyncCode(IngestionHistoryWidget.class));
-
+		treeModel.addMenuEntry("Monitoring", new FilteredIngestionHistoryWidget(
+				executionService,repositoryService), RunAsyncCode
+				.runAsyncCode(FilteredIngestionHistoryWidget.class));
 		treeModel.addMenuEntry("Managing", new IngestionTriggerWidget(
 				repositoryService, resourceService, executionService),
 				RunAsyncCode.runAsyncCode(IngestionTriggerWidget.class));
