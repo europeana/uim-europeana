@@ -80,6 +80,10 @@ public class ZipLoader<I> {
 	
 	private int expectedRecords = 0;
 
+	private int created = 0;
+	
+	private int updated = 0;
+	
 	private boolean forceUpdate;
 
 	/**
@@ -163,6 +167,9 @@ public class ZipLoader<I> {
 		List<MetaDataRecord<I>> result = new ArrayList<MetaDataRecord<I>>();
 		int progress = 0;
 
+
+		
+		
 		HttpZipWorkflowStart.Data value = context
 				.getValue(HttpZipWorkflowStart.DATA_KEY);
 
@@ -195,6 +202,9 @@ public class ZipLoader<I> {
 						
 						value.deletioncandidates.remove(dedupres
 								.getDerivedRecordID());
+						
+						created ++;
+						
 						break;
 					case COLLECTION_CHANGED:
 						LOGGER.log(Level.INFO,"Unique Identifier in COLLECTION_CHANGED state for record with ID " + dedupres
@@ -224,6 +234,7 @@ public class ZipLoader<I> {
 								processrecord(mdr,dedupres,Status.UPDATED);
 								value.deletioncandidates.remove(dedupres
 										.getDerivedRecordID());
+								updated ++;
 							} catch (StorageEngineException e) {
 								e.printStackTrace();
 								mdr = processrecord(mdr,dedupres,Status.UPDATED);
@@ -253,6 +264,7 @@ public class ZipLoader<I> {
 							mdr = processrecord(mdr,dedupres,Status.UPDATED);
 							value.deletioncandidates.remove(dedupres
 									.getDerivedRecordID());
+							updated ++;
 						}
 						break;
 					default:
@@ -423,6 +435,20 @@ public class ZipLoader<I> {
 		return this.expectedRecords;
 	}
 
+	/**
+	 * @return the created
+	 */
+	public int getCreated() {
+		return created;
+	}
+
+	/**
+	 * @return the updated
+	 */
+	public int getUpdated() {
+		return updated;
+	}
+	
 	/**
 	 * Finalizes the current object and make its fields eligible for garbage
 	 * collection

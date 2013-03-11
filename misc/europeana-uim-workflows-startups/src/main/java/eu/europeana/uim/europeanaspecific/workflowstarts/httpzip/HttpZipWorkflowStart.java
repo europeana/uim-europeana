@@ -37,6 +37,7 @@ import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
 import eu.europeana.uim.store.UimDataSet;
@@ -220,6 +221,19 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 	public boolean isFinished(ExecutionContext<MetaDataRecord<I>, I> context) {
 		Data value = context.getValue(DATA_KEY);
 		boolean finished = value== null? true:value.loader.isFinished();
+		
+		if(finished){
+			Execution<I> execution = context.getExecution();
+			execution.putValue("Created", Integer.toString(value.loader.getCreated()));
+			execution.putValue("Updated", Integer.toString(value.loader.getUpdated()));
+			
+			try {
+				context.getStorageEngine().updateExecution(execution);
+			} catch (StorageEngineException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return finished;
 	}
 
@@ -334,6 +348,14 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 			}
 		}
 		
+		Execution<I> execution = context.getExecution();
+		execution.putValue("Deleted", Integer.toString(value.deletioncandidates.size()));
+
+		try {
+			context.getStorageEngine().updateExecution(execution);
+		} catch (StorageEngineException e) {
+			e.printStackTrace();
+		}
 		
 		LOGGER.info("Number of deleted Records: " + value.deletioncandidates.size() );
 		
