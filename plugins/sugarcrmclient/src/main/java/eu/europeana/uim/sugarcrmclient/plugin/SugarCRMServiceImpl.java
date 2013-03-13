@@ -377,12 +377,32 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         String harvestUrl = record.getItemValue(EuropeanaUpdatableField.HARVEST_URL); 
         String metadataformat = record.getItemValue(EuropeanaUpdatableField.METADATA_FORMAT); 
        
+        //Try to see if the provider with the same mnemonic has already been registered 
         Provider cuurprovider = engine.findProvider(mnemonicCode);
         
-
         if (cuurprovider == null) {
-            cuurprovider = engine.createProvider();
+        	
+        	List<?> providers = engine.getAllProviders();
+        	
+        	
+        	for(Object provider: providers){
+        		
+        		Provider cpprovider = (Provider) provider;
+        		
+        		//If we encounter a provider that has the same name but different menmonic with the previous
+        		//with another provider then we assume that the same provider had his identifier updated 
+        		if(providerName.equals(cpprovider.getName()) && !mnemonicCode.equals(cpprovider.getMnemonic())){
+        			cuurprovider = cpprovider;
+        		}
+        	}
+            
         }
+        
+        //Do a second check here if the provider has not been detected so far then create a new one
+        if (cuurprovider == null) {
+        cuurprovider = engine.createProvider();
+        }
+        
         cuurprovider.setAggregator(false);
         cuurprovider.setMnemonic(mnemonicCode);
         cuurprovider.setName(providerName);
@@ -560,6 +580,8 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         String FTPPATH = record.getItemValue(EuropeanaUpdatableField.FTPPATH); 
         String FTP_HTTP_ISOFORMAT = record.getItemValue(EuropeanaUpdatableField.FTP_HTTP_ISOFORMAT); 
         String FTPSERVER = record.getItemValue(EuropeanaUpdatableField.FTPSERVER); 
+        String RECORD_XPATH = record.getItemValue(EuropeanaUpdatableField.RECORDXPATH);
+        
         String HTTPURL = record.getItemValue(EuropeanaUpdatableField.HTTPURL); 
         String FOLDER = record.getItemValue(EuropeanaUpdatableField.FOLDER); 
         String HARVESTING_TYPE = record.getItemValue(EuropeanaRetrievableField.HARVESTING_TYPE); 
@@ -568,7 +590,9 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         String DELETED = record.getItemValue(EuropeanaUpdatableField.DELETED); 
         String ACRONYM = record.getItemValue(EuropeanaRetrievableField.ACRONYM); 
         String ENABLED = record.getItemValue(EuropeanaUpdatableField.ENABLED); 
-        String PREVIEWS_IN_PORTAL = record.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL); 
+        String PREVIEWS_IN_PORTAL = record.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
+
+        
         
         Collection currcollection = engine.findCollection(mnemonicCode);
 
@@ -604,6 +628,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         currcollection.putValue(ControlledVocabularyProxy.FTPPATH, FTPPATH);
         currcollection.putValue(ControlledVocabularyProxy.FTP_HTTP_ISOFORMAT, FTP_HTTP_ISOFORMAT);
         currcollection.putValue(ControlledVocabularyProxy.FTPSERVER, FTPSERVER);
+        currcollection.putValue(ControlledVocabularyProxy.RECORDXPATH, RECORD_XPATH);
         currcollection.putValue(ControlledVocabularyProxy.HTTPURL, HTTPURL);
         currcollection.putValue(ControlledVocabularyProxy.FOLDER, FOLDER);
         currcollection.putValue(ControlledVocabularyProxy.HARVESTING_TYPE, HARVESTING_TYPE);      
