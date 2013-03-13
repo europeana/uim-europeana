@@ -101,7 +101,8 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	IDENTIFIER(EuropeanaRetrievableField.IDENTIFIER),
 	ENABLED(EuropeanaUpdatableField.ENABLED),
 	DATE_OF_REPLICATION(EuropeanaUpdatableField.DATE_OF_REPLICATION),
-	PREVIEWS_ONLY_IN_PORTAL(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
+	PREVIEWS_ONLY_IN_PORTAL(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL),
+	RECORDXPATH(EuropeanaUpdatableField.RECORDXPATH);
 
 
 	private String fieldId;

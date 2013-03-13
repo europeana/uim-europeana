@@ -69,6 +69,7 @@ public enum EuropeanaUpdatableField implements UpdatableField{
 	FTPSERVER("server_c","server_c", "Server"),
 	HTTPURL("http_url_c","http_url_c", "HTTP URL"),
 	FOLDER("folder_c","folder_c","Folder"),
+	RECORDXPATH("record_xpath_c","record_xpath_c","Record XPatth"),
 	
 	ENABLED("enabled_c","enabled_c","Enabled"),
 	DELETED("deleted","deleted","Deleted"),

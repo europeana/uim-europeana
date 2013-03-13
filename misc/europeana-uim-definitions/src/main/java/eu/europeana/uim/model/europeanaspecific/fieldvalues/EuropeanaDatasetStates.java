@@ -20,7 +20,6 @@
  */
 package eu.europeana.uim.model.europeanaspecific.fieldvalues;
 
-import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.sugar.model.DatasetStates;
 
 /**
