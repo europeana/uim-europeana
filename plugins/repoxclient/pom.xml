@@ -93,7 +93,7 @@
 							eu.europeana.uim.store; version=0.0.0,
 							org.apache.commons.lang; version=2.4.0,
 							org.apache.commons.io; version=2.1.0,
-							org.joda.time; version=1.6.2,
+							org.joda.time,
 							eu.europeana.uim; version=0.0.0,
 							eu.europeana.uim.adapter; version=0.0.0,
 							eu.europeana.uim.logging; version=0.0.0,

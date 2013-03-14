@@ -68,13 +68,13 @@ public class OsgiExtractor extends Extractor {
 	// private static OsgiExtractor extractor;
 
 	public static SolrWorkflowService solrWorkFlowService;
-	
 	public OsgiExtractor(){
 		
 	}
 	
 	public OsgiExtractor(SolrWorkflowService solrWorkflowService) {
 		memCache = MemCache.getInstance();
+		
 		OsgiExtractor.solrWorkFlowService=solrWorkflowService;
 	}
 
@@ -111,7 +111,7 @@ public class OsgiExtractor extends Extractor {
 			IllegalArgumentException, InstantiationException,
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
-
+		
 		if (controlledVocabulary != null) {
 			vocabulary = controlledVocabulary;
 			String suffix = controlledVocabulary.getSuffix() != null ? controlledVocabulary
@@ -304,7 +304,7 @@ public class OsgiExtractor extends Extractor {
 											iterations);
 								}
 								ControlledVocabularyImpl oldVoc = vocabulary;
-								if(StringUtils.equals(edmLabel.getLabel().toString(), "cc_skos_broader")){
+								if(StringUtils.equals(edmLabel.getLabel().toString(), "cc_skos_broader") && iterations>0){
 									ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
 											datastore, "URI", element.get("?object").asResource().getURI());
 									
@@ -337,7 +337,7 @@ public class OsgiExtractor extends Extractor {
 											iterations);
 								}
 								ControlledVocabularyImpl oldVoc = vocabulary;
-								if(StringUtils.equals(edmLabel.getLabel().toString(), "pl_dcterms_isPartOf")){
+								if(StringUtils.equals(edmLabel.getLabel().toString(), "pl_dcterms_isPartOf") && iterations>0){
 									ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
 											datastore, "URI", element.get("?object").asResource().getURI());
 									
@@ -395,7 +395,7 @@ public class OsgiExtractor extends Extractor {
 											iterations);
 								}
 								ControlledVocabularyImpl oldVoc = vocabulary;
-								if(StringUtils.equals(edmLabel.getLabel().toString(), "ts_dcterms_isPartOf")){
+								if(StringUtils.equals(edmLabel.getLabel().toString(), "ts_dcterms_isPartOf") && iterations>0){
 									ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
 											datastore, "URI", element.get("?object").asResource().getURI());
 									
@@ -1576,11 +1576,17 @@ public class OsgiExtractor extends Extractor {
 		if (splitName.length > 3) {
 			String vocabularyName = splitName[0] + "/" + splitName[1] + "/"
 					+ splitName[2] + "/";
-			List<ControlledVocabularyImpl> vocabularies = datastore
-					.find(ControlledVocabularyImpl.class)
-					.filter(field, vocabularyName).asList();
-			vocabularies.addAll(datastore.find(ControlledVocabularyImpl.class)
-					.filter("replaceUrl", vocabularyName).asList());
+			List<ControlledVocabularyImpl> vocabularies = VocMemCache.getMemCache(solrWorkFlowService).get(vocabularyName);
+			if(vocabularies.size()==0){
+				for(Entry<String,List<ControlledVocabularyImpl>> vocs: VocMemCache.getMemCache(solrWorkFlowService).entrySet()){
+					for(ControlledVocabularyImpl voc:vocs.getValue()){
+						if(voc.getReplaceUrl()!=null && StringUtils.equals(voc.getReplaceUrl(), vocabularyName)){
+							vocabularies.add(voc);
+						}
+					}
+				}
+			}
+			
 			for (ControlledVocabularyImpl vocabulary : vocabularies) {
 				for (String rule : vocabulary.getRules()) {
 					if (StringUtils.equals(rule, "*")
@@ -1590,6 +1596,8 @@ public class OsgiExtractor extends Extractor {
 				}
 
 			}
+			
+			
 		}
 		return null;
 	}
@@ -1602,7 +1610,7 @@ public class OsgiExtractor extends Extractor {
 
 	public List<ControlledVocabularyImpl> getControlledVocabularies(
 			final Datastore datastore) {
-
+		
 		return datastore.find(ControlledVocabularyImpl.class) != null ? datastore
 				.find(ControlledVocabularyImpl.class).asList() : null;
 	}
