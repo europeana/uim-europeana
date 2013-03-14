@@ -431,11 +431,11 @@ public class TestUtils {
 		
 		Password password = new Password();
 		password.setPassword("password");
-		choiceRetStr.setUser(user);
-		choiceRetStr.setPassword(password);
+		choiceRetStr.getSequence().setUser(user);
+		choiceRetStr.getSequence().setPassword(password);
 		Server server = new Server();
 		server.setServer("bd1.inesc-id.pt");
-		choiceRetStr.setServer(server);
+		choiceRetStr.getSequence().setServer(server);
 		retrieveStrategy.setChoice(choiceRetStr);
 		seq1.setRetrieveStrategy(retrieveStrategy);
 		ds.setSequence1(seq1);

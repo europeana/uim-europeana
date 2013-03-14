@@ -551,7 +551,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			throw new DataSourceOperationException("Harvesting Type Value used for the creation of a datasource was invalid.");	
 		}
 		
-		repoxRestClient.updateDatasourceOAI(ds);
 
 	}
 	
@@ -573,8 +572,74 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 		repoxRestClient.deleteDatasource(id);
 	}
 
-	
-	
+	/* (non-Javadoc)
+	 * @see eu.europeana.uim.repox.RepoxUIMService#hasHarvestingTypeChanged(eu.europeana.uim.store.Collection)
+	 */
+	@Override
+	public boolean hasHarvestingTypeChanged(Collection<?> col) throws DataSourceOperationException{
+		
+		StorageEngine<?> engine = registry.getStorageEngine();
+
+		String stringtype = col.getValue(ControlledVocabularyProxy.HARVESTING_TYPE);
+		
+		DSType harvestingtype =   DSType.valueOf(stringtype);
+
+		DataSources datasources = repoxRestClient.retrieveDataSources();
+		ArrayList<Source> sourceList = (ArrayList<Source>) datasources.getSourceList();
+		
+		
+		for (Source src : sourceList) {
+
+			if(src.getNameCode() != null)
+			{
+				String id = src.getNameCode();
+                if(id.equals(col.getMnemonic())){
+                	
+            		switch(harvestingtype){
+            		case oai_pmh:
+            			if(!src.getType().equals("DataSourceOai")){
+            				return true;
+            			}
+            			break;
+            		case z39_50:
+            			
+            			if(!src.getType().equals("DataSourceZ3950")){
+            				return true;
+            			}
+            			break;
+            		case ftp:
+            			if(!src.getType().equals("DataSourceDirectoryImporter")){
+            				return true;
+            			}
+            			break;
+            			
+            		case http:
+            			if(!src.getType().equals("DataSourceDirectoryImporter")){
+            				return true;
+            			}
+            			break;
+            		case folder:
+            			if(!src.getType().equals("DataSourceDirectoryImporter")){
+            				return true;
+            			}
+            			break;
+            		default:
+            			throw new DataSourceOperationException("Harvesting Type Value used for the creation of a datasource was invalid.");	
+            		}
+
+                	return false;
+                	
+                }
+ 
+			}
+
+		}
+		
+		
+		
+		return false;
+		
+	}
 
 
 	

@@ -36,8 +36,10 @@ import eu.europeana.uim.repoxclient.jibxbindings.Password;
 import eu.europeana.uim.repoxclient.jibxbindings.Port;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordIdPolicy;
 import eu.europeana.uim.repoxclient.jibxbindings.RecordSyntax;
+import eu.europeana.uim.repoxclient.jibxbindings.RecordXPath;
 import eu.europeana.uim.repoxclient.jibxbindings.RetrieveStrategy;
 import eu.europeana.uim.repoxclient.jibxbindings.Server;
+import eu.europeana.uim.repoxclient.jibxbindings.SplitRecords;
 import eu.europeana.uim.repoxclient.jibxbindings.Target;
 import eu.europeana.uim.repoxclient.jibxbindings.Type;
 import eu.europeana.uim.repoxclient.jibxbindings.Url;
@@ -226,14 +228,26 @@ public class JibxObjectProvider {
 			ftpuser.setUser(col.getValue(ControlledVocabularyProxy.FTP_Z3950_USER));
 			Password ftppassword = new Password();
 			ftppassword.setPassword(col.getValue(ControlledVocabularyProxy.FTP_Z3950_PASSWORD));
-			choiceRetStr.setUser(ftpuser);
-			choiceRetStr.setPassword(ftppassword);
+			
+			eu.europeana.uim.repoxclient.jibxbindings.RetrieveStrategy.Choice.Sequence retrseq = new
+					eu.europeana.uim.repoxclient.jibxbindings.RetrieveStrategy.Choice.Sequence();
+			choiceRetStr.setSequence(retrseq);
+			choiceRetStr.getSequence().setUser(ftpuser);
+			choiceRetStr.getSequence().setPassword(ftppassword);
 			Server server = new Server();
 			server.setServer(col.getValue(ControlledVocabularyProxy.FTPSERVER));
-			choiceRetStr.setServer(server);
+			choiceRetStr.getSequence().setServer(server);
+			RecordXPath recxpath = new RecordXPath();
+			recxpath.setRecordXPath(col.getValue(ControlledVocabularyProxy.RECORDXPATH));
+			SplitRecords splitrecords = new SplitRecords();
+			splitrecords.setRecordXPath(recxpath);
+			ds.setSplitRecords(splitrecords);
+
 			retrieveStrategy.setChoice(choiceRetStr);
 			seqftp1.setRetrieveStrategy(retrieveStrategy);
-			ds.setSequence1(seqftp1);
+		    ds.setSequence1(seqftp1);
+		    
+		    
 			break;
 		case http:
 			Sequence2 seq2http = new Sequence2();
@@ -258,6 +272,13 @@ public class JibxObjectProvider {
 			retrieveStrategyhttp.setChoice(choiceRetStrhttp);
 			seq1http.setRetrieveStrategy(retrieveStrategyhttp);
 			ds.setSequence1(seq1http);
+			
+			RecordXPath recxpath2 = new RecordXPath();
+			recxpath2.setRecordXPath(col.getValue(ControlledVocabularyProxy.RECORDXPATH));
+			SplitRecords splitrecords2 = new SplitRecords();
+			splitrecords2.setRecordXPath(recxpath2);
+			ds.setSplitRecords(splitrecords2);
+			
 			break;
 		case folder:
 			Sequence2 seqfolder = new Sequence2();

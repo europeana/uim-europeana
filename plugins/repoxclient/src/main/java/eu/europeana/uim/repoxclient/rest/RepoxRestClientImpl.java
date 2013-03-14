@@ -853,7 +853,7 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 			throws DataSourceOperationException {
 
 		Response resp = createUpdateDSOAI(updateVar, ds, null);
-		if (resp.getSource() == null) {
+		if (resp == null || resp.getSource() == null) {
 			if (createRepoxFailureMessage(resp.getError()) != null) {
 				throw new DataSourceOperationException(
 						createRepoxFailureMessage(resp.getError()));
@@ -2238,13 +2238,12 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 				.getRecordXPath());
 
 		server.append("server=");
-		server.append(ds.getSequence1().getRetrieveStrategy().getChoice()
-				.getServer().getServer());
+		server.append(ds.getSequence1().getRetrieveStrategy().getChoice().getSequence().getServer().getServer());
 		user.append(userVar);
-		user.append(ds.getSequence1().getRetrieveStrategy().getChoice()
-				.getUser().getUser());
+		user.append(ds.getSequence1().getRetrieveStrategy().getChoice().getSequence().
+				getUser().getUser());
 		password.append(passwordVar);
-		password.append(ds.getSequence1().getRetrieveStrategy().getChoice()
+		password.append(ds.getSequence1().getRetrieveStrategy().getChoice().getSequence()
 				.getPassword().getPassword());
 
 		ftpPath.append("ftpPath=");
