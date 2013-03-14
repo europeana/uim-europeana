@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import org.joda.time.DateTime;
 import com.google.gwt.user.client.ui.DialogBox;
-
 import eu.europeana.uim.gui.cp.server.util.PropertyReader;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
@@ -116,6 +115,7 @@ public class IntegrationSeviceProxyImpl extends
 			if (!repoxService.providerExists(prov)) {
 				repoxService.createProviderfromUIMObj(prov);
 			} else {
+				
 				// Or update an already existing REPOX provider from an
 				// (updated) existing UIM provider
 				repoxService.updateProviderfromUIMObj(prov);
@@ -128,8 +128,20 @@ public class IntegrationSeviceProxyImpl extends
 				repoxService.createDatasourcefromUIMObj(coll, prov);
 				result.setDescription("Datasource Created Successfully.");
 			} else {
-				repoxService.updateDatasourcefromUIMObj(coll);
-				result.setDescription("Datasource Updated Successfully.");
+
+
+				if(repoxService.hasHarvestingTypeChanged(coll)){
+					repoxService.deleteDatasourcefromUIMObj(coll);
+					repoxService.createDatasourcefromUIMObj(coll, prov);
+					result.setDescription("Datasource Updated Successfully (harvesting type of the" +
+							"datasource has been changed).");
+					
+				}
+				else{
+					repoxService.updateDatasourcefromUIMObj(coll);
+					result.setDescription("Datasource Updated Successfully.");
+				}
+
 			}
 
 		} catch (QueryResultException e) {
