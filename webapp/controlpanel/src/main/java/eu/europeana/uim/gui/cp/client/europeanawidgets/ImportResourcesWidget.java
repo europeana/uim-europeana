@@ -307,6 +307,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 
 								StringBuffer stacktraceMessage = new StringBuffer();
 								
+								
 								for(int i=0; i<throwable.getStackTrace().length;i++){
 									stacktraceMessage.append(throwable.getStackTrace()[i].toString());
 								}
@@ -321,7 +322,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 								impResultsTable.setWidget(numRows, 1, new HTML(
 										"A system exception has occured"));
 								impResultsTable.setWidget(numRows, 2, new HTML(
-										stacktraceMessage.toString()));
+										throwable.getMessage()));
 
 								progressBar.setProgress(impResultsTable
 										.getRowCount());
