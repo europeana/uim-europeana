@@ -731,7 +731,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 
 		Source ds = new Source();
 		ds.setId(id);
-		repoxRestClient.scheduleHarvesting(id, info.getDatetime(), info.getFrequency(), info.isFullingest());
+		
+		
+		DateTime dt = new DateTime(info.getDate());
+		
+		repoxRestClient.scheduleHarvesting(id, dt, info.getFrequency(), info.isFullingest());
 
 	}
 
@@ -872,7 +876,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 			
 			DateTime dt = new DateTime( year,  monthOfYear,  dayOfMonth,  hourOfDay,  minuteOfHour, 0, 0);
 			
-			schinfo.setDatetime(dt);
+			schinfo.setDate(dt.toDate());
 			schinfo.setFullingest(isfull);
 			schinfo.setFrequency(ingTypeEnum);
 			
