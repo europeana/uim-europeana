@@ -154,8 +154,8 @@
             <xs:attribute name="name" use="required" type="xs:string"/>
             <xs:attribute name="nameCode" use="optional" type="xs:string"/>
             <xs:attribute name="namespace" use="required" type="xs:anyURI"/>
-            <xs:attribute name="sample" use="required" type="xs:integer"/>
-            <xs:attribute name="isSample" use="required" type="xs:boolean"/>
+            <xs:attribute name="sample" use="optional" type="xs:integer"/>
+            <xs:attribute name="isSample" use="optional" type="xs:boolean"/>
             <xs:attribute name="schema" use="required" type="xs:anyURI"/>
             <xs:attribute name="status" use="required"/>
             <xs:attribute name="type" use="required" type="xs:NCName"/>
