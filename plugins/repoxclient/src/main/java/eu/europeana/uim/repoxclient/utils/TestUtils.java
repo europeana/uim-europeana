@@ -171,7 +171,7 @@ public class TestUtils {
 		seq.setOaiSet(oaiSet);
 		OaiSource oaiSource = new OaiSource();
 		oaiSource
-				.setOaiSource("http://sip-manager.isti.cnr.it:8080/repoxUI_Europeana//OAIHandler");
+				.setOaiSource("http://sandbox35.isti.cnr.it:8080/repoxUI_Europeana/OAIHandler");
 		seq.setOaiSource(oaiSource);
 		ds.setSequence(seq);
 
@@ -426,6 +426,11 @@ public class TestUtils {
 		Sequence1 seq1 = new Sequence1();
 		RetrieveStrategy retrieveStrategy = new RetrieveStrategy();
 		RetrieveStrategy.Choice choiceRetStr = new RetrieveStrategy.Choice();
+
+		eu.europeana.uim.repoxclient.jibxbindings.RetrieveStrategy.Choice.Sequence retrstrseq =
+				new eu.europeana.uim.repoxclient.jibxbindings.RetrieveStrategy.Choice.Sequence();
+		choiceRetStr.setSequence(retrstrseq);
+		
 		User user = new User();
 		user.setUser("ftp");
 		
