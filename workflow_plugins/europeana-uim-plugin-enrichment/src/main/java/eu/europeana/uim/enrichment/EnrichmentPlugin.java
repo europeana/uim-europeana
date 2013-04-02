@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -343,11 +344,16 @@ public class EnrichmentPlugin<I> extends
 				return false;
 			}
 
-			String value = mdr
-					.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null ? mdr
-					.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
-					.get(0) : mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
-					.get(0);
+			String value = null;
+			if(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null){
+				value = mdr
+						.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+						.get(0);
+			} else {
+				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
+						.get(0);
+			}
+			
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			SolrInputDocument basicDocument = new SolrConstructor()
@@ -374,7 +380,7 @@ public class EnrichmentPlugin<I> extends
 			fullBean.setEuropeanaCompleteness(completeness);
 			solrInputDocument.addField(
 					EdmLabel.EUROPEANA_COMPLETENESS.toString(), completeness);
-			String collectionId = (String) mdr.getCollection().getId();
+			String collectionId = (String) mdr.getCollection().getMnemonic();
 			String fileName;
 			String oldCollectionId = enrichmentService
 					.getCollectionMongoServer().findOldCollectionId(
@@ -389,10 +395,11 @@ public class EnrichmentPlugin<I> extends
 			String hash = hashExists(collectionId, fileName, fullBean);
 
 			if (StringUtils.isNotEmpty(hash)) {
-				createLookupEntry(mongo, fullBean, hash);
+				createLookupEntry(mongo, fullBean, collectionId,hash);
 			}
 
 			fullBean.setEuropeanaCollectionName(new String[] { fileName });
+			solrInputDocument.setField("europeana_collectionName", fileName);
 			if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 				mongoServer.getDatastore().save(fullBean);
 			} else {
@@ -983,11 +990,18 @@ public class EnrichmentPlugin<I> extends
 		EnrichmentPlugin.enrichmentService = enrichmentService;
 	}
 
-	private void createLookupEntry(Mongo mongo, FullBean fullBean, String hash) {
-		EuropeanaIdMongoServer europeanaIdMongoServer = new EuropeanaIdMongoServer(
-				mongo, europeanaID);
-		EuropeanaId europeanaId = europeanaIdMongoServer
-				.retrieveEuropeanaIdFromOld(hash).get(0);
+	private void createLookupEntry(Mongo mongo, FullBean fullBean, String collectionId, String hash) {
+		EuropeanaIdMongoServer europeanaIdMongoServer = enrichmentService.getEuropeanaIdMongoServer();
+		List<EuropeanaId> europeanaIdList = europeanaIdMongoServer
+				.retrieveEuropeanaIdFromOld(PORTALURL+"/"+collectionId+"/"+hash);
+		EuropeanaId europeanaId;
+		if (europeanaIdList == null|| europeanaIdList.size()==0){
+			europeanaId = new EuropeanaId();
+			europeanaId.setOldId(PORTALURL+"/"+collectionId+"/"+hash);
+			europeanaId.setTimestamp(new Date().getTime());
+		} else {
+			europeanaId = europeanaIdList.get(0);
+		}
 		europeanaId.setNewId(fullBean.getAbout());
 		europeanaIdMongoServer.saveEuropeanaId(europeanaId);
 
@@ -998,15 +1012,16 @@ public class EnrichmentPlugin<I> extends
 			FullBean fullBean) {
 		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
 		sipCreatorUtils.setRepository(repository);
-		if (sipCreatorUtils.getHashField(collectionId, fileName) != null) {
-			return HashUtils.createHash(EseEdmMap.valueOf(
-					sipCreatorUtils.getHashField(collectionId, fileName))
+		String hashField = sipCreatorUtils.getHashField(collectionId, fileName);
+		if (hashField!=null) {
+			return HashUtils.createHash(EseEdmMap.getEseEdmMap(
+					StringUtils.contains(hashField,"[")?StringUtils.substringBefore(hashField, "["):hashField)
 					.getEdmValue(fullBean));
 		}
 		PreSipCreatorUtils preSipCreatorUtils = new PreSipCreatorUtils();
 		preSipCreatorUtils.setRepository(repository);
 		if (preSipCreatorUtils.getHashField(collectionId, fileName) != null) {
-			return HashUtils.createHash(EseEdmMap.valueOf(
+			return HashUtils.createHash(EseEdmMap.getEseEdmMap(
 					preSipCreatorUtils.getHashField(collectionId, fileName))
 					.getEdmValue(fullBean));
 		}
