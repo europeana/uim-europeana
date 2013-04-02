@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -41,7 +43,6 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFReaderF;
-import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import com.mongodb.MongoException;
 
 import eu.europeana.corelib.definitions.jibx.AgentType;
@@ -60,7 +61,6 @@ import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.EntityImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
-import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
 
 public class OsgiExtractor extends Extractor {
@@ -170,8 +170,13 @@ public class OsgiExtractor extends Extractor {
 
 		RDFReaderF rdfReader = solrWorkFlowService.getRDFReaderF();
 		Model model = ModelFactory.createDefaultModel();
+		try{
 		rdfReader.getReader().read(model,
 				new ByteArrayInputStream(xmlString.getBytes()), "");
+		}
+		catch (Exception e){
+			System.out.println(xmlString);
+		}
 		Map<String, String> prefixNS = model.getNsPrefixMap();
 		StringBuilder sb = new StringBuilder();
 		for (Entry<String, String> prefix : prefixNS.entrySet()) {
@@ -1256,7 +1261,18 @@ public class OsgiExtractor extends Extractor {
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
-
+		if (val != null) {
+			String valOld = val;
+			Pattern jibxFixerPattern = Pattern.compile("[\\uD800-\\uE000]",
+					Pattern.UNICODE_CASE | Pattern.CANON_EQ
+							| Pattern.CASE_INSENSITIVE);
+			Matcher jibxFixerMatcher = jibxFixerPattern.matcher(val);
+			String valNew = jibxFixerMatcher.replaceAll("");
+			if(!StringUtils.equals(valNew, valOld)){
+				return obj;
+			}
+		}
+		
 		RdfMethod RDF = null;
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
@@ -1409,7 +1425,18 @@ public class OsgiExtractor extends Extractor {
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
 		RdfMethod RDF = null;
-
+		if (val != null) {
+			String valOld = val;
+			Pattern jibxFixerPattern = Pattern.compile("[\\uD800-\\uE000]",
+					Pattern.UNICODE_CASE | Pattern.CANON_EQ
+							| Pattern.CASE_INSENSITIVE);
+			Matcher jibxFixerMatcher = jibxFixerPattern.matcher(val);
+			String valNew = jibxFixerMatcher.replaceAll("?");
+			if(!StringUtils.equals(valNew, valOld)){
+				return concept;
+			}
+		}
+		
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
 				RDF = rdfMethod;
