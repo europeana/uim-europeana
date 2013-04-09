@@ -53,6 +53,10 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	LATESTMINTMAPPINGID("latestMintMapID"),
 	LATESTMINTTRANSFORMATIONID("latestMintTransformationID"),
 	
+	//Amount of records info
+	DELETEDRECORDS("Deleted"),
+	SPLITRECORDS("Generated"),
+	
 	//Ingestion Results
 	AMOUNT(EuropeanaUpdatableField.AMOUNT), 
 	TOTAL_INGESTED(EuropeanaUpdatableField.TOTAL_INGESTED), 
