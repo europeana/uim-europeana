@@ -26,7 +26,7 @@ public class HttpRetrieverTest {
 		
 		URL url = new URL("http://sip-manager.isti.cnr.it/geomark/records-test4.tar.gz");
 		
-		HttpRetriever retiever = HttpRetriever.createInstance(url,"/tmp/test.tar.gz");
+		HttpRetriever retiever = new HttpRetriever().createInstance(url,"/tmp/test.tar.gz");
 		
 		while(retiever.hasNext()){
 		    count++;	
