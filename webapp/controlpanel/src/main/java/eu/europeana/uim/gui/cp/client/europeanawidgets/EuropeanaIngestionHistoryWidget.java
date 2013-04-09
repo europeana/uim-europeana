@@ -100,7 +100,7 @@ public class EuropeanaIngestionHistoryWidget extends
 		
 		infoDialog = new DialogBox();
 		infoDialog.ensureDebugId("infoDialogBoxx");
-		infoDialog.setText("Tests");
+
 		infoDialog.setModal(true);
 		
 		
@@ -350,27 +350,35 @@ public class EuropeanaIngestionHistoryWidget extends
 		execResultsTable.removeAllRows();
 		
 		
-		execResultsTable.setWidget(0, 0, new HTML("Created"));
-		execResultsTable.setWidget(0, 1, new HTML(String.valueOf(createdValue)));
+		execResultsTable.setWidget(0, 0, new HTML("Created:"));
+		execResultsTable.setWidget(0, 1, new HTML("Records that have been created"));
+		execResultsTable.setWidget(0, 2, new HTML(String.valueOf(createdValue)));
 		
 		
-		execResultsTable.setWidget(1, 0, new HTML("Updated"));
-		execResultsTable.setWidget(1, 1, new HTML(String.valueOf(updatedValue)));
+		execResultsTable.setWidget(1, 0, new HTML("Updated:"));
+		execResultsTable.setWidget(1, 1, new HTML("Records that have been updated"));
+		execResultsTable.setWidget(1, 2, new HTML(String.valueOf(updatedValue)));
 		
-		execResultsTable.setWidget(2, 0, new HTML("Deleted"));
-		execResultsTable.setWidget(2, 1, new HTML(String.valueOf(deletedValue)));
+		execResultsTable.setWidget(2, 0, new HTML("Deleted:"));
+		execResultsTable.setWidget(2, 1, new HTML("Records that have been marked as deleted"));
+		execResultsTable.setWidget(2, 2, new HTML(String.valueOf(deletedValue)));
 		
-		execResultsTable.setWidget(3, 0, new HTML("Omitted"));
-		execResultsTable.setWidget(3, 1, new HTML(String.valueOf(omittedValue)));
+		execResultsTable.setWidget(3, 0, new HTML("Omitted:"));
+		execResultsTable.setWidget(3, 1, new HTML("Records that have been omitted (during the ingestion process this means that" +
+				"they have not been updated since their identifier and content were unaltered)"));
+		execResultsTable.setWidget(3, 2, new HTML(String.valueOf(omittedValue)));
 		
-		execResultsTable.setWidget(4, 0, new HTML("Generated"));
-		execResultsTable.setWidget(4, 1, new HTML(String.valueOf(generatedValue)));
+		execResultsTable.setWidget(4, 0, new HTML("Generated:"));
+		execResultsTable.setWidget(4, 1, new HTML("Extra records Generated after splitting of records during the import process"));
+		execResultsTable.setWidget(4, 2, new HTML(String.valueOf(generatedValue)));
 		
-		execResultsTable.setWidget(5, 0, new HTML("Discarded"));
-		execResultsTable.setWidget(5, 1, new HTML(String.valueOf(discardedValue)));
-		
+		execResultsTable.setWidget(5, 0, new HTML("Discarded:"));
+		execResultsTable.setWidget(5, 1, new HTML("Records that have been discarded during the import process (See 'Failed Records Report'" +
+				" screen for more details.)"));
+		execResultsTable.setWidget(5, 2, new HTML(String.valueOf(discardedValue)));
 		
 		infoDialog.setTitle(object.getWorkflow() + " " + object.getDataSet());
+		infoDialog.setText(object.getWorkflow() + " " + object.getDataSet());
 		
 		infoDialog.show();
 	}
