@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+  xmlns:crm="http://www.cidoc-crm.org/rdfs/cidoc_crm_v5.0.2_english_label.rdfs#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:edm="http://www.europeana.eu/schemas/edm/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:ore="http://www.openarchives.org/ore/terms/"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:rdaGr2="http://rdvocab.info/ElementsGr2/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:wgs84="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:xalan="http://xml.apache.org/xalan">
+  <edm:ProvidedCHO rdf:about="urn:axmedis:00000:obj:5255fe5b-7099-432e-9bcc-3f0ffafd90cf"/>
+  <edm:Proxy rdf:about="urn:axmedis:00000:obj:5255fe5b-7099-432e-9bcc-3f0ffafd90z">
+    <dc:creator xml:lang="fr">La Bellone</dc:creator>
+    <dc:title xml:lang="fr">Retour de Bamako III en images</dc:title>
+    <dc:type xml:lang="fr">photo</dc:type>
+    <dc:type rdf:resource="http://www.eclap.eu/Classification/PerformingArtsType/504"/>
+    <dcterms:temporal rdf:resource="http://www.eclap.eu/Classification/HistoricalPeriod/566"/>
+    <dcterms:temporal rdf:resource="http://www.eclap.eu/Classification/HistoricalPeriod/675"/>
+    <edm:type>IMAGE</edm:type>
+  </edm:Proxy>
+  <edm:Proxy rdf:about="urn:axmedis:00000:obj:5255fe5b-7099-432e-9bcc-3f0ffafd90y">
+    <dc:creator xml:lang="fr">La Bellone</dc:creator>
+    <dc:title xml:lang="fr">Retour de Bamako III en images</dc:title>
+    <dc:type xml:lang="fr">photo</dc:type>
+    <dc:type rdf:resource="http://www.eclap.eu/Classification/PerformingArtsType/504"/>
+    <dcterms:temporal rdf:resource="http://www.eclap.eu/Classification/HistoricalPeriod/566"/>
+    <dcterms:temporal rdf:resource="http://www.eclap.eu/Classification/HistoricalPeriod/675"/>
+    <edm:type>IMAGE</edm:type>
+  </edm:Proxy>
+</rdf:RDF>
