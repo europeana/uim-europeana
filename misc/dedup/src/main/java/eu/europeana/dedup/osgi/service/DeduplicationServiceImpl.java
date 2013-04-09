@@ -36,9 +36,11 @@ import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
+import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistry;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistryMongoServer;
 import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
+import eu.europeana.corelib.tools.lookuptable.LookupState;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 import eu.europeana.dedup.utils.Decoupler;
 import eu.europeana.dedup.utils.PropertyReader;
@@ -107,6 +109,36 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 
 	}
 
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#retrieveEuropeanaIDFromOld(java.lang.String)
+	 */
+	@Override
+	public List<String> retrieveEuropeanaIDFromOld(String oldID,String collectionID) {
+		
+		List<String> retlist = new ArrayList<String>();
+		
+		List<EuropeanaIdRegistry> results = mongoserver.retrieveEuropeanaIdFromOriginal(oldID, collectionID);
+		
+		for(EuropeanaIdRegistry result: results){
+			retlist.add(result.getEid());
+		}
+		return retlist;
+	}
+
+	
+	
+	/* (non-Javadoc)
+	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteEuropeanaID(java.lang.String)
+	 */
+	@Override
+	public void deleteEuropeanaID(String newEuropeanaID) {
+		mongoserver.deleteEuropeanaIdFromNew(newEuropeanaID);
+	}
+	
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -141,7 +173,9 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 					nonUUID = proxy.getAbout();
 				}
 			
-
+			
+			List<EuropeanaIdRegistry> asd = mongoserver.retrieveEuropeanaIdFromOriginal("originalId", "collectionid");
+			
 			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
 					collectionID, dedupres.getEdm(), sessionid);
 
@@ -238,5 +272,17 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 
 		return initializer.getList();
 	}
+
+
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#createUpdateIdStatus(java.lang.String, java.lang.String, eu.europeana.corelib.tools.lookuptable.LookupState)
+	 */
+	@Override
+	public void createUpdateIdStatus(String oldEuropeanaID,String collectionID, LookupState state) {
+		mongoserver.setFailedRecordFailReasonFromOldID(state, oldEuropeanaID,collectionID);
+	}
+
+
 
 }
