@@ -121,6 +121,7 @@
 						<Embed-StripVersion>true</Embed-StripVersion>
 						<Import-Package>
 							!eu.europeana.uim.gui.cp.*,
+							org.theeuropeanlibrary.model.common.qualifier,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues,
 							eu.europeana.uim.orchestration,
 							eu.europeana.uim.plugin.ingestion,
@@ -227,7 +228,8 @@
 			<version>${europeana.uim.version}</version>
 		</dependency>
 
-		<dependency>
+
+    	<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-uim-dedup</artifactId>
 			<version>${project.version}</version>

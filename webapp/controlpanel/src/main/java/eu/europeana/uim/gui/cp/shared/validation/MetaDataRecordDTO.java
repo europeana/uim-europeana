@@ -49,6 +49,8 @@ public class MetaDataRecordDTO extends DataSourceDTO {
     private String                                     workLanguage;
     private String                                     publicationPlace;
 
+    private boolean                                    deleted;
+    
     /**
      * Creates a new instance of this class.
      */
@@ -161,4 +163,18 @@ public class MetaDataRecordDTO extends DataSourceDTO {
     public void setPublicationPlace(String publicationPlace) {
         this.publicationPlace = publicationPlace;
     }
+
+	/**
+	 * @return the deleted
+	 */
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	/**
+	 * @param deleted the deleted to set
+	 */
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 }

@@ -95,7 +95,6 @@ public class IntegrationSeviceProxyImpl extends
 		String id = record.getId();
 
 		try {
-
 			// Retrieve the original SugarCRM record for a collection entry
 			SugarCrmRecord originalRec = sugService.retrieveRecord(id);
 
@@ -166,6 +165,10 @@ public class IntegrationSeviceProxyImpl extends
 			result.setResult(EuropeanaClientConstants.ERRORIMAGELOC);
 		} 
 
+		
+		
+		
+		
 		return result;
 	}
 

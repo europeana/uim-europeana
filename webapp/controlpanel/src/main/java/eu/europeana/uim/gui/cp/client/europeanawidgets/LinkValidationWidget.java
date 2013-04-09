@@ -44,6 +44,7 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Frame;
@@ -55,15 +56,13 @@ import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.RangeChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
-
 import eu.europeana.uim.gui.cp.client.IngestionWidget;
 import eu.europeana.uim.gui.cp.client.services.RepositoryServiceAsync;
 import eu.europeana.uim.gui.cp.shared.CollectionDTO;
 import eu.europeana.uim.gui.cp.shared.ProviderDTO;
-
 import java.io.UnsupportedEncodingException;
-
 import com.google.gwt.http.client.URL;
+import com.google.gwt.cell.client.CheckboxCell;
 
 /**
  * Table view showing current links for link checking
@@ -130,6 +129,13 @@ public class LinkValidationWidget extends IngestionWidget {
     @UiField(provided = true)
     SimplePager                           pager;
 
+    
+    /**
+     * Results analysis 
+     */
+    @UiField(provided = true)
+    Label                                 resultsLabel;
+    
     /**
      * Creates a new instance of this class.
      * 
@@ -200,6 +206,9 @@ public class LinkValidationWidget extends IngestionWidget {
         dataProvider.setList(records);
         dataProvider.addDataDisplay(cellTable);
 
+        
+        resultsLabel = new Label();
+        
         SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
         pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
         pager.setDisplay(cellTable);
@@ -347,6 +356,7 @@ public class LinkValidationWidget extends IngestionWidget {
                     @Override
                     public void onFailure(Throwable caught) {
                         caught.printStackTrace();
+                        records.clear();
                     }
 
                     @Override
@@ -355,6 +365,8 @@ public class LinkValidationWidget extends IngestionWidget {
                         cellTable.setRowCount(result.getNumberRecords());
                         records.addAll(result.getRecords());
                         cellTable.setRowData(offset, records);
+                        resultsLabel.setText("(Total:" + result.getNumberRecords() + " Active:" +
+                        		result.getActiverecords() + " Deleted:" + result.getDeletedrecords() + ")");
                     }
                 });
 
@@ -381,6 +393,22 @@ public class LinkValidationWidget extends IngestionWidget {
      */
     private void initTableColumns() {
 
+        // Ise Deleted column
+        Column<MetaDataRecordDTO, Boolean> isdeletedColumn = new Column<MetaDataRecordDTO, Boolean>(
+                new CheckboxCell()) {
+
+            @Override
+            public Boolean getValue(MetaDataRecordDTO object) {
+                return object.isDeleted();
+
+            }
+        };
+        cellTable.addColumn(isdeletedColumn, "Deleted");
+        cellTable.setColumnWidth(isdeletedColumn,5, Unit.PCT);
+    	
+    	
+    	
+    	
         // ID
         Column<MetaDataRecordDTO, String> idColumn = new Column<MetaDataRecordDTO, String>(
                 new TextCell()) {

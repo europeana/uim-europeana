@@ -322,7 +322,7 @@ public class ImportResourcesWidget extends IngestionWidget {
 								impResultsTable.setWidget(numRows, 1, new HTML(
 										"A system exception has occured"));
 								impResultsTable.setWidget(numRows, 2, new HTML(
-										throwable.getMessage()));
+										throwable.getCause().getMessage()));
 
 								progressBar.setProgress(impResultsTable
 										.getRowCount());

@@ -38,6 +38,16 @@ public class MetaDataResultDTO implements IsSerializable {
     private int                     numberRecords;
 
     /**
+     * number of active records
+     */
+    private int                 activerecords;
+    
+    /**
+     * number of deleted records
+     */
+    private int                 deletedrecords;
+    
+    /**
      * Creates a new instance of this class.
      */
     public MetaDataResultDTO() {
@@ -57,6 +67,25 @@ public class MetaDataResultDTO implements IsSerializable {
         this.numberRecords = numberRecords;
     }
 
+    
+    /**
+     * Creates a new instance of this class.
+     * 
+     * @param records
+     *            list with metadata records
+     * @param numberRecords
+     *            total number of records
+     * @param activerecords
+     * @param deletedrecords
+     */
+    public MetaDataResultDTO(List<MetaDataRecordDTO> records, int numberRecords,int activerecords,int deletedrecords) {
+        this.records = records;
+        this.numberRecords = numberRecords;
+        this.activerecords = activerecords;
+        this.deletedrecords = deletedrecords;
+    }
+
+    
     /**
      * @return list with metadata record
      */
@@ -86,4 +115,26 @@ public class MetaDataResultDTO implements IsSerializable {
     public void setNumberRecords(int numberRecords) {
         this.numberRecords = numberRecords;
     }
+
+	public int getActiverecords() {
+		return activerecords;
+	}
+
+	public void setActiverecords(int activerecords) {
+		this.activerecords = activerecords;
+	}
+
+	/**
+	 * @return the deletedrecords
+	 */
+	public int getDeletedrecords() {
+		return deletedrecords;
+	}
+
+	/**
+	 * @param deletedrecords the deletedrecords to set
+	 */
+	public void setDeletedrecords(int deletedrecords) {
+		this.deletedrecords = deletedrecords;
+	}
 }

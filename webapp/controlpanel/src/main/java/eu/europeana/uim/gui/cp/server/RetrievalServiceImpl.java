@@ -48,6 +48,7 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import com.mongodb.Mongo;
@@ -68,6 +69,7 @@ import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.uim.storage.StorageEngine;
+import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.gui.cp.client.services.RetrievalService;
@@ -263,6 +265,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 			}
 		}
 
+
 		List<MetaDataRecordDTO> results = new ArrayList<MetaDataRecordDTO>();
 		for (MetaDataRecord<String> metaDataRecord : metaDataRecords) {
 			if (metaDataRecord != null && metaDataRecord.getId() != null) {
@@ -270,16 +273,19 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				record.setId(metaDataRecord.getId());
 
 				try {
-
-
+					Status status = metaDataRecord
+							.getFirstValue(EuropeanaModelRegistry.STATUS);
+					
+					if(status != null && status.equals(Status.DELETED)){
+						record.setDeleted(true);
+					}
+					
 					String edmxml = metaDataRecord
 							.getFirstValue(EuropeanaModelRegistry.EDMRECORD);
 
 					if (edmxml != null) {
 						RDF rdf = (RDF) uctx
 								.unmarshalDocument(new StringReader(edmxml));
-
-
 
 								ProxyType cho = rdf.getProxyList().get(0);
 
@@ -312,10 +318,8 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 											record.setPublicationYear(dcchoice
 													.getDate().getString());
 										}
-
 									}
 								}
-
 					}
 
 				} catch (JiBXException e) {
@@ -326,7 +330,24 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				results.add(record);
 			}
 		}
-		return new MetaDataResultDTO(results, maxNumber);
+		
+		
+		int deleted_records = 0;
+		int active_records = maxNumber;
+		
+		Collection<String> collection;
+		try {
+			collection = storage.getCollection(collectionId);
+			deleted_records = collection.getValue("Deleted") == null? 0 :  Integer.parseInt(collection.getValue("Deleted"));
+		    active_records = maxNumber - deleted_records;
+		} catch (StorageEngineException e) {
+			e.printStackTrace();
+		}
+		
+
+		MetaDataResultDTO response =  new MetaDataResultDTO(results, maxNumber,active_records ,deleted_records);
+		
+		return response;
 	}
 
 	@Override
@@ -621,14 +642,19 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				}
 				for (QualifiedValue<EuropeanaLink> qv : qualifiedValues) {
 
-					Set<Enum<?>> qualifiers = qv.getQualifiers();
-					String description = "Link in record - Type ";
-					for (Enum<?> q : qualifiers) {
-						description = description + q + " ";
-					}
+					StringBuffer description = new StringBuffer("Link in record - Type :");
+
 					EuropeanaLink link = qv.getValue();
+					
+					if(link.isCacheable()){
+						description.append("cacheable object");
+					}
+					else{
+						description.append("non-cacheable object");
+					}
+					
 					if (link != null)
-						links.add(new LinkDTO(link.getUrl(), description));
+						links.add(new LinkDTO(link.getUrl(), description.toString()));
 				}
 			}
 		}

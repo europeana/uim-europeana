@@ -5,6 +5,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.prefetch.RunAsyncCode;
 
 import eu.europeana.uim.gui.cp.client.europeanawidgets.CollectionManagement;
+import eu.europeana.uim.gui.cp.client.europeanawidgets.EuropeanaIngestionHistoryWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ExpandedResourceManagementWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.FailedRecordsWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportControlledVocabularyWidget;
@@ -82,9 +83,9 @@ public class EuropeanaIngestionControlPanel extends
 		treeModel.addMenuEntry("Monitoring", new IngestionDetailWidget(
 				executionService), RunAsyncCode
 				.runAsyncCode(IngestionDetailWidget.class));
-		treeModel.addMenuEntry("Monitoring", new FilteredIngestionHistoryWidget(
+		treeModel.addMenuEntry("Monitoring", new EuropeanaIngestionHistoryWidget(
 				executionService,repositoryService), RunAsyncCode
-				.runAsyncCode(FilteredIngestionHistoryWidget.class));
+				.runAsyncCode(EuropeanaIngestionHistoryWidget.class));
 		treeModel.addMenuEntry("Managing", new IngestionTriggerWidget(
 				repositoryService, resourceService, executionService),
 				RunAsyncCode.runAsyncCode(IngestionTriggerWidget.class));

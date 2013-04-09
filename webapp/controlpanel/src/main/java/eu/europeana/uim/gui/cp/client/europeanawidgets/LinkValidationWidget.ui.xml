@@ -68,6 +68,7 @@
             <tr>
                 <td align='center'>
                     <c:SimplePager ui:field='pager' />
+                    <g:Label ui:field='resultsLabel' />
                 </td>
             </tr>
             <tr>
