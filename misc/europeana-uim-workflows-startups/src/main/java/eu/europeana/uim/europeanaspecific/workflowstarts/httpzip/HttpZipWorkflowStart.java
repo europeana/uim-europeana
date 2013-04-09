@@ -226,7 +226,9 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 			Execution<I> execution = context.getExecution();
 			execution.putValue("Created", Integer.toString(value.loader.getCreated()));
 			execution.putValue("Updated", Integer.toString(value.loader.getUpdated()));
-			
+			execution.putValue("Omitted", Integer.toString(value.loader.getOmitted()));
+			execution.putValue("Generated", Integer.toString(value.loader.getGenerated()));
+			execution.putValue("Discarded", Integer.toString(value.loader.getDiscarded()));
 			try {
 				context.getStorageEngine().updateExecution(execution);
 			} catch (StorageEngineException e) {
@@ -293,7 +295,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 
 				Request<I> request = storage.createRequest(collection,new Date());
 
-				HttpRetriever retriever = HttpRetriever.createInstance(url);
+				HttpRetriever retriever = new HttpRetriever().createInstance(url);
 
 				ZipLoader<I> loader = new ZipLoader<I>(retriever.getNumber_of_recs(),
 						retriever,context,request,dedup,forceupdate);
@@ -351,8 +353,11 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		Execution<I> execution = context.getExecution();
 		execution.putValue("Deleted", Integer.toString(value.deletioncandidates.size()));
 
+		Collection<I> collection = (Collection<I>) context.getDataSet();
+		collection.putValue("Deleted", Integer.toString(value.deletioncandidates.size()));
 		try {
 			context.getStorageEngine().updateExecution(execution);
+			context.getStorageEngine().updateCollection(collection);
 		} catch (StorageEngineException e) {
 			e.printStackTrace();
 		}

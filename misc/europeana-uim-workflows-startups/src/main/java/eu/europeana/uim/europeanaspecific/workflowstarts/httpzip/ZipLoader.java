@@ -35,6 +35,7 @@ import org.theeuropeanlibrary.model.common.qualifier.Status;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.progress.ProgressMonitor;
+import eu.europeana.uim.europeanaspecific.workflowstarts.util.SaxBasedIDExtractor;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
@@ -84,6 +85,12 @@ public class ZipLoader<I> {
 	
 	private int updated = 0;
 	
+	private int omitted = 0;
+	
+	private int discarded = 0;
+	
+	private int generated = 0;
+	
 	private boolean forceUpdate;
 
 	/**
@@ -101,7 +108,6 @@ public class ZipLoader<I> {
 	 */
 	private static final Logger LOGGER = Logger.getLogger(ZipLoader.class.getName());
 	
-
 	
 	// Unmarshalling context initialization
 	static {
@@ -188,12 +194,21 @@ public class ZipLoader<I> {
 						(String) request.getCollection().getMnemonic(),
 						(String) request.getId(), rdfstring);
 
+				
+				//If the resultlist contains more than one records then we assume that the incoming records
+				//have been split. We append the number of the extra generated records in the "generated"
+				//variable.
+				
+				if(reslist.size() > 1){
+					generated += reslist.size() -1;
+				}
+				
 				for (DeduplicationResult dedupres : reslist) {
 
 					LookupState state = dedupres.getLookupresult().getState();
 
 					MetaDataRecord<I> mdr = null;
-
+					
 					switch (state) {
 					case ID_REGISTERED:						
 						mdr = processrecord(mdr, dedupres, Status.CREATED);
@@ -209,19 +224,22 @@ public class ZipLoader<I> {
 					case COLLECTION_CHANGED:
 						LOGGER.log(Level.INFO,"Unique Identifier in COLLECTION_CHANGED state for record with ID " + dedupres
 								.getDerivedRecordID());
+						discarded ++;
 						break;
 					case DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS:
 						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS state for record with ID " + dedupres
 								.getDerivedRecordID());
+						discarded ++;
 						break;
 					case DUPLICATE_INCOLLECTION:						
 						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_INCOLLECTION state for record with ID " + dedupres
 							.getDerivedRecordID());
-						
+						discarded ++;
 						break;
 					case DUPLICATE_RECORD_ACROSS_COLLECTIONS:
 						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_RECORD_ACROSS_COLLECTIONS state for record with ID " + dedupres
 								.getDerivedRecordID());
+						discarded ++;
 						break;
 					case IDENTICAL:
 
@@ -234,19 +252,22 @@ public class ZipLoader<I> {
 								processrecord(mdr,dedupres,Status.UPDATED);
 								value.deletioncandidates.remove(dedupres
 										.getDerivedRecordID());
-								updated ++;
+								
 							} catch (StorageEngineException e) {
 								e.printStackTrace();
 								mdr = processrecord(mdr,dedupres,Status.UPDATED);
 								value.deletioncandidates.remove(dedupres
 										.getDerivedRecordID());
 							}
+							
+							updated ++;
 
 						} else {
 							LOGGER.log(Level.INFO,"Unique Identifier in IDENTICAL (ignore identical) state for record with ID " + dedupres
 									.getDerivedRecordID());
 							value.deletioncandidates.remove(dedupres
 									.getDerivedRecordID());
+							omitted ++;
 						}
 
 						break;
@@ -264,8 +285,9 @@ public class ZipLoader<I> {
 							mdr = processrecord(mdr,dedupres,Status.UPDATED);
 							value.deletioncandidates.remove(dedupres
 									.getDerivedRecordID());
-							updated ++;
+
 						}
+						updated ++;
 						break;
 					default:
 						break;
@@ -281,11 +303,56 @@ public class ZipLoader<I> {
 				totalProgress++;
 
 			} catch (JiBXException e) {
-				LOGGER.log(Level.WARNING,"ZipLoader:Error unmarshalling xml for object",e);
+				LOGGER.log(Level.SEVERE,"ZipLoader:Error unmarshalling xml for object",e);
+				
+				SaxBasedIDExtractor extractor = new SaxBasedIDExtractor();
+				List<String> ids = extractor.extractIDs(rdfstring);
+				
+				for(String id:ids){
+					List<String> newids = dedup.retrieveEuropeanaIDFromOld(id, request.getCollection().getMnemonic());
+					
+					for(String newid : newids){
+						value.deletioncandidates.remove(newid);
+						System.out.println(newid);
+					}
+				}
+			    
+				
+				for(String oldID: ids){
+					
+					dedup.createUpdateIdStatus(oldID,request.getCollection().getMnemonic(),LookupState.UPDATE);
+				}
+				
+				discarded ++;
+				
+				
+				
 			} catch (StorageEngineException e) {
-				LOGGER.log(Level.WARNING,"ZipLoader:Storage engine error",e);
+				e.printStackTrace();
+				LOGGER.log(Level.SEVERE,"ZipLoader:Storage engine error",e);
+				discarded ++;
 			} catch (DeduplicationException e) {
-				LOGGER.log(Level.WARNING,"ZipLoader:Deduplication Exception",e);
+				LOGGER.log(Level.SEVERE,"ZipLoader:Deduplication Exception",e);
+				
+				SaxBasedIDExtractor extractor = new SaxBasedIDExtractor();
+				List<String> ids = extractor.extractIDs(rdfstring);
+				
+				for(String id:ids){
+					List<String> newids = dedup.retrieveEuropeanaIDFromOld(id, request.getCollection().getMnemonic());
+					
+					for(String newid : newids){
+						value.deletioncandidates.remove(newid);
+						System.out.println(newid);
+					}
+				}
+				
+				
+				for(String oldID: ids){
+					
+					dedup.createUpdateIdStatus(oldID,request.getCollection().getMnemonic(),LookupState.UPDATE);
+				}
+				
+				discarded ++;
 			}
 		}
 
@@ -448,6 +515,29 @@ public class ZipLoader<I> {
 	public int getUpdated() {
 		return updated;
 	}
+	
+	
+	/**
+	 * @return the generated
+	 */
+	public int getGenerated() {
+		return generated;
+	}
+
+	/**
+	 * @return the discarded
+	 */
+	public int getDiscarded() {
+		return discarded;
+	}
+	
+	/**
+	 * @return the omitted
+	 */
+	public int getOmitted() {
+		return omitted;
+	}
+	
 	
 	/**
 	 * Finalizes the current object and make its fields eligible for garbage

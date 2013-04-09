@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -41,14 +42,12 @@ public class HttpRetriever implements Iterator<String> {
 
 	
 	private TarArchiveInputStream tarInputstream;
-	
-	private static Random generator; 
 
 	private int number_of_recs;
 
 	private int records_read;
 	
-	private static String dest;
+	private String dest;
 	
 	/**
 	 * Private Class constructor (can be instantiated only with factory method)
@@ -60,7 +59,7 @@ public class HttpRetriever implements Iterator<String> {
 	 * @param zipentries
 	 *            References to the zipped files
 	 */
-	private HttpRetriever() {
+	public HttpRetriever() {
 	
 	}
 
@@ -72,9 +71,9 @@ public class HttpRetriever implements Iterator<String> {
 	 * @return
 	 * @throws IOException
 	 */
-	public synchronized static  HttpRetriever createInstance(URL url,String dest)
+	public  HttpRetriever createInstance(URL url,String dest)
 			throws IOException {
-		HttpRetriever.dest = dest;
+		this.dest = dest;
 		HttpRetriever ret = createInstance(url);
 
 		
@@ -92,37 +91,36 @@ public class HttpRetriever implements Iterator<String> {
 	 * @return an instance of this class
 	 * @throws IOException
 	 */
-	public synchronized static HttpRetriever createInstance(URL url)
+	public HttpRetriever createInstance(URL url)
 			throws IOException {
 		
 		HttpRetriever retriever = new HttpRetriever();
 		
-		if(generator == null){
-			generator =  new Random();
-		}
-		
 		File dest;
 		
 		//First copy the remote URI to a 
-		if(HttpRetriever.dest == null){
-		   dest = new File(PropertyReader.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION)+new Integer(generator.nextInt()).toString());
+		if(this.dest == null){
+		   dest = new File(PropertyReader.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION)+new Date().getTime()+".tar.gz");
 		}
 		else{
-		   dest = new File(HttpRetriever.dest);
+		   dest = new File(this.dest);
 		}
 
-		FileUtils.copyURLToFile(url, dest, 100, 100000);
+		
+		System.out.println("Destination file:" + dest );
+		
+		FileUtils.copyURLToFile(url, dest, 10000000, 100000000);
 		TarArchiveInputStream tarfile;
 
 			tarfile =  new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(dest)));
 
-			tarfile.available();
-			
 			TarArchiveEntry  entry;
 			
 			while( (entry = tarfile.getNextTarEntry()) != null){
 				
 				if(entry.isDirectory()){
+					
+					entry = tarfile.getNextTarEntry();
 
 				}
 				else
@@ -135,14 +133,16 @@ public class HttpRetriever implements Iterator<String> {
 			
 			TarArchiveInputStream iterabletarfile = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(dest)));
 			
-			iterabletarfile.available();
-			
 			retriever.tarInputstream = iterabletarfile;
 			
 			
 		return retriever;
 	}
 
+	
+	
+
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -150,7 +150,7 @@ public class HttpRetriever implements Iterator<String> {
 	 */
 	@Override
 	public boolean hasNext() {
-		if(number_of_recs <= records_read ){
+		if(records_read > number_of_recs){
 			return false;
 		}
 		else{
