@@ -136,12 +136,12 @@ public abstract class Dereferencer {
 		} else if (object instanceof ResourceOrLiteralType) {
 			if (((ResourceOrLiteralType) object).getResource() != null) {
 
-				if (isURI(((ResourceOrLiteralType) object).getResource())) {
+				if (isURI(((ResourceOrLiteralType) object).getResource().getResource())) {
 					ControlledVocabularyImpl controlVocabulary = getControlledVocabulary(((ResourceOrLiteralType) object)
-							.getResource());
+							.getResource().getResource());
 					if (controlVocabulary != null) {
 						appendInRDF(rdf, extractor.denormalize(
-								((ResourceOrLiteralType) object).getResource(),
+								((ResourceOrLiteralType) object).getResource().getResource(),
 								controlVocabulary, 0, true));
 
 					}

@@ -53,6 +53,7 @@ import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
+import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Resource;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx._Long;
@@ -1300,8 +1301,9 @@ public class OsgiExtractor extends Extractor {
 					.isAssignableFrom(ResourceOrLiteralType.class)) {
 				ResourceOrLiteralType rs = new ResourceOrLiteralType();
 				if (isURI(val)) {
-					rs.setResource(val);
-					// denormalize(val, iterations - 1);
+					Resource res = new Resource();
+					res.setResource(val);
+					rs.setResource(res);
 				} else {
 					rs.setString(val);
 				}
@@ -1376,7 +1378,9 @@ public class OsgiExtractor extends Extractor {
 					ResourceOrLiteralType.class)) {
 				ResourceOrLiteralType rs = new ResourceOrLiteralType();
 				if (isURI(val)) {
-					rs.setResource(val);
+					Resource res = new Resource();
+					res.setResource(val);
+					rs.setResource(res);
 					// denormalize(val, iterations - 1);
 				} else {
 					rs.setString(val);
@@ -1468,7 +1472,9 @@ public class OsgiExtractor extends Extractor {
 			ResourceOrLiteralType obj = new ResourceOrLiteralType();
 
 			if (isURI(val)) {
-				obj.setResource(val);
+				Resource res = new Resource();
+				res.setResource(val);
+				obj.setResource(res);
 				denormalize(val, iterations - 1);
 			} else {
 				obj.setString(val);

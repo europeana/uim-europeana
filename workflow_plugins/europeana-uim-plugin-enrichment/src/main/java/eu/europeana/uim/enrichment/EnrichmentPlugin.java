@@ -38,11 +38,13 @@ import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Alt;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.Country;
+import eu.europeana.corelib.definitions.jibx.CountryCodes;
 import eu.europeana.corelib.definitions.jibx.Creator;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.LandingPage;
 import eu.europeana.corelib.definitions.jibx.Language1;
+import eu.europeana.corelib.definitions.jibx.LanguageCodes;
 import eu.europeana.corelib.definitions.jibx.Lat;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
@@ -53,6 +55,7 @@ import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
+import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Resource;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.Rights1;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
@@ -874,23 +877,35 @@ public class EnrichmentPlugin<I> extends
 		lp.setResource(PORTALURL + cho.getAbout() + SUFFIX);
 		europeanaAggregation.setLandingPage(lp);
 		Country countryType = new Country();
+		
 		countryType
-				.setString(europeanaAggregation.getCountry() != null ? europeanaAggregation
-						.getCountry().getString() : "eu");
+				.setCountry(europeanaAggregation.getCountry() != null ? europeanaAggregation
+						.getCountry().getCountry() : CountryCodes.EUROPE);
+		
 		europeanaAggregation.setCountry(countryType);
 		Creator creatorType = new Creator();
 		creatorType.setString("Europeana");
 		europeanaAggregation.setCreator(creatorType);
 		Language1 languageType = new Language1();
 		languageType
-				.setString(europeanaAggregation.getLanguage() != null ? europeanaAggregation
-						.getLanguage().getString() : "eu");
+				.setLanguage(europeanaAggregation.getLanguage() != null ? europeanaAggregation
+						.getLanguage().getLanguage() :  LanguageCodes.EN);
+		
 		europeanaAggregation.setLanguage(languageType);
 		Rights1 rightsType = new Rights1();
-		rightsType
-				.setResource(europeanaAggregation.getRights() != null ? europeanaAggregation
-						.getRights().getResource()
-						: "http://creativecommons.org/licenses/by-sa/3.0/");
+		
+		if(europeanaAggregation.getRights() != null){
+			rightsType.setResource(europeanaAggregation
+					.getRights().getResource());
+		}
+		else{
+			Resource res = new Resource();
+			res.setResource("http://creativecommons.org/licenses/by-sa/3.0/");
+			rightsType.setResource(res);
+		}
+		
+		
+		
 		europeanaAggregation.setRights(rightsType);
 		AggregatedCHO aggrCHO = new AggregatedCHO();
 		aggrCHO.setResource(cho.getAbout());
@@ -1061,7 +1076,11 @@ public class EnrichmentPlugin<I> extends
 						.isAssignableFrom(ResourceOrLiteralType.class)) {
 					ResourceOrLiteralType rs = new ResourceOrLiteralType();
 					if (isURI(val)) {
-						rs.setResource(val);
+						
+						Resource res = new Resource();
+						res.setResource(val);
+						rs.setResource(res );
+
 					} else {
 						rs.setString(val);
 					}
@@ -1127,7 +1146,9 @@ public class EnrichmentPlugin<I> extends
 						ResourceOrLiteralType.class)) {
 					ResourceOrLiteralType rs = new ResourceOrLiteralType();
 					if (isURI(val)) {
-						rs.setResource(val);
+						Resource res = new Resource();
+						res.setResource(val);
+						rs.setResource(res );
 					} else {
 						rs.setString(val);
 					}
@@ -1205,7 +1226,9 @@ public class EnrichmentPlugin<I> extends
 			ResourceOrLiteralType obj = new ResourceOrLiteralType();
 
 			if (isURI(val)) {
-				obj.setResource(val);
+				Resource res = new Resource();
+				res.setResource(val);
+				obj.setResource(res);
 			} else {
 				obj.setString(val);
 			}

@@ -253,7 +253,8 @@
 							org.w3c.dom.traversal,
 							!org.apache.log4j.*, 
 							!org.apache.lucene.*, 
-							org.slf4j.*
+							org.slf4j.*,
+							org.apache.solr.client.solrj.util
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>

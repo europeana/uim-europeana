@@ -9,6 +9,7 @@ import eu.europeana.corelib.definitions.jibx.Creator;
 import eu.europeana.corelib.definitions.jibx.Date;
 import eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
+import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Resource;
 import eu.europeana.corelib.definitions.jibx.Spatial;
 import eu.europeana.corelib.definitions.jibx.Subject;
 import eu.europeana.corelib.definitions.jibx.Temporal;
@@ -27,8 +28,10 @@ public enum OriginalField {
 	PROXY_DC_DATE("proxy_dc_date") {
 		@Override
 		public ProxyType appendField(ProxyType proxy, String uri) {
-			Date date = new Date();
-			date.setResource(uri);
+			Date date = new Date();			
+			Resource dateres = new Resource();
+			dateres.setResource(uri);
+			date.setResource(dateres);
 			Choice choice = new Choice();
 			choice.setDate(date);
 			if(proxy.getChoiceList()!=null){
@@ -45,7 +48,9 @@ public enum OriginalField {
 		@Override
 		public ProxyType appendField(ProxyType proxy, String uri) {
 			Coverage coverage = new Coverage();
-			coverage.setResource(uri);
+			Resource coverageres = new Resource();
+			coverageres.setResource(uri);
+			coverage.setResource(coverageres);
 			Choice choice = new Choice();
 			choice.setCoverage(coverage);
 			if(proxy.getChoiceList()!=null){
@@ -62,7 +67,9 @@ public enum OriginalField {
 		@Override
 		public ProxyType appendField(ProxyType proxy, String uri) {
 			Temporal obj = new Temporal();
-			obj.setResource(uri);
+			Resource temporalres = new Resource();
+			temporalres.setResource(uri);
+			obj.setResource(temporalres);
 			Choice choice = new Choice();
 			choice.setTemporal(obj);
 			if(proxy.getChoiceList()!=null){
@@ -87,7 +94,9 @@ public enum OriginalField {
 		@Override
 		public ProxyType appendField(ProxyType proxy, String uri) {
 			Spatial obj = new Spatial();
-			obj.setResource(uri);
+			Resource spatialres = new Resource();
+			spatialres.setResource(uri);
+			obj.setResource(spatialres);
 			Choice choice = new Choice();
 			choice.setSpatial(obj);
 			if(proxy.getChoiceList()!=null){
@@ -104,7 +113,9 @@ public enum OriginalField {
 		@Override
 		public ProxyType appendField(ProxyType proxy, String uri) {
 			Type obj = new Type();
-			obj.setResource(uri);
+			Resource typeres = new Resource();
+			typeres.setResource(uri);
+			obj.setResource(typeres);
 			Choice choice = new Choice();
 			choice.setType(obj);
 			if(proxy.getChoiceList()!=null){
@@ -121,7 +132,9 @@ public enum OriginalField {
 		@Override
 		public ProxyType appendField(ProxyType proxy, String uri) {
 			Subject obj = new Subject();
-			obj.setResource(uri);
+			Resource subjectres = new Resource();
+			subjectres.setResource(uri);
+			obj.setResource(subjectres);
 			Choice choice = new Choice();
 			choice.setSubject(obj);
 			if(proxy.getChoiceList()!=null){
@@ -139,7 +152,9 @@ public enum OriginalField {
 		@Override
 		public ProxyType appendField(ProxyType proxy, String uri) {
 			Creator obj = new Creator();
-			obj.setResource(uri);
+			Resource creatortres = new Resource();
+			creatortres.setResource(uri);
+			obj.setResource(creatortres);
 			Choice choice = new Choice();
 			choice.setCreator(obj);
 			if(proxy.getChoiceList()!=null){
@@ -157,7 +172,10 @@ public enum OriginalField {
 		@Override
 		public ProxyType appendField(ProxyType proxy, String uri) {
 			Contributor obj = new Contributor();
-			obj.setResource(uri);
+			Resource contribtres = new Resource();
+			contribtres.setResource(uri);
+			
+			obj.setResource(contribtres);
 			Choice choice = new Choice();
 			choice.setContributor(obj);
 			if(proxy.getChoiceList()!=null){
