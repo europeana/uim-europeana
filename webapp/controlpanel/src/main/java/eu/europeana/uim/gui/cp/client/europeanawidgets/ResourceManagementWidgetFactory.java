@@ -356,10 +356,20 @@ public class ResourceManagementWidgetFactory {
 		switch(status.getType()){
 		  case COLLECTION:
 			    if(status.getMintID() != null){
+			    	
 					resourcePropertiesTable.setWidget(placecounter, 0, new HTML("Mint ID:"));
 					resourcePropertiesTable.setWidget(placecounter, 1, new HTML(status.getMintID()));  
-					
 					placecounter ++;
+			    	
+					resourcePropertiesTable.setWidget(placecounter, 0, new HTML("Link to Mint:"));
+					Anchor hyper = new Anchor();
+					hyper.setName("MintLink");
+					hyper.setText("Click here to visit MINT.");
+					hyper.setHref(status.getMintURL());
+					hyper.setTarget("NEW");
+					resourcePropertiesTable.setWidget(placecounter, 1, hyper);  
+					placecounter ++;
+
 			    }
 			    
 			    if(status.getMintID() != null && status.getResourceProperties().get("LATESTMINTTRANSFORMATIONID") != null){
