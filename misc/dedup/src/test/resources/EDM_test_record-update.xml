@@ -257,7 +257,7 @@
     <edm:provider>APEnet</edm:provider>
     <edm:rights rdf:resource="http://www.europeana.eu/rights/rr-f/"/>
   </ore:Aggregation>
-  <edm:Proxy rdf:about="#UEDIN:214">
+  <ore:Proxy rdf:about="#UEDIN:214">
     <dc:contributor>CHO - dc:contributor</dc:contributor>
     <dc:coverage>CHO - dc:coverage</dc:coverage>
     <dc:creator>Courtois neveu aÃ®nÃ©</dc:creator>
@@ -314,8 +314,8 @@
     <edm:isSuccessorOf rdf:resource="http://CHO-edm-isSuccessorOf.eu"/>
     <edm:realizes rdf:resource="http://CHO-edm-realizes.eu"/>
     <edm:type>IMAGE</edm:type>
-  </edm:Proxy>
-  <edm:Proxy rdf:about="http://hdl.handle.net/10978/0F3716A7-DB96-403F-ADDE-399D29E34937">
+  </ore:Proxy>
+  <ore:Proxy rdf:about="http://hdl.handle.net/10978/0F3716A7-DB96-403F-ADDE-399D29E34937">
     <dc:contributor>CHO - dc:contributor</dc:contributor>
     <dc:coverage>CHO - dc:coverage</dc:coverage>
     <dc:creator>CHO - dc:creator</dc:creator>
@@ -370,8 +370,8 @@
     <edm:isSuccessorOf rdf:resource="http://CHO-edm-isSuccessorOf.eu"/>
     <edm:realizes rdf:resource="http://CHO-edm-realizes.eu"/>
     <edm:type>TEXT</edm:type>
-  </edm:Proxy>
-  <edm:Proxy rdf:about="http://purl.org/collections/apenet/physical-3_01_01-5-5_3-2149">
+  </ore:Proxy>
+  <ore:Proxy rdf:about="http://purl.org/collections/apenet/physical-3_01_01-5-5_3-2149">
     <dc:creator>Graaf van Holland</dc:creator>
     <dc:description>1 deel</dc:description>
     <dc:identifier>2149</dc:identifier>
@@ -388,8 +388,8 @@
     <dcterms:isPartOf/>
     <dcterms:spatial>Netherlands</dcterms:spatial>
     <edm:type>TEXT</edm:type>
-  </edm:Proxy>
-  <edm:Proxy rdf:about="http://purl.org/collections/apenet/physical-3_01_01-5-5_3-2149_2">
+  </ore:Proxy>
+  <ore:Proxy rdf:about="http://purl.org/collections/apenet/physical-3_01_01-5-5_3-2149_2">
     <dc:creator>Graaf van Holland</dc:creator>
     <dc:identifier>2149.2</dc:identifier>
     <dc:language>dutch</dc:language>
@@ -402,8 +402,8 @@
     <dcterms:spatial>Netherlands</dcterms:spatial>
     <edm:isNextInSequence rdf:resource=""/>
     <edm:type>TEXT</edm:type>
-  </edm:Proxy>
-  <edm:Proxy rdf:about="http://purl.org/collections/apenet/physical-3_01_01-5-5_3-2149_3">
+  </ore:Proxy>
+  <ore:Proxy rdf:about="http://purl.org/collections/apenet/physical-3_01_01-5-5_3-2149_3">
     <dc:creator>Graaf van Holland</dc:creator>
     <dc:identifier>2149.3</dc:identifier>
     <dc:language>dutch</dc:language>
@@ -416,8 +416,8 @@
     <dcterms:spatial>Netherlands</dcterms:spatial>
     <edm:isNextInSequence rdf:resource=""/>
     <edm:type>TEXT</edm:type>
-  </edm:Proxy>
-  <edm:Proxy rdf:about="http://purl.org/collections/apenet/physical-3_01_01-5-5_3-2149_4">
+  </ore:Proxy>
+  <ore:Proxy rdf:about="http://purl.org/collections/apenet/physical-3_01_01-5-5_3-2149_4">
     <dc:creator>Graaf van Holland</dc:creator>
     <dc:identifier>2149.4</dc:identifier>
     <dc:language>dutch</dc:language>
@@ -430,5 +430,5 @@
     <dcterms:spatial>Netherlands</dcterms:spatial>
     <edm:isNextInSequence rdf:resource=""/>
     <edm:type>TEXT</edm:type>
-  </edm:Proxy>
+  </ore:Proxy>
 </rdf:RDF>
