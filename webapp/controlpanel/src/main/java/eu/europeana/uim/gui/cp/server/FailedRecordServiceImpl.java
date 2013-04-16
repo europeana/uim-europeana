@@ -44,6 +44,8 @@ public class FailedRecordServiceImpl extends IntegrationServicesProviderServlet
 				for (Map<String,String> failedRecord : failedResults.subList(offset,
 						max)) {
 					FailedRecordDTO failedRecordDTO = new FailedRecordDTO();
+					failedRecordDTO.setDate(failedRecord
+							.get("date"));
 					failedRecordDTO.setCollectionId(failedRecord
 							.get("collectionId"));
 					failedRecordDTO.setEuropeanaId(failedRecord
@@ -63,7 +65,18 @@ public class FailedRecordServiceImpl extends IntegrationServicesProviderServlet
 							LookupState.DUPLICATE_RECORD_ACROSS_COLLECTIONS.toString())) {
 						failedRecordDTO
 								.setLookupState("The record was encountered twice for different records among split datasets");
-					}else {
+					}
+					else if (StringUtils.equals(failedRecord.get("lookupState"),
+							LookupState.INCOMPATIBLE_XML_CONTENT.toString())) {
+						failedRecordDTO
+								.setLookupState("The imported record has a deprecated XML structure (MINT schema not aligned with internal schema used by UIM).");
+					}
+					else if (StringUtils.equals(failedRecord.get("lookupState"),
+							LookupState.SYSTEM_ERROR.toString())) {
+						failedRecordDTO
+								.setLookupState("A system error occured during the import of this file).");
+					}
+					else {
 						failedRecordDTO
 								.setLookupState("The Europeana Identifier of the record was encountered twice for different records in the same dataset");
 					}

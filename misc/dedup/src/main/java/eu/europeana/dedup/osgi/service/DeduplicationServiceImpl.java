@@ -279,8 +279,8 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#createUpdateIdStatus(java.lang.String, java.lang.String, eu.europeana.corelib.tools.lookuptable.LookupState)
 	 */
 	@Override
-	public void createUpdateIdStatus(String oldEuropeanaID,String collectionID, LookupState state) {
-		mongoserver.setFailedRecordFailReasonFromOldID(state, oldEuropeanaID,collectionID);
+	public void createUpdateIdStatus(String oldEuropeanaID,String newEuropeanaID,String collectionID,String xml,LookupState state) {
+		mongoserver.createFailedRecord(state, collectionID, oldEuropeanaID, newEuropeanaID, xml);
 	}
 
 

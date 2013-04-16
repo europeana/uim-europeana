@@ -283,8 +283,22 @@ public class FailedRecordsWidget extends IngestionWidget {
 
 			}
 		};
+		
 		cellTable.addColumn(oridColumn, "Original Id");
 		cellTable.setColumnWidth(oridColumn, 10, Unit.PCT);
+
+		Column<FailedRecordDTO, String> dateColumn = new Column<FailedRecordDTO, String>(
+				new TextCell()) {
+			@Override
+			public String getValue(FailedRecordDTO object) {
+				return object.getDate();
+			}
+		};
+		
+		cellTable.addColumn(dateColumn, "Date");
+		cellTable.setColumnWidth(dateColumn, 5, Unit.PCT);
+		
+
 
 		Column<FailedRecordDTO, String> colidColumn = new Column<FailedRecordDTO, String>(
 				new TextCell()) {

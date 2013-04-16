@@ -63,7 +63,7 @@ public interface DeduplicationService {
 	 * @param collectionID
 	 * @param state
 	 */
-	public void createUpdateIdStatus(String oldEuropeanaID,String collectionID,LookupState state);
+	public void createUpdateIdStatus(String oldEuropeanaID,String newEuropeanaID,String collectionID,String xml,LookupState state);
 	
 	
 	

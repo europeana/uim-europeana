@@ -313,19 +313,16 @@ public class ZipLoader<I> {
 					
 					for(String newid : newids){
 						value.deletioncandidates.remove(newid);
+						
+						dedup.createUpdateIdStatus(id,newid,request.getCollection().getMnemonic(),rdfstring,LookupState.INCOMPATIBLE_XML_CONTENT);
+						
 						System.out.println(newid);
 					}
+					
+					
 				}
 			    
-				
-				for(String oldID: ids){
-					
-					dedup.createUpdateIdStatus(oldID,request.getCollection().getMnemonic(),LookupState.UPDATE);
-				}
-				
 				discarded ++;
-				
-				
 				
 			} catch (StorageEngineException e) {
 				e.printStackTrace();
@@ -342,14 +339,9 @@ public class ZipLoader<I> {
 					
 					for(String newid : newids){
 						value.deletioncandidates.remove(newid);
+						dedup.createUpdateIdStatus(id,newid,request.getCollection().getMnemonic(),rdfstring,LookupState.INCOMPATIBLE_XML_CONTENT);
 						System.out.println(newid);
 					}
-				}
-				
-				
-				for(String oldID: ids){
-					
-					dedup.createUpdateIdStatus(oldID,request.getCollection().getMnemonic(),LookupState.UPDATE);
 				}
 				
 				discarded ++;
