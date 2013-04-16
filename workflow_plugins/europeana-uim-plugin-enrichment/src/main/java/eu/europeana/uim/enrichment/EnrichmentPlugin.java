@@ -348,7 +348,7 @@ public class EnrichmentPlugin<I> extends
 			}
 
 			String value = null;
-			if(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null){
+			if(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null||mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).size()>0){
 				value = mdr
 						.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
 						.get(0);
