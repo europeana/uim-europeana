@@ -47,6 +47,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 			e.printStackTrace();
 		}
 		
+		
+		
 		BlockingInitializer initializer = new BlockingInitializer() {
 			
 			@Override
@@ -97,7 +99,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 				
 				idserver = new EuropeanaIdMongoServer(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "EuropeanaId");
 				datastore.ensureIndexes();
-				idserver.setDatastore(datastore);BlockingInitializer colInitializer = new BlockingInitializer() {
+				idserver.setDatastore(datastore);
+				BlockingInitializer colInitializer = new BlockingInitializer() {
 					
 					@Override
 					protected void initializeInternal() {
