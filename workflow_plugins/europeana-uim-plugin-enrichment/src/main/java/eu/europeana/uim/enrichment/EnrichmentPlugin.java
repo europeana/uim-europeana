@@ -1097,14 +1097,18 @@ public class EnrichmentPlugin<I> extends
 						.isAssignableFrom(LiteralType.class)) {
 					LiteralType rs = new LiteralType();
 					rs.setString(val);
+					LiteralType.Lang lang = new LiteralType.Lang();
 					if (edmAttr != null
 							&& StringUtils.equals(
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
-						LiteralType.Lang lang = new LiteralType.Lang();
+						
 						lang.setLang(valAttr);
-						rs.setLang(lang);
+						
+					} else {
+						lang.setLang("def");
 					}
+					rs.setLang(lang);
 					lst.add(RDF.returnObject(RDF.getClazz(), rs));
 				}
 
@@ -1127,14 +1131,18 @@ public class EnrichmentPlugin<I> extends
 				} else if (RDF.getClazz().isAssignableFrom(LiteralType.class)) {
 					LiteralType rs = new LiteralType();
 					rs.setString(val);
+					LiteralType.Lang lang = new LiteralType.Lang();
 					if (edmAttr != null
 							&& StringUtils.equals(
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
-						LiteralType.Lang lang = new LiteralType.Lang();
+						
 						lang.setLang(valAttr);
-						rs.setLang(lang);
+						
+					} else {
+						lang.setLang("def");
 					}
+					rs.setLang(lang);
 					Class<?>[] cls = new Class<?>[1];
 					cls[0] = RDF.getClazz();
 					Method method = obj.getClass().getMethod(
@@ -1152,14 +1160,19 @@ public class EnrichmentPlugin<I> extends
 					} else {
 						rs.setString(val);
 					}
+					Lang lang = new Lang();
 					if (edmAttr != null
 							&& StringUtils.equals(
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
-						Lang lang = new Lang();
+						
 						lang.setLang(valAttr);
-						rs.setLang(lang);
+						
 					}
+					else {
+						lang.setLang("def");
+					}
+					rs.setLang(lang);
 					Class<?>[] cls = new Class<?>[1];
 					cls[0] = clazz;
 					Method method = obj.getClass().getMethod(
@@ -1232,13 +1245,17 @@ public class EnrichmentPlugin<I> extends
 			} else {
 				obj.setString(val);
 			}
+			Lang lang = new Lang();
 			if (edmAttr != null
 					&& StringUtils.equals(StringUtils.split(edmAttr, "@")[1],
 							"xml:lang")) {
-				Lang lang = new Lang();
+				
 				lang.setLang(valAttr);
-				obj.setLang(lang);
+				
+			} else {
+				lang.setLang("def");
 			}
+			obj.setLang(lang);
 			Class<?>[] cls = new Class<?>[1];
 			cls[0] = RDF.getClazz();
 			Concept.Choice choice = new Concept.Choice();
@@ -1253,11 +1270,15 @@ public class EnrichmentPlugin<I> extends
 				.isAssignableFrom(LiteralType.class)) {
 			LiteralType obj = new LiteralType();
 			obj.setString(val);
+			LiteralType.Lang lang = new LiteralType.Lang();
 			if (edmAttr != null) {
-				LiteralType.Lang lang = new LiteralType.Lang();
+				
 				lang.setLang(valAttr);
-				obj.setLang(lang);
+				
+			} else {
+				lang.setLang("def");
 			}
+			obj.setLang(lang);
 			Class<?>[] cls = new Class<?>[1];
 			cls[0] = RDF.getClazz();
 			Concept.Choice choice = new Concept.Choice();

@@ -134,7 +134,7 @@ public class SugarCRMServiceImpl implements SugarCrmService {
         Login login = ClientUtils.createStandardLoginObject(username, password);
         String newsessionID = sugarwsClient.login(login);
         sugarwsClient.setSessionID(newsessionID);
-        connectionInfo.append(sugarwsClient.login(login));
+        connectionInfo.append(newsessionID);
         return connectionInfo.toString();
     }
 
