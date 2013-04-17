@@ -38,7 +38,7 @@ public final class PropertyReader {
 		return fields.get(property.toString());
 	}
 	
-	public void loadPropertiesFromFile(String path){
+	public static void loadPropertiesFromFile(String path){
 		try{
 			fields = readFile(path);
 		}

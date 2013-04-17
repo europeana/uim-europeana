@@ -17,6 +17,7 @@ public enum UimConfigurationProperty {
 	SOLR_CORE_MIGRATION("solr.core.migration"),
 	MONGO_DB_COLLECTIONS("mongo.db.collections"),
 	MONGO_DB_EUROPEANA_ID("mongo.db.europeanaId"),
+	UIM_BCLIST_PATH("uim.bclist.path"),
 	UIM_REPOSITORY("uim.repository");
 	
 	String field;
