@@ -33,16 +33,15 @@ public class FailedRecordServiceImpl extends IntegrationServicesProviderServlet
 			List<Map<String,String>> failedResults = engine.getDedupService()
 					.getFailedRecords(collectionId);
 
-			int max = maxSize;
-			if (failedResults != null
-					&& failedResults.size() - offset < maxSize) {
-				max = failedResults.size() - offset;
-			}
-
-			if (max > 0) {
+			
+			if (maxSize > 0) {
 				List<FailedRecordDTO> failedRecordDTOList = new ArrayList<FailedRecordDTO>();
-				for (Map<String,String> failedRecord : failedResults.subList(offset,
-						max)) {
+				
+				int maxval = offset + maxSize > failedResults.size()? failedResults.size() : offset + maxSize;
+				
+				 List<Map<String, String>> fsublist =  failedResults.subList(offset,maxval); 
+				
+				for (Map<String,String> failedRecord : fsublist) {
 					FailedRecordDTO failedRecordDTO = new FailedRecordDTO();
 					failedRecordDTO.setDate(failedRecord
 							.get("date"));
