@@ -41,6 +41,7 @@ import eu.europeana.corelib.definitions.jibx.Country;
 import eu.europeana.corelib.definitions.jibx.CountryCodes;
 import eu.europeana.corelib.definitions.jibx.Creator;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
+import eu.europeana.corelib.definitions.jibx.EuropeanaProxy;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.LandingPage;
 import eu.europeana.corelib.definitions.jibx.Language1;
@@ -54,6 +55,7 @@ import eu.europeana.corelib.definitions.jibx.ProxyIn;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
+import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Resource;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
@@ -92,6 +94,7 @@ import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
+import eu.europeana.uim.enrichment.utils.EuropeanaDateUtils;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugar.SugarCrmRecord;
@@ -543,6 +546,9 @@ public class EnrichmentPlugin<I> extends
 			}
 		}
 
+		if (europeanaProxy==null){
+			europeanaProxy = createEuropeanaProxy(rdf);
+		}
 		europeanaProxy.setAbout("/proxy/europeana" + cho.getAbout());
 		ProxyFor pf = new ProxyFor();
 		pf.setResource("/item" + cho.getAbout());
@@ -734,6 +740,29 @@ public class EnrichmentPlugin<I> extends
 	// hasMetList.add(hasMet);
 	// europeanaProxy.setHasMetList(hasMetList);
 	// }
+
+	private ProxyType createEuropeanaProxy(RDF rdf) {
+		ProxyType europeanaProxy = new ProxyType();
+		EuropeanaProxy prx = new EuropeanaProxy();
+		prx.setEuropeanaProxy(true);
+		europeanaProxy.setEuropeanaProxy(prx);
+		List<String> years = new ArrayList<String>();
+		for (ProxyType proxy : rdf.getProxyList()) {
+			years.addAll(new EuropeanaDateUtils()
+					.createEuropeanaYears(proxy));
+			europeanaProxy.setType(proxy.getType());
+		}
+		List<Year> yearList = new ArrayList<Year>();
+		for (String year : years) {
+			Year yearObj = new Year();
+			LiteralType.Lang lang = new LiteralType.Lang();
+			lang.setLang("eur");
+			yearObj.setLang(lang);
+			yearObj.setString(year);
+			yearList.add(yearObj);
+		}
+		return europeanaProxy;
+	}
 
 	// Clean duplicate contextual entities
 	private RDF cleanRDF(RDF rdf) {
