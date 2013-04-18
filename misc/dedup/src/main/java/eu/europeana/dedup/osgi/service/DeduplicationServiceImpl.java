@@ -173,9 +173,6 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 					nonUUID = proxy.getAbout();
 				}
 			
-			
-			List<EuropeanaIdRegistry> asd = mongoserver.retrieveEuropeanaIdFromOriginal("originalId", "collectionid");
-			
 			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
 					collectionID, dedupres.getEdm(), sessionid);
 
@@ -281,6 +278,13 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	@Override
 	public void createUpdateIdStatus(String oldEuropeanaID,String newEuropeanaID,String collectionID,String xml,LookupState state) {
 		mongoserver.createFailedRecord(state, collectionID, oldEuropeanaID, newEuropeanaID, xml);
+	}
+
+
+
+	@Override
+	public void deleteFailedRecord(String europeanaId,String collectionID) {
+		mongoserver.deleteFailedRecord(europeanaId,collectionID);
 	}
 
 

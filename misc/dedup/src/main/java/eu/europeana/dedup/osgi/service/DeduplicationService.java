@@ -32,6 +32,9 @@ public interface DeduplicationService {
 
 	
 	/**
+	 * Performs a splitting of the incoming record having as a basis the ore:Proxy object and 
+	 * assigns unique identifiers
+	 * 
 	 * @param collectionID
 	 * @param sessionid
 	 * @param edmRecord
@@ -41,30 +44,45 @@ public interface DeduplicationService {
 	public List<DeduplicationResult> deduplicateRecord(String collectionID,String sessionid, String edmRecord) throws DeduplicationException;
 	
 	/**
+	 * Gets the failed records for a specific collection
+	 * 
 	 * @param collectionId
 	 * @return
 	 */
 	public List<Map<String,String>> getFailedRecords(String collectionId);
 	
 	/**
+	 * Retrieves one or more identifiers according to the identifier original value
+	 * 
 	 * @param oldid
 	 * @return
 	 */
 	public List<String> retrieveEuropeanaIDFromOld(String oldID,String collectionID);
 	
 	/**
+	 * Removes an identifier entry from the ID Registry
+	 * 
 	 * @param newEuropeanaID
 	 */
 	public void deleteEuropeanaID(String newEuropeanaID);
 	
 	
 	/**
+	 * Creates an entry in the failed records section
+	 * 
 	 * @param oldEuropeanaID
 	 * @param collectionID
 	 * @param state
 	 */
 	public void createUpdateIdStatus(String oldEuropeanaID,String newEuropeanaID,String collectionID,String xml,LookupState state);
 	
+	
+	/**
+	 * Deletes a failed record entry
+	 * 
+	 * @param europeanaId
+	 */
+	public void deleteFailedRecord(String europeanaId,String collectionID);
 	
 	
 	

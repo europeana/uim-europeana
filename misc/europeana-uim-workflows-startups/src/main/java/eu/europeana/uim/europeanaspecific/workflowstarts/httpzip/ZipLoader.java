@@ -218,6 +218,8 @@ public class ZipLoader<I> {
 						value.deletioncandidates.remove(dedupres
 								.getDerivedRecordID());
 						
+						dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
+						
 						created ++;
 						
 						break;
@@ -269,7 +271,7 @@ public class ZipLoader<I> {
 									.getDerivedRecordID());
 							omitted ++;
 						}
-
+ 
 						break;
 					case UPDATE:
 						try {
@@ -280,11 +282,13 @@ public class ZipLoader<I> {
 							processrecord(mdr, dedupres,Status.UPDATED);
 							value.deletioncandidates.remove(dedupres
 									.getDerivedRecordID());
+							dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
 						} catch (StorageEngineException e) {
 							e.printStackTrace();
 							mdr = processrecord(mdr,dedupres,Status.UPDATED);
 							value.deletioncandidates.remove(dedupres
 									.getDerivedRecordID());
+							dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
 
 						}
 						updated ++;
@@ -315,17 +319,25 @@ public class ZipLoader<I> {
 						value.deletioncandidates.remove(newid);
 						
 						dedup.createUpdateIdStatus(id,newid,request.getCollection().getMnemonic(),rdfstring,LookupState.INCOMPATIBLE_XML_CONTENT);
-						
-						System.out.println(newid);
-					}
-					
-					
+					}	
 				}
-			    
 				discarded ++;
 				
 			} catch (StorageEngineException e) {
 				e.printStackTrace();
+				
+				SaxBasedIDExtractor extractor = new SaxBasedIDExtractor();
+				List<String> ids = extractor.extractIDs(rdfstring);
+				
+				for(String id:ids){
+					List<String> newids = dedup.retrieveEuropeanaIDFromOld(id, request.getCollection().getMnemonic());
+					
+					for(String newid : newids){
+						value.deletioncandidates.remove(newid);
+						dedup.createUpdateIdStatus(id,newid,request.getCollection().getMnemonic(),rdfstring,LookupState.SYSTEM_ERROR);
+					}
+				}
+				
 				LOGGER.log(Level.SEVERE,"ZipLoader:Storage engine error",e);
 				discarded ++;
 			} catch (DeduplicationException e) {
@@ -340,7 +352,6 @@ public class ZipLoader<I> {
 					for(String newid : newids){
 						value.deletioncandidates.remove(newid);
 						dedup.createUpdateIdStatus(id,newid,request.getCollection().getMnemonic(),rdfstring,LookupState.INCOMPATIBLE_XML_CONTENT);
-						System.out.println(newid);
 					}
 				}
 				
