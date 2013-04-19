@@ -900,7 +900,7 @@ public class EnrichmentPlugin<I> extends
 			europeanaAggregation = new EuropeanaAggregationType();
 		}
 		ProvidedCHOType cho = rdf.getProvidedCHOList().get(0);
-		europeanaAggregation.setAbout("/aggregation/europeana/"
+		europeanaAggregation.setAbout("/aggregation/europeana"
 				+ cho.getAbout());
 		LandingPage lp = new LandingPage();
 		lp.setResource(PORTALURL + cho.getAbout() + SUFFIX);

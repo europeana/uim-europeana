@@ -43,6 +43,7 @@ public class SolrList {
 			SolrServerSaver saver = new SolrServerSaver(server,queue);
 			Thread t = new Thread(saver);
 			t.start();
+			
 			queue = new ArrayList<SolrInputDocument>();
 		}
 		queue.add(doc);
@@ -68,17 +69,20 @@ public class SolrList {
 
 		private SolrServer server;
 		private List<SolrInputDocument> queue;
-		public int STATUS;
+		//public boolean STATUS = true;
 		public SolrServerSaver (SolrServer server, List<SolrInputDocument> queue){
 			this.server = server;
 			this.queue = queue;
 		}
 		
 		
+		
 		@Override
 		public void run() {
 			try {
+				
 				server.add(queue);
+				//STATUS = false;
 			} catch (SolrServerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
