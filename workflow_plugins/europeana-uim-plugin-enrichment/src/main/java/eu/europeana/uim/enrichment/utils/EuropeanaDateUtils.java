@@ -16,33 +16,41 @@ public class EuropeanaDateUtils {
 
 	public static String bcList;
 	public static String[] bc;
-	public static void setPath(String path){
+
+	public static void setPath(String path) {
 		PropertyReader.loadPropertiesFromFile(path);
 	}
-	
+
 	public List<String> createEuropeanaYears(ProxyType proxy) {
 		List<String> years = new ArrayList<String>();
 		try {
-			
-			if(bcList==null){
-				bcList = FileUtils.readFileToString(new File(
-					PropertyReader.getProperty(UimConfigurationProperty.UIM_BCLIST_PATH)), "UTF-8");
+
+			if (bcList == null) {
+				bcList = FileUtils
+						.readFileToString(
+								new File(
+										PropertyReader
+												.getProperty(UimConfigurationProperty.UIM_BCLIST_PATH)),
+								"UTF-8");
 				bc = StringUtils.split(bcList, "\n");
 			}
-			if(proxy.getChoiceList()!=null){
-			for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
-				if (choice.ifDate()) {
-					
-						years.addAll(refineDates(bc, choice.getDate().getString()));
-					
+			if (proxy.getChoiceList() != null) {
+				for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
+					if (choice.ifDate()) {
+
+						years.addAll(refineDates(bc, choice.getDate()
+								.getString()));
+
+					}
+					if (choice.ifCreated()) {
+						years.addAll(refineDates(bc, choice.getCreated()
+								.getString()));
+					}
+					if (choice.ifTemporal()) {
+						years.addAll(refineDates(bc, choice.getTemporal()
+								.getString()));
+					}
 				}
-				if (choice.ifCreated()) {
-						years.addAll(refineDates(bc, choice.getCreated().getString()));
-				}
-				if (choice.ifTemporal()) {
-						years.addAll(refineDates(bc, choice.getTemporal().getString()));
-				}
-			}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -51,27 +59,27 @@ public class EuropeanaDateUtils {
 		return years;
 	}
 
-	private List<String> refineDates(String[] patterns,
-			String input) {
+	private List<String> refineDates(String[] patterns, String input) {
 		List<String> dates = new ArrayList<String>();
-			String contains = contains(input, patterns);
-			if (contains != null) {
-				dates.addAll(getDates(input, contains));
-			} 
+		String contains = contains(input, patterns);
+		if (contains != null) {
+			dates.addAll(getDates(input, contains));
+		}
 		return dates;
 	}
 
-
 	private String contains(String input, String[] filters) {
-		for (String filter : filters) {
-			if (StringUtils.containsIgnoreCase(input, filter)) {
-				return filter;
+		if (filters != null) {
+			for (String filter : filters) {
+				if (StringUtils.containsIgnoreCase(input, filter)) {
+					return filter;
+				}
 			}
 		}
 		return null;
 	}
 
-	//TODO: not used for the time being as it created problems
+	// TODO: not used for the time being as it created problems
 	private List<String> clean(String inputField) {
 		List<String> dates = new ArrayList<String>();
 		StringBuffer sb = new StringBuffer();
@@ -80,8 +88,8 @@ public class EuropeanaDateUtils {
 		for (char ch : chars) {
 			if (Character.isDigit(ch)) {
 				sb.append(ch);
-			
-				if (i==chars.length-1 || !Character.isDigit(chars[i + 1])) {
+
+				if (i == chars.length - 1 || !Character.isDigit(chars[i + 1])) {
 					dates.add(sb.toString());
 					sb = new StringBuffer();
 				}
