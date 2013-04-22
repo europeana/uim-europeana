@@ -8,6 +8,6 @@ public interface DeactivationService {
 	
 	public ExtendedEdmMongoServer getMongoServer();
 
-	public void initialize(String path);
+	public void initialize();
 	
 }

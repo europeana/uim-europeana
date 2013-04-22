@@ -4,16 +4,19 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
+
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.deactivation.service.DeactivationService;
-import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
+import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
@@ -46,7 +49,9 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 	public DeactivatePlugin(DeactivationService dService, String name,
 			String description) {
 		super(name, description);
+		dService.initialize();
 		DeactivatePlugin.dService=dService;
+		
 	}
 	
 	
@@ -56,7 +61,7 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 	}
 
 	public int getMaximumThreadCount() {
-		return 5;
+		return 12;
 	}
 
 	public TKey<?, ?>[] getOptionalFields() {
@@ -68,11 +73,11 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 	}
 
 	public List<String> getParameters() {
-		return null;
+		return new ArrayList<String>();
 	}
 
 	public int getPreferredThreadCount() {
-		return 3;
+		return 10;
 	}
 
 	/* (non-Javadoc)
@@ -108,12 +113,19 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-
-			List<String> values = mdr.getValues(
-					EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
-			String value = values.get(0);
+			String value;
+			if(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null&&mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).size()>0){
+				value = mdr
+						.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+						.get(0);
+			} else {
+				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
+						.get(0);
+			}
+			mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
 			// TODO: disable in UIM
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+			
 			FullBean fBean = dService.getMongoServer().getFullBean(
 					rdf.getProvidedCHOList().get(0).getAbout());
 			europeanaIds.add(fBean.getAbout());

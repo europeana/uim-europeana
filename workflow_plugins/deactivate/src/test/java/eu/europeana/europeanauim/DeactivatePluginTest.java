@@ -102,7 +102,7 @@ public class DeactivatePluginTest {
 		String truncated = proplocation.replace("file:", "");
 		PropertyReader.loadPropertiesFromFile(truncated);
 		dService = mock(DeactivationServiceImpl.class);
-		dService.initialize(truncated);
+		dService.initialize();
 
 		save(RECORD);
 

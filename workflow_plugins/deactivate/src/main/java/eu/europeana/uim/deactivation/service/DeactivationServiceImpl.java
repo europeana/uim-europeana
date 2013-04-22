@@ -41,11 +41,9 @@ public class DeactivationServiceImpl implements DeactivationService {
 
 	
 	
-	public void initialize(String path){
+	public void initialize(){
 		try {
-			if(path!=null){
-				PropertyReader.loadPropertiesFromFile(path);
-			}
+			
 			mongoDB=PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
 			mongoHost=PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
 			mongoPort= PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
