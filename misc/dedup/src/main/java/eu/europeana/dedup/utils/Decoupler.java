@@ -50,24 +50,12 @@ import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
  */
 public class Decoupler {
 
-	private static Decoupler INSTANCE;
+
 
 	/**
-	 * Private constructor, instantiate via getInstance() method
+	 * Default constructor
 	 */
-	private Decoupler() {
-	}
-
-	/**
-	 * Static initialiser method
-	 * 
-	 * @return an instance of this class
-	 */
-	public static Decoupler getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new Decoupler();
-		}
-		return INSTANCE;
+	public Decoupler() {
 	}
 
 	

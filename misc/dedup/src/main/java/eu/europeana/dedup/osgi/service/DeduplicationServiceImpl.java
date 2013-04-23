@@ -152,8 +152,9 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 
 		List<DeduplicationResult> deduplist = new ArrayList<DeduplicationResult>();
 
-		List<RDF> decoupledResults = Decoupler.getInstance()
-				.decouple(edmRecord);
+		Decoupler dec = new Decoupler();
+		
+		List<RDF> decoupledResults = dec.decouple(edmRecord);
 		for (RDF result : decoupledResults) {
 
 			DeduplicationResult dedupres = new DeduplicationResult();

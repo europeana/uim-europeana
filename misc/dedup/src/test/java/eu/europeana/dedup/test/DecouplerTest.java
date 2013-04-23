@@ -57,7 +57,7 @@ public class DecouplerTest {
 		//File file = new File("src/test/resources/test.xml");
 		String rdf = FileUtils.readFileToString(file);
 		
-		List<RDF> entitylist = Decoupler.getInstance().decouple(rdf);
+		List<RDF> entitylist = new Decoupler().decouple(rdf);
 		
 		Assert.assertEquals("", 6, entitylist.size());
 		
