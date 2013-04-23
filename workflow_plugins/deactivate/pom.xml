@@ -148,6 +148,7 @@
 							!net.sf.cglib.asm.util,
 							!org.apache.tools.ant.*,
 							!org.testng.*,
+							!org.joda.time,
 							!com.sun.msv.*,
 							!com.sun.jdi,
 							!com.sun.jdi.*,
