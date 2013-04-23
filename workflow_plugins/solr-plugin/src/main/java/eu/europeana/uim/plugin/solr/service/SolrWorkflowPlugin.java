@@ -34,15 +34,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-
-import eu.europeana.uim.plugin.solr.helpers.ConceptDereferencer;
-import eu.europeana.uim.plugin.solr.helpers.Dereferencer;
-import eu.europeana.uim.plugin.solr.helpers.PlaceDereferencer;
-import eu.europeana.uim.plugin.solr.helpers.ProxyDereferencer;
-import eu.europeana.uim.plugin.solr.helpers.TimespanDereferencer;
-import eu.europeana.uim.plugin.solr.helpers.WebResourceDereferencer;
-
-import com.google.code.morphia.Datastore;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Concept;
@@ -62,6 +54,12 @@ import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.plugin.solr.helpers.AgentDereferencer;
+import eu.europeana.uim.plugin.solr.helpers.ConceptDereferencer;
+import eu.europeana.uim.plugin.solr.helpers.Dereferencer;
+import eu.europeana.uim.plugin.solr.helpers.PlaceDereferencer;
+import eu.europeana.uim.plugin.solr.helpers.ProxyDereferencer;
+import eu.europeana.uim.plugin.solr.helpers.TimespanDereferencer;
+import eu.europeana.uim.plugin.solr.helpers.WebResourceDereferencer;
 import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
 import eu.europeana.uim.plugin.solr.utils.JibxUtils;
 import eu.europeana.uim.store.MetaDataRecord;
@@ -117,9 +115,9 @@ public class SolrWorkflowPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
-		// if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-		// || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-		// .equals(Status.DELETED)) {
+		 if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+		 || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+		 .equals(Status.DELETED)) {
 		try {
 
 			String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(
@@ -235,8 +233,9 @@ public class SolrWorkflowPlugin<I> extends
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return false;
-		// // }
+		
+		  }
+		 return false;
 		// return true;
 	}
 

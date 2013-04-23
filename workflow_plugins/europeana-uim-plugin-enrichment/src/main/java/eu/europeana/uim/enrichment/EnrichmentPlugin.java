@@ -17,12 +17,14 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.query.Query;
@@ -55,13 +57,13 @@ import eu.europeana.corelib.definitions.jibx.ProxyIn;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
-import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Resource;
 import eu.europeana.corelib.definitions.jibx.ResourceType;
 import eu.europeana.corelib.definitions.jibx.Rights1;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
+import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.definitions.jibx._Long;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.DocType;
@@ -83,6 +85,7 @@ import eu.europeana.corelib.tools.utils.SipCreatorUtils;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.enums.OriginalField;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
+import eu.europeana.uim.enrichment.utils.EuropeanaDateUtils;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.SolrList;
@@ -94,7 +97,6 @@ import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
-import eu.europeana.uim.enrichment.utils.EuropeanaDateUtils;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugar.SugarCrmRecord;
@@ -335,9 +337,18 @@ public class EnrichmentPlugin<I> extends
 	public boolean process(MetaDataRecord<I> mdr,
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
-		// if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-		// || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-		// .equals(Status.DELETED)){
+		String value = null;
+		if(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null&&mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).size()>0){
+			value = mdr
+					.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+					.get(0);
+		} else {
+			value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
+					.get(0);
+		}
+		 if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+		 || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+		 .equals(Status.DELETED)){
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
 		try {
@@ -350,15 +361,7 @@ public class EnrichmentPlugin<I> extends
 				return false;
 			}
 
-			String value = null;
-			if(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null&&mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).size()>0){
-				value = mdr
-						.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
-						.get(0);
-			} else {
-				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
-						.get(0);
-			}
+			
 			
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
@@ -462,25 +465,40 @@ public class EnrichmentPlugin<I> extends
 			e.printStackTrace();
 		}
 		return false;
-		// } else {
-		// String value = mdr.getValues(
-		// EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
-		// IUnmarshallingContext uctx;
-		// try {
-		// uctx = bfact.createUnmarshallingContext();
-		// RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-		// FullBean fBean =
-		// mongoServer.getFullBean(rdf.getProvidedCHOList().get(0).getAbout());
-		// if(fBean!=null){
-		// mongoServer.getDatastore().delete(fBean);
-		// }
-		// } catch (JiBXException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		//
-		// }
-		// return true;
+		} else {
+			
+			IUnmarshallingContext uctx;
+			try {
+				uctx = bfact.createUnmarshallingContext();
+				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+				FullBean fBean = mongoServer.getFullBean(rdf
+						.getProvidedCHOList().get(0).getAbout());
+				if (fBean != null) {
+					mongoServer.getDatastore().delete(fBean.getAggregations());
+					mongoServer.getDatastore().delete(fBean.getProvidedCHOs());
+					mongoServer.getDatastore().delete(fBean.getProxies());
+					mongoServer.getDatastore().delete(
+							fBean.getEuropeanaAggregation());
+					mongoServer.getDatastore().delete(fBean);
+					solrServer
+					.deleteByQuery(
+							"europeana_id:"
+									+ ClientUtils.escapeQueryChars(fBean
+											.getAbout()));
+				}
+			} catch (JiBXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SolrServerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return true;
 	}
 
 	// update a FullBean

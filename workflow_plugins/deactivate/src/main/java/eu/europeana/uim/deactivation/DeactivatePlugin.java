@@ -111,7 +111,9 @@ public class DeactivatePlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> arg1)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		IBindingFactory bfact;
-
+		if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+				 || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+				 .equals(Status.DELETED)){
 		try {
 			bfact = BindingDirectory.getFactory(RDF.class);
 
@@ -156,8 +158,9 @@ public class DeactivatePlugin<I> extends
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return false;
+		}
+		return true;
 	}
 
 	/*
