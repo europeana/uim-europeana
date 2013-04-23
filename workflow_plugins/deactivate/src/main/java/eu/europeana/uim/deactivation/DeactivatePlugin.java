@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -29,33 +30,29 @@ import eu.europeana.uim.store.MetaDataRecord;
  * @author gmamakis
  * 
  */
-public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,I> {
-
+public class DeactivatePlugin<I> extends
+		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static DeactivationService dService;
 	private static List<String> europeanaIds;
 	private final static int DELETE_THRESHOLD = 1000;
 
-
-	public DeactivatePlugin(String name,
-			String description) {
+	public DeactivatePlugin(String name, String description) {
 		super(name, description);
 	}
-	
-	public DeactivatePlugin(){
-		super("","");
+
+	public DeactivatePlugin() {
+		super("", "");
 	}
 
 	public DeactivatePlugin(DeactivationService dService, String name,
 			String description) {
 		super(name, description);
 		dService.initialize();
-		DeactivatePlugin.dService=dService;
-		
+		DeactivatePlugin.dService = dService;
+
 	}
-	
-	
-	
+
 	public TKey<?, ?>[] getInputFields() {
 		return null;
 	}
@@ -80,33 +77,39 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 		return 10;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#initialize()
 	 */
 	public void initialize() {
 	}
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.orchestration.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.
+	 * orchestration.ExecutionContext)
 	 */
 	@Override
-	public void initialize(
-			ExecutionContext<MetaDataRecord<I>, I> arg0)
+	public void initialize(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
-	
+
 		europeanaIds = new ArrayList<String>();
-		
+
 	}
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana.uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana
+	 * .uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
 	 */
 	@Override
-	public boolean process(
-			MetaDataRecord<I> mdr,
+	public boolean process(MetaDataRecord<I> mdr,
 			ExecutionContext<MetaDataRecord<I>, I> arg1)
-			throws IngestionPluginFailedException,
-			CorruptedDatasetException {
+			throws IngestionPluginFailedException, CorruptedDatasetException {
 		IBindingFactory bfact;
 
 		try {
@@ -114,65 +117,67 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			String value;
-			if(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null&&mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).size()>0){
-				value = mdr
-						.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
-						.get(0);
+			if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
+					&& mdr.getValues(
+							EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+							.size() > 0) {
+				value = mdr.getValues(
+						EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
 			} else {
-				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
-						.get(0);
+				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 			}
-			mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
-			// TODO: disable in UIM
+			// mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
+			// TODO: disable in UIM (?)
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			
+
 			FullBean fBean = dService.getMongoServer().getFullBean(
 					rdf.getProvidedCHOList().get(0).getAbout());
-			europeanaIds.add(fBean.getAbout());
-			dService.getMongoServer().delete(fBean.getAggregations());
-			dService.getMongoServer().delete(fBean.getProvidedCHOs());
-			dService.getMongoServer().delete(fBean.getProxies());
-			dService.getMongoServer().delete(fBean.getEuropeanaAggregation());
-			dService.getMongoServer().delete(fBean);
-			if(europeanaIds.size()==DELETE_THRESHOLD){
-				try {
-					dService.getSolrServer().deleteById(europeanaIds);
-				} catch (SolrServerException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				europeanaIds = new ArrayList<String>();
+			if (fBean != null) {
+				dService.getMongoServer().delete(fBean.getAggregations());
+				dService.getMongoServer().delete(fBean.getProvidedCHOs());
+				dService.getMongoServer().delete(fBean.getProxies());
+				dService.getMongoServer().delete(
+						fBean.getEuropeanaAggregation());
+				dService.getMongoServer().delete(fBean);
+				dService.getSolrServer()
+						.deleteByQuery(
+								"europeana_id:"
+										+ ClientUtils.escapeQueryChars(fBean
+												.getAbout()));
 			}
 			return true;
 		} catch (JiBXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SolrServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return false;
 	}
-	
-	
-	
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non catch (IOException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); }-Javadoc)
+	 * 
 	 * @see eu.europeana.uim.plugin.Plugin#shutdown()
 	 */
 	public void shutdown() {
 
 	}
 
-
-
-	/* (non-Javadoc)
-	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.orchestration.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.
+	 * orchestration.ExecutionContext)
 	 */
 	@Override
-	public void completed(
-			ExecutionContext<MetaDataRecord<I>, I> arg0)
+	public void completed(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
 	}
 
@@ -183,7 +188,5 @@ public class DeactivatePlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<
 	public void setdService(DeactivationService dService) {
 		DeactivatePlugin.dService = dService;
 	}
-	
-	
 
 }

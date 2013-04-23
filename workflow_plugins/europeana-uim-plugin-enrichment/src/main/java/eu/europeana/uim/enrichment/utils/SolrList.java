@@ -39,12 +39,12 @@ public class SolrList {
 	 * @throws IOException
 	 */
 	public void addToQueue(SolrServer server, SolrInputDocument doc) throws SolrServerException, IOException{
+		synchronized(queue){
 		if(queue.size()>=MAX_QUEUE_SIZE){
-			SolrServerSaver saver = new SolrServerSaver(server,queue);
-			Thread t = new Thread(saver);
-			t.start();
 			
+			server.add(queue);
 			queue = new ArrayList<SolrInputDocument>();
+		}
 		}
 		queue.add(doc);
 	}
@@ -60,38 +60,5 @@ public class SolrList {
 		return solrList;
 	}
 	
-	/**
-	 * Helper class to save records to the Solr
-	 * @author Yorgos.Mamakis@ kb.nl
-	 *
-	 */
-	private class SolrServerSaver implements Runnable{
-
-		private SolrServer server;
-		private List<SolrInputDocument> queue;
-		//public boolean STATUS = true;
-		public SolrServerSaver (SolrServer server, List<SolrInputDocument> queue){
-			this.server = server;
-			this.queue = queue;
-		}
-		
-		
-		
-		@Override
-		public void run() {
-			try {
-				
-				server.add(queue);
-				//STATUS = false;
-			} catch (SolrServerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		}
-		
-	}
+	
 }

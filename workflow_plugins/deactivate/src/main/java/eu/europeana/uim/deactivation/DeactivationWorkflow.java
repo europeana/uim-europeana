@@ -21,7 +21,7 @@ public class DeactivationWorkflow extends AbstractWorkflow {
 
 	public boolean isSavepoint(String arg0) {
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 
 }
