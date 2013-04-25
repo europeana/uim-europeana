@@ -5,7 +5,6 @@ package eu.europeana.uim.gui.cp.client.europeanawidgets;
 
 import java.util.Comparator;
 import java.util.Date;
-
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.DateCell;
@@ -18,7 +17,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -58,13 +56,12 @@ public class EuropeanaIngestionHistoryWidget extends
 	 * Table that holds execution results information
 	 */
 	protected FlexTable execResultsTable;
-	
+
 	/**
 	 * Close Button for execution results information dialog
 	 */
 	Button closeButton;
-	
-	
+
 	/**
 	 * @param executionService
 	 * @param repositoryService
@@ -90,40 +87,33 @@ public class EuropeanaIngestionHistoryWidget extends
 		cellFormatter.setHorizontalAlignment(0, 1,
 				HasHorizontalAlignment.ALIGN_LEFT);
 		cellFormatter.setColSpan(0, 0, 2);
-		
+
 		execResultsTable.setWidth("32em");
 		execResultsTable.setCellSpacing(5);
 		execResultsTable.setCellPadding(3);
-		
+
 		closeButton = new Button();
 		closeButton.setText("Close");
-		
+
 		infoDialog = new DialogBox();
 		infoDialog.ensureDebugId("infoDialogBoxx");
 
 		infoDialog.setModal(true);
-		
-		
-		
-		
-		
+
 		// Create a table to layout the content
 		VerticalPanel dialogContents = new VerticalPanel();
 		dialogContents.setSpacing(0);
 
-		
-		closeButton.addClickHandler(new ClickHandler(){
+		closeButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				infoDialog.hide();
 			}
 		});
-		
+
 		dialogContents.add(execResultsTable);
 		dialogContents.add(closeButton);
-		infoDialog.add(dialogContents);  //setWidget(dialogContents);
-		
-
+		infoDialog.add(dialogContents); 
 
 		// ID
 		Column<ExecutionDTO, String> idColumn = new Column<ExecutionDTO, String>(
@@ -251,27 +241,26 @@ public class EuropeanaIngestionHistoryWidget extends
 		cellTable.addColumn(scheduledColumn, "Sche./Fail./Comp.");
 		cellTable.setColumnWidth(scheduledColumn, 13, Unit.PCT);
 
-
 		// Created/Updated/Deleted
 		Column<ExecutionDTO, ExecutionDTO> failureColumn = new Column<ExecutionDTO, ExecutionDTO>(
-				new ModifiableActionCell<ExecutionDTO>("X",	new ModifiableActionCell.Delegate<ExecutionDTO>() {
+				new ModifiableActionCell<ExecutionDTO>("X",
+						new ModifiableActionCell.Delegate<ExecutionDTO>() {
 							@Override
 							public void execute(ExecutionDTO parameter) {
-								
-								 openResultsDialog(parameter);
-								
+
+								openResultsDialog(parameter);
+
 							}
-						})
-				{
+						}) {
 
 					@Override
 					public void render(ActionCell.Context context,
 							ExecutionDTO value, SafeHtmlBuilder sb) {
 
-						super.render(context, value, generateMessageFromDTO(value,sb));
+						super.render(context, value,
+								generateMessageFromDTO(value, sb));
 					}
-				}
-		) {
+				}) {
 			@Override
 			public ExecutionDTO getValue(ExecutionDTO object) {
 				return object;
@@ -330,90 +319,118 @@ public class EuropeanaIngestionHistoryWidget extends
 				});
 	}
 
-	
-	
-	
 	/**
 	 * @param parameter
 	 */
-	protected void openResultsDialog(ExecutionDTO object){
-		
+	protected void openResultsDialog(ExecutionDTO object) {
+
 		execResultsTable.removeAllRows();
-		
-		int createdValue = object.getValue("Created") != null? Integer.parseInt(object.getValue("Created")) : 0 ;
-		int updatedValue = object.getValue("Updated")!= null? Integer.parseInt(object.getValue("Updated")) : 0 ;
-		int deletedValue = object.getValue("Deleted")!= null? Integer.parseInt(object.getValue("Deleted")) : 0 ;
-		int omittedValue = object.getValue("Omitted")!= null? Integer.parseInt(object.getValue("Omitted")) : 0 ;
-		int generatedValue = object.getValue("Generated")!= null? Integer.parseInt(object.getValue("Generated")) : 0 ;
-		int discardedValue = object.getValue("Discarded")!= null? Integer.parseInt(object.getValue("Discarded")) : 0 ;
-		
+
+		int createdValue = object.getValue("Created") != null ? Integer
+				.parseInt(object.getValue("Created")) : 0;
+		int updatedValue = object.getValue("Updated") != null ? Integer
+				.parseInt(object.getValue("Updated")) : 0;
+		int deletedValue = object.getValue("Deleted") != null ? Integer
+				.parseInt(object.getValue("Deleted")) : 0;
+		int omittedValue = object.getValue("Omitted") != null ? Integer
+				.parseInt(object.getValue("Omitted")) : 0;
+		int generatedValue = object.getValue("Generated") != null ? Integer
+				.parseInt(object.getValue("Generated")) : 0;
+		int discardedValue = object.getValue("Discarded") != null ? Integer
+				.parseInt(object.getValue("Discarded")) : 0;
+
 		execResultsTable.removeAllRows();
-		
-		
+
 		execResultsTable.setWidget(0, 0, new HTML("Created:"));
-		execResultsTable.setWidget(0, 1, new HTML("Records that have been created"));
-		execResultsTable.setWidget(0, 2, new HTML(String.valueOf(createdValue)));
-		
-		
+		execResultsTable.setWidget(0, 1, new HTML(
+				"Records that have been created"));
+		execResultsTable
+				.setWidget(0, 2, new HTML(String.valueOf(createdValue)));
+
 		execResultsTable.setWidget(1, 0, new HTML("Updated:"));
-		execResultsTable.setWidget(1, 1, new HTML("Records that have been updated"));
-		execResultsTable.setWidget(1, 2, new HTML(String.valueOf(updatedValue)));
-		
+		execResultsTable.setWidget(1, 1, new HTML(
+				"Records that have been updated"));
+		execResultsTable
+				.setWidget(1, 2, new HTML(String.valueOf(updatedValue)));
+
 		execResultsTable.setWidget(2, 0, new HTML("Deleted:"));
-		execResultsTable.setWidget(2, 1, new HTML("Records that have been marked as deleted"));
-		execResultsTable.setWidget(2, 2, new HTML(String.valueOf(deletedValue)));
-		
+		execResultsTable.setWidget(2, 1, new HTML(
+				"Records that have been marked as deleted"));
+		execResultsTable
+				.setWidget(2, 2, new HTML(String.valueOf(deletedValue)));
+
 		execResultsTable.setWidget(3, 0, new HTML("Omitted:"));
-		execResultsTable.setWidget(3, 1, new HTML("Records that have been omitted (during the ingestion process this means that" +
-				"they have not been updated since their identifier and content were unaltered)"));
-		execResultsTable.setWidget(3, 2, new HTML(String.valueOf(omittedValue)));
-		
+		execResultsTable
+				.setWidget(
+						3,
+						1,
+						new HTML(
+								"Records that have been omitted (during the ingestion process this means that"
+										+ "they have not been updated since their identifier and content were unaltered)"));
+		execResultsTable
+				.setWidget(3, 2, new HTML(String.valueOf(omittedValue)));
+
 		execResultsTable.setWidget(4, 0, new HTML("Generated:"));
-		execResultsTable.setWidget(4, 1, new HTML("Extra records Generated after splitting of records during the import process"));
-		execResultsTable.setWidget(4, 2, new HTML(String.valueOf(generatedValue)));
-		
+		execResultsTable
+				.setWidget(
+						4,
+						1,
+						new HTML(
+								"Extra records Generated after splitting of records during the import process"));
+		execResultsTable.setWidget(4, 2,
+				new HTML(String.valueOf(generatedValue)));
+
 		execResultsTable.setWidget(5, 0, new HTML("Discarded:"));
-		execResultsTable.setWidget(5, 1, new HTML("Records that have been discarded during the import process (See 'Failed Records Report'" +
-				" screen for more details.)"));
-		execResultsTable.setWidget(5, 2, new HTML(String.valueOf(discardedValue)));
-		
+		execResultsTable
+				.setWidget(
+						5,
+						1,
+						new HTML(
+								"Records that have been discarded during the import process (See 'Failed Records Report'"
+										+ " screen for more details.)"));
+		execResultsTable.setWidget(5, 2,
+				new HTML(String.valueOf(discardedValue)));
+
 		infoDialog.setTitle(object.getWorkflow() + " " + object.getDataSet());
 		infoDialog.setText(object.getWorkflow() + " " + object.getDataSet());
-		
+
 		infoDialog.show();
 	}
-	
-	
-	
-	
+
 	/**
 	 * @param object
 	 * @param retsb
 	 * @return
 	 */
-	protected SafeHtmlBuilder generateMessageFromDTO(ExecutionDTO object,SafeHtmlBuilder retsb) {
+	protected SafeHtmlBuilder generateMessageFromDTO(ExecutionDTO object,
+			SafeHtmlBuilder retsb) {
 
-		int createdValue = object.getValue("Created") != null? Integer.parseInt(object.getValue("Created")) : 0 ;
-		int updatedValue = object.getValue("Updated")!= null? Integer.parseInt(object.getValue("Updated")) : 0 ;
-		int deletedValue = object.getValue("Deleted")!= null? Integer.parseInt(object.getValue("Deleted")) : 0 ;
-		int omittedValue = object.getValue("Omitted")!= null? Integer.parseInt(object.getValue("Omitted")) : 0 ;
-		int generatedValue = object.getValue("Generated")!= null? Integer.parseInt(object.getValue("Generated")) : 0 ;
-		int discardedValue = object.getValue("Discarded")!= null? Integer.parseInt(object.getValue("Discarded")) : 0 ;
-		
+		int createdValue = object.getValue("Created") != null ? Integer
+				.parseInt(object.getValue("Created")) : 0;
+		int updatedValue = object.getValue("Updated") != null ? Integer
+				.parseInt(object.getValue("Updated")) : 0;
+		int deletedValue = object.getValue("Deleted") != null ? Integer
+				.parseInt(object.getValue("Deleted")) : 0;
+		int omittedValue = object.getValue("Omitted") != null ? Integer
+				.parseInt(object.getValue("Omitted")) : 0;
+		int generatedValue = object.getValue("Generated") != null ? Integer
+				.parseInt(object.getValue("Generated")) : 0;
+		int discardedValue = object.getValue("Discarded") != null ? Integer
+				.parseInt(object.getValue("Discarded")) : 0;
+
 		int sum = createdValue + updatedValue + omittedValue + generatedValue;
-		
-		
-		if(sum != 0 || discardedValue != 0){
+
+		if (sum != 0 || discardedValue != 0) {
 			StringBuffer buttontype = new StringBuffer();
 			buttontype.append("<button type=\"button\"");
-			if (discardedValue != 0){
+			if (discardedValue != 0) {
 				buttontype.append(" style=\"color: red\"");
 			}
 			buttontype.append("tabindex=\"-1\">");
-			retsb.appendHtmlConstant(buttontype.toString()).append(SafeHtmlUtils.fromString(String.valueOf(sum))).appendHtmlConstant(
-			        "</button>");
+			retsb.appendHtmlConstant(buttontype.toString())
+					.append(SafeHtmlUtils.fromString(String.valueOf(sum)))
+					.appendHtmlConstant("</button>");
 		}
-
 
 		return retsb;
 	}
