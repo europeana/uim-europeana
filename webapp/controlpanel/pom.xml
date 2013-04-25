@@ -152,7 +152,7 @@
 							javax.net,
 							javax.net.ssl,
 							javax.management,
-							org.joda.time,
+							!org.joda.time,
 							com.ctc.wstx.stax.*,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
