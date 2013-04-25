@@ -22,15 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
-
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
-
 import eu.europeana.corelib.definitions.jibx.AggregatedCHO;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
@@ -62,12 +59,18 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 
 	EuropeanaIdRegistryMongoServer mongoserver;
 
+	private IBindingFactory bfact;
+	
+	
+	
 	/**
 	 * Default Constructor
 	 */
 	public DeduplicationServiceImpl() {
 
 		try {
+			
+			bfact = BindingDirectory.getFactory(RDF.class);
 			final Mongo mongo = new Mongo(
 					PropertyReader
 							.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
@@ -103,6 +106,9 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MongoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JiBXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -148,48 +154,26 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	 */
 	@Override
 	public List<DeduplicationResult> deduplicateRecord(String collectionID,
-			String sessionid, String edmRecord) throws DeduplicationException {
+			String sessionid, String edmRecord) throws DeduplicationException,JiBXException {
 
 		List<DeduplicationResult> deduplist = new ArrayList<DeduplicationResult>();
-
 		Decoupler dec = new Decoupler();
-		
 		List<RDF> decoupledResults = dec.decouple(edmRecord);
 		for (RDF result : decoupledResults) {
-
 			DeduplicationResult dedupres = new DeduplicationResult();
-
-			try {
-				dedupres.setEdm(unmarshall(result));
-			} catch (JiBXException e) {
-				throw new DeduplicationException(
-						"Unmarshalling of new deduplicated record failed", e);
-			}
-
+			dedupres.setEdm(unmarshall(result));
 			List<ProxyType> proxylist = result.getProxyList();
-
 			String nonUUID = null;
-
 			for (ProxyType proxy : proxylist) {
 					nonUUID = proxy.getAbout();
 				}
 			
 			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
 					collectionID, dedupres.getEdm(), sessionid);
-
 			updateInternalReferences(result, lookup.getEuropeanaID());
-
-			try {
-				dedupres.setEdm(unmarshall(result));
-			} catch (JiBXException e) {
-				throw new DeduplicationException(
-						"Unmarshalling of new deduplicated record failed", e);
-			}
-
+			dedupres.setEdm(unmarshall(result));
 			dedupres.setLookupresult(lookup);
-
 			dedupres.setDerivedRecordID(lookup.getEuropeanaID());
-
 			deduplist.add(dedupres);
 		}
 
@@ -211,9 +195,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 		for (ProxyType proxy : proxylist) {
 			proxy.setAbout(newID);
 		}
-		
 
-		
 		for (ProvidedCHOType cho : prcholist) {
 			String origId = cho.getAbout();
 			cho.setAbout(newID);
@@ -234,8 +216,6 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	 * @throws JiBXException
 	 */
 	private String unmarshall(RDF edm) throws JiBXException {
-
-		IBindingFactory bfact = BindingDirectory.getFactory(RDF.class);
 		IMarshallingContext mctx = bfact.createMarshallingContext();
 		mctx.setIndent(2);
 		StringWriter stringWriter = new StringWriter();

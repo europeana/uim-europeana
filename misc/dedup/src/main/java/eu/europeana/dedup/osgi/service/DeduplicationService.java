@@ -19,6 +19,8 @@ package eu.europeana.dedup.osgi.service;
 import java.util.List;
 import java.util.Map;
 
+import org.jibx.runtime.JiBXException;
+
 import eu.europeana.corelib.tools.lookuptable.LookupState;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 
@@ -40,8 +42,9 @@ public interface DeduplicationService {
 	 * @param edmRecord
 	 * @return
 	 * @throws DeduplicationException
+	 * @throws JiBXException 
 	 */
-	public List<DeduplicationResult> deduplicateRecord(String collectionID,String sessionid, String edmRecord) throws DeduplicationException;
+	public List<DeduplicationResult> deduplicateRecord(String collectionID,String sessionid, String edmRecord) throws DeduplicationException, JiBXException;
 	
 	/**
 	 * Gets the failed records for a specific collection
