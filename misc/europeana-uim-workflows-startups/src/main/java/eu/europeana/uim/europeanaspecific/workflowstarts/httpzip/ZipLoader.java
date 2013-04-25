@@ -101,7 +101,7 @@ public class ZipLoader<I> {
 	/**
 	 * Static unmarshalling context used for all EDM unmarshalling operations
 	 */
-	private static IUnmarshallingContext mctx;
+	private  IBindingFactory bfact;
 
 	/**
 	 * Static Logger reference
@@ -115,7 +115,7 @@ public class ZipLoader<I> {
 		IBindingFactory bfact;
 		try {
 			bfact = BindingDirectory.getFactory(RDF.class);
-			mctx = bfact.createUnmarshallingContext();
+			
 		} catch (JiBXException e) {
 			LOGGER.log(Level.WARNING,"ZipLoader:Error intializing static unmarshalling context",e);
 
@@ -410,7 +410,9 @@ public class ZipLoader<I> {
 	 */
 	private RDF unmarshall(String edm) throws JiBXException {
 		StringReader reader = new StringReader(edm);
+		IUnmarshallingContext mctx = bfact.createUnmarshallingContext();
 		RDF rdf = (RDF) mctx.unmarshalDocument(reader, "UTF-8");
+		
 		return rdf;
 	}
 
