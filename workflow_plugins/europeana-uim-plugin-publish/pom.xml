@@ -79,6 +79,7 @@
 						<Import-Package>
 							org.apache.solr.*;version="4.0.0",
 							org.apache.lucene.*;version="4.0.0",
+							!org.joda.time,
 							!org.codehaus.jackson.*,
 							!org.codehaus.jackson.map.*,
 							!org.dom4j.*,
