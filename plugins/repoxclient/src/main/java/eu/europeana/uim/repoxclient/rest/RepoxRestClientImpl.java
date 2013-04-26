@@ -291,17 +291,8 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 
 		nameCode.append(nameCodeVar);
 		nameCode.append(prov.getNameCode().getNameCode());
-		homepage.append("url=");
 
-		if (!prov.getUrl().getUrl().equals("")) {
-			if (!prov.getUrl().getUrl().startsWith("http://")) {
-				homepage.append("http://");
-			}
-			homepage.append(prov.getUrl().getUrl().split("/")[0]);
-		} else {
-			homepage.append("http://europeana.eu");
-		}
-
+	
 		datasetType.append("dataSetType=");
 		if (prov.getType() != null) {
 			datasetType.append(prov.getType().getType());
@@ -313,7 +304,6 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 				Response.class, aggregatorId.toString(),dataproviderId.toString(),
 				name.toString(),
 				description.toString(), country.toString(),
-				nameCode.toString(), homepage.toString(),
 				datasetType.toString());
 
 		if (resp.getProvider() == null) {
