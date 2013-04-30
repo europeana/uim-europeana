@@ -108,20 +108,6 @@ public class ZipLoader<I> {
 	 */
 	private static final Logger LOGGER = Logger.getLogger(ZipLoader.class.getName());
 	
-	
-	// Unmarshalling context initialization
-	static {
-
-		IBindingFactory bfact;
-		try {
-			bfact = BindingDirectory.getFactory(RDF.class);
-			
-		} catch (JiBXException e) {
-			LOGGER.log(Level.WARNING,"ZipLoader:Error intializing static unmarshalling context",e);
-
-		}
-
-	}
 
 	/**
 	 * Default constructor for this class
@@ -151,6 +137,13 @@ public class ZipLoader<I> {
 		this.dedup = dedup;
 		this.context = context;
 
+		try {
+			bfact = BindingDirectory.getFactory(RDF.class);
+		} catch (JiBXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		if (forceupdate != null && forceupdate.toLowerCase().equals("true")) {
 			forceUpdate = true;
 		}
