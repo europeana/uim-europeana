@@ -56,6 +56,10 @@
         <servlet-name>reportDownloadServlet</servlet-name>
         <servlet-class>eu.europeana.uim.gui.cp.server.ReportDownloadServlet</servlet-class>
     </servlet>
+    	<servlet>
+        <servlet-name>downloadPDFServlet</servlet-name>
+        <servlet-class>eu.europeana.uim.gui.cp.server.PDFDownloadServlet</servlet-class>
+    </servlet>
 	<servlet>
         <servlet-name>mongoImageViewServlet</servlet-name>
         <servlet-class>eu.europeana.uim.gui.cp.server.MongoImageViewServlet</servlet-class>
@@ -120,6 +124,10 @@
     <servlet-mapping>
         <servlet-name>reportDownloadServlet</servlet-name>
         <url-pattern>/EuropeanaIngestionControlPanel/reportDownload</url-pattern>
+    </servlet-mapping>
+        <servlet-mapping>
+        <servlet-name>downloadPDFServlet</servlet-name>
+        <url-pattern>/EuropeanaIngestionControlPanel/downloadPDF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>mongoImageViewServlet</servlet-name>

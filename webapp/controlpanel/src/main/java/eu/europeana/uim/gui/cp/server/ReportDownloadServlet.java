@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,17 +62,8 @@ public class ReportDownloadServlet extends HttpServlet {
         }
         response.setContentType(fileTypes.get(type));
 
-        File file = ReportUtils.getReportFile(reportDesign, executionid, type);
 
-        if (!file.exists()) {
-            response.sendError(
-                    404,
-                    "Report does not exists. Generate first ? Meant to get:" +
-                            file.getAbsolutePath());
-        }
-        // just reuuse the name from the storage
-        String filenameToSave = file.getName();
-        doDownload(request, response, file, filenameToSave,type);
+        doDownload(request, response, reportDesign, executionid, type);
     }
 
     /**
@@ -88,31 +80,23 @@ public class ReportDownloadServlet extends HttpServlet {
      * @param original_filename
      *            The name the browser should receive.
      */
-    private void doDownload(HttpServletRequest req, HttpServletResponse resp, File file,
-            String original_filename,String type) throws IOException {
+    protected void doDownload(HttpServletRequest req, HttpServletResponse resp,String reportDesign, 
+    		String executionid,String type) throws IOException {
 
-        int length = 0;
-        ServletOutputStream op = resp.getOutputStream();
-
-        resp.setContentType(type);  
-        resp.setContentLength((int)file.length());
-        resp.setHeader("Content-Disposition", "inline;  filename=\"" + original_filename + "\"");
+        resp.setContentType("text/html"); 
         resp.setHeader("Cache-Control", "no-cache"); 
         resp.setDateHeader("Expires", 0);  
         resp.setHeader("Pragma", "No-cache");
 
-        //
-        // Stream to the requester.
-        //
-        byte[] bbuf = new byte[BUFSIZE];
-        DataInputStream in = new DataInputStream(new FileInputStream(file));
-
-        while (((length = in.read(bbuf)) != -1)) {
-            op.write(bbuf, 0, length);
-        }
-
-        in.close();
-        op.flush();
-        op.close();
+        PrintWriter out = resp.getWriter();
+        
+        out.write("<iframe src=\"http://127.0.0.1:8181/gui/EuropeanaIngestionControlPanel/downloadPDF?");        
+        out.write("report=" + reportDesign);
+        out.write("&executionid=" + executionid);
+        out.write("&type=" + type + "\"");
+        out.write(" style=\"width:1200px; height:700px;\" frameborder=\"0\"></iframe>" );
+        
+        out.flush();
+        out.close();
     }
 }
