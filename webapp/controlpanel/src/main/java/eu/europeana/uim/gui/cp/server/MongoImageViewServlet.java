@@ -91,7 +91,6 @@ public class MongoImageViewServlet extends HttpServlet {
 			out.write("<h1>Cached Images for record" + recid + "</h1>");
 
 			for (EuropeanaLink value : values) {
-				//if (value.isCacheable()) {
 
 					String url = value.getUrl();
 
@@ -195,7 +194,6 @@ public class MongoImageViewServlet extends HttpServlet {
 
 					}
 				}
-			//}
 
 		} catch (StorageEngineException e) {
 			e.printStackTrace();

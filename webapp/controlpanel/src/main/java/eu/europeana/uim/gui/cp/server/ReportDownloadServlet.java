@@ -1,20 +1,14 @@
 /* ReportDownloadServlet.java - created on Jul 15, 2011, Copyright (c) 2011 The European Library, all rights reserved */
 package eu.europeana.uim.gui.cp.server;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import eu.europeana.uim.gui.cp.server.engine.Engine;
 
 /**
@@ -24,8 +18,16 @@ import eu.europeana.uim.gui.cp.server.engine.Engine;
  * @date Jul 15, 2011
  */
 public class ReportDownloadServlet extends HttpServlet {
-    final Engine                             engine;
+    
+	private static final long serialVersionUID = 1L;
 
+	final Engine  engine;
+
+    private static String serverURL;
+    
+    final static String  REPORT_DOWNLOAD_PREFIX = "EuropeanaIngestionControlPanel/downloadPDF?";
+    
+    
     private static final Map<String, String> fileTypes = new HashMap<String, String>();
     static {
         fileTypes.put("pdf", "application/pdf");
@@ -83,6 +85,14 @@ public class ReportDownloadServlet extends HttpServlet {
     protected void doDownload(HttpServletRequest req, HttpServletResponse resp,String reportDesign, 
     		String executionid,String type) throws IOException {
 
+		if(serverURL == null){
+	        String scheme = req.getScheme();            
+	        String serverName = req.getServerName();     
+	        int serverPort = req.getServerPort();        
+	        String contextPath = req.getContextPath();   
+	        serverURL = scheme+"://"+serverName+":"+serverPort+contextPath + "/";
+		}
+    	
         resp.setContentType("text/html"); 
         resp.setHeader("Cache-Control", "no-cache"); 
         resp.setDateHeader("Expires", 0);  
@@ -90,7 +100,7 @@ public class ReportDownloadServlet extends HttpServlet {
 
         PrintWriter out = resp.getWriter();
         
-        out.write("<iframe src=\"http://127.0.0.1:8181/gui/EuropeanaIngestionControlPanel/downloadPDF?");        
+        out.write("<iframe src=\"" + serverURL +  REPORT_DOWNLOAD_PREFIX);        
         out.write("report=" + reportDesign);
         out.write("&executionid=" + executionid);
         out.write("&type=" + type + "\"");
