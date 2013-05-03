@@ -2,6 +2,7 @@ package eu.europeana.uim.enrichment.service.impl;
 
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -13,6 +14,7 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
 import eu.annocultor.converters.europeana.Entity;
+import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
@@ -25,6 +27,7 @@ import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 
 public class EnrichmentServiceImpl implements EnrichmentService {
 
+	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	public static EuropeanaEnrichmentTagger tagger;
 	private static HttpSolrServer solrServer;
 	private static HttpSolrServer migrationServer;
@@ -35,7 +38,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	private static String solrCore=PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 	private static String solrCoreMigration = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE_MIGRATION);
 	private static CollectionMongoServer cmServer;
-	private  EuropeanaIdMongoServer idserver;
+	private  static EuropeanaIdMongoServer idserver;
 	public EnrichmentServiceImpl(){
 		tagger = new EuropeanaEnrichmentTagger();
 		try {
@@ -96,7 +99,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 				
 				try {
 					Morphia morphia = new Morphia();
-					morphia.map(Collection.class);
+					morphia.map(EuropeanaId.class);
 					Datastore datastore = morphia.createDatastore(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "collections");
 					datastore.ensureIndexes();
 					idserver = new EuropeanaIdMongoServer(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "EuropeanaId");
@@ -113,13 +116,23 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 				}
 				
 				//idserver.createDatastore();
-				boolean test= idserver.retrieveEuropeanaIdFromOld("test")!=null;
+				
 				
 				
 				}
 		};
 		idInitializer.initialize(EuropeanaIdMongoServer.class.getClassLoader());
-		
+		BlockingInitializer t = new BlockingInitializer() {
+			
+			@Override
+			protected void initializeInternal() {
+				// TODO Auto-generated method stub
+				EuropeanaId id=idserver.find();
+				System.out.println(id.getId().toString());
+				boolean test= idserver.retrieveEuropeanaIdFromOld("test")!=null;
+			}
+		};
+		t.initialize(EuropeanaId.class.getClassLoader());
 	}
 	
 
@@ -227,6 +240,21 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	public void saveEuropeanaId(EuropeanaId europeanaId) {
 		idserver.saveEuropeanaId(europeanaId);
 		
+	}
+	
+	@Override
+	public void createLookupEntry(FullBean fullBean, String collectionId, String hash) {
+		
+				
+		EuropeanaId europeanaId = idserver.getDatastore().find(EuropeanaId.class,"oldId",PORTALURL+"/"+collectionId+"/"+hash).get();
+		if (europeanaId==null){
+			europeanaId = new EuropeanaId();
+			europeanaId.setOldId(PORTALURL+"/"+collectionId+"/"+hash);
+			europeanaId.setTimestamp(new Date().getTime());
+		} 
+		europeanaId.setNewId(fullBean.getAbout());
+		saveEuropeanaId(europeanaId);
+
 	}
 
 }

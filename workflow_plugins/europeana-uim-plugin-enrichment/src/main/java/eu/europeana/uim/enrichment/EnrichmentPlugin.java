@@ -294,7 +294,7 @@ public class EnrichmentPlugin<I> extends
 					.retrieveRecord(sugarCrmId);
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
-
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -360,6 +360,7 @@ public class EnrichmentPlugin<I> extends
 		 .equals(Status.DELETED)){
 		MongoConstructor mongoConstructor = new MongoConstructor();
 
+		
 		try {
 			if (solrServer.ping() == null) {
 				log.log(Level.SEVERE,
@@ -413,7 +414,8 @@ public class EnrichmentPlugin<I> extends
 			String hash = hashExists(collectionId, fileName, fullBean);
 
 			if (StringUtils.isNotEmpty(hash)) {
-				createLookupEntry(mongo, fullBean, collectionId,hash);
+				
+				enrichmentService.createLookupEntry(fullBean, collectionId,hash);
 				String recordId = "/"+collectionId+"/"+hash;
 				solrServer.deleteByQuery("europeana_id:"+ClientUtils.escapeQueryChars(recordId));
 				clearData(recordId);
@@ -1096,21 +1098,7 @@ public class EnrichmentPlugin<I> extends
 		EnrichmentPlugin.enrichmentService = enrichmentService;
 	}
 
-	private void createLookupEntry(Mongo mongo, FullBean fullBean, String collectionId, String hash) {
-		List<EuropeanaId> europeanaIdList = enrichmentService
-				.retrieveEuropeanaIdFromOld(PORTALURL+"/"+collectionId+"/"+hash);
-		EuropeanaId europeanaId;
-		if (europeanaIdList == null|| europeanaIdList.size()==0){
-			europeanaId = new EuropeanaId();
-			europeanaId.setOldId(PORTALURL+"/"+collectionId+"/"+hash);
-			europeanaId.setTimestamp(new Date().getTime());
-		} else {
-			europeanaId = europeanaIdList.get(0);
-		}
-		europeanaId.setNewId(fullBean.getAbout());
-		enrichmentService.saveEuropeanaId(europeanaId);
-
-	}
+	
 
 	// check if the hash of the record exists
 	private String hashExists(String collectionId, String fileName,
