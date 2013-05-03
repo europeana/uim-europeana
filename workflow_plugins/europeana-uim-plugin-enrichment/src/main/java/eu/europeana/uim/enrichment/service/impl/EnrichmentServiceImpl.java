@@ -35,7 +35,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	private static String solrCore=PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 	private static String solrCoreMigration = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE_MIGRATION);
 	private static CollectionMongoServer cmServer;
-	private static EuropeanaIdMongoServer idserver;
+	private  EuropeanaIdMongoServer idserver;
 	public EnrichmentServiceImpl(){
 		tagger = new EuropeanaEnrichmentTagger();
 		try {
@@ -85,32 +85,22 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 		initializer.initialize(CollectionMongoServer.class.getClassLoader());
 		
 		
-		
 		BlockingInitializer idInitializer = new BlockingInitializer() {
 			
 			@Override
 			protected void initializeInternal() {
 				// TODO Auto-generated method stub
-				Morphia morphia = new Morphia();
-				morphia.map(EuropeanaId.class);
-				Datastore datastore;
-				try {
-					datastore = morphia.createDatastore(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "EuropeanaId");
 				
-				idserver = new EuropeanaIdMongoServer(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "EuropeanaId");
-				datastore.ensureIndexes();
-				idserver.setDatastore(datastore);
-				BlockingInitializer colInitializer = new BlockingInitializer() {
+				
 					
-					@Override
-					protected void initializeInternal() {
-						EuropeanaId id = new EuropeanaId();
-						
-					}
-				};
 				
-				
-				colInitializer.initialize(EuropeanaId.class.getClassLoader());
+				try {
+					Morphia morphia = new Morphia();
+					morphia.map(Collection.class);
+					Datastore datastore = morphia.createDatastore(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "collections");
+					datastore.ensureIndexes();
+					idserver = new EuropeanaIdMongoServer(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "EuropeanaId");
+					idserver.setDatastore(datastore);
 				} catch (NumberFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -121,6 +111,11 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				//idserver.createDatastore();
+				boolean test= idserver.retrieveEuropeanaIdFromOld("test")!=null;
+				
+				
 				}
 		};
 		idInitializer.initialize(EuropeanaIdMongoServer.class.getClassLoader());
@@ -214,6 +209,24 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	@Override
 	public EuropeanaIdMongoServer getEuropeanaIdMongoServer() {
 		return idserver;
+	}
+
+
+
+
+	@Override
+	public List<EuropeanaId> retrieveEuropeanaIdFromOld(String string) {
+		
+		return idserver.retrieveEuropeanaIdFromOld(string);
+	}
+
+
+
+
+	@Override
+	public void saveEuropeanaId(EuropeanaId europeanaId) {
+		idserver.saveEuropeanaId(europeanaId);
+		
 	}
 
 }

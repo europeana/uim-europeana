@@ -86,6 +86,7 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.corelib.tools.utils.HashUtils;
 import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
 import eu.europeana.corelib.tools.utils.SipCreatorUtils;
+import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.enums.OriginalField;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
@@ -162,6 +163,8 @@ public class EnrichmentPlugin<I> extends
 		} catch (JiBXException e) {
 			e.printStackTrace();
 		}
+		
+		
 
 	}
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
@@ -263,6 +266,8 @@ public class EnrichmentPlugin<I> extends
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 
+		
+		
 		try {
 			solrList = SolrList.getInstance();
 			migrationSolrList = new ArrayList<SolrInputDocument>();
@@ -1092,8 +1097,7 @@ public class EnrichmentPlugin<I> extends
 	}
 
 	private void createLookupEntry(Mongo mongo, FullBean fullBean, String collectionId, String hash) {
-		EuropeanaIdMongoServer europeanaIdMongoServer = enrichmentService.getEuropeanaIdMongoServer();
-		List<EuropeanaId> europeanaIdList = europeanaIdMongoServer
+		List<EuropeanaId> europeanaIdList = enrichmentService
 				.retrieveEuropeanaIdFromOld(PORTALURL+"/"+collectionId+"/"+hash);
 		EuropeanaId europeanaId;
 		if (europeanaIdList == null|| europeanaIdList.size()==0){
@@ -1104,7 +1108,7 @@ public class EnrichmentPlugin<I> extends
 			europeanaId = europeanaIdList.get(0);
 		}
 		europeanaId.setNewId(fullBean.getAbout());
-		europeanaIdMongoServer.saveEuropeanaId(europeanaId);
+		enrichmentService.saveEuropeanaId(europeanaId);
 
 	}
 

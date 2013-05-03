@@ -7,6 +7,7 @@ import org.apache.solr.common.SolrInputDocument;
 
 import eu.annocultor.converters.europeana.Entity;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
+import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 
 
@@ -25,5 +26,11 @@ public interface EnrichmentService {
 
 
 	public EuropeanaIdMongoServer getEuropeanaIdMongoServer();
+
+
+	List<EuropeanaId> retrieveEuropeanaIdFromOld(String string);
+
+
+	void saveEuropeanaId(EuropeanaId europeanaId);
 	
 }
