@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
@@ -22,6 +23,7 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
+import eu.europeana.uim.enrichment.utils.OsgiEuropeanaIdMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 
@@ -38,7 +40,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	private static String solrCore=PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 	private static String solrCoreMigration = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE_MIGRATION);
 	private static CollectionMongoServer cmServer;
-	private  static EuropeanaIdMongoServer idserver;
+	private  static OsgiEuropeanaIdMongoServer idserver;
 	public EnrichmentServiceImpl(){
 		tagger = new EuropeanaEnrichmentTagger();
 		try {
@@ -88,51 +90,22 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 		initializer.initialize(CollectionMongoServer.class.getClassLoader());
 		
 		
-		BlockingInitializer idInitializer = new BlockingInitializer() {
-			
-			@Override
-			protected void initializeInternal() {
-				// TODO Auto-generated method stub
+		
+					try {
+						idserver = new OsgiEuropeanaIdMongoServer(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "EuropeanaId");
+						idserver.createDatastore();
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (MongoException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				
-				
-					
-				
-				try {
-					Morphia morphia = new Morphia();
-					morphia.map(EuropeanaId.class);
-					Datastore datastore = morphia.createDatastore(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "collections");
-					datastore.ensureIndexes();
-					idserver = new EuropeanaIdMongoServer(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "EuropeanaId");
-					idserver.setDatastore(datastore);
-				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (MongoException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				//idserver.createDatastore();
-				
-				
-				
-				}
-		};
-		idInitializer.initialize(EuropeanaIdMongoServer.class.getClassLoader());
-		BlockingInitializer t = new BlockingInitializer() {
-			
-			@Override
-			protected void initializeInternal() {
-				// TODO Auto-generated method stub
-				EuropeanaId id=idserver.find();
-				System.out.println(id.getId().toString());
-				boolean test= idserver.retrieveEuropeanaIdFromOld("test")!=null;
-			}
-		};
-		t.initialize(EuropeanaId.class.getClassLoader());
+		
 	}
 	
 
@@ -245,15 +218,23 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	@Override
 	public void createLookupEntry(FullBean fullBean, String collectionId, String hash) {
 		
-				
-		EuropeanaId europeanaId = idserver.getDatastore().find(EuropeanaId.class,"oldId",PORTALURL+"/"+collectionId+"/"+hash).get();
-		if (europeanaId==null){
-			europeanaId = new EuropeanaId();
-			europeanaId.setOldId(PORTALURL+"/"+collectionId+"/"+hash);
-			europeanaId.setTimestamp(new Date().getTime());
-		} 
-		europeanaId.setNewId(fullBean.getAbout());
-		saveEuropeanaId(europeanaId);
+		List<EuropeanaId> ids = idserver.retrieveEuropeanaIdFromOld(PORTALURL+"/"+collectionId+"/"+hash);
+		boolean found = false;
+		for (EuropeanaId id:ids){
+			if (StringUtils.equals(fullBean.getAbout(), id.getNewId())){
+				found=true;
+				break;
+			}
+		}
+		if(!found){
+			EuropeanaId id= new EuropeanaId();
+			id.setOldId(ids.get(0).getOldId());
+			id.setLastAccess(0);
+			id.setTimestamp(new Date().getTime());
+			id.setNewId(fullBean.getAbout());
+			saveEuropeanaId(id);
+			
+		}
 
 	}
 
