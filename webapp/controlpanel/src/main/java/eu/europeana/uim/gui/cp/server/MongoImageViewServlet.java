@@ -220,8 +220,8 @@ public class MongoImageViewServlet extends HttpServlet {
 			Datastore store = mor.createDatastore(mongo, dbName);
 
 			@SuppressWarnings("unchecked")
-			NosqlDaoImpl morphiaDAOImpl = new NosqlDaoImpl(ImageCache.class,
-					store);
+			NosqlDaoImpl morphiaDAOImpl = new NosqlDaoImpl(
+					store, ImageCache.class);
 
 			ThumbnailServiceImpl thumbnailService = new ThumbnailServiceImpl();
 			thumbnailService.setDao(morphiaDAOImpl);
