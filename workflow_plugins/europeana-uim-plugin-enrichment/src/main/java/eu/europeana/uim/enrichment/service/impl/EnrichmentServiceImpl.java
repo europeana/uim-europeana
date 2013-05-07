@@ -227,13 +227,14 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 			}
 		}
 		if(!found){
+			if(ids.size()>0 && ids.get(0).getOldId()!=null){
 			EuropeanaId id= new EuropeanaId();
 			id.setOldId(ids.get(0).getOldId());
 			id.setLastAccess(0);
 			id.setTimestamp(new Date().getTime());
 			id.setNewId(fullBean.getAbout());
 			saveEuropeanaId(id);
-			
+			}
 		}
 
 	}
