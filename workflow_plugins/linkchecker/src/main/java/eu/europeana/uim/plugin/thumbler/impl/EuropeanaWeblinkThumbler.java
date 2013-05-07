@@ -105,8 +105,8 @@ public class EuropeanaWeblinkThumbler extends AbstractWeblinkServer {
 			Datastore store = mor.createDatastore(mongo, dbName);
 
 			@SuppressWarnings({ "unchecked", "rawtypes" })
-			NosqlDaoImpl morphiaDAOImpl = new NosqlDaoImpl(ImageCache.class,
-					store);
+			NosqlDaoImpl morphiaDAOImpl = new NosqlDaoImpl(
+					store, ImageCache.class);
 
 			ThumbnailServiceImpl thumbnailService = new ThumbnailServiceImpl();
 			thumbnailService.setDao(morphiaDAOImpl);
