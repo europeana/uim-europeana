@@ -146,7 +146,7 @@ public class EnrichmentPlugin<I> extends
 	private final static String SUFFIX = ".html";
 
 	private static IBindingFactory bfact;
-	
+
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
 	}
@@ -163,8 +163,6 @@ public class EnrichmentPlugin<I> extends
 		} catch (JiBXException e) {
 			e.printStackTrace();
 		}
-		
-		
 
 	}
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
@@ -266,8 +264,6 @@ public class EnrichmentPlugin<I> extends
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 
-		
-		
 		try {
 			solrList = SolrList.getInstance();
 			migrationSolrList = new ArrayList<SolrInputDocument>();
@@ -294,7 +290,7 @@ public class EnrichmentPlugin<I> extends
 					.retrieveRecord(sugarCrmId);
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
-		
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -347,140 +343,177 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
-		if(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)!=null&&mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).size()>0){
-			value = mdr
-					.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+		if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
+				&& mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+						.size() > 0) {
+			value = mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
 					.get(0);
 		} else {
-			value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
-					.get(0);
+			value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 		}
-		 if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-		 || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-		 .equals(Status.DELETED)){
-		MongoConstructor mongoConstructor = new MongoConstructor();
+		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+						.equals(Status.DELETED)) {
+			MongoConstructor mongoConstructor = new MongoConstructor();
 
-		
-		try {
-			if (solrServer.ping() == null) {
-				log.log(Level.SEVERE,
-						"Solr server "
-								+ solrServer.getBaseURL()
-								+ " is not available. "
-								+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
-				return false;
-			}
+			try {
+				if (solrServer.ping() == null) {
+					log.log(Level.SEVERE,
+							"Solr server "
+									+ solrServer.getBaseURL()
+									+ " is not available. "
+									+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
+					return false;
+				}
 
-			
-			
-			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			SolrInputDocument basicDocument = new SolrConstructor()
-					.constructSolrDocument(rdf);
-			// migrationSolrList.add(basicDocument);
-			List<Entity> entities = enrichmentService.enrich(basicDocument);
-			mergeEntities(rdf, entities);
-			RDF rdfFinal = cleanRDF(rdf);
-			SolrInputDocument solrInputDocument = new SolrConstructor()
-					.constructSolrDocument(rdfFinal);
+				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+				SolrInputDocument basicDocument = new SolrConstructor()
+						.constructSolrDocument(rdf);
+				// migrationSolrList.add(basicDocument);
+				List<Entity> entities = enrichmentService.enrich(basicDocument);
+				mergeEntities(rdf, entities);
+				RDF rdfFinal = cleanRDF(rdf);
+				boolean hasEuropeanaProxy = false;
 
-			FullBeanImpl fullBean = mongoConstructor.constructFullBean(
-					rdfFinal, mongoServer);
-			solrInputDocument.addField(
-					EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
-					previewsOnlyInPortal);
+				for (ProxyType proxy : rdfFinal.getProxyList()) {
+					if (proxy.getEuropeanaProxy() != null
+							&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+						hasEuropeanaProxy = true;
+					}
+				}
+				if (!hasEuropeanaProxy) {
+					ProxyType europeanaProxy = new ProxyType();
+					EuropeanaProxy prx = new EuropeanaProxy();
+					prx.setEuropeanaProxy(true);
+					europeanaProxy.setEuropeanaProxy(prx);
+					List<String> years = new ArrayList<String>();
+					for (ProxyType proxy : rdfFinal.getProxyList()) {
+						years.addAll(new EuropeanaDateUtils()
+								.createEuropeanaYears(proxy));
+						europeanaProxy.setType(proxy.getType());
+					}
+					List<Year> yearList = new ArrayList<Year>();
+					for (String year : years) {
+						Year yearObj = new Year();
+						LiteralType.Lang lang = new LiteralType.Lang();
+						lang.setLang("eur");
+						yearObj.setLang(lang);
+						yearObj.setString(year);
+						yearList.add(yearObj);
+					}
 
-			fullBean.getAggregations()
-					.get(0)
-					.setEdmPreviewNoDistribute(
-							Boolean.parseBoolean(previewsOnlyInPortal));
-			int completeness = RecordCompletenessRanking
-					.rankRecordCompleteness(solrInputDocument);
-			fullBean.setEuropeanaCompleteness(completeness);
-			solrInputDocument.addField(
-					EdmLabel.EUROPEANA_COMPLETENESS.toString(), completeness);
-			String collectionId = (String) mdr.getCollection().getMnemonic();
-			String fileName;
-			String oldCollectionId = enrichmentService
-					.getCollectionMongoServer().findOldCollectionId(
-							collectionId);
-			if (oldCollectionId != null) {
-				collectionId = oldCollectionId;
-				fileName = oldCollectionId;
-			} else {
-				fileName = (String) mdr.getCollection().getName();
-			}
+					for (ProxyType proxy : rdfFinal.getProxyList()) {
+						if (proxy != null && proxy.getEuropeanaProxy() != null
+								&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+							rdfFinal.getProxyList().remove(proxy);
+						}
+					}
+					rdfFinal.getProxyList().add(europeanaProxy);
+				}
+				SolrInputDocument solrInputDocument = new SolrConstructor()
+						.constructSolrDocument(rdfFinal);
 
-			String hash = hashExists(collectionId, fileName, fullBean);
+				FullBeanImpl fullBean = mongoConstructor.constructFullBean(
+						rdfFinal, mongoServer);
+				solrInputDocument.addField(
+						EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
+						previewsOnlyInPortal);
 
-			if (StringUtils.isNotEmpty(hash)) {
-				
-				enrichmentService.createLookupEntry(fullBean, collectionId,hash);
-				String recordId = "/"+collectionId+"/"+hash;
-				solrServer.deleteByQuery("europeana_id:"+ClientUtils.escapeQueryChars(recordId));
-				clearData(recordId);
-			}
+				fullBean.getAggregations()
+						.get(0)
+						.setEdmPreviewNoDistribute(
+								Boolean.parseBoolean(previewsOnlyInPortal));
+				int completeness = RecordCompletenessRanking
+						.rankRecordCompleteness(solrInputDocument);
+				fullBean.setEuropeanaCompleteness(completeness);
+				solrInputDocument.addField(
+						EdmLabel.EUROPEANA_COMPLETENESS.toString(),
+						completeness);
+				String collectionId = (String) mdr.getCollection()
+						.getMnemonic();
+				String fileName;
+				String oldCollectionId = enrichmentService
+						.getCollectionMongoServer().findOldCollectionId(
+								collectionId);
+				if (oldCollectionId != null) {
+					collectionId = oldCollectionId;
+					fileName = oldCollectionId;
+				} else {
+					fileName = (String) mdr.getCollection().getName();
+				}
 
-			fullBean.setEuropeanaCollectionName(new String[] { fileName });
-			solrInputDocument.setField("europeana_collectionName", fileName);
-			if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
-				mongoServer.getDatastore().save(fullBean);
-			} else {
-				updateFullBean(fullBean);
+				String hash = hashExists(collectionId, fileName, fullBean);
 
-			}
-			// FileUtils.write(new File("/home/gmamakis/"
-			// + fullBean.getAbout().replace("/", "_") + ".xml"),
-			// EDMUtils.toEDM(fullBean));
-			int retries = 0;
-			while (retries < RETRIES) {
-				try {
-					solrList.addToQueue(solrServer,solrInputDocument);
-					recordNumber++;
-					// Send records to SOLR by thousands
+				if (StringUtils.isNotEmpty(hash)) {
 
-				
+					enrichmentService.createLookupEntry(fullBean, collectionId,
+							hash);
+					String recordId = "/" + collectionId + "/" + hash;
+					solrServer.deleteByQuery("europeana_id:"
+							+ ClientUtils.escapeQueryChars(recordId));
+					clearData(recordId);
+				}
 
-					return true;
-				} catch (SolrException e) {
-					log.log(Level.WARNING, "Solr Exception occured with error "
-							+ e.getMessage() + "\nRetrying");
+				fullBean.setEuropeanaCollectionName(new String[] { fileName });
+				solrInputDocument
+						.setField("europeana_collectionName", fileName);
+				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
+					mongoServer.getDatastore().save(fullBean);
+				} else {
+					updateFullBean(fullBean);
 
 				}
-				retries++;
+				// FileUtils.write(new File("/home/gmamakis/"
+				// + fullBean.getAbout().replace("/", "_") + ".xml"),
+				// EDMUtils.toEDM(fullBean));
+				int retries = 0;
+				while (retries < RETRIES) {
+					try {
+						solrList.addToQueue(solrServer, solrInputDocument);
+						recordNumber++;
+						// Send records to SOLR by thousands
+
+						return true;
+					} catch (SolrException e) {
+						log.log(Level.WARNING,
+								"Solr Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
+
+					}
+					retries++;
+				}
+				return false;
+
+			} catch (JiBXException e) {
+				log.log(Level.WARNING,
+						"JibX Exception occured with error " + e.getMessage()
+								+ "\nRetrying");
+			} catch (MalformedURLException e) {
+				log.log(Level.WARNING,
+						"Malformed URL Exception occured with error "
+								+ e.getMessage() + "\nRetrying");
+			} catch (InstantiationException e) {
+				log.log(Level.WARNING,
+						"Instantiation Exception occured with error "
+								+ e.getMessage() + "\nRetrying");
+			} catch (IllegalAccessException e) {
+				log.log(Level.WARNING,
+						"Illegal Access Exception occured with error "
+								+ e.getMessage() + "\nRetrying");
+			} catch (IOException e) {
+				log.log(Level.WARNING,
+						"IO Exception occured with error " + e.getMessage()
+								+ "\nRetrying");
+			} catch (Exception e) {
+
+				log.log(Level.WARNING, "Generic Exception occured with error "
+						+ e.getMessage() + "\nRetrying");
+				e.printStackTrace();
 			}
 			return false;
-
-		} catch (JiBXException e) {
-			log.log(Level.WARNING,
-					"JibX Exception occured with error " + e.getMessage()
-							+ "\nRetrying");
-		} catch (MalformedURLException e) {
-			log.log(Level.WARNING,
-					"Malformed URL Exception occured with error "
-							+ e.getMessage() + "\nRetrying");
-		} catch (InstantiationException e) {
-			log.log(Level.WARNING,
-					"Instantiation Exception occured with error "
-							+ e.getMessage() + "\nRetrying");
-		} catch (IllegalAccessException e) {
-			log.log(Level.WARNING,
-					"Illegal Access Exception occured with error "
-							+ e.getMessage() + "\nRetrying");
-		} catch (IOException e) {
-			log.log(Level.WARNING,
-					"IO Exception occured with error " + e.getMessage()
-							+ "\nRetrying");
-		} catch (Exception e) {
-
-			log.log(Level.WARNING,
-					"Generic Exception occured with error " + e.getMessage()
-							+ "\nRetrying");
-			e.printStackTrace();
-		}
-		return false;
 		} else {
-			
+
 			IUnmarshallingContext uctx;
 			try {
 				uctx = bfact.createUnmarshallingContext();
@@ -494,11 +527,8 @@ public class EnrichmentPlugin<I> extends
 					mongoServer.getDatastore().delete(
 							fBean.getEuropeanaAggregation());
 					mongoServer.getDatastore().delete(fBean);
-					solrServer
-					.deleteByQuery(
-							"europeana_id:"
-									+ ClientUtils.escapeQueryChars(fBean
-											.getAbout()));
+					solrServer.deleteByQuery("europeana_id:"
+							+ ClientUtils.escapeQueryChars(fBean.getAbout()));
 				}
 			} catch (JiBXException e) {
 				// TODO Auto-generated catch block
@@ -533,13 +563,12 @@ public class EnrichmentPlugin<I> extends
 		DBObject europeanaProxyQuery = new BasicDBObject("about",
 				"/proxy/europeana" + record);
 
-		DBObject providedCHOQuery = new BasicDBObject("about", "/item"
-				+ record);
+		DBObject providedCHOQuery = new BasicDBObject("about", "/item" + record);
 		DBObject aggregationQuery = new BasicDBObject("about",
 				"/aggregation/provider" + record);
 		DBObject europeanaAggregationQuery = new BasicDBObject("about",
 				"/aggregation/europeana" + record);
-		
+
 		europeanaAggregations.remove(europeanaAggregationQuery);
 		records.remove(query);
 		proxies.remove(europeanaProxyQuery);
@@ -547,6 +576,7 @@ public class EnrichmentPlugin<I> extends
 		providedCHOs.remove(providedCHOQuery);
 		aggregations.remove(aggregationQuery);
 	}
+
 	// update a FullBean
 	private void updateFullBean(FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
@@ -610,7 +640,7 @@ public class EnrichmentPlugin<I> extends
 			}
 		}
 
-		if (europeanaProxy==null){
+		if (europeanaProxy == null) {
 			europeanaProxy = createEuropeanaProxy(rdf);
 		}
 		europeanaProxy.setAbout("/proxy/europeana" + cho.getAbout());
@@ -812,8 +842,7 @@ public class EnrichmentPlugin<I> extends
 		europeanaProxy.setEuropeanaProxy(prx);
 		List<String> years = new ArrayList<String>();
 		for (ProxyType proxy : rdf.getProxyList()) {
-			years.addAll(new EuropeanaDateUtils()
-					.createEuropeanaYears(proxy));
+			years.addAll(new EuropeanaDateUtils().createEuropeanaYears(proxy));
 			europeanaProxy.setType(proxy.getType());
 		}
 		List<Year> yearList = new ArrayList<Year>();
@@ -964,17 +993,17 @@ public class EnrichmentPlugin<I> extends
 			europeanaAggregation = new EuropeanaAggregationType();
 		}
 		ProvidedCHOType cho = rdf.getProvidedCHOList().get(0);
-		europeanaAggregation.setAbout("/aggregation/europeana"
-				+ cho.getAbout());
+		europeanaAggregation
+				.setAbout("/aggregation/europeana" + cho.getAbout());
 		LandingPage lp = new LandingPage();
 		lp.setResource(PORTALURL + cho.getAbout() + SUFFIX);
 		europeanaAggregation.setLandingPage(lp);
 		Country countryType = new Country();
-		
+
 		countryType
 				.setCountry(europeanaAggregation.getCountry() != null ? europeanaAggregation
 						.getCountry().getCountry() : CountryCodes.EUROPE);
-		
+
 		europeanaAggregation.setCountry(countryType);
 		Creator creatorType = new Creator();
 		creatorType.setString("Europeana");
@@ -982,23 +1011,20 @@ public class EnrichmentPlugin<I> extends
 		Language1 languageType = new Language1();
 		languageType
 				.setLanguage(europeanaAggregation.getLanguage() != null ? europeanaAggregation
-						.getLanguage().getLanguage() :  LanguageCodes.EN);
-		
+						.getLanguage().getLanguage() : LanguageCodes.EN);
+
 		europeanaAggregation.setLanguage(languageType);
 		Rights1 rightsType = new Rights1();
-		
-		if(europeanaAggregation.getRights() != null){
-			rightsType.setResource(europeanaAggregation
-					.getRights().getResource());
-		}
-		else{
+
+		if (europeanaAggregation.getRights() != null) {
+			rightsType.setResource(europeanaAggregation.getRights()
+					.getResource());
+		} else {
 			Resource res = new Resource();
 			res.setResource("http://creativecommons.org/licenses/by-sa/3.0/");
 			rightsType.setResource(res);
 		}
-		
-		
-		
+
 		europeanaAggregation.setRights(rightsType);
 		AggregatedCHO aggrCHO = new AggregatedCHO();
 		aggrCHO.setResource(cho.getAbout());
@@ -1098,17 +1124,16 @@ public class EnrichmentPlugin<I> extends
 		EnrichmentPlugin.enrichmentService = enrichmentService;
 	}
 
-	
-
 	// check if the hash of the record exists
 	private String hashExists(String collectionId, String fileName,
 			FullBean fullBean) {
 		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
 		sipCreatorUtils.setRepository(repository);
 		String hashField = sipCreatorUtils.getHashField(fileName, fileName);
-		if (hashField!=null) {
+		if (hashField != null) {
 			return HashUtils.createHash(EseEdmMap.getEseEdmMap(
-					StringUtils.contains(hashField,"[")?StringUtils.substringBefore(hashField, "["):hashField)
+					StringUtils.contains(hashField, "[") ? StringUtils
+							.substringBefore(hashField, "[") : hashField)
 					.getEdmValue(fullBean));
 		}
 		PreSipCreatorUtils preSipCreatorUtils = new PreSipCreatorUtils();
@@ -1154,10 +1179,10 @@ public class EnrichmentPlugin<I> extends
 						.isAssignableFrom(ResourceOrLiteralType.class)) {
 					ResourceOrLiteralType rs = new ResourceOrLiteralType();
 					if (isURI(val)) {
-						
+
 						Resource res = new Resource();
 						res.setResource(val);
-						rs.setResource(res );
+						rs.setResource(res);
 
 					} else {
 						rs.setString(val);
@@ -1180,9 +1205,9 @@ public class EnrichmentPlugin<I> extends
 							&& StringUtils.equals(
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
-						
+
 						lang.setLang(valAttr);
-						
+
 					} else {
 						lang.setLang("def");
 					}
@@ -1214,9 +1239,9 @@ public class EnrichmentPlugin<I> extends
 							&& StringUtils.equals(
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
-						
+
 						lang.setLang(valAttr);
-						
+
 					} else {
 						lang.setLang("def");
 					}
@@ -1234,7 +1259,7 @@ public class EnrichmentPlugin<I> extends
 					if (isURI(val)) {
 						Resource res = new Resource();
 						res.setResource(val);
-						rs.setResource(res );
+						rs.setResource(res);
 					} else {
 						rs.setString(val);
 					}
@@ -1243,11 +1268,10 @@ public class EnrichmentPlugin<I> extends
 							&& StringUtils.equals(
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
-						
+
 						lang.setLang(valAttr);
-						
-					}
-					else {
+
+					} else {
 						lang.setLang("def");
 					}
 					rs.setLang(lang);
@@ -1327,9 +1351,9 @@ public class EnrichmentPlugin<I> extends
 			if (edmAttr != null
 					&& StringUtils.equals(StringUtils.split(edmAttr, "@")[1],
 							"xml:lang")) {
-				
+
 				lang.setLang(valAttr);
-				
+
 			} else {
 				lang.setLang("def");
 			}
@@ -1350,9 +1374,9 @@ public class EnrichmentPlugin<I> extends
 			obj.setString(val);
 			LiteralType.Lang lang = new LiteralType.Lang();
 			if (edmAttr != null) {
-				
+
 				lang.setLang(valAttr);
-				
+
 			} else {
 				lang.setLang("def");
 			}
