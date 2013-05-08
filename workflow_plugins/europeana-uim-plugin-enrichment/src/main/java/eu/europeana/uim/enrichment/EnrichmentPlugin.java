@@ -77,6 +77,7 @@ import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
+import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.EdmMongoServer;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
@@ -140,11 +141,12 @@ public class EnrichmentPlugin<I> extends
 	private static SolrList solrList;
 	private static List<SolrInputDocument> migrationSolrList;
 	private final static int SUBMIT_SIZE = 10000;
-	private static OsgiEdmMongoServer mongoServer;
+	
 	private static Mongo mongo;
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
-
+	private static String uname;
+	private static String pass;
 	private static IBindingFactory bfact;
 
 	public EnrichmentPlugin(String name, String description) {
@@ -271,16 +273,13 @@ public class EnrichmentPlugin<I> extends
 			migrationSolrServer = enrichmentService.getMigrationServer();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
-			String uname = PropertyReader
+			uname = PropertyReader
 					.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
 					.getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
-			String pass = PropertyReader
+			pass = PropertyReader
 					.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
 					.getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
-			mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
-			morphia = new Morphia();
-
-			mongoServer.createDatastore(morphia);
+			
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) context.getExecution()
 					.getDataSet();
@@ -312,7 +311,7 @@ public class EnrichmentPlugin<I> extends
 			// solrServer.commit();
 			System.out.println("Committed in Solr Server");
 
-			mongoServer.close();
+			//mongoServer.close();
 		} catch (IOException e) {
 			context.getLoggingEngine().logFailed(
 					Level.SEVERE,
@@ -343,6 +342,10 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
+		OsgiEdmMongoServer mongoServer;
+		try {
+			mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
+		
 		if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 				&& mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
 						.size() > 0) {
@@ -355,7 +358,10 @@ public class EnrichmentPlugin<I> extends
 				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
 						.equals(Status.DELETED)) {
 			MongoConstructor mongoConstructor = new MongoConstructor();
+			
+			morphia = new Morphia();
 
+			mongoServer.createDatastore(morphia);
 			try {
 				if (solrServer.ping() == null) {
 					log.log(Level.SEVERE,
@@ -452,7 +458,7 @@ public class EnrichmentPlugin<I> extends
 					String recordId = "/" + collectionId + "/" + hash;
 					solrServer.deleteByQuery("europeana_id:"
 							+ ClientUtils.escapeQueryChars(recordId));
-					clearData(recordId);
+					clearData(mongoServer,recordId);
 				}
 
 				fullBean.setEuropeanaCollectionName(new String[] { fileName });
@@ -461,7 +467,7 @@ public class EnrichmentPlugin<I> extends
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
-					updateFullBean(fullBean);
+					updateFullBean(mongoServer,fullBean);
 
 				}
 				// FileUtils.write(new File("/home/gmamakis/"
@@ -483,7 +489,7 @@ public class EnrichmentPlugin<I> extends
 					}
 					retries++;
 				}
-				return false;
+				
 
 			} catch (JiBXException e) {
 				log.log(Level.WARNING,
@@ -542,10 +548,16 @@ public class EnrichmentPlugin<I> extends
 			}
 
 		}
+		mongoServer.close();
+		} catch (MongoDBException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return false;
+		}
 		return true;
 	}
 
-	private void clearData(String record) {
+	private void clearData(OsgiEdmMongoServer mongoServer, String record) {
 		// TODO Auto-generated method stub
 		DBCollection records = mongoServer.getDatastore().getDB()
 				.getCollection("record");
@@ -578,7 +590,7 @@ public class EnrichmentPlugin<I> extends
 	}
 
 	// update a FullBean
-	private void updateFullBean(FullBeanImpl fullBean) {
+	private void updateFullBean(OsgiEdmMongoServer mongoServer, FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
 				.createQuery(FullBeanImpl.class).field("about")
 				.equal(fullBean.getAbout().replace("/item", ""));
