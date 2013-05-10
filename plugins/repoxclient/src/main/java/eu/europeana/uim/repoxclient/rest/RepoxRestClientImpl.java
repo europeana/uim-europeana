@@ -391,11 +391,14 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 			country.append("eu");
 		}
 
-		nameCode.append(nameCodeVar);
-		nameCode.append(prov.getNameCode().getNameCode());
+		if(prov.getNameCode() != null){
+			nameCode.append(nameCodeVar);
+			nameCode.append(prov.getNameCode().getNameCode());
+		}
+
 		homepage.append("url=");
 
-		if (prov.getUrl().getUrl() != "") {
+		if (prov.getUrl() != null && prov.getUrl().getUrl() != "") {
 			if (!prov.getUrl().getUrl().startsWith("http")) {
 				homepage.append("http://"
 						+ prov.getUrl().getUrl().split("/")[0]);
