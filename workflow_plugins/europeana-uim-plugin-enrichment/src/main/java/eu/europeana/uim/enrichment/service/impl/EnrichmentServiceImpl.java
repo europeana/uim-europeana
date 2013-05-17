@@ -30,7 +30,7 @@ import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 public class EnrichmentServiceImpl implements EnrichmentService {
 
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
-	public static EuropeanaEnrichmentTagger tagger;
+	//public static EuropeanaEnrichmentTagger tagger;
 	private static HttpSolrServer solrServer;
 	private static HttpSolrServer migrationServer;
 	private static String mongoDB=PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
@@ -42,11 +42,11 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	private static CollectionMongoServer cmServer;
 	private  static OsgiEuropeanaIdMongoServer idserver;
 	public EnrichmentServiceImpl(){
-		tagger = new EuropeanaEnrichmentTagger();
+		
 		try {
 		solrServer = new HttpSolrServer(new URL(solrUrl)+solrCore);
 		migrationServer = new HttpSolrServer(new URL(solrUrl)+solrCoreMigration);
-			tagger.init("Europeana");
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -118,10 +118,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
 	
 
-	@Override
-	public List<Entity> enrich(SolrInputDocument solrDocument) throws Exception {
-		return tagger.tagDocument(solrDocument);
-	}
+	
 	@Override
 	public String getMongoDB() {
 		return mongoDB;
@@ -171,13 +168,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 		EnrichmentServiceImpl.solrServer = solrServer;
 	}
 
-	public  EuropeanaEnrichmentTagger getTagger() {
-		return tagger;
-	}
 
-	public void setTagger(EuropeanaEnrichmentTagger tagger) {
-		EnrichmentServiceImpl.tagger = tagger;
-	}
 
 	@Override
 	public HttpSolrServer getMigrationServer(){

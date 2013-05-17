@@ -14,7 +14,7 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 
 public interface EnrichmentService {
 
-	List<Entity> enrich(SolrInputDocument solrDocument) throws Exception;
+	//List<Entity> enrich(SolrInputDocument solrDocument) throws Exception;
 
 
 	HttpSolrServer getSolrServer();

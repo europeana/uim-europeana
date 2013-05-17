@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -33,6 +34,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.WriteConcern;
 
 import eu.annocultor.converters.europeana.Entity;
 import eu.annocultor.converters.europeana.Field;
@@ -92,6 +94,7 @@ import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.enums.OriginalField;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.EuropeanaDateUtils;
+import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.SolrList;
@@ -148,6 +151,7 @@ public class EnrichmentPlugin<I> extends
 	private static String uname;
 	private static String pass;
 	private static IBindingFactory bfact;
+	private static OsgiEdmMongoServer mongoServer;
 
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
@@ -289,7 +293,18 @@ public class EnrichmentPlugin<I> extends
 					.retrieveRecord(sugarCrmId);
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
+			
+			try {
+				mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
+				morphia = new Morphia();
 
+				mongoServer.createDatastore(morphia);
+				clearData(mongoServer,collection.getMnemonic());
+				solrServer.deleteByQuery("europeana_collectionName:"+ClientUtils.escapeQueryChars(collection.getName()));
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -342,9 +357,8 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
-		OsgiEdmMongoServer mongoServer;
-		try {
-			mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
+		
+			//mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
 		
 		if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 				&& mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
@@ -359,9 +373,9 @@ public class EnrichmentPlugin<I> extends
 						.equals(Status.DELETED)) {
 			MongoConstructor mongoConstructor = new MongoConstructor();
 			
-			morphia = new Morphia();
+			//morphia = new Morphia();
 
-			mongoServer.createDatastore(morphia);
+			//mongoServer.createDatastore(morphia);
 			try {
 				if (solrServer.ping() == null) {
 					log.log(Level.SEVERE,
@@ -377,7 +391,9 @@ public class EnrichmentPlugin<I> extends
 				SolrInputDocument basicDocument = new SolrConstructor()
 						.constructSolrDocument(rdf);
 				// migrationSolrList.add(basicDocument);
-				List<Entity> entities = enrichmentService.enrich(basicDocument);
+				EuropeanaEnrichmentTagger tagger = new EuropeanaEnrichmentTagger();
+				tagger.init("Europeana");
+				List<Entity> entities = tagger.tagDocument(basicDocument);
 				mergeEntities(rdf, entities);
 				RDF rdfFinal = cleanRDF(rdf);
 				boolean hasEuropeanaProxy = false;
@@ -449,21 +465,11 @@ public class EnrichmentPlugin<I> extends
 					fileName = (String) mdr.getCollection().getName();
 				}
 
-				String hash = hashExists(collectionId, fileName, fullBean);
+				
 
-				if (StringUtils.isNotEmpty(hash)) {
-
-					enrichmentService.createLookupEntry(fullBean, collectionId,
-							hash);
-					String recordId = "/" + collectionId + "/" + hash;
-					solrServer.deleteByQuery("europeana_id:"
-							+ ClientUtils.escapeQueryChars(recordId));
-					clearData(mongoServer,recordId);
-				}
-
-				fullBean.setEuropeanaCollectionName(new String[] { fileName });
+				fullBean.setEuropeanaCollectionName(new String[] { mdr.getCollection().getName() });
 				solrInputDocument
-						.setField("europeana_collectionName", fileName);
+						.setField("europeana_collectionName", mdr.getCollection().getName());
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
@@ -548,16 +554,12 @@ public class EnrichmentPlugin<I> extends
 			}
 
 		}
-		mongoServer.close();
-		} catch (MongoDBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return false;
-		}
+		
 		return true;
 	}
 
-	private void clearData(OsgiEdmMongoServer mongoServer, String record) {
+	
+	private void clearData(OsgiEdmMongoServer mongoServer, String collection) {
 		// TODO Auto-generated method stub
 		DBCollection records = mongoServer.getDatastore().getDB()
 				.getCollection("record");
@@ -569,24 +571,26 @@ public class EnrichmentPlugin<I> extends
 				.getCollection("Aggregation");
 		DBCollection europeanaAggregations = mongoServer.getDatastore().getDB()
 				.getCollection("EuropeanaAggregation");
-		DBObject query = new BasicDBObject("about", record);
-		DBObject proxyQuery = new BasicDBObject("about", "/proxy/provider"
-				+ record);
+		
+
+		DBObject query = new BasicDBObject("about", Pattern.compile("^/"+collection+"/"));
+		DBObject proxyQuery = new BasicDBObject("about", "/proxy/provider"+
+				Pattern.compile("^/"+collection+"/"));
 		DBObject europeanaProxyQuery = new BasicDBObject("about",
-				"/proxy/europeana" + record);
+				"/proxy/europeana" + Pattern.compile("^/"+collection+"/"));
 
-		DBObject providedCHOQuery = new BasicDBObject("about", "/item" + record);
+		DBObject providedCHOQuery = new BasicDBObject("about", "/item" + Pattern.compile("^/"+collection+"/"));
 		DBObject aggregationQuery = new BasicDBObject("about",
-				"/aggregation/provider" + record);
+				"/aggregation/provider" + Pattern.compile("^/"+collection+"/"));
 		DBObject europeanaAggregationQuery = new BasicDBObject("about",
-				"/aggregation/europeana" + record);
+				"/aggregation/europeana" + Pattern.compile("^/"+collection+"/"));
 
-		europeanaAggregations.remove(europeanaAggregationQuery);
-		records.remove(query);
-		proxies.remove(europeanaProxyQuery);
-		proxies.remove(proxyQuery);
-		providedCHOs.remove(providedCHOQuery);
-		aggregations.remove(aggregationQuery);
+		europeanaAggregations.remove(europeanaAggregationQuery,WriteConcern.JOURNAL_SAFE);
+		records.remove(query,WriteConcern.JOURNAL_SAFE);
+		proxies.remove(europeanaProxyQuery,WriteConcern.JOURNAL_SAFE);
+		proxies.remove(proxyQuery,WriteConcern.JOURNAL_SAFE);
+		providedCHOs.remove(providedCHOQuery,WriteConcern.JOURNAL_SAFE);
+		aggregations.remove(aggregationQuery,WriteConcern.JOURNAL_SAFE);
 	}
 
 	// update a FullBean
@@ -1137,26 +1141,7 @@ public class EnrichmentPlugin<I> extends
 	}
 
 	// check if the hash of the record exists
-	private String hashExists(String collectionId, String fileName,
-			FullBean fullBean) {
-		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
-		sipCreatorUtils.setRepository(repository);
-		String hashField = sipCreatorUtils.getHashField(fileName, fileName);
-		if (hashField != null) {
-			return HashUtils.createHash(EseEdmMap.getEseEdmMap(
-					StringUtils.contains(hashField, "[") ? StringUtils
-							.substringBefore(hashField, "[") : hashField)
-					.getEdmValue(fullBean));
-		}
-		PreSipCreatorUtils preSipCreatorUtils = new PreSipCreatorUtils();
-		preSipCreatorUtils.setRepository(repository);
-		if (preSipCreatorUtils.getHashField(fileName, fileName) != null) {
-			return HashUtils.createHash(EseEdmMap.getEseEdmMap(
-					preSipCreatorUtils.getHashField(collectionId, fileName))
-					.getEdmValue(fullBean));
-		}
-		return null;
-	}
+	
 
 	// append the rest of the contextual entities
 	@SuppressWarnings({ "unchecked", "rawtypes" })

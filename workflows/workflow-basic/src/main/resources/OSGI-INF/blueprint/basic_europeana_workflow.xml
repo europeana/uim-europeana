@@ -20,13 +20,14 @@
   
       <bean id="eiwClient" class="eu.europeana.uim.europeanaspecific.workflows.EnrichmentWorkflow">
     </bean>
-    
+     <bean id="liwClient" class="eu.europeana.uim.europeanaspecific.workflows.LookupTableWorkflow">
+    </bean>
     <service id="initialIngestionWorkflow" ref="iiwClient" interface="eu.europeana.uim.workflow.Workflow"/>
     
    
     
      <service id="enrichmentIngestionWorkflow" ref="eiwClient" interface="eu.europeana.uim.workflow.Workflow"/>
-
+ <service id="lookupTableIngestionWorkflow" ref="liwClient" interface="eu.europeana.uim.workflow.Workflow"/>
 
 
 </blueprint>

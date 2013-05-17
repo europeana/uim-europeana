@@ -6,6 +6,10 @@ xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
     	 <property name="enrichmentService" ref="enrichment"/>    	
     </bean>
     
+     <bean id="lookupPluginbean" class="eu.europeana.uim.enrichment.LookupCreationPlugin">
+    	 <property name="enrichmentService" ref="enrichment"/>    	
+    </bean>
+    
     <bean id="enrichmentservicebean" class="eu.europeana.uim.enrichment.service.impl.EnrichmentServiceImpl">
     </bean>
     
@@ -17,4 +21,5 @@ xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 	
 	<service id="enrichmentService" ref="enrichmentservicebean" interface="eu.europeana.uim.enrichment.service.EnrichmentService"/>
 
+	<service id="lookupPlugin" ref="lookupPluginbean"  interface="eu.europeana.uim.plugin.ingestion.IngestionPlugin" />
 </blueprint>
