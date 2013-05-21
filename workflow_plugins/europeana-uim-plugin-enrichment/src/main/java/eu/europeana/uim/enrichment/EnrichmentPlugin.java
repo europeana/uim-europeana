@@ -152,7 +152,7 @@ public class EnrichmentPlugin<I> extends
 	private static String pass;
 	private static IBindingFactory bfact;
 	private static OsgiEdmMongoServer mongoServer;
-
+	private static EuropeanaEnrichmentTagger tagger;
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
 	}
@@ -271,6 +271,8 @@ public class EnrichmentPlugin<I> extends
 			throws IngestionPluginFailedException {
 
 		try {
+			tagger = new EuropeanaEnrichmentTagger();
+			tagger.init("Europeana");
 			solrList = SolrList.getInstance();
 			migrationSolrList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
@@ -391,8 +393,7 @@ public class EnrichmentPlugin<I> extends
 				SolrInputDocument basicDocument = new SolrConstructor()
 						.constructSolrDocument(rdf);
 				// migrationSolrList.add(basicDocument);
-				EuropeanaEnrichmentTagger tagger = new EuropeanaEnrichmentTagger();
-				tagger.init("Europeana");
+				
 				List<Entity> entities = tagger.tagDocument(basicDocument);
 				mergeEntities(rdf, entities);
 				RDF rdfFinal = cleanRDF(rdf);
