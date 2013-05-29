@@ -41,7 +41,7 @@ import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
-
+import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 /**
  * Helper Class that checks if a received EDM record contains
  * 
@@ -478,9 +478,24 @@ public class Decoupler {
 			if (methods[i].getName().equals("getResource")) {
 
 				try {
-					String resource = (String) methods[i].invoke(object);
+					
 
-					return resource;
+					if(methods[i].invoke(object) instanceof ResourceOrLiteralType.Resource){
+						ResourceOrLiteralType.Resource resource = (ResourceOrLiteralType.Resource) methods[i].invoke(object);
+						
+						if(resource != null){
+							
+							return resource.getResource();
+						}
+					}
+					
+					if(methods[i].invoke(object) instanceof String){
+						String resource = (String) methods[i].invoke(object);
+						
+						return  resource;
+					}
+										
+					
 				} catch (IllegalArgumentException e) {
 
 				} catch (IllegalAccessException e) {
@@ -492,7 +507,7 @@ public class Decoupler {
 
 		}
 
-		return null;
+		return "";
 
 	}
 

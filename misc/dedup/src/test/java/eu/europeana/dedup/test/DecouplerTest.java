@@ -1,3 +1,20 @@
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
+ * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
+ */
+
 package eu.europeana.dedup.test;
 
 import java.io.File;
@@ -16,22 +33,6 @@ import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.junit.Test;
-/*
- * Copyright 2007-2012 The Europeana Foundation
- *
- *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
- *  by the European Commission;
- *  You may not use this work except in compliance with the Licence.
- * 
- *  You may obtain a copy of the Licence at:
- *  http://joinup.ec.europa.eu/software/page/eupl
- *
- *  Unless required by applicable law or agreed to in writing, software distributed under
- *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
- *  any kind, either express or implied.
- *  See the Licence for the specific language governing permissions and limitations under
- *  the Licence.
- */
 
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
@@ -53,19 +54,33 @@ public class DecouplerTest {
 
 	@Test
 	public void testDecoupling() throws JiBXException, DeduplicationException, IOException{
-		File file = new File("src/test/resources/EDM_test_record-update.xml");
-		//File file = new File("src/test/resources/test.xml");
-		String rdf = FileUtils.readFileToString(file);
+
+		File file1 = new File("src/test/resources/Item_27253459.xml");
+		String rdf = FileUtils.readFileToString(file1);
 		
-		List<RDF> entitylist = new Decoupler().decouple(rdf);
+		List<RDF> entitylist1 = new Decoupler().decouple(rdf);	
 		
-		Assert.assertEquals("", 6, entitylist.size());
-		
-		for(RDF rdfval :entitylist){
+		for(RDF rdfval :entitylist1){
 			String out = unmarshallObject(rdfval);
 			System.out.println(out);
 		}
 		
+		File file2 = new File("src/test/resources/EDM_test_record-update.xml");
+		
+		String rdf2 = FileUtils.readFileToString(file2);
+		
+		List<RDF> entitylist2 = new Decoupler().decouple(rdf2);	
+		
+		for(RDF rdfval :entitylist2){
+			String out = unmarshallObject(rdfval);
+			System.out.println(out);
+		}
+		
+		Assert.assertEquals("",6, entitylist2.size());
+		Assert.assertEquals("",346, entitylist1.size());
+		
+		System.out.println(entitylist1.size());
+		System.out.println(entitylist2.size());
 	}
 	
 
