@@ -194,6 +194,7 @@ public class ZipLoader<I> {
 				
 				if(reslist.size() > 1){
 					generated += reslist.size() -1;
+					expectedRecords += reslist.size() -1;
 				}
 				
 				for (DeduplicationResult dedupres : reslist) {
