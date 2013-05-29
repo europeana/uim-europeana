@@ -302,7 +302,7 @@ public class EnrichmentPlugin<I> extends
 
 				mongoServer.createDatastore(morphia);
 				clearData(mongoServer,collection.getMnemonic());
-				solrServer.deleteByQuery("europeana_id:"+ClientUtils.escapeQueryChars("/"+collection.getName().split("_")[0]+"/*"));
+				solrServer.deleteByQuery("europeana_collectionName:"+collection.getName().split("_")[0]+"*",5000);
 			} catch(Exception e){
 				e.printStackTrace();
 			}
