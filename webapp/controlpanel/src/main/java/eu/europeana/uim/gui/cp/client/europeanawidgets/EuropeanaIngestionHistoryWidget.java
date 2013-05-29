@@ -418,7 +418,7 @@ public class EuropeanaIngestionHistoryWidget extends
 		int discardedValue = object.getValue("Discarded") != null ? Integer
 				.parseInt(object.getValue("Discarded")) : 0;
 
-		int sum = createdValue + updatedValue + omittedValue + generatedValue;
+		int sum = createdValue + updatedValue + omittedValue;
 
 		if (sum != 0 || discardedValue != 0) {
 			StringBuffer buttontype = new StringBuffer();
