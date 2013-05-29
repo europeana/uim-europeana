@@ -18,39 +18,28 @@
 package eu.europeana.dedup.test;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
-
 import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
-import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.junit.Test;
-
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 import eu.europeana.dedup.utils.Decoupler;
 
 /**
- *
+ * Split record (itemization) tests
+ * 
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 27 Sep 2012
  */
 public class DecouplerTest {
 
-	/**
-	 * 
-	 */
-	public DecouplerTest() {
-		// TODO Auto-generated constructor stub
-	}
 
 	@Test
 	public void testDecoupling() throws JiBXException, DeduplicationException, IOException{
