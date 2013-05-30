@@ -541,7 +541,7 @@ public class EnrichmentPlugin<I> extends
 							fBean.getEuropeanaAggregation());
 					mongoServer.getDatastore().delete(fBean);
 					solrServer.deleteByQuery("europeana_id:"
-							+ ClientUtils.escapeQueryChars(fBean.getAbout()));
+							+ ClientUtils.escapeQueryChars(fBean.getAbout()),5000);
 				}
 			} catch (JiBXException e) {
 				// TODO Auto-generated catch block
