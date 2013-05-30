@@ -107,8 +107,6 @@ public class HttpRetriever implements Iterator<String> {
 		}
 
 		
-		System.out.println("Destination file:" + dest );
-		
 		FileUtils.copyURLToFile(url, dest, 10000000, 100000000);
 		TarArchiveInputStream tarfile;
 
