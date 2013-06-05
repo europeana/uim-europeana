@@ -33,6 +33,7 @@ import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
+import eu.europeana.corelib.definitions.jibx.EuropeanaProxy;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
@@ -117,6 +118,7 @@ public class Decoupler {
 			appendPrCHOs(proxy, stub, cleandoc);
 			List<Aggregation> aggregations = appendAggregations(proxy, stub,
 					cleandoc);
+			appendEuropeanaAggregations(stub,cleandoc);
 			appendWebResources(aggregations, stub, cleandoc);
 			appendContextualEntities(proxy, stub, cleandoc);
 			edmList.add(cleandoc);
@@ -157,6 +159,44 @@ public class Decoupler {
 		return foundaggregationlist;
 	}
 
+	
+	/**
+	 * Appends the related EuropeanaAggregations to an RDF document given a specific Proxy object
+	 * @param proxy the proxy object
+	 * @param stub an object used as information holder for the decoupling operation
+	 * @param cleandoc a JIBX representation of a reconstructed EDM document
+	 * @return a copy of the appended EuropeanaAggregationTypes
+	 */
+	private List<EuropeanaAggregationType> appendEuropeanaAggregations(InfoStub stub, RDF cleandoc) {
+				
+		// Get the Aggregator References
+		List<EuropeanaAggregationType> foundeuaggregationlist = new ArrayList<EuropeanaAggregationType>();
+		
+		Vector<EuropeanaAggregationType> euaglist = stub.euaggregationList;
+
+		Vector<ProvidedCHOType> prCHOlist = stub.prchoList;
+		
+		
+		for (EuropeanaAggregationType euagg : euaglist) {
+
+		   for(ProvidedCHOType prCHO : prCHOlist){
+			
+		   if (euagg.getAggregatedCHO().getResource().equals(prCHO.getAbout())) {
+				foundeuaggregationlist.add(euagg);
+				cleandoc.getEuropeanaAggregationList().add(euagg);  //getAggregationList().add(agg);  
+				
+				if (stub.orphanEntities.contains(euagg)) {
+					stub.orphanEntities.remove(euagg);
+				} else {
+					stub.orphanEntities.add(euagg);
+				}
+			}
+			}
+		}
+
+		return foundeuaggregationlist;
+	}
+	
 	
 	/**
 	 * Appends the related Aggregations to an RDF document given a list of Aggregations
@@ -533,7 +573,7 @@ public class Decoupler {
 		Vector<PlaceType> placeList = new Vector<PlaceType>();
 		Vector<TimeSpanType> timeList = new Vector<TimeSpanType>();
 		Vector<WebResourceType> webresourceList = new Vector<WebResourceType>();
-
+		
 		/**
 		 * Default constructor
 		 * @param edmXML
