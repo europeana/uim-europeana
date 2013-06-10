@@ -42,7 +42,7 @@ public class SolrList {
 		synchronized(queue){
 		if(queue.size()>=MAX_QUEUE_SIZE){
 			
-			server.add(queue,10000);
+			server.add(queue);
 			queue = new ArrayList<SolrInputDocument>();
 		}
 		}

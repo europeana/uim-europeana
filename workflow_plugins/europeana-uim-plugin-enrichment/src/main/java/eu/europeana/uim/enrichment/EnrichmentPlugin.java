@@ -302,7 +302,7 @@ public class EnrichmentPlugin<I> extends
 
 				mongoServer.createDatastore(morphia);
 				clearData(mongoServer,collection.getMnemonic());
-				solrServer.deleteByQuery("europeana_collectionName:"+collection.getName().split("_")[0]+"*",5000);
+				solrServer.deleteByQuery("europeana_collectionName:"+collection.getName().split("_")[0]+"*");
 			} catch(Exception e){
 				e.printStackTrace();
 			}
@@ -322,7 +322,7 @@ public class EnrichmentPlugin<I> extends
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		try {
-			solrServer.add(solrList.getQueue(),10000);
+			solrServer.add(solrList.getQueue());
 			System.out.println("Adding " + recordNumber + " documents");
 
 			// solrServer.commit();
@@ -541,7 +541,7 @@ public class EnrichmentPlugin<I> extends
 							fBean.getEuropeanaAggregation());
 					mongoServer.getDatastore().delete(fBean);
 					solrServer.deleteByQuery("europeana_id:"
-							+ ClientUtils.escapeQueryChars(fBean.getAbout()),5000);
+							+ ClientUtils.escapeQueryChars(fBean.getAbout()));
 				}
 			} catch (JiBXException e) {
 				// TODO Auto-generated catch block
