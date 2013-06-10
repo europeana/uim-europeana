@@ -6,13 +6,18 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.ModifiableSolrParams;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.sun.jmx.mbeanserver.ModifiableClassLoaderRepository;
 
 import eu.annocultor.converters.europeana.Entity;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
@@ -208,7 +213,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	
 	@Override
 	public void createLookupEntry(FullBean fullBean, String collectionId, String hash) {
-		
+		/*
 		List<EuropeanaId> ids = idserver.retrieveEuropeanaIdFromOld(PORTALURL+"/"+collectionId+"/"+hash);
 		boolean found = false;
 		for (EuropeanaId id:ids){
@@ -217,6 +222,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 				break;
 			}
 		}
+		
 		if(!found){
 			if(ids.size()>0 && ids.get(0).getOldId()!=null){
 			EuropeanaId id= new EuropeanaId();
@@ -227,7 +233,26 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 			saveEuropeanaId(id);
 			}
 		}
-
+*/
+		
+		ModifiableSolrParams params = new ModifiableSolrParams();
+		params. add("q", "europeana_id:"+ClientUtils.escapeQueryChars("/"+collectionId+"/"+hash));
+		try {
+			SolrDocumentList solrList = solrServer.query(params).getResults();
+			if(solrList.size()>0){
+				EuropeanaId id= new EuropeanaId();
+				id.setOldId("/"+collectionId+"/"+hash);
+				id.setLastAccess(0);
+				id.setTimestamp(new Date().getTime());
+				id.setNewId(fullBean.getAbout());
+				saveEuropeanaId(id);
+				
+			}
+			
+		} catch (SolrServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
