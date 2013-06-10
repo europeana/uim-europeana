@@ -322,7 +322,7 @@ public class EnrichmentPlugin<I> extends
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		try {
-			solrServer.add(solrList.getQueue());
+			solrServer.add(solrList.getQueue(),10000);
 			System.out.println("Adding " + recordNumber + " documents");
 
 			// solrServer.commit();
