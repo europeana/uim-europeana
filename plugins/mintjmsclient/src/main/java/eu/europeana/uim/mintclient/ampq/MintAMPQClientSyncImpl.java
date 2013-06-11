@@ -17,6 +17,7 @@
 package eu.europeana.uim.mintclient.ampq;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import org.jibx.runtime.IMarshallable;
@@ -136,7 +137,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		CreateOrganizationAction cu = new CreateOrganizationAction();
 		cu.setCreateOrganizationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}
 		String resp = handleSynchronousDelivery(correlationId);
 		CreateOrganizationAction respObj = MintClientUtils.marshallobject(resp, CreateOrganizationAction.class);
 		return respObj.getCreateOrganizationResponse();
@@ -152,7 +157,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		CreateUserAction cu = new CreateUserAction();
 		cu.setCreateUserCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}
 		String resp = handleSynchronousDelivery(correlationId);
 		CreateUserAction respObj = MintClientUtils.marshallobject(resp, CreateUserAction.class);
 		return respObj.getCreateUserResponse();
@@ -169,7 +178,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		GetImportsAction cu = new GetImportsAction();
 		cu.setGetImportsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}
 		String resp = handleSynchronousDelivery(correlationId);
 		GetImportsAction respObj = MintClientUtils.marshallobject(resp, GetImportsAction.class);
 		return respObj.getGetImportsResponse();
@@ -191,7 +204,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		CreateImportAction cu = new CreateImportAction();
 		cu.setCreateImportCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}
 		String resp = handleSynchronousDelivery(correlationId);
 		CreateImportAction respObj = MintClientUtils.marshallobject(resp, CreateImportAction.class);
 		return respObj.getCreateImportResponse();
@@ -206,7 +223,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		GetTransformationsAction cu = new GetTransformationsAction();
 		cu.setGetTransformationsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);		
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}	
 		String resp = handleSynchronousDelivery(correlationId);
 		GetTransformationsAction respObj = MintClientUtils.marshallobject(resp, GetTransformationsAction.class);
 		return respObj.getGetTransformationsResponse();
@@ -221,7 +242,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		PublicationAction cu = new PublicationAction();
 		cu.setPublicationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}
 		String resp = handleSynchronousDelivery(correlationId);
 		PublicationAction respObj = MintClientUtils.marshallobject(resp, PublicationAction.class);
 		return respObj.getPublicationResponse();
@@ -239,7 +264,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		OrganizationExistsAction action  = new OrganizationExistsAction();
 		action.setOrganizationExistsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}
 		String resp = handleSynchronousDelivery(correlationId);
 		OrganizationExistsAction respObj =  MintClientUtils.marshallobject(resp, OrganizationExistsAction.class);
 		return respObj.getOrganizationExistsResponse();
@@ -256,7 +285,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		UserExistsAction action = new UserExistsAction();
 		action.setUserExistsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}
 		String resp = handleSynchronousDelivery(correlationId);
 		UserExistsAction respObj =  MintClientUtils.marshallobject(resp, UserExistsAction.class);
 		return respObj.getUserExistsResponse();
@@ -273,7 +306,11 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 		ImportExistsAction action = new ImportExistsAction();
 		action.setImportExistsCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(action);
-		sendChunk(correlationId,cmdstring.getBytes(),true,rpcQueue,rndReplyqueue);
+		try {
+			sendChunk(correlationId,cmdstring.getBytes("UTF-8"),true,rpcQueue,rndReplyqueue);
+		} catch (UnsupportedEncodingException e) {
+			throw new MintOSGIClientException(e.getMessage());
+		}
 		String resp = handleSynchronousDelivery(correlationId);
 		ImportExistsAction respObj =  MintClientUtils.marshallobject(resp, ImportExistsAction.class);
 		return respObj.getImportExistsResponse();

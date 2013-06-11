@@ -117,8 +117,8 @@ public class MintSendSyncTest {
 		command.setCountry("es");
 		command.setEnglishName("TestOrg");
 		command.setName("TestOrg");
-		command.setType("Type");
-		command.setUserId("1002");
+		command.setType("Archive");
+		command.setUserId("1000");
 		CreateOrganizationResponse resp = client.createOrganization(command);
 		orgId = resp.getOrganizationId();
 		CreateOrganizationAction act = new CreateOrganizationAction();

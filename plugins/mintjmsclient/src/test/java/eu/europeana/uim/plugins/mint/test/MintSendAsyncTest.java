@@ -107,7 +107,7 @@ public class MintSendAsyncTest {
 		command.setEnglishName("TestOrg");
 		command.setName("TestOrg");
 		command.setType("Type");
-		command.setUserId("1002");
+		command.setUserId("1000");
 		client.createOrganization(command,provId);
 
 		//Wait for async response
