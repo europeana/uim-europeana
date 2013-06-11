@@ -144,7 +144,7 @@ public class EnrichmentPlugin<I> extends
 	private static SolrList solrList;
 	private static List<SolrInputDocument> migrationSolrList;
 	private final static int SUBMIT_SIZE = 10000;
-	
+
 	private static Mongo mongo;
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
@@ -153,6 +153,7 @@ public class EnrichmentPlugin<I> extends
 	private static IBindingFactory bfact;
 	private static OsgiEdmMongoServer mongoServer;
 	private static EuropeanaEnrichmentTagger tagger;
+
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
 	}
@@ -285,7 +286,15 @@ public class EnrichmentPlugin<I> extends
 			pass = PropertyReader
 					.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
 					.getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
-			
+					if (mongoServer == null) {
+						mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname,
+								pass);
+						morphia = new Morphia();
+
+						mongoServer.createDatastore(morphia);
+						
+				
+					}
 			@SuppressWarnings("rawtypes")
 			Collection collection = (Collection) context.getExecution()
 					.getDataSet();
@@ -295,18 +304,11 @@ public class EnrichmentPlugin<I> extends
 					.retrieveRecord(sugarCrmId);
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
-			
-			try {
-				mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
-				morphia = new Morphia();
 
-				mongoServer.createDatastore(morphia);
-				clearData(mongoServer,collection.getMnemonic());
-				solrServer.deleteByQuery("europeana_collectionName:"+collection.getName().split("_")[0]+"*");
-			} catch(Exception e){
-				e.printStackTrace();
-			}
 			
+				clearData(mongoServer, collection.getMnemonic());
+				solrServer.deleteByQuery("europeana_collectionName:"
+						+ collection.getName().split("_")[0] + "*");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -328,7 +330,7 @@ public class EnrichmentPlugin<I> extends
 			// solrServer.commit();
 			System.out.println("Committed in Solr Server");
 
-			//mongoServer.close();
+			// mongoServer.close();
 		} catch (IOException e) {
 			context.getLoggingEngine().logFailed(
 					Level.SEVERE,
@@ -359,9 +361,9 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
-		
-			//mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
-		
+
+		// mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
+
 		if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 				&& mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
 						.size() > 0) {
@@ -374,10 +376,10 @@ public class EnrichmentPlugin<I> extends
 				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
 						.equals(Status.DELETED)) {
 			MongoConstructor mongoConstructor = new MongoConstructor();
-			
-			//morphia = new Morphia();
 
-			//mongoServer.createDatastore(morphia);
+			// morphia = new Morphia();
+
+			// mongoServer.createDatastore(morphia);
 			try {
 				if (solrServer.ping() == null) {
 					log.log(Level.SEVERE,
@@ -393,7 +395,7 @@ public class EnrichmentPlugin<I> extends
 				SolrInputDocument basicDocument = new SolrConstructor()
 						.constructSolrDocument(rdf);
 				// migrationSolrList.add(basicDocument);
-				
+
 				List<Entity> entities = tagger.tagDocument(basicDocument);
 				mergeEntities(rdf, entities);
 				RDF rdfFinal = cleanRDF(rdf);
@@ -466,15 +468,14 @@ public class EnrichmentPlugin<I> extends
 					fileName = (String) mdr.getCollection().getName();
 				}
 
-				
-
-				fullBean.setEuropeanaCollectionName(new String[] { mdr.getCollection().getName() });
-				solrInputDocument
-						.setField("europeana_collectionName", mdr.getCollection().getName());
+				fullBean.setEuropeanaCollectionName(new String[] { mdr
+						.getCollection().getName() });
+				solrInputDocument.setField("europeana_collectionName", mdr
+						.getCollection().getName());
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
-					updateFullBean(mongoServer,fullBean);
+					updateFullBean(mongoServer, fullBean);
 
 				}
 				// FileUtils.write(new File("/home/gmamakis/"
@@ -496,7 +497,6 @@ public class EnrichmentPlugin<I> extends
 					}
 					retries++;
 				}
-				
 
 			} catch (JiBXException e) {
 				log.log(Level.WARNING,
@@ -555,11 +555,10 @@ public class EnrichmentPlugin<I> extends
 			}
 
 		}
-		
+
 		return true;
 	}
 
-	
 	private void clearData(OsgiEdmMongoServer mongoServer, String collection) {
 		// TODO Auto-generated method stub
 		DBCollection records = mongoServer.getDatastore().getDB()
@@ -572,30 +571,35 @@ public class EnrichmentPlugin<I> extends
 				.getCollection("Aggregation");
 		DBCollection europeanaAggregations = mongoServer.getDatastore().getDB()
 				.getCollection("EuropeanaAggregation");
-		
 
-		DBObject query = new BasicDBObject("about", Pattern.compile("^/"+collection+"/"));
-		DBObject proxyQuery = new BasicDBObject("about", "/proxy/provider"+
-				Pattern.compile("^/"+collection+"/"));
+		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
+				+ collection + "/"));
+		DBObject proxyQuery = new BasicDBObject("about", "/proxy/provider"
+				+ Pattern.compile("^/" + collection + "/"));
 		DBObject europeanaProxyQuery = new BasicDBObject("about",
-				"/proxy/europeana" + Pattern.compile("^/"+collection+"/"));
+				"/proxy/europeana" + Pattern.compile("^/" + collection + "/"));
 
-		DBObject providedCHOQuery = new BasicDBObject("about", "/item" + Pattern.compile("^/"+collection+"/"));
+		DBObject providedCHOQuery = new BasicDBObject("about", "/item"
+				+ Pattern.compile("^/" + collection + "/"));
 		DBObject aggregationQuery = new BasicDBObject("about",
-				"/aggregation/provider" + Pattern.compile("^/"+collection+"/"));
+				"/aggregation/provider"
+						+ Pattern.compile("^/" + collection + "/"));
 		DBObject europeanaAggregationQuery = new BasicDBObject("about",
-				"/aggregation/europeana" + Pattern.compile("^/"+collection+"/"));
+				"/aggregation/europeana"
+						+ Pattern.compile("^/" + collection + "/"));
 
-		europeanaAggregations.remove(europeanaAggregationQuery,WriteConcern.JOURNAL_SAFE);
-		records.remove(query,WriteConcern.JOURNAL_SAFE);
-		proxies.remove(europeanaProxyQuery,WriteConcern.JOURNAL_SAFE);
-		proxies.remove(proxyQuery,WriteConcern.JOURNAL_SAFE);
-		providedCHOs.remove(providedCHOQuery,WriteConcern.JOURNAL_SAFE);
-		aggregations.remove(aggregationQuery,WriteConcern.JOURNAL_SAFE);
+		europeanaAggregations.remove(europeanaAggregationQuery,
+				WriteConcern.JOURNAL_SAFE);
+		records.remove(query, WriteConcern.JOURNAL_SAFE);
+		proxies.remove(europeanaProxyQuery, WriteConcern.JOURNAL_SAFE);
+		proxies.remove(proxyQuery, WriteConcern.JOURNAL_SAFE);
+		providedCHOs.remove(providedCHOQuery, WriteConcern.JOURNAL_SAFE);
+		aggregations.remove(aggregationQuery, WriteConcern.JOURNAL_SAFE);
 	}
 
 	// update a FullBean
-	private void updateFullBean(OsgiEdmMongoServer mongoServer, FullBeanImpl fullBean) {
+	private void updateFullBean(OsgiEdmMongoServer mongoServer,
+			FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
 				.createQuery(FullBeanImpl.class).field("about")
 				.equal(fullBean.getAbout().replace("/item", ""));
@@ -1142,7 +1146,6 @@ public class EnrichmentPlugin<I> extends
 	}
 
 	// check if the hash of the record exists
-	
 
 	// append the rest of the contextual entities
 	@SuppressWarnings({ "unchecked", "rawtypes" })
