@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.response.SolrPingResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
@@ -153,7 +154,7 @@ public class EnrichmentPlugin<I> extends
 	private static IBindingFactory bfact;
 	private static OsgiEdmMongoServer mongoServer;
 	private static EuropeanaEnrichmentTagger tagger;
-
+	private static SolrPingResponse resp;
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
 	}
@@ -304,8 +305,15 @@ public class EnrichmentPlugin<I> extends
 					.retrieveRecord(sugarCrmId);
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
-
-			
+			resp = solrServer.ping();
+			if (resp == null) {
+				log.log(Level.SEVERE,
+						"Solr server "
+								+ solrServer.getBaseURL()
+								+ " is not available. "
+								+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
+				
+			}
 				clearData(mongoServer, collection.getMnemonic());
 				solrServer.deleteByQuery("europeana_collectionName:"
 						+ collection.getName().split("_")[0] + "*");
@@ -324,12 +332,16 @@ public class EnrichmentPlugin<I> extends
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		try {
+			synchronized (solrList) {
+				
+			
 			solrServer.add(solrList.getQueue());
 			System.out.println("Adding " + recordNumber + " documents");
-
+			recordNumber =0;
+			solrList.getQueue().clear();
 			// solrServer.commit();
 			System.out.println("Committed in Solr Server");
-
+			}
 			// mongoServer.close();
 		} catch (IOException e) {
 			context.getLoggingEngine().logFailed(
@@ -363,7 +375,7 @@ public class EnrichmentPlugin<I> extends
 		String value = null;
 
 		// mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
-
+		if(resp!=null){
 		if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 				&& mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
 						.size() > 0) {
@@ -381,14 +393,7 @@ public class EnrichmentPlugin<I> extends
 
 			// mongoServer.createDatastore(morphia);
 			try {
-				if (solrServer.ping() == null) {
-					log.log(Level.SEVERE,
-							"Solr server "
-									+ solrServer.getBaseURL()
-									+ " is not available. "
-									+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
-					return false;
-				}
+				
 
 				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
@@ -557,6 +562,8 @@ public class EnrichmentPlugin<I> extends
 		}
 
 		return true;
+		}
+		return false;
 	}
 
 	private void clearData(OsgiEdmMongoServer mongoServer, String collection) {
