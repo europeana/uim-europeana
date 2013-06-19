@@ -181,6 +181,7 @@
 							!com.google.common.base,
 							!com.google.common.collect,
 							!org.apache.commons.discovery.tools,
+							!org.hibernate,
 						    eu.europeana.uim.solr4,
 							org.apache.solr.common.util,
 							org.apache.solr.client.solrj.impl,
