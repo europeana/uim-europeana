@@ -132,6 +132,7 @@
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,
+							!org.hibernate,
 							!org.apache.felix.service.command,
 							!net.vz.mongodb.jackson,
 							!de.undercouch.bson4jackson.*,
