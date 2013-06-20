@@ -1195,14 +1195,18 @@ public class EnrichmentPlugin<I> extends
 					} else {
 						rs.setString(val);
 					}
+					Lang lang = new Lang();
+					
 					if (edmAttr != null
 							&& StringUtils.equals(
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
-						Lang lang = new Lang();
-						lang.setLang(valAttr);
-						rs.setLang(lang);
+						lang.setLang(StringUtils.isEmpty(valAttr)?"def":valAttr);
+						
+					} else {
+						lang.setLang("def");
 					}
+					rs.setLang(lang);
 					lst.add(RDF.returnObject(RDF.getClazz(), rs));
 				} else if (RDF.getClazz().getSuperclass()
 						.isAssignableFrom(LiteralType.class)) {
@@ -1214,7 +1218,7 @@ public class EnrichmentPlugin<I> extends
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
 
-						lang.setLang(valAttr);
+						lang.setLang(StringUtils.isEmpty(valAttr)?"def":valAttr);
 
 					} else {
 						lang.setLang("def");
@@ -1248,7 +1252,7 @@ public class EnrichmentPlugin<I> extends
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
 
-						lang.setLang(valAttr);
+						lang.setLang(StringUtils.isEmpty(valAttr)?"def":valAttr);
 
 					} else {
 						lang.setLang("def");
@@ -1277,7 +1281,7 @@ public class EnrichmentPlugin<I> extends
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
 
-						lang.setLang(valAttr);
+						lang.setLang(StringUtils.isEmpty(valAttr)?"def":valAttr);
 
 					} else {
 						lang.setLang("def");

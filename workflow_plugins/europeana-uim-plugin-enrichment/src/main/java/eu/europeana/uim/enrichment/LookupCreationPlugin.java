@@ -24,6 +24,7 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
+import eu.europeana.corelib.tools.utils.EuropeanaUriUtils;
 import eu.europeana.corelib.tools.utils.HashUtils;
 import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
 import eu.europeana.corelib.tools.utils.SipCreatorUtils;
@@ -135,8 +136,7 @@ public class LookupCreationPlugin<I> extends
 				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 			}
 			uctx = bfact.createUnmarshallingContext();
-			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			FullBeanImpl fullBean = constructFullBeanMock(rdf);
+			
 			String collectionId = (String) mdr.getCollection().getMnemonic();
 			String fileName;
 			String oldCollectionId = enrichmentService
@@ -148,7 +148,8 @@ public class LookupCreationPlugin<I> extends
 			} else {
 				fileName = (String) mdr.getCollection().getName();
 			}
-
+			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+			FullBeanImpl fullBean = constructFullBeanMock(rdf,collectionId);
 			String hash = hashExists(collectionId, fileName, fullBean);
 
 			if (StringUtils.isNotEmpty(hash)) {
@@ -163,7 +164,7 @@ public class LookupCreationPlugin<I> extends
 		return false;
 	}
 
-	private FullBeanImpl constructFullBeanMock(RDF rdf) {
+	private FullBeanImpl constructFullBeanMock(RDF rdf,String collectionId) {
 		FullBeanImpl fBean = new FullBeanImpl();
 		AggregationImpl aggr = new AggregationImpl();
 		List<AggregationImpl> aggrs = new ArrayList<AggregationImpl>();
@@ -196,15 +197,14 @@ public class LookupCreationPlugin<I> extends
 			fBean.setProxies(proxies);
 		}
 		fBean.setAggregations(aggrs);
+		fBean.setAbout(EuropeanaUriUtils.createEuropeanaId(collectionId, rdf.getProvidedCHOList().get(0).getAbout()));
 		return fBean;
 	}
 
 	private ProxyType findProxy(RDF rdf) {
 		for (ProxyType proxy : rdf.getProxyList()) {
-			if (proxy.getEuropeanaProxy() != null) {
-				if (!proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+			if (proxy.getEuropeanaProxy() == null || !proxy.getEuropeanaProxy().isEuropeanaProxy()) {
 					return proxy;
-				}
 			}
 		}
 		return null;
