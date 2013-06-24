@@ -20,6 +20,10 @@
 	    <module>misc/dedup</module>
 		<module>misc/europeana-uim-definitions</module>
 		<module>plugins</module>
+	    <module>plugins/clientbindings</module>
+		<module>plugins/mintjmsclient</module>
+		<module>plugins/sugarcrmclient</module>
+		<module>plugins/repoxclient</module>
 		<module>misc/europeana-uim-workflows-startups</module>
 		<module>workflow_plugins/europeana-uim-plugin-enrichment</module>
 		<module>workflow_plugins/linkchecker</module>

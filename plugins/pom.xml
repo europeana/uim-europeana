@@ -14,14 +14,6 @@
 	<packaging>pom</packaging>
 	<name>Unified Ingestion Manager: Europeana Provided OSGI plugins</name>
 
-	<modules>
-		<module>clientbindings</module>
-		<module>mintjmsclient</module>
-		<module>sugarcrmclient</module>
-		<module>repoxclient</module>
-	</modules>
-
-
 
 	<dependencies>
 

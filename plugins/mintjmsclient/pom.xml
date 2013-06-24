@@ -133,7 +133,6 @@
 						<phase>package</phase>
 						<goals>
 							<goal>bundle</goal>
-							<!-- <goal>bundleall</goal> -->
 						</goals>
 					</execution>
 				</executions>

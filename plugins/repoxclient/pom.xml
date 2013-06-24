@@ -2,16 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<artifactId>europeana-uim-plugins</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
+	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>europeana-uim-plugin-repox</artifactId>
-	<packaging>jar</packaging>
+	<packaging>bundle</packaging>
 	<name>Unified Ingestion Manager: RepoxClient UIM Plugin</name>
 
 	<dependencies>
@@ -90,12 +91,14 @@
 							org.quartz; version=1.6.2,
 							org.springframework.osgi.service.importer; version=1.2.1,
 							eu.europeana.uim.common; version=0.0.0,
-							eu.europeana.uim.store; version=0.0.0,
+							eu.europeana.uim.store;
+							version=0.0.0,
 							org.apache.commons.lang; version=2.4.0,
 							org.apache.commons.io; version=2.1.0,
 							org.joda.time,
 							eu.europeana.uim; version=0.0.0,
-							eu.europeana.uim.adapter; version=0.0.0,
+							eu.europeana.uim.adapter;
+							version=0.0.0,
 							eu.europeana.uim.logging; version=0.0.0,
 							eu.europeana.uim.orchestration; version=0.0.0,
 							eu.europeana.uim.plugin; version=0.0.0,
@@ -103,7 +106,8 @@
 							eu.europeana.uim.plugin.source; version=0.0.0,
 							eu.europeana.uim.resource; version=0.0.0,
 							eu.europeana.uim.storage; version=0.0.0,
-							eu.europeana.uim.util; version=0.0.0,
+							eu.europeana.uim.util;
+							version=0.0.0,
 							eu.europeana.uim.workflow; version=0.0.0,
 							eu.europeana.uim.sugar; version=0.0.0,
 							eu.europeana.uim.sugar.model; version=0.0.0,
@@ -115,7 +119,6 @@
 					</instructions>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
@@ -129,8 +132,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-
 			<plugin>
 				<inherited>true</inherited>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -140,8 +141,43 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.felix
+										</groupId>
+										<artifactId>
+											maven-bundle-plugin
+										</artifactId>
+										<versionRange>
+											[2.1.0,)
+										</versionRange>
+										<goals>
+											<goal>bundle</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 
