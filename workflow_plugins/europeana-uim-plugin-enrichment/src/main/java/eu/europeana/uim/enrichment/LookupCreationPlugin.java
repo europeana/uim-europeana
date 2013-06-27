@@ -197,7 +197,7 @@ public class LookupCreationPlugin<I> extends
 			fBean.setProxies(proxies);
 		}
 		fBean.setAggregations(aggrs);
-		fBean.setAbout(EuropeanaUriUtils.createEuropeanaId(collectionId, rdf.getProvidedCHOList().get(0).getAbout()));
+		fBean.setAbout(rdf.getProvidedCHOList().get(0).getAbout());
 		return fBean;
 	}
 
