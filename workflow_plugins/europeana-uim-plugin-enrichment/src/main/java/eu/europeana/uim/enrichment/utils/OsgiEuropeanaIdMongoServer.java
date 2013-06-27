@@ -34,7 +34,7 @@ public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServer {
 			super.setDatastore(datastore);
 	}
 	@Override
-	public List<EuropeanaId> retrieveEuropeanaIdFromOld(String oldId) {
-		return datastore.find(EuropeanaId.class).field("oldId").equal(oldId).asList();
+	public EuropeanaId retrieveEuropeanaIdFromOld(String oldId) {
+		return datastore.find(EuropeanaId.class).field("oldId").equal(oldId).get();
 	}
 }

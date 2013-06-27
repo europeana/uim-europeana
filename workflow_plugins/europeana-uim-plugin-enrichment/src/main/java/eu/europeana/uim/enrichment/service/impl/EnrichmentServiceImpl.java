@@ -192,7 +192,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
 
 	@Override
-	public List<EuropeanaId> retrieveEuropeanaIdFromOld(String string) {
+	public EuropeanaId retrieveEuropeanaIdFromOld(String string) {
 		
 		return idserver.retrieveEuropeanaIdFromOld(string);
 	}

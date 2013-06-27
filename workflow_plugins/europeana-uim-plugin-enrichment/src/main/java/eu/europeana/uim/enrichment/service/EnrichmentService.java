@@ -29,7 +29,7 @@ public interface EnrichmentService {
 	public EuropeanaIdMongoServer getEuropeanaIdMongoServer();
 
 
-	List<EuropeanaId> retrieveEuropeanaIdFromOld(String string);
+	EuropeanaId retrieveEuropeanaIdFromOld(String string);
 
 
 	void saveEuropeanaId(EuropeanaId europeanaId);

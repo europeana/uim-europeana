@@ -406,7 +406,7 @@ public class EnrichmentPlugin<I> extends
 				//	synchronized (tagger) {
 					EuropeanaEnrichmentTagger tagger = new EuropeanaEnrichmentTagger();
 					tagger.init("Europeana");
-						entities = tagger.tagDocument(basicDocument);
+					entities = tagger.tagDocument(basicDocument);
 					//}
 					mergeEntities(rdf, entities);
 					RDF rdfFinal = cleanRDF(rdf);
