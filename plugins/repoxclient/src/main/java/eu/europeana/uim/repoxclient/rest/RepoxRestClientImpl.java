@@ -2333,11 +2333,15 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 			namespaceUri.append(ds.getRecordIdPolicy().getSequence()
 					.getNamespaces().getNamespace().getNamespaceUri()
 					.getNamespaceUri());
-
-			recordXPath.append("recordXPath=");
-			recordXPath.append(ds.getSplitRecords().getRecordXPath()
-					.getRecordXPath());
 		}
+		
+		
+		if(ds.getSplitRecords() != null || ds.getSplitRecords().getRecordXPath() != null){
+		recordXPath.append("recordXPath=");
+		recordXPath.append(ds.getSplitRecords().getRecordXPath()
+				.getRecordXPath());
+		}
+		
 		url.append("url=");
 		url.append(ds.getSequence1().getRetrieveStrategy().getChoice().getUrl()
 				.getUrl());
