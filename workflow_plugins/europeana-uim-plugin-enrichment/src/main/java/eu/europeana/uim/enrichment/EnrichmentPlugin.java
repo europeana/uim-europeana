@@ -153,8 +153,9 @@ public class EnrichmentPlugin<I> extends
 	private static String pass;
 	private static IBindingFactory bfact;
 	private static OsgiEdmMongoServer mongoServer;
-	//private static EuropeanaEnrichmentTagger tagger;
+	private static EuropeanaEnrichmentTagger tagger;
 	private static SolrPingResponse resp;
+	private static int recordCount = 0;
 
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
@@ -274,8 +275,10 @@ public class EnrichmentPlugin<I> extends
 			throws IngestionPluginFailedException {
 
 		try {
-		//	tagger = new EuropeanaEnrichmentTagger();
-		// tager.init("Europeana");
+			if (tagger == null) {
+				tagger = new EuropeanaEnrichmentTagger();
+				tagger.init("Europeana");
+			}
 			solrList = SolrList.getInstance();
 			migrationSolrList = new ArrayList<SolrInputDocument>();
 			solrServer = enrichmentService.getSolrServer();
@@ -336,6 +339,9 @@ public class EnrichmentPlugin<I> extends
 
 				solrServer.add(solrList.getQueue());
 				System.out.println("Adding " + recordNumber + " documents");
+				System.out
+						.println("Record Count " + recordCount + " documents");
+				recordCount = 0;
 				recordNumber = 0;
 				solrList.getQueue().clear();
 				// solrServer.commit();
@@ -372,7 +378,7 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
-
+		recordCount++;
 		// mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
 		if (resp != null) {
 			if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
@@ -403,11 +409,12 @@ public class EnrichmentPlugin<I> extends
 					// migrationSolrList.add(basicDocument);
 
 					List<Entity> entities = null;
-				//	synchronized (tagger) {
-					EuropeanaEnrichmentTagger tagger = new EuropeanaEnrichmentTagger();
-					tagger.init("Europeana");
+					// synchronized (tagger) {
+					// EuropeanaEnrichmentTagger tagger = new
+					// EuropeanaEnrichmentTagger();
+
 					entities = tagger.tagDocument(basicDocument);
-					//}
+					// }
 					mergeEntities(rdf, entities);
 					RDF rdfFinal = cleanRDF(rdf);
 					boolean hasEuropeanaProxy = false;
@@ -497,8 +504,11 @@ public class EnrichmentPlugin<I> extends
 					int retries = 0;
 					while (retries < RETRIES) {
 						try {
-							solrList.addToQueue(solrServer, solrInputDocument);
-							recordNumber++;
+							synchronized (solrList) {
+								solrList.addToQueue(solrServer,
+										solrInputDocument);
+								recordNumber++;
+							}
 							// Send records to SOLR by thousands
 
 							return true;
@@ -534,7 +544,6 @@ public class EnrichmentPlugin<I> extends
 					log.log(Level.WARNING,
 							"Generic Exception occured with error "
 									+ e.getMessage() + "\nRetrying");
-					e.printStackTrace();
 				}
 				return false;
 			} else {
@@ -561,14 +570,17 @@ public class EnrichmentPlugin<I> extends
 												.getAbout()));
 					}
 				} catch (JiBXException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.log(Level.WARNING,
+							"Generic Exception occured with error "
+									+ e.getMessage() + "\nRetrying");
 				} catch (SolrServerException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.log(Level.WARNING,
+							"Generic Exception occured with error "
+									+ e.getMessage() + "\nRetrying");
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.log(Level.WARNING,
+							"Generic Exception occured with error "
+									+ e.getMessage() + "\nRetrying");
 				}
 
 			}
@@ -592,20 +604,21 @@ public class EnrichmentPlugin<I> extends
 				.getCollection("EuropeanaAggregation");
 
 		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
-				+ collection + "/"));
+				+ collection + "/.*/"));
 		DBObject proxyQuery = new BasicDBObject("about", "/proxy/provider"
-				+ Pattern.compile("^/" + collection + "/"));
+				+ Pattern.compile("^/" + collection + "/.*/"));
 		DBObject europeanaProxyQuery = new BasicDBObject("about",
-				"/proxy/europeana" + Pattern.compile("^/" + collection + "/"));
+				"/proxy/europeana"
+						+ Pattern.compile("^/" + collection + "/.*/"));
 
 		DBObject providedCHOQuery = new BasicDBObject("about", "/item"
-				+ Pattern.compile("^/" + collection + "/"));
+				+ Pattern.compile("^/" + collection + "/.*/"));
 		DBObject aggregationQuery = new BasicDBObject("about",
 				"/aggregation/provider"
-						+ Pattern.compile("^/" + collection + "/"));
+						+ Pattern.compile("^/" + collection + "/.*/"));
 		DBObject europeanaAggregationQuery = new BasicDBObject("about",
 				"/aggregation/europeana"
-						+ Pattern.compile("^/" + collection + "/"));
+						+ Pattern.compile("^/" + collection + "/.*/"));
 
 		europeanaAggregations.remove(europeanaAggregationQuery,
 				WriteConcern.JOURNAL_SAFE);
@@ -733,7 +746,9 @@ public class EnrichmentPlugin<I> extends
 								entity.getOriginalField()).appendField(
 								europeanaProxy, concept.getAbout());
 					} catch (IllegalArgumentException e) {
-
+						log.log(Level.SEVERE,
+								"Generic Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
 					}
 
 				}
@@ -775,7 +790,9 @@ public class EnrichmentPlugin<I> extends
 								entity.getOriginalField()).appendField(
 								europeanaProxy, ts.getAbout());
 					} catch (IllegalArgumentException e) {
-
+						log.log(Level.SEVERE,
+								"Generic Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
 					}
 				}
 			} else if (StringUtils.equals(entity.getClassName(), "Agent")) {
@@ -816,7 +833,9 @@ public class EnrichmentPlugin<I> extends
 								entity.getOriginalField()).appendField(
 								europeanaProxy, ts.getAbout());
 					} catch (IllegalArgumentException e) {
-
+						log.log(Level.SEVERE,
+								"Generic Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
 					}
 				}
 			} else {
@@ -858,7 +877,9 @@ public class EnrichmentPlugin<I> extends
 								entity.getOriginalField()).appendField(
 								europeanaProxy, ts.getAbout());
 					} catch (IllegalArgumentException e) {
-
+						log.log(Level.SEVERE,
+								"Generic Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
 					}
 				}
 			}
@@ -1208,13 +1229,14 @@ public class EnrichmentPlugin<I> extends
 						rs.setString(val);
 					}
 					Lang lang = new Lang();
-					
+
 					if (edmAttr != null
 							&& StringUtils.equals(
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
-						lang.setLang(StringUtils.isEmpty(valAttr)?"def":valAttr);
-						
+						lang.setLang(StringUtils.isEmpty(valAttr) ? "def"
+								: valAttr);
+
 					} else {
 						lang.setLang("def");
 					}
@@ -1230,7 +1252,8 @@ public class EnrichmentPlugin<I> extends
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
 
-						lang.setLang(StringUtils.isEmpty(valAttr)?"def":valAttr);
+						lang.setLang(StringUtils.isEmpty(valAttr) ? "def"
+								: valAttr);
 
 					} else {
 						lang.setLang("def");
@@ -1264,7 +1287,8 @@ public class EnrichmentPlugin<I> extends
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
 
-						lang.setLang(StringUtils.isEmpty(valAttr)?"def":valAttr);
+						lang.setLang(StringUtils.isEmpty(valAttr) ? "def"
+								: valAttr);
 
 					} else {
 						lang.setLang("def");
@@ -1293,7 +1317,8 @@ public class EnrichmentPlugin<I> extends
 									StringUtils.split(edmAttr, "@")[1],
 									"xml:lang")) {
 
-						lang.setLang(StringUtils.isEmpty(valAttr)?"def":valAttr);
+						lang.setLang(StringUtils.isEmpty(valAttr) ? "def"
+								: valAttr);
 
 					} else {
 						lang.setLang("def");

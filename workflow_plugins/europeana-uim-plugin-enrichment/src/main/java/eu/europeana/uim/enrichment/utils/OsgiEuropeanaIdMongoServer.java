@@ -14,7 +14,7 @@ import eu.europeana.uim.enrichment.MongoBundleActivator;
 public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServer {
 
 	public OsgiEuropeanaIdMongoServer(Mongo mongoServer, String databaseName) {
-		super(mongoServer,databaseName);
+		super(mongoServer,databaseName,"","");
 		this.mongoServer = mongoServer;
 		this.databaseName = databaseName;		
 	}

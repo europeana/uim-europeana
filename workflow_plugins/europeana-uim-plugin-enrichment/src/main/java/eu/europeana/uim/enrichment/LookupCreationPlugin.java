@@ -136,7 +136,7 @@ public class LookupCreationPlugin<I> extends
 				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 			}
 			uctx = bfact.createUnmarshallingContext();
-			
+
 			String collectionId = (String) mdr.getCollection().getMnemonic();
 			String fileName;
 			String oldCollectionId = enrichmentService
@@ -149,7 +149,7 @@ public class LookupCreationPlugin<I> extends
 				fileName = (String) mdr.getCollection().getName();
 			}
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			FullBeanImpl fullBean = constructFullBeanMock(rdf,collectionId);
+			FullBeanImpl fullBean = constructFullBeanMock(rdf, collectionId);
 			String hash = hashExists(collectionId, fileName, fullBean);
 
 			if (StringUtils.isNotEmpty(hash)) {
@@ -164,7 +164,7 @@ public class LookupCreationPlugin<I> extends
 		return false;
 	}
 
-	private FullBeanImpl constructFullBeanMock(RDF rdf,String collectionId) {
+	private FullBeanImpl constructFullBeanMock(RDF rdf, String collectionId) {
 		FullBeanImpl fBean = new FullBeanImpl();
 		AggregationImpl aggr = new AggregationImpl();
 		List<AggregationImpl> aggrs = new ArrayList<AggregationImpl>();
@@ -203,8 +203,9 @@ public class LookupCreationPlugin<I> extends
 
 	private ProxyType findProxy(RDF rdf) {
 		for (ProxyType proxy : rdf.getProxyList()) {
-			if (proxy.getEuropeanaProxy() == null || !proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-					return proxy;
+			if (proxy.getEuropeanaProxy() == null
+					|| !proxy.getEuropeanaProxy().isEuropeanaProxy()) {
+				return proxy;
 			}
 		}
 		return null;
@@ -254,17 +255,24 @@ public class LookupCreationPlugin<I> extends
 		sipCreatorUtils.setRepository(repository);
 		String hashField = sipCreatorUtils.getHashField(fileName, fileName);
 		if (hashField != null) {
-			return HashUtils.createHash(EseEdmMap.getEseEdmMap(
+			String val = EseEdmMap.getEseEdmMap(
 					StringUtils.contains(hashField, "[") ? StringUtils
 							.substringBefore(hashField, "[") : hashField)
-					.getEdmValue(fullBean));
+					.getEdmValue(fullBean);
+			if (val != null){
+				return HashUtils.createHash(val);
+			}
 		}
 		PreSipCreatorUtils preSipCreatorUtils = new PreSipCreatorUtils();
 		preSipCreatorUtils.setRepository(repository);
+
 		if (preSipCreatorUtils.getHashField(fileName, fileName) != null) {
-			return HashUtils.createHash(EseEdmMap.getEseEdmMap(
+			String val = EseEdmMap.getEseEdmMap(
 					preSipCreatorUtils.getHashField(collectionId, fileName))
-					.getEdmValue(fullBean));
+					.getEdmValue(fullBean);
+			if (val != null){
+				return HashUtils.createHash(val);
+			}
 		}
 		return null;
 	}
