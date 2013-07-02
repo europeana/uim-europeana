@@ -7,9 +7,9 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,17 +80,8 @@ import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
-import eu.europeana.corelib.solr.exceptions.MongoDBException;
-import eu.europeana.corelib.solr.server.EdmMongoServer;
-import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
-import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
-import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
-import eu.europeana.corelib.tools.utils.HashUtils;
-import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
-import eu.europeana.corelib.tools.utils.SipCreatorUtils;
-import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.enums.OriginalField;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
@@ -99,6 +90,7 @@ import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.SolrList;
+import eu.europeana.uim.enrichment.utils.SolrList.State;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
@@ -122,7 +114,6 @@ public class EnrichmentPlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static HttpSolrServer solrServer;
-	private static HttpSolrServer migrationSolrServer;
 	private static String mongoDB;
 	private static String mongoHost = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
@@ -142,10 +133,8 @@ public class EnrichmentPlugin<I> extends
 	private static String collections = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static Morphia morphia;
-	private static SolrList solrList;
-	private static List<SolrInputDocument> migrationSolrList;
-	private final static int SUBMIT_SIZE = 10000;
-
+	private SolrList solrList;
+	private ArrayBlockingQueue<SolrInputDocument> queue;
 	private static Mongo mongo;
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
@@ -156,6 +145,7 @@ public class EnrichmentPlugin<I> extends
 	private static EuropeanaEnrichmentTagger tagger;
 	private static SolrPingResponse resp;
 	private static int recordCount = 0;
+	
 
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
@@ -279,10 +269,12 @@ public class EnrichmentPlugin<I> extends
 				tagger = new EuropeanaEnrichmentTagger();
 				tagger.init("Europeana");
 			}
-			solrList = SolrList.getInstance();
-			migrationSolrList = new ArrayList<SolrInputDocument>();
+			queue = new ArrayBlockingQueue<SolrInputDocument>(1000);
+			
 			solrServer = enrichmentService.getSolrServer();
-			migrationSolrServer = enrichmentService.getMigrationServer();
+			solrList = new SolrList(queue, solrServer);
+			Thread t = new Thread(solrList);
+			t.start();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
 			uname = PropertyReader
@@ -334,36 +326,18 @@ public class EnrichmentPlugin<I> extends
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
-		try {
-			synchronized (solrList) {
+		
 
-				solrServer.add(solrList.getQueue());
+				solrList.setState(State.FINISHED);
 				System.out.println("Adding " + recordNumber + " documents");
 				System.out
 						.println("Record Count " + recordCount + " documents");
 				recordCount = 0;
 				recordNumber = 0;
-				solrList.getQueue().clear();
 				// solrServer.commit();
 				System.out.println("Committed in Solr Server");
-			}
 			// mongoServer.close();
-		} catch (IOException e) {
-			context.getLoggingEngine().logFailed(
-					Level.SEVERE,
-					this,
-					e,
-					"Input/Output exception occured in Solr with the following message: "
-							+ e.getMessage());
-		} catch (SolrServerException e) {
-			context.getLoggingEngine().logFailed(
-					Level.SEVERE,
-					this,
-					e,
-					"Solr server exception occured in Solr with the following message: "
-							+ e.getMessage());
-		}
-
+		
 	}
 
 	/*
@@ -477,7 +451,7 @@ public class EnrichmentPlugin<I> extends
 							completeness);
 					String collectionId = (String) mdr.getCollection()
 							.getMnemonic();
-					String fileName;
+					String fileName="";
 					String oldCollectionId = enrichmentService
 							.getCollectionMongoServer().findOldCollectionId(
 									collectionId);
@@ -501,25 +475,12 @@ public class EnrichmentPlugin<I> extends
 					// FileUtils.write(new File("/home/gmamakis/"
 					// + fullBean.getAbout().replace("/", "_") + ".xml"),
 					// EDMUtils.toEDM(fullBean));
-					int retries = 0;
-					while (retries < RETRIES) {
-						try {
-							synchronized (solrList) {
-								solrList.addToQueue(solrServer,
-										solrInputDocument);
+					queue.put(solrInputDocument);
 								recordNumber++;
-							}
 							// Send records to SOLR by thousands
 
-							return true;
-						} catch (SolrException e) {
-							log.log(Level.WARNING,
-									"Solr Exception occured with error "
-											+ e.getMessage() + "\nRetrying");
-
-						}
-						retries++;
-					}
+					
+				return true;
 
 				} catch (JiBXException e) {
 					log.log(Level.WARNING, "JibX Exception occured with error "
@@ -604,21 +565,21 @@ public class EnrichmentPlugin<I> extends
 				.getCollection("EuropeanaAggregation");
 
 		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
-				+ collection + "/.*/"));
-		DBObject proxyQuery = new BasicDBObject("about", "/proxy/provider"
-				+ Pattern.compile("^/" + collection + "/.*/"));
+				+ collection + "/"));
+		DBObject proxyQuery = new BasicDBObject("about", "^/proxy/provider"
+				+ Pattern.compile("/" + collection + "/"));
 		DBObject europeanaProxyQuery = new BasicDBObject("about",
-				"/proxy/europeana"
-						+ Pattern.compile("^/" + collection + "/.*/"));
+				"^/proxy/europeana"
+						+ Pattern.compile("/" + collection + "/"));
 
-		DBObject providedCHOQuery = new BasicDBObject("about", "/item"
-				+ Pattern.compile("^/" + collection + "/.*/"));
+		DBObject providedCHOQuery = new BasicDBObject("about", "^/item"
+				+ Pattern.compile("/" + collection + "/"));
 		DBObject aggregationQuery = new BasicDBObject("about",
-				"/aggregation/provider"
-						+ Pattern.compile("^/" + collection + "/.*/"));
+				"^/aggregation/provider"
+						+ Pattern.compile("/" + collection + "/"));
 		DBObject europeanaAggregationQuery = new BasicDBObject("about",
-				"/aggregation/europeana"
-						+ Pattern.compile("^/" + collection + "/.*/"));
+				"^/aggregation/europeana"
+						+ Pattern.compile("/" + collection + "/"));
 
 		europeanaAggregations.remove(europeanaAggregationQuery,
 				WriteConcern.JOURNAL_SAFE);
