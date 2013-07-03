@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +19,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.SolrPingResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -89,8 +87,6 @@ import eu.europeana.uim.enrichment.utils.EuropeanaDateUtils;
 import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
-import eu.europeana.uim.enrichment.utils.SolrList;
-import eu.europeana.uim.enrichment.utils.SolrList.State;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
@@ -124,7 +120,6 @@ public class EnrichmentPlugin<I> extends
 	private static int recordNumber;
 	private static String europeanaID = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA_ID);
-	private static final int RETRIES = 10;
 	private static String repository = PropertyReader
 			.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	private static SugarCrmService sugarCrmService;
@@ -133,8 +128,6 @@ public class EnrichmentPlugin<I> extends
 	private static String collections = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static Morphia morphia;
-	private SolrList solrList;
-	private ArrayBlockingQueue<SolrInputDocument> queue;
 	private static Mongo mongo;
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
@@ -144,7 +137,6 @@ public class EnrichmentPlugin<I> extends
 	private static OsgiEdmMongoServer mongoServer;
 	private static EuropeanaEnrichmentTagger tagger;
 	private static SolrPingResponse resp;
-	private static int recordCount = 0;
 	
 
 	public EnrichmentPlugin(String name, String description) {
@@ -269,12 +261,7 @@ public class EnrichmentPlugin<I> extends
 				tagger = new EuropeanaEnrichmentTagger();
 				tagger.init("Europeana");
 			}
-			queue = new ArrayBlockingQueue<SolrInputDocument>(1000);
-			
 			solrServer = enrichmentService.getSolrServer();
-			solrList = new SolrList(queue, solrServer);
-			Thread t = new Thread(solrList);
-			t.start();
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
 			uname = PropertyReader
@@ -328,15 +315,18 @@ public class EnrichmentPlugin<I> extends
 			throws IngestionPluginFailedException {
 		
 
-				solrList.setState(State.FINISHED);
 				System.out.println("Adding " + recordNumber + " documents");
-				System.out
-						.println("Record Count " + recordCount + " documents");
-				recordCount = 0;
 				recordNumber = 0;
-				// solrServer.commit();
+				try {
+					solrServer.commit();
+				} catch (SolrServerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				System.out.println("Committed in Solr Server");
-			// mongoServer.close();
 		
 	}
 
@@ -352,8 +342,6 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
-		recordCount++;
-		// mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname, pass);
 		if (resp != null) {
 			if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 					&& mdr.getValues(
@@ -369,9 +357,7 @@ public class EnrichmentPlugin<I> extends
 							.equals(Status.DELETED)) {
 				MongoConstructor mongoConstructor = new MongoConstructor();
 
-				// morphia = new Morphia();
-
-				// mongoServer.createDatastore(morphia);
+			
 				try {
 
 					IUnmarshallingContext uctx = bfact
@@ -380,15 +366,13 @@ public class EnrichmentPlugin<I> extends
 							value));
 					SolrInputDocument basicDocument = new SolrConstructor()
 							.constructSolrDocument(rdf);
-					// migrationSolrList.add(basicDocument);
+			
 
 					List<Entity> entities = null;
-					// synchronized (tagger) {
-					// EuropeanaEnrichmentTagger tagger = new
-					// EuropeanaEnrichmentTagger();
+				
 
 					entities = tagger.tagDocument(basicDocument);
-					// }
+					
 					mergeEntities(rdf, entities);
 					RDF rdfFinal = cleanRDF(rdf);
 					boolean hasEuropeanaProxy = false;
@@ -472,13 +456,8 @@ public class EnrichmentPlugin<I> extends
 						updateFullBean(mongoServer, fullBean);
 
 					}
-					// FileUtils.write(new File("/home/gmamakis/"
-					// + fullBean.getAbout().replace("/", "_") + ".xml"),
-					// EDMUtils.toEDM(fullBean));
-					queue.put(solrInputDocument);
-								recordNumber++;
-							// Send records to SOLR by thousands
 
+					solrServer.add(solrInputDocument);
 					
 				return true;
 
@@ -582,12 +561,12 @@ public class EnrichmentPlugin<I> extends
 						+ Pattern.compile("/" + collection + "/"));
 
 		europeanaAggregations.remove(europeanaAggregationQuery,
-				WriteConcern.JOURNAL_SAFE);
-		records.remove(query, WriteConcern.JOURNAL_SAFE);
-		proxies.remove(europeanaProxyQuery, WriteConcern.JOURNAL_SAFE);
-		proxies.remove(proxyQuery, WriteConcern.JOURNAL_SAFE);
-		providedCHOs.remove(providedCHOQuery, WriteConcern.JOURNAL_SAFE);
-		aggregations.remove(aggregationQuery, WriteConcern.JOURNAL_SAFE);
+				WriteConcern.FSYNC_SAFE);
+		records.remove(query, WriteConcern.FSYNC_SAFE);
+		proxies.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
+		proxies.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
+		providedCHOs.remove(providedCHOQuery, WriteConcern.FSYNC_SAFE);
+		aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
 	}
 
 	// update a FullBean
