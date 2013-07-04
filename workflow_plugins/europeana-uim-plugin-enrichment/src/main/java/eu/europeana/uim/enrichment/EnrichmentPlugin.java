@@ -462,28 +462,34 @@ public class EnrichmentPlugin<I> extends
 				return true;
 
 				} catch (JiBXException e) {
-					log.log(Level.WARNING, "JibX Exception occured with error "
-							+ e.getMessage() + "\nRetrying");
+//					log.log(Level.WARNING, "JibX Exception occured with error "
+//							+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				} catch (MalformedURLException e) {
 					log.log(Level.WARNING,
 							"Malformed URL Exception occured with error "
 									+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				} catch (InstantiationException e) {
 					log.log(Level.WARNING,
 							"Instantiation Exception occured with error "
 									+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				} catch (IllegalAccessException e) {
 					log.log(Level.WARNING,
 							"Illegal Access Exception occured with error "
 									+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				} catch (IOException e) {
 					log.log(Level.WARNING, "IO Exception occured with error "
 							+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				} catch (Exception e) {
 
 					log.log(Level.WARNING,
 							"Generic Exception occured with error "
 									+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				}
 				return false;
 			} else {
@@ -513,14 +519,17 @@ public class EnrichmentPlugin<I> extends
 					log.log(Level.WARNING,
 							"Generic Exception occured with error "
 									+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				} catch (SolrServerException e) {
 					log.log(Level.WARNING,
 							"Generic Exception occured with error "
 									+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				} catch (IOException e) {
 					log.log(Level.WARNING,
 							"Generic Exception occured with error "
 									+ e.getMessage() + "\nRetrying");
+					e.printStackTrace();
 				}
 
 			}
