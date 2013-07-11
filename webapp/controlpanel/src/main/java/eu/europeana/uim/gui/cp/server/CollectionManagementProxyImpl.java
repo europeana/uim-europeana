@@ -62,7 +62,7 @@ public class CollectionManagementProxyImpl extends
 				collectionDTO.setNewCollection(collection.getNewCollectionId());
 				collections.add(collectionDTO);
 			}
-			collectionMongoServer.close();
+//			collectionMongoServer.close();
 
 		return collections;
 
@@ -81,7 +81,7 @@ public class CollectionManagementProxyImpl extends
 			collection
 					.setOldCollectionId(collectionDTO.getOriginalCollection());
 			collectionMongoServer.saveCollection(collection);
-			collectionMongoServer.close();
+//			collectionMongoServer.close();
 		} catch (UnknownHostException e) {
 			return false;
 		} catch (MongoException e) {
@@ -105,7 +105,7 @@ public class CollectionManagementProxyImpl extends
 						.getOriginalCollection());
 				collectionMongoServer.saveCollection(collection);
 			}
-			collectionMongoServer.close();
+//			collectionMongoServer.close();
 
 		return true;
 	}
