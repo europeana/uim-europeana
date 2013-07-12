@@ -287,15 +287,15 @@ public class EnrichmentPlugin<I> extends
 					.retrieveRecord(sugarCrmId);
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
-			resp = solrServer.ping();
-			if (resp == null) {
-				log.log(Level.SEVERE,
-						"Solr server "
-								+ solrServer.getBaseURL()
-								+ " is not available. "
-								+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
-
-			}
+//			resp = solrServer.ping();
+//			if (resp == null) {
+//				log.log(Level.SEVERE,
+//						"Solr server "
+//								+ solrServer.getBaseURL()
+//								+ " is not available. "
+//								+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
+//
+//			}
 			clearData(mongoServer, collection.getMnemonic());
 			solrServer.deleteByQuery("europeana_collectionName:"
 					+ collection.getName().split("_")[0] + "*");
@@ -343,7 +343,7 @@ public class EnrichmentPlugin<I> extends
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
 		log.log(Level.INFO,"Solr is down=" + (resp==null));
-		if (resp != null) {
+
 			if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 					&& mdr.getValues(
 							EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
@@ -538,8 +538,7 @@ public class EnrichmentPlugin<I> extends
 			}
 
 			return true;
-		}
-		return false;
+		
 	}
 
 	private void clearData(OsgiEdmMongoServer mongoServer, String collection) {
