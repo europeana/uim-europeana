@@ -342,6 +342,7 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
+		log.log(Level.INFO,"Solr is down=" + (resp==null));
 		if (resp != null) {
 			if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 					&& mdr.getValues(
@@ -352,6 +353,7 @@ public class EnrichmentPlugin<I> extends
 			} else {
 				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 			}
+			log.log(Level.INFO,"Status size = "+mdr.getValues(EuropeanaModelRegistry.STATUS).size());
 			if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
 					|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
 							.equals(Status.DELETED)) {
@@ -364,6 +366,7 @@ public class EnrichmentPlugin<I> extends
 							.createUnmarshallingContext();
 					RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(
 							value));
+					log.log(Level.INFO,"Processing record "+ rdf.getProvidedCHOList().get(0).getAbout());
 					SolrInputDocument basicDocument = new SolrConstructor()
 							.constructSolrDocument(rdf);
 			
@@ -456,7 +459,7 @@ public class EnrichmentPlugin<I> extends
 						updateFullBean(mongoServer, fullBean);
 
 					}
-
+					recordNumber++;
 					solrServer.add(solrInputDocument);
 					
 				return true;
