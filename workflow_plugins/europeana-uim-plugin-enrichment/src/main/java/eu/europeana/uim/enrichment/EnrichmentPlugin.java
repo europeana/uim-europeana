@@ -693,10 +693,14 @@ public class EnrichmentPlugin<I> extends
 					conceptList.add(concept);
 					rdf.setConceptList(conceptList);
 					try {
+						if(StringUtils.isNotBlank(entity.getOriginalField())){
 						europeanaProxy = OriginalField.getOriginalField(
 								entity.getOriginalField()).appendField(
 								europeanaProxy, concept.getAbout());
+						}
 					} catch (IllegalArgumentException e) {
+						log.log(Level.SEVERE,entity.getOriginalField());
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Generic Exception occured with error "
 										+ e.getMessage() + "\nRetrying");
@@ -737,10 +741,13 @@ public class EnrichmentPlugin<I> extends
 					timespans.add(ts);
 					rdf.setTimeSpanList(timespans);
 					try {
+						if(StringUtils.isNotBlank(entity.getOriginalField())){
 						europeanaProxy = OriginalField.getOriginalField(
 								entity.getOriginalField()).appendField(
 								europeanaProxy, ts.getAbout());
+						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Generic Exception occured with error "
 										+ e.getMessage() + "\nRetrying");
@@ -780,10 +787,13 @@ public class EnrichmentPlugin<I> extends
 					agents.add(ts);
 					rdf.setAgentList(agents);
 					try {
+						if(StringUtils.isNotBlank(entity.getOriginalField())){
 						europeanaProxy = OriginalField.getOriginalField(
 								entity.getOriginalField()).appendField(
 								europeanaProxy, ts.getAbout());
+						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Generic Exception occured with error "
 										+ e.getMessage() + "\nRetrying");
@@ -824,9 +834,11 @@ public class EnrichmentPlugin<I> extends
 					places.add(ts);
 					rdf.setPlaceList(places);
 					try {
+						if(StringUtils.isNotBlank(entity.getOriginalField())){
 						europeanaProxy = OriginalField.getOriginalField(
 								entity.getOriginalField()).appendField(
 								europeanaProxy, ts.getAbout());
+						}
 					} catch (IllegalArgumentException e) {
 						log.log(Level.SEVERE,
 								"Generic Exception occured with error "
