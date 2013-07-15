@@ -254,15 +254,19 @@ public class EnrichmentPlugin<I> extends
 	 * orchestration.ExecutionContext)
 	 */
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
-
+		Collection collection=null;
 		try {
+			log.log(Level.INFO,"Initializing Annocultor");
 			if (tagger == null) {
 				tagger = new EuropeanaEnrichmentTagger();
 				tagger.init("Europeana");
 			}
+			log.log(Level.INFO,"Annocultor Initialized");
 			solrServer = enrichmentService.getSolrServer();
+			log.log(Level.INFO,"Solr Server Acquired");
 			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
 			uname = PropertyReader
@@ -279,15 +283,12 @@ public class EnrichmentPlugin<I> extends
 				mongoServer.createDatastore(morphia);
 
 			}
-			@SuppressWarnings("rawtypes")
-			Collection collection = (Collection) context.getExecution()
+			log.log(Level.INFO,"Mongo Initialized");
+			
+			collection = (Collection) context.getExecution()
 					.getDataSet();
-			String sugarCrmId = collection
-					.getValue(ControlledVocabularyProxy.SUGARCRMID);
-			SugarCrmRecord sugarCrmRecord = sugarCrmService
-					.retrieveRecord(sugarCrmId);
-			previewsOnlyInPortal = sugarCrmRecord
-					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
+			log.log(Level.INFO,"Collection acquired");
+			
 //			resp = solrServer.ping();
 //			if (resp == null) {
 //				log.log(Level.SEVERE,
@@ -308,6 +309,21 @@ public class EnrichmentPlugin<I> extends
 			log.log(Level.SEVERE,e.getMessage());
 			e.printStackTrace();
 		}
+		String sugarCrmId = collection
+				.getValue(ControlledVocabularyProxy.SUGARCRMID);
+		log.log(Level.INFO,"SugarCrmId acquired");
+		try{
+		SugarCrmRecord sugarCrmRecord = sugarCrmService
+				.retrieveRecord(sugarCrmId);
+		log.log(Level.INFO, " Retrieved the SugarCRM collection");
+		previewsOnlyInPortal = sugarCrmRecord
+				.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
+		} catch (Exception e){
+			
+			log.log(Level.INFO,"Error retrieving SugarCRM record");
+			previewsOnlyInPortal = "false";
+		}
+		log.log(Level.INFO,"Preview Only in portal acquired with value: "+ previewsOnlyInPortal);
 	}
 
 	/*
