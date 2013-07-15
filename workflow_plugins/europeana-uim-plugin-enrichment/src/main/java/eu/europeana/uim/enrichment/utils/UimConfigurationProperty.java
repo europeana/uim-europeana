@@ -18,6 +18,8 @@ public enum UimConfigurationProperty {
 	MONGO_DB_COLLECTIONS("mongo.db.collections"),
 	MONGO_DB_EUROPEANA_ID("mongo.db.europeanaId"),
 	UIM_BCLIST_PATH("uim.bclist.path"),
+	SUGARCRM_USERNAME("sugarcrm.username"),
+	SUGARCRM_PASSWORD("sugarcrm.password"),
 	UIM_REPOSITORY("uim.repository");
 	
 	String field;

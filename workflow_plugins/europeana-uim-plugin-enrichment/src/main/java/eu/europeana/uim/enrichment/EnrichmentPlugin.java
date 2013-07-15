@@ -98,6 +98,8 @@ import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
+import eu.europeana.uim.sugar.LoginFailureException;
+import eu.europeana.uim.sugar.QueryResultException;
 import eu.europeana.uim.sugar.SugarCrmRecord;
 import eu.europeana.uim.sugar.SugarCrmService;
 
@@ -313,14 +315,20 @@ public class EnrichmentPlugin<I> extends
 				.getValue(ControlledVocabularyProxy.SUGARCRMID);
 		log.log(Level.INFO,"SugarCrmId acquired");
 		try{
+			try {
+				sugarCrmService.updateSession(PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_USERNAME), PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_PASSWORD));
+			} catch (LoginFailureException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		SugarCrmRecord sugarCrmRecord = sugarCrmService
 				.retrieveRecord(sugarCrmId);
 		log.log(Level.INFO, " Retrieved the SugarCRM collection");
 		previewsOnlyInPortal = sugarCrmRecord
 				.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
-		} catch (Exception e){
+		} catch (QueryResultException e){
 			
-			log.log(Level.INFO,"Error retrieving SugarCRM record");
+			log.log(Level.SEVERE,"Error retrieving SugarCRM record");
 			previewsOnlyInPortal = "false";
 		}
 		log.log(Level.INFO,"Preview Only in portal acquired with value: "+ previewsOnlyInPortal);
