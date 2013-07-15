@@ -176,10 +176,11 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 			//mintservice.createMintAuthorizedUser(provider);
 			
 			mintservice.createMappingSession(collection);
-			
+			/*
 			String sugarID = collection.getValue("sugarCRMID");
 			sugarservice.changeEntryStatus(sugarID, 
 					EuropeanaDatasetStates.MAPPING_AND_NORMALIZATION);
+		    */
 			
 		} catch (MintOSGIClientException e) {
 			throw new IngestionPluginFailedException("Error while creating mapping in Mint",e);
@@ -187,9 +188,12 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 			throw new IngestionPluginFailedException("Error while creating mapping in Mint",e);
 		} catch (StorageEngineException e) {
 			throw new IngestionPluginFailedException("Error while storing data in UIM",e);
-		} catch (QueryResultException e) {
+		} 
+		/*
+		catch (QueryResultException e) {
 			throw new IngestionPluginFailedException("Error while updating data in SugarCRM",e);
 		}
+		*/
 		
 	}
 

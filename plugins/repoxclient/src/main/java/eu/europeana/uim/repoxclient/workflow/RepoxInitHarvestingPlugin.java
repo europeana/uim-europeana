@@ -103,6 +103,7 @@ public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collec
 				
 				context.getExecution().setActive(false);
 
+				/*
 				String sugarID = coll.getValue("sugarCRMID");
 				switch(status.getStatus()){
 				case OK:
@@ -115,7 +116,7 @@ public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collec
 					break;
 				
 				}
-				
+				*/
 				String log = repoxservice.getHarvestLog(coll);
 				context.getLoggingEngine().log(Level.INFO, "Repox Harvesting Session Results",log);
 				
@@ -128,9 +129,12 @@ public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collec
 		} catch (HarvestingOperationException e) {
 			throw new IngestionPluginFailedException("Error while initiating harvestiing at the remote " +
 					"Datasource from UIM",e);
-		} catch (QueryResultException e) {
-			throw new IngestionPluginFailedException("Error while trying to write information back to SugarCRM",e);
-		} catch (InterruptedException e) {
+		} 
+		/*
+		catch (QueryResultException e) {
+			throw new IngestionPluginFailedException("Error while trying to write information back to SugarCRM",e);	
+		} */
+		catch (InterruptedException e) {
 			throw new IngestionPluginFailedException("InterruptedException",e);
 		}
 	}
