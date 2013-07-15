@@ -42,6 +42,9 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 
 	private static MintUIMService mintservice;
 	private static SugarCrmService sugarservice;
+	/** Force provider update */
+	public static final String force_provider_update = "mint.force.poviderupdate";
+	
 	
 	/**
 	 * The parameters used by this Plugin
@@ -49,6 +52,7 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
 		{
+			add(force_provider_update);
 
 		}
 	};
@@ -163,7 +167,7 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 		
 		try {
 			
-			mintservice.createMintOrganization(provider);
+			mintservice.createMintOrganization(provider,force_provider_update);
 			
 			//TODO:Commented out for the time being. Implement it when user management for Mint is ready
 			//mintservice.createMintAuthorizedUser(provider);

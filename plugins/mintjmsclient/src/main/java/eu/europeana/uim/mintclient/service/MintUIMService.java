@@ -32,6 +32,8 @@ import eu.europeana.uim.store.Provider;
 public interface MintUIMService {
 
 	/**
+	 * Creates a user in MINT
+	 * 
 	 * @param provider
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
@@ -39,13 +41,28 @@ public interface MintUIMService {
 	public void createMintAuthorizedUser(Provider<?> provider) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
 	
 	/**
+	 * Creates a Provider placeholder in MINT.
+	 * 
 	 * @param provider
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 */
 	public void createMintOrganization(Provider<?> provider) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
 	
+	
 	/**
+	 * Creates a Provider placeholder in MINT.
+	 * 
+	 * @param provider
+	 * @throws MintOSGIClientException
+	 * @throws MintRemoteException
+	 */
+	public void createMintOrganization(Provider<?> provider,String enforce) throws MintOSGIClientException, MintRemoteException,StorageEngineException;
+	
+	
+	/**
+	 * Creates an import from Repox.
+	 * 
 	 * @param collection
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException

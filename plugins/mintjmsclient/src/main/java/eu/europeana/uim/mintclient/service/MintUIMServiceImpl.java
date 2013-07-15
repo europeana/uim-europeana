@@ -129,7 +129,28 @@ public class MintUIMServiceImpl implements MintUIMService {
 		if(mintID == null){
 			performOrgCreation(provider);
 		}
-		 else{
+		}
+	
+			
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * eu.europeana.uim.mintclient.service.MintUIMService#createMintOrganization
+	 * (eu.europeana.uim.store.Provider)
+	 */
+	@Override
+	public void createMintOrganization(Provider provider,String enforce)
+			throws MintOSGIClientException, MintRemoteException,
+			StorageEngineException {
+		
+		String mintID = provider.getValue(ControlledVocabularyProxy.MINTID);
+		
+		if(mintID == null){
+			performOrgCreation(provider);
+		}
+
+		 else if (mintID != null && "true".equals(enforce)){
 				OrganizationExistsCommand org = new OrganizationExistsCommand();
 				org.setOrganizationId(mintID);
 				
@@ -139,10 +160,10 @@ public class MintUIMServiceImpl implements MintUIMService {
 					performOrgCreation(provider);
 			    }
 		 }
-			
+
 		}
 	
-			
+	
 	
 
 	
@@ -165,6 +186,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 		
 		command.setUserId(userID);
 
+		
 
 		CreateOrganizationResponse resp = synchronousClient
 				.createOrganization(command);
