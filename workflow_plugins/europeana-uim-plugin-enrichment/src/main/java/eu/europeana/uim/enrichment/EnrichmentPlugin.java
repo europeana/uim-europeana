@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -296,10 +297,15 @@ public class EnrichmentPlugin<I> extends
 //								+ "\nChange solr.host and solr.port properties in uim.properties and restart UIM");
 //
 //			}
+			long start = new Date().getTime();
+			log.log(Level.INFO, "Clearing collection "+ collection.getMnemonic() + " from Mongo");
 			clearData(mongoServer, collection.getMnemonic());
+			log.log(Level.INFO, "Clearing collection "+ collection.getMnemonic() + " from Solr");
 			solrServer.deleteByQuery("europeana_collectionName:"
 					+ collection.getName().split("_")[0] + "*");
+			log.log(Level.INFO, "Finished removing after " + (new Date().getTime()-start) + " ms");
 		} catch (Exception e) {
+			log.log(Level.SEVERE,e.getMessage());
 			e.printStackTrace();
 		}
 	}
