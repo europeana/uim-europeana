@@ -190,16 +190,18 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 
 						for (MetaDataRecord<I> mdr : list) {
 							
+							if(mdr != null){
+
 							Task<MetaDataRecord<I>, I> task = new Task<MetaDataRecord<I>, I>(mdr,context);
 							synchronized (getQueue()) {
 								getQueue().offer(task);
 							}
+							
+						}
 						}
 
 					} catch (Throwable t) {
-						throw new RuntimeException(
-								"Failed to retrieve MDRs from storage. "
-										+ context.getExecution().toString(), t);
+						throw new RuntimeException("Failed to retrieve MDRs from storage. "); //+ context.getExecution().toString(), t);
 					} finally {
 						setDone(true);
 					}

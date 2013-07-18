@@ -307,6 +307,7 @@ public class ZipLoader<I> {
 						processrecord(mdr,dedupres,Status.UPDATED);
 						value.deletioncandidates.remove(dedupres
 								.getDerivedRecordID());
+						dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
 						updated ++;
 						
 					} catch (StorageEngineException e) {
