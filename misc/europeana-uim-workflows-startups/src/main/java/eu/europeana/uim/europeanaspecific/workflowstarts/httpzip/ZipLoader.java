@@ -317,7 +317,10 @@ public class ZipLoader<I> {
 						created ++;
 					}
 					
-					
+					if (mdr != null) {
+						System.out.println("Added ");
+						result.add(mdr);
+					}
 				}
 				}
 
