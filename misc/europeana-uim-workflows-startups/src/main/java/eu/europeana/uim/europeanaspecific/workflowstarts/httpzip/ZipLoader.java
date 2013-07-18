@@ -203,6 +203,9 @@ public class ZipLoader<I> {
 
 					MetaDataRecord<I> mdr = null;
 					
+					if(state != null){
+
+					
 					switch (state) {
 					case ID_REGISTERED:						
 						mdr = processrecord(mdr, dedupres, Status.CREATED);
@@ -295,6 +298,26 @@ public class ZipLoader<I> {
 						result.add(mdr);
 					}
 
+				}
+
+				else{
+					try {
+						mdr = storage.getMetaDataRecord(dedupres
+								.getDerivedRecordID());
+						processrecord(mdr,dedupres,Status.UPDATED);
+						value.deletioncandidates.remove(dedupres
+								.getDerivedRecordID());
+						updated ++;
+						
+					} catch (StorageEngineException e) {
+						mdr = processrecord(mdr,dedupres,Status.CREATED);
+						value.deletioncandidates.remove(dedupres
+								.getDerivedRecordID());
+						created ++;
+					}
+					
+					
+				}
 				}
 
 				progress++;
