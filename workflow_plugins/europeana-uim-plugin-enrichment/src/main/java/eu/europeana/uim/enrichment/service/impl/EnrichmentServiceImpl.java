@@ -1,9 +1,24 @@
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
+ * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
+ */
 package eu.europeana.uim.enrichment.service.impl;
 
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -27,28 +42,28 @@ import eu.europeana.uim.enrichment.utils.OsgiEuropeanaIdMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 
+/**
+ * See EnrichmentService
+ * 
+ * @author Yorgos.Mamakis@ kb.nl
+ *
+ */
 public class EnrichmentServiceImpl implements EnrichmentService {
 
-	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
-	//public static EuropeanaEnrichmentTagger tagger;
 	private static HttpSolrServer solrServer;
-	private static HttpSolrServer migrationServer;
 	private static String mongoDB=PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
 	private static String mongoHost=PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
 	private static String mongoPort= PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
 	private static String solrUrl= PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
 	private static String solrCore=PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
-	private static String solrCoreMigration = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE_MIGRATION);
 	private static CollectionMongoServer cmServer;
 	private  static OsgiEuropeanaIdMongoServer idserver;
 	public EnrichmentServiceImpl(){
 		
 		try {
 		solrServer = new HttpSolrServer(new URL(solrUrl)+solrCore);
-		migrationServer = new HttpSolrServer(new URL(solrUrl)+solrCoreMigration);
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -70,7 +85,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 						@Override
 						protected void initializeInternal() {
 							Collection col = new Collection();
-							
+							cmServer.findOldCollectionId("test");
 						}
 					};
 					colInitializer.initialize(Collection.class.getClassLoader());
@@ -170,11 +185,6 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
 
 
-	@Override
-	public HttpSolrServer getMigrationServer(){
-		return EnrichmentServiceImpl.migrationServer;
-	}
-
 
 
 
@@ -208,27 +218,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	
 	@Override
 	public void createLookupEntry(FullBean fullBean, String collectionId, String hash) {
-		/*
-		List<EuropeanaId> ids = idserver.retrieveEuropeanaIdFromOld(PORTALURL+"/"+collectionId+"/"+hash);
-		boolean found = false;
-		for (EuropeanaId id:ids){
-			if (StringUtils.equals(fullBean.getAbout(), id.getNewId())){
-				found=true;
-				break;
-			}
-		}
-		
-		if(!found){
-			if(ids.size()>0 && ids.get(0).getOldId()!=null){
-			EuropeanaId id= new EuropeanaId();
-			id.setOldId(ids.get(0).getOldId());
-			id.setLastAccess(0);
-			id.setTimestamp(new Date().getTime());
-			id.setNewId(fullBean.getAbout());
-			saveEuropeanaId(id);
-			}
-		}
-*/
+	
 		
 		ModifiableSolrParams params = new ModifiableSolrParams();
 		params. add("q", "europeana_id:"+ClientUtils.escapeQueryChars("/"+collectionId+"/"+hash));
@@ -245,7 +235,6 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 			}
 			
 		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
