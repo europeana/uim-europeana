@@ -1,3 +1,19 @@
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
+ * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
+ */
 package eu.europeana.uim.enrichment;
 
 import java.io.StringReader;
@@ -39,6 +55,12 @@ import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.store.MetaDataRecord;
 
+/**
+ * Redirect creation plugin
+ * @author Yorgos.Mamakis@ kb.nl
+ *
+ * @param <I>
+ */
 public class LookupCreationPlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
@@ -164,6 +186,7 @@ public class LookupCreationPlugin<I> extends
 		return false;
 	}
 
+	//Generate a minimum Fullbean
 	private FullBeanImpl constructFullBeanMock(RDF rdf, String collectionId) {
 		FullBeanImpl fBean = new FullBeanImpl();
 		AggregationImpl aggr = new AggregationImpl();
@@ -239,13 +262,11 @@ public class LookupCreationPlugin<I> extends
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
 
 	}
 
