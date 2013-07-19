@@ -1,27 +1,47 @@
+/*
+ * Copyright 2007-2012 The Europeana Foundation
+ *
+ *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
+ *  by the European Commission;
+ *  You may not use this work except in compliance with the Licence.
+ * 
+ *  You may obtain a copy of the Licence at:
+ *  http://joinup.ec.europa.eu/software/page/eupl
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
+ *  any kind, either express or implied.
+ *  See the Licence for the specific language governing permissions and limitations under
+ *  the Licence.
+ */
 package eu.europeana.uim.enrichment.service;
 
-import java.util.List;
-
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.common.SolrInputDocument;
 
-import eu.annocultor.converters.europeana.Entity;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 
 
+/**
+ * Enrichment service, exposing various Storage functionality
+ * @author Yorgos.Mamakis@ kb.nl
+ *
+ */
 public interface EnrichmentService {
 
-	//List<Entity> enrich(SolrInputDocument solrDocument) throws Exception;
-
-
+	/**
+	 * Get the Solr Server to save the Enriched metadata to
+	 * @return
+	 */
 	HttpSolrServer getSolrServer();
 
+	/**
+	 * Get the Mongo database name;
+	 * @return
+	 */
 	String getMongoDB();
-	
-	public HttpSolrServer getMigrationServer();
 
 	public CollectionMongoServer getCollectionMongoServer();
 
