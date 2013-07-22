@@ -36,6 +36,7 @@ import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
+import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEuropeanaIdMongoServer;
@@ -77,7 +78,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 					Morphia morphia = new Morphia();
 					morphia.map(Collection.class);
 					Datastore datastore = morphia.createDatastore(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "collections");
-					cmServer = new CollectionMongoServer();
+					cmServer = new CollectionMongoServerImpl();
 					datastore.ensureIndexes();
 					cmServer.setDatastore(datastore);
 					BlockingInitializer colInitializer = new BlockingInitializer() {
@@ -102,7 +103,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 				
 			}
 		}; 
-		initializer.initialize(CollectionMongoServer.class.getClassLoader());
+		initializer.initialize(CollectionMongoServerImpl.class.getClassLoader());
 		
 		
 		

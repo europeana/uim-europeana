@@ -14,6 +14,7 @@ import com.mongodb.MongoException;
 
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
+import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
 import eu.europeana.uim.gui.cp.client.services.CollectionManagementProxy;
 import eu.europeana.uim.gui.cp.server.util.PropertyReader;
 import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
@@ -37,7 +38,7 @@ public class CollectionManagementProxyImpl extends
 	
 	static{
 		try {
-			collectionMongoServer = new CollectionMongoServer(new Mongo(
+			collectionMongoServer = new CollectionMongoServerImpl(new Mongo(
 					MONGO_HOST, MONGO_PORT), MONGO_DB);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -74,7 +75,7 @@ public class CollectionManagementProxyImpl extends
 	@Override
 	public Boolean saveOneCollection(CollectionMappingDTO collectionDTO) {
 		try {
-			collectionMongoServer = new CollectionMongoServer(new Mongo(
+			collectionMongoServer = new CollectionMongoServerImpl(new Mongo(
 					MONGO_HOST, MONGO_PORT), MONGO_DB);
 			collection = new Collection();
 			collection.setNewCollectionId(collectionDTO.getNewCollection());

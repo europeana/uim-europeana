@@ -23,6 +23,7 @@ import com.mongodb.Mongo;
 
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
+import eu.europeana.corelib.tools.lookuptable.impl.EuropeanaIdMongoServerImpl;
 import eu.europeana.uim.enrichment.MongoBundleActivator;
 
 /**
@@ -30,7 +31,7 @@ import eu.europeana.uim.enrichment.MongoBundleActivator;
  * @author Yorgos.Mamakis@ kb.nl
  *
  */
-public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServer {
+public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServerImpl implements EuropeanaIdMongoServer {
 
 	public OsgiEuropeanaIdMongoServer(Mongo mongoServer, String databaseName) {
 		super(mongoServer,databaseName,"","");

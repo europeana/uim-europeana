@@ -3,11 +3,14 @@ package eu.europeana.uim.gui.cp.server;
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
+
+import eu.europeana.corelib.dereference.VocabularyMongoServer;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
-import eu.europeana.corelib.dereference.impl.VocabularyMongoServer;
+import eu.europeana.corelib.dereference.impl.VocabularyMongoServerImpl;
 
 
-public class OsgiVocabularyMongoServer extends VocabularyMongoServer {
+
+public class OsgiVocabularyMongoServer extends VocabularyMongoServerImpl implements VocabularyMongoServer{
 	private Mongo mongoServer;
 	private String databaseName;
 	private Datastore datastore;
@@ -27,7 +30,6 @@ public class OsgiVocabularyMongoServer extends VocabularyMongoServer {
 		this.mongoServer = mongoServer;
 		this.databaseName = databaseName;
 		createDatastore();
-		// TODO Auto-generated constructor stub
 	}
 
 	private void createDatastore() {

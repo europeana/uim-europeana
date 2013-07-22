@@ -13,12 +13,13 @@ import com.mongodb.MongoException;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.model.EdmLabel;
+import eu.europeana.corelib.dereference.VocabularyMongoServer;
 import eu.europeana.corelib.dereference.exceptions.VocabularyNotFoundException;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.Extractor;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
-import eu.europeana.corelib.dereference.impl.VocabularyMongoServer;
+import eu.europeana.corelib.dereference.impl.VocabularyMongoServerImpl;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxy;
 import eu.europeana.uim.gui.cp.server.util.PropertyReader;
 import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
@@ -48,7 +49,7 @@ public class ImportVocabularyProxyImpl extends
 	// Statically initializing VocabularyMongoServer
 	{
 		try {
-			mongo = new VocabularyMongoServer(
+			mongo = new VocabularyMongoServerImpl(
 					new Mongo(MONGO_HOST, MONGO_PORT), MONGO_DB);
 
 		} catch (UnknownHostException e) {
