@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -158,6 +159,26 @@ public class EnrichmentPlugin<I> extends
 	private final static String XML_LANG = "_@xml:lang";
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
 			.getName());
+
+	private enum EnrichmentFields {
+		DC_DATE("proxy_dc_date"), DC_COVERAGE("proxy_dc_coverage"), DC_TERMS_TEMPORAL(
+				"proxy_dcterms_temporal"), EDM_YEAR("proxy_edm_year"), DCTERMS_SPATIAL(
+				"proxy_dcterms_spatial"), DC_TYPE("proxy_dc_type"), DC_SUBJECT(
+				"proxy_dc_subject"), DC_CREATOR("proxy_dc_creator"), DC_CONTRIBUTOR(
+				"proxy_dc_contributor");
+
+		String value;
+
+		private EnrichmentFields(String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return this.value;
+		}
+
+	};
+
 	public EnrichmentPlugin(String name, String description) {
 		super(name, description);
 	}
@@ -172,11 +193,11 @@ public class EnrichmentPlugin<I> extends
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 		} catch (JiBXException e) {
-			log.log(Level.SEVERE,"Error creating the JibX factory");
+			log.log(Level.SEVERE, "Error creating the JibX factory");
 		}
 
 	}
-	
+
 	/**
 	 * The parameters used by this WorkflowStart
 	 */
@@ -412,9 +433,11 @@ public class EnrichmentPlugin<I> extends
 				SolrInputDocument basicDocument = new SolrConstructor()
 						.constructSolrDocument(rdf);
 
+				SolrInputDocument mockDocument = createMockForEnrichment(basicDocument);
+				
 				List<Entity> entities = null;
 
-				entities = tagger.tagDocument(basicDocument);
+				entities = tagger.tagDocument(mockDocument);
 
 				mergeEntities(rdf, entities);
 				RDF rdfFinal = cleanRDF(rdf);
@@ -550,6 +573,21 @@ public class EnrichmentPlugin<I> extends
 			return false;
 		}
 
+	}
+
+	private SolrInputDocument createMockForEnrichment(
+			SolrInputDocument basicDocument) {
+		
+		SolrInputDocument mockDocument = new SolrInputDocument();
+		for(String fieldName:basicDocument.keySet()){
+			for(EnrichmentFields field:EnrichmentFields.values()){
+				if(StringUtils.equals(field.getValue(), fieldName)||StringUtils.startsWith(fieldName, field.getValue())){
+					mockDocument.addField(fieldName, basicDocument.getFieldValue(fieldName));
+				}
+			}
+		}
+		
+		return mockDocument;
 	}
 
 	private void clearData(OsgiEdmMongoServer mongoServer, String collection) {
@@ -801,7 +839,7 @@ public class EnrichmentPlugin<I> extends
 									.getValues()
 									.get(field.getValues().keySet().iterator()
 											.next()).get(0));
-						
+
 						} else {
 							if (field.getValues() != null) {
 								for (Entry<String, List<String>> entry : field
@@ -835,7 +873,6 @@ public class EnrichmentPlugin<I> extends
 			}
 		}
 	}
-
 
 	private ProxyType createEuropeanaProxy(RDF rdf) {
 		ProxyType europeanaProxy = new ProxyType();
