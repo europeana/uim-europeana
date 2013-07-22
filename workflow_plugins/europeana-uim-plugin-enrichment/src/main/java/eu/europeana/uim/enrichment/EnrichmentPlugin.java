@@ -582,7 +582,7 @@ public class EnrichmentPlugin<I> extends
 		for(String fieldName:basicDocument.keySet()){
 			for(EnrichmentFields field:EnrichmentFields.values()){
 				if(StringUtils.equals(field.getValue(), fieldName)||StringUtils.startsWith(fieldName, field.getValue())){
-					mockDocument.addField(fieldName, basicDocument.getFieldValue(fieldName));
+					mockDocument.addField(field.getValue(), basicDocument.getFieldValue(fieldName));
 				}
 			}
 		}
