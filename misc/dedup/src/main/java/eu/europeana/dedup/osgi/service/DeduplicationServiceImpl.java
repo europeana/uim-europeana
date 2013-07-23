@@ -22,14 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.JiBXException;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 import eu.europeana.corelib.definitions.jibx.AggregatedCHO;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistry;
-import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistryMongoServer;
 import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
 import eu.europeana.corelib.tools.lookuptable.LookupState;
@@ -53,7 +57,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 	private static final Logger log = Logger
 			.getLogger(DeduplicationServiceImpl.class.getName());
 
-	EuropeanaIdRegistryMongoServer mongoserver;
+	EuropeanaIdRegistryMongoServerImpl mongoserver;
 
 	private IBindingFactory bfact;
 	
@@ -95,7 +99,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 					}
 				}
 			};
-			initializer.initialize(EuropeanaIdRegistryMongoServer.class
+			initializer.initialize(EuropeanaIdRegistryMongoServerImpl.class
 					.getClassLoader());
 
 		} catch (UnknownHostException e) {
@@ -241,7 +245,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 				list = mongoserver.getFailedRecords(str);
 			}
 		};
-		initializer.initialize(EuropeanaIdRegistryMongoServer.class
+		initializer.initialize(EuropeanaIdRegistryMongoServerImpl.class
 				.getClassLoader());
 
 		return initializer.getList();
