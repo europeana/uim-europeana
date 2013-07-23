@@ -22,12 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IMarshallingContext;
-import org.jibx.runtime.JiBXException;
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
+
 import eu.europeana.corelib.definitions.jibx.AggregatedCHO;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
@@ -38,6 +33,7 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistryMongoServer;
 import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
 import eu.europeana.corelib.tools.lookuptable.LookupState;
+import eu.europeana.corelib.tools.lookuptable.impl.EuropeanaIdRegistryMongoServerImpl;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
 import eu.europeana.dedup.utils.Decoupler;
 import eu.europeana.dedup.utils.PropertyReader;
@@ -82,7 +78,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 				public void initializeInternal() {
 					try {
 						status = STATUS_BOOTING;
-						mongoserver = new EuropeanaIdRegistryMongoServer(mongo,
+						mongoserver = new EuropeanaIdRegistryMongoServerImpl(mongo,
 								PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY));
 
 						boolean test = mongoserver.oldIdExists("something");
