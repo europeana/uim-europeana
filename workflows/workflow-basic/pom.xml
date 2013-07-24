@@ -33,7 +33,7 @@
 			<artifactId>europeana-uim-plugin-enrichment</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-workflows-startups</artifactId>
@@ -94,13 +94,13 @@
 							eu.europeana.uim.europeanaspecific.workflows
 						</Export-Package>
 						<Import-Package>
-						   eu.europeana.dedup.osgi.service.exceptions,
-						   eu.europeana.uim.europeanaspecific.workflowstarts.*,
-						   eu.europeana.uim.plugin.source,
-						   eu.europeana.uim.storage,
-						   eu.europeana.uim.common.progress,
-						   eu.europeana.uim.orchestration,
-						   *
+							eu.europeana.dedup.osgi.service.exceptions,
+							eu.europeana.uim.europeanaspecific.workflowstarts.*,
+							eu.europeana.uim.plugin.source,
+							eu.europeana.uim.storage,
+							eu.europeana.uim.common.progress,
+							eu.europeana.uim.orchestration,
+							*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 					</instructions>
@@ -121,6 +121,43 @@
 			</plugin>
 
 		</plugins>
+		
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.felix
+										</groupId>
+										<artifactId>
+											maven-bundle-plugin
+										</artifactId>
+										<versionRange>
+											[2.1.0,)
+										</versionRange>
+										<goals>
+											<goal>bundle</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 </project>

@@ -31,6 +31,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPException;
+
+import org.jibx.runtime.JiBXException;
+import org.springframework.oxm.Marshaller;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.jibx.JibxMarshaller;
+import org.springframework.ws.client.core.WebServiceTemplate;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -53,7 +61,10 @@ import eu.europeana.uim.sugar.SugarCrmRecord;
 import eu.europeana.uim.sugar.SugarCrmService;
 import eu.europeana.uim.sugar.model.DatasetStates;
 import eu.europeana.uim.sugar.model.UpdatableField;
+import eu.europeana.uim.sugarcrmclient.internal.ExtendedSaajSoapMessageFactory;
 import eu.europeana.uim.sugarcrmclient.internal.helpers.ClientUtils;
+import eu.europeana.uim.sugarcrmclient.internal.helpers.PropertyReader;
+import eu.europeana.uim.sugarcrmclient.internal.helpers.UimConfigurationProperty;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryList;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntryListResponse;
@@ -69,11 +80,13 @@ import eu.europeana.uim.sugarcrmclient.jibxbindings.SetEntry;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachment;
 import eu.europeana.uim.sugarcrmclient.jibxbindings.SetNoteAttachmentResponse;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl;
+import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaUpdatableField;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuery;
 import eu.europeana.uim.sugarcrmclient.ws.SugarWsClientImpl;
+import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBLoginFailureException;
 import eu.europeana.uim.sugarcrmclient.ws.exceptions.JIXBQueryResultException;
 import eu.europeana.uim.workflow.Workflow;
 import org.apache.commons.lang.StringUtils;
@@ -96,8 +109,71 @@ public class SugarCRMServiceImpl implements SugarCrmService {
      */
     public SugarCRMServiceImpl() {
         this.pollingListeners = new LinkedHashMap<String, PollingListener>();
-    }
+        
+        
+		BlockingInitializer initializer = new BlockingInitializer() {
+			@Override
+			public void initializeInternal() {
+				MessageFactory mf = null;
+				try {
+				   mf = MessageFactory.newInstance();
+				} catch (SOAPException e1) {
+					e1.printStackTrace();
+				}
+				
+				ExtendedSaajSoapMessageFactory mfactory = new ExtendedSaajSoapMessageFactory(mf);
+				WebServiceTemplate webServiceTemplate = new WebServiceTemplate(mfactory);
 
+				JibxMarshaller marshaller = new JibxMarshaller();
+
+				marshaller.setStandalone(true);
+				marshaller.setTargetClass(eu.europeana.uim.sugarcrmclient.jibxbindings.Login.class);
+				marshaller.setTargetClass(eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries.class);
+				marshaller.setEncoding("UTF-8");
+				marshaller.setTargetPackage("eu.europeana.uim.sugarcrmclient.jibxbindings");
+
+				try {
+					marshaller.afterPropertiesSet();
+				} catch (JiBXException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				System.out.println(marshaller.supports(eu.europeana.uim.sugarcrmclient.jibxbindings.GetEntries.class));
+				System.out.println(marshaller.supports(eu.europeana.uim.sugarcrmclient.jibxbindings.Login.class));
+				
+				webServiceTemplate.setMarshaller(marshaller);
+				webServiceTemplate.setUnmarshaller(marshaller);
+				
+				sugarwsClient = new SugarWsClientImpl();
+				String userName = PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_USERNAME);
+				String password = PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_PASSWORD);
+				String uri = PropertyReader.getProperty(UimConfigurationProperty.SUGARCRM_HOST);
+				webServiceTemplate.setDefaultUri(uri);
+				sugarwsClient.setUsername(userName);
+				sugarwsClient.setPassword(password);
+				sugarwsClient.setWebServiceTemplate(webServiceTemplate);
+
+				try {
+					sugarwsClient.setSessionID(sugarwsClient.login(ClientUtils.createStandardLoginObject(userName,password)));
+				} catch (JIXBLoginFailureException e) {
+					sugarwsClient.setSessionID("-1");
+					e.printStackTrace();
+				} catch (Exception e){
+					e.printStackTrace();
+				}
+
+				System.out.println("Done");
+			}
+
+		};
+		initializer.initialize(SugarWsClientImpl.class
+				.getClassLoader());
+        
+    
+    
+    }
+    
     /*
      * (non-Javadoc)
      * 

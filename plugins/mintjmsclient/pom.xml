@@ -115,10 +115,14 @@
 							eu.europeana.uim.common,
 							eu.europeana.uim.sugar,
 							eu.europeana.uim.sugar.model,
-							eu.europeana.uim.util
+							eu.europeana.uim.util,
+							javax.management,
+							javax.xml.parsers, 
+							javax.xml.stream, 
+							!*
 						</Import-Package>
 						<Embed-Dependency>europeana-uim-plugin-clientbindings,mongo-java-driver,amqp-client,com.springsource.org.apache.commons.io,commons-io,commons-lang</Embed-Dependency>
-
+						<Embed-Transitive>true</Embed-Transitive>
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
 					</instructions>

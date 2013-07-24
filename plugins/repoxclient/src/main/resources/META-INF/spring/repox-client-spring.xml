@@ -58,9 +58,4 @@
 
    <osgi:service id="repoxHarvestingWorkflow" ref="repoxHarvestWf" interface="eu.europeana.uim.workflow.Workflow"/> 
 
-   
-
-    
-
-    
 </beans>

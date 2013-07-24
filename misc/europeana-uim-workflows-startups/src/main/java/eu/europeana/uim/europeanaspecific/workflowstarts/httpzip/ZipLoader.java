@@ -308,6 +308,9 @@ public class ZipLoader<I> {
 						value.deletioncandidates.remove(dedupres
 								.getDerivedRecordID());
 						dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
+						
+						System.out.println("Added " + dedupres.getDerivedRecordID());
+						
 						updated ++;
 						
 					} catch (StorageEngineException e) {
@@ -318,7 +321,6 @@ public class ZipLoader<I> {
 					}
 					
 					if (mdr != null) {
-						System.out.println("Added ");
 						result.add(mdr);
 					}
 				}

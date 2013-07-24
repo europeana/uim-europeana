@@ -19,8 +19,16 @@ package eu.europeana.uim.repoxclient.rest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.jibx.runtime.JiBXException;
 import org.joda.time.DateTime;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
+import org.springframework.oxm.jibx.JibxMarshaller;
+import org.springframework.web.client.RestTemplate;
+
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
@@ -53,9 +61,12 @@ import eu.europeana.uim.repoxclient.jibxbindings.Url;
 import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.utils.DSType;
 import eu.europeana.uim.repoxclient.utils.JibxObjectProvider;
+import eu.europeana.uim.repoxclient.utils.PropertyReader;
+import eu.europeana.uim.repoxclient.utils.UimConfigurationProperty;
 import eu.europeana.uim.repoxclient.utils.Z3950Methods;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.Provider;
+import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 
 /**
@@ -75,8 +86,64 @@ public class RepoxUIMServiceImpl implements RepoxUIMService {
 	private Registry registry;
 
 
+	
+	public RepoxUIMServiceImpl(){
+		BlockingInitializer initializer = new BlockingInitializer() {
 
+			@Override
+			protected void initializeInternal() {
+				
+				String defaultURI = PropertyReader.getProperty(UimConfigurationProperty.REPOX_HOST);
+				
+				RepoxRestClientImpl repoxRestClientimp = new RepoxRestClientImpl();
+				
+				RestTemplate restTemplate = new RestTemplate();
+				
+				List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+				
+				MarshallingHttpMessageConverter messageConverter = new MarshallingHttpMessageConverter();
+				
+				JibxMarshaller marshaller = new JibxMarshaller();
+				
+				marshaller.setTargetClass(eu.europeana.uim.repoxclient.jibxbindings.Response.class);
 
+				try {
+					marshaller.afterPropertiesSet();
+				} catch (JiBXException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				messageConverter.setMarshaller(marshaller);
+				messageConverter.setUnmarshaller(marshaller);
+				
+				messageConverters.add(messageConverter);
+				
+				restTemplate.setMessageConverters(messageConverters);
+				
+				repoxRestClientimp.setRestTemplate(restTemplate);
+				repoxRestClientimp.setDefaultURI(defaultURI);
+				
+				
+				repoxRestClient = repoxRestClientimp;
+				
+				try {
+					repoxRestClient.retrieveProviders();
+				} catch (ProviderOperationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			
+		};
+		
+		initializer.initialize(RepoxRestClientImpl.class
+				.getClassLoader());
+	}
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see eu.europeana.uim.repox.RepoxUIMService#showConnectionStatus()
 	 */

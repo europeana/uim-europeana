@@ -78,6 +78,7 @@
 			<artifactId>europeana-uim-dedup</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 	</dependencies>
 
 
@@ -113,7 +114,6 @@
 							javax.naming,
 							org.theeuropeanlibrary.model.common.*,
 							eu.europeana.uim.model.europeana.*,
-							org.xmlpull.v1,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,
@@ -130,6 +130,7 @@
 							eu.europeana.uim.europeanaspecific.workflowstarts.*,
 						</Export-Package>
 						<Embed-Dependency>oclc-harvester2,log4j,xalan,corelib-solr-definitions,commons-compress,commons-lang</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
 			</plugin>

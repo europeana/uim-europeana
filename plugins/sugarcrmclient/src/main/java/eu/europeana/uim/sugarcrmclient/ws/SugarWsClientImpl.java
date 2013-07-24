@@ -75,7 +75,7 @@ public class SugarWsClientImpl implements SugarWsClient {
 	/**
 	 * Default Constructor
 	 */
-	SugarWsClientImpl(){
+	public SugarWsClientImpl(){
 	}
 	
 	
@@ -84,7 +84,7 @@ public class SugarWsClientImpl implements SugarWsClient {
 	 * @param username
 	 * @param password
 	 */
-	SugarWsClientImpl(String username,String password){
+	public SugarWsClientImpl(String username,String password){
 	   this.username = username;
 	   this.password = password;
 	}

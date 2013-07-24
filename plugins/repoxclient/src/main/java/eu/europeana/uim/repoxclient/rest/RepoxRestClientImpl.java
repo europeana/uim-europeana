@@ -16,8 +16,15 @@
  */
 package eu.europeana.uim.repoxclient.rest;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.jibx.runtime.JiBXException;
 import org.joda.time.DateTime;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
+import org.springframework.oxm.jibx.JibxMarshaller;
 import org.springframework.web.client.RestTemplate;
+import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.repox.AggregatorOperationException;
 import eu.europeana.uim.repox.DataSourceOperationException;
 import eu.europeana.uim.repox.HarvestingOperationException;
@@ -42,6 +49,7 @@ import eu.europeana.uim.repoxclient.plugin.RepoxRestClient;
 import eu.europeana.uim.repoxclient.utils.PropertyReader;
 import eu.europeana.uim.repoxclient.utils.UimConfigurationProperty;
 
+
 /**
  * Class implementing REST functionality for accessing REPOX
  * 
@@ -57,7 +65,7 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 	/**
 	 * Default Constructor
 	 */
-	public RepoxRestClientImpl(){
+	public RepoxRestClientImpl(){		
 		defaultURI = PropertyReader.getProperty(UimConfigurationProperty.REPOX_HOST);
 	}
 	
@@ -92,6 +100,53 @@ public class RepoxRestClientImpl implements RepoxRestClient {
 	private final static String namespacePrefixVar="namespacePrefix=";
 	private final static String namespaceUriVar="namespaceUri=";
 
+	
+	
+	
+	/**
+	 * Utility class for initializing the RestTemplate
+	 * 
+	 * @throws JiBXException
+	 */
+	private void initRestTemplate() throws JiBXException{
+		
+		
+		BlockingInitializer initializer = new BlockingInitializer() {
+
+			@Override
+			protected void initializeInternal() {
+		        restTemplate = new RestTemplate();
+				
+				List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+				
+				MarshallingHttpMessageConverter messageConverter = new MarshallingHttpMessageConverter();
+				
+				JibxMarshaller marshaller = new JibxMarshaller();
+				
+				marshaller.setTargetClass(eu.europeana.uim.repoxclient.jibxbindings.Response.class);
+
+				try {
+					marshaller.afterPropertiesSet();
+				} catch (JiBXException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				messageConverter.setMarshaller(marshaller);
+				messageConverter.setUnmarshaller(marshaller);
+				
+				messageConverters.add(messageConverter);
+				
+				restTemplate.setMessageConverters(messageConverters);
+				
+			}
+			
+		};
+		
+		initializer.initialize(RestTemplate.class
+				.getClassLoader());
+
+	}
 	
 	
 	/*

@@ -3,18 +3,23 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:bp="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:shell="http://karaf.apache.org/xmlns/shell/v1.0.0">
+   
+   <reference id="registry" interface="eu.europeana.uim.Registry"/>
+   
+   <bean id="sugarcrmPlugin" class="eu.europeana.uim.sugarcrmclient.plugin.SugarCRMServiceImpl">    
+      <property name="registry" ref="registry"/>
+   </bean>
+   
+   <service id="sugarcrmPluginService" ref="sugarcrmPlugin" interface="eu.europeana.uim.sugar.SugarCrmService"/>
+   
 
 
-
-   <reference id="sugarcrmPluginService" interface="eu.europeana.uim.sugar.SugarCrmService" availability="optional"/>
-
-   <shell:command-bundle>
+    <shell:command-bundle>
         <shell:command name="uim/sugarCrmAgent">
             <shell:action class="eu.europeana.uim.sugarcrmclient.plugin.command.SugarCrmCommand">
-                <shell:argument ref="sugarcrmPluginService"/>
+                <shell:argument ref="sugarcrmPlugin"/>
             </shell:action>
         </shell:command>
     </shell:command-bundle>
-   
    
 </blueprint>

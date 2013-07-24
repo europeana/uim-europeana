@@ -139,68 +139,63 @@
 					<instructions>
 						<Export-Package>eu.europeana.uim.enrichment.*</Export-Package>
 						<Import-Package>
-							!org.codehaus.jackson.*,
-							!org.codehaus.jackson.map.*,
-							!org.codehaus.aspectwerkz.hook.*,
-							!org.dom4j.*,
-							!org.imgscalr.*,
-							!org.relaxng.datatype.*,
-							!org.jdom.*,
-							!org.apache.log,
-							!org.apache.log.*,
-							!net.sf.cglib.asm.util,
-							!org.apache.tools.ant.*,
-							!org.testng.*,
-							!com.sun.msv.*,
-							!com.sun.jdi,
-							!com.sun.jdi.*,
-							!com.sun.jdmk.comm,
-							!com.ibm.uvm.tools,
-							!com.werken.xpath,
-							!com.saxonica.validate,
-							!javax.jmdns,
-							!javax.transaction,
-							!javax.transaction.*,
-							!javax.persistence,
-							!nu.xom,
-							!org.apache.xml.resolver,
-							!org.apache.xml.resolver.*,
-							!org.apache.xml.serializer,
-							!org.apache.sanselan,
-							!org.apache.sanselan.formats.jpeg.xmp,
-							!org.hibernate.annotations,
-							!org.hibernate.annotation.*,
-							!org.springframework.security.authentication.encoding,
-							!org.springframework.transaction.annotation,
-							!sun.io.*,
-							!org.codehaus.jettison,
-							!org.codehaus.jettison.*,
-							!sun.misc,
-							!sun.reflect,
-							!net.vz.mongodb.jackson,
-							!com.google.common.base,
-							!com.google.common.collect,
-							!org.apache.commons.discovery.tools,
-							!org.hibernate,
-							eu.europeana.uim.solr4,
-							org.apache.solr.common.util,
-							org.apache.solr.client.solrj.impl,
-							org.apache.solr.common,
-							org.apache.solr.client.solrj,
-							org.apache.solr.common.params,
-							org.apache.solr.client.solrj.response,
-							org.apache.solr.client.solrj.beans,
-							org.xmlpull.v1,
+							org.osgi.framework; version=1.5.0,
+							javax.annotation; version=0.0.0,
+							javax.crypto; version=0.0.0,
+							javax.crypto.spec; version=0.0.0,
+							javax.imageio; version=0.0.0,
+							javax.imageio.spi; version=0.0.0,
+							javax.management; version=0.0.0,
+							javax.naming; version=0.0.0,
+							javax.naming.spi; version=0.0.0,
+							javax.net; version=0.0.0,
+							javax.net.ssl; version=0.0.0,
+							javax.security.auth; version=0.0.0,
+							javax.security.auth.x500; version=0.0.0,
+							javax.sql; version=0.0.0,
+							javax.swing; version=0.0.0,
+							javax.swing.border; version=0.0.0,
+							javax.swing.event; version=0.0.0,
+							javax.swing.plaf; version=0.0.0,
+							javax.swing.table; version=0.0.0,
+							javax.swing.text; version=0.0.0,
+							javax.swing.tree; version=0.0.0,
+							javax.tools; version=0.0.0,
+							org.ietf.jgss; version=0.0.0,
+							org.osgi.service.blueprint; version=1.0.1,
+							jline; version=2.5.0,
+							javax.servlet; version=2.5.0,
+							javax.servlet.http; version=2.5.0,
+							eu.europeana.uim.common; version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.store; version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.orchestration; version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.plugin.ingestion; version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.sugar; version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.sugar.model; version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues;
+							version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
+							org.theeuropeanlibrary.model.common.qualifier;
+							version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.solr4; version=2.0.0.SNAPSHOT,
+							org.apache.solr.common.util; version=4.0.0,
+							org.apache.solr.client.solrj.impl; version=4.0.0,
+							org.apache.solr.common; version=4.0.0,
+							org.apache.solr.client.solrj; version=4.0.0,
+							org.apache.solr.common.params; version=4.0.0,
+							org.apache.solr.client.solrj.response; version=4.0.0,
+							org.apache.solr.client.solrj.beans; version=4.0.0,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,
-							*
+							!*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>
 							*;scope=compile|runtime;artifactId=!europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
 
 						</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
 						<Bundle-Activator>eu.europeana.uim.enrichment.MongoBundleActivator</Bundle-Activator>
 					</instructions>
 				</configuration>
@@ -229,7 +224,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 

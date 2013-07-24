@@ -94,13 +94,13 @@
 							javax.xml.transform, 
 							javax.xml.transform.dom, 
 							javax.xml.transform.stream, 
-							org.apache.commons.collections, 
-							org.apache.commons.io, 
-							org.apache.commons.io.output, 
-							org.apache.commons.lang, 
-							org.joda.time, 
+							!org.apache.commons.collections, 
+							!org.apache.commons.io, 
+							!org.apache.commons.io.output, 
+							!org.apache.commons.lang, 
+							!org.joda.time, 
 							org.w3c.dom,
-							org.xmlpull.v1,
+							!org.xmlpull.v1,
 							gnu.trove.set.hash,
 							!org.dom4j, 
 							!org.jdom, 
@@ -126,7 +126,7 @@
 							eu.europeana.uim.model.adapters,
 							eu.europeana.uim.model.adapters.europeana
 						</Export-Package>
-						<Embed-Dependency>jibx-extras,jibx-run,europeana-uim-model-tel,europeana-uim-model-common,europeana-uim-model-adapters</Embed-Dependency>
+						<Embed-Dependency>jibx-extras,jibx-run,europeana-uim-model-tel,europeana-uim-model-common,europeana-uim-model-adapters,commons-lang</Embed-Dependency>
 					</instructions>
 				</configuration>
 			</plugin>
