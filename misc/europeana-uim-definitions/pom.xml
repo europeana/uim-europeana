@@ -11,8 +11,6 @@
 	<packaging>bundle</packaging>
 	<name>Unified Ingestion Manager: Europeana Data Model Definitions</name>
 
-
-
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -69,8 +67,6 @@
 		</dependency>
 
 	</dependencies>
-
-
 
 	<build>
 		<defaultGoal>install</defaultGoal>
@@ -143,6 +139,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
 
 </project>
