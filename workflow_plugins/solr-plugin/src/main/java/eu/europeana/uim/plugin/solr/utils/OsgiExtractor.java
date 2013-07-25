@@ -464,9 +464,11 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	private EntityImpl retrieveValueFromResource(String resource) {
-
-		EntityImpl entity = datastore.find(EntityImpl.class)
+		EntityImpl entity;
+		synchronized(this){
+		entity = datastore.find(EntityImpl.class)
 				.filter("uri", resource).get();
+		}
 		if (entity == null) {
 			String val = retrieveValue(resource);
 			if (val.length() > 0) {

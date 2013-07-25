@@ -340,6 +340,7 @@ public class EnrichmentPlugin<I> extends
 					"Finished removing after " + (new Date().getTime() - start)
 							+ " ms");
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.log(Level.SEVERE, e.getMessage());
 		}
 		String sugarCrmId = collection
@@ -469,7 +470,7 @@ public class EnrichmentPlugin<I> extends
 						yearObj.setString(year);
 						yearList.add(yearObj);
 					}
-
+					europeanaProxy.setYearList(yearList);
 					for (ProxyType proxy : rdfFinal.getProxyList()) {
 						if (proxy != null && proxy.getEuropeanaProxy() != null
 								&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {

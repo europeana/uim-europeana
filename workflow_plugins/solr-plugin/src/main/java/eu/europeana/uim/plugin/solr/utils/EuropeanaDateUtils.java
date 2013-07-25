@@ -64,8 +64,28 @@ public class EuropeanaDateUtils {
 		String contains = contains(input, patterns);
 		if (contains != null) {
 			dates.addAll(getDates(input, contains));
+		} else if (isSingleDate(input, 10)) {
+			if (!dates.contains(input)) {
+				dates.add(input);
+			}
 		}
 		return dates;
+	}
+
+	private boolean isSingleDate(String input, int radix) {
+		if (input.isEmpty())
+			return false;
+		for (int i = 0; i < input.length(); i++) {
+			if (i == 0 && input.charAt(i) == '-') {
+				if (input.length() == 1)
+					return false;
+				else
+					continue;
+			}
+			if (Character.digit(input.charAt(i), radix) < 0)
+				return false;
+		}
+		return true;
 	}
 
 	private String contains(String input, String[] filters) {

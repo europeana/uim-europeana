@@ -111,54 +111,67 @@ public class DeactivatePlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> arg1)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		IBindingFactory bfact;
-		if(mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-				 || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-				 .equals(Status.DELETED)){
-		try {
-			bfact = BindingDirectory.getFactory(RDF.class);
+		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+						.equals(Status.DELETED)) {
+			try {
+				bfact = BindingDirectory.getFactory(RDF.class);
 
-			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-			String value;
-			if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
-					&& mdr.getValues(
+				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+				String value;
+				if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
+						&& mdr.getValues(
+								EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+								.size() > 0) {
+					value = mdr.getValues(
 							EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
-							.size() > 0) {
-				value = mdr.getValues(
-						EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
-			} else {
-				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
-			}
-			// mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
-			// TODO: disable in UIM (?)
-			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+							.get(0);
+				} else {
+					value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
+							.get(0);
+				}
+				// mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
+				// TODO: disable in UIM (?)
+				RDF rdf;
+				try {
+					rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 
-			FullBean fBean = dService.getMongoServer().getFullBean(
-					rdf.getProvidedCHOList().get(0).getAbout());
-			if (fBean != null) {
-				dService.getMongoServer().delete(fBean.getAggregations());
-				dService.getMongoServer().delete(fBean.getProvidedCHOs());
-				dService.getMongoServer().delete(fBean.getProxies());
-				dService.getMongoServer().delete(
-						fBean.getEuropeanaAggregation());
-				dService.getMongoServer().delete(fBean);
-				dService.getSolrServer()
-						.deleteByQuery(
-								"europeana_id:"
-										+ ClientUtils.escapeQueryChars(fBean
-												.getAbout()));
+					FullBean fBean = dService.getMongoServer().getFullBean(
+							rdf.getProvidedCHOList().get(0).getAbout());
+					if (fBean != null) {
+						dService.getMongoServer().delete(
+								fBean.getAggregations());
+						dService.getMongoServer().delete(
+								fBean.getProvidedCHOs());
+						dService.getMongoServer().delete(fBean.getProxies());
+						dService.getMongoServer().delete(
+								fBean.getEuropeanaAggregation());
+						dService.getMongoServer().delete(fBean);
+						try {
+							dService.getSolrServer().deleteByQuery(
+									"europeana_id:"
+											+ ClientUtils
+													.escapeQueryChars(fBean
+															.getAbout()));
+						} catch (SolrServerException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+					mdr.deleteValues(EuropeanaModelRegistry.STATUS);
+					mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
+				} catch (JiBXException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			} catch (JiBXException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
 			}
-			return true;
-		} catch (JiBXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
 		}
 		return true;
 	}

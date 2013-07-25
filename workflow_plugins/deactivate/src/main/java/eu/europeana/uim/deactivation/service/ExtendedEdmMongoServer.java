@@ -3,6 +3,7 @@ package eu.europeana.uim.deactivation.service;
 import java.util.List;
 
 import com.mongodb.Mongo;
+import com.mongodb.WriteConcern;
 
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.EdmMongoServer;
@@ -32,7 +33,7 @@ public class ExtendedEdmMongoServer extends EdmMongoServerImpl implements EdmMon
 	 * @param obj
 	 */
 	public <T> void delete(T obj) {
-		this.getDatastore().delete(obj);
+		this.getDatastore().delete(obj, WriteConcern.JOURNAL_SAFE);
 	}
 
 }

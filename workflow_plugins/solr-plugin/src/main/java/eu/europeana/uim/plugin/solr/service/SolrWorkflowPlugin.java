@@ -187,7 +187,7 @@ public class SolrWorkflowPlugin<I> extends
 				yearObj.setString(year);
 				yearList.add(yearObj);
 			}
-
+			europeanaProxy.setYearList(yearList);
 			for (ProxyType proxy : rdfFinal.getProxyList()) {
 				if (proxy != null && proxy.getEuropeanaProxy() != null
 						&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
