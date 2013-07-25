@@ -12,6 +12,7 @@
 	<name>Unified Ingestion Manager: Europeana Data Model Definitions</name>
 
 
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
