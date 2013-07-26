@@ -69,14 +69,15 @@ public class OsgiExtractor extends Extractor {
 	// private static OsgiExtractor extractor;
 
 	public static SolrWorkflowService solrWorkFlowService;
-	public OsgiExtractor(){
-		
+
+	public OsgiExtractor() {
+
 	}
-	
+
 	public OsgiExtractor(SolrWorkflowService solrWorkflowService) {
 		memCache = MemCache.getInstance();
-		
-		OsgiExtractor.solrWorkFlowService=solrWorkflowService;
+
+		OsgiExtractor.solrWorkFlowService = solrWorkflowService;
 	}
 
 	// public static OsgiExtractor getInstance(final Datastore datastore) {
@@ -112,7 +113,7 @@ public class OsgiExtractor extends Extractor {
 			IllegalArgumentException, InstantiationException,
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
-		
+
 		if (controlledVocabulary != null) {
 			vocabulary = controlledVocabulary;
 			String suffix = controlledVocabulary.getSuffix() != null ? controlledVocabulary
@@ -171,11 +172,10 @@ public class OsgiExtractor extends Extractor {
 
 		RDFReaderF rdfReader = solrWorkFlowService.getRDFReaderF();
 		Model model = ModelFactory.createDefaultModel();
-		try{
-		rdfReader.getReader().read(model,
-				new ByteArrayInputStream(xmlString.getBytes()), "");
-		}
-		catch (Exception e){
+		try {
+			rdfReader.getReader().read(model,
+					new ByteArrayInputStream(xmlString.getBytes()), "");
+		} catch (Exception e) {
 			System.out.println(xmlString);
 		}
 		Map<String, String> prefixNS = model.getNsPrefixMap();
@@ -185,9 +185,9 @@ public class OsgiExtractor extends Extractor {
 					prefix.getValue()));
 		}
 		// Find the root contextual entity
-		String rootEntity = 
-				String.format(ROOT_TEMPLATE, sb.toString(), resource);
-//		System.out.println(rootEntity);
+		String rootEntity = String.format(ROOT_TEMPLATE, sb.toString(),
+				resource);
+		// System.out.println(rootEntity);
 		com.hp.hpl.jena.query.Query queryRoot = QueryFactory.create(rootEntity);
 		QueryExecution qRoot = QueryExecutionFactory.create(queryRoot, model);
 		try {
@@ -195,81 +195,86 @@ public class OsgiExtractor extends Extractor {
 			if (rootRs.hasNext()) {
 				String element = rootRs.next().get("?object").toString();
 				String[] nsAndLocal = element.split("#");
-				String prefix = findByPrefix(prefixNS,nsAndLocal[0]);
-				if(prefix!=null){
-				String normalizedElement = prefix+":"+nsAndLocal[1];
-				
-				if (isMapped(normalizedElement)) {
-					List<EdmMappedField> edmList = getEdmLabel(normalizedElement);
-					if (edmList != null && edmList.size() > 0) {
-						
-						for (EdmMappedField edmLabel : edmList) {
-							
-							if (StringUtils.equalsIgnoreCase(edmLabel
-									.getLabel().toString(), "skos_concept")) {
-								if (lastConcept != null) {
-									if (lastConcept.getAbout() != null) {
-										concepts.add(lastConcept);
+				String prefix = findByPrefix(prefixNS, nsAndLocal[0]);
+				if (prefix != null) {
+					String normalizedElement = prefix + ":" + nsAndLocal[1];
+
+					if (isMapped(normalizedElement)) {
+						List<EdmMappedField> edmList = getEdmLabel(normalizedElement);
+						if (edmList != null && edmList.size() > 0) {
+
+							for (EdmMappedField edmLabel : edmList) {
+
+								if (StringUtils.equalsIgnoreCase(edmLabel
+										.getLabel().toString(), "skos_concept")) {
+									if (lastConcept != null) {
+										if (lastConcept.getAbout() != null) {
+											concepts.add(lastConcept);
+											lastConcept = createNewEntity(
+													Concept.class, resource);
+										}
+									} else {
 										lastConcept = createNewEntity(
 												Concept.class, resource);
+
 									}
-								} else {
-									lastConcept = createNewEntity(
-											Concept.class, resource);
 
-								}
+								} else if (StringUtils.equalsIgnoreCase(
+										edmLabel.getLabel().toString(),
+										"edm_agent")) {
+									if (lastAgent != null) {
+										if (lastAgent.getAbout() != null) {
+											agents.add(lastAgent);
 
-							} else if (StringUtils.equalsIgnoreCase(edmLabel
-									.getLabel().toString(), "edm_agent")) {
-								if (lastAgent != null) {
-									if (lastAgent.getAbout() != null) {
-										agents.add(lastAgent);
-
+											lastAgent = createNewEntity(
+													AgentType.class, resource);
+										}
+									} else {
 										lastAgent = createNewEntity(
 												AgentType.class, resource);
 									}
-								} else {
-									lastAgent = createNewEntity(
-											AgentType.class, resource);
-								}
 
-							} else if (StringUtils.equalsIgnoreCase(edmLabel
-									.getLabel().toString(), "edm_timespan")) {
-								if (lastTimespan != null) {
-									if (lastTimespan.getAbout() != null) {
-										timespans.add(lastTimespan);
+								} else if (StringUtils.equalsIgnoreCase(
+										edmLabel.getLabel().toString(),
+										"edm_timespan")) {
+									if (lastTimespan != null) {
+										if (lastTimespan.getAbout() != null) {
+											timespans.add(lastTimespan);
+											lastTimespan = createNewEntity(
+													TimeSpanType.class,
+													resource);
+										}
+
+									} else {
 										lastTimespan = createNewEntity(
 												TimeSpanType.class, resource);
 									}
 
-								} else {
-									lastTimespan = createNewEntity(
-											TimeSpanType.class, resource);
-								}
-
-							} else if (StringUtils.equalsIgnoreCase(edmLabel
-									.getLabel().toString(), "edm_place")) {
-								if (lastPlace != null) {
-									if (lastPlace.getAbout() != null) {
-										places.add(lastPlace);
+								} else if (StringUtils.equalsIgnoreCase(
+										edmLabel.getLabel().toString(),
+										"edm_place")) {
+									if (lastPlace != null) {
+										if (lastPlace.getAbout() != null) {
+											places.add(lastPlace);
+											lastPlace = createNewEntity(
+													PlaceType.class, resource);
+										}
+									} else {
 										lastPlace = createNewEntity(
 												PlaceType.class, resource);
 									}
-								} else {
-									lastPlace = createNewEntity(
-											PlaceType.class, resource);
 								}
 							}
 						}
 					}
 				}
 			}
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		// Find the rest and append them as appropriate
-		String qString = String.format(SPARQL_TEMPLATE, sb.toString(), resource);
+		String qString = String
+				.format(SPARQL_TEMPLATE, sb.toString(), resource);
 		com.hp.hpl.jena.query.Query query = QueryFactory.create(qString);
 		QueryExecution qexec = QueryExecutionFactory.create(query, model);
 		try {
@@ -277,143 +282,175 @@ public class OsgiExtractor extends Extractor {
 
 			while (results.hasNext()) {
 				QuerySolution element = results.next();
-				String[] nsAndLocal = element.get("?predicate").toString().split("#");
-				String prefix =  findByPrefix(prefixNS,nsAndLocal[0]);
-				if (prefix !=null){
-				String normalizedElement = prefix+":"+nsAndLocal[1];
-				if (isMapped(normalizedElement)) {
-					List<EdmMappedField> edmList = getEdmLabel(normalizedElement);
-					if (edmList != null && edmList.size() > 0) {
-						for (EdmMappedField edmLabel : edmList) {
-							if (StringUtils.startsWith(edmLabel
-									.getLabel().toString(), "cc")) {
-								
-								if(element.get("?object").isLiteral()){
-									appendConceptValue(
-											lastConcept == null ? new Concept()
-													: lastConcept,
-											edmLabel.getLabel()
-													.toString(),
-											element.get("?object").asLiteral().getString(),
-											"xml:lang",
-											element.get("?object").asLiteral().getLanguage(),
-											iterations);
-								} else {
-									appendConceptValue(
-											lastConcept == null ? new Concept()
-													: lastConcept,
-											edmLabel.getLabel()
-													.toString(),
-											element.get("?object").asResource().getURI(),
-											null,
-											null,
-											iterations);
+				String[] nsAndLocal = element.get("?predicate").toString()
+						.split("#");
+				String prefix = findByPrefix(prefixNS, nsAndLocal[0]);
+				if (prefix != null) {
+					String normalizedElement = prefix + ":" + nsAndLocal[1];
+					if (isMapped(normalizedElement)) {
+						List<EdmMappedField> edmList = getEdmLabel(normalizedElement);
+						if (edmList != null && edmList.size() > 0) {
+							for (EdmMappedField edmLabel : edmList) {
+								if (StringUtils.startsWith(edmLabel.getLabel()
+										.toString(), "cc")) {
+
+									if (element.get("?object").isLiteral()) {
+										appendConceptValue(
+												lastConcept == null ? new Concept()
+														: lastConcept, edmLabel
+														.getLabel().toString(),
+												element.get("?object")
+														.asLiteral()
+														.getString(),
+												"xml:lang",
+												element.get("?object")
+														.asLiteral()
+														.getLanguage(),
+												iterations);
+									} else {
+										appendConceptValue(
+												lastConcept == null ? new Concept()
+														: lastConcept, edmLabel
+														.getLabel().toString(),
+												element.get("?object")
+														.asResource().getURI(),
+												null, null, iterations);
+									}
+									ControlledVocabularyImpl oldVoc = vocabulary;
+									if (StringUtils.equals(edmLabel.getLabel()
+											.toString(), "cc_skos_broader")
+											&& iterations > 0) {
+										ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
+												datastore, "URI",
+												element.get("?object")
+														.asResource().getURI());
+
+										concepts.addAll(denormalize(
+												element.get("?object")
+														.asResource().getURI(),
+												controlledVocabulary,
+												iterations - 1, true).get(
+												"concepts"));
+									}
+									vocabulary = oldVoc;
+								} else if (StringUtils.startsWith(edmLabel
+										.getLabel().toString(), "pl")) {
+									if (element.get("?object").isLiteral()) {
+										appendValue(
+												PlaceType.class,
+												lastPlace == null ? new PlaceType()
+														: lastPlace, edmLabel
+														.getLabel().toString(),
+												element.get("?object")
+														.asLiteral()
+														.getString(),
+												"xml:lang",
+												element.get("?object")
+														.asLiteral()
+														.getLanguage(),
+												iterations);
+									} else {
+										appendValue(
+												PlaceType.class,
+												lastPlace == null ? new PlaceType()
+														: lastPlace, edmLabel
+														.getLabel().toString(),
+												element.get("?object")
+														.asResource().getURI(),
+												null, null, iterations);
+									}
+									ControlledVocabularyImpl oldVoc = vocabulary;
+									if (StringUtils.equals(edmLabel.getLabel()
+											.toString(), "pl_dcterms_isPartOf")
+											&& iterations > 0) {
+										ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
+												datastore, "URI",
+												element.get("?object")
+														.asResource().getURI());
+
+										places.addAll(denormalize(
+												element.get("?object")
+														.asResource().getURI(),
+												controlledVocabulary,
+												iterations - 1, true).get(
+												"places"));
+									}
+									vocabulary = oldVoc;
+								} else if (StringUtils.startsWith(edmLabel
+										.getLabel().toString(), "ag")) {
+									if (element.get("?object").isLiteral()) {
+										appendValue(
+												AgentType.class,
+												lastAgent == null ? new AgentType()
+														: lastAgent, edmLabel
+														.getLabel().toString(),
+												element.get("?object")
+														.asLiteral()
+														.getString(),
+												"xml:lang",
+												element.get("?object")
+														.asLiteral()
+														.getLanguage(),
+												iterations);
+									} else {
+										appendValue(
+												AgentType.class,
+												lastAgent == null ? new AgentType()
+														: lastAgent, edmLabel
+														.getLabel().toString(),
+												element.get("?object")
+														.asResource().getURI(),
+												null, null, iterations);
+									}
+								} else if (StringUtils.startsWith(edmLabel
+										.getLabel().toString(), "ts")) {
+									if (element.get("?object").isLiteral()) {
+										appendValue(
+												TimeSpanType.class,
+												lastTimespan == null ? new TimeSpanType()
+														: lastTimespan,
+												edmLabel.getLabel().toString(),
+												element.get("?object")
+														.asLiteral()
+														.getString(),
+												"xml:lang",
+												element.get("?object")
+														.asLiteral()
+														.getLanguage(),
+												iterations);
+									} else {
+										appendValue(
+												TimeSpanType.class,
+												lastTimespan == null ? new TimeSpanType()
+														: lastTimespan,
+												edmLabel.getLabel().toString(),
+												element.get("?object")
+														.asResource().getURI(),
+												null, null, iterations);
+									}
+									ControlledVocabularyImpl oldVoc = vocabulary;
+									if (StringUtils.equals(edmLabel.getLabel()
+											.toString(), "ts_dcterms_isPartOf")
+											&& iterations > 0) {
+										ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
+												datastore, "URI",
+												element.get("?object")
+														.asResource().getURI());
+
+										timespans.addAll(denormalize(
+												element.get("?object")
+														.asResource().getURI(),
+												controlledVocabulary,
+												iterations - 1, true).get(
+												"timespans"));
+									}
+									vocabulary = oldVoc;
 								}
-								ControlledVocabularyImpl oldVoc = vocabulary;
-								if(StringUtils.equals(edmLabel.getLabel().toString(), "cc_skos_broader") && iterations>0){
-									ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
-											datastore, "URI", element.get("?object").asResource().getURI());
-									
-									concepts.addAll(denormalize(element.get("?object").asResource().getURI(), controlledVocabulary, iterations-1, true).get("concepts"));
-								}
-								vocabulary = oldVoc;
-							} else if (StringUtils.startsWith(edmLabel
-									.getLabel().toString(), "pl")){
-								if (element.get("?object").isLiteral()){
-									appendValue(
-											PlaceType.class,
-											lastPlace == null ? new PlaceType()
-													: lastPlace,
-											edmLabel.getLabel()
-													.toString(),
-													element.get("?object").asLiteral().getString(),
-													"xml:lang",
-													element.get("?object").asLiteral().getLanguage(),
-											iterations);
-								} else {
-									appendValue(
-											PlaceType.class,
-											lastPlace == null ? new PlaceType()
-													: lastPlace,
-											edmLabel.getLabel()
-													.toString(),
-													element.get("?object").asResource().getURI(),
-													null,
-													null,
-											iterations);
-								}
-								ControlledVocabularyImpl oldVoc = vocabulary;
-								if(StringUtils.equals(edmLabel.getLabel().toString(), "pl_dcterms_isPartOf") && iterations>0){
-									ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
-											datastore, "URI", element.get("?object").asResource().getURI());
-									
-									places.addAll(denormalize(element.get("?object").asResource().getURI(), controlledVocabulary, iterations-1, true).get("places"));
-								}
-								vocabulary = oldVoc;
-							} else if (StringUtils.startsWith(edmLabel
-									.getLabel().toString(), "ag")){
-								if (element.get("?object").isLiteral()){
-									appendValue(
-											AgentType.class,
-											lastAgent == null ? new AgentType()
-													: lastAgent,
-											edmLabel.getLabel()
-													.toString(),
-													element.get("?object").asLiteral().getString(),
-													"xml:lang",
-													element.get("?object").asLiteral().getLanguage(),
-											iterations);
-								} else {
-									appendValue(
-											AgentType.class,
-											lastAgent== null ? new AgentType()
-													: lastAgent,
-											edmLabel.getLabel()
-													.toString(),
-													element.get("?object").asResource().getURI(),
-													null,
-													null,
-											iterations);
-								}
-							} else if (StringUtils.startsWith(edmLabel
-									.getLabel().toString(), "ts")){
-								if (element.get("?object").isLiteral()){
-									appendValue(
-											TimeSpanType.class,
-											lastTimespan == null ? new TimeSpanType()
-													: lastTimespan,
-											edmLabel.getLabel()
-													.toString(),
-													element.get("?object").asLiteral().getString(),
-													"xml:lang",
-													element.get("?object").asLiteral().getLanguage(),
-											iterations);
-								} else {
-									appendValue(
-											TimeSpanType.class,
-											lastTimespan== null ? new TimeSpanType()
-													: lastTimespan,
-											edmLabel.getLabel()
-													.toString(),
-													element.get("?object").asResource().getURI(),
-													null,
-													null,
-											iterations);
-								}
-								ControlledVocabularyImpl oldVoc = vocabulary;
-								if(StringUtils.equals(edmLabel.getLabel().toString(), "ts_dcterms_isPartOf") && iterations>0){
-									ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
-											datastore, "URI", element.get("?object").asResource().getURI());
-									
-									timespans.addAll(denormalize(element.get("?object").asResource().getURI(), controlledVocabulary, iterations-1, true).get("timespans"));
-								}
-								vocabulary = oldVoc;
 							}
+
 						}
-						
 					}
 				}
-			}
 			}
 			if (lastConcept != null)
 				concepts.add(lastConcept);
@@ -426,7 +463,7 @@ public class OsgiExtractor extends Extractor {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		denormalizedValues.put("concepts", concepts);
 		denormalizedValues.put("agents", agents);
 		denormalizedValues.put("timespans", timespans);
@@ -435,15 +472,13 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	private String findByPrefix(Map<String, String> prefixNS, String string) {
-		for(Entry<String,String> prefix:prefixNS.entrySet()){
-			if (StringUtils.equals(prefix.getValue(), string+"#")){
+		for (Entry<String, String> prefix : prefixNS.entrySet()) {
+			if (StringUtils.equals(prefix.getValue(), string + "#")) {
 				return prefix.getKey();
 			}
 		}
 		return null;
 	}
-
-	
 
 	public void setDatastore(Datastore datastore) {
 		this.datastore = datastore;
@@ -465,9 +500,9 @@ public class OsgiExtractor extends Extractor {
 
 	private EntityImpl retrieveValueFromResource(String resource) {
 		EntityImpl entity;
-		synchronized(this){
-		entity = datastore.find(EntityImpl.class)
-				.filter("uri", resource).get();
+		synchronized (this) {
+			entity = datastore.find(EntityImpl.class).filter("uri", resource)
+					.get();
 		}
 		if (entity == null) {
 			String val = retrieveValue(resource);
@@ -476,8 +511,13 @@ public class OsgiExtractor extends Extractor {
 				newEntity.setUri(resource);
 				newEntity.setTimestamp(new Date().getTime());
 				newEntity.setContent(val);
-				datastore.save(newEntity);
-				return newEntity;
+				try {
+					datastore.save(newEntity);
+					return newEntity;
+				} catch (Exception e) {
+					return datastore.find(EntityImpl.class)
+							.filter("uri", resource).get();
+				}
 			}
 			return null;
 		} else {
@@ -548,11 +588,11 @@ public class OsgiExtractor extends Extractor {
 							| Pattern.CASE_INSENSITIVE);
 			Matcher jibxFixerMatcher = jibxFixerPattern.matcher(val);
 			String valNew = jibxFixerMatcher.replaceAll("");
-			if(!StringUtils.equals(valNew, valOld)){
+			if (!StringUtils.equals(valNew, valOld)) {
 				return obj;
 			}
 		}
-		
+
 		RdfMethod RDF = null;
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
@@ -715,11 +755,11 @@ public class OsgiExtractor extends Extractor {
 							| Pattern.CASE_INSENSITIVE);
 			Matcher jibxFixerMatcher = jibxFixerPattern.matcher(val);
 			String valNew = jibxFixerMatcher.replaceAll("?");
-			if(!StringUtils.equals(valNew, valOld)){
+			if (!StringUtils.equals(valNew, valOld)) {
 				return concept;
 			}
 		}
-		
+
 		for (RdfMethod rdfMethod : RdfMethod.values()) {
 			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
 				RDF = rdfMethod;
@@ -888,17 +928,21 @@ public class OsgiExtractor extends Extractor {
 		if (splitName.length > 3) {
 			String vocabularyName = splitName[0] + "/" + splitName[1] + "/"
 					+ splitName[2] + "/";
-			List<ControlledVocabularyImpl> vocabularies = VocMemCache.getMemCache(solrWorkFlowService).get(vocabularyName);
-			if(vocabularies.size()==0){
-				for(Entry<String,List<ControlledVocabularyImpl>> vocs: VocMemCache.getMemCache(solrWorkFlowService).entrySet()){
-					for(ControlledVocabularyImpl voc:vocs.getValue()){
-						if(voc.getReplaceUrl()!=null && StringUtils.equals(voc.getReplaceUrl(), vocabularyName)){
+			List<ControlledVocabularyImpl> vocabularies = VocMemCache
+					.getMemCache(solrWorkFlowService).get(vocabularyName);
+			if (vocabularies.size() == 0) {
+				for (Entry<String, List<ControlledVocabularyImpl>> vocs : VocMemCache
+						.getMemCache(solrWorkFlowService).entrySet()) {
+					for (ControlledVocabularyImpl voc : vocs.getValue()) {
+						if (voc.getReplaceUrl() != null
+								&& StringUtils.equals(voc.getReplaceUrl(),
+										vocabularyName)) {
 							vocabularies.add(voc);
 						}
 					}
 				}
 			}
-			
+
 			for (ControlledVocabularyImpl vocabulary : vocabularies) {
 				for (String rule : vocabulary.getRules()) {
 					if (StringUtils.equals(rule, "*")
@@ -908,8 +952,7 @@ public class OsgiExtractor extends Extractor {
 				}
 
 			}
-			
-			
+
 		}
 		return null;
 	}
@@ -922,7 +965,7 @@ public class OsgiExtractor extends Extractor {
 
 	public List<ControlledVocabularyImpl> getControlledVocabularies(
 			final Datastore datastore) {
-		
+
 		return datastore.find(ControlledVocabularyImpl.class) != null ? datastore
 				.find(ControlledVocabularyImpl.class).asList() : null;
 	}
