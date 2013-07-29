@@ -51,6 +51,13 @@ public class FailedRecordServiceImpl extends IntegrationServicesProviderServlet
 							.get("europeanaId"));
 					failedRecordDTO.setOriginalId(failedRecord.get("originalId"));
 					failedRecordDTO.setEdm(failedRecord.get("edm"));
+					
+					if (failedRecord.get("message") != null){
+						failedRecordDTO.setMessage(failedRecord.get("message"));
+					}
+					
+					
+					
 					if (StringUtils.equals(failedRecord.get("lookupState"),
 							LookupState.IDENTICAL.toString())) {
 						failedRecordDTO
@@ -75,10 +82,20 @@ public class FailedRecordServiceImpl extends IntegrationServicesProviderServlet
 						failedRecordDTO
 								.setLookupState("A system error occured during the import of this file).");
 					}
+					else if (StringUtils.equals(failedRecord.get("lookupState"),
+							LookupState.DERIVED_DUPLICATE_INCOLLECTION.toString())) {
+						failedRecordDTO
+								.setLookupState("Two records obtained the same identifier during the import process.");
+					}
 					else {
 						failedRecordDTO
 								.setLookupState("The Europeana Identifier of the record was encountered twice for different records in the same dataset");
 					}
+					
+					
+					
+					
+					
 					failedRecordDTOList.add(failedRecordDTO);
 				}
 
