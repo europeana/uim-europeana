@@ -16,9 +16,10 @@ public class VocMemCache {
 	public static  Map<String, List<ControlledVocabularyImpl>> getMemCache(SolrWorkflowService solrWorkflowService){
 		if(vocMemCache==null){
 			OsgiExtractor extractor = solrWorkflowService.getExtractor();
-
+			extractor.setDatastore(solrWorkflowService.getDatastore());
 			List<ControlledVocabularyImpl> vocs = extractor
-					.getControlledVocabularies(solrWorkflowService.getDatastore());
+					.getControlledVocabularies();
+			
 			vocMemCache = new HashMap<String, List<ControlledVocabularyImpl>>();
 			List<ControlledVocabularyImpl> vocsInMap;
 			for (ControlledVocabularyImpl voc : vocs) {
