@@ -328,7 +328,7 @@ public class FailedRecordsWidget extends IngestionWidget {
 			}
 		};
 		cellTable.addColumn(contributorColumn, "Failure Reason");
-		cellTable.setColumnWidth(contributorColumn, 30, Unit.PCT);
+		cellTable.setColumnWidth(contributorColumn, 15, Unit.PCT);
 		// Show Record Details
 		Column<FailedRecordDTO, FailedRecordDTO> edmColumn = new Column<FailedRecordDTO, FailedRecordDTO>(
 				new ActionCell<FailedRecordDTO>("Show EDM",
@@ -366,6 +366,18 @@ public class FailedRecordsWidget extends IngestionWidget {
 				return object;
 			}
 		};
+		
+		Column<FailedRecordDTO, String> descrColumn = new Column<FailedRecordDTO, String>(
+				new TextCell()) {
+			@Override
+			public String getValue(FailedRecordDTO object) {
+				return object.getMessage();
+			}
+		};
+		cellTable.addColumn(descrColumn, "Error Description:");
+		cellTable.setColumnWidth(descrColumn, 25, Unit.PCT);
+		
+		
 		cellTable.addColumn(edmColumn, "Show EDM");
 		cellTable.setColumnWidth(edmColumn, 4, Unit.PCT);
 		

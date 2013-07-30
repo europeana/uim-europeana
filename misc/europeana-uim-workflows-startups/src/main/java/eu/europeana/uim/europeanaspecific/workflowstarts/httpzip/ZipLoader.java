@@ -110,7 +110,7 @@ public class ZipLoader<I> {
 	
 
 	/**
-	 * Default constructor for this class
+	 * Default constructor for th	is class
 	 * 
 	 * @param expectedRecords
 	 *            The number of expected records
@@ -235,6 +235,11 @@ public class ZipLoader<I> {
 							.getDerivedRecordID());
 						discarded ++;
 						break;
+					case DERIVED_DUPLICATE_INCOLLECTION:						
+						LOGGER.log(Level.INFO,"Unique Identifier in DERIVED_DUPLICATE_INCOLLECTION state for record with ID " + dedupres
+							.getDerivedRecordID());
+						discarded ++;
+						break;
 					case DUPLICATE_RECORD_ACROSS_COLLECTIONS:
 						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_RECORD_ACROSS_COLLECTIONS state for record with ID " + dedupres
 								.getDerivedRecordID());
@@ -294,7 +299,7 @@ public class ZipLoader<I> {
 						break;
 					}
 
-					if (mdr != null) {
+					if (mdr != null) {						
 						result.add(mdr);
 					}
 
