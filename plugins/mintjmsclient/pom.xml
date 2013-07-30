@@ -13,7 +13,6 @@
 	<packaging>bundle</packaging>
 	<name>Unified Ingestion Manager: Mint AMPQ Client Plugin</name>
 
-
 	<dependencies>
 
 		<dependency>
