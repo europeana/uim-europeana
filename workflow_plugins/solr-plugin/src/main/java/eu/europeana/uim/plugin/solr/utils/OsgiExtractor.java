@@ -62,6 +62,7 @@ import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.EntityImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
+
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
 
 public class OsgiExtractor extends Extractor {
@@ -102,7 +103,7 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	private static MemCache memCache;
-	private ControlledVocabularyImpl vocabulary;
+	// private ControlledVocabularyImpl vocabulary;
 	private Datastore datastore;
 	private final static long UPDATETIMESTAMP = 5184000000l;
 
@@ -131,15 +132,13 @@ public class OsgiExtractor extends Extractor {
 
 					if (entity != null && entity.getContent().length() > 0) {
 
-						// Map<String, List> entityCache =
-						// createDereferencingMap(
-						// entity.getContent(), iterations);
 						Map<String, List> entityCache = createDereferencingMapRDF(
 								resource, entity.getContent(), iterations);
 						synchronized (memCache) {
 							memCache.getEntityCache().put(entity.getUri(),
 									entityCache);
 						}
+
 						return entityCache;
 					}
 				}
@@ -156,8 +155,9 @@ public class OsgiExtractor extends Extractor {
 
 	private Map<String, List> createDereferencingMapRDF(String resource,
 			String xmlString, int iterations) {
-		String SPARQL_TEMPLATE = "%s SELECT ?predicate ?object WHERE {<%s> ?predicate ?object .}";
-		String ROOT_TEMPLATE = "%s SELECT ?object WHERE {<%s> rdf:type ?object .}";
+
+		String SPARQL_TEMPLATE = "%s SELECT ?predicate ?object WHERE {?res ?predicate ?object . FILTER(?res=<%s>||?res=<%s>)}";
+		String ROOT_TEMPLATE = "%s SELECT ?object WHERE {?res rdf:type ?object . FILTER(?res=<%s>||?res=<%s>)}";
 		String PREFIX_TEMPLATE = "PREFIX  %s:<%s> ";
 		Map<String, List> denormalizedValues = new HashMap<String, List>();
 		List<Concept> concepts = new ArrayList<Concept>();
@@ -169,38 +169,46 @@ public class OsgiExtractor extends Extractor {
 		AgentType lastAgent = null;
 		TimeSpanType lastTimespan = null;
 		PlaceType lastPlace = null;
-
+		System.out.println(xmlString);
 		RDFReaderF rdfReader = solrWorkFlowService.getRDFReaderF();
 		Model model = ModelFactory.createDefaultModel();
-		try {
-			rdfReader.getReader().read(model,
-					new ByteArrayInputStream(xmlString.getBytes()), "");
-		} catch (Exception e) {
-			System.out.println(xmlString);
-		}
+
+		rdfReader.getReader().read(model,
+				new ByteArrayInputStream(xmlString.getBytes()), "");
+
 		Map<String, String> prefixNS = model.getNsPrefixMap();
 		StringBuilder sb = new StringBuilder();
 		for (Entry<String, String> prefix : prefixNS.entrySet()) {
+
 			sb.append(String.format(PREFIX_TEMPLATE, prefix.getKey(),
 					prefix.getValue()));
 		}
+
 		// Find the root contextual entity
 		String rootEntity = String.format(ROOT_TEMPLATE, sb.toString(),
-				resource);
-		// System.out.println(rootEntity);
+				resource, resource + "/");
+
 		com.hp.hpl.jena.query.Query queryRoot = QueryFactory.create(rootEntity);
 		QueryExecution qRoot = QueryExecutionFactory.create(queryRoot, model);
 		try {
 			ResultSet rootRs = qRoot.execSelect();
-			if (rootRs.hasNext()) {
+			while (rootRs.hasNext()) {
 				String element = rootRs.next().get("?object").toString();
+				System.out.println(element);
 				String[] nsAndLocal = element.split("#");
+				if (nsAndLocal.length == 1) {
+					nsAndLocal = new String[] {
+							StringUtils.substringBeforeLast(element, "/"),
+							StringUtils.substringAfterLast(element, "/") };
+
+				}
 				String prefix = findByPrefix(prefixNS, nsAndLocal[0]);
 				if (prefix != null) {
 					String normalizedElement = prefix + ":" + nsAndLocal[1];
 
 					if (isMapped(normalizedElement)) {
 						List<EdmMappedField> edmList = getEdmLabel(normalizedElement);
+
 						if (edmList != null && edmList.size() > 0) {
 
 							for (EdmMappedField edmLabel : edmList) {
@@ -225,7 +233,6 @@ public class OsgiExtractor extends Extractor {
 									if (lastAgent != null) {
 										if (lastAgent.getAbout() != null) {
 											agents.add(lastAgent);
-
 											lastAgent = createNewEntity(
 													AgentType.class, resource);
 										}
@@ -260,6 +267,8 @@ public class OsgiExtractor extends Extractor {
 													PlaceType.class, resource);
 										}
 									} else {
+										System.out
+												.println("Creating new place");
 										lastPlace = createNewEntity(
 												PlaceType.class, resource);
 									}
@@ -273,8 +282,8 @@ public class OsgiExtractor extends Extractor {
 			e.printStackTrace();
 		}
 		// Find the rest and append them as appropriate
-		String qString = String
-				.format(SPARQL_TEMPLATE, sb.toString(), resource);
+		String qString = String.format(SPARQL_TEMPLATE, sb.toString(),
+				resource, resource + "/");
 		com.hp.hpl.jena.query.Query query = QueryFactory.create(qString);
 		QueryExecution qexec = QueryExecutionFactory.create(query, model);
 		try {
@@ -284,6 +293,14 @@ public class OsgiExtractor extends Extractor {
 				QuerySolution element = results.next();
 				String[] nsAndLocal = element.get("?predicate").toString()
 						.split("#");
+				if (nsAndLocal.length == 1) {
+					nsAndLocal = new String[] {
+							StringUtils.substringBeforeLast(
+									element.get("?predicate").toString(), "/"),
+							StringUtils.substringAfterLast(
+									element.get("?predicate").toString(), "/") };
+
+				}
 				String prefix = findByPrefix(prefixNS, nsAndLocal[0]);
 				if (prefix != null) {
 					String normalizedElement = prefix + ":" + nsAndLocal[1];
@@ -367,13 +384,14 @@ public class OsgiExtractor extends Extractor {
 												datastore, "URI",
 												element.get("?object")
 														.asResource().getURI());
-
-										places.addAll(denormalize(
+										Map<String, List> pl = denormalize(
 												element.get("?object")
 														.asResource().getURI(),
 												controlledVocabulary,
-												iterations - 1, true).get(
-												"places"));
+												iterations - 1, true);
+										if (pl != null) {
+											places.addAll(pl.get("places"));
+										}
 									}
 									vocabulary = oldVoc;
 								} else if (StringUtils.startsWith(edmLabel
@@ -468,12 +486,14 @@ public class OsgiExtractor extends Extractor {
 		denormalizedValues.put("agents", agents);
 		denormalizedValues.put("timespans", timespans);
 		denormalizedValues.put("places", places);
+
 		return denormalizedValues;
 	}
 
 	private String findByPrefix(Map<String, String> prefixNS, String string) {
 		for (Entry<String, String> prefix : prefixNS.entrySet()) {
-			if (StringUtils.equals(prefix.getValue(), string + "#")) {
+			if (StringUtils.startsWith(prefix.getValue(), string)
+					|| StringUtils.startsWith(string, prefix.getValue())) {
 				return prefix.getKey();
 			}
 		}
@@ -544,6 +564,8 @@ public class OsgiExtractor extends Extractor {
 			try {
 
 				if (StringUtils.isNotBlank(vocabulary.getReplaceUrl())) {
+					System.out.println("replacing with "
+							+ vocabulary.getReplaceUrl());
 					resource = StringUtils.replace(resource,
 							vocabulary.getURI(), vocabulary.getReplaceUrl());
 				}
@@ -555,9 +577,9 @@ public class OsgiExtractor extends Extractor {
 				return writer.toString();
 
 			} catch (MalformedURLException e) {
-				return "";
+				e.printStackTrace();
 			} catch (IOException e) {
-				return "";
+				e.printStackTrace();
 			}
 		}
 		return "";
@@ -567,6 +589,7 @@ public class OsgiExtractor extends Extractor {
 			throws InstantiationException, IllegalAccessException,
 			SecurityException, NoSuchMethodException, IllegalArgumentException,
 			InvocationTargetException {
+		System.out.println("Creating new agent " + clazz.getCanonicalName());
 		T obj = clazz.newInstance();
 		Class<?>[] cls = new Class<?>[1];
 		cls[0] = (String.class);
@@ -581,6 +604,7 @@ public class OsgiExtractor extends Extractor {
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
+		System.out.println("appendign field:" + edmLabel);
 		if (val != null) {
 			String valOld = val;
 			Pattern jibxFixerPattern = Pattern.compile("[\\uD800-\\uE000]",
@@ -611,9 +635,9 @@ public class OsgiExtractor extends Extractor {
 
 				ResourceType rs = new ResourceType();
 				rs.setResource(val != null ? val : valAttr);
-				// if (isURI(rs.getResource())) {
-				// denormalize(rs.getResource(), iterations - 1);
-				// }
+				if (isURI(rs.getResource())) {
+					denormalize(rs.getResource(), iterations - 1);
+				}
 				lst.add(RDF.returnObject(RDF.getClazz(), rs));
 
 			} else if (RDF.getClazz().getSuperclass()
@@ -659,66 +683,7 @@ public class OsgiExtractor extends Extractor {
 									"set"), cls);
 			method.invoke(obj, lst);
 		} else {
-			if (RDF.getClazz().isAssignableFrom(ResourceType.class)) {
-				ResourceType rs = new ResourceType();
-				rs.setResource(val != null ? val : valAttr);
-				// if (isURI(rs.getResource())) {
-				// denormalize(rs.getResource(), iterations - 1);
-				// }
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = RDF.getClazz();
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
-			} else if (RDF.getClazz().isAssignableFrom(LiteralType.class)) {
-				LiteralType rs = new LiteralType();
-				rs.setString(val);
-				// if (isURI(val)) {
-				// denormalize(val, iterations - 1);
-				// }
-				if (edmAttr != null) {
-
-					if (StringUtils.equals(edmAttr, "xml:lang")) {
-						LiteralType.Lang lang = new LiteralType.Lang();
-						lang.setLang(valAttr);
-						rs.setLang(lang);
-
-					}
-				}
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = RDF.getClazz();
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
-
-			} else if (RDF.getClazz().isAssignableFrom(
-					ResourceOrLiteralType.class)) {
-				ResourceOrLiteralType rs = new ResourceOrLiteralType();
-				if (isURI(val)) {
-					Resource res = new Resource();
-					res.setResource(val);
-					rs.setResource(res);
-					// denormalize(val, iterations - 1);
-				} else {
-					rs.setString(val);
-				}
-				if (edmAttr != null) {
-
-					if (StringUtils.equals(edmAttr, "xml:lang")) {
-						Lang lang = new Lang();
-						lang.setLang(valAttr);
-						rs.setLang(lang);
-					}
-				}
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = clazz;
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
-			} else if (RDF.getClazz().isAssignableFrom(_Long.class)) {
+			if (RDF.getClazz().isAssignableFrom(_Long.class)) {
 				Float rs = Float.parseFloat(val);
 				_Long lng = new _Long();
 				lng.setLong(rs);
@@ -736,6 +701,67 @@ public class OsgiExtractor extends Extractor {
 				lng.setAlt(rs);
 				((PlaceType) obj).setAlt(lng);
 
+			} else if (RDF.getClazz().getSuperclass()
+					.isAssignableFrom(ResourceType.class)) {
+				ResourceType rs = new ResourceType();
+				rs.setResource(val != null ? val : valAttr);
+				if (isURI(rs.getResource())) {
+					denormalize(rs.getResource(), iterations - 1);
+				}
+				Class<?>[] cls = new Class<?>[1];
+				cls[0] = RDF.getClazz();
+				Method method = obj.getClass().getMethod(
+						StringUtils.replace(RDF.getMethodName(), "get", "set"),
+						cls);
+				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
+			} else if (RDF.getClazz().getSuperclass()
+					.isAssignableFrom(LiteralType.class)) {
+				LiteralType rs = new LiteralType();
+				rs.setString(val);
+				if (isURI(val)) {
+					denormalize(val, iterations - 1);
+				}
+				if (edmAttr != null) {
+
+					if (StringUtils.equals(edmAttr, "xml:lang")) {
+						LiteralType.Lang lang = new LiteralType.Lang();
+						lang.setLang(valAttr);
+						rs.setLang(lang);
+
+					}
+				}
+				Class<?>[] cls = new Class<?>[1];
+				cls[0] = RDF.getClazz();
+				Method method = obj.getClass().getMethod(
+						StringUtils.replace(RDF.getMethodName(), "get", "set"),
+						cls);
+				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
+
+			} else if (RDF.getClazz().getSuperclass()
+					.isAssignableFrom(ResourceOrLiteralType.class)) {
+				ResourceOrLiteralType rs = new ResourceOrLiteralType();
+				if (isURI(val)) {
+					Resource res = new Resource();
+					res.setResource(val);
+					rs.setResource(res);
+					denormalize(val, iterations - 1);
+				} else {
+					rs.setString(val);
+				}
+				if (edmAttr != null) {
+
+					if (StringUtils.equals(edmAttr, "xml:lang")) {
+						Lang lang = new Lang();
+						lang.setLang(valAttr);
+						rs.setLang(lang);
+					}
+				}
+				Class<?>[] cls = new Class<?>[1];
+				cls[0] = clazz;
+				Method method = obj.getClass().getMethod(
+						StringUtils.replace(RDF.getMethodName(), "get", "set"),
+						cls);
+				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 			}
 		}
 
@@ -963,9 +989,7 @@ public class OsgiExtractor extends Extractor {
 	 * @return A list with all the stored controlled vocabularies
 	 */
 
-	public List<ControlledVocabularyImpl> getControlledVocabularies(
-			final Datastore datastore) {
-
+	public List<ControlledVocabularyImpl> getControlledVocabularies() {
 		return datastore.find(ControlledVocabularyImpl.class) != null ? datastore
 				.find(ControlledVocabularyImpl.class).asList() : null;
 	}

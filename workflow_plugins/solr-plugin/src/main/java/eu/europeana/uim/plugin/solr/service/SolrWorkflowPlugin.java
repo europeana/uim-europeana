@@ -195,9 +195,12 @@ public class SolrWorkflowPlugin<I> extends
 				}
 			}
 			rdfFinal.getProxyList().add(europeanaProxy);
+			
 			marshallingContext.marshalDocument(rdfFinal, "UTF-8", null, out);
 			String der = out.toString("UTF-8");
+			
 			mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
+			recordNumber++;
 			return true;
 
 		} catch (JiBXException e) {

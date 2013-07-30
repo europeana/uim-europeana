@@ -191,12 +191,18 @@ public enum RdfMethod {
 					return (T) pref;
 				}
 			}, PL_DCTERMS_ISPART_OF(
-			"pl_dcterm_isPartOf", "getIsPartOfList", IsPartOf.class) {
+			"pl_dcterms_isPartOf", "getIsPartOfList", IsPartOf.class) {
 				@Override
 				public <T, V> T returnObject(T clazz, V obj) {
 					IsPartOf pref = new IsPartOf();
+					if(((ResourceOrLiteralType) obj).getString()!=null){
 					pref.setString(((ResourceOrLiteralType) obj).getString());
-					pref.setResource(((ResourceOrLiteralType) obj).getResource());
+					}
+					if(((ResourceOrLiteralType) obj).getResource()!=null){
+						pref.setResource(((ResourceOrLiteralType) obj).getResource());
+						} else {
+							pref.setResource(new ResourceOrLiteralType.Resource());
+						}
 					if (((ResourceOrLiteralType) obj).getLang() != null) {
 						pref.setLang(((ResourceOrLiteralType) obj).getLang());
 					}
@@ -286,7 +292,10 @@ public enum RdfMethod {
 				@Override
 				public <T, V> T returnObject(T clazz, V obj) {
 					IsPartOf pref = new IsPartOf();
-					pref.setString(((ResourceOrLiteralType) obj).getString());
+					if(((ResourceOrLiteralType) obj).getString()!=null){
+						pref.setString(((ResourceOrLiteralType) obj).getString());
+					}
+				
 					pref.setResource(((ResourceOrLiteralType) obj).getResource());
 					if (((ResourceOrLiteralType) obj).getLang() != null) {
 						pref.setLang(((ResourceOrLiteralType) obj).getLang());
@@ -447,7 +456,7 @@ public enum RdfMethod {
 					return (T) pref;
 				}
 			}, AG_FOAF_NAME(
-			"ag_foaf_name", "getName", Name.class) {
+			"ag_foaf_name", "getNameList", Name.class) {
 				@Override
 				public <T, V> T returnObject(T clazz, V obj) {
 					Name pref = new Name();

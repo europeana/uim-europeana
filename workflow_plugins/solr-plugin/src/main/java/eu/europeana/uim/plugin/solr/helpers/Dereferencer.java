@@ -64,18 +64,18 @@ public abstract class Dereferencer {
 		if (splitName.length > 3) {
 			String vocabularyUri = splitName[0] + "/" + splitName[1] + "/"
 					+ splitName[2] + "/";
-
 			if (vocMemCache.containsKey(vocabularyUri)
 					|| hasReplaceUri(vocabularyUri)) {
-
 				List<ControlledVocabularyImpl> vocabularies = vocMemCache
 						.get(vocabularyUri) != null ? vocMemCache
 						.get(vocabularyUri) : getReplaceUri(vocabularyUri);
 				if (vocabularies != null) {
 					for (ControlledVocabularyImpl vocabulary : vocabularies) {
 						for (String rule : vocabulary.getRules()) {
+					
 							if (StringUtils.equals(rule, "*")
 									|| StringUtils.contains(str, rule)) {
+								System.out.println("found vocabulary:" + vocabulary.getName());
 								return vocabulary;
 							}
 						}
@@ -107,14 +107,19 @@ public abstract class Dereferencer {
 			InvocationTargetException {
 		OsgiExtractor extractor = solrWorkflowService.getExtractor();
 		extractor.setDatastore(solrWorkflowService.getDatastore());
+		
 		if (object instanceof String) {
 
 			if (isURI((String) object)) {
 
 				ControlledVocabularyImpl controlVocabulary = getControlledVocabulary((String) object);
+				System.out.println((String)object);
 				if (controlVocabulary != null) {
-
-					appendInRDF(rdf, extractor.denormalize((String) object,
+					String res = (String) object;
+					if(controlVocabulary.getReplaceUrl()!=null){
+						res  = StringUtils.replace(res, controlVocabulary.getURI(), controlVocabulary.getReplaceUrl());
+					}
+					appendInRDF(rdf, extractor.denormalize(res,
 							controlVocabulary, 0, true));
 
 				}
