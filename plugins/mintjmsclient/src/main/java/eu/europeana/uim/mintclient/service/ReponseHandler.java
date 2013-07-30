@@ -16,6 +16,9 @@
  */
 package eu.europeana.uim.mintclient.service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jibx.runtime.IMarshallable;
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.orchestration.Orchestrator;
@@ -55,6 +58,8 @@ public class ReponseHandler {
 	private StorageEngine<?> storage;
 	private SugarCrmService sugservice;
 	private final static String ingestionWf = "InitialIngestionWorkflow";
+	private static Set<String> providerlock;
+	
 	
 	/**
 	 * Default constructor
@@ -63,11 +68,13 @@ public class ReponseHandler {
 	 * @param orchestrator
 	 * @param sugservice
 	 */
-	public ReponseHandler(Registry registry, Orchestrator<?> orchestrator,SugarCrmService sugservice) {
+	public ReponseHandler(Registry registry, Orchestrator<?> orchestrator,SugarCrmService sugservice,
+			Set<String> providerlock) {
 		this.registry = registry;
 		this.orchestrator = orchestrator;
 		this.storage = registry.getStorageEngine();
 		this.sugservice = sugservice;
+		ReponseHandler.providerlock = providerlock;
 	}
 
 	
@@ -130,6 +137,7 @@ public class ReponseHandler {
 			prov.putValue(ControlledVocabularyProxy.MINTID, action
 					.getCreateOrganizationResponse().getOrganizationId());
 			storage.updateProvider(prov);
+			providerlock.remove(prov.getMnemonic());
 		}
 		else if(response instanceof CreateUserAction){
 			@SuppressWarnings("rawtypes")

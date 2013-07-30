@@ -172,6 +172,9 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 			
 			mintservice.createMintOrganization(provider,forceupdate);
 			
+			
+			
+			
 			//TODO:Commented out for the time being. Implement it when user management for Mint is ready
 			//mintservice.createMintAuthorizedUser(provider);
 			
