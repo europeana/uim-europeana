@@ -67,7 +67,9 @@ import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
 
 public class OsgiExtractor extends Extractor {
 
-	// private static OsgiExtractor extractor;
+	private static MemCache memCache;
+	private Datastore datastore;
+	private final static long UPDATETIMESTAMP = 5184000000l;
 
 	public static SolrWorkflowService solrWorkFlowService;
 
@@ -81,16 +83,6 @@ public class OsgiExtractor extends Extractor {
 		OsgiExtractor.solrWorkFlowService = solrWorkflowService;
 	}
 
-	// public static OsgiExtractor getInstance(final Datastore datastore) {
-	//
-	// if (extractor == null) {
-	// extractor = new OsgiExtractor();
-	//
-	//
-	// }
-	// return extractor;
-	// }
-
 	public List<EdmMappedField> getEdmLabel(String field) {
 
 		if (vocabulary != null) {
@@ -102,11 +94,7 @@ public class OsgiExtractor extends Extractor {
 		return new ArrayList<EdmMappedField>();
 	}
 
-	private static MemCache memCache;
-	// private ControlledVocabularyImpl vocabulary;
-	private Datastore datastore;
-	private final static long UPDATETIMESTAMP = 5184000000l;
-
+	
 	@SuppressWarnings("rawtypes")
 	public Map<String, List> denormalize(String resource,
 			ControlledVocabularyImpl controlledVocabulary, int iterations,
@@ -184,7 +172,6 @@ public class OsgiExtractor extends Extractor {
 					prefix.getValue()));
 		}
 
-		// Find the root contextual entity
 		String rootEntity = String.format(ROOT_TEMPLATE, sb.toString(),
 				resource, resource + "/");
 
