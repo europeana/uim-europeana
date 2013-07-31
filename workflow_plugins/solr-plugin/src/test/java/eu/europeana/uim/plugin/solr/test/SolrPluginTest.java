@@ -172,7 +172,6 @@ public class SolrPluginTest {
 	}
 
 	private void prepareTimeMappings() {
-		// TODO Auto-generated method stub
 		
 	}
 
