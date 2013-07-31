@@ -178,7 +178,7 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 			String forceupdate = context.getProperties().getProperty(
 					force_provider_update);
 			
-			http://www.europeana.eu/schemas/ese mintservice.createMintOrganization(provider2,forceupdate);
+            mintservice.createMintOrganization(provider2,forceupdate);
 			
 			
 			//TODO:Commented out for the time being. Implement it when user management for Mint is ready
