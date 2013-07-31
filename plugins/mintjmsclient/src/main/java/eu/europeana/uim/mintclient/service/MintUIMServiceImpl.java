@@ -17,7 +17,10 @@
 package eu.europeana.uim.mintclient.service;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -63,6 +66,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 	private static SugarCrmService sugservice;
 	private static LoggingEngine<?> logger;
 	private static ReponseHandler resphandler;
+	private static Set<String> providerlock;
 
 	private final static String HEADERERRORMESSAGE = "hasError";
 	private final static String HEADERCORRELATIONID = "correlation_id";
@@ -70,14 +74,15 @@ public class MintUIMServiceImpl implements MintUIMService {
 	/**
 	 * Private constructor, instantiated via private factory method
 	 */
-	public MintUIMServiceImpl(Registry registry,SugarCrmService sugservice) {
+	public MintUIMServiceImpl(Registry registry, SugarCrmService sugservice) {
 		MintUIMServiceImpl.registry = registry;
 		MintUIMServiceImpl.orchestrator = registry.getOrchestrator();
 		MintUIMServiceImpl.sugservice = sugservice;
 		MintUIMServiceImpl.logger = (LoggingEngine<?>) (registry != null ? registry
 				.getLoggingEngine() : null);
-		
-		MintUIMServiceImpl.resphandler = new ReponseHandler(registry,orchestrator,sugservice);
+		providerlock = Collections.synchronizedSet(new HashSet<String>());
+		MintUIMServiceImpl.resphandler = new ReponseHandler(registry,
+				orchestrator, sugservice, providerlock);
 	}
 
 	/**
@@ -89,7 +94,8 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 * @param service
 	 * @return
 	 */
-	public static MintUIMServiceImpl createService(Registry registryref, SugarCrmService service) {
+	public static MintUIMServiceImpl createService(Registry registryref,
+			SugarCrmService service) {
 
 		MintClientFactory factory = new MintClientFactory();
 		try {
@@ -98,7 +104,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 			asynchronousClient = (MintAMPQClientASync) factory.asyncMode(
 					MintUIMServiceImpl.UIMConsumerListener.class)
 					.createClient();
-			return new MintUIMServiceImpl(registryref,service);
+			return new MintUIMServiceImpl(registryref, service);
 		} catch (MintOSGIClientException e) {
 			registryref.getLoggingEngine().logFailed(Level.SEVERE,
 					"MintUIMServiceImpl", e,
@@ -123,15 +129,14 @@ public class MintUIMServiceImpl implements MintUIMService {
 	public void createMintOrganization(Provider provider)
 			throws MintOSGIClientException, MintRemoteException,
 			StorageEngineException {
-		
+
 		String mintID = provider.getValue(ControlledVocabularyProxy.MINTID);
-		
-		if(mintID == null){
+
+		if (mintID == null) {
 			performOrgCreation(provider);
 		}
-		}
-	
-			
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -140,62 +145,76 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 * (eu.europeana.uim.store.Provider)
 	 */
 	@Override
-	public void createMintOrganization(Provider provider,String enforce)
+	public void createMintOrganization(Provider provider, String enforce)
 			throws MintOSGIClientException, MintRemoteException,
 			StorageEngineException {
-		
+
 		String mintID = provider.getValue(ControlledVocabularyProxy.MINTID);
-		
-		if(mintID == null){
+
+		if (mintID == null) {
 			performOrgCreation(provider);
 		}
 
-		 else if (mintID != null && "true".equals(enforce)){
+		else if (mintID != null) {
+
+			if ("true".equals(enforce)) {
+
 				OrganizationExistsCommand org = new OrganizationExistsCommand();
 				org.setOrganizationId(mintID);
-				
-				OrganizationExistsResponse orgresp = synchronousClient.organizationExists(org);
 
-				if(!orgresp.isExists()){
+				OrganizationExistsResponse orgresp = synchronousClient
+						.organizationExists(org);
+
+				if (!orgresp.isExists()) {
 					performOrgCreation(provider);
-			    }
-		 }
+				}
 
+			}
 		}
-	
-	
-	
 
-	
+	}
+
 	/**
 	 * @param provider
 	 * @throws MintOSGIClientException
 	 * @throws MintRemoteException
 	 * @throws StorageEngineException
 	 */
-	private void performOrgCreation(Provider provider) throws MintOSGIClientException, MintRemoteException, StorageEngineException{
-		CreateOrganizationCommand command = new CreateOrganizationCommand();
-		command.setCountry(provider
-				.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY));
-		command.setEnglishName(provider.getName());
-		command.setName(provider.getName());
-		command.setType(provider
-				.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
-		String userID = provider
-				.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID);
-		
-		command.setUserId(userID);
+	private void performOrgCreation(Provider provider)
+			throws MintOSGIClientException, MintRemoteException,
+			StorageEngineException {
 
-		
+		boolean hasLock = providerlock.contains(provider.getMnemonic());
 
-		CreateOrganizationResponse resp = synchronousClient
-				.createOrganization(command);
-		
-		CreateOrganizationAction action = new CreateOrganizationAction();
-		action.setCreateOrganizationResponse(resp);
-		resphandler.handleResponse(action, provider);
+		if (!hasLock) {
+			providerlock.add(provider.getMnemonic());
+			CreateOrganizationCommand command = new CreateOrganizationCommand();
+			command.setCountry(provider
+					.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY));
+			command.setEnglishName(provider.getName());
+			command.setName(provider.getName());
+			command.setType(provider
+					.getValue(ControlledVocabularyProxy.PROVIDERTYPE));
+			String userID = provider
+					.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID);
+			command.setUserId(userID);
+			CreateOrganizationResponse resp = synchronousClient
+					.createOrganization(command);
+			CreateOrganizationAction action = new CreateOrganizationAction();
+			action.setCreateOrganizationResponse(resp);
+			resphandler.handleResponse(action, provider);
+		} else {
+			try {
+				Thread.sleep(50000);
+				performOrgCreation(provider);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -205,7 +224,8 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 */
 	@Override
 	public void createMintAuthorizedUser(Provider provider)
-			throws MintOSGIClientException, MintRemoteException, StorageEngineException {
+			throws MintOSGIClientException, MintRemoteException,
+			StorageEngineException {
 		CreateUserCommand command = new CreateUserCommand();
 
 		command.setEmail(provider
@@ -241,31 +261,28 @@ public class MintUIMServiceImpl implements MintUIMService {
 			throws MintOSGIClientException, MintRemoteException,
 			StorageEngineException {
 		CreateImportCommand command = new CreateImportCommand();
-		
+
 		Provider provider = collection.getProvider();
-		//command.setUserId(provider
-		//		.getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
+		// command.setUserId(provider
+		// .getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
+
+		Provider provider2 = registry.getStorageEngine().findProvider(provider.getMnemonic());
 		
 		command.setUserId("1000");
-		command.setOrganizationId(provider
+		command.setOrganizationId(provider2
 				.getValue(ControlledVocabularyProxy.MINTID));
-		
-		String repoxID =  collection.getValue(ControlledVocabularyProxy.REPOXID);
-		
-		if(repoxID == null){
-			throw new MintOSGIClientException("Cannot create mapping session because" +
-					"there is not a repox datasource registered in UIM which can" +
-					"provide the data for the mapping session");
+
+		String repoxID = collection.getValue(ControlledVocabularyProxy.REPOXID);
+
+		if (repoxID == null) {
+			throw new MintOSGIClientException(
+					"Cannot create mapping session because"
+							+ "there is not a repox datasource registered in UIM which can"
+							+ "provide the data for the mapping session");
 		}
-		
-		command.setRepoxTableName(repoxID);		
-		asynchronousClient.createImports(command,repoxID);
-		/*
-				CreateImportResponse resp = 
-		CreateImportAction action = new CreateImportAction();
-		action.setCreateImportResponse(resp);
-		resphandler.handleResponse(action,collection);
-		*/
+
+		command.setRepoxTableName(repoxID);
+		asynchronousClient.createImports(command, repoxID);
 	}
 
 	/**
@@ -334,7 +351,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 			} catch (StorageEngineException e) {
 				logger.logFailed(Level.SEVERE,
 						"Incoming message has thrown a storage exception", e);
-			} catch (Exception e){
+			} catch (Exception e) {
 				logger.logFailed(Level.SEVERE,
 						"Incoming message has thrown an unknown exception", e);
 			}
