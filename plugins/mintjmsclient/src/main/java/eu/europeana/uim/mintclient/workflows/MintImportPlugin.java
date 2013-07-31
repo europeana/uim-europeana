@@ -165,14 +165,20 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 		Collection<I> collection = (Collection<I>) context.getDataSet();
 		Provider<I> provider = collection.getProvider();
 		
+		Provider<I> provider2 =  null;
+		
+		try {
+			provider2 = context.getStorageEngine().findProvider(provider.getMnemonic());
+		} catch (StorageEngineException e1) {
+			e1.printStackTrace();
+		}
+				
 		try {
 			
 			String forceupdate = context.getProperties().getProperty(
 					force_provider_update);
 			
-			mintservice.createMintOrganization(provider,forceupdate);
-			
-			
+			http://www.europeana.eu/schemas/ese mintservice.createMintOrganization(provider2,forceupdate);
 			
 			
 			//TODO:Commented out for the time being. Implement it when user management for Mint is ready

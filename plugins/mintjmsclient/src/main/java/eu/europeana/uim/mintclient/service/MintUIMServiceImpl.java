@@ -266,8 +266,10 @@ public class MintUIMServiceImpl implements MintUIMService {
 		// command.setUserId(provider
 		// .getValue(ControlledVocabularyProxy.PROVIDERMINTUSERID));
 
+		Provider provider2 = registry.getStorageEngine().findProvider(provider.getMnemonic());
+		
 		command.setUserId("1000");
-		command.setOrganizationId(provider
+		command.setOrganizationId(provider2
 				.getValue(ControlledVocabularyProxy.MINTID));
 
 		String repoxID = collection.getValue(ControlledVocabularyProxy.REPOXID);
