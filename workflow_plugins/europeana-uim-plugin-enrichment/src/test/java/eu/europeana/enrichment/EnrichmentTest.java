@@ -6,10 +6,7 @@ import java.util.List;
 import org.apache.solr.common.SolrInputDocument;
 import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-<<<<<<< HEAD
-=======
 
->>>>>>> f212be1... fixed
 import org.junit.Assert;
 import org.junit.Test;
 
