@@ -32,6 +32,11 @@
 			<artifactId>jibx-run</artifactId>
 			<version>${jibx.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-archiver</artifactId>
+			<version>2.2</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jibx</groupId>
@@ -156,9 +161,11 @@
 							javax.net; version=0.0.0,
 							javax.net.ssl; version=0.0.0,
 							javax.security.auth; version=0.0.0,
-							javax.security.auth.x500; version=0.0.0,
+							javax.security.auth.x500;
+							version=0.0.0,
 							javax.sql; version=0.0.0,
-							javax.swing; version=0.0.0,
+							javax.swing;
+							version=0.0.0,
 							javax.swing.border; version=0.0.0,
 							javax.swing.event; version=0.0.0,
 							javax.swing.plaf; version=0.0.0,
@@ -167,23 +174,33 @@
 							javax.swing.tree; version=0.0.0,
 							javax.tools; version=0.0.0,
 							org.ietf.jgss; version=0.0.0,
-							org.osgi.service.blueprint; version=1.0.1,
+							org.osgi.service.blueprint;
+							version=1.0.1,
 							jline; version=2.5.0,
 							javax.servlet; version=2.5.0,
 							javax.servlet.http; version=2.5.0,
-							eu.europeana.uim.common; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.store; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.orchestration; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.plugin.ingestion; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.sugar; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.sugar.model; version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.common;
+							version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.store;
+							version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.orchestration;
+							version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.plugin.ingestion;
+							version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.sugar;
+							version=2.0.0.SNAPSHOT,
+							eu.europeana.uim.sugar.model;
+							version=2.0.0.SNAPSHOT,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues;
 							version=1.0.0.SNAPSHOT,
-							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.model.europeana;
+							version=1.0.0.SNAPSHOT,
 							org.theeuropeanlibrary.model.common.qualifier;
 							version=1.0.0.SNAPSHOT,
-							eu.europeana.uim.solr4; version=2.0.0.SNAPSHOT,
-							org.apache.solr.common.util; version=4.0.0,
+							eu.europeana.uim.solr4;
+							version=2.0.0.SNAPSHOT,
+							org.apache.solr.common.util;
+							version=4.0.0,
 							org.apache.solr.client.solrj.impl; version=4.0.0,
 							org.apache.solr.common; version=4.0.0,
 							org.apache.solr.client.solrj; version=4.0.0,
@@ -201,7 +218,7 @@
 
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-<!-- 						<Bundle-Activator>eu.europeana.uim.enrichment.MongoBundleActivator</Bundle-Activator> -->
+						<!-- <Bundle-Activator>eu.europeana.uim.enrichment.MongoBundleActivator</Bundle-Activator> -->
 					</instructions>
 				</configuration>
 			</plugin>
