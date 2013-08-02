@@ -20,8 +20,6 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
-import com.google.code.morphia.mapping.DefaultCreator;
-import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
@@ -41,7 +39,6 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
-import eu.europeana.uim.enrichment.MongoBundleActivator;
 
 /**
  * TODO: change to reflect the changes in the Interface definitions in corelib
@@ -68,12 +65,7 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 	
 	public Datastore createDatastore(Morphia morphia)
 	{
-		 morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
-             @Override
-             protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
-                 return MongoBundleActivator.getBundleClassLoader();
-             }
-         });
+		
 		morphia.map(FullBeanImpl.class);
 		morphia.map(ProvidedCHOImpl.class);
 		morphia.map(AgentImpl.class);

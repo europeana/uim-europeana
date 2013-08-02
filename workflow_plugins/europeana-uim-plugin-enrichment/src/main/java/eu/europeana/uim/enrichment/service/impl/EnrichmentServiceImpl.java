@@ -18,27 +18,25 @@ package eu.europeana.uim.enrichment.service.impl;
 
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Date;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.params.ModifiableSolrParams;
+
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
-import eu.europeana.corelib.definitions.solr.beans.FullBean;
+import eu.europeana.corelib.solr.exceptions.MongoDBException;
+import eu.europeana.corelib.solr.server.EdmMongoServer;
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
-import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
+
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
+import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.OsgiEuropeanaIdMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
@@ -59,9 +57,11 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	private static String solrCore=PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 	private static CollectionMongoServer cmServer;
 	private  static OsgiEuropeanaIdMongoServer idserver;
+	private static OsgiEdmMongoServer server;
 	public EnrichmentServiceImpl(){
 		
 		try {
+			
 		solrServer = new HttpSolrServer(new URL(solrUrl)+solrCore);
 			
 		} catch (Exception e) {
@@ -103,11 +103,22 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 				
 			}
 		}; 
+		
+		
+		
 		initializer.initialize(CollectionMongoServerImpl.class.getClassLoader());
 		
 		
 		
 					try {
+						String uname = PropertyReader
+								.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
+								.getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
+						String pass = PropertyReader
+								.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
+								.getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
+						server = new OsgiEdmMongoServer(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "europeana", uname,pass);
+						server.createDatastore(new Morphia());
 						idserver = new OsgiEuropeanaIdMongoServer(new Mongo(mongoHost,Integer.parseInt(mongoPort)), "EuropeanaId");
 						idserver.createDatastore();
 					} catch (NumberFormatException e) {
@@ -117,6 +128,9 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (MongoException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (MongoDBException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -203,41 +217,14 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
 
 	@Override
-	public EuropeanaId retrieveEuropeanaIdFromOld(String string) {
-		
-		return idserver.retrieveEuropeanaIdFromOld(string);
+	public EdmMongoServer getEuropeanaMongoServer() {
+		// TODO Auto-generated method stub
+		return server;
 	}
 
 
 
 
-	@Override
-	public void saveEuropeanaId(EuropeanaId europeanaId) {
-		idserver.saveEuropeanaId(europeanaId);
-		
-	}
 	
-	@Override
-	public void createLookupEntry(FullBean fullBean, String collectionId, String hash) {
-	
-		
-		ModifiableSolrParams params = new ModifiableSolrParams();
-		params. add("q", "europeana_id:"+ClientUtils.escapeQueryChars("/"+collectionId+"/"+hash));
-		try {
-			SolrDocumentList solrList = solrServer.query(params).getResults();
-			if(solrList.size()>0){
-				EuropeanaId id= new EuropeanaId();
-				id.setOldId("/"+collectionId+"/"+hash);
-				id.setLastAccess(0);
-				id.setTimestamp(new Date().getTime());
-				id.setNewId(fullBean.getAbout());
-				saveEuropeanaId(id);
-				
-			}
-			
-		} catch (SolrServerException e) {
-			e.printStackTrace();
-		}
-	}
 
 }

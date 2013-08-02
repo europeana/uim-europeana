@@ -95,6 +95,7 @@ import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
+import eu.europeana.corelib.solr.server.EdmMongoServer;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
 import eu.europeana.uim.common.TKey;
@@ -146,14 +147,11 @@ public class EnrichmentPlugin<I> extends
 	private static String previewsOnlyInPortal;
 	private static String collections = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
-	private static Morphia morphia;
-	private static Mongo mongo;
+	//private static Morphia morphia;
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
-	private static String uname;
-	private static String pass;
 	private static IBindingFactory bfact;
-	private static OsgiEdmMongoServer mongoServer;
+	private static EdmMongoServer mongoServer;
 	private static EuropeanaEnrichmentTagger tagger;
 
 	private final static String XML_LANG = "_@xml:lang";
@@ -300,25 +298,17 @@ public class EnrichmentPlugin<I> extends
 			log.log(Level.INFO, "Initializing Annocultor");
 			if (tagger == null) {
 				tagger = new EuropeanaEnrichmentTagger();
-				tagger.init("Europeana");
+				tagger.init("Europeana","localhost","27017");
 			}
 			log.log(Level.INFO, "Annocultor Initialized");
 			solrServer = enrichmentService.getSolrServer();
 			log.log(Level.INFO, "Solr Server Acquired");
-			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
 			mongoDB = enrichmentService.getMongoDB();
-			uname = PropertyReader
-					.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
-					.getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
-			pass = PropertyReader
-					.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
-					.getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
+		
 			if (mongoServer == null) {
-				mongoServer = new OsgiEdmMongoServer(mongo, mongoDB, uname,
-						pass);
-				morphia = new Morphia();
+				
+				mongoServer =enrichmentService.getEuropeanaMongoServer();
 
-				mongoServer.createDatastore(morphia);
 
 			}
 			log.log(Level.INFO, "Mongo Initialized");
@@ -591,16 +581,16 @@ public class EnrichmentPlugin<I> extends
 		return mockDocument;
 	}
 
-	private void clearData(OsgiEdmMongoServer mongoServer, String collection) {
-		DBCollection records = mongoServer.getDatastore().getDB()
+	private void clearData(EdmMongoServer mongoServer2, String collection) {
+		DBCollection records = mongoServer2.getDatastore().getDB()
 				.getCollection("record");
-		DBCollection proxies = mongoServer.getDatastore().getDB()
+		DBCollection proxies = mongoServer2.getDatastore().getDB()
 				.getCollection("Proxy");
-		DBCollection providedCHOs = mongoServer.getDatastore().getDB()
+		DBCollection providedCHOs = mongoServer2.getDatastore().getDB()
 				.getCollection("ProvidedCHO");
-		DBCollection aggregations = mongoServer.getDatastore().getDB()
+		DBCollection aggregations = mongoServer2.getDatastore().getDB()
 				.getCollection("Aggregation");
-		DBCollection europeanaAggregations = mongoServer.getDatastore().getDB()
+		DBCollection europeanaAggregations = mongoServer2.getDatastore().getDB()
 				.getCollection("EuropeanaAggregation");
 
 		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
@@ -629,12 +619,12 @@ public class EnrichmentPlugin<I> extends
 	}
 
 	// update a FullBean
-	private void updateFullBean(OsgiEdmMongoServer mongoServer,
+	private void updateFullBean(EdmMongoServer mongoServer2,
 			FullBeanImpl fullBean) {
-		Query<FullBeanImpl> updateQuery = mongoServer.getDatastore()
+		Query<FullBeanImpl> updateQuery = mongoServer2.getDatastore()
 				.createQuery(FullBeanImpl.class).field("about")
 				.equal(fullBean.getAbout().replace("/item", ""));
-		UpdateOperations<FullBeanImpl> ops = mongoServer.getDatastore()
+		UpdateOperations<FullBeanImpl> ops = mongoServer2.getDatastore()
 				.createUpdateOperations(FullBeanImpl.class);
 		ops.set("title", fullBean.getTitle() != null ? fullBean.getTitle()
 				: new String[] {});
@@ -669,7 +659,7 @@ public class EnrichmentPlugin<I> extends
 						: new String[] {});
 		ops.set("europeanaCollectionName",
 				fullBean.getEuropeanaCollectionName());
-		mongoServer.getDatastore().update(updateQuery, ops);
+		mongoServer2.getDatastore().update(updateQuery, ops);
 	}
 
 	/*

@@ -19,6 +19,7 @@ package eu.europeana.uim.enrichment.service;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
+import eu.europeana.corelib.solr.server.EdmMongoServer;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
@@ -48,14 +49,8 @@ public interface EnrichmentService {
 
 	public EuropeanaIdMongoServer getEuropeanaIdMongoServer();
 
-
-	EuropeanaId retrieveEuropeanaIdFromOld(String string);
-
-
-	void saveEuropeanaId(EuropeanaId europeanaId);
-
-
-	void createLookupEntry(FullBean fullBean, String collectionId, String hash);
+	public EdmMongoServer getEuropeanaMongoServer();
+	
 
 
 	

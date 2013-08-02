@@ -17,14 +17,11 @@
 package eu.europeana.uim.enrichment.utils;
 
 import com.google.code.morphia.Morphia;
-import com.google.code.morphia.mapping.DefaultCreator;
-import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.corelib.tools.lookuptable.impl.EuropeanaIdMongoServerImpl;
-import eu.europeana.uim.enrichment.MongoBundleActivator;
 
 /**
  * TODO: change to reflect the changes in the Interface definition
@@ -42,12 +39,7 @@ public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServerImpl imple
 	@Override
 	public void createDatastore(){
 		Morphia morphia = new Morphia();
-		 morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
-             @Override
-             protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
-                 return MongoBundleActivator.getBundleClassLoader();
-             }
-         });
+		
 		 morphia.map(EuropeanaId.class);
 		 datastore = morphia.createDatastore(mongoServer, databaseName);
 			datastore.ensureIndexes();

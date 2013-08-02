@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
-			<version>0.99.1-SNAPSHOT</version>
+			<version>0.99</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -107,7 +107,12 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<version>1.33</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -196,7 +201,7 @@
 
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Bundle-Activator>eu.europeana.uim.enrichment.MongoBundleActivator</Bundle-Activator>
+<!-- 						<Bundle-Activator>eu.europeana.uim.enrichment.MongoBundleActivator</Bundle-Activator> -->
 					</instructions>
 				</configuration>
 			</plugin>

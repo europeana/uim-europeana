@@ -17,20 +17,21 @@
 package eu.europeana.uim.enrichment;
 
 import java.io.StringReader;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
 
 import eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
@@ -40,7 +41,7 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
-import eu.europeana.corelib.tools.utils.EuropeanaUriUtils;
+import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.utils.HashUtils;
 import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
 import eu.europeana.corelib.tools.utils.SipCreatorUtils;
@@ -63,28 +64,23 @@ import eu.europeana.uim.store.MetaDataRecord;
  */
 public class LookupCreationPlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
-
+	private static EnrichmentService enrichmentService;
 	public LookupCreationPlugin(String name, String description) {
 		super(name, description);
+		
 		// TODO Auto-generated constructor stub
 	}
 
 	public LookupCreationPlugin() {
 		super("", "");
+		
 		// TODO Auto-generated constructor stub
 	}
 
 	private static String repository = PropertyReader
 			.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
-	private static String mongoDB;
-	private static String mongoHost = PropertyReader
-			.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
-	private static String mongoPort = PropertyReader
-			.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
-	private static String uname;
-	private static String pass;
-	private static Mongo mongo;
-	private static EnrichmentService enrichmentService;
+	
+
 	private static IBindingFactory bfact;
 	static {
 		try {
@@ -176,7 +172,7 @@ public class LookupCreationPlugin<I> extends
 
 			if (StringUtils.isNotEmpty(hash)) {
 
-				enrichmentService.createLookupEntry(fullBean, collectionId,
+				createLookupEntry(fullBean, collectionId,
 						hash);
 			}
 		} catch (JiBXException e) {
@@ -237,26 +233,7 @@ public class LookupCreationPlugin<I> extends
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
-		try {
-			mongo = new Mongo(mongoHost, Integer.parseInt(mongoPort));
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MongoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		mongoDB = enrichmentService.getMongoDB();
-		uname = PropertyReader
-				.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
-				.getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
-		pass = PropertyReader
-				.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
-				.getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
-
+		
 	}
 
 	@Override
@@ -297,12 +274,37 @@ public class LookupCreationPlugin<I> extends
 		}
 		return null;
 	}
+	
 
-	public EnrichmentService getEnrichmentService() {
-		return enrichmentService;
+	private void saveEuropeanaId(EuropeanaId europeanaId) {
+		enrichmentService.getEuropeanaIdMongoServer().saveEuropeanaId(europeanaId);
+		
 	}
-
-	public void setEnrichmentService(EnrichmentService enrichmentService) {
-		LookupCreationPlugin.enrichmentService = enrichmentService;
+	
+	
+	private void createLookupEntry(FullBean fullBean, String collectionId, String hash) {
+	
+		
+		ModifiableSolrParams params = new ModifiableSolrParams();
+		params. add("q", "europeana_id:"+ClientUtils.escapeQueryChars("/"+collectionId+"/"+hash));
+		try {
+			SolrDocumentList solrList = enrichmentService.getSolrServer().query(params).getResults();
+			if(solrList.size()>0){
+				EuropeanaId id= new EuropeanaId();
+				id.setOldId("/"+collectionId+"/"+hash);
+				id.setLastAccess(0);
+				id.setTimestamp(new Date().getTime());
+				id.setNewId(fullBean.getAbout());
+				saveEuropeanaId(id);
+				
+			}
+			
+		} catch (SolrServerException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void setEnrichmentService(EnrichmentService service){
+		LookupCreationPlugin.enrichmentService = service;
 	}
 }
