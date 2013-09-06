@@ -362,6 +362,10 @@ public class EnrichmentPlugin<I> extends
 				+ previewsOnlyInPortal);
 	}
 
+	public static void setTagger(EuropeanaEnrichmentTagger tagger) {
+		EnrichmentPlugin.tagger = tagger;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -427,9 +431,9 @@ public class EnrichmentPlugin<I> extends
 				SolrInputDocument mockDocument = createMockForEnrichment(basicDocument);
 				
 				List<Entity> entities = null;
-
+				log.log(Level.INFO,"Before tagging Document");
 				entities = tagger.tagDocument(mockDocument);
-
+				log.log(Level.INFO,"Tagged document");
 				mergeEntities(rdf, entities);
 				RDF rdfFinal = cleanRDF(rdf);
 				boolean hasEuropeanaProxy = false;
