@@ -129,7 +129,7 @@ public class Decoupler {
 			appendPrCHOs(proxy, stub, cleandoc);
 			List<Aggregation> aggregations = appendAggregations(proxy, stub,
 					cleandoc);
-			appendEuropeanaAggregations(stub,cleandoc);
+			appendEuropeanaAggregations(proxy,stub,cleandoc);
 			appendWebResources(aggregations, stub, cleandoc);
 			HashSet<String> resrefs = processWebresources(cleandoc);
 			appendContextualEntities(proxy, stub, cleandoc,resrefs);
@@ -219,25 +219,20 @@ public class Decoupler {
 	 * @param cleandoc a JIBX representation of a reconstructed EDM document
 	 * @return a copy of the appended EuropeanaAggregationTypes
 	 */
-	private List<EuropeanaAggregationType> appendEuropeanaAggregations(InfoStub stub, RDF cleandoc) {
+	private List<EuropeanaAggregationType> appendEuropeanaAggregations(ProxyType proxy,InfoStub stub, RDF cleandoc) {
 				
-		// Get the Aggregator References
+		// Get the EuropeanaAggregator References
 		List<EuropeanaAggregationType> foundeuaggregationlist = new ArrayList<EuropeanaAggregationType>();
 		
 		Vector<EuropeanaAggregationType> euaglist = stub.euaggregationList;
-
-		Vector<ProvidedCHOType> prCHOlist = stub.prchoList;
-		
 		
 		for (EuropeanaAggregationType euagg : euaglist) {
-
-		   for(ProvidedCHOType prCHO : prCHOlist){
 			
-		   if (euagg.getAggregatedCHO().getResource().equals(prCHO.getAbout())) {
+		   if (euagg.getAggregatedCHO().getResource().equals(proxy.getAbout())) {
 				foundeuaggregationlist.add(euagg);
 				cleandoc.getEuropeanaAggregationList().add(euagg);  
 			}
-			}
+
 		}
 
 		return foundeuaggregationlist;
