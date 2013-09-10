@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,13 +42,11 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 
-import com.google.code.morphia.Morphia;
 import com.google.code.morphia.query.Query;
 import com.google.code.morphia.query.UpdateOperations;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
 import com.mongodb.WriteConcern;
 
 import eu.annocultor.converters.europeana.Entity;
@@ -151,12 +148,13 @@ public class EnrichmentPlugin<I> extends
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
 	private static IBindingFactory bfact;
-	private static EdmMongoServer mongoServer;
+	private static OsgiEdmMongoServer mongoServer;
 	private static EuropeanaEnrichmentTagger tagger;
-
+	private static int processCount;
 	private final static String XML_LANG = "_@xml:lang";
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
 			.getName());
+	
 
 	private enum EnrichmentFields {
 		DC_DATE("proxy_dc_date"), DC_COVERAGE("proxy_dc_coverage"), DC_TERMS_TEMPORAL(
@@ -294,6 +292,7 @@ public class EnrichmentPlugin<I> extends
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		Collection collection = null;
+		processCount=0;
 		try {
 			log.log(Level.INFO, "Initializing Annocultor");
 			if (tagger == null) {
@@ -377,10 +376,12 @@ public class EnrichmentPlugin<I> extends
 			throws IngestionPluginFailedException {
 
 		log.log(Level.INFO, "Adding " + recordNumber + " documents");
-
+		System.out.println( "Adding " + recordNumber + " documents");
+		System.out.println("Process called " + processCount);
 		try {
 			solrServer.commit();
 			log.log(Level.INFO, "Added " + recordNumber + " documents");
+			System.out.println( "Added " + recordNumber + " documents");
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
@@ -402,7 +403,7 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
-
+		processCount++;
 		if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 				&& mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
 						.size() > 0) {
@@ -509,28 +510,34 @@ public class EnrichmentPlugin<I> extends
 				return true;
 
 			} catch (JiBXException e) {
-				// log.log(Level.WARNING, "JibX Exception occured with error "
-				// + e.getMessage() + "\nRetrying");
+				 log.log(Level.SEVERE, "JibX Exception occured with error "
+				 + e.getMessage() + "\nRetrying");
+				 e.printStackTrace();
 			} catch (MalformedURLException e) {
-				log.log(Level.WARNING,
+				log.log(Level.SEVERE,
 						"Malformed URL Exception occured with error "
 								+ e.getMessage() + "\nRetrying");
+				e.printStackTrace();
 			} catch (InstantiationException e) {
-				log.log(Level.WARNING,
+				log.log(Level.SEVERE,
 						"Instantiation Exception occured with error "
 								+ e.getMessage() + "\nRetrying");
+				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				log.log(Level.WARNING,
+				log.log(Level.SEVERE,
 						"Illegal Access Exception occured with error "
 								+ e.getMessage() + "\nRetrying");
+				e.printStackTrace();
 			} catch (IOException e) {
-				log.log(Level.WARNING,
+				log.log(Level.SEVERE,
 						"IO Exception occured with error " + e.getMessage()
 								+ "\nRetrying");
+				e.printStackTrace();
 			} catch (Exception e) {
-
-				log.log(Level.WARNING, "Generic Exception occured with error "
+				e.printStackTrace();
+				log.log(Level.SEVERE, "Generic Exception occured with error "
 						+ e.getMessage() + "\nRetrying");
+				
 			}
 			return false;
 		} else {
@@ -551,19 +558,23 @@ public class EnrichmentPlugin<I> extends
 					solrServer.deleteByQuery("europeana_id:"
 							+ ClientUtils.escapeQueryChars(fBean.getAbout()));
 				}
+				recordNumber++;
 				return true;
 			} catch (JiBXException e) {
 				log.log(Level.SEVERE,
 						"JibX Exception occured with error " + e.getMessage()
 								+ "\nRetrying");
+				e.printStackTrace();
 			} catch (SolrServerException e) {
 				log.log(Level.SEVERE,
 						"Solr Server Exception occured with error "
 								+ e.getMessage() + "\nRetrying");
+				e.printStackTrace();
 			} catch (IOException e) {
 				log.log(Level.SEVERE,
 						"IO Exception occured with error " + e.getMessage()
 								+ "\nRetrying");
+				e.printStackTrace();
 			}
 			return false;
 		}

@@ -25,8 +25,6 @@ import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
-import eu.europeana.corelib.solr.server.EdmMongoServer;
-import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
@@ -35,6 +33,7 @@ import eu.europeana.uim.enrichment.EnrichmentPlugin;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.service.impl.EnrichmentServiceImpl;
 import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
+import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.logging.LoggingEngineAdapter;
@@ -90,7 +89,7 @@ public class EnrichmentPluginTest {
 			
 			EuropeanaIdMongoServer idServer = new EuropeanaIdMongoServerImpl(
 					mongoServer, "idTest", "", "");
-			EdmMongoServer edmMongoServer = new EdmMongoServerImpl(mongoServer, "recordTest", "", "");
+			OsgiEdmMongoServer edmMongoServer = new OsgiEdmMongoServer(mongoServer, "recordTest", "", "");
 			
 			idServer.createDatastore();
 			HttpSolrServer solrServer = mock(HttpSolrServer.class);
