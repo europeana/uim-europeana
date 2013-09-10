@@ -20,6 +20,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
+import com.google.code.morphia.mapping.DefaultCreator;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
@@ -38,14 +40,16 @@ import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
-import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
+import eu.europeana.corelib.solr.server.EdmMongoServer;
+import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
+import eu.europeana.uim.enrichment.MongoBundleActivator;
 
 /**
  * TODO: change to reflect the changes in the Interface definitions in corelib
  * @author Yorgos.Mamakis@ kb.nl
  *
  */
-public class OsgiEdmMongoServer extends EdmMongoServerImpl {
+public class OsgiEdmMongoServer implements EdmMongoServer{
 	private Mongo mongoServer;
 	private String databaseName;
 	private String username;
@@ -65,7 +69,12 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 	
 	public Datastore createDatastore(Morphia morphia)
 	{
-		
+		 morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+			              @Override
+			              protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+			                  return MongoBundleActivator.getBundleClassLoader();
+			              }
+			       });
 		morphia.map(FullBeanImpl.class);
 		morphia.map(ProvidedCHOImpl.class);
 		morphia.map(AgentImpl.class);
@@ -93,13 +102,11 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 		return datastore;
 	}
 	
-	@Override
 	public  <T> T searchByAbout(Class<T> clazz, String about) {
 
 		return datastore.find(clazz).filter("about", about).get();
 	}
 	
-	@Override
 	public  FullBean getFullBean(String id) {
 		if (datastore.find(FullBeanImpl.class).field("about").equal(id).get() != null) {
 			return datastore.find(FullBeanImpl.class).field("about").equal(id)
@@ -108,8 +115,29 @@ public class OsgiEdmMongoServer extends EdmMongoServerImpl {
 		return null;
 	}
 
-	@Override
 	public Datastore getDatastore() {
 		return this.datastore;
+	}
+
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public FullBean resolve(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setEuropeanaIdMongoServer(
+			EuropeanaIdMongoServer europeanaIdMongoServer) {
+		// TODO Auto-generated method stub
+		
 	}
 }

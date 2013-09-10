@@ -45,8 +45,9 @@ public class EnrichmentTest {
 			doc.addField("proxy_dc_coverage","paris");
 			doc.addField("proxy_dc_creator","rembrandt");
 			List<Entity> entities = tagger.tagDocument(doc);
+			
 			Assert.assertEquals(7, entities.size());
-			mongoExec.stop();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
