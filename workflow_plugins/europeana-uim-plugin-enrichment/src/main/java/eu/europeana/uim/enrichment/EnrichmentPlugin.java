@@ -474,6 +474,7 @@ public class EnrichmentPlugin<I> extends
 					}
 					rdfFinal.getProxyList().add(europeanaProxy);
 				}
+				
 				SolrInputDocument solrInputDocument = new SolrConstructor()
 						.constructSolrDocument(rdfFinal);
 
@@ -694,6 +695,10 @@ public class EnrichmentPlugin<I> extends
 			if (proxy.getEuropeanaProxy() != null
 					&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
 				europeanaProxy = proxy;
+			} else {
+				if(!StringUtils.startsWith(proxy.getAbout(), "/proxy/provider")){
+					proxy.setAbout("/proxy/provider"+proxy.getAbout());
+				}
 			}
 		}
 
@@ -878,6 +883,7 @@ public class EnrichmentPlugin<I> extends
 				}
 			}
 		}
+		
 	}
 
 	private ProxyType createEuropeanaProxy(RDF rdf) {
@@ -1072,7 +1078,7 @@ public class EnrichmentPlugin<I> extends
 
 		europeanaAggregation.setRights(rightsType);
 		AggregatedCHO aggrCHO = new AggregatedCHO();
-		aggrCHO.setResource(cho.getAbout());
+		aggrCHO.setResource("/item"+cho.getAbout());
 		europeanaAggregation.setAggregatedCHO(aggrCHO);
 		return europeanaAggregation;
 	}
