@@ -36,7 +36,9 @@ public enum UimConfigurationProperty {
 	UIM_BCLIST_PATH("uim.bclist.path"),
 	SUGARCRM_USERNAME("sugarcrm.username"),
 	SUGARCRM_PASSWORD("sugarcrm.password"),
-	UIM_REPOSITORY("uim.repository");
+	UIM_REPOSITORY("uim.repository"),
+	SOLR_USERNAME("solr.username"),
+	SOLR_PASSWORD("solr.password");
 	
 	String field;
 	private UimConfigurationProperty(String field){

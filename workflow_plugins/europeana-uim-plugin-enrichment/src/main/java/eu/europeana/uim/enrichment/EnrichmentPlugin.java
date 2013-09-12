@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -301,6 +302,7 @@ public class EnrichmentPlugin<I> extends
 			}
 			log.log(Level.INFO, "Annocultor Initialized");
 			solrServer = enrichmentService.getSolrServer();
+			
 			log.log(Level.INFO, "Solr Server Acquired");
 			mongoDB = enrichmentService.getMongoDB();
 		
@@ -883,7 +885,8 @@ public class EnrichmentPlugin<I> extends
 				}
 			}
 		}
-		
+		proxyList.add(europeanaProxy);
+		rdf.setProxyList(proxyList);
 	}
 
 	private ProxyType createEuropeanaProxy(RDF rdf) {
@@ -905,6 +908,7 @@ public class EnrichmentPlugin<I> extends
 			yearObj.setString(year);
 			yearList.add(yearObj);
 		}
+		europeanaProxy.setYearList(yearList);
 		return europeanaProxy;
 	}
 
