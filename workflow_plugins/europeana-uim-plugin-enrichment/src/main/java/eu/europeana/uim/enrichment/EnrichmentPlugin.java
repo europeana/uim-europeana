@@ -417,6 +417,7 @@ public class EnrichmentPlugin<I> extends
 		log.log(Level.INFO,
 				"Status size = "
 						+ mdr.getValues(EuropeanaModelRegistry.STATUS).size());
+		
 		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
 				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
 						.equals(Status.DELETED)) {
@@ -543,45 +544,8 @@ public class EnrichmentPlugin<I> extends
 				
 			}
 			return false;
-		} else {
-
-			IUnmarshallingContext uctx;
-			try {
-				uctx = bfact.createUnmarshallingContext();
-				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-				FullBean fBean = mongoServer.getFullBean(rdf
-						.getProvidedCHOList().get(0).getAbout());
-				if (fBean != null) {
-					mongoServer.getDatastore().delete(fBean.getAggregations());
-					mongoServer.getDatastore().delete(fBean.getProvidedCHOs());
-					mongoServer.getDatastore().delete(fBean.getProxies());
-					mongoServer.getDatastore().delete(
-							fBean.getEuropeanaAggregation());
-					mongoServer.getDatastore().delete(fBean);
-					solrServer.deleteByQuery("europeana_id:"
-							+ ClientUtils.escapeQueryChars(fBean.getAbout()));
-				}
-				recordNumber++;
-				return true;
-			} catch (JiBXException e) {
-				log.log(Level.SEVERE,
-						"JibX Exception occured with error " + e.getMessage()
-								+ "\nRetrying");
-				e.printStackTrace();
-			} catch (SolrServerException e) {
-				log.log(Level.SEVERE,
-						"Solr Server Exception occured with error "
-								+ e.getMessage() + "\nRetrying");
-				e.printStackTrace();
-			} catch (IOException e) {
-				log.log(Level.SEVERE,
-						"IO Exception occured with error " + e.getMessage()
-								+ "\nRetrying");
-				e.printStackTrace();
-			}
-			return false;
-		}
-
+		} 
+		return false;
 	}
 
 	private SolrInputDocument createMockForEnrichment(
