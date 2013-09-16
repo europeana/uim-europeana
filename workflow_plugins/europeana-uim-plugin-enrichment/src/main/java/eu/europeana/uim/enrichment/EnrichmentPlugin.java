@@ -136,6 +136,7 @@ public class EnrichmentPlugin<I> extends
 	private static String solrUrl;
 	private static String solrCore;
 	private static int recordNumber;
+	private static int deleted;
 	private static String europeanaID = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA_ID);
 	private static String repository = PropertyReader
@@ -384,6 +385,8 @@ public class EnrichmentPlugin<I> extends
 			solrServer.commit();
 			log.log(Level.INFO, "Added " + recordNumber + " documents");
 			System.out.println( "Added " + recordNumber + " documents");
+			log.log(Level.INFO,"Deleted are " + deleted);
+			System.out.println("Deleted are "+deleted);
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
@@ -391,6 +394,8 @@ public class EnrichmentPlugin<I> extends
 		}
 		log.log(Level.INFO, "Committed in Solr Server");
 		recordNumber = 0;
+		processCount=0;
+		deleted=0;
 	}
 
 	/*
@@ -418,9 +423,11 @@ public class EnrichmentPlugin<I> extends
 				"Status size = "
 						+ mdr.getValues(EuropeanaModelRegistry.STATUS).size());
 		
-		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-						.equals(Status.DELETED)) {
+		Status status = mdr
+				.getFirstValue(EuropeanaModelRegistry.STATUS);
+		
+		if(status == null || !status.equals(Status.DELETED)){
+			
 			MongoConstructor mongoConstructor = new MongoConstructor();
 
 			try {
@@ -544,7 +551,9 @@ public class EnrichmentPlugin<I> extends
 				
 			}
 			return false;
-		} 
+		} else {
+			deleted++;
+		}
 		return false;
 	}
 
