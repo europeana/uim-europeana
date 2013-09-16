@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -40,6 +42,8 @@ import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
+import eu.europeana.corelib.solr.exceptions.EdmFieldNotFoundException;
+import eu.europeana.corelib.solr.exceptions.EdmValueNotFoundException;
 import eu.europeana.corelib.solr.utils.EseEdmMap;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.utils.HashUtils;
@@ -58,28 +62,31 @@ import eu.europeana.uim.store.MetaDataRecord;
 
 /**
  * Redirect creation plugin
+ * 
  * @author Yorgos.Mamakis@ kb.nl
- *
+ * 
  * @param <I>
  */
 public class LookupCreationPlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 	private static EnrichmentService enrichmentService;
+	private static final Logger log = Logger
+			.getLogger(LookupCreationPlugin.class.getName());
+
 	public LookupCreationPlugin(String name, String description) {
 		super(name, description);
-		
+
 		// TODO Auto-generated constructor stub
 	}
 
 	public LookupCreationPlugin() {
 		super("", "");
-		
+
 		// TODO Auto-generated constructor stub
 	}
 
 	private static String repository = PropertyReader
 			.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
-	
 
 	private static IBindingFactory bfact;
 	static {
@@ -168,12 +175,19 @@ public class LookupCreationPlugin<I> extends
 			}
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			FullBeanImpl fullBean = constructFullBeanMock(rdf, collectionId);
-			String hash = hashExists(collectionId, fileName, fullBean);
-
+			String hash = null;
+			try{
+				hashExists(collectionId, fileName, fullBean);
+			}
+			catch(Exception e){
+				log.log(Level.SEVERE, e.getMessage());
+				return false;
+			}
+			
 			if (StringUtils.isNotEmpty(hash)) {
 
-				createLookupEntry(fullBean, collectionId,
-						hash);
+				createLookupEntry(fullBean, collectionId, hash);
+				return true;
 			}
 		} catch (JiBXException e) {
 			// TODO Auto-generated catch block
@@ -182,7 +196,7 @@ public class LookupCreationPlugin<I> extends
 		return false;
 	}
 
-	//Generate a minimum Fullbean
+	// Generate a minimum Fullbean
 	private FullBeanImpl constructFullBeanMock(RDF rdf, String collectionId) {
 		FullBeanImpl fBean = new FullBeanImpl();
 		AggregationImpl aggr = new AggregationImpl();
@@ -233,7 +247,7 @@ public class LookupCreationPlugin<I> extends
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
-		
+
 	}
 
 	@Override
@@ -248,17 +262,31 @@ public class LookupCreationPlugin<I> extends
 	}
 
 	private String hashExists(String collectionId, String fileName,
-			FullBean fullBean) {
+			FullBean fullBean) throws EdmFieldNotFoundException,EdmValueNotFoundException,NullPointerException{
 		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
 		sipCreatorUtils.setRepository(repository);
 		String hashField = sipCreatorUtils.getHashField(fileName, fileName);
 		if (hashField != null) {
-			String val = EseEdmMap.getEseEdmMap(
-					StringUtils.contains(hashField, "[") ? StringUtils
-							.substringBefore(hashField, "[") : hashField)
-					.getEdmValue(fullBean);
-			if (val != null){
-				return HashUtils.createHash(val);
+			String val = null;
+
+			try {
+				val = EseEdmMap
+						.getEseEdmMap(
+								StringUtils.contains(hashField, "[") ? StringUtils.substringBefore(
+										hashField, "[")
+										: hashField, fullBean.getAbout())
+						.getEdmValue(fullBean);
+				if (val != null) {
+					return HashUtils.createHash(val);
+				}
+			} catch (EdmFieldNotFoundException e) {
+				throw e;
+			}
+			catch (EdmValueNotFoundException e) {
+				throw e;
+			}
+			catch (NullPointerException e) {
+				throw e;
 			}
 		}
 		PreSipCreatorUtils preSipCreatorUtils = new PreSipCreatorUtils();
@@ -266,45 +294,49 @@ public class LookupCreationPlugin<I> extends
 
 		if (preSipCreatorUtils.getHashField(fileName, fileName) != null) {
 			String val = EseEdmMap.getEseEdmMap(
-					preSipCreatorUtils.getHashField(collectionId, fileName))
-					.getEdmValue(fullBean);
-			if (val != null){
+					preSipCreatorUtils.getHashField(collectionId, fileName),
+					fullBean.getAbout()).getEdmValue(fullBean);
+			if (val != null) {
 				return HashUtils.createHash(val);
 			}
 		}
 		return null;
 	}
-	
 
 	private void saveEuropeanaId(EuropeanaId europeanaId) {
-		enrichmentService.getEuropeanaIdMongoServer().saveEuropeanaId(europeanaId);
-		
+		enrichmentService.getEuropeanaIdMongoServer().saveEuropeanaId(
+				europeanaId);
+
 	}
-	
-	
-	private void createLookupEntry(FullBean fullBean, String collectionId, String hash) {
-	
-		
+
+	private void createLookupEntry(FullBean fullBean, String collectionId,
+			String hash) {
+
 		ModifiableSolrParams params = new ModifiableSolrParams();
-		params. add("q", "europeana_id:"+ClientUtils.escapeQueryChars("/"+collectionId+"/"+hash));
+		params.add(
+				"q",
+				"europeana_id:"
+						+ ClientUtils.escapeQueryChars("/" + collectionId + "/"
+								+ hash));
 		try {
-			SolrDocumentList solrList = enrichmentService.getSolrServer().query(params).getResults();
-			if(solrList.size()>0){
-				EuropeanaId id= new EuropeanaId();
-				id.setOldId("/"+collectionId+"/"+hash);
+			SolrDocumentList solrList = enrichmentService
+					.getProductionSolrServer().query(params).getResults();
+			if (solrList.size() > 0) {
+				EuropeanaId id = new EuropeanaId();
+				id.setOldId("/" + collectionId + "/" + hash);
 				id.setLastAccess(0);
 				id.setTimestamp(new Date().getTime());
 				id.setNewId(fullBean.getAbout());
 				saveEuropeanaId(id);
-				
+
 			}
-			
+
 		} catch (SolrServerException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void setEnrichmentService(EnrichmentService service){
+
+	public void setEnrichmentService(EnrichmentService service) {
 		LookupCreationPlugin.enrichmentService = service;
 	}
 }

@@ -49,6 +49,6 @@ public interface EnrichmentService {
 
 	public OsgiEdmMongoServer getEuropeanaMongoServer();
 	
-
+	public HttpSolrServer getProductionSolrServer();
 	
 }

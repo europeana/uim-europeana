@@ -61,6 +61,7 @@ import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 public class EnrichmentServiceImpl implements EnrichmentService {
 
 	private static HttpSolrServer solrServer;
+	private static HttpSolrServer solrProductionServer;
 	private static String mongoDB = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
 	private static String mongoHost = PropertyReader
@@ -69,6 +70,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 			.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
 	private static String solrUrl = PropertyReader
 			.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
+	private static String solrProductionUrl = PropertyReader
+			.getProperty(UimConfigurationProperty.SOLR_PRODUCTION_HOSTURL);
 	private static String solrCore = PropertyReader
 			.getProperty(UimConfigurationProperty.SOLR_CORE);
 	private static CollectionMongoServer cmServer;
@@ -199,7 +202,10 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	public HttpSolrServer getSolrServer() {
 		return solrServer;
 	}
-
+	@Override
+	public HttpSolrServer getProductionSolrServer() {
+		return solrServer;
+	}
 
 
 	@Override

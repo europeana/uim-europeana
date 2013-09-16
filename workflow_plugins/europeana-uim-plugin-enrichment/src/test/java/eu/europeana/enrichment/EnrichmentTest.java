@@ -27,6 +27,7 @@ public class EnrichmentTest {
 			if(!new File(ANNOCULTOR_DB+"/annocultor_db.3").exists()){
 				final TarGZipUnArchiver ua = new TarGZipUnArchiver();
 				ua.setSourceFile(new File(ANNOCULTOR_DB+"/annocultor_db.tar.gz"));
+				ua.setDestDirectory(new File(ANNOCULTOR_DB));
 				ua.enableLogging(new ConsoleLogger(0,"test"));
 				ua.extract();
 			}
@@ -47,7 +48,7 @@ public class EnrichmentTest {
 			List<Entity> entities = tagger.tagDocument(doc);
 			
 			Assert.assertEquals(7, entities.size());
-			
+			mongoExec.stop();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

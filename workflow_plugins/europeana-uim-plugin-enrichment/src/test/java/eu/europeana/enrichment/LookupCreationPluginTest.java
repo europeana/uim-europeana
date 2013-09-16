@@ -47,7 +47,7 @@ public class LookupCreationPluginTest {
 	public void testProcess() {
 		try {
 			String RECORD =FileUtils.readFileToString(new File("src/test/resources/edm_concept.xml"));
-			MongodConfig conf = new MongodConfig(Version.V2_0_7, 10000, false);
+			MongodConfig conf = new MongodConfig(Version.V2_0_7, 10003, false);
 			MongodStarter runtime = MongodStarter.getDefaultInstance();
 			MongodExecutable mongoExec = runtime.prepare(conf);
 			mongoExec.start();
@@ -56,7 +56,7 @@ public class LookupCreationPluginTest {
 
 			LookupCreationPlugin plugin = new LookupCreationPlugin();
 			plugin.setEnrichmentService(serv);
-			Mongo mongoServer = new Mongo("localhost", 10000);
+			Mongo mongoServer = new Mongo("localhost", 10003);
 			CollectionMongoServer collectionServer = new CollectionMongoServerImpl(
 					mongoServer, "colTest");
 			
@@ -95,6 +95,7 @@ public class LookupCreationPluginTest {
 //			Assert.assertTrue(idServer.newIdExists("#ULEI:M0000005"));
 			
 			plugin.completed(context);
+			mongoExec.stop();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

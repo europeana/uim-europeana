@@ -60,11 +60,11 @@ public class EnrichmentPluginTest {
 			String RECORD = FileUtils.readFileToString(new File(
 					"src/test/resources/edm_concept.xml"));
 
-			MongodConfig conf = new MongodConfig(Version.V2_0_7, 10000, false,"src/test/resources/annocultor_db");
+			MongodConfig conf = new MongodConfig(Version.V2_0_7, 10001, false,"src/test/resources/annocultor_db");
 			
 			MongodStarter runtime = MongodStarter.getDefaultInstance();
 			MongodExecutable mongoExec = runtime.prepare(conf);
-		//	mongoExec.start();
+			mongoExec.start();
 			PropertyReader
 					.loadPropertiesFromFile("src/test/resources/uim.properties");
 			EnrichmentService serv = mock(EnrichmentServiceImpl.class);
@@ -83,7 +83,7 @@ public class EnrichmentPluginTest {
 			EnrichmentPlugin plugin  = new EnrichmentPlugin();
 			plugin.setEnrichmentService(serv);
 			plugin.setSugarCrmService(sugarService);
-			Mongo mongoServer = new Mongo("localhost", 10000);
+			Mongo mongoServer = new Mongo("localhost", 10001);
 			CollectionMongoServer collectionServer = new CollectionMongoServerImpl(
 					mongoServer, "colTest");
 			
