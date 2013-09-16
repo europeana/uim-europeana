@@ -425,7 +425,7 @@ public class EnrichmentPlugin<I> extends
 		
 		Status status = mdr
 				.getFirstValue(EuropeanaModelRegistry.STATUS);
-		
+		System.out.println(status.toString());
 		if(!(status != null && status.equals(Status.DELETED))){
 			
 			MongoConstructor mongoConstructor = new MongoConstructor();
