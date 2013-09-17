@@ -426,7 +426,7 @@ public class EnrichmentPlugin<I> extends
 			System.out.println("Status " + i + " is: "
 					+ status.get(i).toString());
 		}
-		if (!(status != null && status.equals(Status.DELETED))) {
+		if (!(status != null && status.get(0).equals(Status.DELETED))) {
 
 			MongoConstructor mongoConstructor = new MongoConstructor();
 
