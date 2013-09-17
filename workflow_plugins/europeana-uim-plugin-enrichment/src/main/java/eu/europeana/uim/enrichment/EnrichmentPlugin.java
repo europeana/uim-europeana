@@ -422,12 +422,7 @@ public class EnrichmentPlugin<I> extends
 						+ mdr.getValues(EuropeanaModelRegistry.STATUS).size());
 
 		List<Status> status = mdr.getValues(EuropeanaModelRegistry.STATUS);
-		System.out.println("Status size = "
-						+ mdr.getValues(EuropeanaModelRegistry.STATUS).size());
-		for (int i = 0; i < status.size(); i++) {
-			System.out.println("Status " + i + " is: "
-					+ status.get(i).toString());
-		}
+		
 		if (!(status != null && status.get(0).equals(Status.DELETED))) {
 
 			MongoConstructor mongoConstructor = new MongoConstructor();
