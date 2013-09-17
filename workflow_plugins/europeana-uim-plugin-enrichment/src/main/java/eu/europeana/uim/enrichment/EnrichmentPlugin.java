@@ -146,7 +146,7 @@ public class EnrichmentPlugin<I> extends
 	private static String previewsOnlyInPortal;
 	private static String collections = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
-	//private static Morphia morphia;
+	// private static Morphia morphia;
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
 	private static IBindingFactory bfact;
@@ -156,7 +156,6 @@ public class EnrichmentPlugin<I> extends
 	private final static String XML_LANG = "_@xml:lang";
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
 			.getName());
-	
 
 	private enum EnrichmentFields {
 		DC_DATE("proxy_dc_date"), DC_COVERAGE("proxy_dc_coverage"), DC_TERMS_TEMPORAL(
@@ -294,23 +293,22 @@ public class EnrichmentPlugin<I> extends
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		Collection collection = null;
-		processCount=0;
+		processCount = 0;
 		try {
 			log.log(Level.INFO, "Initializing Annocultor");
 			if (tagger == null) {
 				tagger = new EuropeanaEnrichmentTagger();
-				tagger.init("Europeana","localhost","27017");
+				tagger.init("Europeana", "localhost", "27017");
 			}
 			log.log(Level.INFO, "Annocultor Initialized");
 			solrServer = enrichmentService.getSolrServer();
-			
+
 			log.log(Level.INFO, "Solr Server Acquired");
 			mongoDB = enrichmentService.getMongoDB();
-		
-			if (mongoServer == null) {
-				
-				mongoServer =enrichmentService.getEuropeanaMongoServer();
 
+			if (mongoServer == null) {
+
+				mongoServer = enrichmentService.getEuropeanaMongoServer();
 
 			}
 			log.log(Level.INFO, "Mongo Initialized");
@@ -379,14 +377,14 @@ public class EnrichmentPlugin<I> extends
 			throws IngestionPluginFailedException {
 
 		log.log(Level.INFO, "Adding " + recordNumber + " documents");
-		System.out.println( "Adding " + recordNumber + " documents");
+		System.out.println("Adding " + recordNumber + " documents");
 		System.out.println("Process called " + processCount);
 		try {
 			solrServer.commit();
 			log.log(Level.INFO, "Added " + recordNumber + " documents");
-			System.out.println( "Added " + recordNumber + " documents");
-			log.log(Level.INFO,"Deleted are " + deleted);
-			System.out.println("Deleted are "+deleted);
+			System.out.println("Added " + recordNumber + " documents");
+			log.log(Level.INFO, "Deleted are " + deleted);
+			System.out.println("Deleted are " + deleted);
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
@@ -394,8 +392,8 @@ public class EnrichmentPlugin<I> extends
 		}
 		log.log(Level.INFO, "Committed in Solr Server");
 		recordNumber = 0;
-		processCount=0;
-		deleted=0;
+		processCount = 0;
+		deleted = 0;
 	}
 
 	/*
@@ -422,14 +420,14 @@ public class EnrichmentPlugin<I> extends
 		log.log(Level.INFO,
 				"Status size = "
 						+ mdr.getValues(EuropeanaModelRegistry.STATUS).size());
-		
-		List<Status> status = mdr
-				.getValues(EuropeanaModelRegistry.STATUS);
-		for(int i=0 ;i<status.size();i++){
-		System.out.println("Status " + i + " is: " + status.toString());
+
+		List<Status> status = mdr.getValues(EuropeanaModelRegistry.STATUS);
+		for (int i = 0; i < status.size(); i++) {
+			System.out.println("Status " + i + " is: "
+					+ status.get(i).toString());
 		}
-		if(!(status != null && status.equals(Status.DELETED))){
-			
+		if (!(status != null && status.equals(Status.DELETED))) {
+
 			MongoConstructor mongoConstructor = new MongoConstructor();
 
 			try {
@@ -442,11 +440,11 @@ public class EnrichmentPlugin<I> extends
 						.constructSolrDocument(rdf);
 
 				SolrInputDocument mockDocument = createMockForEnrichment(basicDocument);
-				
+
 				List<Entity> entities = null;
-				log.log(Level.INFO,"Before tagging Document");
+				log.log(Level.INFO, "Before tagging Document");
 				entities = tagger.tagDocument(mockDocument);
-				log.log(Level.INFO,"Tagged document");
+				log.log(Level.INFO, "Tagged document");
 				mergeEntities(rdf, entities);
 				RDF rdfFinal = cleanRDF(rdf);
 				boolean hasEuropeanaProxy = false;
@@ -486,7 +484,7 @@ public class EnrichmentPlugin<I> extends
 					}
 					rdfFinal.getProxyList().add(europeanaProxy);
 				}
-				
+
 				SolrInputDocument solrInputDocument = new SolrConstructor()
 						.constructSolrDocument(rdfFinal);
 
@@ -523,9 +521,10 @@ public class EnrichmentPlugin<I> extends
 				return true;
 
 			} catch (JiBXException e) {
-				 log.log(Level.SEVERE, "JibX Exception occured with error "
-				 + e.getMessage() + "\nRetrying");
-				 e.printStackTrace();
+				log.log(Level.SEVERE,
+						"JibX Exception occured with error " + e.getMessage()
+								+ "\nRetrying");
+				e.printStackTrace();
 			} catch (MalformedURLException e) {
 				log.log(Level.SEVERE,
 						"Malformed URL Exception occured with error "
@@ -550,7 +549,7 @@ public class EnrichmentPlugin<I> extends
 				e.printStackTrace();
 				log.log(Level.SEVERE, "Generic Exception occured with error "
 						+ e.getMessage() + "\nRetrying");
-				
+
 			}
 			return false;
 		} else {
@@ -561,16 +560,18 @@ public class EnrichmentPlugin<I> extends
 
 	private SolrInputDocument createMockForEnrichment(
 			SolrInputDocument basicDocument) {
-		
+
 		SolrInputDocument mockDocument = new SolrInputDocument();
-		for(String fieldName:basicDocument.keySet()){
-			for(EnrichmentFields field:EnrichmentFields.values()){
-				if(StringUtils.equals(field.getValue(), fieldName)||StringUtils.startsWith(fieldName, field.getValue())){
-					mockDocument.addField(field.getValue(), basicDocument.getFieldValue(fieldName));
+		for (String fieldName : basicDocument.keySet()) {
+			for (EnrichmentFields field : EnrichmentFields.values()) {
+				if (StringUtils.equals(field.getValue(), fieldName)
+						|| StringUtils.startsWith(fieldName, field.getValue())) {
+					mockDocument.addField(field.getValue(),
+							basicDocument.getFieldValue(fieldName));
 				}
 			}
 		}
-		
+
 		return mockDocument;
 	}
 
@@ -583,8 +584,8 @@ public class EnrichmentPlugin<I> extends
 				.getCollection("ProvidedCHO");
 		DBCollection aggregations = mongoServer2.getDatastore().getDB()
 				.getCollection("Aggregation");
-		DBCollection europeanaAggregations = mongoServer2.getDatastore().getDB()
-				.getCollection("EuropeanaAggregation");
+		DBCollection europeanaAggregations = mongoServer2.getDatastore()
+				.getDB().getCollection("EuropeanaAggregation");
 
 		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
 				+ collection + "/"));
@@ -673,8 +674,9 @@ public class EnrichmentPlugin<I> extends
 					&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
 				europeanaProxy = proxy;
 			} else {
-				if(!StringUtils.startsWith(proxy.getAbout(), "/proxy/provider")){
-					proxy.setAbout("/proxy/provider"+proxy.getAbout());
+				if (!StringUtils
+						.startsWith(proxy.getAbout(), "/proxy/provider")) {
+					proxy.setAbout("/proxy/provider" + proxy.getAbout());
 				}
 			}
 		}
@@ -1057,7 +1059,7 @@ public class EnrichmentPlugin<I> extends
 
 		europeanaAggregation.setRights(rightsType);
 		AggregatedCHO aggrCHO = new AggregatedCHO();
-		aggrCHO.setResource("/item"+cho.getAbout());
+		aggrCHO.setResource("/item" + cho.getAbout());
 		europeanaAggregation.setAggregatedCHO(aggrCHO);
 		return europeanaAggregation;
 	}
