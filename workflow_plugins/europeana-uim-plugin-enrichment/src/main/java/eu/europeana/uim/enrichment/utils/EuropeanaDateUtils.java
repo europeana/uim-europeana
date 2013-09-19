@@ -18,6 +18,7 @@ package eu.europeana.uim.enrichment.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,12 +108,23 @@ public class EuropeanaDateUtils {
 	private String contains(String input, String[] filters) {
 		if (filters != null) {
 			for (String filter : filters) {
-				if (StringUtils.containsIgnoreCase(input, filter)) {
+				if (StringUtils.containsIgnoreCase(input, filter)&& !isUri(input)) {
 					return filter;
 				}
 			}
 		}
 		return null;
+	}
+
+	private boolean isUri(String input) {
+		try {
+			new URL(input);
+			return true;
+		}
+		catch (Exception e){
+			//do nothing
+		}
+		return false;
 	}
 
 	// TODO: not used for the time being as it created problems
