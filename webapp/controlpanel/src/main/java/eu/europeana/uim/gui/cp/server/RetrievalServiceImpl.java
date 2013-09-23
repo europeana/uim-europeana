@@ -466,6 +466,9 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
+		} catch (MongoDBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return record;
 	}

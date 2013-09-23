@@ -15,6 +15,7 @@ import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
+import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.deactivation.service.DeactivationService;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
@@ -165,6 +166,9 @@ public class DeactivatePlugin<I> extends
 					mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 					mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
 				} catch (JiBXException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (MongoDBException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
