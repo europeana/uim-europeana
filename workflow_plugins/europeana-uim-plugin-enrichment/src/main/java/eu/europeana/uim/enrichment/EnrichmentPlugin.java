@@ -347,6 +347,9 @@ public class EnrichmentPlugin<I> extends
 			} catch (LoginFailureException e) {
 				log.log(Level.SEVERE,
 						"Error updating Sugar Session id. " + e.getMessage());
+			} catch (Exception e){
+				log.log(Level.SEVERE,
+						"Generic SugarCRM error. " + e.getMessage());
 			}
 			SugarCrmRecord sugarCrmRecord = sugarCrmService
 					.retrieveRecord(sugarCrmId);
@@ -357,6 +360,9 @@ public class EnrichmentPlugin<I> extends
 
 			log.log(Level.SEVERE, "Error retrieving SugarCRM record");
 			previewsOnlyInPortal = "false";
+		} catch(Exception e){
+			log.log(Level.SEVERE,
+					"Record could not be retrieved. " + e.getMessage());
 		}
 		log.log(Level.INFO, "Preview Only in portal acquired with value: "
 				+ previewsOnlyInPortal);
