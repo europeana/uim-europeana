@@ -63,10 +63,6 @@ public class EuropeanaDateUtils {
 								.getString()));
 
 					}
-					if (choice.ifCreated()) {
-						years.addAll(refineDates(bc, choice.getCreated()
-								.getString()));
-					}
 					if (choice.ifTemporal()) {
 						years.addAll(refineDates(bc, choice.getTemporal()
 								.getString()));
