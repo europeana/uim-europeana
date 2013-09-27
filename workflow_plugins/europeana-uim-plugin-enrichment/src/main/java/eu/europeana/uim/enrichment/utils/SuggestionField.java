@@ -42,11 +42,9 @@ public enum SuggestionField {
 			"proxy_dcterms_alternative.");
 
 	private String field;
-
 	private SuggestionField(String field) {
 		this.field = field;
 	}
-
 	public SolrInputDocument transferField(SolrInputDocument input,
 			SolrInputDocument output) {
 		Collection<String> fieldNames = input.getFieldNames();

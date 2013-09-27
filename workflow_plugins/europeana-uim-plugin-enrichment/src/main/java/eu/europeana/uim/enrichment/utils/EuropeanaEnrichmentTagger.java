@@ -34,7 +34,6 @@ public class EuropeanaEnrichmentTagger extends BuiltinSolrDocumentTagger {
 	        }
 	        return fieldName.contains("_") || fieldName.equalsIgnoreCase("timestamp");
 	}
-
 	@Override
 	public void preProcess(SolrInputDocument document, String id) {
 

@@ -43,7 +43,6 @@ public enum UimConfigurationProperty {
 	private UimConfigurationProperty(String field){
 		this.field = field;
 	}
-	
 	@Override
 	public String toString(){
 		return this.field;

@@ -35,7 +35,6 @@ public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServerImpl imple
 		this.mongoServer = mongoServer;
 		this.databaseName = databaseName;		
 	}
-
 	@Override
 	public void createDatastore(){
 		Morphia morphia = new Morphia();

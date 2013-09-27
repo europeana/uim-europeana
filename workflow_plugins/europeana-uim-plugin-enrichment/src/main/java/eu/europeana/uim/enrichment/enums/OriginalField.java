@@ -203,8 +203,7 @@ public enum OriginalField {
 			}
 			return proxy;
 		}
-	}
-	;
+	};
 	
 	String originalField;
 

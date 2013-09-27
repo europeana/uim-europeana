@@ -144,7 +144,6 @@ public class EuropeanaDateUtils {
 			}
 			i++;
 		}
-
 		return dates;
 	}
 

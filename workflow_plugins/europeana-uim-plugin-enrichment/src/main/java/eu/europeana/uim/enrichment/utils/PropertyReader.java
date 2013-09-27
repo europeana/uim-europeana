@@ -28,7 +28,6 @@ public final class PropertyReader {
 			System.out.println("Values not loaded. Call loadPropertiesFromFile(filePath) to specify the filepath");
 		}
 	}
-	
 	/**
 	 * Get UIM Property
 	 * @param property An enumerated configuration property available for this plugin

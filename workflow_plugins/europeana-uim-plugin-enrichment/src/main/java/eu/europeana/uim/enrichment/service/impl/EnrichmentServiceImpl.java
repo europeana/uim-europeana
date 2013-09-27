@@ -204,7 +204,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 	}
 	@Override
 	public HttpSolrServer getProductionSolrServer() {
-		return solrServer;
+		return solrProductionServer;
 	}
 
 

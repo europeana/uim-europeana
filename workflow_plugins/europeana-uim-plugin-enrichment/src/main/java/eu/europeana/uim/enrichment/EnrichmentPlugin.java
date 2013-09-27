@@ -32,10 +32,8 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -86,7 +84,6 @@ import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.corelib.definitions.jibx._Long;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.DocType;
-import eu.europeana.corelib.definitions.solr.beans.FullBean;
 import eu.europeana.corelib.dereference.impl.RdfMethod;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
@@ -490,7 +487,6 @@ public class EnrichmentPlugin<I> extends
 
 				SolrInputDocument solrInputDocument = new SolrConstructor()
 						.constructSolrDocument(rdfFinal);
-
 				FullBeanImpl fullBean = mongoConstructor.constructFullBean(
 						rdfFinal, mongoServer);
 				solrInputDocument.addField(

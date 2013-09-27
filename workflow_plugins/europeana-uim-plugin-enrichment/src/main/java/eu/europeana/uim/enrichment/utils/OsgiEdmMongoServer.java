@@ -65,7 +65,6 @@ public class OsgiEdmMongoServer implements EdmMongoServer{
 		this.password = password;
 		
 	}
-
 	
 	public Datastore createDatastore(Morphia morphia)
 	{

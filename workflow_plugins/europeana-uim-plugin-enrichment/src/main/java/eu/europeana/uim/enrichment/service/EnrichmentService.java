@@ -44,7 +44,6 @@ public interface EnrichmentService {
 
 	public CollectionMongoServer getCollectionMongoServer();
 
-
 	public EuropeanaIdMongoServer getEuropeanaIdMongoServer();
 
 	public OsgiEdmMongoServer getEuropeanaMongoServer();
