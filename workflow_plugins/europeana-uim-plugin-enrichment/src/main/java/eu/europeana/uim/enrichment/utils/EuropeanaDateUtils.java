@@ -58,12 +58,13 @@ public class EuropeanaDateUtils {
 			if (proxy.getChoiceList() != null) {
 				for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
 					if (choice.ifDate()) {
-
+						System.out.println("Generating year by dc:date");
 						years.addAll(refineDates(bc, choice.getDate()
 								.getString()));
 
 					}
 					if (choice.ifTemporal()) {
+						System.out.println("Generating year by dcterms:temporal");
 						years.addAll(refineDates(bc, choice.getTemporal()
 								.getString()));
 					}
@@ -87,6 +88,7 @@ public class EuropeanaDateUtils {
 			dates.add(input);
 			}
 		}
+		System.out.println("Dates size for input: "+input);
 		return dates;
 	}
 
@@ -105,6 +107,7 @@ public class EuropeanaDateUtils {
 		if (filters != null) {
 			for (String filter : filters) {
 				if (StringUtils.containsIgnoreCase(input, filter)&& !isUri(input)) {
+					System.out.println("Filter " + filter);
 					return filter;
 				}
 			}
