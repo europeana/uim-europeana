@@ -89,6 +89,7 @@ import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
+import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.server.EdmMongoServer;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
@@ -508,6 +509,13 @@ public class EnrichmentPlugin<I> extends
 						.getCollection().getName() });
 				solrInputDocument.setField("europeana_collectionName", mdr
 						.getCollection().getName());
+				ProxyImpl euProxy = null;
+				for(ProxyImpl proxy :fullBean.getProxies() ){
+					if(proxy.isEuropeanaProxy()){
+						euProxy = proxy;
+					}
+				}
+				System.out.println("Fullbean yearList " + euProxy.getYear()!=null? euProxy.getYear().size():0);
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
@@ -871,6 +879,7 @@ public class EnrichmentPlugin<I> extends
 		prx.setEuropeanaProxy(true);
 		europeanaProxy.setEuropeanaProxy(prx);
 		List<String> years = new ArrayList<String>();
+		
 		for (ProxyType proxy : rdf.getProxyList()) {
 			years.addAll(new EuropeanaDateUtils().createEuropeanaYears(proxy));
 			europeanaProxy.setType(proxy.getType());
