@@ -509,12 +509,7 @@ public class EnrichmentPlugin<I> extends
 						.getCollection().getName() });
 				solrInputDocument.setField("europeana_collectionName", mdr
 						.getCollection().getName());
-				ProxyImpl euProxy = null;
-				for(ProxyImpl proxy :fullBean.getProxies() ){
-					if(proxy.isEuropeanaProxy()){
-						euProxy = proxy;
-					}
-				}
+			
 				
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
