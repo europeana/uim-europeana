@@ -467,6 +467,7 @@ public class EnrichmentPlugin<I> extends
 								.createEuropeanaYears(proxy));
 						europeanaProxy.setType(proxy.getType());
 					}
+					System.out.println("Years list " + years.size());
 					List<Year> yearList = new ArrayList<Year>();
 					for (String year : years) {
 						Year yearObj = new Year();
@@ -879,6 +880,7 @@ public class EnrichmentPlugin<I> extends
 			years.addAll(new EuropeanaDateUtils().createEuropeanaYears(proxy));
 			europeanaProxy.setType(proxy.getType());
 		}
+		System.out.println("Create EuropeanaProxy years:" +years.size());
 		List<Year> yearList = new ArrayList<Year>();
 		for (String year : years) {
 			Year yearObj = new Year();
