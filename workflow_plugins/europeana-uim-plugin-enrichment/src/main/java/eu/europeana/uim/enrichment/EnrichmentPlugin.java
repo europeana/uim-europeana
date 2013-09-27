@@ -515,7 +515,7 @@ public class EnrichmentPlugin<I> extends
 						euProxy = proxy;
 					}
 				}
-				System.out.println("Fullbean yearList " + euProxy.getYear()!=null? euProxy.getYear().size():0);
+				
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
