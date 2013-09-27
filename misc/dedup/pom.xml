@@ -17,6 +17,11 @@
 			<artifactId>corelib-solr-tools</artifactId>
 			<version>${corelib.version}</version>
 		</dependency>
+			<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-utils</artifactId>
+			<version>${corelib.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -63,7 +68,7 @@
 							gnu.trove.set.hash,
 							!*
 						</Import-Package>
-						<Embed-Dependency>corelib-solr-tools,morphia,mongo-java-driver,corelib-solr-definitions,corelib-solr-dereference,commons-codec,commons-lang,commons-io</Embed-Dependency>
+						<Embed-Dependency>corelib-utils,corelib-solr-tools,morphia,mongo-java-driver,corelib-solr-definitions,corelib-solr-dereference,commons-codec,commons-lang,commons-io</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->
 						<Include-Resource>src/main/resources</Include-Resource>
