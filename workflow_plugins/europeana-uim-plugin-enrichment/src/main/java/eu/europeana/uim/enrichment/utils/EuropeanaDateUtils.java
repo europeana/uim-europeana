@@ -114,12 +114,14 @@ public class EuropeanaDateUtils {
 
 	private boolean isUri(String input) {
 		try {
+			System.out.println("in isUri with value: " +input);
 			new URL(input);
 			return true;
 		}
 		catch (Exception e){
 			//do nothing
 		}
+		System.out.println("isUri returned false for input: " +input);
 		return false;
 	}
 
