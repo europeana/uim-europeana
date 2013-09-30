@@ -445,14 +445,15 @@ public class EnrichmentPlugin<I> extends
 				List<Entity> entities = null;
 				log.log(Level.INFO, "Before tagging Document");
 				entities = tagger.tagDocument(mockDocument);
-				//TODO: remove in production
+				// TODO: remove in production
 				if (entities != null) {
 					System.out.println("entities size: " + entities.size());
 					for (Entity entity : entities) {
 						System.out.println("Type: " + entity.getClassName());
-						System.out.println("Original Field: "
-								+ entity.getOriginalField() != null ? entity
-								.getOriginalField() : "");
+						System.out
+								.println(entity.getOriginalField() != null ? "Original Field: "
+										+ entity.getOriginalField()
+										: "");
 						System.out.println("Uri: " + entity.getUri());
 						for (Field field : entity.getFields()) {
 							System.out.println("Generated field:"
@@ -593,6 +594,9 @@ public class EnrichmentPlugin<I> extends
 			for (EnrichmentFields field : EnrichmentFields.values()) {
 				if (StringUtils.equals(field.getValue(), fieldName)
 						|| StringUtils.startsWith(fieldName, field.getValue())) {
+					System.out.println("Adding field " + fieldName
+							+ " with value"
+							+ basicDocument.getFieldValue(fieldName));
 					mockDocument.addField(field.getValue(),
 							basicDocument.getFieldValue(fieldName));
 				}
