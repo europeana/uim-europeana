@@ -33,7 +33,7 @@ import eu.europeana.uim.logging.LoggingEngineAdapter;
 import eu.europeana.uim.deactivation.DeactivatePlugin;
 import eu.europeana.uim.deactivation.service.DeactivationServiceImpl;
 import eu.europeana.uim.deactivation.service.ExtendedEdmMongoServer;
-import eu.europeana.uim.model.europeanaspecific.EuropeanaModelRegistry;
+import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.bean.CollectionBean;

@@ -106,7 +106,7 @@ public class EuropeanaDateUtils {
 	private String contains(String input, String[] filters) {
 		if (filters != null) {
 			for (String filter : filters) {
-				if (StringUtils.containsIgnoreCase(input, filter)&& !isUri(input)) {
+				if ((StringUtils.containsIgnoreCase(input, " " + filter +" ")|| StringUtils.endsWithIgnoreCase(input.trim(), " "+filter))&& !isUri(input)) {
 					System.out.println("Filter " + filter);
 					return filter;
 				}
@@ -150,10 +150,10 @@ public class EuropeanaDateUtils {
 
 	private List<String> getDates(String input, String remove) {
 		List<String> dates = new ArrayList<String>();
-		String[] left = StringUtils.splitByWholeSeparator(input, remove);
+		String[] left = StringUtils.splitByWholeSeparator(input.toLowerCase(), remove.toLowerCase());
 		List<Character> chars = new ArrayList<Character>();
 		for (String str : left) {
-
+			if(str.length()>0){
 			chars.add('-');
 			for (char ch : str.toCharArray()) {
 				if (Character.isDigit(ch)) {
@@ -163,6 +163,7 @@ public class EuropeanaDateUtils {
 				}
 			}
 			chars.add(',');
+			}
 		}
 		StringBuffer sb = new StringBuffer();
 		for (char ch : chars) {

@@ -3,6 +3,7 @@ package eu.europeana.uim.deactivation;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -35,8 +36,6 @@ public class DeactivatePlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static DeactivationService dService;
-	private static List<String> europeanaIds;
-	private final static int DELETE_THRESHOLD = 1000;
 
 	public DeactivatePlugin(String name, String description) {
 		super(name, description);
@@ -96,7 +95,6 @@ public class DeactivatePlugin<I> extends
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
 
-		europeanaIds = new ArrayList<String>();
 
 	}
 
@@ -163,8 +161,8 @@ public class DeactivatePlugin<I> extends
 						}
 
 					}
-					mdr.deleteValues(EuropeanaModelRegistry.STATUS);
-					mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
+					mdr.deleteValues(EuropeanaModelRegistry.REMOVED);
+					mdr.addValue(EuropeanaModelRegistry.REMOVED,new Date().getTime());
 				} catch (JiBXException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
