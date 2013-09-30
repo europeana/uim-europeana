@@ -345,7 +345,7 @@ public class EnrichmentPlugin<I> extends
 			} catch (LoginFailureException e) {
 				log.log(Level.SEVERE,
 						"Error updating Sugar Session id. " + e.getMessage());
-			} catch (Exception e){
+			} catch (Exception e) {
 				log.log(Level.SEVERE,
 						"Generic SugarCRM error. " + e.getMessage());
 			}
@@ -358,7 +358,7 @@ public class EnrichmentPlugin<I> extends
 
 			log.log(Level.SEVERE, "Error retrieving SugarCRM record");
 			previewsOnlyInPortal = "false";
-		} catch(Exception e){
+		} catch (Exception e) {
 			log.log(Level.SEVERE,
 					"Record could not be retrieved. " + e.getMessage());
 		}
@@ -426,7 +426,7 @@ public class EnrichmentPlugin<I> extends
 						+ mdr.getValues(EuropeanaModelRegistry.STATUS).size());
 
 		List<Status> status = mdr.getValues(EuropeanaModelRegistry.STATUS);
-		
+
 		if (!(status != null && status.get(0).equals(Status.DELETED))) {
 
 			MongoConstructor mongoConstructor = new MongoConstructor();
@@ -445,8 +445,33 @@ public class EnrichmentPlugin<I> extends
 				List<Entity> entities = null;
 				log.log(Level.INFO, "Before tagging Document");
 				entities = tagger.tagDocument(mockDocument);
+				//TODO: remove in production
+				if (entities != null) {
+					System.out.println("entities size: " + entities.size());
+					for (Entity entity : entities) {
+						System.out.println("Type: " + entity.getClassName());
+						System.out.println("Original Field: "
+								+ entity.getOriginalField() != null ? entity
+								.getOriginalField() : "");
+						System.out.println("Uri: " + entity.getUri());
+						for (Field field : entity.getFields()) {
+							System.out.println("Generated field:"
+									+ field.getName());
+							for (Entry<String, List<String>> entry : field
+									.getValues().entrySet()) {
+								for (String val : entry.getValue()) {
+									System.out
+											.println("Generated field with language: "
+													+ entry.getKey()
+													+ " and value " + val);
+								}
+							}
+						}
+					}
+				}
 				log.log(Level.INFO, "Tagged document");
 				mergeEntities(rdf, entities);
+
 				RDF rdfFinal = cleanRDF(rdf);
 				boolean hasEuropeanaProxy = false;
 
@@ -510,8 +535,7 @@ public class EnrichmentPlugin<I> extends
 						.getCollection().getName() });
 				solrInputDocument.setField("europeana_collectionName", mdr
 						.getCollection().getName());
-			
-				
+
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
@@ -875,12 +899,12 @@ public class EnrichmentPlugin<I> extends
 		prx.setEuropeanaProxy(true);
 		europeanaProxy.setEuropeanaProxy(prx);
 		List<String> years = new ArrayList<String>();
-		
+
 		for (ProxyType proxy : rdf.getProxyList()) {
 			years.addAll(new EuropeanaDateUtils().createEuropeanaYears(proxy));
 			europeanaProxy.setType(proxy.getType());
 		}
-		System.out.println("Create EuropeanaProxy years:" +years.size());
+		System.out.println("Create EuropeanaProxy years:" + years.size());
 		List<Year> yearList = new ArrayList<Year>();
 		for (String year : years) {
 			Year yearObj = new Year();
