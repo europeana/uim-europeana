@@ -176,7 +176,9 @@ public class ReponseHandler {
 			
 			collection.putValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION,
 					ziplocation);
+
 			storage.updateCollection(collection);
+			
 			Workflow ingestionworkflow =registry.getWorkflow(ingestionWf);
 			
 			orchestrator.executeWorkflow(ingestionworkflow, collection);
