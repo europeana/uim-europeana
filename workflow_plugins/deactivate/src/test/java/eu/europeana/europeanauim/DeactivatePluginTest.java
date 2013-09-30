@@ -30,6 +30,7 @@ import eu.europeana.europeanauim.utils.UimConfigurationProperty;
 import eu.europeana.uim.orchestration.ActiveExecution;
 import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.logging.LoggingEngineAdapter;
+import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.deactivation.DeactivatePlugin;
 import eu.europeana.uim.deactivation.service.DeactivationServiceImpl;
 import eu.europeana.uim.deactivation.service.ExtendedEdmMongoServer;

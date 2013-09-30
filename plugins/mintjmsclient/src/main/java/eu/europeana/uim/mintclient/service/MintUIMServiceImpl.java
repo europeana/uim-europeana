@@ -348,12 +348,15 @@ public class MintUIMServiceImpl implements MintUIMService {
 			} catch (MintOSGIClientException e) {
 				logger.logFailed(Level.SEVERE,
 						"Incoming message caused an exception to the client", e);
+				e.printStackTrace();
 			} catch (StorageEngineException e) {
 				logger.logFailed(Level.SEVERE,
 						"Incoming message has thrown a storage exception", e);
+				e.printStackTrace();
 			} catch (Exception e) {
 				logger.logFailed(Level.SEVERE,
 						"Incoming message has thrown an unknown exception", e);
+				e.printStackTrace();
 			}
 
 		}
