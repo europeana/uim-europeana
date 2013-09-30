@@ -434,6 +434,7 @@ public class EnrichmentPlugin<I> extends
 			try {
 
 				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+				
 				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 				log.log(Level.INFO, "Processing record "
 						+ rdf.getProvidedCHOList().get(0).getAbout());
@@ -445,31 +446,7 @@ public class EnrichmentPlugin<I> extends
 				List<Entity> entities = null;
 				log.log(Level.INFO, "Before tagging Document");
 				entities = tagger.tagDocument(mockDocument);
-				// TODO: remove in production
-				if (entities != null) {
-					System.out.println("entities size: " + entities.size());
-					for (Entity entity : entities) {
-						System.out.println("Type: " + entity.getClassName());
-						System.out
-								.println(entity.getOriginalField() != null ? "Original Field: "
-										+ entity.getOriginalField()
-										: "");
-						System.out.println("Uri: " + entity.getUri());
-						for (Field field : entity.getFields()) {
-							System.out.println("Generated field:"
-									+ field.getName());
-							for (Entry<String, List<String>> entry : field
-									.getValues().entrySet()) {
-								for (String val : entry.getValue()) {
-									System.out
-											.println("Generated field with language: "
-													+ entry.getKey()
-													+ " and value " + val);
-								}
-							}
-						}
-					}
-				}
+				
 				log.log(Level.INFO, "Tagged document");
 				mergeEntities(rdf, entities);
 
@@ -493,7 +470,6 @@ public class EnrichmentPlugin<I> extends
 								.createEuropeanaYears(proxy));
 						europeanaProxy.setType(proxy.getType());
 					}
-					System.out.println("Years list " + years.size());
 					List<Year> yearList = new ArrayList<Year>();
 					for (String year : years) {
 						Year yearObj = new Year();

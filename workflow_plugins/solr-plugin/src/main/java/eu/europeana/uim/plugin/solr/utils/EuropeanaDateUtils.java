@@ -2,6 +2,7 @@ package eu.europeana.uim.plugin.solr.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,13 +38,13 @@ public class EuropeanaDateUtils {
 			if (proxy.getChoiceList() != null) {
 				for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
 					if (choice.ifDate()) {
-
+						System.out.println("Generating year by dc:date");
 						years.addAll(refineDates(bc, choice.getDate()
 								.getString()));
 
 					}
-					
 					if (choice.ifTemporal()) {
+						System.out.println("Generating year by dcterms:temporal");
 						years.addAll(refineDates(bc, choice.getTemporal()
 								.getString()));
 					}
@@ -61,39 +62,50 @@ public class EuropeanaDateUtils {
 		String contains = contains(input, patterns);
 		if (contains != null) {
 			dates.addAll(getDates(input, contains));
-		} else if (isSingleDate(input, 10)) {
-			if (!dates.contains(input)) {
-				dates.add(input);
+			
+		} else if(isSingleDate(input,10)){
+			if(!dates.contains(input)){
+			dates.add(input);
 			}
 		}
+		System.out.println("Dates size for input: "+input);
 		return dates;
 	}
 
-	private boolean isSingleDate(String input, int radix) {
-		if (input.isEmpty())
-			return false;
-		for (int i = 0; i < input.length(); i++) {
-			if (i == 0 && input.charAt(i) == '-') {
-				if (input.length() == 1)
-					return false;
-				else
-					continue;
-			}
-			if (Character.digit(input.charAt(i), radix) < 0)
-				return false;
-		}
-		return true;
+	private boolean isSingleDate(String input,int radix){
+		    if(input.isEmpty()) return false;
+		    for(int i = 0; i < input.length(); i++) {
+		        if(i == 0 && input.charAt(i) == '-') {
+		            if(input.length() == 1) return false;
+		            else continue;
+		        }
+		        if(Character.digit(input.charAt(i),radix) < 0) return false;
+		    }
+		    return true;
 	}
-
 	private String contains(String input, String[] filters) {
 		if (filters != null) {
 			for (String filter : filters) {
-				if (StringUtils.containsIgnoreCase(input, filter)) {
+				if ((StringUtils.containsIgnoreCase(input, " " + filter +" ")|| StringUtils.endsWithIgnoreCase(input.trim(), " "+filter))&& !isUri(input)) {
+					System.out.println("Filter " + filter);
 					return filter;
 				}
 			}
 		}
 		return null;
+	}
+
+	private boolean isUri(String input) {
+		try {
+			System.out.println("in isUri with value: " +input);
+			new URL(input);
+			return true;
+		}
+		catch (Exception e){
+			//do nothing
+		}
+		System.out.println("isUri returned false for input: " +input);
+		return false;
 	}
 
 	// TODO: not used for the time being as it created problems
@@ -113,16 +125,15 @@ public class EuropeanaDateUtils {
 			}
 			i++;
 		}
-
 		return dates;
 	}
 
 	private List<String> getDates(String input, String remove) {
 		List<String> dates = new ArrayList<String>();
-		String[] left = StringUtils.splitByWholeSeparator(input, remove);
+		String[] left = StringUtils.splitByWholeSeparator(input.toLowerCase(), remove.toLowerCase());
 		List<Character> chars = new ArrayList<Character>();
 		for (String str : left) {
-
+			if(str.length()>0){
 			chars.add('-');
 			for (char ch : str.toCharArray()) {
 				if (Character.isDigit(ch)) {
@@ -132,6 +143,7 @@ public class EuropeanaDateUtils {
 				}
 			}
 			chars.add(',');
+			}
 		}
 		StringBuffer sb = new StringBuffer();
 		for (char ch : chars) {

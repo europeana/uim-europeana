@@ -22,8 +22,9 @@ public class EuropeanaDateUtilsTest {
 		//String dcDateString1 = "-150 / -70"; //should give -150 and -70
 		//String dcDateString2 = "75/140 AD"; //should give 75 and 140
 		String dcDateString3 = "circa 1500 BC"; //should give -1500
-		String dcDateString4 = "1200- 1300"; //should be empty
-		String dcDateString5 = "1700";
+		String dcDateString4 = "http://semium.org/time/1996"; //should be empty
+		String dcDateString5 = "10 października 2001";
+		
 //		EuropeanaType.Choice dateChoice1 = new EuropeanaType.Choice();
 //		Date date1 = new Date();
 //		date1.setString(dcDateString1);
