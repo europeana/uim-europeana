@@ -152,6 +152,7 @@ public class DeactivatePlugin<I> extends
 											+ ClientUtils
 													.escapeQueryChars(fBean
 															.getAbout()));
+							dService.getSolrServer().commit();
 						} catch (SolrServerException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

@@ -22,7 +22,7 @@ public class EuropeanaDateUtilsTest {
 		//String dcDateString2 = "75/140 AD"; //should give 75 and 140
 		String dcDateString3 = "circa 1500 BC"; //should give -1500
 		String dcDateString4 = "1200-1300"; //should be empty
-		String dcDateString5 = "1700";
+		String dcDateString5 = "Höhe in cm: 52";
 //		EuropeanaType.Choice dateChoice1 = new EuropeanaType.Choice();
 //		Date date1 = new Date();
 //		date1.setString(dcDateString1);

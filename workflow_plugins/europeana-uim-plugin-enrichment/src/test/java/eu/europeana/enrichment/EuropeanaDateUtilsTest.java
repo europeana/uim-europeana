@@ -23,7 +23,7 @@ public class EuropeanaDateUtilsTest {
 		//String dcDateString2 = "75/140 AD"; //should give 75 and 140
 		String dcDateString3 = "circa 1500 BC"; //should give -1500
 		String dcDateString4 = "http://semium.org/time/1996"; //should be empty
-		String dcDateString5 = "10 października 2001";
+		String dcDateString5 = "110. Jahrestag Ortsvereinsgründung Wiedergründung SPD-Ortsverein";
 		
 //		EuropeanaType.Choice dateChoice1 = new EuropeanaType.Choice();
 //		Date date1 = new Date();
