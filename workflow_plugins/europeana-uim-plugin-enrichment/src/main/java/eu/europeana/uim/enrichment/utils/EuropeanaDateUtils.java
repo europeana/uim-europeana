@@ -152,15 +152,21 @@ public class EuropeanaDateUtils {
 		List<String> dates = new ArrayList<String>();
 		String[] left = StringUtils.splitByWholeSeparator(input.toLowerCase(), remove.toLowerCase());
 		List<Character> chars = new ArrayList<Character>();
+		boolean hasDigits = false;
+		boolean foundNum = false;
 		for (String str : left) {
 			if(str.length()>0){
 			chars.add('-');
 			for (char ch : str.toCharArray()) {
-				if (Character.isDigit(ch)) {
+				if (Character.isDigit(ch)&&!foundNum) {
 					chars.add(ch);
-				} else if (ch == '\\' || ch == '/') {
-					chars.add(',');
+					hasDigits=true;
+				} else if(foundNum && Character.isDigit(ch)){
+					chars.clear();
 				}
+				else if(hasDigits){
+					foundNum=true;
+				} 
 			}
 			chars.add(',');
 			}
