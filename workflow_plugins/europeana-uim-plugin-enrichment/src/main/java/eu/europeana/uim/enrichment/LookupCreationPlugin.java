@@ -163,6 +163,7 @@ public class LookupCreationPlugin<I> extends
 			uctx = bfact.createUnmarshallingContext();
 
 			String collectionId = (String) mdr.getCollection().getMnemonic();
+			System.out.println(collectionId);
 			String fileName;
 			String oldCollectionId = enrichmentService
 					.getCollectionMongoServer().findOldCollectionId(
@@ -177,7 +178,7 @@ public class LookupCreationPlugin<I> extends
 			FullBeanImpl fullBean = constructFullBeanMock(rdf, collectionId);
 			String hash = null;
 			try{
-				hashExists(collectionId, fileName, fullBean);
+				hash = hashExists(collectionId, fileName, fullBean);
 			}
 			catch(Exception e){
 				log.log(Level.SEVERE, e.getMessage());
