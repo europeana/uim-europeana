@@ -84,7 +84,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 		try {
 
 			solrServer = new HttpSolrServer(new URL(solrUrl) + solrCore);
-
+			solrProductionServer = new HttpSolrServer(new URL(solrProductionUrl)+solrCore);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
