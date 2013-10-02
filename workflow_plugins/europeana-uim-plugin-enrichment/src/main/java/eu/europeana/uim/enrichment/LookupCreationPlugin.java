@@ -212,6 +212,11 @@ public class LookupCreationPlugin<I> extends
 		aggr.setEdmObject(rdf.getAggregationList().get(0).getObject() != null ? rdf
 				.getAggregationList().get(0).getObject().getResource()
 				: null);
+		String[] hasView = new String[1];
+		hasView[0] = rdf.getAggregationList().get(0).getObject() != null ? rdf
+				.getAggregationList().get(0).getObject().getResource()
+				: null;
+		aggr.setHasView(hasView);
 		aggrs.add(aggr);
 		List<ProxyImpl> proxies = new ArrayList<ProxyImpl>();
 		ProxyImpl proxy = new ProxyImpl();
