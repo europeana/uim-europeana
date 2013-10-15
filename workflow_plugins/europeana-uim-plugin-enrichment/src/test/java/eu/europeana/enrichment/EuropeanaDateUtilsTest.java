@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.europeana.corelib.definitions.jibx.Date;
@@ -14,6 +15,7 @@ import eu.europeana.uim.enrichment.utils.PropertyReader;
 
 public class EuropeanaDateUtilsTest {
 
+	@Ignore
 	@Test
 	public void testUtils(){
 		PropertyReader.loadPropertiesFromFile("src/test/resources/uim.properties");

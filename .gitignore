@@ -1,2 +1,13 @@
-/.settings
-/.project
+# Eclipse project files
+.classpath
+.project
+.settings/
+.externalToolBuilders/
+
+# Maven
+*/target/**
+
+# Temp files
+*~
+*.bak
+target/

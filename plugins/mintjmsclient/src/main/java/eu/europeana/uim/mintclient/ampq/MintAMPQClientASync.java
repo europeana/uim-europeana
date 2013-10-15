@@ -16,6 +16,8 @@
  */
 package eu.europeana.uim.mintclient.ampq;
 
+import com.rabbitmq.client.Consumer;
+
 import eu.europeana.uim.mintclient.jibxbindings.CreateImportCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateOrganizationCommand;
 import eu.europeana.uim.mintclient.jibxbindings.CreateUserCommand;
@@ -92,6 +94,9 @@ public interface MintAMPQClientASync extends MintAMPQClient {
 	 */
 	public void createImports(CreateImportCommand command,String collectionID) throws MintOSGIClientException, MintRemoteException;
 
-
-
+	/**
+	 * Gets a reference to the consumer
+	 * @return
+	 */
+	public Consumer getConsumer();
 }

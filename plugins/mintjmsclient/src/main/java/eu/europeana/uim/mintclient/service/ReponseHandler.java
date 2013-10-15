@@ -16,9 +16,8 @@
  */
 package eu.europeana.uim.mintclient.service;
 
-import java.util.HashSet;
-import java.util.Set;
 
+import java.util.Set;
 import org.jibx.runtime.IMarshallable;
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.orchestration.Orchestrator;

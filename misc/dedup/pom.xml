@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>europeana-uim-dedup</artifactId>
-	<name>Europeana Unique Identifier - Deduplication Service</name>
+	<name>Unified Ingestion Manager: Europeana Unique Identifier - Itemization Service</name>
 
 
 	<dependencies>
@@ -26,7 +26,6 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<!-- for packaging as an OSGi bundle, we use the maven-bundle-plugin -->

@@ -57,7 +57,7 @@ import eu.europeana.uim.mintclient.utils.MintClientUtils;
 public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implements MintAMPQClientASync{
 
 
-	private static Consumer defaultConsumer;
+	public static Consumer defaultConsumer;
 	private static MintAMPQClientAsyncImpl instance;
 	
 	/**
@@ -215,6 +215,12 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 		cu.setPublicationCommand(command);
 		String cmdstring = MintClientUtils.unmarshallObject(cu);
 		sendChunk(correlationID,cmdstring.getBytes(),true,inbound,outbound);
+	}
+
+
+	@Override
+	public  Consumer getConsumer() {
+		return defaultConsumer;
 	}
 
 }

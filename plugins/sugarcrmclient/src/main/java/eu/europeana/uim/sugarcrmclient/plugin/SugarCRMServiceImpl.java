@@ -30,19 +30,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
-
 import org.jibx.runtime.JiBXException;
-import org.springframework.oxm.Marshaller;
-import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.jibx.JibxMarshaller;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import eu.europeana.uim.orchestration.ActiveExecution;
 import eu.europeana.uim.orchestration.Orchestrator;
 import eu.europeana.uim.Registry;

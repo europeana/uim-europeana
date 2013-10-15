@@ -13,6 +13,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mongodb.Mongo;
@@ -43,6 +44,7 @@ import eu.europeana.uim.store.bean.ProviderBean;
 
 public class LookupCreationPluginTest {
 
+	@Ignore
 	@Test
 	public void testProcess() {
 		try {
