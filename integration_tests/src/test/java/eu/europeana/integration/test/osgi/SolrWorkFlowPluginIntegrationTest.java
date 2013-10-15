@@ -22,7 +22,7 @@ import eu.europeana.uim.workflow.Workflow;
 public class SolrWorkFlowPluginIntegrationTest extends
 		AbstractEuropeanaIntegrationTest {
 
-	//TODO:Ignore untill slf4j issue is fixed
+	//TODO:Ignore until slf4j issue is fixed
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Ignore
 	@Test

@@ -34,6 +34,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 
 
+
 /**
  * Abstract configuration Class for pax exam tests.
  * 

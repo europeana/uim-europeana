@@ -39,6 +39,7 @@ import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.repox.model.RepoxHarvestingStatus;
 import org.apache.log4j.Logger;
 
+
 /**
  * Class implementing Unit Tests for UIM Repox Service
  * This is a PAX-EXAM OSGI based test. This practically means that tests are executed within

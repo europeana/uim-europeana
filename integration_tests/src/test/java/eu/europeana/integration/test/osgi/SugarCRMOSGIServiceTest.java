@@ -47,6 +47,7 @@ import eu.europeana.uim.sugarcrmclient.plugin.objects.queries.SimpleSugarCrmQuer
 
 import eu.europeana.uim.workflow.Workflow;
 
+
 /**
  * Class implementing Unit Tests for UIM Repox Service
  * This is a PAX-EXAM OSGI based test. This practically means that tests are executed within
