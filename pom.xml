@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
- 
+
 	<parent>
 		<artifactId>europeana-uim</artifactId>
 		<groupId>eu.europeana</groupId>
@@ -17,10 +17,10 @@
 	<name>Unified Ingestion Manager: Europeana Specific Modules</name>
 
 	<modules>
-	    <module>misc/dedup</module>
+		<module>misc/dedup</module>
 		<module>misc/europeana-uim-definitions</module>
 		<module>plugins</module>
-	    <module>plugins/clientbindings</module>
+		<module>plugins/clientbindings</module>
 		<module>plugins/mintjmsclient</module>
 		<module>plugins/sugarcrmclient</module>
 		<module>plugins/repoxclient</module>
@@ -32,6 +32,7 @@
 		<module>workflow_plugins/europeana-uim-plugin-publish</module>
 		<module>workflows/workflow-basic</module>
 		<module>webapp/controlpanel</module>
+		<module>misc/europeana-uim-deploy</module>
 	</modules>
 
 
