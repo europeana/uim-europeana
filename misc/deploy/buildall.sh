@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # This statrtup script  Be sure to set the $UIM_SOURCE and $KARAF_UIM_HOME
 # environment variables properly before executing it.
 
