@@ -54,7 +54,7 @@ git pull
 mvn clean install -DskipTests
 
 #Stop Karaf
-sh $KARAF_UIM_HOME/bin/stop
+$KARAF_UIM_HOME/bin/stop
 
 #Wait for a while
 sleep 5
@@ -63,4 +63,4 @@ sleep 5
 cp $UIM_SOURCE/uim-europeana/misc/europeana-uim-deploy/target/*.kar $KARAF_UIM_HOME/deploy/
 
 #Start Karaf again
-sh $KARAF_UIM_HOME/bin/start
+$KARAF_UIM_HOME/bin/start
