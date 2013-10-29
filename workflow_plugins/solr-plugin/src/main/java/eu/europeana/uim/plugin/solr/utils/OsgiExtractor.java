@@ -144,7 +144,7 @@ public class OsgiExtractor extends Extractor {
 	private Map<String, List> createDereferencingMapRDF(String resource,
 			String xmlString, int iterations) {
 
-		String SPARQL_TEMPLATE = "%s SELECT ?predicate ?object WHERE {?res ?predicate ?object . FILTER(?res=<%s>||?res=<%s>)}";
+		String SPARQL_TEMPLATE = "%s SELECT ?predicate ?object WHERE {?res ?predicate ?object . FILTER(?res=<%s>||?res=<%s>||?res=<%s>)}";
 		String ROOT_TEMPLATE = "%s SELECT ?object WHERE {?res rdf:type ?object . FILTER(?res=<%s>||?res=<%s>)}";
 		String PREFIX_TEMPLATE = "PREFIX  %s:<%s> ";
 		Map<String, List> denormalizedValues = new HashMap<String, List>();
@@ -270,7 +270,7 @@ public class OsgiExtractor extends Extractor {
 		}
 		// Find the rest and append them as appropriate
 		String qString = String.format(SPARQL_TEMPLATE, sb.toString(),
-				resource, resource + "/");
+				resource, resource + "/", resource.substring(1, resource.length()-1));
 		com.hp.hpl.jena.query.Query query = QueryFactory.create(qString);
 		QueryExecution qexec = QueryExecutionFactory.create(query, model);
 		try {

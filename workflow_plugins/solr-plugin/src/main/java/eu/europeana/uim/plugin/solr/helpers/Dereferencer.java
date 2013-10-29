@@ -113,13 +113,12 @@ public abstract class Dereferencer {
 			if (isURI((String) object)) {
 
 				ControlledVocabularyImpl controlVocabulary = getControlledVocabulary((String) object);
-				System.out.println((String)object);
 				if (controlVocabulary != null) {
-					String res = (String) object;
-					if(controlVocabulary.getReplaceUrl()!=null){
-						res  = StringUtils.replace(res, controlVocabulary.getURI(), controlVocabulary.getReplaceUrl());
-					}
-					appendInRDF(rdf, extractor.denormalize(res,
+//					String res = (String) object;
+//					if(controlVocabulary.getReplaceUrl()!=null){
+//						res  = StringUtils.replace(res, controlVocabulary.getURI(), controlVocabulary.getReplaceUrl());
+//					}
+					appendInRDF(rdf, extractor.denormalize((String)object,
 							controlVocabulary, 0, true));
 
 				}
