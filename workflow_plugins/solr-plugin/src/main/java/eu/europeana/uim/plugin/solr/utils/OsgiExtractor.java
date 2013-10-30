@@ -94,7 +94,6 @@ public class OsgiExtractor extends Extractor {
 		return new ArrayList<EdmMappedField>();
 	}
 
-	
 	@SuppressWarnings("rawtypes")
 	public Map<String, List> denormalize(String resource,
 			ControlledVocabularyImpl controlledVocabulary, int iterations,
@@ -119,9 +118,14 @@ public class OsgiExtractor extends Extractor {
 					EntityImpl entity = retrieveValueFromResource(fullUri);
 
 					if (entity != null && entity.getContent().length() > 0) {
-
+						String ref = resource;
+						if (controlledVocabulary.getReplaceUrl() != null) {
+							ref = StringUtils.replace(resource,
+									controlledVocabulary.getURI(),
+									controlledVocabulary.getReplaceUrl());
+						}
 						Map<String, List> entityCache = createDereferencingMapRDF(
-								resource, entity.getContent(), iterations);
+								ref, entity.getContent(), iterations);
 						synchronized (memCache) {
 							memCache.getEntityCache().put(entity.getUri(),
 									entityCache);
@@ -145,7 +149,7 @@ public class OsgiExtractor extends Extractor {
 			String xmlString, int iterations) {
 
 		String SPARQL_TEMPLATE = "%s SELECT ?predicate ?object WHERE {?res ?predicate ?object . FILTER(?res=<%s>||?res=<%s>||?res=<%s>)}";
-		String ROOT_TEMPLATE = "%s SELECT ?object WHERE {?res rdf:type ?object . FILTER(?res=<%s>||?res=<%s>)}";
+		String ROOT_TEMPLATE = "%s SELECT ?object WHERE {?res rdf:type ?object . FILTER(?res=<%s>||?res=<%s>||?res=<%s>)}";
 		String PREFIX_TEMPLATE = "PREFIX  %s:<%s> ";
 		Map<String, List> denormalizedValues = new HashMap<String, List>();
 		List<Concept> concepts = new ArrayList<Concept>();
@@ -173,7 +177,8 @@ public class OsgiExtractor extends Extractor {
 		}
 
 		String rootEntity = String.format(ROOT_TEMPLATE, sb.toString(),
-				resource, resource + "/");
+				resource, resource + "/",
+				resource.subSequence(0, resource.length() - 1));
 
 		com.hp.hpl.jena.query.Query queryRoot = QueryFactory.create(rootEntity);
 		QueryExecution qRoot = QueryExecutionFactory.create(queryRoot, model);
@@ -270,7 +275,8 @@ public class OsgiExtractor extends Extractor {
 		}
 		// Find the rest and append them as appropriate
 		String qString = String.format(SPARQL_TEMPLATE, sb.toString(),
-				resource, resource + "/", resource.substring(1, resource.length()-1));
+				resource, resource + "/",
+				resource.substring(0, resource.length() - 1));
 		com.hp.hpl.jena.query.Query query = QueryFactory.create(qString);
 		QueryExecution qexec = QueryExecutionFactory.create(query, model);
 		try {
