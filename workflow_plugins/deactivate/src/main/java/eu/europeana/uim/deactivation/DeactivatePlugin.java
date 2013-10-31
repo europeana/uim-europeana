@@ -152,7 +152,7 @@ public class DeactivatePlugin<I> extends
 											+ ClientUtils
 													.escapeQueryChars(fBean
 															.getAbout()));
-							dService.getSolrServer().commit();
+							
 						} catch (SolrServerException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -198,6 +198,15 @@ public class DeactivatePlugin<I> extends
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
+		try {
+			dService.getSolrServer().commit();
+		} catch (SolrServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public DeactivationService getdService() {
