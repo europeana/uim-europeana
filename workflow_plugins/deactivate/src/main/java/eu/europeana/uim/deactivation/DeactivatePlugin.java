@@ -1,24 +1,23 @@
 package eu.europeana.uim.deactivation;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 
-import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.solr.beans.FullBean;
-import eu.europeana.corelib.solr.exceptions.MongoDBException;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.WriteConcern;
+
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.deactivation.service.DeactivationService;
+import eu.europeana.uim.deactivation.service.ExtendedEdmMongoServer;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
@@ -100,7 +99,7 @@ public class DeactivatePlugin<I> extends
 			dService.getSolrServer().deleteByQuery(
 					"europeana_collectionName:"+
 							collection.getName().split("_")[0]+"*");
-			
+			clearData(dService.getMongoServer(), collection.getName().split("_")[0]);
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -126,10 +125,8 @@ public class DeactivatePlugin<I> extends
 		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
 				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
 						.equals(Status.DELETED)) {
-			try {
-				bfact = BindingDirectory.getFactory(RDF.class);
-
-				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+		
+				
 				String value;
 				if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 						&& mdr.getValues(
@@ -144,41 +141,50 @@ public class DeactivatePlugin<I> extends
 				}
 				// mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
 				// TODO: disable in UIM (?)
-				RDF rdf;
-				try {
-					rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-
-					FullBean fBean = dService.getMongoServer().getFullBean(
-							rdf.getProvidedCHOList().get(0).getAbout());
-					if (fBean != null) {
-						dService.getMongoServer().delete(
-								fBean.getAggregations());
-						dService.getMongoServer().delete(
-								fBean.getProvidedCHOs());
-						dService.getMongoServer().delete(fBean.getProxies());
-						dService.getMongoServer().delete(
-								fBean.getEuropeanaAggregation());
-						dService.getMongoServer().delete(fBean);
-						
-
-					}
+				
 					mdr.deleteValues(EuropeanaModelRegistry.REMOVED);
 					mdr.addValue(EuropeanaModelRegistry.REMOVED,new Date().getTime());
-				} catch (JiBXException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (MongoDBException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			} catch (JiBXException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
+				
 		}
 		return true;
 	}
 
+	private void clearData(ExtendedEdmMongoServer mongoServer2, String collection) {
+		DBCollection records = mongoServer2.getDatastore().getDB()
+				.getCollection("record");
+		DBCollection proxies = mongoServer2.getDatastore().getDB()
+				.getCollection("Proxy");
+		DBCollection providedCHOs = mongoServer2.getDatastore().getDB()
+				.getCollection("ProvidedCHO");
+		DBCollection aggregations = mongoServer2.getDatastore().getDB()
+				.getCollection("Aggregation");
+		DBCollection europeanaAggregations = mongoServer2.getDatastore()
+				.getDB().getCollection("EuropeanaAggregation");
+
+		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
+				+ collection + "/"));
+		DBObject proxyQuery = new BasicDBObject("about", "^/proxy/provider"
+				+ Pattern.compile("/" + collection + "/"));
+		DBObject europeanaProxyQuery = new BasicDBObject("about",
+				"^/proxy/europeana" + Pattern.compile("/" + collection + "/"));
+
+		DBObject providedCHOQuery = new BasicDBObject("about", "^/item"
+				+ Pattern.compile("/" + collection + "/"));
+		DBObject aggregationQuery = new BasicDBObject("about",
+				"^/aggregation/provider"
+						+ Pattern.compile("/" + collection + "/"));
+		DBObject europeanaAggregationQuery = new BasicDBObject("about",
+				"^/aggregation/europeana"
+						+ Pattern.compile("/" + collection + "/"));
+
+		europeanaAggregations.remove(europeanaAggregationQuery,
+				WriteConcern.FSYNC_SAFE);
+		records.remove(query, WriteConcern.FSYNC_SAFE);
+		proxies.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
+		proxies.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
+		providedCHOs.remove(providedCHOQuery, WriteConcern.FSYNC_SAFE);
+		aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
+	}
 	/*
 	 * (non catch (IOException e) { // TODO Auto-generated catch block
 	 * e.printStackTrace(); }-Javadoc)
