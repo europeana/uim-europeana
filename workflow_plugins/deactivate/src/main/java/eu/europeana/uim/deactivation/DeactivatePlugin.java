@@ -95,17 +95,19 @@ public class DeactivatePlugin<I> extends
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
 		try {
-			Collection collection = (Collection) arg0.getExecution().getDataSet();
+			Collection collection = (Collection) arg0.getExecution()
+					.getDataSet();
 			String collectionId = collection.getName().split("_")[0];
-			String newCollectionId = dService.getCollectionMongoServer().findNewCollectionId(collection.getName().split("_")[0]);
-			if (newCollectionId!=null){
+			String newCollectionId = dService.getCollectionMongoServer()
+					.findNewCollectionId(collection.getName().split("_")[0]);
+			System.out.println(newCollectionId);
+			if (newCollectionId != null) {
 				collectionId = newCollectionId;
 			}
 			dService.getSolrServer().deleteByQuery(
-					"europeana_collectionName:"
-							+ collectionId);
+					"europeana_collectionName:" + collectionId + "*");
 			clearData(dService.getMongoServer(), collectionId);
-	
+
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -130,15 +132,15 @@ public class DeactivatePlugin<I> extends
 		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
 				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
 						.equals(Status.DELETED)) {
-					mdr.deleteValues(EuropeanaModelRegistry.REMOVED);
-					mdr.addValue(EuropeanaModelRegistry.REMOVED,new Date().getTime());
-				
+			mdr.deleteValues(EuropeanaModelRegistry.REMOVED);
+			mdr.addValue(EuropeanaModelRegistry.REMOVED, new Date().getTime());
+
 		}
 		return true;
 	}
 
-
-	private void clearData(ExtendedEdmMongoServer mongoServer2, String collection) {
+	private void clearData(ExtendedEdmMongoServer mongoServer2,
+			String collection) {
 		DBCollection records = mongoServer2.getDatastore().getDB()
 				.getCollection("record");
 		DBCollection proxies = mongoServer2.getDatastore().getDB()
@@ -174,6 +176,7 @@ public class DeactivatePlugin<I> extends
 		providedCHOs.remove(providedCHOQuery, WriteConcern.FSYNC_SAFE);
 		aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
 	}
+
 	/*
 	 * (non catch (IOException e) { // TODO Auto-generated catch block
 	 * e.printStackTrace(); }-Javadoc)
