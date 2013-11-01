@@ -96,11 +96,15 @@ public class DeactivatePlugin<I> extends
 			throws IngestionPluginFailedException {
 		try {
 			Collection collection = (Collection) arg0.getExecution().getDataSet();
+			String collectionId = collection.getName().split("_")[0];
+			String newCollectionId = dService.getCollectionMongoServer().findNewCollectionId(collection.getName().split("_")[0]);
+			if (newCollectionId!=null){
+				collectionId = newCollectionId;
+			}
 			dService.getSolrServer().deleteByQuery(
 					"europeana_collectionName:"
-							+ collection.getName().split("_")[0] + "*");
-			clearData(dService.getMongoServer(), collection.getName()
-					.split("_")[0]);
+							+ collectionId);
+			clearData(dService.getMongoServer(), collectionId);
 	
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
