@@ -97,14 +97,17 @@ public class DeactivatePlugin<I> extends
 			Collection collection = (Collection) arg0.getExecution()
 					.getDataSet();
 			String collectionId = collection.getName().split("_")[0];
+			System.out.println("Removing collectionId: " +collectionId);
 			String newCollectionId = dService.getCollectionMongoServer()
 					.findNewCollectionId(collection.getName().split("_")[0]);
 			System.out.println("New collection id is:"+newCollectionId);
 			if (newCollectionId != null) {
 				collectionId = newCollectionId;
 			}
+			System.out.println("removing from solr");
 			dService.getSolrServer().deleteByQuery(
 					"europeana_collectionName:" + collectionId + "*");
+			System.out.println("removing from mongo");
 			clearData(dService.getMongoServer(), collectionId);
 
 		} catch (SolrServerException e) {
