@@ -434,7 +434,7 @@ public class EnrichmentPlugin<I> extends
 			try {
 
 				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-				
+
 				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 				log.log(Level.INFO, "Processing record "
 						+ rdf.getProvidedCHOList().get(0).getAbout());
@@ -446,7 +446,7 @@ public class EnrichmentPlugin<I> extends
 				List<Entity> entities = null;
 				log.log(Level.INFO, "Before tagging Document");
 				entities = tagger.tagDocument(mockDocument);
-				
+
 				log.log(Level.INFO, "Tagged document");
 				mergeEntities(rdf, entities);
 
@@ -510,9 +510,20 @@ public class EnrichmentPlugin<I> extends
 
 				fullBean.setEuropeanaCollectionName(new String[] { mdr
 						.getCollection().getName() });
+				if (fullBean.getEuropeanaAggregation().getEdmLanguage() != null) {
+					fullBean.setLanguage(new String[] { fullBean
+							.getEuropeanaAggregation().getEdmLanguage()
+							.values().iterator().next().get(0) });
+				}
 				solrInputDocument.setField("europeana_collectionName", mdr
 						.getCollection().getName());
-
+				ProxyImpl providerProxy = getProviderProxy(fullBean);
+				List<String> titles = new ArrayList<String>();
+				for (Entry<String, List<String>> entry : providerProxy
+						.getDcTitle().entrySet()) {
+					titles.addAll(entry.getValue());
+				}
+				fullBean.setTitle(titles.toArray(new String[titles.size()]));
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
@@ -1439,6 +1450,15 @@ public class EnrichmentPlugin<I> extends
 			return false;
 		}
 
+	}
+
+	private static ProxyImpl getProviderProxy(FullBeanImpl fbean) {
+		for (ProxyImpl proxy : fbean.getProxies()) {
+			if (!proxy.isEuropeanaProxy()) {
+				return proxy;
+			}
+		}
+		return null;
 	}
 
 }
