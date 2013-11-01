@@ -24,6 +24,7 @@ import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
+import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 
 /**
@@ -94,7 +95,19 @@ public class DeactivatePlugin<I> extends
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
-
+		try {
+			Collection collection = (Collection) arg0.getExecution().getDataSet();
+			dService.getSolrServer().deleteByQuery(
+					"europeana_collectionName:"+
+							collection.getName().split("_")[0]+"*");
+			
+		} catch (SolrServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -146,20 +159,7 @@ public class DeactivatePlugin<I> extends
 						dService.getMongoServer().delete(
 								fBean.getEuropeanaAggregation());
 						dService.getMongoServer().delete(fBean);
-						try {
-							dService.getSolrServer().deleteByQuery(
-									"europeana_id:"
-											+ ClientUtils
-													.escapeQueryChars(fBean
-															.getAbout()));
-							
-						} catch (SolrServerException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						
 
 					}
 					mdr.deleteValues(EuropeanaModelRegistry.REMOVED);
