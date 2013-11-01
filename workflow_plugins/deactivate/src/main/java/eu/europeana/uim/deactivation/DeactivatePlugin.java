@@ -95,13 +95,13 @@ public class DeactivatePlugin<I> extends
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
 		try {
-			Collection collection = (Collection) arg0.getExecution()
-					.getDataSet();
+			Collection collection = (Collection) arg0.getExecution().getDataSet();
 			dService.getSolrServer().deleteByQuery(
 					"europeana_collectionName:"
 							+ collection.getName().split("_")[0] + "*");
 			clearData(dService.getMongoServer(), collection.getName()
 					.split("_")[0]);
+	
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,6 +131,7 @@ public class DeactivatePlugin<I> extends
 			mdr.deleteValues(EuropeanaModelRegistry.REMOVED);
 			mdr.addValue(EuropeanaModelRegistry.REMOVED, new Date().getTime());
 
+				
 		}
 		return true;
 	}
@@ -173,6 +174,7 @@ public class DeactivatePlugin<I> extends
 		aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
 	}
 
+	
 	/*
 	 * (non catch (IOException e) { // TODO Auto-generated catch block
 	 * e.printStackTrace(); }-Javadoc)
