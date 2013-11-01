@@ -97,11 +97,17 @@ public class DeactivatePlugin<I> extends
 		try {
 			Collection collection = (Collection) arg0.getExecution().getDataSet();
 			dService.getSolrServer().deleteByQuery(
+<<<<<<< HEAD
 					"europeana_collectionName:"
 							+ collection.getName().split("_")[0] + "*");
 			clearData(dService.getMongoServer(), collection.getName()
 					.split("_")[0]);
 	
+=======
+					"europeana_collectionName:"+
+							collection.getName().split("_")[0]+"*");
+			clearData(dService.getMongoServer(), collection.getName().split("_")[0]);
+>>>>>>> branch 'master' of https://github.com/europeana/uim-europeana.git
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -127,15 +133,38 @@ public class DeactivatePlugin<I> extends
 		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
 				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
 						.equals(Status.DELETED)) {
+<<<<<<< HEAD
 
 			mdr.deleteValues(EuropeanaModelRegistry.REMOVED);
 			mdr.addValue(EuropeanaModelRegistry.REMOVED, new Date().getTime());
 
+=======
+		
+				
+				String value;
+				if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
+						&& mdr.getValues(
+								EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+								.size() > 0) {
+					value = mdr.getValues(
+							EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+							.get(0);
+				} else {
+					value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
+							.get(0);
+				}
+				// mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
+				// TODO: disable in UIM (?)
+				
+					mdr.deleteValues(EuropeanaModelRegistry.REMOVED);
+					mdr.addValue(EuropeanaModelRegistry.REMOVED,new Date().getTime());
+>>>>>>> branch 'master' of https://github.com/europeana/uim-europeana.git
 				
 		}
 		return true;
 	}
 
+<<<<<<< HEAD
 	private void clearData(ExtendedEdmMongoServer mongoServer2,
 			String collection) {
 		DBCollection records = mongoServer2.getDatastore().getDB()
@@ -175,6 +204,44 @@ public class DeactivatePlugin<I> extends
 	}
 
 	
+=======
+	private void clearData(ExtendedEdmMongoServer mongoServer2, String collection) {
+		DBCollection records = mongoServer2.getDatastore().getDB()
+				.getCollection("record");
+		DBCollection proxies = mongoServer2.getDatastore().getDB()
+				.getCollection("Proxy");
+		DBCollection providedCHOs = mongoServer2.getDatastore().getDB()
+				.getCollection("ProvidedCHO");
+		DBCollection aggregations = mongoServer2.getDatastore().getDB()
+				.getCollection("Aggregation");
+		DBCollection europeanaAggregations = mongoServer2.getDatastore()
+				.getDB().getCollection("EuropeanaAggregation");
+
+		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
+				+ collection + "/"));
+		DBObject proxyQuery = new BasicDBObject("about", "^/proxy/provider"
+				+ Pattern.compile("/" + collection + "/"));
+		DBObject europeanaProxyQuery = new BasicDBObject("about",
+				"^/proxy/europeana" + Pattern.compile("/" + collection + "/"));
+
+		DBObject providedCHOQuery = new BasicDBObject("about", "^/item"
+				+ Pattern.compile("/" + collection + "/"));
+		DBObject aggregationQuery = new BasicDBObject("about",
+				"^/aggregation/provider"
+						+ Pattern.compile("/" + collection + "/"));
+		DBObject europeanaAggregationQuery = new BasicDBObject("about",
+				"^/aggregation/europeana"
+						+ Pattern.compile("/" + collection + "/"));
+
+		europeanaAggregations.remove(europeanaAggregationQuery,
+				WriteConcern.FSYNC_SAFE);
+		records.remove(query, WriteConcern.FSYNC_SAFE);
+		proxies.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
+		proxies.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
+		providedCHOs.remove(providedCHOQuery, WriteConcern.FSYNC_SAFE);
+		aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
+	}
+>>>>>>> branch 'master' of https://github.com/europeana/uim-europeana.git
 	/*
 	 * (non catch (IOException e) { // TODO Auto-generated catch block
 	 * e.printStackTrace(); }-Javadoc)
