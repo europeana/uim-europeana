@@ -109,6 +109,7 @@ public class DeactivationServiceImpl implements DeactivationService {
 					collectionMongoServer = new CollectionMongoServerImpl(
 							new Mongo(mongoHost, Integer.parseInt(mongoPort)),
 							"collections");
+					
 					collectionMongoServer.findOldCollectionId("test");
 				} catch (NumberFormatException e) {
 					// TODO Auto-generated catch block

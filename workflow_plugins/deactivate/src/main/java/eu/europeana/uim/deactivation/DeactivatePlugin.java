@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.jibx.runtime.IBindingFactory;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import com.mongodb.BasicDBObject;
@@ -100,7 +99,7 @@ public class DeactivatePlugin<I> extends
 			String collectionId = collection.getName().split("_")[0];
 			String newCollectionId = dService.getCollectionMongoServer()
 					.findNewCollectionId(collection.getName().split("_")[0]);
-			System.out.println(newCollectionId);
+			System.out.println("New collection id is:"+newCollectionId);
 			if (newCollectionId != null) {
 				collectionId = newCollectionId;
 			}
