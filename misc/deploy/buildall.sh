@@ -59,8 +59,11 @@ $KARAF_UIM_HOME/bin/stop
 #Wait for a while
 sleep 5
 
+#Start Karaf again
+$KARAF_UIM_HOME/bin/start clean
+
+#Wait for a while
+sleep 5
+
 #Copy the produced KAR file to the karaf deploy folder
 cp $UIM_SOURCE/uim-europeana/misc/europeana-uim-deploy/target/*.kar $KARAF_UIM_HOME/deploy/
-
-#Start Karaf again
-$KARAF_UIM_HOME/bin/start
