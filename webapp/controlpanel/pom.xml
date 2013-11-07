@@ -135,6 +135,7 @@
 							eu.europeana.uim.*,
 							eu.europeana.uim.workflow,
 							eu.europeana.dedup.osgi.service.*,
+							org.springframework.context.*,
 							org.osgi.framework,
 							org.w3c.dom,
 							org.xml.sax,
@@ -186,7 +187,7 @@
 	</build>
 
 	<dependencies>
-
+		
 		<dependency>
 			<groupId>javax.xml.stream</groupId>
 			<artifactId>stax-api</artifactId>
@@ -375,7 +376,6 @@
 			<artifactId>commons-net</artifactId>
 			<version>20030805.205232</version>
 		</dependency>
-
 	</dependencies>
 
 
