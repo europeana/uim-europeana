@@ -72,7 +72,7 @@ public class LookupCreationPlugin<I> extends
 	private static EnrichmentService enrichmentService;
 	private static final Logger log = Logger
 			.getLogger(LookupCreationPlugin.class.getName());
-
+	private final static String OVERRIDESIPCREATOR = "override.sipcreator.mapping.field";
 	public LookupCreationPlugin(String name, String description) {
 		super(name, description);
 
@@ -100,6 +100,13 @@ public class LookupCreationPlugin<I> extends
 
 	}
 
+	private static List<String> params = new ArrayList<String>(){
+		private static final long serialVersionUID = 1L;
+
+		{
+			add(OVERRIDESIPCREATOR);
+		}
+	};
 	@Override
 	public TKey<?, ?>[] getInputFields() {
 		// TODO Auto-generated method stub
@@ -126,8 +133,7 @@ public class LookupCreationPlugin<I> extends
 
 	@Override
 	public List<String> getParameters() {
-		// TODO Auto-generated method stub
-		return new ArrayList<String>();
+		return params;
 	}
 
 	@Override

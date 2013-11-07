@@ -257,7 +257,8 @@ public class EnrichmentPlugin<I> extends
 	 */
 	@Override
 	public List<String> getParameters() {
-		return params;
+		
+		return new ArrayList<String>();
 	}
 
 	/*

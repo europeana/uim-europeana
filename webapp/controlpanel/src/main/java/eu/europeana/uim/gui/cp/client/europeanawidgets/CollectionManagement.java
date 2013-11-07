@@ -176,7 +176,7 @@ public class CollectionManagement extends IngestionWidget {
 		final FormPanel form = new FormPanel();
 		form.setEncoding(FormPanel.ENCODING_MULTIPART);
 		form.setMethod(FormPanel.METHOD_POST);
-		form.setAction(EuropeanaClientConstants.UPLOAD_SERVLET_URL);
+		form.setAction(GWT.getHostPageBaseURL()+"EuropeanaIngestionControlPanel/uploadservlet");
 		FlexTable flex = new FlexTable();
 		Label delLabel = new Label("Select delimiter");
 		final TextBox delimiter = new TextBox();

@@ -567,13 +567,14 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		form.addSubmitHandler(new SubmitHandler() {
 			@Override
 			public void onSubmit(SubmitEvent event) {
+				
 				if (radioButton.getValue()) {
 					form.setMethod(FormPanel.METHOD_POST);
-					form.setAction(EuropeanaClientConstants.UPLOAD_SERVLET_URL);
+					form.setAction(GWT.getHostPageBaseURL()+"EuropeanaIngestionControlPanel/uploadservlet");
 					Window.alert("Saving, you will be notified when the file is uploaded");
 				} else if (radioButton1.getValue()) {
 					form.setMethod(FormPanel.METHOD_GET);
-					form.setAction(EuropeanaClientConstants.REMOTE_UPLOAD_SERVLET_URL);
+					form.setAction(GWT.getHostPageBaseURL()+"EuropeanaIngestionControlPanel/remoteuploadservlet");
 					Window.alert("Downloading remote file, you will be notified when the file is saved");
 				} else {
 					Window.alert("Select a file");

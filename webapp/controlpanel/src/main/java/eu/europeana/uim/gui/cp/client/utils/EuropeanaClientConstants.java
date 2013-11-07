@@ -92,12 +92,4 @@ public class EuropeanaClientConstants {
 	public final static String VOCREPLACEURL = "Vocabulary Replace URL";
 	public final static String VOCLOCATION = "Vocabulary Location";
 	
-	 public final static String
-	 UPLOAD_SERVLET_URL="http://europeana-uim.isti.cnr.it:8181/gui/EuropeanaIngestionControlPanel/uploadservlet";
-	 public final static String
-	 REMOTE_UPLOAD_SERVLET_URL="http://europeana-uim.isti.cnr.it:8181/gui/EuropeanaIngestionControlPanel/remoteuploadservlet";
-	// public final static String
-	// UPLOAD_SERVLET_URL="http://localhost:8181/gui/EuropeanaIngestionControlPanel/uploadservlet";
-	// public final static String
-	// REMOTE_UPLOAD_SERVLET_URL="http://localhost:8181/gui/EuropeanaIngestionControlPanel/remoteuploadservlet";
 }
