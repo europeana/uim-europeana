@@ -405,18 +405,22 @@ public class ZipLoader<I> {
 		if (mdr == null) {
 			mdr = storage.createMetaDataRecord(request.getCollection(),
 					dedupres.getDerivedRecordID());
+			mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
+					new Date().toString());
 		} else {
 			// Remove the previous ingestion date
-			mdr.deleteValues(EuropeanaModelRegistry.UIMINGESTIONDATE);
+			mdr.deleteValues(EuropeanaModelRegistry.UIMUPDATEDDATE);
 			// Remove the previous instances of EDM Records
 			mdr.deleteValues(EuropeanaModelRegistry.EDMRECORD);
 			// Remove the previous registered links
 			mdr.deleteValues(EuropeanaModelRegistry.EUROPEANALINK);
             // Remove all previous STATUS information
 			mdr.deleteValues(EuropeanaModelRegistry.STATUS);
+			//Removed previous versions of Dereferenced EDM XML
+			mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
 		}
 
-		mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
+		mdr.addValue(EuropeanaModelRegistry.UIMUPDATEDDATE,
 				new Date().toString());
 
 		mdr.addValue(EuropeanaModelRegistry.EDMRECORD, dedupres.getEdm());
