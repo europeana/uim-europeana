@@ -92,6 +92,7 @@ import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.server.EdmMongoServer;
+import eu.europeana.corelib.solr.utils.EdmUtils;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
 import eu.europeana.uim.common.TKey;
@@ -257,7 +258,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	@Override
 	public List<String> getParameters() {
-		
+
 		return new ArrayList<String>();
 	}
 
@@ -525,6 +526,24 @@ public class EnrichmentPlugin<I> extends
 					titles.addAll(entry.getValue());
 				}
 				fullBean.setTitle(titles.toArray(new String[titles.size()]));
+				if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE) != null && mdr.getValues(EuropeanaModelRegistry.INITIALSAVE).size()>0) {
+					fullBean.setTimestampCreated(new Date(mdr.getValues(
+							EuropeanaModelRegistry.INITIALSAVE).get(0)));
+				} else {
+					Date timestampCreated = new Date();
+					fullBean.setTimestampCreated(timestampCreated);
+					mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
+							timestampCreated.getTime());
+				}
+
+				mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
+				Date timestampUpdated = new Date();
+				fullBean.setTimestampUpdated(timestampUpdated);
+				mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
+						timestampUpdated.getTime());
+				mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
+				mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,
+						EdmUtils.toEDM(fullBean));
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
