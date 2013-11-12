@@ -156,19 +156,15 @@ public class DeactivatePlugin<I> extends
 
 		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
 				+ collection + "/"));
-		DBObject proxyQuery = new BasicDBObject("about", "^/proxy/provider"
-				+ Pattern.compile("/" + collection + "/"));
+		DBObject proxyQuery = new BasicDBObject("about", 
+				Pattern.compile("^/proxy/provider/" + collection + "/"));
 		DBObject europeanaProxyQuery = new BasicDBObject("about",
-				"^/proxy/europeana" + Pattern.compile("/" + collection + "/"));
+				  Pattern.compile("^/proxy/europeana/" + collection + "/"));
 
-		DBObject providedCHOQuery = new BasicDBObject("about", "^/item"
-				+ Pattern.compile("/" + collection + "/"));
-		DBObject aggregationQuery = new BasicDBObject("about",
-				"^/aggregation/provider"
-						+ Pattern.compile("/" + collection + "/"));
+		DBObject providedCHOQuery = new BasicDBObject("about", Pattern.compile("^/item/" + collection + "/"));
+		DBObject aggregationQuery = new BasicDBObject("about", Pattern.compile("^/aggregation/provider/" + collection + "/"));
 		DBObject europeanaAggregationQuery = new BasicDBObject("about",
-				"^/aggregation/europeana"
-						+ Pattern.compile("/" + collection + "/"));
+				 Pattern.compile("^/aggregation/europeana/" + collection + "/"));
 
 		europeanaAggregations.remove(europeanaAggregationQuery,
 				WriteConcern.FSYNC_SAFE);
