@@ -703,4 +703,10 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 		xml = writer.toString();
 		return xml;
 	}
+
+	@Override
+	public String getEnrichedRecord(String recordId) {
+	
+		return getXml(recordId, EuropeanaModelRegistry.EDMENRICHEDRECORD);
+	}
 }

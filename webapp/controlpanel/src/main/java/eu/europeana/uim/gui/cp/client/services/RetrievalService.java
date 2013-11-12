@@ -53,6 +53,13 @@ public interface RetrievalService extends RemoteService {
      * @return xml representation of the dereferenced metadata record object model
      */
     String getDereferencedRecord(String recordId);
+    
+    /**
+     * @param recordId
+     * @return xml representation of the dereferenced metadata record object model
+     */
+    String getEnrichedRecord(String recordId);
+    
     /**
      * Delivers up to a maxSize number of records starting at the offset for the provided collection
      * from the search index together with facets and the total number of results.

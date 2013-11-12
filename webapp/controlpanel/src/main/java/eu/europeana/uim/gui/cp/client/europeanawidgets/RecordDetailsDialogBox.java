@@ -54,6 +54,10 @@ public class RecordDetailsDialogBox extends DialogBox {
         deref.setVisibleLines(20);
         tabPanel.add(deref,"Dereferenced XML");
         
+        final TextArea enriched = new TextArea();
+        enriched.setCharacterWidth(100);
+        enriched.setVisibleLines(20);
+        tabPanel.add(enriched,"Enriched XML");
         final RichTextArea search = new RichTextArea();
         search.setPixelSize(900, 600);
         //setCharacterWidth(100);
@@ -97,7 +101,17 @@ public class RecordDetailsDialogBox extends DialogBox {
                 deref.setText(result);
             }
         });
-        
+        retrievalServiceAsync.getEnrichedRecord(recordId, new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                caught.printStackTrace();
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                enriched.setText(result);
+            }
+        });
         retrievalServiceAsync.getSearchRecord(recordId, new AsyncCallback<EdmRecordDTO>() {
             @Override
             public void onFailure(Throwable caught) {
