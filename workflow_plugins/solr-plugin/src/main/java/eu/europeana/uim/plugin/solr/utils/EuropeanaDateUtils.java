@@ -48,6 +48,9 @@ public class EuropeanaDateUtils {
 						years.addAll(refineDates(bc, choice.getTemporal()
 								.getString()));
 					}
+					if(choice.ifCreated()&& choice.getCreated().getString()!=null){
+						years.addAll(refineDates(bc,choice.getCreated().getString()));
+					}
 				}
 			}
 		} catch (IOException e) {

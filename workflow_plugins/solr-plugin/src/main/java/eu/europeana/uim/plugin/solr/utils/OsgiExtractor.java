@@ -109,7 +109,10 @@ public class OsgiExtractor extends Extractor {
 			// int iters = iterFromVocabulary ? controlledVocabulary
 			// .getIterations() : iterations;
 			if (resource + suffix != null) {
-				String fullUri = resource + suffix;
+				String fullUri = StringUtils.endsWith(resource, "/")
+						&& StringUtils.startsWith(suffix, "/") ? resource
+						+ StringUtils.substringAfter(suffix, "/") : resource
+						+ suffix;
 				if (!fullUri.contains("/.")) {
 					Map<String, List> retMap = retrieveMapFromCache(fullUri);
 					if (retMap != null) {
@@ -119,7 +122,7 @@ public class OsgiExtractor extends Extractor {
 
 					if (entity != null && entity.getContent().length() > 0) {
 						String ref = resource;
-						if (controlledVocabulary.getReplaceUrl() != null) {
+						if (StringUtils.isNotEmpty(controlledVocabulary.getReplaceUrl())) {
 							ref = StringUtils.replace(resource,
 									controlledVocabulary.getURI(),
 									controlledVocabulary.getReplaceUrl());
