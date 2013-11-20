@@ -119,7 +119,7 @@ public abstract class Dereferencer {
 //						res  = StringUtils.replace(res, controlVocabulary.getURI(), controlVocabulary.getReplaceUrl());
 //					}
 					appendInRDF(rdf, extractor.denormalize((String)object,
-							controlVocabulary, 0, true));
+							controlVocabulary, controlVocabulary.getIterations(), true));
 
 				}
 			}
@@ -133,7 +133,7 @@ public abstract class Dereferencer {
 					if (controlVocabulary != null) {
 						appendInRDF(rdf, extractor.denormalize(
 								((ResourceType) object).getResource(),
-								controlVocabulary, 0, true));
+								controlVocabulary, controlVocabulary.getIterations(), true));
 					}
 				}
 			}
@@ -146,7 +146,7 @@ public abstract class Dereferencer {
 					if (controlVocabulary != null) {
 						appendInRDF(rdf, extractor.denormalize(
 								((ResourceOrLiteralType) object).getResource().getResource(),
-								controlVocabulary, 0, true));
+								controlVocabulary, controlVocabulary.getIterations(), true));
 
 					}
 				}
@@ -159,7 +159,7 @@ public abstract class Dereferencer {
 					if (controlVocabulary != null) {
 						appendInRDF(rdf, extractor.denormalize(
 								((ResourceOrLiteralType) object).getString(),
-								controlVocabulary, 0, true));
+								controlVocabulary,controlVocabulary.getIterations(), true));
 
 					}
 				}
@@ -173,7 +173,7 @@ public abstract class Dereferencer {
 					if (controlVocabulary != null) {
 						appendInRDF(rdf, extractor.denormalize(
 								((LiteralType) object).getString(),
-								controlVocabulary, 0, true));
+								controlVocabulary, controlVocabulary.getIterations(), true));
 					}
 
 				}

@@ -97,6 +97,7 @@ import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.enums.OriginalField;
+import eu.europeana.uim.enrichment.normalizer.AgentNormalizer;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.EuropeanaDateUtils;
 import eu.europeana.uim.enrichment.utils.EuropeanaEnrichmentTagger;
@@ -606,8 +607,12 @@ public class EnrichmentPlugin<I> extends
 					System.out.println("Adding field " + fieldName
 							+ " with value"
 							+ basicDocument.getFieldValue(fieldName));
+					if(field.equals(EnrichmentFields.DC_CREATOR)|| field.equals(EnrichmentFields.DC_CONTRIBUTOR)){
+						mockDocument.addField(field.getValue(), AgentNormalizer.normalize(basicDocument.getFieldValue(fieldName)));
+					} else {
 					mockDocument.addField(field.getValue(),
 							basicDocument.getFieldValue(fieldName));
+					}
 				}
 			}
 		}
