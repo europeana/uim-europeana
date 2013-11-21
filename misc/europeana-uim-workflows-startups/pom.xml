@@ -99,6 +99,7 @@
 							eu.europeana.uim.util,
 							eu.europeana.uim.workflow,
 							eu.europeana.uim.store.mongo,
+							eu.europeana.uim.logging,
 							org.osgi.service.blueprint,
 							org.apache.commons.lang,
 							org.apache.commons.io,

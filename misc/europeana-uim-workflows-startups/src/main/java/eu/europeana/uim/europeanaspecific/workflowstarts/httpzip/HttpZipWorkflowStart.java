@@ -21,11 +21,12 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
@@ -34,6 +35,7 @@ import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.TKey;
+import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
@@ -108,7 +110,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		public int maxrecords = 0;
 		public int expected = 0;
 		
-		public HashSet<String> deletioncandidates;
+		public Set<String> deletioncandidates;
 	}
 
 	/**
@@ -223,16 +225,18 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		boolean finished = value== null? true:value.loader.isFinished();
 		
 		if(finished){
+			context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Initializing Data statistics analysis for imports:");			
 			Execution<I> execution = context.getExecution();
-			execution.putValue("Created", Integer.toString(value.loader.getCreated()));
-			execution.putValue("Updated", Integer.toString(value.loader.getUpdated()));
-			execution.putValue("Omitted", Integer.toString(value.loader.getOmitted()));
-			execution.putValue("Generated", Integer.toString(value.loader.getGenerated()));
-			execution.putValue("Discarded", Integer.toString(value.loader.getDiscarded()));
+			execution.putValue("Created", Integer.toString(value.loader.getCreated()));		
+			execution.putValue("Updated", Integer.toString(value.loader.getUpdated()));		
+			execution.putValue("Omitted", Integer.toString(value.loader.getOmitted()));			
+			execution.putValue("Generated", Integer.toString(value.loader.getGenerated()));			
+			execution.putValue("Discarded", Integer.toString(value.loader.getDiscarded()));			
 			try {
 				context.getStorageEngine().updateExecution(execution);
 			} catch (StorageEngineException e) {
-				e.printStackTrace();
+				context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error updating execution " +
+						" with deleted records information due to UIM storage engine failure " + e.getMessage());
 			}
 		}
 		
@@ -249,48 +253,71 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context) throws WorkflowStartFailedException {
 		
-
-
 		StorageEngine<I> storage = context.getStorageEngine();
-		
 		UimDataSet<I> dataset = context.getDataSet();
+		
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Initializing import from MINT for collection:" +
+				dataset.getId());
+				
 		if (dataset instanceof Collection) {
 
 			Collection<I> collection = (Collection<I>) dataset;
-
-			//
 			Data value = new Data();
-			value.deletioncandidates = new HashSet<String>();
+			
+			value.deletioncandidates = Collections.synchronizedSet(new HashSet<String>());
 			
 			try {
 				I[] availableMDRs = storage.getByCollection(collection);
-				
 				for(int i=0; i<availableMDRs.length; i++){
 					value.deletioncandidates.add((String) availableMDRs[i]);
 				}
-				
 			} catch (StorageEngineException e) {
-				e.printStackTrace();
+				context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error seting deletion " +
+						"candidates on HttpZipWorkflowStart:" + e.getMessage());
 			}
-			
-			
-			
+
 			URL url = null;
+			
 			String httpzipurlprop = context.getProperties().getProperty(
 					httpzipurl);
 			
 			String forceupdate = context.getProperties().getProperty(
 					importidenticals);
 			
+			if(forceupdate != null){
+				if(!forceupdate.equals("true") || !forceupdate.equals("false")){
+					context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error seting the 'http.overwrite.even.if.identical' value:" +
+							"only 'true' or 'false' allowed");
+					throw new WorkflowStartFailedException("Error seting the 'http.overwrite.even.if.identical' value");
+					
+				}
+				else{
+					context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Using update identical records value:" +
+							forceupdate);
+				}
+			}
 
+			
+			
 			try {
 
 				if (httpzipurlprop != null) {
 					url = new URL(httpzipurlprop);
+					context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Location of TAR.GZIP data (overriden by user): " +
+							httpzipurlprop);
 				} else {
 					url = new URL(
 							collection
 									.getValue(ControlledVocabularyProxy.MINTPUBLICATIONLOCATION));
+					context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Location of TAR.GZIP data (set by MINT): " +
+							httpzipurlprop);
+				}
+				
+				//If the zip location of the data is not found then throw an exception
+				if(url == null){
+					context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "The zip location of the data " +
+							"is not defined. Try importing the dataset from MINT or setting the 'http.overwrite.zip.baseUrl' value on the workflow start");
+					throw new WorkflowStartFailedException("The zip location of the data is not defined.");
 				}
 
 				Request<I> request = storage.createRequest(collection,new Date());
@@ -305,16 +332,24 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 				context.putValue(DATA_KEY, value);
 
 			} catch (MalformedURLException e) {
+				context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error accessing URL exposed by MINT: " +
+						e.getMessage());
 				throw new WorkflowStartFailedException("HttpZipWorkflowStart:Error accessing URL exposed by MINT ",e);
 			} catch (IOException e) {
-				throw new WorkflowStartFailedException("HttpZipWorkflowStart:Error reading zip file ",e);
+				context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error reading tar.gz file: " +
+						e.getMessage());
+				throw new WorkflowStartFailedException("HttpZipWorkflowStart:Error reading tar.gz file ",e);
 			} catch (StorageEngineException e) {
+				context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error accessigng UIM storage engine: " +
+						e.getMessage());
 				throw new WorkflowStartFailedException("HttpZipWorkflowStart:Error accessigng UIM storage engine",e);
 			}
 
 		} else if (dataset instanceof Request) {
+			context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "A request cannot be the basis for a new import: ");
 			throw new WorkflowStartFailedException("HttpZipWorkflowStart:A request cannot be the basis for a new import.");
 		} else {
+			context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Unsupported dataset <"+ context.getDataSet() + ">");
 			throw new WorkflowStartFailedException("Unsupported dataset <"+ context.getDataSet() + ">");
 		}
 
@@ -329,23 +364,37 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 	 */
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context) throws WorkflowStartFailedException {
+	
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Finished importing records, checking for records that should be marked as deleted.");
+		
 		Data value = context.getValue(DATA_KEY);
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Records created for the first time:" + Integer.toString(value.loader.getCreated()));
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Records updated:" + Integer.toString(value.loader.getUpdated()));
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Records not reimported because found identical:" + Integer.toString(value.loader.getOmitted()));
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Records generated due to splitting process:" + Integer.toString(value.loader.getGenerated()));
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Records discarded during the import process:" + Integer.toString(value.loader.getDiscarded()));
+		
 		value.loader.close();
 
 		StorageEngine<I> uimengine = context.getStorageEngine();
 		
 		if(!value.deletioncandidates.isEmpty()){
+			
+			context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Number of deletion candidates found :" + value.deletioncandidates.size());
+			
 			Iterator<String> it = value.deletioncandidates.iterator();
 			
 			while(it.hasNext()){
+				String id = it.next();
 				try {
-					MetaDataRecord<I> mdr = uimengine.getMetaDataRecord((I) it.next());
+					MetaDataRecord<I> mdr = uimengine.getMetaDataRecord((I) id);
 					mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 					mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
 					uimengine.updateMetaDataRecord(mdr);
-					LOGGER.info("Record" + mdr.getId() + "Deleted" );
+					context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Marked Record " + mdr.getId() + " as Deleted." );
 				} catch (StorageEngineException e) {
-					LOGGER.log(Level.WARNING,"HttpZipWorkflowStart:",e );
+					context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error marking record " + id + 
+							" as deleted due to UIM storage engine failure " + e.getMessage());
 				}
 			}
 		}
@@ -359,10 +408,9 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 			context.getStorageEngine().updateExecution(execution);
 			context.getStorageEngine().updateCollection(collection);
 		} catch (StorageEngineException e) {
-			e.printStackTrace();
+			context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error updating execution or collection " +
+					" with deleted records information due to UIM storage engine failure " + e.getMessage());
 		}
-		
-		LOGGER.info("Number of deleted Records: " + value.deletioncandidates.size() );
 		
 		if (context.getExecution().isCanceled()) {
 			value.request.setFailed(true);
