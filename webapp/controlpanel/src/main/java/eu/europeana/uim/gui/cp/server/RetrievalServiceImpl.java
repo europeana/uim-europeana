@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -280,6 +281,33 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 						record.setDeleted(true);
 					}
 					
+					
+					String creationDate = metaDataRecord
+							.getFirstValue(EuropeanaModelRegistry.UIMINGESTIONDATE);
+					
+					record.setImportuimdate(creationDate);
+					
+					String updateDate = metaDataRecord
+							.getFirstValue(EuropeanaModelRegistry.UIMUPDATEDDATE);
+					
+					record.setUpdateuimdate(updateDate); 
+					
+					Long initialsaveDate = metaDataRecord
+							.getFirstValue(EuropeanaModelRegistry.INITIALSAVE);
+					
+					if(initialsaveDate != null){
+						Date tmpdate = new Date(initialsaveDate);
+						record.setFirstingestiondate(tmpdate.toString());
+					}
+					
+					Long updatesaveDate = metaDataRecord
+							.getFirstValue(EuropeanaModelRegistry.UPDATEDSAVE);
+					
+					if(updatesaveDate != null){
+						Date tmpdate = new Date(updatesaveDate);
+						record.setIngestionupdatedate(tmpdate.toString());
+					}
+					
 					String edmxml = metaDataRecord
 							.getFirstValue(EuropeanaModelRegistry.EDMRECORD);
 
@@ -297,26 +325,6 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 										if (dcchoice.ifTitle()) {
 											record.setTitle(dcchoice.getTitle()
 													.getString());
-										}
-
-										if (dcchoice.ifLanguage()) {
-											record.setWorkLanguage(dcchoice
-													.getLanguage().getString());
-										}
-
-										if (dcchoice.ifCreator()) {
-											record.setCreator(dcchoice
-													.getCreator().getString());
-										}
-
-										if (dcchoice.ifPublisher()) {
-											record.setPublicationPlace(dcchoice
-													.getPublisher().getString());
-										}
-
-										if (dcchoice.ifDate()) {
-											record.setPublicationYear(dcchoice
-													.getDate().getString());
 										}
 									}
 								}

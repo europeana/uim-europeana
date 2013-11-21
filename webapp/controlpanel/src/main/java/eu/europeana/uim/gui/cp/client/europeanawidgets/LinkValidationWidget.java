@@ -20,13 +20,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import eu.europeana.uim.gui.cp.client.services.RetrievalServiceAsync;
 import eu.europeana.uim.gui.cp.shared.validation.LinkDTO;
 import eu.europeana.uim.gui.cp.shared.validation.LinksResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.MetaDataRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.MetaDataResultDTO;
-
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
@@ -420,7 +418,7 @@ public class LinkValidationWidget extends IngestionWidget {
             }
         };
         cellTable.addColumn(idColumn, "ID");
-        cellTable.setColumnWidth(idColumn, 10, Unit.PCT);
+        cellTable.setColumnWidth(idColumn, 30, Unit.PCT);
 
         // Title
         Column<MetaDataRecordDTO, String> titleColumn = new Column<MetaDataRecordDTO, String>(
@@ -432,61 +430,57 @@ public class LinkValidationWidget extends IngestionWidget {
         };
         cellTable.addColumn(titleColumn, "Title");
         cellTable.setColumnWidth(titleColumn, 15, Unit.PCT);
-
-        // Creator
-        Column<MetaDataRecordDTO, String> creatorColumn = new Column<MetaDataRecordDTO, String>(
+        
+        
+        //UIM First Import Date Column
+        Column<MetaDataRecordDTO, String> uimingestiondateColumn = new Column<MetaDataRecordDTO, String>(
                 new TextCell()) {
             @Override
             public String getValue(MetaDataRecordDTO object) {
-                return object.getCreator();
+                return object.getImportuimdate();
             }
         };
-        cellTable.addColumn(creatorColumn, "Creator");
-        cellTable.setColumnWidth(creatorColumn, 13, Unit.PCT);
 
-        // Contributor
-        Column<MetaDataRecordDTO, String> contributorColumn = new Column<MetaDataRecordDTO, String>(
+        cellTable.addColumn(uimingestiondateColumn, "First Imported in UIM");
+        cellTable.setColumnWidth(uimingestiondateColumn, 5, Unit.PCT);
+        
+        
+        //UIM First Update Date Column
+        Column<MetaDataRecordDTO, String> uimupdatedateColumn = new Column<MetaDataRecordDTO, String>(
                 new TextCell()) {
             @Override
             public String getValue(MetaDataRecordDTO object) {
-                return object.getContributor();
+                return object.getUpdateuimdate();
             }
         };
-        cellTable.addColumn(contributorColumn, "Publisher");
-        cellTable.setColumnWidth(contributorColumn, 13, Unit.PCT);
 
-        // Year
-        Column<MetaDataRecordDTO, String> yearColumn = new Column<MetaDataRecordDTO, String>(
+        cellTable.addColumn(uimupdatedateColumn, "Last Updated in  UIM");
+        cellTable.setColumnWidth(uimupdatedateColumn, 5, Unit.PCT);
+        
+        //Solr/Mongo First Ingestion Date Column
+        Column<MetaDataRecordDTO, String> solrCreateColumn = new Column<MetaDataRecordDTO, String>(
                 new TextCell()) {
             @Override
             public String getValue(MetaDataRecordDTO object) {
-                return object.getPublicationYear();
+                return object.getFirstingestiondate();
             }
         };
-        cellTable.addColumn(yearColumn, "Year");
-        cellTable.setColumnWidth(yearColumn, 9, Unit.PCT);
 
-        // Place
-        Column<MetaDataRecordDTO, String> countryColumn = new Column<MetaDataRecordDTO, String>(
+        cellTable.addColumn(solrCreateColumn, "Solr/Mongo ingestion Date");
+        cellTable.setColumnWidth(solrCreateColumn, 5, Unit.PCT);
+        
+        //Solr/Mongo Update Date Column
+        Column<MetaDataRecordDTO, String> solrUpdateColumn = new Column<MetaDataRecordDTO, String>(
                 new TextCell()) {
             @Override
             public String getValue(MetaDataRecordDTO object) {
-                return object.getPublicationPlace();
+                return object.getIngestionupdatedate();
             }
         };
-        cellTable.addColumn(countryColumn, "Place");
-        cellTable.setColumnWidth(countryColumn, 10, Unit.PCT);
 
-        // Language
-        Column<MetaDataRecordDTO, String> langColumn = new Column<MetaDataRecordDTO, String>(
-                new TextCell()) {
-            @Override
-            public String getValue(MetaDataRecordDTO object) {
-                return object.getWorkLanguage();
-            }
-        };
-        cellTable.addColumn(langColumn, "Language");
-        cellTable.setColumnWidth(langColumn, 10, Unit.PCT);
+        cellTable.addColumn(solrUpdateColumn, "Solr/Mongo update Date");
+        cellTable.setColumnWidth(solrUpdateColumn, 5, Unit.PCT);
+        
 
         // Show Record Details
         Column<MetaDataRecordDTO, MetaDataRecordDTO> plainColumn = new Column<MetaDataRecordDTO, MetaDataRecordDTO>(
@@ -504,6 +498,7 @@ public class LinkValidationWidget extends IngestionWidget {
                 return object;
             }
         };
+
         cellTable.addColumn(plainColumn, "Show");
         cellTable.setColumnWidth(plainColumn, 4, Unit.PCT);
 

@@ -42,12 +42,13 @@ public class MetaDataRecordDTO extends DataSourceDTO {
 
     private String                                     title;
 
-    private String                                     creator;
-    private String                                     contributor;
-    private String                                     publicationYear;
-
-    private String                                     workLanguage;
-    private String                                     publicationPlace;
+    private String                                     importuimdate;
+    
+    private String                                     updateuimdate;
+    
+    private String                                     firstingestiondate;
+    
+    private String                                     ingestionupdatedate;
 
     private boolean                                    deleted;
     
@@ -69,15 +70,9 @@ public class MetaDataRecordDTO extends DataSourceDTO {
      * @param workLanguage
      * @param publicationPlace
      */
-    public MetaDataRecordDTO(Long id, String title, String creator, String contributor,
-                             String publicationYear, String workLanguage, String publicationPlace) {
+    public MetaDataRecordDTO(Long id, String title) {
         super(id);
         this.title = title;
-        this.creator = creator;
-        this.contributor = contributor;
-        this.publicationYear = publicationYear;
-        this.workLanguage = workLanguage;
-        this.publicationPlace = publicationPlace;
     }
 
     /**
@@ -94,75 +89,7 @@ public class MetaDataRecordDTO extends DataSourceDTO {
         this.title = title;
     }
 
-    /**
-     * @return creator
-     */
-    public String getCreator() {
-        return creator;
-    }
 
-    /**
-     * @param creator
-     */
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    /**
-     * @return contributor
-     */
-    public String getContributor() {
-        return contributor;
-    }
-
-    /**
-     * @param contributor
-     */
-    public void setContributor(String contributor) {
-        this.contributor = contributor;
-    }
-
-    /**
-     * @return publicationYear
-     */
-    public String getPublicationYear() {
-        return publicationYear;
-    }
-
-    /**
-     * @param publicationYear
-     */
-    public void setPublicationYear(String publicationYear) {
-        this.publicationYear = publicationYear;
-    }
-
-    /**
-     * @return workLanguage
-     */
-    public String getWorkLanguage() {
-        return workLanguage;
-    }
-
-    /**
-     * @param workLanguage
-     */
-    public void setWorkLanguage(String workLanguage) {
-        this.workLanguage = workLanguage;
-    }
-
-    /**
-     * @return publicationPlace
-     */
-    public String getPublicationPlace() {
-        return publicationPlace;
-    }
-
-    /**
-     * @param publicationPlace
-     */
-    public void setPublicationPlace(String publicationPlace) {
-        this.publicationPlace = publicationPlace;
-    }
 
 	/**
 	 * @return the deleted
@@ -177,4 +104,62 @@ public class MetaDataRecordDTO extends DataSourceDTO {
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
+
+	/**
+	 * @return the importuimdate
+	 */
+	public String getImportuimdate() {
+		return importuimdate;
+	}
+
+	/**
+	 * @param importuimdate the importuimdate to set
+	 */
+	public void setImportuimdate(String importuimdate) {
+		this.importuimdate = importuimdate;
+	}
+
+	/**
+	 * @return the updateuimdate
+	 */
+	public String getUpdateuimdate() {
+		return updateuimdate;
+	}
+
+	/**
+	 * @param updateuimdate the updateuimdate to set
+	 */
+	public void setUpdateuimdate(String updateuimdate) {
+		this.updateuimdate = updateuimdate;
+	}
+
+	/**
+	 * @return the firstingestiondate
+	 */
+	public String getFirstingestiondate() {
+		return firstingestiondate;
+	}
+
+	/**
+	 * @param firstingestiondate the firstingestiondate to set
+	 */
+	public void setFirstingestiondate(String firstingestiondate) {
+		this.firstingestiondate = firstingestiondate;
+	}
+
+	/**
+	 * @return the ingestionupdatedate
+	 */
+	public String getIngestionupdatedate() {
+		return ingestionupdatedate;
+	}
+
+	/**
+	 * @param ingestionupdatedate the ingestionupdatedate to set
+	 */
+	public void setIngestionupdatedate(String ingestionupdatedate) {
+		this.ingestionupdatedate = ingestionupdatedate;
+	}
+
+
 }
