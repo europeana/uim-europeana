@@ -715,16 +715,20 @@ public class EnrichmentPlugin<I> extends
 		List<ProvidedCHOType> providedChoList = rdf.getProvidedCHOList();
 		cho = providedChoList.get(0);
 		List<ProxyType> proxyList = rdf.getProxyList();
+		int i = 0;
+		int index=0;
 		for (ProxyType proxy : proxyList) {
 			if (proxy.getEuropeanaProxy() != null
 					&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
 				europeanaProxy = proxy;
+				index=i;
 			} else {
 				if (!StringUtils
 						.startsWith(proxy.getAbout(), "/proxy/provider")) {
 					proxy.setAbout("/proxy/provider" + proxy.getAbout());
 				}
 			}
+			i++;
 		}
 
 		if (europeanaProxy == null) {
@@ -908,6 +912,7 @@ public class EnrichmentPlugin<I> extends
 				}
 			}
 		}
+		proxyList.remove(index);
 		proxyList.add(europeanaProxy);
 		rdf.setProxyList(proxyList);
 	}
