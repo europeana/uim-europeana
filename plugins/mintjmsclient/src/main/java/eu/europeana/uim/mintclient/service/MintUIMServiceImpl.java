@@ -74,9 +74,9 @@ public class MintUIMServiceImpl implements MintUIMService {
 	/**
 	 * Private constructor, instantiated via private factory method
 	 */
-	public MintUIMServiceImpl(Registry registry, SugarCrmService sugservice) {
+	public MintUIMServiceImpl(Registry registry,Orchestrator<?> orchestrator, SugarCrmService sugservice) {
 		MintUIMServiceImpl.registry = registry;
-		MintUIMServiceImpl.orchestrator = registry.getOrchestrator();
+		MintUIMServiceImpl.orchestrator = orchestrator;
 		MintUIMServiceImpl.sugservice = sugservice;
 		MintUIMServiceImpl.logger = (LoggingEngine<?>) (registry != null ? registry
 				.getLoggingEngine() : null);
@@ -95,7 +95,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 	 * @return
 	 */
 	public static MintUIMServiceImpl createService(Registry registryref,
-			SugarCrmService service) {
+			Orchestrator<?> orchestrator, SugarCrmService service) {
 
 		MintClientFactory factory = new MintClientFactory();
 		try {
@@ -104,7 +104,7 @@ public class MintUIMServiceImpl implements MintUIMService {
 			asynchronousClient = (MintAMPQClientASync) factory.asyncMode(
 					MintUIMServiceImpl.UIMConsumerListener.class)
 					.createClient();
-			return new MintUIMServiceImpl(registryref, service);
+			return new MintUIMServiceImpl(registryref,orchestrator,service);
 		} catch (MintOSGIClientException e) {
 			registryref.getLoggingEngine().logFailed(Level.SEVERE,
 					"MintUIMServiceImpl", e,

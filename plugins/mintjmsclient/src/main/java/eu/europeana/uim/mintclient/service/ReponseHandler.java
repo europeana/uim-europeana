@@ -180,6 +180,10 @@ public class ReponseHandler {
 			
 			Workflow ingestionworkflow =registry.getWorkflow(ingestionWf);
 			
+			if(ingestionworkflow == null){
+				throw new MintOSGIClientException("Failed to get reference to InitialIngestionWorkflow");
+			}
+			
 			orchestrator.executeWorkflow(ingestionworkflow, collection);
 		}
 		else if(response instanceof ImportExistsAction){
