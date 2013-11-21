@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 
 public final class AgentNormalizer {
 
+	@SuppressWarnings("rawtypes")
 	public static List<String> normalize(Object input) {
 		List<String> normalized = new ArrayList<String>();
 		if (input.getClass().isAssignableFrom(String.class)) {

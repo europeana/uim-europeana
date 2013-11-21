@@ -146,7 +146,6 @@ public class EnrichmentPlugin<I> extends
 	private static String previewsOnlyInPortal;
 	private static String collections = PropertyReader
 			.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
-	// private static Morphia morphia;
 	private final static String PORTALURL = "http://www.europeana.eu/portal/record";
 	private final static String SUFFIX = ".html";
 	private static IBindingFactory bfact;
@@ -563,33 +562,37 @@ public class EnrichmentPlugin<I> extends
 						"JibX Exception occured with error " + e.getMessage()
 								+ "\nRetrying");
 				e.printStackTrace();
+				return false;
 			} catch (MalformedURLException e) {
 				log.log(Level.SEVERE,
 						"Malformed URL Exception occured with error "
 								+ e.getMessage() + "\nRetrying");
 				e.printStackTrace();
+				return false;
 			} catch (InstantiationException e) {
 				log.log(Level.SEVERE,
 						"Instantiation Exception occured with error "
 								+ e.getMessage() + "\nRetrying");
 				e.printStackTrace();
+				return false;
 			} catch (IllegalAccessException e) {
 				log.log(Level.SEVERE,
 						"Illegal Access Exception occured with error "
 								+ e.getMessage() + "\nRetrying");
 				e.printStackTrace();
+				return false;
 			} catch (IOException e) {
 				log.log(Level.SEVERE,
 						"IO Exception occured with error " + e.getMessage()
 								+ "\nRetrying");
 				e.printStackTrace();
+				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
 				log.log(Level.SEVERE, "Generic Exception occured with error "
 						+ e.getMessage() + "\nRetrying");
-
+				return false;
 			}
-			return false;
 		} else {
 			deleted++;
 		}
@@ -604,14 +607,15 @@ public class EnrichmentPlugin<I> extends
 			for (EnrichmentFields field : EnrichmentFields.values()) {
 				if (StringUtils.equals(field.getValue(), fieldName)
 						|| StringUtils.startsWith(fieldName, field.getValue())) {
-					System.out.println("Adding field " + fieldName
-							+ " with value"
-							+ basicDocument.getFieldValue(fieldName));
-					if(field.equals(EnrichmentFields.DC_CREATOR)|| field.equals(EnrichmentFields.DC_CONTRIBUTOR)){
-						mockDocument.addField(field.getValue(), AgentNormalizer.normalize(basicDocument.getFieldValue(fieldName)));
+					
+					if (field.equals(EnrichmentFields.DC_CREATOR)
+							|| field.equals(EnrichmentFields.DC_CONTRIBUTOR)) {
+						mockDocument.addField(field.getValue(), AgentNormalizer
+								.normalize(basicDocument
+										.getFieldValue(fieldName)));
 					} else {
-					mockDocument.addField(field.getValue(),
-							basicDocument.getFieldValue(fieldName));
+						mockDocument.addField(field.getValue(),
+								basicDocument.getFieldValue(fieldName));
 					}
 				}
 			}

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -35,6 +37,7 @@ public class DeactivatePlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static DeactivationService dService;
+	private final static Logger log = Logger.getLogger(DeactivatePlugin.class.getName());
 
 	public DeactivatePlugin(String name, String description) {
 		super(name, description);
@@ -97,25 +100,27 @@ public class DeactivatePlugin<I> extends
 			Collection collection = (Collection) arg0.getExecution()
 					.getDataSet();
 			String collectionId = collection.getName().split("_")[0];
-			System.out.println("Removing collectionId: " +collectionId);
+			log.log(Level.INFO,"Removing collectionId: " +collectionId);
 			String newCollectionId = dService.getCollectionMongoServer()
 					.findNewCollectionId(collection.getName().split("_")[0]);
-			System.out.println("New collection id is:"+newCollectionId);
+			log.log(Level.INFO,"New collection id is:"+newCollectionId);
 			if (newCollectionId != null) {
 				collectionId = newCollectionId;
 			}
-			System.out.println("removing from solr");
+			log.log(Level.INFO,"removing from solr");
 			dService.getSolrServer().deleteByQuery(
 					"europeana_collectionName:" + collectionId + "*");
-			System.out.println("removing from mongo");
+			log.log(Level.INFO,"removing from mongo");
 			clearData(dService.getMongoServer(), collectionId);
 
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			log.log(Level.SEVERE,e.getMessage());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			log.log(Level.SEVERE,e.getMessage());
 		}
 
 	}
@@ -198,10 +203,10 @@ public class DeactivatePlugin<I> extends
 			dService.getSolrServer().commit();
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.SEVERE,e.getMessage());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.SEVERE,e.getMessage());
 		}
 	}
 

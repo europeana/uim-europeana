@@ -73,6 +73,7 @@ public class LookupCreationPlugin<I> extends
 	private static final Logger log = Logger
 			.getLogger(LookupCreationPlugin.class.getName());
 	private final static String OVERRIDESIPCREATOR = "override.sipcreator.mapping.field";
+
 	public LookupCreationPlugin(String name, String description) {
 		super(name, description);
 
@@ -100,13 +101,14 @@ public class LookupCreationPlugin<I> extends
 
 	}
 
-	private static List<String> params = new ArrayList<String>(){
+	private static List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
 
 		{
 			add(OVERRIDESIPCREATOR);
 		}
 	};
+
 	@Override
 	public TKey<?, ?>[] getInputFields() {
 		// TODO Auto-generated method stub
@@ -169,7 +171,7 @@ public class LookupCreationPlugin<I> extends
 			uctx = bfact.createUnmarshallingContext();
 
 			String collectionId = (String) mdr.getCollection().getMnemonic();
-			System.out.println(collectionId);
+
 			String fileName;
 			String oldCollectionId = enrichmentService
 					.getCollectionMongoServer().findOldCollectionId(
@@ -183,22 +185,21 @@ public class LookupCreationPlugin<I> extends
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 			FullBeanImpl fullBean = constructFullBeanMock(rdf, collectionId);
 			String hash = null;
-			try{
+			try {
 				hash = hashExists(collectionId, fileName, fullBean);
-			}
-			catch(Exception e){
+			} catch (Exception e) {
 				log.log(Level.SEVERE, e.getMessage());
 				return false;
 			}
-			
+
 			if (StringUtils.isNotEmpty(hash)) {
 
 				createLookupEntry(fullBean, collectionId, hash);
 				return true;
 			}
 		} catch (JiBXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage());
+			return false;
 		}
 		return false;
 	}
@@ -220,8 +221,7 @@ public class LookupCreationPlugin<I> extends
 				: null);
 		String[] hasView = new String[1];
 		hasView[0] = rdf.getAggregationList().get(0).getObject() != null ? rdf
-				.getAggregationList().get(0).getObject().getResource()
-				: null;
+				.getAggregationList().get(0).getObject().getResource() : null;
 		aggr.setHasView(hasView);
 		aggrs.add(aggr);
 		List<ProxyImpl> proxies = new ArrayList<ProxyImpl>();
@@ -274,32 +274,24 @@ public class LookupCreationPlugin<I> extends
 	}
 
 	private String hashExists(String collectionId, String fileName,
-			FullBean fullBean) throws EdmFieldNotFoundException,EdmValueNotFoundException,NullPointerException{
+			FullBean fullBean) throws EdmFieldNotFoundException,
+			EdmValueNotFoundException, NullPointerException {
 		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
 		sipCreatorUtils.setRepository(repository);
 		String hashField = sipCreatorUtils.getHashField(fileName, fileName);
 		if (hashField != null) {
 			String val = null;
 
-			try {
-				val = EseEdmMap
-						.getEseEdmMap(
-								StringUtils.contains(hashField, "[") ? StringUtils.substringBefore(
-										hashField, "[")
-										: hashField, fullBean.getAbout())
-						.getEdmValue(fullBean);
-				if (val != null) {
-					return HashUtils.createHash(val);
-				}
-			} catch (EdmFieldNotFoundException e) {
-				throw e;
+			val = EseEdmMap
+					.getEseEdmMap(
+							StringUtils.contains(hashField, "[") ? StringUtils.substringBefore(
+									hashField, "[")
+									: hashField, fullBean.getAbout())
+					.getEdmValue(fullBean);
+			if (val != null) {
+				return HashUtils.createHash(val);
 			}
-			catch (EdmValueNotFoundException e) {
-				throw e;
-			}
-			catch (NullPointerException e) {
-				throw e;
-			}
+
 		}
 		PreSipCreatorUtils preSipCreatorUtils = new PreSipCreatorUtils();
 		preSipCreatorUtils.setRepository(repository);
@@ -344,7 +336,7 @@ public class LookupCreationPlugin<I> extends
 			}
 
 		} catch (SolrServerException e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage());
 		}
 	}
 

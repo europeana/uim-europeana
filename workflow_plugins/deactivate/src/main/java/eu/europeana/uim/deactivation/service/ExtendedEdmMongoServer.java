@@ -33,7 +33,7 @@ public class ExtendedEdmMongoServer extends EdmMongoServerImpl implements EdmMon
 	 * @param obj
 	 */
 	public <T> void delete(T obj) {
-		this.getDatastore().delete(obj, WriteConcern.JOURNAL_SAFE);
+		this.getDatastore().delete(obj, WriteConcern.FSYNC_SAFE);
 	}
 
 }
