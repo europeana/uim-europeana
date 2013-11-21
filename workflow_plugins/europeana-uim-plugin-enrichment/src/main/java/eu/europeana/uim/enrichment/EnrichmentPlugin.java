@@ -545,7 +545,7 @@ public class EnrichmentPlugin<I> extends
 						timestampUpdated.getTime());
 				mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
 				mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,
-						EdmUtils.toEDM(fullBean));
+						EdmUtils.toEDM(fullBean,true));
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
