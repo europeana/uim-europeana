@@ -11,19 +11,19 @@ public final class AgentNormalizer {
 	public static List<String> normalize(Object input) {
 		List<String> normalized = new ArrayList<String>();
 		if (input.getClass().isAssignableFrom(String.class)) {
-			normalized.addAll(normalizeInternal((String)input));
-		} else if (input.getClass().isAssignableFrom(ArrayList.class)){
-			for(Object str:((List)input)){
-				normalized.addAll(normalizeInternal((String)str));
+			normalized.addAll(normalizeInternal((String) input));
+		} else if (input.getClass().isAssignableFrom(ArrayList.class)) {
+			for (Object str : ((List) input)) {
+				normalized.addAll(normalizeInternal((String) str));
 			}
 		}
-		
+
 		return normalized;
 	}
-	
-	private static List<String> normalizeInternal(String input){
+
+	private static List<String> normalizeInternal(String input) {
 		List<String> normalized = new ArrayList<String>();
-		String str =  input;
+		String str = input;
 		if (str.contains("[")) {
 			str = StringUtils.substringBefore(str, "[").trim();
 		}
@@ -35,8 +35,12 @@ public final class AgentNormalizer {
 		}
 		if (str.contains(",")) {
 			String[] split = str.split(",");
-			normalized.add(split[0].trim() + " " + split[1].trim());
-			normalized.add(split[1].trim() + " " + split[0].trim());
+			if (split.length > 0) {
+				normalized.add(split[0].trim() + " " + split[1].trim());
+				normalized.add(split[1].trim() + " " + split[0].trim());
+			} else {
+				normalized.add(str);
+			}
 		} else {
 			normalized.add(str);
 		}
