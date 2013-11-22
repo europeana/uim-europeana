@@ -295,15 +295,12 @@ public class EnrichmentPlugin<I> extends
 		Collection collection = null;
 		processCount = 0;
 		try {
-			log.log(Level.INFO, "Initializing Annocultor");
 			if (tagger == null) {
 				tagger = new EuropeanaEnrichmentTagger();
 				tagger.init("Europeana", "localhost", "27017");
 			}
-			log.log(Level.INFO, "Annocultor Initialized");
 			solrServer = enrichmentService.getSolrServer();
 
-			log.log(Level.INFO, "Solr Server Acquired");
 			mongoDB = enrichmentService.getMongoDB();
 
 			if (mongoServer == null) {
@@ -311,31 +308,18 @@ public class EnrichmentPlugin<I> extends
 				mongoServer = enrichmentService.getEuropeanaMongoServer();
 
 			}
-			log.log(Level.INFO, "Mongo Initialized");
 
 			collection = (Collection) context.getExecution().getDataSet();
-			log.log(Level.INFO, "Collection acquired");
 
-			long start = new Date().getTime();
-			log.log(Level.INFO,
-					"Clearing collection " + collection.getMnemonic()
-							+ " from Mongo");
 			clearData(mongoServer, collection.getMnemonic());
-			log.log(Level.INFO,
-					"Clearing collection " + collection.getMnemonic()
-							+ " from Solr");
 			solrServer.deleteByQuery("europeana_collectionName:"
 					+ collection.getName().split("_")[0] + "*");
-			log.log(Level.INFO,
-					"Finished removing after " + (new Date().getTime() - start)
-							+ " ms");
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.log(Level.SEVERE, e.getMessage());
 		}
 		String sugarCrmId = collection
 				.getValue(ControlledVocabularyProxy.SUGARCRMID);
-		log.log(Level.INFO, "SugarCrmId acquired");
 		try {
 			try {
 				sugarCrmService
@@ -353,7 +337,6 @@ public class EnrichmentPlugin<I> extends
 			}
 			SugarCrmRecord sugarCrmRecord = sugarCrmService
 					.retrieveRecord(sugarCrmId);
-			log.log(Level.INFO, " Retrieved the SugarCRM collection");
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 		} catch (QueryResultException e) {
@@ -423,9 +406,6 @@ public class EnrichmentPlugin<I> extends
 		} else {
 			value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 		}
-		log.log(Level.INFO,
-				"Status size = "
-						+ mdr.getValues(EuropeanaModelRegistry.STATUS).size());
 
 		List<Status> status = mdr.getValues(EuropeanaModelRegistry.STATUS);
 
@@ -438,18 +418,14 @@ public class EnrichmentPlugin<I> extends
 				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 
 				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-				log.log(Level.INFO, "Processing record "
-						+ rdf.getProvidedCHOList().get(0).getAbout());
 				SolrInputDocument basicDocument = new SolrConstructor()
 						.constructSolrDocument(rdf);
 
 				SolrInputDocument mockDocument = createMockForEnrichment(basicDocument);
 
 				List<Entity> entities = null;
-				log.log(Level.INFO, "Before tagging Document");
 				entities = tagger.tagDocument(mockDocument);
 
-				log.log(Level.INFO, "Tagged document");
 				mergeEntities(rdf, entities);
 
 				RDF rdfFinal = cleanRDF(rdf);
@@ -521,11 +497,16 @@ public class EnrichmentPlugin<I> extends
 						.getCollection().getName());
 				ProxyImpl providerProxy = getProviderProxy(fullBean);
 				List<String> titles = new ArrayList<String>();
+
 				for (Entry<String, List<String>> entry : providerProxy
 						.getDcTitle().entrySet()) {
-					titles.addAll(entry.getValue());
+					if (entry.getValue() != null) {
+						titles.addAll(entry.getValue());
+					}
 				}
-				fullBean.setTitle(titles.toArray(new String[titles.size()]));
+				if (titles.size() > 0) {
+					fullBean.setTitle(titles.toArray(new String[titles.size()]));
+				}
 				if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE) != null
 						&& mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
 								.size() > 0) {
@@ -545,7 +526,7 @@ public class EnrichmentPlugin<I> extends
 						timestampUpdated.getTime());
 				mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
 				mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,
-						EdmUtils.toEDM(fullBean,true));
+						EdmUtils.toEDM(fullBean, true));
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
@@ -607,7 +588,7 @@ public class EnrichmentPlugin<I> extends
 			for (EnrichmentFields field : EnrichmentFields.values()) {
 				if (StringUtils.equals(field.getValue(), fieldName)
 						|| StringUtils.startsWith(fieldName, field.getValue())) {
-					
+
 					if (field.equals(EnrichmentFields.DC_CREATOR)
 							|| field.equals(EnrichmentFields.DC_CONTRIBUTOR)) {
 						mockDocument.addField(field.getValue(), AgentNormalizer
@@ -716,12 +697,14 @@ public class EnrichmentPlugin<I> extends
 		cho = providedChoList.get(0);
 		List<ProxyType> proxyList = rdf.getProxyList();
 		int i = 0;
-		int index=0;
+		int index = 0;
+		boolean foundProxy = false;
 		for (ProxyType proxy : proxyList) {
 			if (proxy.getEuropeanaProxy() != null
 					&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
 				europeanaProxy = proxy;
-				index=i;
+				index = i;
+				foundProxy = true;
 			} else {
 				if (!StringUtils
 						.startsWith(proxy.getAbout(), "/proxy/provider")) {
@@ -912,7 +895,9 @@ public class EnrichmentPlugin<I> extends
 				}
 			}
 		}
-		proxyList.remove(index);
+		if (proxyList.size() > 1 && foundProxy) {
+			proxyList.remove(index);
+		}
 		proxyList.add(europeanaProxy);
 		rdf.setProxyList(proxyList);
 	}
@@ -928,7 +913,6 @@ public class EnrichmentPlugin<I> extends
 			years.addAll(new EuropeanaDateUtils().createEuropeanaYears(proxy));
 			europeanaProxy.setType(proxy.getType());
 		}
-		System.out.println("Create EuropeanaProxy years:" + years.size());
 		List<Year> yearList = new ArrayList<Year>();
 		for (String year : years) {
 			Year yearObj = new Year();

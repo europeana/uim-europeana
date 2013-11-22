@@ -35,7 +35,7 @@ public final class AgentNormalizer {
 		}
 		if (str.contains(",")) {
 			String[] split = str.split(",");
-			if (split.length > 0) {
+			if (split.length > 1) {
 				normalized.add(split[0].trim() + " " + split[1].trim());
 				normalized.add(split[1].trim() + " " + split[0].trim());
 			} else {
