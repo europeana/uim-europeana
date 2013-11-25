@@ -497,11 +497,12 @@ public class EnrichmentPlugin<I> extends
 						.getCollection().getName());
 				ProxyImpl providerProxy = getProviderProxy(fullBean);
 				List<String> titles = new ArrayList<String>();
-
-				for (Entry<String, List<String>> entry : providerProxy
-						.getDcTitle().entrySet()) {
-					if (entry.getValue() != null) {
-						titles.addAll(entry.getValue());
+				if (providerProxy.getDcTitle() != null) {
+					for (Entry<String, List<String>> entry : providerProxy
+							.getDcTitle().entrySet()) {
+						if (entry.getValue() != null) {
+							titles.addAll(entry.getValue());
+						}
 					}
 				}
 				if (titles.size() > 0) {
