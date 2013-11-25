@@ -209,6 +209,7 @@ public class ZipLoader<I> {
 					switch (state) {
 					case ID_REGISTERED:						
 						mdr = processrecord(mdr, dedupres, Status.CREATED);
+						
 						LOGGER.log(Level.INFO,"Unique Identifier in ID_REGISTERED state for record with ID " + dedupres
 								.getDerivedRecordID());
 						
@@ -220,29 +221,51 @@ public class ZipLoader<I> {
 						created ++;
 						
 						break;
-					case COLLECTION_CHANGED:
-						LOGGER.log(Level.INFO,"Unique Identifier in COLLECTION_CHANGED state for record with ID " + dedupres
+					case COLLECTION_CHANGED:					
+						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in COLLECTION_CHANGED state for record with ID " + dedupres
 								.getDerivedRecordID());
+						
+						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
+								getMnemonic(),rdfstring,LookupState.COLLECTION_CHANGED);
+						
 						discarded ++;
 						break;
 					case DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS:
-						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS state for record with ID " + dedupres
+						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS state for record with ID " + dedupres
 								.getDerivedRecordID());
+						
+						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
+								getMnemonic(),rdfstring,LookupState.DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS);
+						
 						discarded ++;
 						break;
-					case DUPLICATE_INCOLLECTION:						
-						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_INCOLLECTION state for record with ID " + dedupres
-							.getDerivedRecordID());
+					case DUPLICATE_INCOLLECTION:										
+						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DUPLICATE_INCOLLECTION state for record with ID " + dedupres
+								.getDerivedRecordID());
+						
+						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
+								getMnemonic(),rdfstring,LookupState.DUPLICATE_INCOLLECTION);
+						
 						discarded ++;
 						break;
-					case DERIVED_DUPLICATE_INCOLLECTION:						
-						LOGGER.log(Level.INFO,"Unique Identifier in DERIVED_DUPLICATE_INCOLLECTION state for record with ID " + dedupres
-							.getDerivedRecordID());
+					case DERIVED_DUPLICATE_INCOLLECTION:
+						
+						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DERIVED_DUPLICATE_INCOLLECTION state for record with ID " + dedupres
+								.getDerivedRecordID());
+						
+						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
+								getMnemonic(),rdfstring,LookupState.DERIVED_DUPLICATE_INCOLLECTION);
+						
 						discarded ++;
 						break;
 					case DUPLICATE_RECORD_ACROSS_COLLECTIONS:
-						LOGGER.log(Level.INFO,"Unique Identifier in DUPLICATE_RECORD_ACROSS_COLLECTIONS state for record with ID " + dedupres
+						
+						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DUPLICATE_RECORD_ACROSS_COLLECTIONS state for record with ID " + dedupres
 								.getDerivedRecordID());
+						
+						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
+								getMnemonic(),rdfstring,LookupState.DUPLICATE_RECORD_ACROSS_COLLECTIONS);
+						
 						discarded ++;
 						break;
 					case IDENTICAL:
@@ -313,8 +336,6 @@ public class ZipLoader<I> {
 						value.deletioncandidates.remove(dedupres
 								.getDerivedRecordID());
 						dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
-						
-						System.out.println("Added " + dedupres.getDerivedRecordID());
 						
 						updated ++;
 						

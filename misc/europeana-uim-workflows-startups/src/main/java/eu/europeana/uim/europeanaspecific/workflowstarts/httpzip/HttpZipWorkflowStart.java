@@ -224,8 +224,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		Data value = context.getValue(DATA_KEY);
 		boolean finished = value== null? true:value.loader.isFinished();
 		
-		if(finished){
-			context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Initializing Data statistics analysis for imports:");			
+		if(finished){			
 			Execution<I> execution = context.getExecution();
 			execution.putValue("Created", Integer.toString(value.loader.getCreated()));		
 			execution.putValue("Updated", Integer.toString(value.loader.getUpdated()));		
@@ -284,18 +283,9 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 			String forceupdate = context.getProperties().getProperty(
 					importidenticals);
 			
-			if(forceupdate != null){
-				if(!forceupdate.equals("true") || !forceupdate.equals("false")){
-					context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart", "Error seting the 'http.overwrite.even.if.identical' value:" +
-							"only 'true' or 'false' allowed");
-					throw new WorkflowStartFailedException("Error seting the 'http.overwrite.even.if.identical' value");
-					
-				}
-				else{
-					context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Using update identical records value:" +
-							forceupdate);
-				}
-			}
+
+		    context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Using update identical records value:" + forceupdate);
+
 
 			
 			
@@ -324,6 +314,8 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 
 				HttpRetriever retriever = new HttpRetriever().createInstance(url);
 
+				context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Initializing Duplicate Identifier Detection:");
+				
 				ZipLoader<I> loader = new ZipLoader<I>(retriever.getNumber_of_recs(),
 						retriever,context,request,dedup,forceupdate);
 
@@ -365,7 +357,8 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context) throws WorkflowStartFailedException {
 	
-		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Finished importing records, checking for records that should be marked as deleted.");
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Initializing Data statistics analysis for imports:");
+
 		
 		Data value = context.getValue(DATA_KEY);
 		context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Records created for the first time:" + Integer.toString(value.loader.getCreated()));
@@ -379,7 +372,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		StorageEngine<I> uimengine = context.getStorageEngine();
 		
 		if(!value.deletioncandidates.isEmpty()){
-			
+			context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Finished analysis, checking for records that should be marked as deleted.");
 			context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Number of deletion candidates found :" + value.deletioncandidates.size());
 			
 			Iterator<String> it = value.deletioncandidates.iterator();
