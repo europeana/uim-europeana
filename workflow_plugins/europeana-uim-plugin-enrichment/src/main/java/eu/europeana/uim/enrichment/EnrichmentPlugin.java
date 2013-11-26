@@ -365,14 +365,16 @@ public class EnrichmentPlugin<I> extends
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
-
-		context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Adding " + recordNumber + " documents");
-		context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Process called " + processCount);
+		
+		log.log(Level.INFO, "Adding " + recordNumber + " documents");
+		log.log(Level.INFO, "Process called " +processCount);
+		//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Adding " + recordNumber + " documents");
+		//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Process called " + processCount);
 		try {
 			solrServer.commit();
-			context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Added " + recordNumber + " documents");
+			//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Added " + recordNumber + " documents");
 			log.log(Level.INFO, "Added " + recordNumber + " documents");
-			context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Deleted are " + recordNumber + " deleted");
+			//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Deleted are " + recordNumber + " deleted");
 			log.log(Level.INFO, "Deleted are " + deleted);
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
