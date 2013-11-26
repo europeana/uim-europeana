@@ -508,30 +508,30 @@ public class EnrichmentPlugin<I> extends
 				if (titles.size() > 0) {
 					fullBean.setTitle(titles.toArray(new String[titles.size()]));
 				}
-				if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE) != null
-						&& mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
+				if (mdr.getValues(EuropeanaModelRegistry.UIMINGESTIONDATE) != null
+						&& mdr.getValues(EuropeanaModelRegistry.UIMINGESTIONDATE)
 								.size() > 0) {
 					solrInputDocument.addField("timestamp_created", new Date(mdr.getValues(
-							EuropeanaModelRegistry.INITIALSAVE).get(0)));
+							EuropeanaModelRegistry.UIMINGESTIONDATE).get(0)));
 					fullBean.setTimestampCreated(new Date(mdr.getValues(
-							EuropeanaModelRegistry.INITIALSAVE).get(0)));
+							EuropeanaModelRegistry.UIMINGESTIONDATE).get(0)));
 				} else {
 					Date timestampCreated = new Date();
 					fullBean.setTimestampCreated(timestampCreated);
 					solrInputDocument.addField("timestamp_created", timestampCreated);
-					mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
-							timestampCreated.getTime());
+//					mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
+//							timestampCreated.getTime());
 				}
 
-				mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
+				//mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
 				Date timestampUpdated = new Date();
 				fullBean.setTimestampUpdated(timestampUpdated);
 				solrInputDocument.addField("timestamp_update", timestampUpdated);
-				mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
-						timestampUpdated.getTime());
-				mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
-				mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,
-						EdmUtils.toEDM(fullBean, true));
+				//mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
+				//		timestampUpdated.getTime());
+				//mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
+				//mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,
+				//		EdmUtils.toEDM(fullBean, true));
 				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 					mongoServer.getDatastore().save(fullBean);
 				} else {
