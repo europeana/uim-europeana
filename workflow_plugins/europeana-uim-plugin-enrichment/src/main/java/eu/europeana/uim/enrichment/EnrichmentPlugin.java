@@ -508,13 +508,13 @@ public class EnrichmentPlugin<I> extends
 				if (titles.size() > 0) {
 					fullBean.setTitle(titles.toArray(new String[titles.size()]));
 				}
-				if (mdr.getValues(EuropeanaModelRegistry.UIMINGESTIONDATE) != null
-						&& mdr.getValues(EuropeanaModelRegistry.UIMINGESTIONDATE)
+				if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE) != null
+						&& mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
 								.size() > 0) {
-					solrInputDocument.addField("timestamp_created",new Date(Date.parse(mdr.getValues(
-							EuropeanaModelRegistry.UIMINGESTIONDATE).get(0))));
-					fullBean.setTimestampCreated(new Date(Date.parse(mdr.getValues(
-							EuropeanaModelRegistry.UIMINGESTIONDATE).get(0))));
+					solrInputDocument.addField("timestamp_created",new Date(mdr.getValues(
+							EuropeanaModelRegistry.INITIALSAVE).get(0)));
+					fullBean.setTimestampCreated(new Date(mdr.getValues(
+							EuropeanaModelRegistry.INITIALSAVE).get(0)));
 				} else {
 					Date timestampCreated = new Date();
 					fullBean.setTimestampCreated(timestampCreated);
