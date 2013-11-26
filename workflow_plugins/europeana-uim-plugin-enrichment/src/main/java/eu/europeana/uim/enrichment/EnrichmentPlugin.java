@@ -316,6 +316,7 @@ public class EnrichmentPlugin<I> extends
 					+ collection.getName().split("_")[0] + "*");
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 			log.log(Level.SEVERE, e.getMessage());
 		}
 		String sugarCrmId = collection
@@ -365,15 +366,14 @@ public class EnrichmentPlugin<I> extends
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 
-		log.log(Level.INFO, "Adding " + recordNumber + " documents");
-		System.out.println("Adding " + recordNumber + " documents");
-		System.out.println("Process called " + processCount);
+		context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Adding " + recordNumber + " documents");
+		context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Process called " + processCount);
 		try {
 			solrServer.commit();
+			context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Added " + recordNumber + " documents");
 			log.log(Level.INFO, "Added " + recordNumber + " documents");
-			System.out.println("Added " + recordNumber + " documents");
+			context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Deleted are " + recordNumber + " deleted");
 			log.log(Level.INFO, "Deleted are " + deleted);
-			System.out.println("Deleted are " + deleted);
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
@@ -511,11 +511,14 @@ public class EnrichmentPlugin<I> extends
 				if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE) != null
 						&& mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
 								.size() > 0) {
+					solrInputDocument.addField("timestamp_created", new Date(mdr.getValues(
+							EuropeanaModelRegistry.INITIALSAVE).get(0)));
 					fullBean.setTimestampCreated(new Date(mdr.getValues(
 							EuropeanaModelRegistry.INITIALSAVE).get(0)));
 				} else {
 					Date timestampCreated = new Date();
 					fullBean.setTimestampCreated(timestampCreated);
+					solrInputDocument.addField("timestamp_created", timestampCreated);
 					mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
 							timestampCreated.getTime());
 				}
@@ -523,6 +526,7 @@ public class EnrichmentPlugin<I> extends
 				mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
 				Date timestampUpdated = new Date();
 				fullBean.setTimestampUpdated(timestampUpdated);
+				solrInputDocument.addField("timestamp_update", timestampUpdated);
 				mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
 						timestampUpdated.getTime());
 				mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
