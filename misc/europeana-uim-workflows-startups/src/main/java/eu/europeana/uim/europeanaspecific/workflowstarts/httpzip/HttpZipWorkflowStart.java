@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.theeuropeanlibrary.model.common.qualifier.Status;
+
 import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.storage.StorageEngine;
@@ -39,6 +41,7 @@ import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.store.Execution;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.Request;
@@ -69,7 +72,6 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 	 * The deduplication service reference (null if not available)
 	 */
 	DeduplicationService dedup;
-	
 	
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String httpzipurl = "http.overwrite.zip.baseUrl";
@@ -109,7 +111,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 
 		public int maxrecords = 0;
 		public int expected = 0;
-		
+		public boolean isNew=true;
 		public Set<String> deletioncandidates;
 	}
 
@@ -267,6 +269,9 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 			
 			try {
 				I[] availableMDRs = storage.getByCollection(collection);
+				if(availableMDRs.length>0){
+					value.isNew = false;
+				}
 				for(int i=0; i<availableMDRs.length; i++){
 					value.deletioncandidates.add((String) availableMDRs[i]);
 				}
@@ -383,6 +388,8 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 					MetaDataRecord<I> mdr = uimengine.getMetaDataRecord((I) id);
 					mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 					mdr.addValue(EuropeanaModelRegistry.STATUS, Status.DELETED);
+					mdr.deleteValues(EuropeanaModelRegistry.UIMUPDATEDDATE);
+					mdr.addValue(EuropeanaModelRegistry.UIMUPDATEDDATE, new Date().toString());
 					uimengine.updateMetaDataRecord(mdr);
 					context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart", "Marked Record " + mdr.getId() + " as Deleted." );
 				} catch (StorageEngineException e) {
@@ -397,6 +404,8 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 
 		Collection<I> collection = (Collection<I>) context.getDataSet();
 		collection.putValue("Deleted", Integer.toString(value.deletioncandidates.size()));
+		collection.putValue(ControlledVocabularyProxy.ISNEW.toString(), Boolean.toString(value.isNew));
+		collection.putValue(ControlledVocabularyProxy.LASTINGESTION_DATE.toString(),Long.toString(new Date().getTime()));
 		try {
 			context.getStorageEngine().updateExecution(execution);
 			context.getStorageEngine().updateCollection(collection);

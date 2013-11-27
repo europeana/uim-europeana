@@ -22,9 +22,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -34,11 +37,13 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.openrdf.query.algebra.Add;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import com.google.code.morphia.query.Query;
@@ -111,6 +116,7 @@ import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
+import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.sugar.LoginFailureException;
@@ -151,11 +157,13 @@ public class EnrichmentPlugin<I> extends
 	private static IBindingFactory bfact;
 	private static OsgiEdmMongoServer mongoServer;
 	private static EuropeanaEnrichmentTagger tagger;
+	private static Date ingestionDate;
 	private static int processCount;
 	private final static String XML_LANG = "_@xml:lang";
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
 			.getName());
-
+	private final static String OVERRIDECHECKS="override.all.checks";
+	private final static String OVERRIDEENRICHMENT="override.enrichment.creation";
 	private enum EnrichmentFields {
 		DC_DATE("proxy_dc_date"), DC_COVERAGE("proxy_dc_coverage"), DC_TERMS_TEMPORAL(
 				"proxy_dcterms_temporal"), EDM_YEAR("proxy_edm_year"), DCTERMS_SPATIAL(
@@ -199,7 +207,10 @@ public class EnrichmentPlugin<I> extends
 	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-
+		{
+			add(OVERRIDECHECKS);
+			add(OVERRIDEENRICHMENT);
+		}
 	};
 
 	/*
@@ -259,7 +270,7 @@ public class EnrichmentPlugin<I> extends
 	@Override
 	public List<String> getParameters() {
 
-		return new ArrayList<String>();
+		return params;
 	}
 
 	/*
@@ -310,13 +321,19 @@ public class EnrichmentPlugin<I> extends
 			}
 
 			collection = (Collection) context.getExecution().getDataSet();
-
-			clearData(mongoServer, collection.getMnemonic());
-			solrServer.deleteByQuery("europeana_collectionName:"
-					+ collection.getName().split("_")[0] + "*");
+			String overrideChecks = context.getProperties().getProperty(OVERRIDECHECKS);
+			if (Boolean.parseBoolean(collection
+					.getValue(ControlledVocabularyProxy.ISNEW.toString()))|| Boolean.parseBoolean(overrideChecks)) {
+				clearData(mongoServer, collection.getMnemonic());
+				solrServer.deleteByQuery("europeana_collectionName:"
+						+ collection.getName().split("_")[0] + "*");
+			}
+			ingestionDate = new Date(Long.parseLong(collection
+					.getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
+							.toString())));
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 			log.log(Level.SEVERE, e.getMessage());
 		}
 		String sugarCrmId = collection
@@ -365,16 +382,20 @@ public class EnrichmentPlugin<I> extends
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
-		
+
 		log.log(Level.INFO, "Adding " + recordNumber + " documents");
-		log.log(Level.INFO, "Process called " +processCount);
-		//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Adding " + recordNumber + " documents");
-		//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Process called " + processCount);
+		log.log(Level.INFO, "Process called " + processCount);
+		// context.getLoggingEngine().log(context.getExecution(),Level.INFO,
+		// "Adding " + recordNumber + " documents");
+		// context.getLoggingEngine().log(context.getExecution(),Level.INFO,
+		// "Process called " + processCount);
 		try {
 			solrServer.commit();
-			//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Added " + recordNumber + " documents");
+			// context.getLoggingEngine().log(context.getExecution(),Level.INFO,
+			// "Added " + recordNumber + " documents");
 			log.log(Level.INFO, "Added " + recordNumber + " documents");
-			//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Deleted are " + recordNumber + " deleted");
+			// context.getLoggingEngine().log(context.getExecution(),Level.INFO,
+			// "Deleted are " + recordNumber + " deleted");
 			log.log(Level.INFO, "Deleted are " + deleted);
 		} catch (SolrServerException e) {
 			log.log(Level.SEVERE, e.getMessage());
@@ -408,183 +429,282 @@ public class EnrichmentPlugin<I> extends
 		} else {
 			value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 		}
-
-		List<Status> status = mdr.getValues(EuropeanaModelRegistry.STATUS);
-
-		if (!(status != null && status.get(0).equals(Status.DELETED))) {
-
-			MongoConstructor mongoConstructor = new MongoConstructor();
-
-			try {
+		String overrideChecks = context.getProperties().getProperty(OVERRIDECHECKS);
+		// Check dates first
+		SimpleDateFormat sdf = new SimpleDateFormat(
+				"EEE MMM dd HH:mm:ss Z yyyy", Locale.US);
+		try {
+			Date updateDate = sdf.parse((mdr.getValues(
+					EuropeanaModelRegistry.UIMUPDATEDDATE).size()>0)?mdr.getValues(
+							EuropeanaModelRegistry.UIMUPDATEDDATE).get(0):new Date(0).toString());
+			
+			if (updateDate.after(ingestionDate)||Boolean.parseBoolean(overrideChecks)) {
 
 				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 
 				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-				SolrInputDocument basicDocument = new SolrConstructor()
-						.constructSolrDocument(rdf);
+				List<Status> status = mdr
+						.getValues(EuropeanaModelRegistry.STATUS);
 
-				SolrInputDocument mockDocument = createMockForEnrichment(basicDocument);
+				if (!(status != null && status.get(0).equals(Status.DELETED))) {
 
-				List<Entity> entities = null;
-				entities = tagger.tagDocument(mockDocument);
+					MongoConstructor mongoConstructor = new MongoConstructor();
 
-				mergeEntities(rdf, entities);
+					try {
 
-				RDF rdfFinal = cleanRDF(rdf);
-				boolean hasEuropeanaProxy = false;
+						SolrInputDocument basicDocument = new SolrConstructor()
+								.constructSolrDocument(rdf);
 
-				for (ProxyType proxy : rdfFinal.getProxyList()) {
-					if (proxy.getEuropeanaProxy() != null
-							&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-						hasEuropeanaProxy = true;
-					}
-				}
-				if (!hasEuropeanaProxy) {
-					ProxyType europeanaProxy = new ProxyType();
-					EuropeanaProxy prx = new EuropeanaProxy();
-					prx.setEuropeanaProxy(true);
-					europeanaProxy.setEuropeanaProxy(prx);
-					List<String> years = new ArrayList<String>();
-					for (ProxyType proxy : rdfFinal.getProxyList()) {
-						years.addAll(new EuropeanaDateUtils()
-								.createEuropeanaYears(proxy));
-						europeanaProxy.setType(proxy.getType());
-					}
-					List<Year> yearList = new ArrayList<Year>();
-					for (String year : years) {
-						Year yearObj = new Year();
-						LiteralType.Lang lang = new LiteralType.Lang();
-						lang.setLang("eur");
-						yearObj.setLang(lang);
-						yearObj.setString(year);
-						yearList.add(yearObj);
-					}
-					europeanaProxy.setYearList(yearList);
-					for (ProxyType proxy : rdfFinal.getProxyList()) {
-						if (proxy != null && proxy.getEuropeanaProxy() != null
-								&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-							rdfFinal.getProxyList().remove(proxy);
+						SolrInputDocument mockDocument = createMockForEnrichment(basicDocument);
+
+						List<Entity> entities = null;
+						entities = tagger.tagDocument(mockDocument);
+
+						mergeEntities(rdf, entities);
+
+						RDF rdfFinal = cleanRDF(rdf);
+						boolean hasEuropeanaProxy = false;
+
+						for (ProxyType proxy : rdfFinal.getProxyList()) {
+							if (proxy.getEuropeanaProxy() != null
+									&& proxy.getEuropeanaProxy()
+											.isEuropeanaProxy()) {
+								hasEuropeanaProxy = true;
+							}
 						}
-					}
-					rdfFinal.getProxyList().add(europeanaProxy);
-				}
-
-				SolrInputDocument solrInputDocument = new SolrConstructor()
-						.constructSolrDocument(rdfFinal);
-				FullBeanImpl fullBean = mongoConstructor.constructFullBean(
-						rdfFinal, mongoServer);
-				solrInputDocument.addField(
-						EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
-						previewsOnlyInPortal);
-
-				fullBean.getAggregations()
-						.get(0)
-						.setEdmPreviewNoDistribute(
-								Boolean.parseBoolean(previewsOnlyInPortal));
-				int completeness = RecordCompletenessRanking
-						.rankRecordCompleteness(solrInputDocument);
-				fullBean.setEuropeanaCompleteness(completeness);
-				solrInputDocument.addField(
-						EdmLabel.EUROPEANA_COMPLETENESS.toString(),
-						completeness);
-
-				fullBean.setEuropeanaCollectionName(new String[] { mdr
-						.getCollection().getName() });
-				if (fullBean.getEuropeanaAggregation().getEdmLanguage() != null) {
-					fullBean.setLanguage(new String[] { fullBean
-							.getEuropeanaAggregation().getEdmLanguage()
-							.values().iterator().next().get(0) });
-				}
-				solrInputDocument.setField("europeana_collectionName", mdr
-						.getCollection().getName());
-				ProxyImpl providerProxy = getProviderProxy(fullBean);
-				List<String> titles = new ArrayList<String>();
-				if (providerProxy.getDcTitle() != null) {
-					for (Entry<String, List<String>> entry : providerProxy
-							.getDcTitle().entrySet()) {
-						if (entry.getValue() != null) {
-							titles.addAll(entry.getValue());
+						if (!hasEuropeanaProxy) {
+							ProxyType europeanaProxy = new ProxyType();
+							EuropeanaProxy prx = new EuropeanaProxy();
+							prx.setEuropeanaProxy(true);
+							europeanaProxy.setEuropeanaProxy(prx);
+							List<String> years = new ArrayList<String>();
+							for (ProxyType proxy : rdfFinal.getProxyList()) {
+								years.addAll(new EuropeanaDateUtils()
+										.createEuropeanaYears(proxy));
+								europeanaProxy.setType(proxy.getType());
+							}
+							List<Year> yearList = new ArrayList<Year>();
+							for (String year : years) {
+								Year yearObj = new Year();
+								LiteralType.Lang lang = new LiteralType.Lang();
+								lang.setLang("eur");
+								yearObj.setLang(lang);
+								yearObj.setString(year);
+								yearList.add(yearObj);
+							}
+							europeanaProxy.setYearList(yearList);
+							for (ProxyType proxy : rdfFinal.getProxyList()) {
+								if (proxy != null
+										&& proxy.getEuropeanaProxy() != null
+										&& proxy.getEuropeanaProxy()
+												.isEuropeanaProxy()) {
+									rdfFinal.getProxyList().remove(proxy);
+								}
+							}
+							rdfFinal.getProxyList().add(europeanaProxy);
 						}
+
+						SolrInputDocument solrInputDocument = new SolrConstructor()
+								.constructSolrDocument(rdfFinal);
+						FullBeanImpl fullBean = mongoConstructor
+								.constructFullBean(rdfFinal, mongoServer);
+						solrInputDocument.addField(
+								EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
+								previewsOnlyInPortal);
+
+						fullBean.getAggregations()
+								.get(0)
+								.setEdmPreviewNoDistribute(
+										Boolean.parseBoolean(previewsOnlyInPortal));
+						int completeness = RecordCompletenessRanking
+								.rankRecordCompleteness(solrInputDocument);
+						fullBean.setEuropeanaCompleteness(completeness);
+						solrInputDocument.addField(
+								EdmLabel.EUROPEANA_COMPLETENESS.toString(),
+								completeness);
+
+						fullBean.setEuropeanaCollectionName(new String[] { mdr
+								.getCollection().getName() });
+						if (fullBean.getEuropeanaAggregation().getEdmLanguage() != null) {
+							fullBean.setLanguage(new String[] { fullBean
+									.getEuropeanaAggregation().getEdmLanguage()
+									.values().iterator().next().get(0) });
+						}
+						solrInputDocument.setField("europeana_collectionName",
+								mdr.getCollection().getName());
+						ProxyImpl providerProxy = getProviderProxy(fullBean);
+						List<String> titles = new ArrayList<String>();
+						if (providerProxy.getDcTitle() != null) {
+							for (Entry<String, List<String>> entry : providerProxy
+									.getDcTitle().entrySet()) {
+								if (entry.getValue() != null) {
+									titles.addAll(entry.getValue());
+								}
+							}
+						}
+						if (titles.size() > 0) {
+							fullBean.setTitle(titles.toArray(new String[titles
+									.size()]));
+						}
+						if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE) != null
+								&& mdr.getValues(
+										EuropeanaModelRegistry.INITIALSAVE)
+										.size() > 0) {
+							solrInputDocument.addField(
+									"timestamp_created",
+									new Date(mdr.getValues(
+											EuropeanaModelRegistry.INITIALSAVE)
+											.get(0)));
+							fullBean.setTimestampCreated(new Date(mdr
+									.getValues(
+											EuropeanaModelRegistry.INITIALSAVE)
+									.get(0)));
+						} else {
+							Date timestampCreated = new Date();
+							fullBean.setTimestampCreated(timestampCreated);
+							solrInputDocument.addField("timestamp_created",
+									timestampCreated);
+							mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
+									timestampCreated.getTime());
+						}
+
+						mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
+						Date timestampUpdated = new Date();
+						fullBean.setTimestampUpdated(timestampUpdated);
+						solrInputDocument.addField("timestamp_update",
+								timestampUpdated);
+						mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
+								timestampUpdated.getTime());
+						String overrideEnrichment = context.getProperties().getProperty(OVERRIDEENRICHMENT);
+						if(Boolean.parseBoolean(overrideEnrichment)){
+							mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
+							mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,
+								EdmUtils.toEDM(fullBean, true));
+						}
+						context.getStorageEngine().updateMetaDataRecord(mdr);
+						if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
+							mongoServer.getDatastore().save(fullBean);
+						} else {
+							updateFullBean(mongoServer, fullBean);
+
+						}
+						recordNumber++;
+						solrServer.add(solrInputDocument);
+
+						return true;
+
+					} catch (MalformedURLException e) {
+						log.log(Level.SEVERE,
+								"Malformed URL Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
+						e.printStackTrace();
+						return false;
+					} catch (InstantiationException e) {
+						log.log(Level.SEVERE,
+								"Instantiation Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
+						e.printStackTrace();
+						return false;
+					} catch (IllegalAccessException e) {
+						log.log(Level.SEVERE,
+								"Illegal Access Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
+						e.printStackTrace();
+						return false;
+					} catch (IOException e) {
+						log.log(Level.SEVERE,
+								"IO Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
+						e.printStackTrace();
+						return false;
+					} catch (Exception e) {
+						e.printStackTrace();
+						log.log(Level.SEVERE,
+								"Generic Exception occured with error "
+										+ e.getMessage() + "\nRetrying");
+						return false;
 					}
 				}
-				if (titles.size() > 0) {
-					fullBean.setTitle(titles.toArray(new String[titles.size()]));
+
+				else {
+					boolean res = removeRecord(rdf);
+					if (res) {
+						deleted++;
+					}
+					mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
+					mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
+							new Date().getTime());
+					try {
+						context.getStorageEngine().updateMetaDataRecord(mdr);
+					} catch (StorageEngineException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return res;
 				}
-				if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE) != null
-						&& mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
-								.size() > 0) {
-					solrInputDocument.addField("timestamp_created",new Date(mdr.getValues(
-							EuropeanaModelRegistry.INITIALSAVE).get(0)));
-					fullBean.setTimestampCreated(new Date(mdr.getValues(
-							EuropeanaModelRegistry.INITIALSAVE).get(0)));
-				} else {
-					Date timestampCreated = new Date();
-					fullBean.setTimestampCreated(timestampCreated);
-					solrInputDocument.addField("timestamp_created", timestampCreated);
-//					mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
-//							timestampCreated.getTime());
-				}
-
-				//mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
-				Date timestampUpdated = new Date();
-				fullBean.setTimestampUpdated(timestampUpdated);
-				solrInputDocument.addField("timestamp_update", timestampUpdated);
-				//mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
-				//		timestampUpdated.getTime());
-				//mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
-				//mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,
-				//		EdmUtils.toEDM(fullBean, true));
-				if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
-					mongoServer.getDatastore().save(fullBean);
-				} else {
-					updateFullBean(mongoServer, fullBean);
-
-				}
-				recordNumber++;
-				solrServer.add(solrInputDocument);
-
-				return true;
-
-			} catch (JiBXException e) {
-				log.log(Level.SEVERE,
-						"JibX Exception occured with error " + e.getMessage()
-								+ "\nRetrying");
-				e.printStackTrace();
-				return false;
-			} catch (MalformedURLException e) {
-				log.log(Level.SEVERE,
-						"Malformed URL Exception occured with error "
-								+ e.getMessage() + "\nRetrying");
-				e.printStackTrace();
-				return false;
-			} catch (InstantiationException e) {
-				log.log(Level.SEVERE,
-						"Instantiation Exception occured with error "
-								+ e.getMessage() + "\nRetrying");
-				e.printStackTrace();
-				return false;
-			} catch (IllegalAccessException e) {
-				log.log(Level.SEVERE,
-						"Illegal Access Exception occured with error "
-								+ e.getMessage() + "\nRetrying");
-				e.printStackTrace();
-				return false;
-			} catch (IOException e) {
-				log.log(Level.SEVERE,
-						"IO Exception occured with error " + e.getMessage()
-								+ "\nRetrying");
-				e.printStackTrace();
-				return false;
-			} catch (Exception e) {
-				e.printStackTrace();
-				log.log(Level.SEVERE, "Generic Exception occured with error "
-						+ e.getMessage() + "\nRetrying");
-				return false;
+				
 			}
-		} else {
-			deleted++;
+		} catch (JiBXException e) {
+			log.log(Level.SEVERE,
+					"JibX Exception occured with error " + e.getMessage()
+							+ "\nRetrying");
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
 		}
 		return false;
+	}
+
+	private boolean removeRecord(RDF rdf) {
+		try {
+			solrServer.deleteByQuery("europeana_id:"
+					+ ClientUtils.escapeQueryChars(rdf.getProvidedCHOList()
+							.get(0).getAbout()));
+
+			DBCollection records = mongoServer.getDatastore().getDB()
+					.getCollection("record");
+			DBCollection proxies = mongoServer.getDatastore().getDB()
+					.getCollection("Proxy");
+			DBCollection providedCHOs = mongoServer.getDatastore().getDB()
+					.getCollection("ProvidedCHO");
+			DBCollection aggregations = mongoServer.getDatastore().getDB()
+					.getCollection("Aggregation");
+			DBCollection europeanaAggregations = mongoServer.getDatastore()
+					.getDB().getCollection("EuropeanaAggregation");
+
+			DBObject query = new BasicDBObject("about", rdf
+					.getProvidedCHOList().get(0).getAbout());
+			DBObject proxyQuery = new BasicDBObject("about", "/proxy/provider"
+					+ rdf.getProvidedCHOList().get(0).getAbout());
+			DBObject europeanaProxyQuery = new BasicDBObject("about",
+					"/proxy/europeana"
+							+ rdf.getProvidedCHOList().get(0).getAbout());
+
+			DBObject providedCHOQuery = new BasicDBObject("about", "/item/"
+					+ rdf.getProvidedCHOList().get(0).getAbout());
+			DBObject aggregationQuery = new BasicDBObject("about",
+					"/aggregation/provider"
+							+ rdf.getProvidedCHOList().get(0).getAbout());
+			DBObject europeanaAggregationQuery = new BasicDBObject("about",
+					"/aggregation/europeana"
+							+ rdf.getProvidedCHOList().get(0).getAbout());
+			europeanaAggregations.remove(europeanaAggregationQuery,
+					WriteConcern.FSYNC_SAFE);
+			records.remove(query, WriteConcern.FSYNC_SAFE);
+			proxies.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
+			proxies.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
+			providedCHOs.remove(providedCHOQuery, WriteConcern.FSYNC_SAFE);
+			aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
+			return true;
+		} catch (SolrServerException e) {
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
 	}
 
 	private SolrInputDocument createMockForEnrichment(
