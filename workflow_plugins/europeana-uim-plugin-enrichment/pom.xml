@@ -218,6 +218,11 @@
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,
+							eu.europeana.uim.europeanaspecific.workflowstarts.*,
+							eu.europeana.uim.plugin.source,
+							eu.europeana.uim.storage,
+							eu.europeana.uim.common.progress,
+							eu.europeana.uim.logging; version=0.0.0,
 							!org.apache.http.impl.client,
 							!org.apache.http.client.*,
 							!*

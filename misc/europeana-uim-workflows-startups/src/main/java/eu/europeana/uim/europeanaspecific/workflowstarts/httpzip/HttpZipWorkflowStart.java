@@ -263,6 +263,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		if (dataset instanceof Collection) {
 
 			Collection<I> collection = (Collection<I>) dataset;
+			collection.putValue(ControlledVocabularyProxy.LASTINGESTION_DATE.toString(),Long.toString(new Date().getTime()));
 			Data value = new Data();
 			
 			value.deletioncandidates = Collections.synchronizedSet(new HashSet<String>());
@@ -405,7 +406,7 @@ public class HttpZipWorkflowStart<I> extends AbstractWorkflowStart<MetaDataRecor
 		Collection<I> collection = (Collection<I>) context.getDataSet();
 		collection.putValue("Deleted", Integer.toString(value.deletioncandidates.size()));
 		collection.putValue(ControlledVocabularyProxy.ISNEW.toString(), Boolean.toString(value.isNew));
-		collection.putValue(ControlledVocabularyProxy.LASTINGESTION_DATE.toString(),Long.toString(new Date().getTime()));
+		
 		try {
 			context.getStorageEngine().updateExecution(execution);
 			context.getStorageEngine().updateCollection(collection);

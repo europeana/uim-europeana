@@ -22,11 +22,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.jibx.runtime.BindingDirectory;
@@ -39,7 +42,6 @@ import org.theeuropeanlibrary.model.common.qualifier.Status;
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.EuropeanaProxy;
-import eu.europeana.corelib.definitions.jibx.IsPartOf;
 import eu.europeana.corelib.definitions.jibx.LiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
@@ -47,9 +49,9 @@ import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.Year;
-import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
@@ -63,6 +65,7 @@ import eu.europeana.uim.plugin.solr.helpers.TimespanDereferencer;
 import eu.europeana.uim.plugin.solr.helpers.WebResourceDereferencer;
 import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
 import eu.europeana.uim.plugin.solr.utils.JibxUtils;
+import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 
 /**
@@ -76,17 +79,21 @@ import eu.europeana.uim.store.MetaDataRecord;
 public class SolrWorkflowPlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
-	private static int recordNumber;
-	private static Map<String, List<ControlledVocabularyImpl>> vocMemCache;
-
+	private final static String OVERRIDECHECKS = "override.all.checks";
+	@SuppressWarnings("rawtypes")
+	private final static TKey<SolrWorkflowPlugin, Long> date = TKey.register(
+			SolrWorkflowPlugin.class, "enrichment", Long.class);
 	private static SolrWorkflowService solrWorkflowService;
 	private static IBindingFactory bfact;
+	private static final Logger log = Logger.getLogger(SolrWorkflowPlugin.class.getName());
 	/**
 	 * The parameters used by this WorkflowStart
 	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-
+		{
+			add(OVERRIDECHECKS);
+		}
 	};
 
 	/**
@@ -99,8 +106,7 @@ public class SolrWorkflowPlugin<I> extends
 		try {
 			bfact = BindingDirectory.getFactory(RDF.class);
 		} catch (JiBXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.SEVERE,"Error initializing Jibx Factory:" + e.getMessage());
 		}
 
 	}
@@ -116,150 +122,184 @@ public class SolrWorkflowPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
-		if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-				|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-						.equals(Status.DELETED)) {
-			try {
+		
+		String overrideChecks = context.getProperties().getProperty(
+				OVERRIDECHECKS);
+		boolean check = false;
+		if (StringUtils.isNotEmpty(overrideChecks)) {
+			check = Boolean.parseBoolean(overrideChecks);
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat(
+				"EEE MMM dd HH:mm:ss Z yyyy", Locale.US);
+		try {
 
-				String value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
-						.get(0);
-				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-				IMarshallingContext marshallingContext = bfact
-						.createMarshallingContext();
-				marshallingContext.setIndent(2);
-				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-				// RDF rdfCopy = (RDF) uctx.unmarshalDocument(new
-				// StringReader(value));
-				RDF rdfCopy = clone(rdf);
-				if (rdf.getAgentList() != null) {
-					for (AgentType agent : rdf.getAgentList()) {
-						dereferenceAgent(rdfCopy, agent);
-					}
-				}
-				if (rdf.getConceptList() != null) {
-					for (Concept concept : rdf.getConceptList()) {
-						dereferenceConcept(rdfCopy, concept);
-					}
-				}
+			Date updateDate = sdf.parse((mdr.getValues(
+					EuropeanaModelRegistry.UIMUPDATEDDATE).size() > 0) ? mdr
+					.getValues(EuropeanaModelRegistry.UIMUPDATEDDATE).get(0)
+					: new Date(0).toString());
+			Date ingestionDate = new Date(context.getValue(date));
 
-				if (rdf.getPlaceList() != null) {
-					for (PlaceType place : rdf.getPlaceList()) {
-						dereferencePlace(rdfCopy, place);
-					}
-				}
+			if (updateDate.after(ingestionDate)
+					|| updateDate.toString().equals(ingestionDate.toString())
+					|| check) {
+				if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+						|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+								.equals(Status.DELETED)) {
+					try {
 
-				for (ProxyType proxy : rdf.getProxyList()) {
-					if (proxy.getEuropeanaProxy() == null
-							|| !proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-						dereferenceProxy(rdfCopy, proxy);
-					}
-				}
-
-				if (rdf.getTimeSpanList() != null) {
-					for (TimeSpanType timespan : rdf.getTimeSpanList()) {
-						dereferenceTimespan(rdfCopy, timespan);
-					}
-				}
-				if (rdf.getWebResourceList() != null) {
-					for (WebResourceType webresource : rdf.getWebResourceList()) {
-						dereferenceWebResource(rdfCopy, webresource);
-					}
-				}
-
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				RDF rdfFinal = cleanRDF(rdfCopy);
-
-				ProxyType europeanaProxy = new ProxyType();
-				EuropeanaProxy prx = new EuropeanaProxy();
-				prx.setEuropeanaProxy(true);
-				europeanaProxy.setEuropeanaProxy(prx);
-				List<String> years = new ArrayList<String>();
-				for (ProxyType proxy : rdfFinal.getProxyList()) {
-					years.addAll(new EuropeanaDateUtils()
-							.createEuropeanaYears(proxy));
-					europeanaProxy.setType(proxy.getType());
-				}
-				List<Year> yearList = new ArrayList<Year>();
-				for (String year : years) {
-					Year yearObj = new Year();
-					Lang lang = new Lang();
-					lang.setLang("eur");
-					yearObj.setLang(lang);
-					yearObj.setString(year);
-					yearList.add(yearObj);
-				}
-				europeanaProxy.setYearList(yearList);
-				for (ProxyType proxy : rdfFinal.getProxyList()) {
-					if (proxy != null && proxy.getEuropeanaProxy() != null
-							&& proxy.getEuropeanaProxy().isEuropeanaProxy()) {
-						rdfFinal.getProxyList().remove(proxy);
-					}
-				}
-				rdfFinal.getProxyList().add(europeanaProxy);
-				for (PlaceType place : rdfFinal.getPlaceList()) {
-					if (place.getIsPartOfList() != null) {
-						for (IsPartOf i : place.getIsPartOfList()) {
-							System.out.println("Is part of is null: "
-									+ (i == null));
-							if (i.getResource() != null) {
-								System.out.println("The resource is "
-										+ i.getResource().getResource());
-							}
-							if (i.getString() != null) {
-								System.out.println("The string is "
-										+ i.getString());
-							}
-							if(i.getLang()!=null){
-								System.out.println("The language is " + i.getLang().getLang());
+						String value = mdr.getValues(
+								EuropeanaModelRegistry.EDMRECORD).get(0);
+						IUnmarshallingContext uctx = bfact
+								.createUnmarshallingContext();
+						IMarshallingContext marshallingContext = bfact
+								.createMarshallingContext();
+						marshallingContext.setIndent(2);
+						RDF rdf = (RDF) uctx
+								.unmarshalDocument(new StringReader(value));
+						RDF rdfCopy = clone(rdf);
+						if (rdf.getAgentList() != null) {
+							for (AgentType agent : rdf.getAgentList()) {
+								dereferenceAgent(rdfCopy, agent);
 							}
 						}
+						if (rdf.getConceptList() != null) {
+							for (Concept concept : rdf.getConceptList()) {
+								dereferenceConcept(rdfCopy, concept);
+							}
+						}
+
+						if (rdf.getPlaceList() != null) {
+							for (PlaceType place : rdf.getPlaceList()) {
+								dereferencePlace(rdfCopy, place);
+							}
+						}
+
+						for (ProxyType proxy : rdf.getProxyList()) {
+							if (proxy.getEuropeanaProxy() == null
+									|| !proxy.getEuropeanaProxy()
+											.isEuropeanaProxy()) {
+								dereferenceProxy(rdfCopy, proxy);
+							}
+						}
+
+						if (rdf.getTimeSpanList() != null) {
+							for (TimeSpanType timespan : rdf.getTimeSpanList()) {
+								dereferenceTimespan(rdfCopy, timespan);
+							}
+						}
+						if (rdf.getWebResourceList() != null) {
+							for (WebResourceType webresource : rdf
+									.getWebResourceList()) {
+								dereferenceWebResource(rdfCopy, webresource);
+							}
+						}
+
+						ByteArrayOutputStream out = new ByteArrayOutputStream();
+						RDF rdfFinal = cleanRDF(rdfCopy);
+
+						ProxyType europeanaProxy = new ProxyType();
+						EuropeanaProxy prx = new EuropeanaProxy();
+						prx.setEuropeanaProxy(true);
+						europeanaProxy.setEuropeanaProxy(prx);
+						List<String> years = new ArrayList<String>();
+						for (ProxyType proxy : rdfFinal.getProxyList()) {
+							years.addAll(new EuropeanaDateUtils()
+									.createEuropeanaYears(proxy));
+							europeanaProxy.setType(proxy.getType());
+						}
+						List<Year> yearList = new ArrayList<Year>();
+						for (String year : years) {
+							Year yearObj = new Year();
+							Lang lang = new Lang();
+							lang.setLang("eur");
+							yearObj.setLang(lang);
+							yearObj.setString(year);
+							yearList.add(yearObj);
+						}
+						europeanaProxy.setYearList(yearList);
+						for (ProxyType proxy : rdfFinal.getProxyList()) {
+							if (proxy != null
+									&& proxy.getEuropeanaProxy() != null
+									&& proxy.getEuropeanaProxy()
+											.isEuropeanaProxy()) {
+								rdfFinal.getProxyList().remove(proxy);
+							}
+						}
+						rdfFinal.getProxyList().add(europeanaProxy);
+
+						marshallingContext.marshalDocument(rdfFinal, "UTF-8",
+								null, out);
+						String der = out.toString("UTF-8");
+
+						mdr.addValue(
+								EuropeanaModelRegistry.EDMDEREFERENCEDRECORD,
+								der);
+						return true;
+
+					} catch (JiBXException e) {
+						context.getLoggingEngine().logFailed(
+								Level.SEVERE,
+								this,
+								e,
+								"JiBX unmarshalling has failed with the following error: "
+										+ e.getMessage());
+						
+					} catch (MalformedURLException e) {
+						log.log(
+								Level.SEVERE,
+								
+								"Error: "
+										+ e.getMessage());
+					} catch (IOException e) {
+						log.log(
+								Level.SEVERE,
+								
+								"Error: "
+										+ e.getMessage());
+					} catch (SecurityException e) {
+						log.log(
+								Level.SEVERE,
+								
+								"Error: "
+										+ e.getMessage());
+					} catch (IllegalArgumentException e) {
+						log.log(
+								Level.SEVERE,
+								
+								"Error: "
+										+ e.getMessage());
+					} catch (NoSuchMethodException e) {
+						log.log(
+								Level.SEVERE,
+								
+								"Error: "
+										+ e.getMessage());
+					} catch (IllegalAccessException e) {
+						log.log(
+								Level.SEVERE,
+								
+								"Error: "
+										+ e.getMessage());
+					} catch (InvocationTargetException e) {
+						log.log(
+								Level.SEVERE,
+								
+								"Error: "
+										+ e.getMessage());
+					} catch (InstantiationException e) {
+						log.log(
+								Level.SEVERE,
+								
+								"Error: "
+										+ e.getMessage());
 					}
+
 				}
-				marshallingContext
-						.marshalDocument(rdfFinal, "UTF-8", null, out);
-				String der = out.toString("UTF-8");
-
-				mdr.addValue(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD, der);
-				recordNumber++;
-				return true;
-
-			} catch (JiBXException e) {
-				context.getLoggingEngine().logFailed(
-						Level.SEVERE,
-						this,
-						e,
-						"JiBX unmarshalling has failed with the following error: "
-								+ e.getMessage());
-				e.printStackTrace();
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return false;
-		// return true;
 	}
 
 	private RDF clone(RDF rdf) {
@@ -502,7 +542,17 @@ public class SolrWorkflowPlugin<I> extends
 	@Override
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
+		if (((Collection<I>) context.getDataSet())
+				.getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
+						.toString()) != null) {
+			context.putValue(date, Long.parseLong(((Collection<I>) context
+					.getDataSet())
+					.getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
+							.toString())));
 
+		} else {
+			context.putValue(date, new Date().getTime());
+		}
 	}
 
 	/*
@@ -564,10 +614,6 @@ public class SolrWorkflowPlugin<I> extends
 	@Override
 	public List<String> getParameters() {
 		return params;
-	}
-
-	public static int getRecords() {
-		return recordNumber;
 	}
 
 }
