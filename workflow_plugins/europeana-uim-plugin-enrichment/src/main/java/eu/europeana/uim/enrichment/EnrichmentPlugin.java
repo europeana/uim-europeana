@@ -617,13 +617,15 @@ public class EnrichmentPlugin<I> extends
 				.getCollection("record");
 		DBCollection proxies = mongoServer2.getDatastore().getDB()
 				.getCollection("Proxy");
+		DBCollection physicalThing = mongoServer2.getDatastore().getDB()
+				.getCollection("PhysicalThing");
 		DBCollection providedCHOs = mongoServer2.getDatastore().getDB()
 				.getCollection("ProvidedCHO");
 		DBCollection aggregations = mongoServer2.getDatastore().getDB()
 				.getCollection("Aggregation");
 		DBCollection europeanaAggregations = mongoServer2.getDatastore()
 				.getDB().getCollection("EuropeanaAggregation");
-
+		
 		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
 				+ collection + "/"));
 		DBObject proxyQuery = new BasicDBObject("about",
@@ -642,6 +644,8 @@ public class EnrichmentPlugin<I> extends
 		records.remove(query, WriteConcern.FSYNC_SAFE);
 		proxies.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
 		proxies.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
+		physicalThing.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
+		physicalThing.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
 		providedCHOs.remove(providedCHOQuery, WriteConcern.FSYNC_SAFE);
 		aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
 	}
