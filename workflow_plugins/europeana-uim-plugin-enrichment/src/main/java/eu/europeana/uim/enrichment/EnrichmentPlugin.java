@@ -92,7 +92,6 @@ import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.server.EdmMongoServer;
-import eu.europeana.corelib.solr.utils.EdmUtils;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
 import eu.europeana.uim.common.TKey;
@@ -189,6 +188,7 @@ public class EnrichmentPlugin<I> extends
 			bfact = BindingDirectory.getFactory(RDF.class);
 
 		} catch (JiBXException e) {
+			e.printStackTrace();
 			log.log(Level.SEVERE, "Error creating the JibX factory");
 		}
 
@@ -332,21 +332,24 @@ public class EnrichmentPlugin<I> extends
 			} catch (LoginFailureException e) {
 				log.log(Level.SEVERE,
 						"Error updating Sugar Session id. " + e.getMessage());
+				e.printStackTrace();
 			} catch (Exception e) {
 				log.log(Level.SEVERE,
 						"Generic SugarCRM error. " + e.getMessage());
+				e.printStackTrace();
 			}
 			SugarCrmRecord sugarCrmRecord = sugarCrmService
 					.retrieveRecord(sugarCrmId);
 			previewsOnlyInPortal = sugarCrmRecord
 					.getItemValue(EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
 		} catch (QueryResultException e) {
-
+			e.printStackTrace();
 			log.log(Level.SEVERE, "Error retrieving SugarCRM record");
 			previewsOnlyInPortal = "false";
 		} catch (Exception e) {
 			log.log(Level.SEVERE,
 					"Record could not be retrieved. " + e.getMessage());
+			e.printStackTrace();
 		}
 		log.log(Level.INFO, "Preview Only in portal acquired with value: "
 				+ previewsOnlyInPortal);
@@ -377,8 +380,10 @@ public class EnrichmentPlugin<I> extends
 			//context.getLoggingEngine().log(context.getExecution(),Level.INFO, "Deleted are " + recordNumber + " deleted");
 			log.log(Level.INFO, "Deleted are " + deleted);
 		} catch (SolrServerException e) {
+			e.printStackTrace();
 			log.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
+			e.printStackTrace();
 			log.log(Level.SEVERE, e.getMessage());
 		}
 		log.log(Level.INFO, "Committed in Solr Server");
@@ -775,6 +780,7 @@ public class EnrichmentPlugin<I> extends
 									europeanaProxy, concept.getAbout());
 						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Exception generated appending the skos:Concept original Field. "
 										+ e.getMessage() + ".");
@@ -817,6 +823,7 @@ public class EnrichmentPlugin<I> extends
 									europeanaProxy, ts.getAbout());
 						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Exception generated appending the edm:Timespan original Field. "
 										+ e.getMessage() + ".");
@@ -857,6 +864,7 @@ public class EnrichmentPlugin<I> extends
 									europeanaProxy, ts.getAbout());
 						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Exception generated appending the edm:Agent original Field. "
 										+ e.getMessage() + ".");
@@ -899,6 +907,7 @@ public class EnrichmentPlugin<I> extends
 									europeanaProxy, ts.getAbout());
 						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Exception generated appending the edm:Place original Field. "
 										+ e.getMessage() + ".");
