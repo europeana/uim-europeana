@@ -158,8 +158,9 @@ public class EnrichmentPlugin<I> extends
 	private final static String XML_LANG = "_@xml:lang";
 	private static final Logger log = Logger.getLogger(EnrichmentPlugin.class
 			.getName());
-	private final static String OVERRIDECHECKS = "override.all.checks";
-	private final static String OVERRIDEENRICHMENT = "override.enrichment.creation";
+	private final static String OVERRIDECHECKS = "override.all.checks.force.delete";
+	private final static String OVERRIDEENRICHMENT = "override.enrichment.save";
+	private final static String FORCELASTUPDATE = "override.last.update.check";
 
 	private enum EnrichmentFields {
 		DC_DATE("proxy_dc_date"), DC_COVERAGE("proxy_dc_coverage"), DC_TERMS_TEMPORAL(
@@ -211,9 +212,11 @@ public class EnrichmentPlugin<I> extends
 	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
+		
 		{
 			add(OVERRIDECHECKS);
 			add(OVERRIDEENRICHMENT);
+			add(FORCELASTUPDATE);
 		}
 	};
 
@@ -452,9 +455,14 @@ public class EnrichmentPlugin<I> extends
 		}
 		String overrideChecks = context.getProperties().getProperty(
 				OVERRIDECHECKS);
+		String overrideUpdateCheck = context.getProperties().getProperty(FORCELASTUPDATE);
 		boolean check = false;
+		boolean checkUpdate = false;
 		if (StringUtils.isNotEmpty(overrideChecks)) {
 			check = Boolean.parseBoolean(overrideChecks);
+		}
+		if (StringUtils.isNotEmpty(overrideUpdateCheck)) {
+			checkUpdate = Boolean.parseBoolean(overrideUpdateCheck);
 		}
 		// Check dates first
 		SimpleDateFormat sdf = new SimpleDateFormat(
@@ -469,7 +477,7 @@ public class EnrichmentPlugin<I> extends
 
 			if (updateDate.after(ingestionDate)
 					|| updateDate.toString().equals(ingestionDate.toString())
-					|| check) {
+					|| check || checkUpdate) {
 
 				IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 
@@ -753,10 +761,10 @@ public class EnrichmentPlugin<I> extends
 							|| field.equals(EnrichmentFields.DC_CONTRIBUTOR)) {
 						mockDocument.addField(field.getValue(), AgentNormalizer
 								.normalize(basicDocument
-										.getFieldValue(fieldName)));
+										.getFieldValues(fieldName)));
 					} else {
 						mockDocument.addField(field.getValue(),
-								basicDocument.getFieldValue(fieldName));
+								basicDocument.getFieldValues(fieldName));
 					}
 				}
 			}
