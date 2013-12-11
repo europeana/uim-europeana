@@ -211,6 +211,8 @@
 							eu.europeana.uim.plugin; version=0.0.0,
 							eu.europeana.uim.plugin.ingestion; version=0.0.0,
 							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues;
+							version=1.0.0.SNAPSHOT,
 							eu.europeana.uim.solr4,
 							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.util,
