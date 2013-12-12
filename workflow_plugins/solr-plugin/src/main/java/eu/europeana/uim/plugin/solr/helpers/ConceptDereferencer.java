@@ -8,7 +8,7 @@ import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
 
-public class ConceptDereferencer extends Dereferencer{
+public class ConceptDereferencer extends Dereferencer {
 
 	public ConceptDereferencer(SolrWorkflowService solrWorkflowService) {
 		super(solrWorkflowService);
@@ -21,6 +21,7 @@ public class ConceptDereferencer extends Dereferencer{
 			NoSuchMethodException, InvocationTargetException {
 		Concept concept = (Concept)t;
 		derefResourceOrLiteral(rdf,  concept.getAbout());
+		if(concept.getChoiceList()!=null){
 		for (eu.europeana.corelib.definitions.jibx.Concept.Choice choice : concept
 				.getChoiceList()) {
 			if (choice.ifBroader())
@@ -40,6 +41,6 @@ public class ConceptDereferencer extends Dereferencer{
 			if (choice.ifRelatedMatch())
 				derefResourceOrLiteral(rdf, choice.getRelatedMatch());
 		}
+		}
 	}
-
 }
