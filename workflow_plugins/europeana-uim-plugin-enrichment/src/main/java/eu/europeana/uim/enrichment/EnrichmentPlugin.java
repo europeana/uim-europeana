@@ -352,7 +352,7 @@ public class EnrichmentPlugin<I> extends
 								.toString())));
 
 			} else {
-				context.putValue(date, new Date().getTime());
+				context.putValue(date, new Date(0).getTime());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -385,6 +385,7 @@ public class EnrichmentPlugin<I> extends
 			log.log(Level.SEVERE, "Error retrieving SugarCRM record");
 			previewsOnlyInPortal = "false";
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.log(Level.SEVERE,
 					"Record could not be retrieved. " + e.getMessage());
 		}
@@ -424,8 +425,10 @@ public class EnrichmentPlugin<I> extends
 					"Deleted are " + deleted);
 			log.log(Level.INFO, "Deleted are " + deleted);
 		} catch (SolrServerException e) {
+			e.printStackTrace();
 			log.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
+			e.printStackTrace();
 			log.log(Level.SEVERE, e.getMessage());
 		}
 		log.log(Level.INFO, "Committed in Solr Server");
@@ -935,6 +938,7 @@ public class EnrichmentPlugin<I> extends
 									europeanaProxy, concept.getAbout());
 						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Exception generated appending the skos:Concept original Field. "
 										+ e.getMessage() + ".");
@@ -977,6 +981,7 @@ public class EnrichmentPlugin<I> extends
 									europeanaProxy, ts.getAbout());
 						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Exception generated appending the edm:Timespan original Field. "
 										+ e.getMessage() + ".");
@@ -1017,6 +1022,7 @@ public class EnrichmentPlugin<I> extends
 									europeanaProxy, ts.getAbout());
 						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Exception generated appending the edm:Agent original Field. "
 										+ e.getMessage() + ".");
@@ -1059,6 +1065,7 @@ public class EnrichmentPlugin<I> extends
 									europeanaProxy, ts.getAbout());
 						}
 					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 						log.log(Level.SEVERE,
 								"Exception generated appending the edm:Place original Field. "
 										+ e.getMessage() + ".");
