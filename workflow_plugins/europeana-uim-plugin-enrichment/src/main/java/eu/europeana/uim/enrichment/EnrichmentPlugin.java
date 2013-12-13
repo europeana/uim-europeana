@@ -336,13 +336,7 @@ public class EnrichmentPlugin<I> extends
 			if (StringUtils.isNotEmpty(overrideChecks)) {
 				check = Boolean.parseBoolean(overrideChecks);
 			}
-			if (Boolean.parseBoolean(collection
-					.getValue(ControlledVocabularyProxy.ISNEW.toString()))
-					|| check) {
-				clearData(mongoServer, collection.getMnemonic());
-				solrServer.deleteByQuery("europeana_collectionName:"
-						+ collection.getName().split("_")[0] + "*");
-			}
+			
 			if (collection
 					.getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
 							.toString()) != null) {
@@ -353,7 +347,16 @@ public class EnrichmentPlugin<I> extends
 
 			} else {
 				context.putValue(date, new Date(0).getTime());
+				check=true;
 			}
+			if (Boolean.parseBoolean(collection
+					.getValue(ControlledVocabularyProxy.ISNEW.toString()))
+					|| check) {
+				clearData(mongoServer, collection.getMnemonic());
+				solrServer.deleteByQuery("europeana_collectionName:"
+						+ collection.getName().split("_")[0] + "*");
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 
