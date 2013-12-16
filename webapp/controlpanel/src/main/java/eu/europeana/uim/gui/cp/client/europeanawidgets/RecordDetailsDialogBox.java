@@ -57,7 +57,7 @@ public class RecordDetailsDialogBox extends DialogBox {
         final TextArea enriched = new TextArea();
         enriched.setCharacterWidth(100);
         enriched.setVisibleLines(20);
-        tabPanel.add(enriched,"Enriched XML");
+        tabPanel.add(enriched,"Last saved enriched XML");
         final RichTextArea search = new RichTextArea();
         search.setPixelSize(900, 600);
         //setCharacterWidth(100);
