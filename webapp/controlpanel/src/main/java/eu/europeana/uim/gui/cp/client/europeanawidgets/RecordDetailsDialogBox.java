@@ -52,7 +52,7 @@ public class RecordDetailsDialogBox extends DialogBox {
         final TextArea deref = new TextArea();
         deref.setCharacterWidth(100);
         deref.setVisibleLines(20);
-        tabPanel.add(deref,"Dereferenced XML");
+        tabPanel.add(deref,"Last saved dereferenced XML");
         
         final TextArea enriched = new TextArea();
         enriched.setCharacterWidth(100);
