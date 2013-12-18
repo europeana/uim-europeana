@@ -68,7 +68,7 @@ import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
 public class OsgiExtractor extends Extractor {
 
 	private static MemCache memCache;
-	private Datastore datastore;
+	private static Datastore datastore;
 	private final static long UPDATETIMESTAMP = 5184000000l;
 
 	public static SolrWorkflowService solrWorkFlowService;

@@ -161,7 +161,6 @@ public class SolrPluginTest {
 		//Assert.assertTrue();
 		System.out.println(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0));
 		plugin.completed(context);
-		Assert.assertEquals(1, SolrWorkflowPlugin.getRecords());
 		
 		plugin.shutdown();
 		} catch (Exception e1) {

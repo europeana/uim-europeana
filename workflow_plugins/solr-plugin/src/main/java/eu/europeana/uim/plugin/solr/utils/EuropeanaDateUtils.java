@@ -38,13 +38,11 @@ public class EuropeanaDateUtils {
 			if (proxy.getChoiceList() != null) {
 				for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
 					if (choice.ifDate()) {
-						System.out.println("Generating year by dc:date");
 						years.addAll(refineDates(bc, choice.getDate()
 								.getString()));
 
 					}
 					if (choice.ifTemporal()) {
-						System.out.println("Generating year by dcterms:temporal");
 						years.addAll(refineDates(bc, choice.getTemporal()
 								.getString()));
 					}

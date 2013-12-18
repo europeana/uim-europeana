@@ -19,29 +19,28 @@ public class ConceptDereferencer extends Dereferencer {
 			SecurityException, IllegalArgumentException, IOException,
 			InstantiationException, IllegalAccessException,
 			NoSuchMethodException, InvocationTargetException {
-		Concept concept = (Concept) t;
-		derefResourceOrLiteral(rdf, concept.getAbout());
-		if (concept.getChoiceList() != null) {
-			for (eu.europeana.corelib.definitions.jibx.Concept.Choice choice : concept
-					.getChoiceList()) {
-				if (choice.ifBroader())
-					derefResourceOrLiteral(rdf, choice.getBroader());
-				if (choice.ifBroadMatch())
-					derefResourceOrLiteral(rdf, choice.getBroadMatch());
-				if (choice.ifCloseMatch())
-					derefResourceOrLiteral(rdf, choice.getCloseMatch());
-				if (choice.ifExactMatch())
-					derefResourceOrLiteral(rdf, choice.getExactMatch());
-				if (choice.ifNarrower())
-					derefResourceOrLiteral(rdf, choice.getNarrower());
-				if (choice.ifNarrowMatch())
-					derefResourceOrLiteral(rdf, choice.getNarrowMatch());
-				if (choice.ifRelated())
-					derefResourceOrLiteral(rdf, choice.getRelated());
-				if (choice.ifRelatedMatch())
-					derefResourceOrLiteral(rdf, choice.getRelatedMatch());
-			}
+		Concept concept = (Concept)t;
+		derefResourceOrLiteral(rdf,  concept.getAbout());
+		if(concept.getChoiceList()!=null){
+		for (eu.europeana.corelib.definitions.jibx.Concept.Choice choice : concept
+				.getChoiceList()) {
+			if (choice.ifBroader())
+				derefResourceOrLiteral(rdf, choice.getBroader());
+			if (choice.ifBroadMatch())
+				derefResourceOrLiteral(rdf, choice.getBroadMatch());
+			if (choice.ifCloseMatch())
+				derefResourceOrLiteral(rdf, choice.getCloseMatch());
+			if (choice.ifExactMatch())
+				derefResourceOrLiteral(rdf, choice.getExactMatch());
+			if (choice.ifNarrower())
+				derefResourceOrLiteral(rdf, choice.getNarrower());
+			if (choice.ifNarrowMatch())
+				derefResourceOrLiteral(rdf, choice.getNarrowMatch());
+			if (choice.ifRelated())
+				derefResourceOrLiteral(rdf, choice.getRelated());
+			if (choice.ifRelatedMatch())
+				derefResourceOrLiteral(rdf, choice.getRelatedMatch());
+		}
 		}
 	}
-
 }

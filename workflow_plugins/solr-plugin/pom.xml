@@ -44,9 +44,9 @@
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
-			<!-- <version>0.99.1-SNAPSHOT</version> -->
-			<version>0.99</version>
-			<scope>compile</scope>
+			<version>0.99.1-SNAPSHOT</version>
+<!-- 			<version>0.99</version> -->
+<!-- 			<scope>compile</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
@@ -59,6 +59,16 @@
 				</exclusion>
 			</exclusions>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -176,6 +186,7 @@
 					<instructions>
 						<Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
 						<Import-Package>
+						org.osgi.framework; version=1.5.0,
 							javax.annotation; version=0.0.0,
 							javax.imageio; version=0.0.0,
 							javax.management; version=0.0.0,
@@ -211,6 +222,8 @@
 							eu.europeana.uim.plugin; version=0.0.0,
 							eu.europeana.uim.plugin.ingestion; version=0.0.0,
 							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues;
+							version=1.0.0.SNAPSHOT,
 							eu.europeana.uim.solr4,
 							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.util,
@@ -238,6 +251,7 @@
 							*;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
+						<Bundle-Activator>eu.europeana.uim.plugin.solr.service.MongoBundleActivator</Bundle-Activator>
 					</instructions>
 				</configuration>
 			</plugin>

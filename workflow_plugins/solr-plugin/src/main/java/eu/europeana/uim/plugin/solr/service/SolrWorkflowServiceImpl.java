@@ -5,8 +5,10 @@ import java.util.List;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
+import com.google.code.morphia.mapping.DefaultCreator;
 import com.hp.hpl.jena.rdf.model.RDFReaderF;
 import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -17,7 +19,7 @@ import eu.europeana.uim.plugin.solr.utils.PropertyReader;
 import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 
 public class SolrWorkflowServiceImpl implements SolrWorkflowService {
-//	private static OsgiExtractor extractor;
+	private static OsgiExtractor extractor;
 	private static Datastore datastore;
 
 	public SolrWorkflowServiceImpl() {
@@ -28,6 +30,12 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 			
 				if (datastore == null) {
 					Morphia morphia = new Morphia();
+					 morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+			              @Override
+			              protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+			                  return MongoBundleActivator.getBundleClassLoader();
+			              }
+			       });
 					morphia.map(ControlledVocabularyImpl.class);
 					try {
 						datastore = morphia
@@ -56,29 +64,32 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 		};
 		datastoreInitializer.initialize(Datastore.class.getClassLoader());
 		
-		
+		final OsgiExtractor extractor = new OsgiExtractor();
 		BlockingInitializer initializer = new BlockingInitializer() {
 
 			@Override
 			protected void initializeInternal() {
 //				if(extractor == null){
-					OsgiExtractor extractor = new OsgiExtractor();
+				
 //				}
 				extractor.setDatastore(datastore);
-				BlockingInitializer vocInitializer = new BlockingInitializer() {
-
-					@Override
-					protected void initializeInternal() {
-						// TODO Auto-generated method stub
-						ControlledVocabularyImpl voc = new ControlledVocabularyImpl();
-						
-					}
-				};
-				vocInitializer.initialize(ControlledVocabularyImpl.class
-						.getClassLoader());
+				
+				
 			}
 		};
 		initializer.initialize(OsgiExtractor.class.getClassLoader());
+		
+		BlockingInitializer vocInitializer = new BlockingInitializer() {
+
+			@Override
+			protected void initializeInternal() {
+				// TODO Auto-generated method stub
+				List<ControlledVocabularyImpl> vocabularies = extractor.getControlledVocabularies();
+				
+			}
+		};
+		vocInitializer.initialize(ControlledVocabularyImpl.class
+				.getClassLoader());
 		
 		BlockingInitializer rdfReaderInitializer = new BlockingInitializer() {
 			
@@ -93,8 +104,12 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 	
 	@Override
 	public OsgiExtractor getExtractor() {
-		OsgiExtractor extractor = new OsgiExtractor(this);
-		extractor.setDatastore(datastore);
+		//OsgiExtractor extractor = new OsgiExtractor(this);
+		if(extractor==null){
+			extractor = new OsgiExtractor(this);
+			extractor.setDatastore(datastore);
+		}
+		
 		return extractor;
 	}
 

@@ -17,7 +17,8 @@ import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 
 public class JibxUtils {
 
-	public synchronized AgentType mergeAgentFields(AgentType fAgent, AgentType sAgent) {
+	public synchronized AgentType mergeAgentFields(AgentType fAgent,
+			AgentType sAgent) {
 		AgentType agent = new AgentType();
 		agent.setAbout(fAgent.getAbout().length() < sAgent.getAbout().length() ? fAgent
 				.getAbout() : sAgent.getAbout());
@@ -212,20 +213,24 @@ public class JibxUtils {
 		return agent;
 	}
 
-	public synchronized Concept mergeConceptsField(Concept fConcept, Concept sConcept) {
+	public synchronized Concept mergeConceptsField(Concept fConcept,
+			Concept sConcept) {
 		Concept concept = new Concept();
 		concept.setAbout(fConcept.getAbout().length() < sConcept.getAbout()
 				.length() ? fConcept.getAbout() : sConcept.getAbout());
 		concept.setChoiceList(sConcept.getChoiceList());
-		for (Concept.Choice choice : fConcept.getChoiceList()) {
-			if (!concept.getChoiceList().contains(choice)) {
-				concept.getChoiceList().add(choice);
+		if (fConcept.getChoiceList() != null) {
+			for (Concept.Choice choice : fConcept.getChoiceList()) {
+				if (!concept.getChoiceList().contains(choice)) {
+					concept.getChoiceList().add(choice);
+				}
 			}
 		}
 		return concept;
 	}
 
-	public synchronized TimeSpanType mergeTimespanFields(TimeSpanType fTs, TimeSpanType sTs) {
+	public synchronized TimeSpanType mergeTimespanFields(TimeSpanType fTs,
+			TimeSpanType sTs) {
 		TimeSpanType ts = new TimeSpanType();
 		ts.setAbout(fTs.getAbout().length() < sTs.getAbout().length() ? fTs
 				.getAbout() : sTs.getAbout());
@@ -236,214 +241,212 @@ public class JibxUtils {
 		if (fTs.getEnd() != null || sTs.getEnd() != null) {
 			ts.setEnd(fTs.getEnd() != null ? fTs.getEnd() : sTs.getEnd());
 		}
-		
+
 		if (sTs.getAltLabelList() != null) {
 			ts.setAltLabelList(sTs.getAltLabelList());
 			if (fTs.getAltLabelList() != null) {
-					for (AltLabel altLabel : fTs.getAltLabelList()) {
-						if (!ts.getAltLabelList().contains(altLabel)) {
-							ts.getAltLabelList().add(altLabel);
-						}
+				for (AltLabel altLabel : fTs.getAltLabelList()) {
+					if (!ts.getAltLabelList().contains(altLabel)) {
+						ts.getAltLabelList().add(altLabel);
 					}
 				}
+			}
 		} else {
 			if (fTs.getAltLabelList() != null) {
 				fTs.setAltLabelList(fTs.getAltLabelList());
 			}
 		}
-		
-		
-		
+
 		if (sTs.getPrefLabelList() != null) {
 			ts.setPrefLabelList(sTs.getPrefLabelList());
 			if (fTs.getPrefLabelList() != null) {
-					for (PrefLabel prefLabel : fTs.getPrefLabelList()) {
-						if (!ts.getPrefLabelList().contains(prefLabel)) {
-							ts.getPrefLabelList().add(prefLabel);
-						}
+				for (PrefLabel prefLabel : fTs.getPrefLabelList()) {
+					if (!ts.getPrefLabelList().contains(prefLabel)) {
+						ts.getPrefLabelList().add(prefLabel);
 					}
 				}
+			}
 		} else {
 			if (fTs.getPrefLabelList() != null) {
 				ts.setPrefLabelList(fTs.getPrefLabelList());
 			}
 		}
-		
+
 		if (sTs.getHasPartList() != null) {
 			ts.setHasPartList(sTs.getHasPartList());
 			if (fTs.getHasPartList() != null) {
-					for (HasPart hasPart: fTs.getHasPartList()) {
-						if (!ts.getHasPartList().contains(hasPart)) {
-							ts.getHasPartList().add(hasPart);
-						}
+				for (HasPart hasPart : fTs.getHasPartList()) {
+					if (!ts.getHasPartList().contains(hasPart)) {
+						ts.getHasPartList().add(hasPart);
 					}
 				}
+			}
 		} else {
 			if (fTs.getHasPartList() != null) {
 				ts.setHasPartList(fTs.getHasPartList());
 			}
 		}
-		
+
 		if (sTs.getIsPartOfList() != null) {
 			ts.setIsPartOfList(sTs.getIsPartOfList());
 			if (fTs.getIsPartOfList() != null) {
-					for (IsPartOf isPartOf: fTs.getIsPartOfList()) {
-						if (!ts.getIsPartOfList().contains(isPartOf)) {
-							ts.getIsPartOfList().add(isPartOf);
-						}
+				for (IsPartOf isPartOf : fTs.getIsPartOfList()) {
+					if (!ts.getIsPartOfList().contains(isPartOf)) {
+						ts.getIsPartOfList().add(isPartOf);
 					}
 				}
+			}
 		} else {
 			if (fTs.getIsPartOfList() != null) {
 				ts.setIsPartOfList(fTs.getIsPartOfList());
 			}
 		}
-		
+
 		if (sTs.getNoteList() != null) {
 			ts.setNoteList(sTs.getNoteList());
 			if (fTs.getNoteList() != null) {
-					for (Note note: fTs.getNoteList()) {
-						if (!ts.getNoteList().contains(note)) {
-							ts.getNoteList().add(note);
-						}
+				for (Note note : fTs.getNoteList()) {
+					if (!ts.getNoteList().contains(note)) {
+						ts.getNoteList().add(note);
 					}
 				}
+			}
 		} else {
 			if (fTs.getNoteList() != null) {
 				ts.setNoteList(fTs.getNoteList());
 			}
 		}
-		
+
 		if (sTs.getSameAList() != null) {
 			ts.setSameAList(sTs.getSameAList());
 			if (fTs.getSameAList() != null) {
-					for (SameAs sameAs: fTs.getSameAList()) {
-						if (!ts.getSameAList().contains(sameAs)) {
-							ts.getSameAList().add(sameAs);
-						}
+				for (SameAs sameAs : fTs.getSameAList()) {
+					if (!ts.getSameAList().contains(sameAs)) {
+						ts.getSameAList().add(sameAs);
 					}
 				}
+			}
 		} else {
 			if (fTs.getSameAList() != null) {
 				ts.setSameAList(fTs.getSameAList());
 			}
 		}
-		
+
 		return ts;
 	}
 
-	public synchronized PlaceType mergePlacesFields(PlaceType fPlace, PlaceType sPlace) {
+	public synchronized PlaceType mergePlacesFields(PlaceType fPlace,
+			PlaceType sPlace) {
 		PlaceType place = new PlaceType();
-		
-		place.setAbout(fPlace.getAbout().length()<sPlace.getAbout().length()?fPlace.getAbout():sPlace.getAbout());
-		
-		
+
+		place.setAbout(fPlace.getAbout().length() < sPlace.getAbout().length() ? fPlace
+				.getAbout() : sPlace.getAbout());
+
 		if (sPlace.getAltLabelList() != null) {
 			place.setAltLabelList(sPlace.getAltLabelList());
 			if (fPlace.getAltLabelList() != null) {
-					for (AltLabel altLabel : fPlace.getAltLabelList()) {
-						if (!place.getAltLabelList().contains(altLabel)) {
-							place.getAltLabelList().add(altLabel);
-						}
+				for (AltLabel altLabel : fPlace.getAltLabelList()) {
+					if (!place.getAltLabelList().contains(altLabel)) {
+						place.getAltLabelList().add(altLabel);
 					}
 				}
+			}
 		} else {
 			if (fPlace.getAltLabelList() != null) {
 				fPlace.setAltLabelList(fPlace.getAltLabelList());
 			}
 		}
-		
-		
-		
+
 		if (sPlace.getPrefLabelList() != null) {
 			place.setPrefLabelList(sPlace.getPrefLabelList());
 			if (fPlace.getPrefLabelList() != null) {
-					for (PrefLabel prefLabel : fPlace.getPrefLabelList()) {
-						if (!place.getPrefLabelList().contains(prefLabel)) {
-							place.getPrefLabelList().add(prefLabel);
-						}
+				for (PrefLabel prefLabel : fPlace.getPrefLabelList()) {
+					if (!place.getPrefLabelList().contains(prefLabel)) {
+						place.getPrefLabelList().add(prefLabel);
 					}
 				}
+			}
 		} else {
 			if (fPlace.getPrefLabelList() != null) {
 				place.setPrefLabelList(fPlace.getPrefLabelList());
 			}
 		}
-		
+
 		if (sPlace.getHasPartList() != null) {
 			place.setHasPartList(sPlace.getHasPartList());
 			if (fPlace.getHasPartList() != null) {
-					for (HasPart hasPart: fPlace.getHasPartList()) {
-						if (!place.getHasPartList().contains(hasPart)) {
-							place.getHasPartList().add(hasPart);
-						}
+				for (HasPart hasPart : fPlace.getHasPartList()) {
+					if (!place.getHasPartList().contains(hasPart)) {
+						place.getHasPartList().add(hasPart);
 					}
 				}
+			}
 		} else {
 			if (fPlace.getHasPartList() != null) {
 				place.setHasPartList(fPlace.getHasPartList());
 			}
 		}
-		
+
 		if (sPlace.getIsPartOfList() != null) {
 			place.setIsPartOfList(sPlace.getIsPartOfList());
 			if (fPlace.getIsPartOfList() != null) {
-					for (IsPartOf isPartOf: fPlace.getIsPartOfList()) {
-						if (!place.getIsPartOfList().contains(isPartOf)) {
-							place.getIsPartOfList().add(isPartOf);
-						}
+				for (IsPartOf isPartOf : fPlace.getIsPartOfList()) {
+					if (!place.getIsPartOfList().contains(isPartOf)) {
+						place.getIsPartOfList().add(isPartOf);
 					}
 				}
+			}
 		} else {
 			if (fPlace.getIsPartOfList() != null) {
 				place.setIsPartOfList(fPlace.getIsPartOfList());
 			}
 		}
-		
+
 		if (sPlace.getNoteList() != null) {
 			place.setNoteList(sPlace.getNoteList());
 			if (fPlace.getNoteList() != null) {
-					for (Note note: fPlace.getNoteList()) {
-						if (!place.getNoteList().contains(note)) {
-							place.getNoteList().add(note);
-						}
+				for (Note note : fPlace.getNoteList()) {
+					if (!place.getNoteList().contains(note)) {
+						place.getNoteList().add(note);
 					}
 				}
+			}
 		} else {
 			if (fPlace.getNoteList() != null) {
 				place.setNoteList(fPlace.getNoteList());
 			}
 		}
-		
+
 		if (sPlace.getSameAList() != null) {
 			place.setSameAList(sPlace.getSameAList());
 			if (fPlace.getSameAList() != null) {
-					for (SameAs sameAs: fPlace.getSameAList()) {
-						if (!place.getSameAList().contains(sameAs)) {
-							place.getSameAList().add(sameAs);
-						}
+				for (SameAs sameAs : fPlace.getSameAList()) {
+					if (!place.getSameAList().contains(sameAs)) {
+						place.getSameAList().add(sameAs);
 					}
 				}
+			}
 		} else {
 			if (fPlace.getSameAList() != null) {
 				place.setSameAList(fPlace.getSameAList());
 			}
 		}
-		
-		if(fPlace.getLat()!=null||sPlace.getLat()!=null){
-			place.setLat(fPlace.getLat()!=null?fPlace.getLat():sPlace.getLat());
+
+		if (fPlace.getLat() != null || sPlace.getLat() != null) {
+			place.setLat(fPlace.getLat() != null ? fPlace.getLat() : sPlace
+					.getLat());
 		}
-		
-		if(fPlace.getLong()!=null||sPlace.getLong()!=null){
-			place.setLong(fPlace.getLong()!=null?fPlace.getLong():sPlace.getLong());
+
+		if (fPlace.getLong() != null || sPlace.getLong() != null) {
+			place.setLong(fPlace.getLong() != null ? fPlace.getLong() : sPlace
+					.getLong());
 		}
-		
-		if(fPlace.getAlt()!=null||sPlace.getAlt()!=null){
-			place.setAlt(fPlace.getAlt()!=null?fPlace.getAlt():sPlace.getAlt());
+
+		if (fPlace.getAlt() != null || sPlace.getAlt() != null) {
+			place.setAlt(fPlace.getAlt() != null ? fPlace.getAlt() : sPlace
+					.getAlt());
 		}
 		return place;
 	}
 
-	
-	
 }

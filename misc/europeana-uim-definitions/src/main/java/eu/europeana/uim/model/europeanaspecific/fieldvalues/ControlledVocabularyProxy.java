@@ -57,6 +57,10 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	DELETEDRECORDS("Deleted"),
 	SPLITRECORDS("Generated"),
 	
+	//Incremental operation fields
+	LASTINGESTION_DATE("Ingestion date"),
+	ISNEW("New dataset"),
+	
 	//Ingestion Results
 	AMOUNT(EuropeanaUpdatableField.AMOUNT), 
 	TOTAL_INGESTED(EuropeanaUpdatableField.TOTAL_INGESTED), 
