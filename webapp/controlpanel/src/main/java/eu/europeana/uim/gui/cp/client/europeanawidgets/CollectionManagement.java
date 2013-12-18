@@ -11,6 +11,8 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellList;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -27,19 +29,19 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ProvidesKey;
 
 import eu.europeana.uim.gui.cp.client.IngestionWidget;
 import eu.europeana.uim.gui.cp.client.services.CollectionManagementProxyAsync;
 import eu.europeana.uim.gui.cp.client.services.RepositoryServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.ResourceServiceAsync;
-import eu.europeana.uim.gui.cp.client.utils.EuropeanaClientConstants;
 import eu.europeana.uim.gui.cp.shared.CollectionMappingDTO;
 
 public class CollectionManagement extends IngestionWidget {
 
 	@UiField(provided = true)
 	SplitLayoutPanel collectionManagement;
-	CellList<CollectionMappingDTO> mappedCollections;
+	CellTable<CollectionMappingDTO> mappedCollections;
 	CellList<CollectionMappingDTO> csvCollections;
 	Button save;
 	
@@ -76,8 +78,36 @@ public class CollectionManagement extends IngestionWidget {
 
 	private ScrollPanel createMappedCollectionTable() {
 		ScrollPanel scroll = new ScrollPanel();
-		mappedCollections = new CellList<CollectionMappingDTO>(
-				new CollectionCell());
+		ProvidesKey<CollectionMappingDTO> key  = new ProvidesKey<CollectionMappingDTO>() {
+			
+			@Override
+			public Object getKey(CollectionMappingDTO arg0) {
+				// TODO Auto-generated method stub
+				return arg0.getOriginalCollection();
+			}
+		};
+		mappedCollections = new CellTable<CollectionMappingDTO>(
+				key);
+		TextColumn<CollectionMappingDTO> originalColumn = new TextColumn<CollectionMappingDTO>() {
+
+			@Override
+			public String getValue(CollectionMappingDTO arg0) {
+				// TODO Auto-generated method stub
+				return arg0.getOriginalCollection();
+			}
+		};
+		TextColumn<CollectionMappingDTO> newColumn = new TextColumn<CollectionMappingDTO>() {
+
+			@Override
+			public String getValue(CollectionMappingDTO arg0) {
+				// TODO Auto-generated method stub
+				return arg0.getNewCollection();
+			}
+		
+		};
+		
+		mappedCollections.addColumn(originalColumn, "Original Collection ID");
+		mappedCollections.addColumn(newColumn, "New Collection ID");
 		scroll.add(mappedCollections);
 		fillMappedCollections();
 		return scroll;
@@ -86,26 +116,26 @@ public class CollectionManagement extends IngestionWidget {
 	private void fillMappedCollections() {
 
 		collectionManagementProxy
-				.retrieveCollections(new AsyncCallback<List<CollectionMappingDTO>>() {
+		.retrieveCollections(new AsyncCallback<List<CollectionMappingDTO>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						caught.printStackTrace();
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
 
-					}
+			}
 
-					@Override
-					public void onSuccess(List<CollectionMappingDTO> result) {
-						if (result.size() > 0) {
-							mappedCollections.setRowData(result);
-						} else {
-							mappedCollections
-									.setEmptyListWidget(new CellList<List<CollectionMappingDTO>>(
-											null));
-						}
+			@Override
+			public void onSuccess(List<CollectionMappingDTO> result) {
+				if (result.size() > 0) {
+					mappedCollections.setRowData(result);
+				} else {
+					mappedCollections
+							.setEmptyTableWidget(new CellList<List<CollectionMappingDTO>>(
+									null));
+				}
 
-					}
-				});
+			}
+		});
 	}
 
 	private FlexTable mapOneCollectionPanel() {

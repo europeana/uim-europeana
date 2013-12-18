@@ -14,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
 import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
 import eu.europeana.uim.plugin.solr.utils.VocMemCache;
-
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.LiteralType;
@@ -64,11 +63,13 @@ public abstract class Dereferencer {
 		if (splitName.length > 3) {
 			String vocabularyUri = splitName[0] + "/" + splitName[1] + "/"
 					+ splitName[2] + "/";
-			if (vocMemCache.containsKey(vocabularyUri)
-					|| hasReplaceUri(vocabularyUri)) {
-				List<ControlledVocabularyImpl> vocabularies = vocMemCache
-						.get(vocabularyUri) != null ? vocMemCache
-						.get(vocabularyUri) : getReplaceUri(vocabularyUri);
+			List<ControlledVocabularyImpl>  vocabularies = findVocabularies(vocabularyUri);
+//			if (vocMemCache.containsKey(vocabularyUri)
+//					|| hasReplaceUri(vocabularyUri)) {
+//				
+//				List<ControlledVocabularyImpl> vocabularies = vocMemCache
+//						.get(vocabularyUri) != null ? vocMemCache
+//						.get(vocabularyUri) : getReplaceUri(vocabularyUri);
 				if (vocabularies != null) {
 					for (ControlledVocabularyImpl vocabulary : vocabularies) {
 						for (String rule : vocabulary.getRules()) {
@@ -82,9 +83,25 @@ public abstract class Dereferencer {
 
 					}
 				}
-			}
+//			}
 
 		}
+		return null;
+	}
+
+	private List<ControlledVocabularyImpl> findVocabularies(String vocabularyUri) {
+		if(vocMemCache.containsKey(vocabularyUri)){
+			return vocMemCache.get(vocabularyUri);
+		}
+		if(hasReplaceUri(vocabularyUri)){
+			getReplaceUri(vocabularyUri);
+		}
+		for(String key: vocMemCache.keySet()){
+			if(key.startsWith(vocabularyUri)){
+				return vocMemCache.get(key);
+			}
+		}
+		
 		return null;
 	}
 

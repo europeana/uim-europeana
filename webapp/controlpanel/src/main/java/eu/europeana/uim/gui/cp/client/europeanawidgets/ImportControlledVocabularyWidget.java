@@ -17,6 +17,8 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellList;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,6 +38,7 @@ import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -71,7 +74,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	List<String> storedVocabularies;
 	CellList<EdmFieldDTO> mappableFields;
 	CellList<MappingDTO> mappedFields;
-	CellList<ControlledVocabularyDTO> vocabularyTable;
+	CellTable<ControlledVocabularyDTO> vocabularyTable;
 	List<MappingDTO> mappings;
 	private final ImportVocabularyProxyAsync importedVocabulary;
 	ControlledVocabularyDTO vocabulary;
@@ -421,8 +424,93 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	 */
 	protected ScrollPanel createUploadedVocabularies() {
 		ScrollPanel scroll = new ScrollPanel();
-		vocabularyTable = new CellList<ControlledVocabularyDTO>(
-				new VocabularyCell());
+		ProvidesKey<ControlledVocabularyDTO> key  = new ProvidesKey<ControlledVocabularyDTO>() {
+			
+			@Override
+			public Object getKey(ControlledVocabularyDTO arg0) {
+				return arg0.getName();
+			}
+		};
+		vocabularyTable = new CellTable<ControlledVocabularyDTO>(
+				key);
+		
+		TextColumn<ControlledVocabularyDTO> nameColumn = new TextColumn<ControlledVocabularyDTO>() {
+
+			@Override
+			public String getValue(ControlledVocabularyDTO arg0) {
+				return arg0.getName();
+			}
+		};
+		TextColumn<ControlledVocabularyDTO> urlColumn = new TextColumn<ControlledVocabularyDTO>() {
+			
+			@Override
+			public String getValue(ControlledVocabularyDTO arg0) {
+				// TODO Auto-generated method stub
+				return arg0.getUri();
+			}
+		};
+		
+		TextColumn<ControlledVocabularyDTO> replaceUrlColumn = new TextColumn<ControlledVocabularyDTO>() {
+			
+			@Override
+			public String getValue(ControlledVocabularyDTO arg0) {
+				// TODO Auto-generated method stub
+				return arg0.getReplaceUrl();
+			}
+		};
+		
+		TextColumn<ControlledVocabularyDTO> locationColumn = new TextColumn<ControlledVocabularyDTO>() {
+			
+			@Override
+			public String getValue(ControlledVocabularyDTO arg0) {
+				// TODO Auto-generated method stub
+				return arg0.getLocation();
+			}
+		};
+		
+		TextColumn<ControlledVocabularyDTO> suffixColumn = new TextColumn<ControlledVocabularyDTO>() {
+			
+			@Override
+			public String getValue(ControlledVocabularyDTO arg0) {
+				// TODO Auto-generated method stub
+				return arg0.getSuffix();
+			}
+		};
+		
+		TextColumn<ControlledVocabularyDTO> iterationsColumn = new TextColumn<ControlledVocabularyDTO>() {
+			
+			@Override
+			public String getValue(ControlledVocabularyDTO arg0) {
+				// TODO Auto-generated method stub
+				return Integer.toString(arg0.getIterations());
+			}
+		};
+		
+		TextColumn<ControlledVocabularyDTO> rulesColumn = new TextColumn<ControlledVocabularyDTO>() {
+			
+			@Override
+			public String getValue(ControlledVocabularyDTO arg0) {
+				String rules = "";
+				int i=1;
+				for(String rule : arg0.getRules()){
+					rules = rules +rule;
+					if(i<arg0.getRules().length){
+						rules = rules+", ";
+					}
+					i++;
+				}
+				
+				return rules;
+			}
+		};
+		
+		vocabularyTable.addColumn(nameColumn,"Name");
+		vocabularyTable.addColumn(locationColumn,"Location");
+		vocabularyTable.addColumn(urlColumn,"URL");
+		vocabularyTable.addColumn(replaceUrlColumn, "ReplaceURL");
+		vocabularyTable.addColumn(suffixColumn,"Suffix");
+		vocabularyTable.addColumn(rulesColumn,"Rules");
+		vocabularyTable.addColumn(iterationsColumn,"Iterations");
 		final SelectionModel<ControlledVocabularyDTO> selectionModel = new SingleSelectionModel<ControlledVocabularyDTO>();
 		vocabularyTable.setSelectionModel(selectionModel);
 		selectionModel
@@ -455,7 +543,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 							vocabularyTable.setRowData(result);
 						} else {
 							vocabularyTable
-									.setEmptyListWidget(new CellList<List<ControlledVocabularyDTO>>(
+									.setEmptyTableWidget(new CellTable<List<ControlledVocabularyDTO>>(
 											null));
 						}
 					}
@@ -761,23 +849,23 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		}
 	}
 
-	/**
-	 * Controlled vocabulary field representation
-	 * 
-	 * 
-	 */
-	private class VocabularyCell extends AbstractCell<ControlledVocabularyDTO> {
-		@Override
-		public void render(com.google.gwt.cell.client.Cell.Context context,
-				ControlledVocabularyDTO value, SafeHtmlBuilder sb) {
-			sb.appendHtmlConstant("<table><tr><td>");
-			sb.appendHtmlConstant(value.getName() + "|</td><td>");
-			sb.appendHtmlConstant((value.getLocation() == null ? "Not Set"
-					: value.getLocation()) + "|</td><td>");
-			sb.appendHtmlConstant((value.getUri()) == null ? "Not Set" : value
-					.getUri() + "|</td><td>");
-			sb.appendHtmlConstant((value.getSuffix() == null ? "Not Set"
-					: value.getSuffix()) + "|</td></tr></table>");
-		}
-	}
+//	/**
+//	 * Controlled vocabulary field representation
+//	 * 
+//	 * 
+//	 */
+//	private class VocabularyCell extends AbstractCell<ControlledVocabularyDTO> {
+//		@Override
+//		public void render(com.google.gwt.cell.client.Cell.Context context,
+//				ControlledVocabularyDTO value, SafeHtmlBuilder sb) {
+//			sb.appendHtmlConstant("<table border='1'><tr><td>");
+//			sb.appendHtmlConstant(value.getName() + "</td><td>");
+//			sb.appendHtmlConstant((value.getLocation() == null ? "Not Set"
+//					: value.getLocation()) + "|</td><td>");
+//			sb.appendHtmlConstant((value.getUri()) == null ? "Not Set" : value
+//					.getUri() + "|</td><td>");
+//			sb.appendHtmlConstant((value.getSuffix() == null ? "Not Set"
+//					: value.getSuffix()) + "|</td></tr></table>");
+//		}
+//	}
 }
