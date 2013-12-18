@@ -91,7 +91,7 @@ public class SolrPluginTest {
 	}
 
 
-	@Test
+	//@Test
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void testConcept() {
 		String RECORD = null;
