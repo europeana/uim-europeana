@@ -43,7 +43,6 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import org.openrdf.query.algebra.Add;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import com.google.code.morphia.query.Query;
@@ -97,6 +96,7 @@ import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.server.EdmMongoServer;
+import eu.europeana.corelib.solr.utils.EdmUtils;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
 import eu.europeana.corelib.solr.utils.SolrConstructor;
 import eu.europeana.uim.common.TKey;
