@@ -39,8 +39,10 @@ import eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.definitions.solr.beans.FullBean;
+import eu.europeana.corelib.definitions.solr.entity.ProvidedCHO;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
+import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.exceptions.EdmFieldNotFoundException;
 import eu.europeana.corelib.solr.exceptions.EdmValueNotFoundException;
@@ -188,6 +190,7 @@ public class LookupCreationPlugin<I> extends
 			try {
 				hash = hashExists(collectionId, fileName, fullBean);
 			} catch (Exception e) {
+				e.printStackTrace();
 				log.log(Level.SEVERE, e.getMessage());
 				return false;
 			}
@@ -243,6 +246,14 @@ public class LookupCreationPlugin<I> extends
 		}
 		fBean.setAggregations(aggrs);
 		fBean.setAbout(rdf.getProvidedCHOList().get(0).getAbout());
+		if (rdf.getProvidedCHOList().get(0).getSameAList() != null) {
+			ProvidedCHO pCho = new ProvidedCHOImpl();
+			pCho.setOwlSameAs(new String[] { rdf.getProvidedCHOList().get(0)
+					.getSameAList().get(0).getResource() });
+			List<ProvidedCHO> pChos = new ArrayList<ProvidedCHO>();
+			pChos.add(pCho);
+			fBean.setProvidedCHOs(pChos);
+		}
 		return fBean;
 	}
 
