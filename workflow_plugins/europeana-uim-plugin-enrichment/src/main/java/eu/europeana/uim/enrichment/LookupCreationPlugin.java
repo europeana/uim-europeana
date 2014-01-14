@@ -51,6 +51,7 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.utils.HashUtils;
 import eu.europeana.corelib.tools.utils.PreSipCreatorUtils;
 import eu.europeana.corelib.tools.utils.SipCreatorUtils;
+import eu.europeana.corelib.utils.EuropeanaUriUtils;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
@@ -74,7 +75,7 @@ public class LookupCreationPlugin<I> extends
 	private static EnrichmentService enrichmentService;
 	private static final Logger log = Logger
 			.getLogger(LookupCreationPlugin.class.getName());
-	private final static String OVERRIDESIPCREATOR = "override.sipcreator.mapping.field";
+	private final static String OVERRIDESIPCREATOR = "override.sipcreator.field";
 
 	public LookupCreationPlugin(String name, String description) {
 		super(name, description);
@@ -171,40 +172,85 @@ public class LookupCreationPlugin<I> extends
 				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
 			}
 			uctx = bfact.createUnmarshallingContext();
-
-			String collectionId = (String) mdr.getCollection().getMnemonic();
-
-			String fileName;
-			String oldCollectionId = enrichmentService
-					.getCollectionMongoServer().findOldCollectionId(
-							collectionId);
-			if (oldCollectionId != null) {
-				collectionId = oldCollectionId;
-				fileName = oldCollectionId;
-			} else {
-				fileName = (String) mdr.getCollection().getName();
-			}
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			FullBeanImpl fullBean = constructFullBeanMock(rdf, collectionId);
-			String hash = null;
-			try {
-				hash = hashExists(collectionId, fileName, fullBean);
-			} catch (Exception e) {
-				e.printStackTrace();
-				log.log(Level.SEVERE, e.getMessage());
-				return false;
-			}
+			String collectionId = (String) mdr.getCollection()
+					.getMnemonic();
+			if (context.getProperties().getProperty(OVERRIDESIPCREATOR) == null) {
+				String fileName;
+				String oldCollectionId = enrichmentService
+						.getCollectionMongoServer().findOldCollectionId(
+								collectionId);
+				if (oldCollectionId != null) {
+					collectionId = oldCollectionId;
+					fileName = oldCollectionId;
+				} else {
+					fileName = (String) mdr.getCollection().getName();
+				}
+				
+				FullBeanImpl fullBean = constructFullBeanMock(rdf, collectionId);
+				String hash = null;
+				try {
+					hash = hashExists(collectionId, fileName, fullBean);
+				} catch (Exception e) {
+					e.printStackTrace();
+					log.log(Level.SEVERE, e.getMessage());
+					return false;
+				}
 
-			if (StringUtils.isNotEmpty(hash)) {
+				if (StringUtils.isNotEmpty(hash)) {
 
-				createLookupEntry(fullBean, collectionId, hash);
-				return true;
+					createLookupEntry(fullBean, collectionId, hash);
+					return true;
+				}
+			} else {
+				String fieldValue = "";
+				if(context.getProperties().getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("edm:isShownAt")){
+					fieldValue = rdf.getAggregationList().get(0).getIsShownAt().getResource();
+				} else if(context.getProperties().getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("edm:isShownBy")){
+					fieldValue = rdf.getAggregationList().get(0).getIsShownBy().getResource();
+				} else if(context.getProperties().getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("dc:identifier")){
+					ProxyType proxy = findProxy(rdf);
+					for (Choice choice : proxy.getChoiceList()) {
+						if (choice.ifIdentifier()) {
+							fieldValue = choice.getIdentifier().getString();
+						}
+					}
+				} else if(context.getProperties().getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("owl:sameAs")){
+					fieldValue = rdf.getProvidedCHOList().get(0).getSameAList().get(0).getResource();
+				}
+				createLookupEntry(rdf.getProvidedCHOList().get(0).getAbout(),collectionId,fieldValue);
+				
 			}
 		} catch (JiBXException e) {
 			log.log(Level.SEVERE, e.getMessage());
 			return false;
 		}
 		return false;
+	}
+
+	private void createLookupEntry(String newId,String collectionId, String value) {
+		ModifiableSolrParams params = new ModifiableSolrParams();
+		String finalId = EuropeanaUriUtils.createEuropeanaId(collectionId, value);
+		params.add(
+				"q",
+				"europeana_id:"
+						+ ClientUtils.escapeQueryChars(finalId));
+		try {
+			SolrDocumentList solrList = enrichmentService
+					.getProductionSolrServer().query(params).getResults();
+			if (solrList.size() > 0) {
+				EuropeanaId id = new EuropeanaId();
+				id.setOldId(finalId);
+				id.setLastAccess(0);
+				id.setTimestamp(new Date().getTime());
+				id.setNewId(newId);
+				saveEuropeanaId(id);
+
+			}
+
+		} catch (SolrServerException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
 	}
 
 	// Generate a minimum Fullbean
