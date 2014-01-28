@@ -61,6 +61,7 @@ import eu.europeana.uim.plugin.solr.helpers.ConceptDereferencer;
 import eu.europeana.uim.plugin.solr.helpers.Dereferencer;
 import eu.europeana.uim.plugin.solr.helpers.PlaceDereferencer;
 import eu.europeana.uim.plugin.solr.helpers.ProxyDereferencer;
+import eu.europeana.uim.plugin.solr.helpers.ResourceNotRDFException;
 import eu.europeana.uim.plugin.solr.helpers.TimespanDereferencer;
 import eu.europeana.uim.plugin.solr.helpers.WebResourceDereferencer;
 import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
@@ -85,7 +86,8 @@ public class SolrWorkflowPlugin<I> extends
 			SolrWorkflowPlugin.class, "enrichment", Long.class);
 	private static SolrWorkflowService solrWorkflowService;
 	private static IBindingFactory bfact;
-	private static final Logger log = Logger.getLogger(SolrWorkflowPlugin.class.getName());
+	private static final Logger log = Logger.getLogger(SolrWorkflowPlugin.class
+			.getName());
 	/**
 	 * The parameters used by this WorkflowStart
 	 */
@@ -106,7 +108,8 @@ public class SolrWorkflowPlugin<I> extends
 		try {
 			bfact = BindingDirectory.getFactory(RDF.class);
 		} catch (JiBXException e) {
-			log.log(Level.SEVERE,"Error initializing Jibx Factory:" + e.getMessage());
+			log.log(Level.SEVERE,
+					"Error initializing Jibx Factory:" + e.getMessage());
 		}
 
 	}
@@ -122,7 +125,7 @@ public class SolrWorkflowPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
-		
+
 		String overrideChecks = context.getProperties().getProperty(
 				OVERRIDECHECKS);
 		boolean check = false;
@@ -237,61 +240,54 @@ public class SolrWorkflowPlugin<I> extends
 						return true;
 
 					} catch (JiBXException e) {
+						e.printStackTrace();
 						context.getLoggingEngine().logFailed(
 								Level.SEVERE,
 								this,
 								e,
 								"JiBX unmarshalling has failed with the following error: "
 										+ e.getMessage());
-						
+
 					} catch (MalformedURLException e) {
-						log.log(
-								Level.SEVERE,
-								
-								"Error: "
-										+ e.getMessage());
+						log.log(Level.SEVERE,
+
+						"Error: " + e.getMessage());
+						e.printStackTrace();
 					} catch (IOException e) {
-						log.log(
-								Level.SEVERE,
-								
-								"Error: "
-										+ e.getMessage());
+						log.log(Level.SEVERE,
+
+						"Error: " + e.getMessage());
+						e.printStackTrace();
 					} catch (SecurityException e) {
-						log.log(
-								Level.SEVERE,
-								
-								"Error: "
-										+ e.getMessage());
+						log.log(Level.SEVERE,
+
+						"Error: " + e.getMessage());
+						e.printStackTrace();
 					} catch (IllegalArgumentException e) {
-						log.log(
-								Level.SEVERE,
-								
-								"Error: "
-										+ e.getMessage());
+						log.log(Level.SEVERE,
+
+						"Error: " + e.getMessage());
+						e.printStackTrace();
 					} catch (NoSuchMethodException e) {
-						log.log(
-								Level.SEVERE,
-								
-								"Error: "
-										+ e.getMessage());
+						log.log(Level.SEVERE,
+
+						"Error: " + e.getMessage());
+						e.printStackTrace();
 					} catch (IllegalAccessException e) {
-						log.log(
-								Level.SEVERE,
-								
-								"Error: "
-										+ e.getMessage());
+						log.log(Level.SEVERE,
+
+						"Error: " + e.getMessage());
+						e.printStackTrace();
 					} catch (InvocationTargetException e) {
-						log.log(
-								Level.SEVERE,
-								
-								"Error: "
-										+ e.getMessage());
+						log.log(Level.SEVERE,
+
+						"Error: " + e.getMessage());
+						e.printStackTrace();
 					} catch (InstantiationException e) {
-						log.log(
-								Level.SEVERE,
-								
-								"Error: "
-										+ e.getMessage());
+						log.log(Level.SEVERE,
+
+						"Error: " + e.getMessage());
+						e.printStackTrace();
 					}
 
 				}
@@ -456,7 +452,11 @@ public class SolrWorkflowPlugin<I> extends
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
 		Dereferencer der = new WebResourceDereferencer(solrWorkflowService);
-		der.dereference(rdf, webResource);
+		try {
+			der.dereference(rdf, webResource);
+		} catch (ResourceNotRDFException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
 	}
 
 	private void dereferenceTimespan(RDF rdf, TimeSpanType timeSpan)
@@ -465,7 +465,11 @@ public class SolrWorkflowPlugin<I> extends
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
 		TimespanDereferencer der = new TimespanDereferencer(solrWorkflowService);
-		der.dereference(rdf, timeSpan);
+		try {
+			der.dereference(rdf, timeSpan);
+		} catch (ResourceNotRDFException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
 	}
 
 	private void dereferenceProxy(RDF rdf, ProxyType proxy)
@@ -474,7 +478,11 @@ public class SolrWorkflowPlugin<I> extends
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
 		Dereferencer der = new ProxyDereferencer(solrWorkflowService);
-		der.dereference(rdf, proxy);
+		try {
+			der.dereference(rdf, proxy);
+		} catch (ResourceNotRDFException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
 	}
 
 	private void dereferencePlace(RDF rdf, PlaceType place)
@@ -483,7 +491,11 @@ public class SolrWorkflowPlugin<I> extends
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
 		Dereferencer der = new PlaceDereferencer(solrWorkflowService);
-		der.dereference(rdf, place);
+		try {
+			der.dereference(rdf, place);
+		} catch (ResourceNotRDFException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
 	}
 
 	private void dereferenceConcept(RDF rdf, Concept concept)
@@ -492,7 +504,11 @@ public class SolrWorkflowPlugin<I> extends
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
 		Dereferencer der = new ConceptDereferencer(solrWorkflowService);
-		der.dereference(rdf, concept);
+		try {
+			der.dereference(rdf, concept);
+		} catch (ResourceNotRDFException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
 	}
 
 	private void dereferenceAgent(RDF rdf, AgentType agent)
@@ -501,7 +517,11 @@ public class SolrWorkflowPlugin<I> extends
 			IllegalAccessException, NoSuchMethodException,
 			InvocationTargetException {
 		Dereferencer der = new AgentDereferencer(solrWorkflowService);
-		der.dereference(rdf, agent);
+		try {
+			der.dereference(rdf, agent);
+		} catch (ResourceNotRDFException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
 	}
 
 	/*

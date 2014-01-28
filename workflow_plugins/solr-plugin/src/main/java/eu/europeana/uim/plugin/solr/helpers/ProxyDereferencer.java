@@ -19,7 +19,7 @@ public class ProxyDereferencer extends Dereferencer{
 	public <T> void dereference(RDF rdf, T t) throws MalformedURLException,
 			SecurityException, IllegalArgumentException, IOException,
 			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
+			NoSuchMethodException, InvocationTargetException, ResourceNotRDFException {
 		ProxyType proxy = (ProxyType)t;
 		derefResourceOrLiteralList(rdf,  proxy.getHasMetList());
 		derefResourceOrLiteralList(rdf, proxy.getHasTypeList());

@@ -31,7 +31,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.ctc.wstx.stax.WstxInputFactory;
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.query.Query;
 import com.google.code.morphia.query.UpdateOperations;
@@ -62,7 +61,7 @@ import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.EntityImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
-
+import eu.europeana.uim.plugin.solr.helpers.ResourceNotRDFException;
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
 
 public class OsgiExtractor extends Extractor {
@@ -83,7 +82,8 @@ public class OsgiExtractor extends Extractor {
 		OsgiExtractor.solrWorkFlowService = solrWorkflowService;
 	}
 
-	public List<EdmMappedField> getEdmLabel(String field) {
+	public List<EdmMappedField> getEdmLabel(
+			ControlledVocabularyImpl vocabulary, String field) {
 
 		if (vocabulary != null) {
 
@@ -100,47 +100,103 @@ public class OsgiExtractor extends Extractor {
 			boolean iterFromVocabulary) throws SecurityException,
 			IllegalArgumentException, InstantiationException,
 			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
+			InvocationTargetException, ResourceNotRDFException {
 
-		if (controlledVocabulary != null) {
-			vocabulary = controlledVocabulary;
-			String suffix = controlledVocabulary.getSuffix() != null ? controlledVocabulary
-					.getSuffix() : "";
-			// int iters = iterFromVocabulary ? controlledVocabulary
-			// .getIterations() : iterations;
-			if (resource + suffix != null) {
-				String fullUri = StringUtils.endsWith(resource, "/")
-						&& StringUtils.startsWith(suffix, "/") ? resource
-						+ StringUtils.substringAfter(suffix, "/") : resource
-						+ suffix;
-				if (!fullUri.contains("/.")) {
-					Map<String, List> retMap = retrieveMapFromCache(fullUri);
-					if (retMap != null) {
-						return retMap;
-					}
-					EntityImpl entity = retrieveValueFromResource(fullUri);
+		if (iterations > -1) {
+			if (controlledVocabulary != null) {
 
-					if (entity != null && entity.getContent().length() > 0) {
-						String ref = resource;
-						if (StringUtils.isNotEmpty(controlledVocabulary.getReplaceUrl())) {
-							ref = StringUtils.replace(resource,
-									controlledVocabulary.getURI(),
-									controlledVocabulary.getReplaceUrl());
+				// String suffix = controlledVocabulary.getSuffix() != null ?
+				// controlledVocabulary
+				// .getSuffix() : "";
+				// int iters = iterFromVocabulary ? controlledVocabulary
+				// .getIterations() : iterations;
+				if (resource != null) {
+					// if (resource + suffix != null) {
+					// String fullUri = StringUtils.endsWith(resource, "/")
+					// && StringUtils.startsWith(suffix, "/") ? resource
+					// + StringUtils.substringAfter(suffix, "/") : resource
+					// + suffix;
+					String fullUri = resource;
+					if (!fullUri.contains("/.")) {
+						Map<String, List> retMap = retrieveMapFromCache(fullUri);
+						if (retMap != null) {
+							return retMap;
 						}
-						Map<String, List> entityCache = createDereferencingMapRDF(
-								ref, entity.getContent(), iterations);
-						synchronized (memCache) {
-							memCache.getEntityCache().put(entity.getUri(),
-									entityCache);
-						}
+						EntityImpl entity = retrieveValueFromResource(fullUri);
 
-						return entityCache;
+						if (entity != null && entity.getContent().length() > 0) {
+							if (entity.getContent().contains("</html>")) {
+								throw new ResourceNotRDFException("Entity: "
+										+ entity.getUri() + " resolved in HTML");
+							}
+							String ref = resource;
+							// if
+							// (StringUtils.isNotEmpty(controlledVocabulary.getReplaceUrl()))
+							// {
+							// ref = StringUtils.replace(resource,
+							// controlledVocabulary.getURI(),
+							// controlledVocabulary.getReplaceUrl());
+							// }
+							boolean exists = false;
+							boolean hasInternalRules = false;
+							double num = Math.random();
+							for (ControlledVocabularyImpl voc : VocMemCache
+									.getMemCache(solrWorkFlowService).get(
+											controlledVocabulary.getURI())) {
+								List<String> internalRules = getInternalRule(voc);
+								if (internalRules != null) {
+									hasInternalRules = true;
+									for (String internalRule : internalRules) {
+										if (StringUtils.contains(
+												entity.getContent(),
+												internalRule)) {
+											exists = true;
+											controlledVocabulary = voc;
+											System.out.println("Rule for "
+													+ num + " found: "
+													+ internalRule);
+										}
+									}
+								}
+							}
+
+							if (!exists && hasInternalRules) {
+								controlledVocabulary = null;
+							}
+
+							if (controlledVocabulary != null) {
+								Map<String, List> entityCache = createDereferencingMapRDF(
+										controlledVocabulary, ref,
+										entity.getContent(), iterations);
+								System.out.println("Entity cache for size "
+										+ num + ": " + entityCache.size());
+								synchronized (memCache) {
+									memCache.getEntityCache().put(
+											entity.getUri(), entityCache);
+								}
+
+								return entityCache;
+							}
+						}
 					}
+
 				}
 			}
 		}
-
 		return new HashMap<String, List>();
+	}
+
+	private List<String> getInternalRule(ControlledVocabularyImpl vocabulary) {
+		List<String> internalRules = new ArrayList<String>();
+		if (vocabulary.getRules() != null && vocabulary.getRules().length > 0) {
+			for (String rule : vocabulary.getRules()) {
+				if (rule.contains("<")) {
+					internalRules.add(StringUtils.substringBetween(rule, "<",
+							">"));
+				}
+			}
+		}
+		return internalRules.size() > 0 ? internalRules : null;
 	}
 
 	private Map<String, List> retrieveMapFromCache(String fullUri) {
@@ -148,7 +204,8 @@ public class OsgiExtractor extends Extractor {
 				.getEntityCache().get(fullUri) : null;
 	}
 
-	private Map<String, List> createDereferencingMapRDF(String resource,
+	private Map<String, List> createDereferencingMapRDF(
+			ControlledVocabularyImpl vocabulary, String resource,
 			String xmlString, int iterations) {
 
 		String SPARQL_TEMPLATE = "%s SELECT ?predicate ?object WHERE {?res ?predicate ?object . FILTER(?res=<%s>||?res=<%s>||?res=<%s>)}";
@@ -164,7 +221,6 @@ public class OsgiExtractor extends Extractor {
 		AgentType lastAgent = null;
 		TimeSpanType lastTimespan = null;
 		PlaceType lastPlace = null;
-		System.out.println(xmlString);
 		RDFReaderF rdfReader = solrWorkFlowService.getRDFReaderF();
 		Model model = ModelFactory.createDefaultModel();
 
@@ -185,11 +241,13 @@ public class OsgiExtractor extends Extractor {
 
 		com.hp.hpl.jena.query.Query queryRoot = QueryFactory.create(rootEntity);
 		QueryExecution qRoot = QueryExecutionFactory.create(queryRoot, model);
+		boolean foundRoot = false;
 		try {
 			ResultSet rootRs = qRoot.execSelect();
+
 			while (rootRs.hasNext()) {
+
 				String element = rootRs.next().get("?object").toString();
-				System.out.println(element);
 				String[] nsAndLocal = element.split("#");
 				if (nsAndLocal.length == 1) {
 					nsAndLocal = new String[] {
@@ -201,9 +259,17 @@ public class OsgiExtractor extends Extractor {
 				if (prefix != null) {
 					String normalizedElement = prefix + ":" + nsAndLocal[1];
 
-					if (isMapped(normalizedElement)) {
-						List<EdmMappedField> edmList = getEdmLabel(normalizedElement);
-
+					if (isMapped(vocabulary, normalizedElement)
+							|| containsInternalRule(vocabulary,
+									normalizedElement)) {
+						foundRoot = true;
+						List<EdmMappedField> edmList = getEdmLabel(vocabulary,
+								normalizedElement);
+						if (edmList == null || edmList.size() == 0) {
+							edmList = new ArrayList<EdmMappedField>();
+							edmList.add(vocabulary.getElements()
+									.get("rdf:type").get(0));
+						}
 						if (edmList != null && edmList.size() > 0) {
 
 							for (EdmMappedField edmLabel : edmList) {
@@ -262,8 +328,6 @@ public class OsgiExtractor extends Extractor {
 													PlaceType.class, resource);
 										}
 									} else {
-										System.out
-												.println("Creating new place");
 										lastPlace = createNewEntity(
 												PlaceType.class, resource);
 									}
@@ -276,214 +340,256 @@ public class OsgiExtractor extends Extractor {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// Find the rest and append them as appropriate
-		String qString = String.format(SPARQL_TEMPLATE, sb.toString(),
-				resource, resource + "/",
-				resource.substring(0, resource.length() - 1));
-		com.hp.hpl.jena.query.Query query = QueryFactory.create(qString);
-		QueryExecution qexec = QueryExecutionFactory.create(query, model);
-		try {
-			ResultSet results = qexec.execSelect();
 
-			while (results.hasNext()) {
-				QuerySolution element = results.next();
-				String[] nsAndLocal = element.get("?predicate").toString()
-						.split("#");
-				if (nsAndLocal.length == 1) {
-					nsAndLocal = new String[] {
-							StringUtils.substringBeforeLast(
-									element.get("?predicate").toString(), "/"),
-							StringUtils.substringAfterLast(
-									element.get("?predicate").toString(), "/") };
+		if (foundRoot) {
+			// Find the rest and append them as appropriate
+			String qString = String.format(SPARQL_TEMPLATE, sb.toString(),
+					resource, resource + "/",
+					resource.substring(0, resource.length() - 1));
+			com.hp.hpl.jena.query.Query query = QueryFactory.create(qString);
+			QueryExecution qexec = QueryExecutionFactory.create(query, model);
+			try {
+				ResultSet results = qexec.execSelect();
 
-				}
-				String prefix = findByPrefix(prefixNS, nsAndLocal[0]);
-				if (prefix != null) {
-					String normalizedElement = prefix + ":" + nsAndLocal[1];
-					if (isMapped(normalizedElement)) {
-						List<EdmMappedField> edmList = getEdmLabel(normalizedElement);
-						if (edmList != null && edmList.size() > 0) {
-							for (EdmMappedField edmLabel : edmList) {
-								if (StringUtils.startsWith(edmLabel.getLabel()
-										.toString(), "cc")) {
+				while (results.hasNext()) {
+					QuerySolution element = results.next();
+					String[] nsAndLocal = element.get("?predicate").toString()
+							.split("#");
+					if (nsAndLocal.length == 1) {
+						nsAndLocal = new String[] {
+								StringUtils.substringBeforeLast(
+										element.get("?predicate").toString(),
+										"/"),
+								StringUtils.substringAfterLast(
+										element.get("?predicate").toString(),
+										"/") };
 
-									if (element.get("?object").isLiteral()) {
-										appendConceptValue(
-												lastConcept == null ? new Concept()
-														: lastConcept, edmLabel
-														.getLabel().toString(),
-												element.get("?object")
-														.asLiteral()
-														.getString(),
-												"xml:lang",
-												element.get("?object")
-														.asLiteral()
-														.getLanguage(),
-												iterations);
-									} else {
-										appendConceptValue(
-												lastConcept == null ? new Concept()
-														: lastConcept, edmLabel
-														.getLabel().toString(),
-												element.get("?object")
-														.asResource().getURI(),
-												null, null, iterations);
-									}
-									ControlledVocabularyImpl oldVoc = vocabulary;
-									if (StringUtils.equals(edmLabel.getLabel()
-											.toString(), "cc_skos_broader")
-											&& iterations > 0) {
-										ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
-												datastore, "URI",
-												element.get("?object")
-														.asResource().getURI());
+					}
+					String prefix = findByPrefix(prefixNS, nsAndLocal[0]);
+					if (prefix != null) {
+						String normalizedElement = prefix + ":" + nsAndLocal[1];
+						if (isMapped(vocabulary, normalizedElement)) {
+							List<EdmMappedField> edmList = getEdmLabel(
+									vocabulary, normalizedElement);
+							if (edmList != null && edmList.size() > 0) {
+								for (EdmMappedField edmLabel : edmList) {
+									if (StringUtils.startsWith(edmLabel
+											.getLabel().toString(), "cc")) {
 
-										concepts.addAll(denormalize(
-												element.get("?object")
-														.asResource().getURI(),
-												controlledVocabulary,
-												iterations - 1, true).get(
-												"concepts"));
-									}
-									vocabulary = oldVoc;
-								} else if (StringUtils.startsWith(edmLabel
-										.getLabel().toString(), "pl")) {
-									if (element.get("?object").isLiteral()) {
-										appendValue(
-												PlaceType.class,
-												lastPlace == null ? new PlaceType()
-														: lastPlace, edmLabel
-														.getLabel().toString(),
-												element.get("?object")
-														.asLiteral()
-														.getString(),
-												"xml:lang",
-												element.get("?object")
-														.asLiteral()
-														.getLanguage(),
-												iterations);
-									} else {
-										appendValue(
-												PlaceType.class,
-												lastPlace == null ? new PlaceType()
-														: lastPlace, edmLabel
-														.getLabel().toString(),
-												element.get("?object")
-														.asResource().getURI(),
-												null, null, iterations);
-									}
-									ControlledVocabularyImpl oldVoc = vocabulary;
-									if (StringUtils.equals(edmLabel.getLabel()
-											.toString(), "pl_dcterms_isPartOf")
-											&& iterations > 0) {
-										ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
-												datastore, "URI",
-												element.get("?object")
-														.asResource().getURI());
-										Map<String, List> pl = denormalize(
-												element.get("?object")
-														.asResource().getURI(),
-												controlledVocabulary,
-												iterations - 1, true);
-										if (pl != null) {
-											places.addAll(pl.get("places"));
+										if (element.get("?object").isLiteral()) {
+											appendConceptValue(
+													lastConcept == null ? new Concept()
+															: lastConcept,
+													edmLabel.getLabel()
+															.toString(),
+													element.get("?object")
+															.asLiteral()
+															.getString(),
+													"xml:lang",
+													element.get("?object")
+															.asLiteral()
+															.getLanguage(),
+													iterations);
+										} else {
+											appendConceptValue(
+													lastConcept == null ? new Concept()
+															: lastConcept,
+													edmLabel.getLabel()
+															.toString(),
+													element.get("?object")
+															.asResource()
+															.getURI(), null,
+													null, iterations);
 										}
-									}
-									vocabulary = oldVoc;
-								} else if (StringUtils.startsWith(edmLabel
-										.getLabel().toString(), "ag")) {
-									if (element.get("?object").isLiteral()) {
-										appendValue(
-												AgentType.class,
-												lastAgent == null ? new AgentType()
-														: lastAgent, edmLabel
-														.getLabel().toString(),
-												element.get("?object")
-														.asLiteral()
-														.getString(),
-												"xml:lang",
-												element.get("?object")
-														.asLiteral()
-														.getLanguage(),
-												iterations);
-									} else {
-										appendValue(
-												AgentType.class,
-												lastAgent == null ? new AgentType()
-														: lastAgent, edmLabel
-														.getLabel().toString(),
-												element.get("?object")
-														.asResource().getURI(),
-												null, null, iterations);
-									}
-								} else if (StringUtils.startsWith(edmLabel
-										.getLabel().toString(), "ts")) {
-									if (element.get("?object").isLiteral()) {
-										appendValue(
-												TimeSpanType.class,
-												lastTimespan == null ? new TimeSpanType()
-														: lastTimespan,
-												edmLabel.getLabel().toString(),
-												element.get("?object")
-														.asLiteral()
-														.getString(),
-												"xml:lang",
-												element.get("?object")
-														.asLiteral()
-														.getLanguage(),
-												iterations);
-									} else {
-										appendValue(
-												TimeSpanType.class,
-												lastTimespan == null ? new TimeSpanType()
-														: lastTimespan,
-												edmLabel.getLabel().toString(),
-												element.get("?object")
-														.asResource().getURI(),
-												null, null, iterations);
-									}
-									ControlledVocabularyImpl oldVoc = vocabulary;
-									if (StringUtils.equals(edmLabel.getLabel()
-											.toString(), "ts_dcterms_isPartOf")
-											&& iterations > 0) {
-										ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
-												datastore, "URI",
-												element.get("?object")
-														.asResource().getURI());
+										ControlledVocabularyImpl oldVoc = vocabulary;
+										if (StringUtils.equals(edmLabel
+												.getLabel().toString(),
+												"cc_skos_broader")
+												&& iterations > 0) {
+											ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
+													datastore, "URI", element
+															.get("?object")
+															.asResource()
+															.getURI());
+											Map<String, List> conceptDen = denormalize(
+													element.get("?object")
+															.asResource()
+															.getURI(),
+													controlledVocabulary,
+													iterations - 1, true);
+											if (concepts.size() > 0) {
+												concepts.addAll(conceptDen
+														.get("concepts"));
+											}
+										}
+										vocabulary = oldVoc;
+									} else if (StringUtils.startsWith(edmLabel
+											.getLabel().toString(), "pl")) {
+										if (element.get("?object").isLiteral()) {
+											appendValue(
+													PlaceType.class,
+													lastPlace == null ? new PlaceType()
+															: lastPlace,
+													edmLabel.getLabel()
+															.toString(),
+													element.get("?object")
+															.asLiteral()
+															.getString(),
+													"xml:lang",
+													element.get("?object")
+															.asLiteral()
+															.getLanguage(),
+													iterations);
+										} else {
+											appendValue(
+													PlaceType.class,
+													lastPlace == null ? new PlaceType()
+															: lastPlace,
+													edmLabel.getLabel()
+															.toString(),
+													element.get("?object")
+															.asResource()
+															.getURI(), null,
+													null, iterations);
+										}
+										ControlledVocabularyImpl oldVoc = vocabulary;
+										if (StringUtils.equals(edmLabel
+												.getLabel().toString(),
+												"pl_dcterms_isPartOf")
+												&& iterations > 0) {
+											ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
+													datastore, "URI", element
+															.get("?object")
+															.asResource()
+															.getURI());
+											Map<String, List> pl = denormalize(
+													element.get("?object")
+															.asResource()
+															.getURI(),
+													controlledVocabulary,
+													iterations - 1, true);
+											if (pl != null) {
+												places.addAll(pl.get("places"));
+											}
+										}
+										vocabulary = oldVoc;
+									} else if (StringUtils.startsWith(edmLabel
+											.getLabel().toString(), "ag")) {
+										if (element.get("?object").isLiteral()) {
+											appendValue(
+													AgentType.class,
+													lastAgent == null ? new AgentType()
+															: lastAgent,
+													edmLabel.getLabel()
+															.toString(),
+													element.get("?object")
+															.asLiteral()
+															.getString(),
+													"xml:lang",
+													element.get("?object")
+															.asLiteral()
+															.getLanguage(),
+													iterations);
+										} else {
+											appendValue(
+													AgentType.class,
+													lastAgent == null ? new AgentType()
+															: lastAgent,
+													edmLabel.getLabel()
+															.toString(),
+													element.get("?object")
+															.asResource()
+															.getURI(), null,
+													null, iterations);
+										}
+									} else if (StringUtils.startsWith(edmLabel
+											.getLabel().toString(), "ts")) {
+										if (element.get("?object").isLiteral()) {
+											appendValue(
+													TimeSpanType.class,
+													lastTimespan == null ? new TimeSpanType()
+															: lastTimespan,
+													edmLabel.getLabel()
+															.toString(),
+													element.get("?object")
+															.asLiteral()
+															.getString(),
+													"xml:lang",
+													element.get("?object")
+															.asLiteral()
+															.getLanguage(),
+													iterations);
+										} else {
+											appendValue(
+													TimeSpanType.class,
+													lastTimespan == null ? new TimeSpanType()
+															: lastTimespan,
+													edmLabel.getLabel()
+															.toString(),
+													element.get("?object")
+															.asResource()
+															.getURI(), null,
+													null, iterations);
+										}
+										ControlledVocabularyImpl oldVoc = vocabulary;
+										if (StringUtils.equals(edmLabel
+												.getLabel().toString(),
+												"ts_dcterms_isPartOf")
+												&& iterations > 0) {
+											ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
+													datastore, "URI", element
+															.get("?object")
+															.asResource()
+															.getURI());
 
-										timespans.addAll(denormalize(
-												element.get("?object")
-														.asResource().getURI(),
-												controlledVocabulary,
-												iterations - 1, true).get(
-												"timespans"));
+											timespans.addAll(denormalize(
+													element.get("?object")
+															.asResource()
+															.getURI(),
+													controlledVocabulary,
+													iterations - 1, true).get(
+													"timespans"));
+										}
+										vocabulary = oldVoc;
 									}
-									vocabulary = oldVoc;
 								}
-							}
 
+							}
 						}
 					}
 				}
+				if (lastConcept != null)
+					concepts.add(lastConcept);
+				if (lastAgent != null)
+					agents.add(lastAgent);
+				if (lastTimespan != null)
+					timespans.add(lastTimespan);
+				if (lastPlace != null)
+					places.add(lastPlace);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			if (lastConcept != null)
-				concepts.add(lastConcept);
-			if (lastAgent != null)
-				agents.add(lastAgent);
-			if (lastTimespan != null)
-				timespans.add(lastTimespan);
-			if (lastPlace != null)
-				places.add(lastPlace);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-
 		denormalizedValues.put("concepts", concepts);
 		denormalizedValues.put("agents", agents);
 		denormalizedValues.put("timespans", timespans);
 		denormalizedValues.put("places", places);
 
 		return denormalizedValues;
+	}
+
+	private boolean containsInternalRule(ControlledVocabularyImpl vocabulary,
+			String normalizedElement) {
+		List<String> internalRules = getInternalRule(vocabulary);
+		if (internalRules != null) {
+			for (String internalRule : internalRules) {
+				if (internalRule.contains(normalizedElement.split(":")[1])) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private String findByPrefix(Map<String, String> prefixNS, String string) {
@@ -500,7 +606,7 @@ public class OsgiExtractor extends Extractor {
 		this.datastore = datastore;
 	}
 
-	public boolean isMapped(String field) {
+	public boolean isMapped(ControlledVocabularyImpl vocabulary, String field) {
 
 		if (vocabulary != null) {
 			for (Entry<String, List<EdmMappedField>> entry : vocabulary
@@ -556,18 +662,21 @@ public class OsgiExtractor extends Extractor {
 
 	private String retrieveValue(String resource) {
 		URLConnection urlConnection;
-		if (resource != null && vocabulary != null) {
+		if (resource != null) {
 			try {
 
-				if (StringUtils.isNotBlank(vocabulary.getReplaceUrl())) {
-					System.out.println("replacing with "
-							+ vocabulary.getReplaceUrl());
-					resource = StringUtils.replace(resource,
-							vocabulary.getURI(), vocabulary.getReplaceUrl());
-				}
+				// if (StringUtils.isNotBlank(vocabulary.getReplaceUrl())) {
+				// System.out.println("replacing with "
+				// + vocabulary.getReplaceUrl());
+				// resource = StringUtils.replace(resource,
+				// vocabulary.getURI(), vocabulary.getReplaceUrl());
+				// }
 				urlConnection = new URL(resource).openConnection();
-
+				urlConnection
+						.setRequestProperty("accept",
+								"application/rdf+xml, text/turtle, text/n3,text/rdf+n3");
 				InputStream inputStream = urlConnection.getInputStream();
+
 				StringWriter writer = new StringWriter();
 				IOUtils.copy(inputStream, writer, "UTF-8");
 				return writer.toString();
@@ -599,8 +708,7 @@ public class OsgiExtractor extends Extractor {
 			String val, String edmAttr, String valAttr, int iterations)
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
-			InvocationTargetException {
-		System.out.println("appendign field:" + edmLabel);
+			InvocationTargetException, ResourceNotRDFException {
 		if (val != null) {
 			String valOld = val;
 			Pattern jibxFixerPattern = Pattern.compile("[\\uD800-\\uE000]",
@@ -611,156 +719,156 @@ public class OsgiExtractor extends Extractor {
 			if (!StringUtils.equals(valNew, valOld)) {
 				return obj;
 			}
-		}
 
-		RdfMethod RDF = null;
-		for (RdfMethod rdfMethod : RdfMethod.values()) {
-			if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
-				RDF = rdfMethod;
-			}
-		}
-		if (RDF.getMethodName().endsWith("List")) {
-
-			Method mthd = clazz.getMethod(RDF.getMethodName());
-
-			@SuppressWarnings("rawtypes")
-			List lst = mthd.invoke(obj) != null ? (ArrayList) mthd.invoke(obj)
-					: new ArrayList();
-			if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(ResourceType.class)) {
-
-				ResourceType rs = new ResourceType();
-				rs.setResource(val != null ? val : valAttr);
-				if (isURI(rs.getResource())) {
-					denormalize(rs.getResource(), iterations - 1);
+			RdfMethod RDF = null;
+			for (RdfMethod rdfMethod : RdfMethod.values()) {
+				if (StringUtils.equals(rdfMethod.getSolrField(), edmLabel)) {
+					RDF = rdfMethod;
 				}
-				lst.add(RDF.returnObject(RDF.getClazz(), rs));
+			}
+			if (RDF.getMethodName().endsWith("List")) {
+				Method mthd = clazz.getMethod(RDF.getMethodName());
 
-			} else if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(ResourceOrLiteralType.class)) {
-				ResourceOrLiteralType rs = new ResourceOrLiteralType();
-				if (isURI(val)) {
-					Resource res = new Resource();
-					res.setResource(val);
-					rs.setResource(res);
-				} else {
+				@SuppressWarnings("rawtypes")
+				List lst = mthd.invoke(obj) != null ? (ArrayList) mthd
+						.invoke(obj) : new ArrayList();
+				if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(ResourceType.class)) {
+
+					ResourceType rs = new ResourceType();
+					rs.setResource(val != null ? val : valAttr);
+					if (isURI(rs.getResource())) {
+						denormalize(rs.getResource(), iterations - 1);
+					}
+					lst.add(RDF.returnObject(RDF.getClazz(), rs));
+
+				} else if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(ResourceOrLiteralType.class)) {
+
+					ResourceOrLiteralType rs = new ResourceOrLiteralType();
+					if (isURI(val)) {
+						Resource res = new Resource();
+						res.setResource(val);
+						rs.setResource(res);
+						rs.setString("");
+					} else {
+						rs.setString(val);
+					}
+					if (edmAttr != null) {
+
+						if (StringUtils.equals(edmAttr, "xml:lang")) {
+							Lang lang = new Lang();
+							lang.setLang(valAttr);
+							rs.setLang(lang);
+						}
+
+					}
+					lst.add(RDF.returnObject(RDF.getClazz(), rs));
+				} else if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(LiteralType.class)) {
+					LiteralType rs = new LiteralType();
 					rs.setString(val);
-				}
-				if (edmAttr != null) {
+					if (edmAttr != null) {
 
-					if (StringUtils.equals(edmAttr, "xml:lang")) {
-						Lang lang = new Lang();
-						lang.setLang(valAttr);
-						rs.setLang(lang);
+						if (StringUtils.equals(edmAttr, "xml:lang")) {
+							LiteralType.Lang lang = new LiteralType.Lang();
+							lang.setLang(valAttr);
+							rs.setLang(lang);
+						}
 					}
-
+					lst.add(RDF.returnObject(RDF.getClazz(), rs));
 				}
-				lst.add(RDF.returnObject(RDF.getClazz(), rs));
-			} else if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(LiteralType.class)) {
-				LiteralType rs = new LiteralType();
-				rs.setString(val);
-				if (edmAttr != null) {
 
-					if (StringUtils.equals(edmAttr, "xml:lang")) {
-						LiteralType.Lang lang = new LiteralType.Lang();
-						lang.setLang(valAttr);
-						rs.setLang(lang);
+				Class<?>[] cls = new Class<?>[1];
+				cls[0] = List.class;
+				Method method = obj.getClass().getMethod(
+						StringUtils.replace(RDF.getMethodName(), "get", "set"),
+						cls);
+				method.invoke(obj, lst);
+			} else {
+				if (RDF.getClazz().isAssignableFrom(_Long.class)) {
+					Float rs = Float.parseFloat(val);
+					_Long lng = new _Long();
+					lng.setLong(rs);
+					((PlaceType) obj).setLong(lng);
+
+				} else if (RDF.getClazz().isAssignableFrom(Lat.class)) {
+					Float rs = Float.parseFloat(val);
+					Lat lng = new Lat();
+					lng.setLat(rs);
+					((PlaceType) obj).setLat(lng);
+
+				} else if (RDF.getClazz().isAssignableFrom(Alt.class)) {
+					Float rs = Float.parseFloat(val);
+					Alt lng = new Alt();
+					lng.setAlt(rs);
+					((PlaceType) obj).setAlt(lng);
+
+				} else if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(ResourceType.class)) {
+					ResourceType rs = new ResourceType();
+					rs.setResource(val != null ? val : valAttr);
+					if (isURI(rs.getResource())) {
+						denormalize(rs.getResource(), iterations - 1);
 					}
-				}
-				lst.add(RDF.returnObject(RDF.getClazz(), rs));
-			}
-
-			Class<?>[] cls = new Class<?>[1];
-			cls[0] = List.class;
-			Method method = obj.getClass()
-					.getMethod(
+					Class<?>[] cls = new Class<?>[1];
+					cls[0] = RDF.getClazz();
+					Method method = obj.getClass().getMethod(
 							StringUtils.replace(RDF.getMethodName(), "get",
 									"set"), cls);
-			method.invoke(obj, lst);
-		} else {
-			if (RDF.getClazz().isAssignableFrom(_Long.class)) {
-				Float rs = Float.parseFloat(val);
-				_Long lng = new _Long();
-				lng.setLong(rs);
-				((PlaceType) obj).setLong(lng);
-
-			} else if (RDF.getClazz().isAssignableFrom(Lat.class)) {
-				Float rs = Float.parseFloat(val);
-				Lat lng = new Lat();
-				lng.setLat(rs);
-				((PlaceType) obj).setLat(lng);
-
-			} else if (RDF.getClazz().isAssignableFrom(Alt.class)) {
-				Float rs = Float.parseFloat(val);
-				Alt lng = new Alt();
-				lng.setAlt(rs);
-				((PlaceType) obj).setAlt(lng);
-
-			} else if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(ResourceType.class)) {
-				ResourceType rs = new ResourceType();
-				rs.setResource(val != null ? val : valAttr);
-				if (isURI(rs.getResource())) {
-					denormalize(rs.getResource(), iterations - 1);
-				}
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = RDF.getClazz();
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
-			} else if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(LiteralType.class)) {
-				LiteralType rs = new LiteralType();
-				rs.setString(val);
-				if (isURI(val)) {
-					denormalize(val, iterations - 1);
-				}
-				if (edmAttr != null) {
-
-					if (StringUtils.equals(edmAttr, "xml:lang")) {
-						LiteralType.Lang lang = new LiteralType.Lang();
-						lang.setLang(valAttr);
-						rs.setLang(lang);
-
-					}
-				}
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = RDF.getClazz();
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
-
-			} else if (RDF.getClazz().getSuperclass()
-					.isAssignableFrom(ResourceOrLiteralType.class)) {
-				ResourceOrLiteralType rs = new ResourceOrLiteralType();
-				if (isURI(val)) {
-					Resource res = new Resource();
-					res.setResource(val);
-					rs.setResource(res);
-					denormalize(val, iterations - 1);
-				} else {
+					method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
+				} else if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(LiteralType.class)) {
+					LiteralType rs = new LiteralType();
 					rs.setString(val);
-				}
-				if (edmAttr != null) {
-
-					if (StringUtils.equals(edmAttr, "xml:lang")) {
-						Lang lang = new Lang();
-						lang.setLang(valAttr);
-						rs.setLang(lang);
+					if (isURI(val)) {
+						denormalize(val, iterations - 1);
 					}
+					if (edmAttr != null) {
+
+						if (StringUtils.equals(edmAttr, "xml:lang")) {
+							LiteralType.Lang lang = new LiteralType.Lang();
+							lang.setLang(valAttr);
+							rs.setLang(lang);
+
+						}
+					}
+					Class<?>[] cls = new Class<?>[1];
+					cls[0] = RDF.getClazz();
+					Method method = obj.getClass().getMethod(
+							StringUtils.replace(RDF.getMethodName(), "get",
+									"set"), cls);
+					method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
+
+				} else if (RDF.getClazz().getSuperclass()
+						.isAssignableFrom(ResourceOrLiteralType.class)) {
+					ResourceOrLiteralType rs = new ResourceOrLiteralType();
+					if (isURI(val)) {
+						Resource res = new Resource();
+						res.setResource(val);
+						rs.setResource(res);
+						rs.setString("");
+						denormalize(val, iterations - 1);
+					} else {
+						rs.setString(val);
+					}
+					if (edmAttr != null && valAttr!=null) {
+
+						if (StringUtils.equals(edmAttr, "xml:lang")) {
+							Lang lang = new Lang();
+							lang.setLang(valAttr);
+							rs.setLang(lang);
+						}
+					}
+					Class<?>[] cls = new Class<?>[1];
+					cls[0] = RDF.getClazz();
+					Method method = obj.getClass().getMethod(
+							StringUtils.replace(RDF.getMethodName(), "get",
+									"set"), cls);
+					method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 				}
-				Class<?>[] cls = new Class<?>[1];
-				cls[0] = clazz;
-				Method method = obj.getClass().getMethod(
-						StringUtils.replace(RDF.getMethodName(), "get", "set"),
-						cls);
-				method.invoke(obj, RDF.returnObject(RDF.getClazz(), rs));
 			}
 		}
-
 		return obj;
 	}
 
@@ -768,7 +876,7 @@ public class OsgiExtractor extends Extractor {
 			String val, String edmAttr, String valAttr, int iterations)
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
-			InvocationTargetException {
+			InvocationTargetException, ResourceNotRDFException {
 		RdfMethod RDF = null;
 		if (val != null) {
 			String valOld = val;
@@ -868,9 +976,10 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private Map<String, List> denormalize(String val, int iterations) {
+	private Map<String, List> denormalize(String val, int iterations)
+			throws ResourceNotRDFException {
 		try {
-			if (iterations > 0) {
+			if (iterations > -1) {
 				ControlledVocabularyImpl controlledVocabulary = getControlledVocabulary(
 						datastore, "URI", val);
 				return denormalize(val, controlledVocabulary, iterations, false);
@@ -934,15 +1043,6 @@ public class OsgiExtractor extends Extractor {
 
 	}
 
-	public String getMappedField(EdmMappedField europeanaField) {
-		for (String key : vocabulary.getElements().keySet()) {
-			if (europeanaField.equals(vocabulary.getElements().get(key))) {
-				return key;
-			}
-		}
-		return null;
-	}
-
 	public ControlledVocabularyImpl getControlledVocabulary(
 			Datastore datastore, String field, String filter)
 			throws UnknownHostException, MongoException {
@@ -952,29 +1052,31 @@ public class OsgiExtractor extends Extractor {
 					+ splitName[2] + "/";
 			List<ControlledVocabularyImpl> vocabularies = VocMemCache
 					.getMemCache(solrWorkFlowService).get(vocabularyName);
-			if (vocabularies.size() == 0) {
-				for (Entry<String, List<ControlledVocabularyImpl>> vocs : VocMemCache
-						.getMemCache(solrWorkFlowService).entrySet()) {
-					for (ControlledVocabularyImpl voc : vocs.getValue()) {
-						if (voc.getReplaceUrl() != null
-								&& StringUtils.equals(voc.getReplaceUrl(),
-										vocabularyName)) {
-							vocabularies.add(voc);
+			// if (vocabularies.size() == 0) {
+			// for (Entry<String, List<ControlledVocabularyImpl>> vocs :
+			// VocMemCache
+			// .getMemCache(solrWorkFlowService).entrySet()) {
+			// for (ControlledVocabularyImpl voc : vocs.getValue()) {
+			// if (voc.getReplaceUrl() != null
+			// && StringUtils.equals(voc.getReplaceUrl(),
+			// vocabularyName)) {
+			// vocabularies.add(voc);
+			// }
+			// }
+			// }
+			// }
+			if (vocabularies != null) {
+				for (ControlledVocabularyImpl vocabulary : vocabularies) {
+					for (String rule : vocabulary.getRules()) {
+						if (StringUtils.equals(rule, "*")
+								|| StringUtils.contains(filter, rule)
+								|| StringUtils.contains(rule, "<")) {
+							return vocabulary;
 						}
 					}
+
 				}
 			}
-
-			for (ControlledVocabularyImpl vocabulary : vocabularies) {
-				for (String rule : vocabulary.getRules()) {
-					if (StringUtils.equals(rule, "*")
-							|| StringUtils.contains(filter, rule)) {
-						return vocabulary;
-					}
-				}
-
-			}
-
 		}
 		return null;
 	}

@@ -18,7 +18,7 @@ public class PlaceDereferencer extends Dereferencer{
 	public <T> void dereference(RDF rdf, T t) throws MalformedURLException,
 			SecurityException, IllegalArgumentException, IOException,
 			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
+			NoSuchMethodException, InvocationTargetException, ResourceNotRDFException {
 		PlaceType place = (PlaceType)t;
 		derefResourceOrLiteral(rdf,  place.getAbout());
 		derefResourceOrLiteralList(rdf,  place.getIsPartOfList());

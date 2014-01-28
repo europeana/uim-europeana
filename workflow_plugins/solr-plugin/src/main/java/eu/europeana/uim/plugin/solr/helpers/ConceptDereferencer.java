@@ -18,7 +18,7 @@ public class ConceptDereferencer extends Dereferencer {
 	public <T> void dereference(RDF rdf, T t) throws MalformedURLException,
 			SecurityException, IllegalArgumentException, IOException,
 			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
+			NoSuchMethodException, InvocationTargetException, ResourceNotRDFException {
 		Concept concept = (Concept)t;
 		derefResourceOrLiteral(rdf,  concept.getAbout());
 		if(concept.getChoiceList()!=null){

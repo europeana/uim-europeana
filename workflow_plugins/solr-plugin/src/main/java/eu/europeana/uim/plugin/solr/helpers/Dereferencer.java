@@ -75,8 +75,7 @@ public abstract class Dereferencer {
 						for (String rule : vocabulary.getRules()) {
 					
 							if (StringUtils.equals(rule, "*")
-									|| StringUtils.contains(str, rule)) {
-								System.out.println("found vocabulary:" + vocabulary.getName());
+									|| StringUtils.contains(str, rule) || StringUtils.startsWith(rule, "<")) {
 								return vocabulary;
 							}
 						}
@@ -93,9 +92,9 @@ public abstract class Dereferencer {
 		if(vocMemCache.containsKey(vocabularyUri)){
 			return vocMemCache.get(vocabularyUri);
 		}
-		if(hasReplaceUri(vocabularyUri)){
-			getReplaceUri(vocabularyUri);
-		}
+//		if(hasReplaceUri(vocabularyUri)){
+//			getReplaceUri(vocabularyUri);
+//		}
 		for(String key: vocMemCache.keySet()){
 			if(key.startsWith(vocabularyUri)){
 				return vocMemCache.get(key);
@@ -109,7 +108,7 @@ public abstract class Dereferencer {
 			throws MalformedURLException, IOException, SecurityException,
 			IllegalArgumentException, InstantiationException,
 			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
+			InvocationTargetException, ResourceNotRDFException {
 		if (list != null) {
 			for (Object object : list) {
 				derefResourceOrLiteral(rdf, object);
@@ -121,7 +120,7 @@ public abstract class Dereferencer {
 			throws MalformedURLException, IOException, SecurityException,
 			IllegalArgumentException, InstantiationException,
 			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
+			InvocationTargetException, ResourceNotRDFException {
 		OsgiExtractor extractor = solrWorkflowService.getExtractor();
 		extractor.setDatastore(solrWorkflowService.getDatastore());
 		
@@ -263,5 +262,5 @@ public abstract class Dereferencer {
 		}
 	}
 
-	public abstract <T> void dereference(RDF rdf, T t) throws MalformedURLException, SecurityException, IllegalArgumentException, IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException;
+	public abstract <T> void dereference(RDF rdf, T t) throws MalformedURLException, SecurityException, IllegalArgumentException, IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, ResourceNotRDFException;
 }

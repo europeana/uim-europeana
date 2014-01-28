@@ -1373,8 +1373,6 @@ public class EnrichmentPlugin<I> extends
 		EnrichmentPlugin.enrichmentService = enrichmentService;
 	}
 
-	// check if the hash of the record exists
-
 	// append the rest of the contextual entities
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <T> T appendValue(Class<T> clazz, T obj, String edmLabel,

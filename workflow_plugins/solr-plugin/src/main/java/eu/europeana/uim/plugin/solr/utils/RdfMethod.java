@@ -258,7 +258,7 @@ public enum RdfMethod {
 			return (T) pref;
 		}
 	},
-	PL_OWL_SAMEAS("pl_owl_sameAs", "getSameAsList", SameAs.class) {
+	PL_OWL_SAMEAS("pl_owl_sameAs", "getSameAList", SameAs.class) {
 		@Override
 		public <T, V> T returnObject(T clazz, V obj) {
 			SameAs pref = new SameAs();
@@ -329,7 +329,7 @@ public enum RdfMethod {
 			return (T) pref;
 		}
 	},
-	TS_OWL_SAMEAS("ts_owl_sameAs", "getSameAsList", SameAs.class) {
+	TS_OWL_SAMEAS("ts_owl_sameAs", "getSameAList", SameAs.class) {
 		@Override
 		public <T, V> T returnObject(T clazz, V obj) {
 			SameAs pref = new SameAs();
@@ -465,7 +465,7 @@ public enum RdfMethod {
 			return (T) pref;
 		}
 	},
-	AG_OWL_SAMEAS("ag_owl_sameAs", "getSameAsList", SameAs.class) {
+	AG_OWL_SAMEAS("ag_owl_sameAs", "getSameAList", SameAs.class) {
 		@Override
 		public <T, V> T returnObject(T clazz, V obj) {
 			SameAs pref = new SameAs();

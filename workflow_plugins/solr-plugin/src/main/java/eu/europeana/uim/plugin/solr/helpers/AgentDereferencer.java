@@ -15,7 +15,7 @@ public class AgentDereferencer extends Dereferencer{
 	}
 
 	@Override
-	public <T> void dereference(RDF rdf, T t) throws MalformedURLException, SecurityException, IllegalArgumentException, IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+	public <T> void dereference(RDF rdf, T t) throws MalformedURLException, SecurityException, IllegalArgumentException, IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, ResourceNotRDFException {
 		AgentType agent = (AgentType)t;
 		derefResourceOrLiteral(rdf, agent.getAbout());
 		derefResourceOrLiteralList(rdf, agent.getHasMetList());

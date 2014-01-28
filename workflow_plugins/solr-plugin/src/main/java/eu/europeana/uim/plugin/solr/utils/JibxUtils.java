@@ -1,5 +1,7 @@
 package eu.europeana.uim.plugin.solr.utils;
 
+import java.util.ArrayList;
+
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.AltLabel;
 import eu.europeana.corelib.definitions.jibx.Concept;
@@ -60,7 +62,11 @@ public class JibxUtils {
 					: sAgent.getGender());
 		}
 		if (fAgent.getProfessionOrOccupation() != null
-				|| sAgent.getPrefLabelList() != null) {
+				&& (fAgent.getProfessionOrOccupation().getResource() != null || fAgent
+						.getProfessionOrOccupation().getString() != null)
+				|| sAgent.getProfessionOrOccupation() != null
+				&& (sAgent.getProfessionOrOccupation().getResource() != null || sAgent
+						.getProfessionOrOccupation().getString() != null)) {
 			agent.setProfessionOrOccupation(fAgent.getProfessionOrOccupation() != null ? fAgent
 					.getProfessionOrOccupation() : sAgent
 					.getProfessionOrOccupation());

@@ -18,7 +18,7 @@ public class TimespanDereferencer extends Dereferencer {
 	public <T> void dereference(RDF rdf, T t) throws MalformedURLException,
 			SecurityException, IllegalArgumentException, IOException,
 			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
+			NoSuchMethodException, InvocationTargetException, ResourceNotRDFException {
 		TimeSpanType timeSpan = (TimeSpanType) t;
 		derefResourceOrLiteralList(rdf,  timeSpan.getHasPartList());
 		derefResourceOrLiteralList(rdf, timeSpan.getIsPartOfList());

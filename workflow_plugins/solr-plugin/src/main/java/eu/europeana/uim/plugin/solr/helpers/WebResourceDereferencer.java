@@ -18,7 +18,7 @@ public class WebResourceDereferencer extends Dereferencer{
 	public <T> void dereference(RDF rdf, T t) throws MalformedURLException,
 			SecurityException, IllegalArgumentException, IOException,
 			InstantiationException, IllegalAccessException,
-			NoSuchMethodException, InvocationTargetException {
+			NoSuchMethodException, InvocationTargetException, ResourceNotRDFException {
 				WebResourceType webResource = (WebResourceType)t;
 				derefResourceOrLiteralList(rdf, webResource.getCreatedList());
 				derefResourceOrLiteralList(rdf, webResource.getExtentList());
