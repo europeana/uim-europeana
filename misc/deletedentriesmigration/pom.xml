@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>europeana-uim-europeanaspecific</artifactId>
+		<groupId>eu.europeana.europeanauim</groupId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>uimentriesmigration</artifactId>
+	<packaging>jar</packaging>
+	<name>uimentriesmigration</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		
+				<dependency>
+			<groupId>${europeana.uim.groupId}</groupId>
+			<artifactId>europeana-uim-storage-mongo</artifactId>
+			<version>${europeana.uim.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${europeana.uim.groupId}</groupId>
+			<artifactId>europeana-uim-model-tel</artifactId>
+			<version>${europeana.uim.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${europeana.uim.groupId}</groupId>
+			<artifactId>europeana-uim-model-europeana</artifactId>
+			<version>${europeana.uim.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${europeana.uim.groupId}</groupId>
+			<artifactId>europeana-uim-model-common</artifactId>
+			<version>${europeana.uim.version}</version>
+		</dependency> 
+		
+	</dependencies>
+	
+</project>
