@@ -83,7 +83,11 @@ public class Migrator {
 				Status status = null;
 				for(Status st : statuslist){
 					if(st.equals(Status.DELETED)){
+						System.out.print("!!!!!Found deleted!!!!!!");
 						status = Status.DELETED;
+					}
+					else{
+						status = Status.CLEANUP;
 					}
 				}
 				

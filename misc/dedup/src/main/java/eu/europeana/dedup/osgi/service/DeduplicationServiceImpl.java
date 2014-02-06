@@ -263,9 +263,43 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 
 
 
+	/* (non-Javadoc)
+	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteFailedRecord(java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void deleteFailedRecord(String europeanaId,String collectionID) {
 		mongoserver.deleteFailedRecord(europeanaId,collectionID);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#markdeleted(java.lang.String, boolean)
+	 */
+	@Override
+	public void markdeleted(String europeanaID, boolean isdeleted) {
+		mongoserver.markdeleted(europeanaID, isdeleted);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#isdeleted(java.lang.String)
+	 */
+	@Override
+	public boolean isdeleted(String europeanaID) {
+		return mongoserver.isdeleted(europeanaID);
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteFailedRecords(java.lang.String)
+	 */
+	@Override
+	public void deleteFailedRecords(String collectionID) {
+		mongoserver.deleteFailedRecords(collectionID);
+		
 	}
 
 
