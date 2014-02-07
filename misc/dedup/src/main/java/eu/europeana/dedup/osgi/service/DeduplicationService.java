@@ -69,7 +69,6 @@ public interface DeduplicationService {
 	 */
 	public void deleteEuropeanaID(String newEuropeanaID);
 	
-	
 	/**
 	 * Creates an entry in the failed records section
 	 * 
@@ -79,7 +78,6 @@ public interface DeduplicationService {
 	 */
 	public void createUpdateIdStatus(String oldEuropeanaID,String newEuropeanaID,String collectionID,String xml,LookupState state);
 	
-	
 	/**
 	 * Deletes a failed record entry
 	 * 
@@ -88,5 +86,29 @@ public interface DeduplicationService {
 	public void deleteFailedRecord(String europeanaId,String collectionID);
 	
 	
+	/**
+	 * Deletes all failed records entries that belong to a collection
+	 * 
+	 * @param collectionID
+	 */
+	public void deleteFailedRecords(String collectionID);
+	
+	
+	
+	/**
+	 * Sets a deleted status to a specific record
+	 * 
+	 * @param europeanaID
+	 * @param isdeleted
+	 */
+	public void markdeleted(String europeanaID, boolean isdeleted);
+	
+	/**
+	 * Check if the record that corresponds to the specific europeana id is deleted
+	 *
+	 * @param europeanaID
+	 * @return
+	 */
+	public boolean isdeleted(String europeanaID);
 	
 }
