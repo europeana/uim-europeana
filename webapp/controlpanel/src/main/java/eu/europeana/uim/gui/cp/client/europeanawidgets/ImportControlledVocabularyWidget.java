@@ -127,7 +127,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	@Override
 	public Widget onInitialize() {
 		importVocabulary = new TabLayoutPanel(20, Unit.PX);
-		importVocabulary.setSize("1024px", "700px");
+		importVocabulary.setSize("1280px", "768px");
 		importVocabulary.add(createImportTable(), "Upload Vocabulary");
 		importVocabulary.add(createFieldMappingPage(), "Vocabulary Mapping");
 		Binder uiBinder = GWT.create(Binder.class);
@@ -149,7 +149,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		vpanel.addEast(createButtons(), 250);
 		vpanel.addEast(createMappedFieldsTable(), 250);
 		vpanel.add(createMappableFieldTable());
-		vpanel.setHeight("650px");
+		vpanel.setHeight("700px");
 		return vpanel;
 	}
 

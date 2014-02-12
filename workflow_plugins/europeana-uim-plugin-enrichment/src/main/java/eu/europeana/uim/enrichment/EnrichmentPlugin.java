@@ -21,7 +21,6 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -129,6 +128,7 @@ import eu.europeana.uim.sugar.SugarCrmService;
  * @author Yorgos.Mamakis@ kb.nl
  * 
  */
+@SuppressWarnings("rawtypes")
 public class EnrichmentPlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
@@ -199,6 +199,7 @@ public class EnrichmentPlugin<I> extends
 		}
 
 	}
+
 	private final static TKey<EnrichmentPlugin, Long> date = TKey.register(
 			EnrichmentPlugin.class, "enrichment", Long.class);
 	private final static TKey<EnrichmentPlugin, Long> processCalledTKey = TKey
@@ -212,7 +213,7 @@ public class EnrichmentPlugin<I> extends
 	 */
 	private static final List<String> params = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-		
+
 		{
 			add(OVERRIDECHECKS);
 			add(OVERRIDEENRICHMENT);
@@ -307,7 +308,6 @@ public class EnrichmentPlugin<I> extends
 	 * orchestration.ExecutionContext)
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
 	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException {
 		Collection collection = null;
@@ -336,7 +336,7 @@ public class EnrichmentPlugin<I> extends
 			if (StringUtils.isNotEmpty(overrideChecks)) {
 				check = Boolean.parseBoolean(overrideChecks);
 			}
-			
+
 			if (collection
 					.getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
 							.toString()) != null) {
@@ -347,7 +347,7 @@ public class EnrichmentPlugin<I> extends
 
 			} else {
 				context.putValue(date, new Date(0).getTime());
-				check=true;
+				check = true;
 			}
 			if (Boolean.parseBoolean(collection
 					.getValue(ControlledVocabularyProxy.ISNEW.toString()))
@@ -356,7 +356,7 @@ public class EnrichmentPlugin<I> extends
 				solrServer.deleteByQuery("europeana_collectionName:"
 						+ collection.getName().split("_")[0] + "*");
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -438,7 +438,7 @@ public class EnrichmentPlugin<I> extends
 			log.log(Level.SEVERE, e.getMessage());
 		}
 		log.log(Level.INFO, "Committed in Solr Server");
-		
+
 	}
 
 	/*
@@ -453,7 +453,8 @@ public class EnrichmentPlugin<I> extends
 			ExecutionContext<MetaDataRecord<I>, I> context)
 			throws IngestionPluginFailedException, CorruptedDatasetException {
 		String value = null;
-		context.putValue(processCalledTKey, context.getValue(processCalledTKey)+1);
+		context.putValue(processCalledTKey,
+				context.getValue(processCalledTKey) + 1);
 		if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
 				&& mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
 						.size() > 0) {
@@ -464,7 +465,8 @@ public class EnrichmentPlugin<I> extends
 		}
 		String overrideChecks = context.getProperties().getProperty(
 				OVERRIDECHECKS);
-		String overrideUpdateCheck = context.getProperties().getProperty(FORCELASTUPDATE);
+		String overrideUpdateCheck = context.getProperties().getProperty(
+				FORCELASTUPDATE);
 		boolean check = false;
 		boolean checkUpdate = false;
 		if (StringUtils.isNotEmpty(overrideChecks)) {
@@ -600,13 +602,12 @@ public class EnrichmentPlugin<I> extends
 										EuropeanaModelRegistry.INITIALSAVE)
 										.size() > 0) {
 							timestampCreated = new Date(mdr.getValues(
-									EuropeanaModelRegistry.INITIALSAVE)
-									.get(0));
+									EuropeanaModelRegistry.INITIALSAVE).get(0));
 						} else {
 							mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
 									timestampCreated.getTime());
 						}
-						
+
 						fullBean.setTimestampCreated(timestampCreated);
 						solrInputDocument.addField("timestamp_created",
 								timestampCreated);
@@ -637,9 +638,10 @@ public class EnrichmentPlugin<I> extends
 							updateFullBean(mongoServer, fullBean);
 
 						}
-						context.putValue(addedTKey, context.getValue(addedTKey)+1);
+						context.putValue(addedTKey,
+								context.getValue(addedTKey) + 1);
 						solrServer.add(solrInputDocument);
-						
+
 						return true;
 
 					} catch (MalformedURLException e) {
@@ -678,7 +680,8 @@ public class EnrichmentPlugin<I> extends
 				else {
 					boolean res = removeRecord(rdf);
 					if (res) {
-						context.putValue(deletedTKey,context.getValue(deletedTKey)+1);
+						context.putValue(deletedTKey,
+								context.getValue(deletedTKey) + 1);
 					}
 					mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
 					mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
@@ -719,8 +722,8 @@ public class EnrichmentPlugin<I> extends
 					.getCollection("Aggregation");
 			DBCollection europeanaAggregations = mongoServer.getDatastore()
 					.getDB().getCollection("EuropeanaAggregation");
-			DBCollection physicalThing = mongoServer.getDatastore()
-					.getDB().getCollection("PhysicalThing");
+			DBCollection physicalThing = mongoServer.getDatastore().getDB()
+					.getCollection("PhysicalThing");
 			DBObject query = new BasicDBObject("about", rdf
 					.getProvidedCHOList().get(0).getAbout());
 			DBObject proxyQuery = new BasicDBObject("about", "/proxy/provider"
@@ -787,21 +790,22 @@ public class EnrichmentPlugin<I> extends
 				.getCollection("record");
 		DBCollection proxies = mongoServer2.getDatastore().getDB()
 				.getCollection("Proxy");
-		DBCollection physicalThing = mongoServer2.getDatastore().getDB().getCollection("PhysicalThing");
+		DBCollection physicalThing = mongoServer2.getDatastore().getDB()
+				.getCollection("PhysicalThing");
 		DBCollection providedCHOs = mongoServer2.getDatastore().getDB()
 				.getCollection("ProvidedCHO");
 		DBCollection aggregations = mongoServer2.getDatastore().getDB()
 				.getCollection("Aggregation");
 		DBCollection europeanaAggregations = mongoServer2.getDatastore()
 				.getDB().getCollection("EuropeanaAggregation");
-		
+
 		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
 				+ collection + "/"));
 		DBObject proxyQuery = new BasicDBObject("about",
 				Pattern.compile("^/proxy/provider/" + collection + "/"));
 		DBObject europeanaProxyQuery = new BasicDBObject("about",
 				Pattern.compile("^/proxy/europeana/" + collection + "/"));
-		
+
 		DBObject providedCHOQuery = new BasicDBObject("about",
 				Pattern.compile("^/item/" + collection + "/"));
 		DBObject aggregationQuery = new BasicDBObject("about",
@@ -813,8 +817,8 @@ public class EnrichmentPlugin<I> extends
 		records.remove(query, WriteConcern.FSYNC_SAFE);
 		proxies.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
 		proxies.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
-		physicalThing.remove(proxyQuery,WriteConcern.FSYNC_SAFE);
-		physicalThing.remove(europeanaProxyQuery,WriteConcern.FSYNC_SAFE);
+		physicalThing.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
+		physicalThing.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
 		providedCHOs.remove(providedCHOQuery, WriteConcern.FSYNC_SAFE);
 		aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
 	}
@@ -1374,7 +1378,7 @@ public class EnrichmentPlugin<I> extends
 	}
 
 	// append the rest of the contextual entities
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	private <T> T appendValue(Class<T> clazz, T obj, String edmLabel,
 			String val, String edmAttr, String valAttr)
 			throws SecurityException, NoSuchMethodException,
@@ -1637,14 +1641,7 @@ public class EnrichmentPlugin<I> extends
 	 * @return
 	 */
 	private static boolean isURI(String uri) {
-
-		try {
-			new URL(uri);
-			return true;
-		} catch (MalformedURLException e) {
-			return false;
-		}
-
+		return uri.startsWith("http://");
 	}
 
 	private static ProxyImpl getProviderProxy(FullBeanImpl fbean) {

@@ -1,10 +1,12 @@
 package eu.europeana.uim.plugin.solr.utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.AltLabel;
 import eu.europeana.corelib.definitions.jibx.Concept;
+import eu.europeana.corelib.definitions.jibx.Concept.Choice;
 import eu.europeana.corelib.definitions.jibx.HasMet;
 import eu.europeana.corelib.definitions.jibx.HasPart;
 import eu.europeana.corelib.definitions.jibx.Identifier;
@@ -225,6 +227,10 @@ public class JibxUtils {
 		concept.setAbout(fConcept.getAbout().length() < sConcept.getAbout()
 				.length() ? fConcept.getAbout() : sConcept.getAbout());
 		concept.setChoiceList(sConcept.getChoiceList());
+		if(concept.getChoiceList()==null){
+			List<Choice> choices = new ArrayList<Choice>();
+			concept.setChoiceList(choices);
+		}
 		if (fConcept.getChoiceList() != null) {
 			for (Concept.Choice choice : fConcept.getChoiceList()) {
 				if (!concept.getChoiceList().contains(choice)) {
