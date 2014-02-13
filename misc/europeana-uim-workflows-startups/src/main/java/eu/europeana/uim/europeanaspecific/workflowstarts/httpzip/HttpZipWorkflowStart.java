@@ -544,6 +544,7 @@ public class HttpZipWorkflowStart<I> extends
 
 		}
 		
+		context.getStorageEngine().completed(context);
 		//MongoStorageEngine mgengine = new MongoStorageEngine();
 		//mgengine.initialize();
 		//mgengine.flushCollectionMDRS((String) context.getDataSet().getId());
