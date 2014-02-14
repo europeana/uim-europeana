@@ -18,7 +18,7 @@ public class MigratorTest
     {
     	Migrator m = new Migrator();
     	try {
-			m.populateDeleteStatus();
+    		Migrator.populateDeleteStatus();
 		} catch (StorageEngineException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

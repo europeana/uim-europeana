@@ -43,7 +43,7 @@ public class Migrator {
 	private static StorageEngine<String> uimstorage;
 
 	
-	public Migrator(){
+	static{
 		Mongo mongo = null;
 		try {
 		   mongo = new Mongo();
@@ -60,10 +60,42 @@ public class Migrator {
 		uimstorage.initialize();
 	}
 	
+	
+	/**
+	 * Public constructor
+	 */
+	public Migrator(){
+	}
+	
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String args[]){
+		
+		try {
+			if(args.length == 1){
+				Mongo mongo = new Mongo(args[0]);
+			}
+				
+			populateDeleteStatus();
+		} catch (StorageEngineException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MongoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
 	/**
 	 * @throws StorageEngineException
 	 */
-	public void populateDeleteStatus() throws StorageEngineException{
+	public static void populateDeleteStatus() throws StorageEngineException{
 		
 		// Get all collections from storage engine
 		ArrayList<Collection<String>> collidlist = (ArrayList<Collection<String>>) uimstorage.getAllCollections();
@@ -85,6 +117,7 @@ public class Migrator {
 					if(st.equals(Status.DELETED)){
 						System.out.print("!!!!!Found deleted!!!!!!");
 						status = Status.DELETED;
+						break;
 					}
 					else{
 						status = Status.CLEANUP;
@@ -96,7 +129,7 @@ public class Migrator {
 					// Get the record ID and lookup the entry in the EuropeanaIDRegistry
 					// And set the deleted column value to true
 					idregistry.markdeleted(mdr.getId(), true);
-					System.out.print("(deleted)");
+					System.out.print("(******deleted*******)");
 				}
 				else{
 					// Else set to false.
