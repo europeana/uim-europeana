@@ -181,7 +181,7 @@ public class LookupCreationPlugin<I> extends
 						.getCollectionMongoServer().findOldCollectionId(
 								collectionId);
 				if (oldCollectionId != null) {
-					collectionId = oldCollectionId;
+					
 					fileName = oldCollectionId;
 				} else {
 					fileName = (String) mdr.getCollection().getName();
@@ -355,7 +355,7 @@ public class LookupCreationPlugin<I> extends
 
 		if (preSipCreatorUtils.getHashField(fileName, fileName) != null) {
 			String val = EseEdmMap.getEseEdmMap(
-					preSipCreatorUtils.getHashField(collectionId, fileName),
+					preSipCreatorUtils.getHashField(fileName, fileName),
 					fullBean.getAbout()).getEdmValue(fullBean);
 			if (val != null) {
 				return HashUtils.createHash(val);
