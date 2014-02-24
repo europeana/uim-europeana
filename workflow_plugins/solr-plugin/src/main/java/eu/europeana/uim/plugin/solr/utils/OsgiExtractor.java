@@ -417,7 +417,7 @@ public class OsgiExtractor extends Extractor {
 															.getURI(),
 													controlledVocabulary,
 													iterations - 1, true);
-											if (concepts.size() > 0) {
+											if (conceptDen !=null && conceptDen.size()>0) {
 												concepts.addAll(conceptDen
 														.get("concepts"));
 											}
