@@ -71,7 +71,18 @@ public class ReponseHandler {
 			Set<String> providerlock) {
 		this.registry = registry;
 		this.orchestrator = orchestrator;
-		this.storage = registry.getStorageEngine();
+		int count = 0;
+		do {
+			try {
+				Thread.currentThread().sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			this.storage = registry.getStorageEngine();
+			count++;
+		}  while (this.storage == null && count < 10);
+
+		
 		this.sugservice = sugservice;
 		ReponseHandler.providerlock = providerlock;
 	}

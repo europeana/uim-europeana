@@ -435,8 +435,37 @@ public class HttpZipWorkflowStart<I> extends
 
 		if (context.getExecution().isCanceled()) {
 			value.request.setFailed(true);
-		} else {
+		} else {		
+			//Log the results
+			 logExecutionResults(context);
+			 value.loader.close();
 
+			 //Process the deleted records
+			 try {
+				processDeletedEntries( value, context);
+			} catch (StorageEngineException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}      
+		}
+		
+		context.getStorageEngine().completed(context);
+
+	}
+
+	
+	/**
+	 * Logs the results of the import execution
+	 * 
+	 * @param context
+	 */
+	private void logExecutionResults(ExecutionContext<MetaDataRecord<I>, I> context){
+		context.getLoggingEngine().log(context.getExecution(), Level.INFO,
+				"HttpZipWorkflowStart",
+				"Initializing Data statistics analysis for imports:");
+		Data value = context.getValue(DATA_KEY);
+
+			//Log entries
 			context.getLoggingEngine().log(
 					context.getExecution(),
 					Level.INFO,
@@ -468,29 +497,118 @@ public class HttpZipWorkflowStart<I> extends
 					"Records discarded during the import process:"
 							+ Integer.toString(value.loader.getDiscarded()));
 
-			value.loader.close();
+	}
+	
+	
+	/**
+	 * Processes Deleted Entries
+	 * 
+	 * @param value
+	 * @param context
+	 * @throws StorageEngineException 
+	 */
+	private void processDeletedEntries(Data value,ExecutionContext<MetaDataRecord<I>, I> context) throws StorageEngineException{
+		int deletedCounter = value.deletioncandidates.size();
+		
+		StorageEngine<I> uimengine = context.getStorageEngine();
 
-			StorageEngine<I> uimengine = context.getStorageEngine();
+		//Check if there are deletion candidates found
+		if (!value.deletioncandidates.isEmpty()) {
+			
+			Collection<I> coll = context.getDataSetCollection();
+			
+			String[] entries = (String[]) uimengine.getByCollection(coll);
+			
+			Set<String> nondeledtrecs = new HashSet<String>();
+			
+			for(int i= 0; i < entries.length; i++){
+				
+				boolean markedasdeleted = value.deletioncandidates.contains(entries[i]);
 
-			if (!value.deletioncandidates.isEmpty()) {
-				context.getLoggingEngine()
-						.log(context.getExecution(), Level.INFO,
-								"HttpZipWorkflowStart",
-								"Finished analysis, checking for records that should be marked as deleted.");
-				context.getLoggingEngine().log(
-						context.getExecution(),
-						Level.INFO,
-						"HttpZipWorkflowStart",
-						"Number of deletion candidates found :"
-								+ value.deletioncandidates.size());
+				if(markedasdeleted){
+					nondeledtrecs.add(entries[i]);
+				}
+			}
+			
+			
+			context.getLoggingEngine()
+					.log(context.getExecution(), Level.INFO,
+							"HttpZipWorkflowStart",
+							"Finished analysis, checking for records that should be marked as deleted.");
+			context.getLoggingEngine().log(
+					context.getExecution(),
+					Level.INFO,
+					"HttpZipWorkflowStart",
+					"Number of deletion candidates found :"
+							+ value.deletioncandidates.size());
 
-				Iterator<String> it = value.deletioncandidates.iterator();
+			
+			Iterator<String> nondeledtrecsit = nondeledtrecs.iterator();
+			
+			//Process records that were included in the last import
+			while (nondeledtrecsit.hasNext()) {
+				String id = nondeledtrecsit.next();
+				try {
+					MetaDataRecord<I> mdr = uimengine
+							.getMetaDataRecord((I) id);
+					
+					boolean hastatusdeleted  = false;
+					
+					//Check if the record contains any "Deleted" status values
+					List<Status> statuslist = mdr.getValues(EuropeanaModelRegistry.STATUS);
+					
 
-				while (it.hasNext()) {
-					String id = it.next();
-					try {
-						MetaDataRecord<I> mdr = uimengine
-								.getMetaDataRecord((I) id);
+					for(Status st : statuslist){
+						if(st.equals(Status.DELETED)){
+							hastatusdeleted = true;
+							break;
+						}
+					}
+					
+					//If it does then remove the updated mark and save it
+					if(!hastatusdeleted){
+						mdr.deleteValues(EuropeanaModelRegistry.STATUS);
+						uimengine.updateMetaDataRecord(mdr);
+					}
+					
+					dedup.markdeleted(id, false);
+
+				} catch (StorageEngineException e) {
+					context.getLoggingEngine()
+							.log(context.getExecution(),
+									Level.SEVERE,
+									"HttpZipWorkflowStart",
+									"Error marking record "
+											+ id
+											+ " as deleted due to UIM storage engine failure "
+											+ e.getMessage());
+				}
+			}
+			
+			
+			Iterator<String> it = value.deletioncandidates.iterator();
+
+			while (it.hasNext()) {
+				String id = it.next();
+				try {
+					MetaDataRecord<I> mdr = uimengine
+							.getMetaDataRecord((I) id);
+					
+					boolean hastatusdeleted  = false;
+					
+					//Check if the record contains any "Deleted" status values
+					List<Status> statuslist = mdr.getValues(EuropeanaModelRegistry.STATUS);
+					
+
+					for(Status st : statuslist){
+						if(st.equals(Status.DELETED)){
+							hastatusdeleted = true;
+							break;
+						}
+					}
+					
+					
+					if(!hastatusdeleted){
 						mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 						mdr.addValue(EuropeanaModelRegistry.STATUS,
 								Status.DELETED);
@@ -505,52 +623,51 @@ public class HttpZipWorkflowStart<I> extends
 										"Marked Record " + mdr.getId()
 												+ " as Deleted.");
 						dedup.markdeleted(id, true);
-
-					} catch (StorageEngineException e) {
-						context.getLoggingEngine()
-								.log(context.getExecution(),
-										Level.SEVERE,
-										"HttpZipWorkflowStart",
-										"Error marking record "
-												+ id
-												+ " as deleted due to UIM storage engine failure "
-												+ e.getMessage());
 					}
+					else{
+						deletedCounter --;
+					}
+
+
+				} catch (StorageEngineException e) {
+					context.getLoggingEngine()
+							.log(context.getExecution(),
+									Level.SEVERE,
+									"HttpZipWorkflowStart",
+									"Error marking record "
+											+ id
+											+ " as deleted due to UIM storage engine failure "
+											+ e.getMessage());
 				}
 			}
-
-			Execution<I> execution = context.getExecution();
-			execution.putValue("Deleted",
-					Integer.toString(value.deletioncandidates.size()));
-
-			Collection<I> collection = (Collection<I>) context.getDataSet();
-			collection.putValue("Deleted",
-					Integer.toString(value.deletioncandidates.size()));
-			collection.putValue(ControlledVocabularyProxy.ISNEW.toString(),
-					Boolean.toString(value.isNew));
-
-			try {
-				context.getStorageEngine().updateExecution(execution);
-				context.getStorageEngine().updateCollection(collection);
-			} catch (StorageEngineException e) {
-				context.getLoggingEngine()
-						.log(context.getExecution(),
-								Level.SEVERE,
-								"HttpZipWorkflowStart",
-								"Error updating execution or collection "
-										+ " with deleted records information due to UIM storage engine failure "
-										+ e.getMessage());
-			}
-
 		}
-		
-		context.getStorageEngine().completed(context);
-		//MongoStorageEngine mgengine = new MongoStorageEngine();
-		//mgengine.initialize();
-		//mgengine.flushCollectionMDRS((String) context.getDataSet().getId());
 
+		Execution<I> execution = context.getExecution();
+		execution.putValue("Deleted",
+				Integer.toString(deletedCounter));
+
+		Collection<I> collection = (Collection<I>) context.getDataSet();
+		collection.putValue("Deleted",
+				Integer.toString(value.deletioncandidates.size()));
+		collection.putValue(ControlledVocabularyProxy.ISNEW.toString(),
+				Boolean.toString(value.isNew));
+
+		try {
+			context.getStorageEngine().updateExecution(execution);
+			context.getStorageEngine().updateCollection(collection);
+		} catch (StorageEngineException e) {
+			context.getLoggingEngine()
+					.log(context.getExecution(),
+							Level.SEVERE,
+							"HttpZipWorkflowStart",
+							"Error updating execution or collection "
+									+ " with deleted records information due to UIM storage engine failure "
+									+ e.getMessage());
+		}
 	}
-
+	
+		
+	
 	/*
 	 * (non-Javadoc)
 	 * 

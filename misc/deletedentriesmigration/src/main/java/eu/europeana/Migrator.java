@@ -40,7 +40,7 @@ import eu.europeana.uim.storage.StorageEngineException;
 public class Migrator {
 
 	private static EuropeanaIdRegistryMongoServer  idregistry;
-	private static StorageEngine<String> uimstorage;
+	private static MongoStorageEngine uimstorage;
 
 	
 	static{
@@ -137,6 +137,8 @@ public class Migrator {
 					System.out.print("(not deleted)");
 				}
 			}
+			
+			uimstorage.purgeInmemoryCollectionRecordIDsBrute();
 		}
 	}
 	
