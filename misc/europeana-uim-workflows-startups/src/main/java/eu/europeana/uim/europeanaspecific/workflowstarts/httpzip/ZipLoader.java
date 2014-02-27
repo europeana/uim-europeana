@@ -221,15 +221,7 @@ public class ZipLoader<I> {
 						created ++;
 						
 						break;
-					case COLLECTION_CHANGED:					
-						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in COLLECTION_CHANGED state for record with ID " + dedupres
-								.getDerivedRecordID());
-						
-						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
-								getMnemonic(),rdfstring,LookupState.COLLECTION_CHANGED);
-						
-						discarded ++;
-						break;
+					
 					case DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS:
 						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS state for record with ID " + dedupres
 								.getDerivedRecordID());
