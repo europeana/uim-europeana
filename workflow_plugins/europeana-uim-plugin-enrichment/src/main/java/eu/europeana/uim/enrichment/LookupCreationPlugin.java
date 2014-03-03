@@ -34,6 +34,7 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
@@ -160,66 +161,83 @@ public class LookupCreationPlugin<I> extends
 		IUnmarshallingContext uctx;
 
 		try {
+			List<Status> status = mdr.getValues(EuropeanaModelRegistry.STATUS);
 
-			String value = null;
-			if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
-					&& mdr.getValues(
+			if (!(status != null && status.get(0).equals(Status.DELETED))) {
+				String value = null;
+				if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
+						&& mdr.getValues(
+								EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+								.size() > 0) {
+					value = mdr.getValues(
 							EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
-							.size() > 0) {
-				value = mdr.getValues(
-						EuropeanaModelRegistry.EDMDEREFERENCEDRECORD).get(0);
-			} else {
-				value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
-			}
-			uctx = bfact.createUnmarshallingContext();
-			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-			String collectionId = (String) mdr.getCollection()
-					.getMnemonic();
-			if (context.getProperties().getProperty(OVERRIDESIPCREATOR) == null) {
-				String fileName;
-				String oldCollectionId = enrichmentService
-						.getCollectionMongoServer().findOldCollectionId(
-								collectionId);
-				if (oldCollectionId != null) {
-					
-					fileName = oldCollectionId;
+							.get(0);
 				} else {
-					fileName = (String) mdr.getCollection().getName();
+					value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
+							.get(0);
 				}
-				
-				FullBeanImpl fullBean = constructFullBeanMock(rdf, collectionId);
-				String hash = null;
-				try {
-					hash = hashExists(collectionId, fileName, fullBean);
-				} catch (Exception e) {
-					e.printStackTrace();
-					log.log(Level.SEVERE, e.getMessage());
-					return false;
-				}
+				uctx = bfact.createUnmarshallingContext();
+				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+				String collectionId = (String) mdr.getCollection()
+						.getMnemonic();
+				if (context.getProperties().getProperty(OVERRIDESIPCREATOR) == null) {
+					String fileName;
+					String oldCollectionId = enrichmentService
+							.getCollectionMongoServer().findOldCollectionId(
+									collectionId);
+					if (oldCollectionId != null) {
 
-				if (StringUtils.isNotEmpty(hash)) {
-
-					createLookupEntry(fullBean, collectionId, hash);
-					return true;
-				}
-			} else {
-				String fieldValue = "";
-				if(context.getProperties().getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("edm:isShownAt")){
-					fieldValue = rdf.getAggregationList().get(0).getIsShownAt().getResource();
-				} else if(context.getProperties().getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("edm:isShownBy")){
-					fieldValue = rdf.getAggregationList().get(0).getIsShownBy().getResource();
-				} else if(context.getProperties().getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("dc:identifier")){
-					ProxyType proxy = findProxy(rdf);
-					for (Choice choice : proxy.getChoiceList()) {
-						if (choice.ifIdentifier()) {
-							fieldValue = choice.getIdentifier().getString();
-						}
+						fileName = oldCollectionId;
+					} else {
+						fileName = (String) mdr.getCollection().getName();
 					}
-				} else if(context.getProperties().getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("owl:sameAs")){
-					fieldValue = rdf.getProvidedCHOList().get(0).getSameAList().get(0).getResource();
+
+					FullBeanImpl fullBean = constructFullBeanMock(rdf,
+							collectionId);
+					String hash = null;
+					try {
+						hash = hashExists(collectionId, fileName, fullBean);
+					} catch (Exception e) {
+						e.printStackTrace();
+						log.log(Level.SEVERE, e.getMessage());
+						return false;
+					}
+
+					if (StringUtils.isNotEmpty(hash)) {
+
+						createLookupEntry(fullBean, collectionId, hash);
+						return true;
+					}
+				} else {
+					String fieldValue = "";
+					if (context.getProperties().getProperty(OVERRIDESIPCREATOR)
+							.equalsIgnoreCase("edm:isShownAt")) {
+						fieldValue = rdf.getAggregationList().get(0)
+								.getIsShownAt().getResource();
+					} else if (context.getProperties()
+							.getProperty(OVERRIDESIPCREATOR)
+							.equalsIgnoreCase("edm:isShownBy")) {
+						fieldValue = rdf.getAggregationList().get(0)
+								.getIsShownBy().getResource();
+					} else if (context.getProperties()
+							.getProperty(OVERRIDESIPCREATOR)
+							.equalsIgnoreCase("dc:identifier")) {
+						ProxyType proxy = findProxy(rdf);
+						for (Choice choice : proxy.getChoiceList()) {
+							if (choice.ifIdentifier()) {
+								fieldValue = choice.getIdentifier().getString();
+							}
+						}
+					} else if (context.getProperties()
+							.getProperty(OVERRIDESIPCREATOR)
+							.equalsIgnoreCase("owl:sameAs")) {
+						fieldValue = rdf.getProvidedCHOList().get(0)
+								.getSameAList().get(0).getResource();
+					}
+					createLookupEntry(rdf.getProvidedCHOList().get(0)
+							.getAbout(), collectionId, fieldValue);
+
 				}
-				createLookupEntry(rdf.getProvidedCHOList().get(0).getAbout(),collectionId,fieldValue);
-				
 			}
 		} catch (JiBXException e) {
 			log.log(Level.SEVERE, e.getMessage());
@@ -228,17 +246,16 @@ public class LookupCreationPlugin<I> extends
 		return false;
 	}
 
-	private void createLookupEntry(String newId,String collectionId, String value) {
+	private void createLookupEntry(String newId, String collectionId,
+			String value) {
 		ModifiableSolrParams params = new ModifiableSolrParams();
-		String finalId = EuropeanaUriUtils.createEuropeanaId(collectionId, value);
-		params.add(
-				"q",
-				"europeana_id:"
-						+ ClientUtils.escapeQueryChars(finalId));
+		String finalId = EuropeanaUriUtils.createEuropeanaId(collectionId,
+				value);
+		params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
 		try {
 			SolrDocumentList solrList = enrichmentService
 					.getProductionSolrServer().query(params).getResults();
-			if (solrList.size() > 0) {
+			if (solrList.size() > 0 && !(finalId.equals(newId))) {
 				EuropeanaId id = new EuropeanaId();
 				id.setOldId(finalId);
 				id.setLastAccess(0);
