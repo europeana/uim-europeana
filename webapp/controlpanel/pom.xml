@@ -129,6 +129,7 @@
 							eu.europeana.uim.common,
 							eu.europeana.uim.common.progress,
 							eu.europeana.uim.store,
+							eu.europeana.uim.external,
 							eu.europeana.uim.store.mongo.decorators,
 							eu.europeana.uim.store.mongo,
 							eu.europeana.uim.store.mongo.resourceentities,
