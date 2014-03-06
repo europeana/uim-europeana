@@ -115,7 +115,7 @@
 							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,
 							corelib-solr,corelib-solr-tools,corelib-solr-dereference,corelib-definitions,corelib-utils,
 							corelib-solr-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
-							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api
+							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,validation-api
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
@@ -151,7 +151,6 @@
 							javax.net,
 							javax.net.ssl,
 							javax.management,
-							javax.validation,
 							com.ctc.wstx.stax.*,
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
@@ -195,7 +194,11 @@
 			<artifactId>stax-api</artifactId>
 			<version>1.0-2</version>
 		</dependency>
-
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.1.0.Final</version>
+		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
@@ -206,12 +209,7 @@
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
 			<version>${gwtVersion}</version>
-			<!-- <scope>provided</scope> -->
-		</dependency>
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google</groupId>
