@@ -17,7 +17,7 @@
 	<name>Unified Ingestion Manager: Europeana Ingestion Control Panel GUI (GWT)</name>
 
 	<properties>
-		<gwtVersion>2.3.0</gwtVersion>
+		<gwtVersion>2.6.0</gwtVersion>
 		<!-- GWT needs at least java 1.6 -->
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
