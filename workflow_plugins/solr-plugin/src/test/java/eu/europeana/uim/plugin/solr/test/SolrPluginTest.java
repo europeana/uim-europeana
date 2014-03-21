@@ -87,7 +87,7 @@ public class SolrPluginTest {
 		extractor.setMappedField("skos:prefLabel_xml:lang", EdmLabel.CC_SKOS_PREF_LABEL, "xml:lang");
 		extractor.setMappedField("skos:broader", EdmLabel.CC_SKOS_BROADER, null);
 		extractor.setMappedField("skos:inScheme", EdmLabel.CC_SKOS_INSCHEME, null);
-		extractor.saveMapping(0);
+		extractor.saveMapping(0,new String[]{"InstrumentsKeywords","HornbostelAndSachs"}, "MIMO-Concepts");
 	}
 
 
@@ -190,7 +190,7 @@ public class SolrPluginTest {
 		extractor.setMappedField("rdaGr2:dateOfDeath", EdmLabel.AG_RDAGR2_DATEOFDEATH, null);
 		extractor.setMappedField("foaf:name", EdmLabel.AG_FOAF_NAME, null);
 		extractor.setMappedField("skos:Concept_rdf:about", EdmLabel.EDM_AGENT, null);
-		extractor.saveMapping(0);
+		extractor.saveMapping(0, new String[]{"InstrumentMaker"}, "MIMO-Agents");
 	}
 
 
@@ -212,7 +212,7 @@ public class SolrPluginTest {
 		extractor.setMappedField("gn:alternateName_xml:lang", EdmLabel.PL_SKOS_ALT_LABEL,"xml:lang");
 		extractor.setMappedField("wgs84_pos:long", EdmLabel.PL_WGS84_POS_LONG,null);
 		extractor.setMappedField("wgs84_pos:lat", EdmLabel.PL_WGS84_POS_LAT,null);
-		extractor.saveMapping(0);
+		extractor.saveMapping(0, new String[]{"*"} , "Geonames");
 	}
 
 
