@@ -8,6 +8,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -31,6 +33,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
@@ -70,6 +73,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	Button deleteVocabulary;
 	Button editVocabulary;
 	Button refreshVocabularies;
+	final ListBox vocList = new ListBox(false);
 	CellList<OriginalFieldDTO> originalFields;
 	List<String> storedVocabularies;
 	CellList<EdmFieldDTO> mappableFields;
@@ -83,7 +87,9 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	MappingDTO mappedField;
 	String originalField;
 	String edmField;
-
+	TextBox vocabularyRules;
+	TextBox vocabularyUri;
+	TextBox vocabularyName;
 	/**
 	 * Constructor for the call to the service
 	 * 
@@ -132,8 +138,8 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		importVocabulary.add(createFieldMappingPage(), "Vocabulary Mapping");
 		Binder uiBinder = GWT.create(Binder.class);
 		Widget widget = (Widget) uiBinder.createAndBindUi(this);
-//		RootLayoutPanel.get().setHeight("650px");
-//		RootLayoutPanel.get().add(importVocabulary);
+		// RootLayoutPanel.get().setHeight("650px");
+		// RootLayoutPanel.get().add(importVocabulary);
 		return widget;
 	}
 
@@ -190,20 +196,23 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		saveMapping.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				importedVocabulary.saveMapping(Integer.parseInt(vocabularyIterations.getValue()), new AsyncCallback<Boolean>() {
-					@Override
-					public void onSuccess(Boolean result) {
-						Window.alert("The mapping was saved successfully");
-						fillVocabularyTable();
-					}
+				importedVocabulary.saveMapping(
+						Integer.parseInt(vocabularyIterations.getValue()),
+						vocabularyRules.getText().split(" "), vocabularyUri.getText(),
+						new AsyncCallback<Boolean>() {
+							@Override
+							public void onSuccess(Boolean result) {
+								Window.alert("The mapping was saved successfully");
+								fillVocabularyTable();
+							}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						Window.alert("The mapping was not saved. "
-								+ caught.getMessage());
-						caught.printStackTrace();
-					}
-				});
+							@Override
+							public void onFailure(Throwable caught) {
+								Window.alert("The mapping was not saved. "
+										+ caught.getMessage());
+								caught.printStackTrace();
+							}
+						});
 			}
 		});
 		deleteMapping = new Button(EuropeanaClientConstants.VOCDELETEMAPPING);
@@ -232,23 +241,38 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 						});
 			}
 		});
-		buttons.setWidget(0, 0, new Label(EuropeanaClientConstants.VOCITERATIONS));
+		buttons.setWidget(0, 0, new Label(
+				EuropeanaClientConstants.VOCITERATIONS));
 		vocabularyIterations = new TextBox();
 		vocabularyIterations.setName("vocabularyIteration");
 		vocabularyIterations.addKeyPressHandler(new KeyPressHandler() {
-			
+
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
-				if (!Character.isDigit(event.getCharCode())){
+				if (!Character.isDigit(event.getCharCode())) {
 					Window.alert("The value is not a digit");
 				}
-				
+
+			}
+		});
+
+		Button exportMappingButton = new Button();
+		exportMappingButton.setText("Export mapping");
+		exportMappingButton.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent arg0) {
+				Window.open(GWT.getHostPageBaseURL()
+								+ "EuropeanaIngestionControlPanel/handlemappingservlet?vocabularyName="
+								+ vocabulary.getName(), "_blank", null);
 			}
 		});
 		buttons.setWidget(1, 0, vocabularyIterations);
+
 		buttons.setWidget(2, 0, createMapping);
 		buttons.setWidget(3, 0, saveMapping);
 		buttons.setWidget(4, 0, deleteMapping);
+		buttons.setWidget(5, 0,exportMappingButton);
 		return buttons;
 	}
 
@@ -385,20 +409,21 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		editVocabulary.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				importedVocabulary.setVocabulary(vocabulary.getName(), vocabulary.getUri(), new AsyncCallback<Boolean>() {
-					
-					@Override
-					public void onSuccess(Boolean result) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-						
-					}
-				});
+				importedVocabulary.setVocabulary(vocabulary.getName(),
+						vocabulary.getUri(), new AsyncCallback<Boolean>() {
+
+							@Override
+							public void onSuccess(Boolean result) {
+								
+
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
+
+							}
+						});
 				fillMappingTables();
 				importVocabulary.selectTab(1);
 			}
@@ -424,16 +449,15 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 	 */
 	protected ScrollPanel createUploadedVocabularies() {
 		ScrollPanel scroll = new ScrollPanel();
-		ProvidesKey<ControlledVocabularyDTO> key  = new ProvidesKey<ControlledVocabularyDTO>() {
-			
+		ProvidesKey<ControlledVocabularyDTO> key = new ProvidesKey<ControlledVocabularyDTO>() {
+
 			@Override
 			public Object getKey(ControlledVocabularyDTO arg0) {
 				return arg0.getName();
 			}
 		};
-		vocabularyTable = new CellTable<ControlledVocabularyDTO>(
-				key);
-		
+		vocabularyTable = new CellTable<ControlledVocabularyDTO>(key);
+
 		TextColumn<ControlledVocabularyDTO> nameColumn = new TextColumn<ControlledVocabularyDTO>() {
 
 			@Override
@@ -442,75 +466,45 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 			}
 		};
 		TextColumn<ControlledVocabularyDTO> urlColumn = new TextColumn<ControlledVocabularyDTO>() {
-			
+
 			@Override
 			public String getValue(ControlledVocabularyDTO arg0) {
 				// TODO Auto-generated method stub
 				return arg0.getUri();
 			}
 		};
-		
-		TextColumn<ControlledVocabularyDTO> replaceUrlColumn = new TextColumn<ControlledVocabularyDTO>() {
-			
-			@Override
-			public String getValue(ControlledVocabularyDTO arg0) {
-				// TODO Auto-generated method stub
-				return arg0.getReplaceUrl();
-			}
-		};
-		
-		TextColumn<ControlledVocabularyDTO> locationColumn = new TextColumn<ControlledVocabularyDTO>() {
-			
-			@Override
-			public String getValue(ControlledVocabularyDTO arg0) {
-				// TODO Auto-generated method stub
-				return arg0.getLocation();
-			}
-		};
-		
-		TextColumn<ControlledVocabularyDTO> suffixColumn = new TextColumn<ControlledVocabularyDTO>() {
-			
-			@Override
-			public String getValue(ControlledVocabularyDTO arg0) {
-				// TODO Auto-generated method stub
-				return arg0.getSuffix();
-			}
-		};
-		
+
 		TextColumn<ControlledVocabularyDTO> iterationsColumn = new TextColumn<ControlledVocabularyDTO>() {
-			
+
 			@Override
 			public String getValue(ControlledVocabularyDTO arg0) {
 				// TODO Auto-generated method stub
 				return Integer.toString(arg0.getIterations());
 			}
 		};
-		
+
 		TextColumn<ControlledVocabularyDTO> rulesColumn = new TextColumn<ControlledVocabularyDTO>() {
-			
+
 			@Override
 			public String getValue(ControlledVocabularyDTO arg0) {
 				String rules = "";
-				int i=1;
-				for(String rule : arg0.getRules()){
-					rules = rules +rule;
-					if(i<arg0.getRules().length){
-						rules = rules+", ";
+				int i = 1;
+				for (String rule : arg0.getRules()) {
+					rules = rules + rule;
+					if (i < arg0.getRules().length) {
+						rules = rules + ", ";
 					}
 					i++;
 				}
-				
+
 				return rules;
 			}
 		};
-		
-		vocabularyTable.addColumn(nameColumn,"Name");
-		vocabularyTable.addColumn(locationColumn,"Location");
-		vocabularyTable.addColumn(urlColumn,"URL");
-		vocabularyTable.addColumn(replaceUrlColumn, "ReplaceURL");
-		vocabularyTable.addColumn(suffixColumn,"Suffix");
-		vocabularyTable.addColumn(rulesColumn,"Rules");
-		vocabularyTable.addColumn(iterationsColumn,"Iterations");
+
+		vocabularyTable.addColumn(nameColumn, "Name");
+		vocabularyTable.addColumn(urlColumn, "URL");
+		vocabularyTable.addColumn(rulesColumn, "Rules");
+		vocabularyTable.addColumn(iterationsColumn, "Iterations");
 		final SelectionModel<ControlledVocabularyDTO> selectionModel = new SingleSelectionModel<ControlledVocabularyDTO>();
 		vocabularyTable.setSelectionModel(selectionModel);
 		selectionModel
@@ -519,6 +513,13 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 					public void onSelectionChange(SelectionChangeEvent event) {
 						vocabulary = ((SingleSelectionModel<ControlledVocabularyDTO>) selectionModel)
 								.getSelectedObject();
+						vocabularyName.setText(vocabulary.getName());
+						vocabularyUri.setText(vocabulary.getUri());
+						String rules = "";
+						for(String rule: vocabulary.getRules()){
+							rules += rule +" ";
+						}
+						vocabularyRules.setText(rules.trim());
 					}
 				});
 		scroll.add(vocabularyTable);
@@ -540,11 +541,18 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 					@Override
 					public void onSuccess(List<ControlledVocabularyDTO> result) {
 						if (result.size() > 0) {
+
 							vocabularyTable.setRowData(result);
+							vocList.clear();
+							for (ControlledVocabularyDTO voc : result) {
+								vocList.addItem(voc.getName());
+							}
+
 						} else {
 							vocabularyTable
 									.setEmptyTableWidget(new CellTable<List<ControlledVocabularyDTO>>(
 											null));
+							vocList.clear();
 						}
 					}
 				});
@@ -568,23 +576,78 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		table.getColumnFormatter().getElement(1).setPropertyInt("width", 400);
 		table.setWidget(0, 0,
 				new Label(EuropeanaClientConstants.VOCABULARYNAME));
-		TextBox vocabularyName = new TextBox();
+		vocabularyName = new TextBox();
 		setDOMID(vocabularyName, "vocabularyName");
 		vocabularyName.setName("vocabularyName");
 		table.setWidget(0, 1, vocabularyName);
 		table.setWidget(1, 0, new Label(EuropeanaClientConstants.VOCABULARYURI));
-		final TextBox vocabularyUri = new TextBox();
+		vocabularyUri = new TextBox();
 		setDOMID(vocabularyUri, "vocabularyURI");
 		vocabularyUri.setName("vocabularyURI");
 		table.setWidget(1, 1, vocabularyUri);
+
 		
-		table.setWidget(2,0, new Label(EuropeanaClientConstants.VOCREPLACEURL));
-		final TextBox vocabularyReplaceUrl = new TextBox();
-		setDOMID(vocabularyReplaceUrl, "vocabularyReplaceUrl");
-		vocabularyReplaceUrl.setName("vocabularyReplaceUrl");
-		table.setWidget(2, 1, vocabularyReplaceUrl);
+		final RadioButton radioButton1 = new RadioButton("file", "Remote File");
+		radioButton1.ensureDebugId("file-remote");
+		radioButton1.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// saveAndUpload.setEnabled(false);
+				url.setEnabled(true);
+			}
+		});
+		table.setWidget(2, 0, radioButton1);
+
+		url.ensureDebugId("url");
+		setDOMID(url, "url");
+		url.setName("url");
+		table.setWidget(2, 1, url);
+
+		final RadioButton rbUseOther = new RadioButton("file",
+				EuropeanaClientConstants.VOCUSEOTHER);
+		rbUseOther.ensureDebugId("file-other");
+		rbUseOther.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// saveAndUpload.setEnabled(false);
+				url.setEnabled(false);
+			}
+		});
+		table.setWidget(3, 0, rbUseOther);
+		table.setWidget(3, 1, vocList);
+		final TextBox selectedVocabulary = new TextBox();
+		selectedVocabulary.setVisible(false);
+		selectedVocabulary.setName("selectedVocabulary");
+		if (vocList.getItemCount() > 0) {
+			selectedVocabulary.setText(vocList.getItemText(0));
+		}
+		table.setWidget(3, 2, selectedVocabulary);
+		vocList.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent arg0) {
+				// TODO Auto-generated method stub
+				selectedVocabulary.setText(vocList.getItemText(vocList
+						.getSelectedIndex()));
+			}
+		});
+		final RadioButton rbImportFromFile = new RadioButton("file",
+				EuropeanaClientConstants.VOCIMPORTFROM);
+		rbImportFromFile.ensureDebugId("file-mapping");
+		rbImportFromFile.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// saveAndUpload.setEnabled(false);
+				url.setEnabled(false);
+				
+			}
+		});
+		
 		saveAndUpload = new FileUpload();
-		//saveAndUpload.setEnabled(false);
+		// saveAndUpload.setEnabled(false);
 		saveAndUpload.setEnabled(true);
 		form.add(saveAndUpload);
 		final RadioButton radioButton = new RadioButton("file", "Local File");
@@ -593,47 +656,27 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				//saveAndUpload.setEnabled(true);
+				// saveAndUpload.setEnabled(true);
 				url.setEnabled(false);
+				
 			}
 		});
-		
-		table.setWidget(3, 0, radioButton);
-		
+
+		table.setWidget(4, 0, radioButton);
+
 		saveAndUpload.ensureDebugId("local");
 		saveAndUpload.setName("local");
 		setDOMID(saveAndUpload, "local");
 		saveAndUpload.setTitle(EuropeanaClientConstants.VOCSAVEANDUPLOAD);
-		table.setWidget(3, 1, saveAndUpload);
-		final RadioButton radioButton1 = new RadioButton("file", "Remote File");
-		radioButton1.ensureDebugId("file-remote");
-		radioButton1.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				//saveAndUpload.setEnabled(false);
-				url.setEnabled(true);
-			}
-		});
-		table.setWidget(4, 0, radioButton1);
-
-		url.ensureDebugId("url");
-		setDOMID(url, "url");
-		url.setName("url");
-		table.setWidget(4, 1, url);
 		
-		table.setWidget(5, 0, new Label(
+		table.setWidget(5, 0, rbImportFromFile);
+		table.setWidget(6, 0, saveAndUpload);
+		table.setWidget(6, 0, new Label(
 				EuropeanaClientConstants.VOCABULARYRULES));
-		final TextBox vocabularyRules = new TextBox();
+		vocabularyRules = new TextBox();
 		setDOMID(vocabularyRules, "vocabularyRules");
 		vocabularyRules.setName("vocabularyRules");
-		table.setWidget(5, 1, vocabularyRules);
-		table.setWidget(6, 0, new Label(
-				EuropeanaClientConstants.VOCABULARYSUFFIX));
-		TextBox vocabularySuffix = new TextBox();
-		setDOMID(vocabularySuffix, "vocabularySuffix");
-		vocabularySuffix.setName("vocabularySuffix");
-		table.setWidget(6, 1, vocabularySuffix);
+		table.setWidget(6, 1, vocabularyRules);
 		Button submit = new Button(EuropeanaClientConstants.VOCSAVEANDUPLOAD);
 		submit.addClickHandler(new ClickHandler() {
 			@Override
@@ -641,29 +684,34 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				form.submit();
 			}
 		});
-	
-		
-		
-		table.setWidget(8, 1, submit);
-		table.setWidget(7, 0, new Label(EuropeanaClientConstants.VOCLOCATION));
-		TextBox vocabularyLocation = new TextBox();
-		vocabularyLocation.setName("vocabularyLocation");
-		vocabularyLocation.setVisible(true);
-		table.setWidget(7,1,vocabularyLocation);
-		
+
+		table.setWidget(7, 1, submit);
+
 		form.add(table);
 		form.addSubmitHandler(new SubmitHandler() {
 			@Override
 			public void onSubmit(SubmitEvent event) {
-				
+
 				if (radioButton.getValue()) {
 					form.setMethod(FormPanel.METHOD_POST);
-					form.setAction(GWT.getHostPageBaseURL()+"EuropeanaIngestionControlPanel/uploadservlet");
+					form.setAction(GWT.getHostPageBaseURL()
+							+ "EuropeanaIngestionControlPanel/uploadservlet");
 					Window.alert("Saving, you will be notified when the file is uploaded");
 				} else if (radioButton1.getValue()) {
 					form.setMethod(FormPanel.METHOD_GET);
-					form.setAction(GWT.getHostPageBaseURL()+"EuropeanaIngestionControlPanel/remoteuploadservlet");
+					form.setAction(GWT.getHostPageBaseURL()
+							+ "EuropeanaIngestionControlPanel/remoteuploadservlet");
 					Window.alert("Downloading remote file, you will be notified when the file is saved");
+				} else if (rbUseOther.getValue()) {
+					form.setMethod(FormPanel.METHOD_GET);
+					form.setAction(GWT.getHostPageBaseURL()
+							+ "EuropeanaIngestionControlPanel/copymappingservlet");
+					Window.alert("Copying and saving the mapping specified");
+				} else if (rbImportFromFile.getValue()) {
+					form.setMethod(FormPanel.METHOD_POST);
+					form.setAction(GWT.getHostPageBaseURL()
+							+ "EuropeanaIngestionControlPanel/handlemappingservlet");
+					Window.alert("Importing mapping");
 				} else {
 					Window.alert("Select a file");
 				}
@@ -672,10 +720,11 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		form.addSubmitCompleteHandler(new SubmitCompleteHandler() {
 			@Override
 			public void onSubmitComplete(SubmitCompleteEvent event) {
-				if (radioButton.getValue() || radioButton1.getValue()) {
+				if (radioButton.getValue() || radioButton1.getValue()
+						|| rbImportFromFile.getValue() || rbUseOther.getValue()) {
 					uploadControlledVocabulary();
 					fillVocabularyTable();
-					
+
 				}
 			}
 		});
@@ -696,10 +745,9 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				.<InputElement> cast().getValue());
 		vocabulary.setRules(DOM.getElementById("vocabularyRules")
 				.<InputElement> cast().getValue().split(" "));
-		vocabulary.setReplaceUrl(DOM.getElementById("vocabularyReplaceUrl")
-				.<InputElement> cast().getValue());
-		
-		
+		// vocabulary.setReplaceUrl(DOM.getElementById("vocabularyReplaceUrl")
+		// .<InputElement> cast().getValue());
+
 		importedVocabulary.importVocabulary(vocabulary,
 				new AsyncCallback<ControlledVocabularyDTO>() {
 					@Override
@@ -745,7 +793,8 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		}
 		originalFields.setRowData(originals);
 		mappedFields.setRowData(vocabulary.getMapping());
-		vocabularyIterations.setValue(Integer.toString(vocabulary.getIterations()));
+		vocabularyIterations.setValue(Integer.toString(vocabulary
+				.getIterations()));
 		retrieveEdmFields();
 	}
 
@@ -823,8 +872,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		public void render(com.google.gwt.cell.client.Cell.Context context,
 				EdmFieldDTO value, SafeHtmlBuilder sb) {
 			sb.appendHtmlConstant("<table><tr><td>");
-			sb.appendHtmlConstant(value.getField()
-					+ "</td></tr></table>");
+			sb.appendHtmlConstant(value.getField() + "</td></tr></table>");
 		}
 	}
 
@@ -841,31 +889,11 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 			sb.appendHtmlConstant("<table><tr><td>");
 			sb.appendHtmlConstant(value.getOriginal().getField()
 					+ "</td><td>-></td><td>");
-			for(EdmFieldDTO field : value.getMapped()){
-			sb.appendHtmlConstant(field.getField()
-					+ "\n");
+			for (EdmFieldDTO field : value.getMapped()) {
+				sb.appendHtmlConstant(field.getField() + "\n");
 			}
 			sb.appendHtmlConstant("</td></tr></table>");
 		}
 	}
 
-//	/**
-//	 * Controlled vocabulary field representation
-//	 * 
-//	 * 
-//	 */
-//	private class VocabularyCell extends AbstractCell<ControlledVocabularyDTO> {
-//		@Override
-//		public void render(com.google.gwt.cell.client.Cell.Context context,
-//				ControlledVocabularyDTO value, SafeHtmlBuilder sb) {
-//			sb.appendHtmlConstant("<table border='1'><tr><td>");
-//			sb.appendHtmlConstant(value.getName() + "</td><td>");
-//			sb.appendHtmlConstant((value.getLocation() == null ? "Not Set"
-//					: value.getLocation()) + "|</td><td>");
-//			sb.appendHtmlConstant((value.getUri()) == null ? "Not Set" : value
-//					.getUri() + "|</td><td>");
-//			sb.appendHtmlConstant((value.getSuffix() == null ? "Not Set"
-//					: value.getSuffix()) + "|</td></tr></table>");
-//		}
-//	}
 }

@@ -91,5 +91,7 @@ public class EuropeanaClientConstants {
 	public final static String VOCITERATIONS = "# of broader iterations";
 	public final static String VOCREPLACEURL = "Vocabulary Replace URL";
 	public final static String VOCLOCATION = "Vocabulary Location";
+	public final static String VOCUSEOTHER = "Copy mapping from";
+	public final static String VOCIMPORTFROM = "Import Mapping";
 	
 }

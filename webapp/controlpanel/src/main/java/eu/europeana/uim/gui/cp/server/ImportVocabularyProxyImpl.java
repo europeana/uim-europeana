@@ -110,10 +110,10 @@ public class ImportVocabularyProxyImpl extends
 		return mapping;
 	}
 
-	public boolean saveMapping(int iterations) {
+	public boolean saveMapping(int iterations, String[] vocabularyRules, String vocabularyUrl) {
 		if (extractor != null) {
 			
-			return extractor.saveMapping(iterations);
+			return extractor.saveMapping(iterations, vocabularyRules, vocabularyUrl);
 		}
 		return false;
 	}

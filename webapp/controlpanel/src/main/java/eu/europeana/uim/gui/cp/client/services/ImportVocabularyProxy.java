@@ -37,7 +37,7 @@ public interface ImportVocabularyProxy extends RemoteService{
 	 * The method does not use a controlled vocabulary, as it expects the vocabulary to be already initialized
 	 * @return true on success, false otherwise
 	 */
-	public boolean saveMapping(int iterations);
+	public boolean saveMapping(int iterations, String[] vocabularyRules, String vocabularyURL);
 	
 	/**
 	 * Method to retrieve the controlled vocabularies already stored

@@ -37,6 +37,14 @@
 		<servlet-class>eu.europeana.uim.gui.cp.server.RemoteUploadServlet</servlet-class>
 	</servlet>
 	<servlet>
+		<servlet-name>handleMappingServlet</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.HandleMappingServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>copyMappingServlet</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.CopyMappingServlet</servlet-class>
+	</servlet>
+	<servlet>
 		<servlet-name>integrationService</servlet-name>
 		<servlet-class>eu.europeana.uim.gui.cp.server.IntegrationSeviceProxyImpl</servlet-class>
 	</servlet>
@@ -108,6 +116,14 @@
 	<servlet-mapping>
 		<servlet-name>uploadServlet</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/uploadservlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>handleMappingServlet</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/handlemappingservlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>copyMappingServlet</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/copymappingservlet</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>integrationService</servlet-name>

@@ -15,7 +15,7 @@ import eu.europeana.uim.gui.cp.shared.MappingDTO;
 public interface ImportVocabularyProxyAsync {
 	public void importVocabulary(ControlledVocabularyDTO vocabulary, AsyncCallback<ControlledVocabularyDTO> mapping);
 	public void mapField(String originalField,String mappedField,AsyncCallback<MappingDTO> result);
-	public void saveMapping(int iterations,AsyncCallback<Boolean> result);
+	public void saveMapping(int iterations,String[] vocabularyRules, String vocabularyURL,AsyncCallback<Boolean> result);
 	public void retrieveVocabularies(AsyncCallback<List<ControlledVocabularyDTO>> vocabularies);
 	public void retrieveEdmFields( AsyncCallback<List<EdmFieldDTO>> edmFields);
 	public void removeVocabulary(String vocabularyName, AsyncCallback<Boolean> result);
