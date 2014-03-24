@@ -671,12 +671,12 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		
 		table.setWidget(5, 0, rbImportFromFile);
 		table.setWidget(6, 0, saveAndUpload);
-		table.setWidget(6, 0, new Label(
+		table.setWidget(7, 0, new Label(
 				EuropeanaClientConstants.VOCABULARYRULES));
 		vocabularyRules = new TextBox();
 		setDOMID(vocabularyRules, "vocabularyRules");
 		vocabularyRules.setName("vocabularyRules");
-		table.setWidget(6, 1, vocabularyRules);
+		table.setWidget(7, 1, vocabularyRules);
 		Button submit = new Button(EuropeanaClientConstants.VOCSAVEANDUPLOAD);
 		submit.addClickHandler(new ClickHandler() {
 			@Override
@@ -685,7 +685,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 			}
 		});
 
-		table.setWidget(7, 1, submit);
+		table.setWidget(8, 1, submit);
 
 		form.add(table);
 		form.addSubmitHandler(new SubmitHandler() {
