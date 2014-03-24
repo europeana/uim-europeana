@@ -22,7 +22,7 @@ public class EnrichmentWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>,I>
 	
 	@Override
 	public boolean isSavepoint(String pluginIdentifier) {
-		return false;
+		return true;
 	}
 
 	@Override

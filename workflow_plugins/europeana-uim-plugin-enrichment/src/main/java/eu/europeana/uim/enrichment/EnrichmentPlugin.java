@@ -620,18 +620,8 @@ public class EnrichmentPlugin<I> extends
 								timestampUpdated.getTime());
 						String overrideEnrichment = context.getProperties()
 								.getProperty(OVERRIDEENRICHMENT);
-						boolean overrideWriteBack = false;
-						if (StringUtils.isNotEmpty(overrideEnrichment)) {
-							overrideWriteBack = Boolean
-									.parseBoolean(overrideEnrichment);
-						}
-						if (!overrideWriteBack) {
-							mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
-							mdr.addValue(
-									EuropeanaModelRegistry.EDMENRICHEDRECORD,
-									EdmUtils.toEDM(fullBean, true));
-						}
-						context.getStorageEngine().updateMetaDataRecord(mdr);
+					
+						
 						if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 							mongoServer.getDatastore().save(fullBean);
 						} else {
@@ -640,8 +630,21 @@ public class EnrichmentPlugin<I> extends
 						}
 						context.putValue(addedTKey,
 								context.getValue(addedTKey) + 1);
+						boolean overrideWriteBack = false;
+						if (StringUtils.isNotEmpty(overrideEnrichment)) {
+							overrideWriteBack = Boolean
+									.parseBoolean(overrideEnrichment);
+						}
+						if (!overrideWriteBack) {
+							mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
+							String fb = (EdmUtils.toEDM(fullBean, true));
+							//System.out.println(fb);
+							mdr.addValue(
+									EuropeanaModelRegistry.EDMENRICHEDRECORD,
+									fb);
+						}
 						solrServer.add(solrInputDocument);
-
+						context.getStorageEngine().updateMetaDataRecord(mdr);
 						return true;
 
 					} catch (MalformedURLException e) {
