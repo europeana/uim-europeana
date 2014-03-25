@@ -94,6 +94,7 @@ import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
+import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.EdmMongoServer;
 import eu.europeana.corelib.solr.utils.EdmUtils;
 import eu.europeana.corelib.solr.utils.MongoConstructor;
@@ -621,11 +622,11 @@ public class EnrichmentPlugin<I> extends
 						String overrideEnrichment = context.getProperties()
 								.getProperty(OVERRIDEENRICHMENT);
 					
-						
+						FullBeanImpl saved  = fullBean;
 						if (mongoServer.getFullBean(fullBean.getAbout()) == null) {
 							mongoServer.getDatastore().save(fullBean);
 						} else {
-							updateFullBean(mongoServer, fullBean);
+							saved = updateFullBean(mongoServer, fullBean);
 
 						}
 						context.putValue(addedTKey,
@@ -637,8 +638,7 @@ public class EnrichmentPlugin<I> extends
 						}
 						if (!overrideWriteBack) {
 							mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
-							String fb = (EdmUtils.toEDM(fullBean, true));
-							//System.out.println(fb);
+							String fb = (EdmUtils.toEDM(saved, true));
 							mdr.addValue(
 									EuropeanaModelRegistry.EDMENRICHEDRECORD,
 									fb);
@@ -827,7 +827,7 @@ public class EnrichmentPlugin<I> extends
 	}
 
 	// update a FullBean
-	private void updateFullBean(EdmMongoServer mongoServer2,
+	private FullBeanImpl updateFullBean(EdmMongoServer mongoServer2,
 			FullBeanImpl fullBean) {
 		Query<FullBeanImpl> updateQuery = mongoServer2.getDatastore()
 				.createQuery(FullBeanImpl.class).field("about")
@@ -868,6 +868,13 @@ public class EnrichmentPlugin<I> extends
 		ops.set("europeanaCollectionName",
 				fullBean.getEuropeanaCollectionName());
 		mongoServer2.getDatastore().update(updateQuery, ops);
+		try {
+			return (FullBeanImpl)mongoServer2.getFullBean(fullBean.getAbout());
+		} catch (MongoDBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return fullBean;
 	}
 
 	/*
