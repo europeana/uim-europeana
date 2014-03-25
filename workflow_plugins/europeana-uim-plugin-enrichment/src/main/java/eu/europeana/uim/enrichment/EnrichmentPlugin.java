@@ -355,7 +355,7 @@ public class EnrichmentPlugin<I> extends
 					|| check) {
 				clearData(mongoServer, collection.getMnemonic());
 				solrServer.deleteByQuery("europeana_collectionName:"
-						+ collection.getName().split("_")[0] + "*");
+						+ collection.getName().split("_")[0] + "_*");
 			}
 
 		} catch (Exception e) {
