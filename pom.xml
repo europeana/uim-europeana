@@ -142,7 +142,7 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-			<url>http://artifactory.eanadev.org/artifactory/uim-release-local</url>
+			<url>http://artifactory.eanadev.org/artifactory/uim-releases-local</url>
 		</repository>
 
 		
