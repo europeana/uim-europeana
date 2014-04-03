@@ -145,12 +145,7 @@
 			<url>http://artifactory.eanadev.org/artifactory/uim-release-local</url>
 		</repository>
 
-		<!-- Europeana Labs Core libraries -->
-		<repository>
-			<id>artifactory.eanadev.org-corelib</id>
-			<name>artifactory.eanadev.org.libs-releases-local</name>
-			<url>http://artifactory.eanadev.org/artifactory/libs-release-local</url>
-		</repository>
+		
 
 		<!-- Europeana Labs Core snapshot libraries -->
 		<repository>
