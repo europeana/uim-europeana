@@ -111,20 +111,20 @@
 		<repository>
 			<id>libs-release-local</id>
 			<name>artifactory.eanadev.org-releases</name>
-			<url>http://europeanalabs.eu/artifactory/libs-release-local</url>
+			<url>http://artifactory.eanadev.org/artifactory/libs-release-local</url>
 		</repository>
 
 		<repository>
 			<id>ext-snapshots-local</id>
 			<name>artifactory.eanadev.org-snapshot</name>
-			<url>http://europeanalabs.eu/artifactory/ext-snapshot-local</url>
+			<url>http://artifactory.eanadev.org/artifactory/ext-snapshot-local</url>
 		</repository>
 
 		<!-- Europeana Labs Java.net Maven 2 Repository (mirror) -->
 		<repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Maven 2 Repository (mirror)</name>
-			<url>http://europeanalabs.eu/artifactory/java.net.m2</url>
+			<url>http://artifactory.eanadev.org/artifactory/java.net.m2</url>
 		</repository>
 
 
@@ -132,7 +132,7 @@
 		<repository>
 			<id>artifactory.eanadev.org</id>
 			<name>artifactory.eanadev.org-releases</name>
-			<url>http://europeanalabs.eu/artifactory/ext-release-local</url>
+			<url>http://artifactory.eanadev.org/artifactory/ext-release-local</url>
 		</repository>
 
 		<!-- Europeana Labs UIM releases repository -->
