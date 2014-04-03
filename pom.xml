@@ -109,15 +109,15 @@
 
 	<repositories>
 		<repository>
-			<id>europeanalabs.eu.artifactory.repo1</id>
-			<name>europeanalabs.eu-releases</name>
-			<url>http://europeanalabs.eu/artifactory/repo1</url>
+			<id>libs-release-local</id>
+			<name>artifactory.eanadev.org-releases</name>
+			<url>http://europeanalabs.eu/artifactory/libs-release-local</url>
 		</repository>
 
 		<repository>
 			<id>ext-snapshots-local</id>
-			<name>europeanalabs.eu-snapshots</name>
-			<url>http://europeanalabs.eu/artifactory/ext-snapshots-local</url>
+			<name>artifactory.eanadev.org-snapshot</name>
+			<url>http://europeanalabs.eu/artifactory/ext-snapshot-local</url>
 		</repository>
 
 		<!-- Europeana Labs Java.net Maven 2 Repository (mirror) -->
@@ -130,9 +130,9 @@
 
 		<!-- Europeana Labs UIM external libraries repository -->
 		<repository>
-			<id>europeanalabs.eu</id>
-			<name>europeanalabs.eu-releases</name>
-			<url>http://europeanalabs.eu/artifactory/ext-releases-local</url>
+			<id>artifactory.eanadev.org</id>
+			<name>artifactory.eanadev.org-releases</name>
+			<url>http://europeanalabs.eu/artifactory/ext-release-local</url>
 		</repository>
 
 		<!-- Europeana Labs UIM releases repository -->
@@ -142,21 +142,21 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-			<url>http://europeanalabs.eu/artifactory/uim-releases-local</url>
+			<url>http://artifactory.eanadev.org/artifactory/uim-release-local</url>
 		</repository>
 
 		<!-- Europeana Labs Core libraries -->
 		<repository>
-			<id>europeanalabs.corelibs.eu</id>
-			<name>europeanalabs.libs-releases-local</name>
-			<url>http://europeanalabs.eu/artifactory/libs-releases-local</url>
+			<id>artifactory.eanadev.org-corelib</id>
+			<name>artifactory.eanadev.org.libs-releases-local</name>
+			<url>http://artifactory.eanadev.org/artifactory/libs-release-local</url>
 		</repository>
 
 		<!-- Europeana Labs Core snapshot libraries -->
 		<repository>
-			<id>europeanalabs.corelibs.eu.snapshots</id>
-			<name>europeanalabs.libs-snapshots-local</name>
-			<url>http://europeanalabs.eu/artifactory/libs-snapshots-local</url>
+			<id>artifactory.eanadev.org.corelibs.eu.snapshot</id>
+			<name>artifactory.eanadev.org.libs-snapshot-local</name>
+			<url>http://artifactory.eanadev.org/artifactory/libs-snapshot-local</url>
 		</repository>
 
 	</repositories>
@@ -164,15 +164,15 @@
 
 	<distributionManagement>
 		<repository>
-			<id>europeanalabs.eu-releases</id>
-			<name>europeanalabs.eu-releases</name>
-			<url>http://europeanalabs.eu/artifactory/plugins-releases-local</url>
+			<id>artifactory.eanadev.org-releases</id>
+			<name>artifactory.eanadev.org-releases</name>
+			<url>http://artifactory.eanadev.org/artifactory/plugins-release-local</url>
 		</repository>
 
 		<snapshotRepository>
-			<id>europeanalabs.eu</id>
-			<name>europeanalabs.eu-snapshots</name>
-			<url>http://europeanalabs.eu/artifactory/plugins-snapshots-local</url>
+			<id>artifactory.eanadev.org</id>
+			<name>artifactory.eanadev.org-snapshot</name>
+			<url>http://artifactory.eanadev.org/artifactory/plugins-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
 

@@ -304,7 +304,7 @@
 		<repository>
 			<id>aduna</id>
 			<name>aduna-releases</name>
-			<url>http://europeanalabs.eu/artifactory/aduna</url>
+			<url>http://artifactory.eanadev.org/artifactory/aduna</url>
 		</repository>
 	</repositories>
 </project>

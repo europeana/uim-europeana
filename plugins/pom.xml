@@ -186,14 +186,14 @@
 		<repository>
 			<id>com.springsource.repository.bundles.release</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-			<url>http://europeanalabs.eu/artifactory/com.springsource.repository.bundles.release/</url>
+			<url>http://artifactory.eanadev.org/artifactory/com.springsource.repository.bundles.release/</url>
 		</repository>
 
 		<!-- Europeana Labs SpringSource External Bundle Releases cache -->
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-			<url>http://europeanalabs.eu/artifactory/com.springsource.repository.bundles.external</url>
+			<url>http://artifactory.eanadev.org/artifactory/com.springsource.repository.bundles.external</url>
 		</repository>
 
 	</repositories>
