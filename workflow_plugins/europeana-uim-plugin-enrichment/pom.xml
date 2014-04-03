@@ -304,7 +304,7 @@
 		<repository>
 			<id>aduna</id>
 			<name>aduna-releases</name>
-			<url>http://artifactory.eanadev.org/artifactory/aduna</url>
+			<url>http://artifactory.eanadev.org/artifactory/aduna-cache</url>
 		</repository>
 	</repositories>
 </project>
