@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features name="uim-features">
-	<feature name="uim-europeana-complete" version="2.0.0.SNAPSHOT">
+	<feature name="uim-europeana-complete" version="2.0.1.SNAPSHOT">
 		<feature version="2.2.11">war</feature>
 		<bundle>mvn:org.jibx/jibx-run/1.2.3</bundle>
 		<bundle>mvn:org.jibx/jibx-extras/1.2.3</bundle>
-		<bundle>mvn:eu.europeana/europeana-uim-common/2.0.0-SNAPSHOT</bundle>
-		<bundle>mvn:eu.europeana/europeana-uim-api/2.0.0-SNAPSHOT</bundle>
-		<bundle>mvn:eu.europeana/europeana-uim-orchestration-basic/2.0.0-SNAPSHOT</bundle>
-		<bundle>mvn:eu.europeana/europeana-uim-external-sugar-api/2.0.0-SNAPSHOT</bundle>
-		<bundle>mvn:eu.europeana/europeana-uim-external-repox-api/2.0.0-SNAPSHOT</bundle>
+		<bundle>mvn:eu.europeana/europeana-uim-common/2.0.1-SNAPSHOT</bundle>
+		<bundle>mvn:eu.europeana/europeana-uim-api/2.0.1-SNAPSHOT</bundle>
+		<bundle>mvn:eu.europeana/europeana-uim-orchestration-basic/2.0.1-SNAPSHOT</bundle>
+		<bundle>mvn:eu.europeana/europeana-uim-external-sugar-api/2.0.1-SNAPSHOT</bundle>
+		<bundle>mvn:eu.europeana/europeana-uim-external-repox-api/2.0.1-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-datamodel-definitions/1.0.0-SNAPSHOT</bundle>
-		<bundle>mvn:eu.europeana/europeana-uim-storage-mongo/2.0.0-SNAPSHOT</bundle>
-		<bundle start-level='85'>mvn:eu.europeana/europeana-uim-logging-database/2.0.0-SNAPSHOT</bundle>
+		<bundle>mvn:eu.europeana/europeana-uim-storage-mongo/2.0.1-SNAPSHOT</bundle>
+		<bundle start-level='85'>mvn:eu.europeana/europeana-uim-logging-database/2.0.1-SNAPSHOT</bundle>
 		<!-- Uncomment this if you want to use memory logging engine instead (for 
 			debugging purposes) <bundle>mvn:eu.europeana/europeana-uim-logging-memory/1.3.1-SNAPSHOT</bundle> -->
 		<!-- Uncomment this if you want to use memory engine instead <bundle>mvn:eu.europeana/europeana-uim-storage-memory/1.3.1-SNAPSHOT</bundle> -->
