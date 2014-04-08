@@ -77,6 +77,8 @@ public class LookupCreationPlugin<I> extends
 	private static final Logger log = Logger
 			.getLogger(LookupCreationPlugin.class.getName());
 	private final static String OVERRIDESIPCREATOR = "override.sipcreator.field";
+	private final static String USE_CUSTOM_FIELD = "redirect.use.custom.field";
+	private final static String USE_FUNCTIONS = "redirect.use.custom.functions";
 
 	public LookupCreationPlugin(String name, String description) {
 		super(name, description);
@@ -110,6 +112,8 @@ public class LookupCreationPlugin<I> extends
 
 		{
 			add(OVERRIDESIPCREATOR);
+			add(USE_CUSTOM_FIELD);
+			add(USE_FUNCTIONS);
 		}
 	};
 
@@ -180,13 +184,14 @@ public class LookupCreationPlugin<I> extends
 				RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 				String collectionId = (String) mdr.getCollection()
 						.getMnemonic();
-				if (context.getProperties().getProperty(OVERRIDESIPCREATOR) == null) {
+				if (context.getProperties().getProperty(OVERRIDESIPCREATOR) == null
+						&& context.getProperties()
+								.getProperty(USE_CUSTOM_FIELD) == null) {
 					String fileName;
 					String oldCollectionId = enrichmentService
 							.getCollectionMongoServer().findOldCollectionId(
 									collectionId);
 					if (oldCollectionId != null) {
-
 						fileName = oldCollectionId;
 					} else {
 						fileName = (String) mdr.getCollection().getName();
@@ -196,7 +201,12 @@ public class LookupCreationPlugin<I> extends
 							collectionId);
 					String hash = null;
 					try {
-						hash = hashExists(collectionId, fileName, fullBean);
+						hash = hashExists(
+								collectionId,
+								fileName,
+								fullBean,
+								context.getProperties().getProperty(
+										USE_FUNCTIONS));
 					} catch (Exception e) {
 						e.printStackTrace();
 						log.log(Level.SEVERE, e.getMessage());
@@ -204,38 +214,89 @@ public class LookupCreationPlugin<I> extends
 					}
 
 					if (StringUtils.isNotEmpty(hash)) {
-
 						createLookupEntry(fullBean, collectionId, hash);
 						return true;
 					}
 				} else {
 					String fieldValue = "";
-					if (context.getProperties().getProperty(OVERRIDESIPCREATOR)
-							.equalsIgnoreCase("edm:isShownAt")) {
-						fieldValue = rdf.getAggregationList().get(0)
-								.getIsShownAt().getResource();
-					} else if (context.getProperties()
-							.getProperty(OVERRIDESIPCREATOR)
-							.equalsIgnoreCase("edm:isShownBy")) {
-						fieldValue = rdf.getAggregationList().get(0)
-								.getIsShownBy().getResource();
-					} else if (context.getProperties()
-							.getProperty(OVERRIDESIPCREATOR)
-							.equalsIgnoreCase("dc:identifier")) {
-						ProxyType proxy = findProxy(rdf);
-						for (Choice choice : proxy.getChoiceList()) {
-							if (choice.ifIdentifier()) {
-								fieldValue = choice.getIdentifier().getString();
+					if (context.getProperties().getProperty(OVERRIDESIPCREATOR) != null) {
+						if (context.getProperties()
+								.getProperty(OVERRIDESIPCREATOR)
+								.equalsIgnoreCase("edm:isShownAt")) {
+							fieldValue = rdf.getAggregationList().get(0)
+									.getIsShownAt().getResource();
+						} else if (context.getProperties()
+								.getProperty(OVERRIDESIPCREATOR)
+								.equalsIgnoreCase("edm:isShownBy")) {
+							fieldValue = rdf.getAggregationList().get(0)
+									.getIsShownBy().getResource();
+						} else if (context.getProperties()
+								.getProperty(OVERRIDESIPCREATOR)
+								.equalsIgnoreCase("dc:identifier")) {
+							ProxyType proxy = findProxy(rdf);
+							for (Choice choice : proxy.getChoiceList()) {
+								if (choice.ifIdentifier()) {
+									fieldValue = choice.getIdentifier()
+											.getString();
+								}
 							}
+						} else if (context.getProperties()
+								.getProperty(OVERRIDESIPCREATOR)
+								.equalsIgnoreCase("owl:sameAs")) {
+							fieldValue = rdf.getProvidedCHOList().get(0)
+									.getSameAList().get(0).getResource();
 						}
-					} else if (context.getProperties()
-							.getProperty(OVERRIDESIPCREATOR)
-							.equalsIgnoreCase("owl:sameAs")) {
-						fieldValue = rdf.getProvidedCHOList().get(0)
-								.getSameAList().get(0).getResource();
+						createLookupEntry(
+								rdf.getProvidedCHOList().get(0).getAbout(),
+								collectionId,
+								applyTransformations(
+										fieldValue,
+										context.getProperties().getProperty(
+												USE_FUNCTIONS)));
+					} else {
+						String edmValue = null;
+						if (context.getProperties()
+								.getProperty(USE_CUSTOM_FIELD)
+								.equalsIgnoreCase("edm:isShownAt")) {
+							fieldValue = rdf.getAggregationList().get(0)
+									.getIsShownAt().getResource();
+							edmValue = "provider_aggregation_edm_isShownAt";
+						} else if (context.getProperties()
+								.getProperty(USE_CUSTOM_FIELD)
+								.equalsIgnoreCase("edm:isShownBy")) {
+							fieldValue = rdf.getAggregationList().get(0)
+									.getIsShownBy().getResource();
+							edmValue = "provider_aggregation_edm_isShownBy";
+						} else if (context.getProperties()
+								.getProperty(USE_CUSTOM_FIELD)
+								.equalsIgnoreCase("dc:identifier")) {
+							ProxyType proxy = findProxy(rdf);
+							for (Choice choice : proxy.getChoiceList()) {
+								if (choice.ifIdentifier()) {
+									fieldValue = choice.getIdentifier()
+											.getString();
+								}
+							}
+							edmValue = "proxy_dc_identifier";
+						} else if (context.getProperties()
+								.getProperty(USE_CUSTOM_FIELD)
+								.equalsIgnoreCase("owl:sameAs")) {
+							fieldValue = rdf.getProvidedCHOList().get(0)
+									.getSameAList().get(0).getResource();
+							edmValue = "provider_aggregation_owl_sameAs";
+						} else if (context.getProperties()
+								.getProperty(USE_CUSTOM_FIELD)
+								.equalsIgnoreCase("edm:object")) {
+							fieldValue = rdf.getAggregationList().get(0)
+									.getObject().getResource();
+							edmValue = "provider_aggregation_edm_object";
+						}
+						generateRedirectsFromCustomField(
+								fieldValue,
+								edmValue,
+								context.getProperties().getProperty(
+										USE_FUNCTIONS));
 					}
-					createLookupEntry(rdf.getProvidedCHOList().get(0)
-							.getAbout(), collectionId, fieldValue);
 
 				}
 			}
@@ -244,6 +305,48 @@ public class LookupCreationPlugin<I> extends
 			return false;
 		}
 		return false;
+	}
+
+	private void generateRedirectsFromCustomField(String fieldValue,
+			String property, String transformations) {
+
+		try {
+			String finalId = null;
+			String newId = null;
+			ModifiableSolrParams paramsOld = new ModifiableSolrParams();
+			paramsOld.add(
+					"q",
+					property
+							+ ":"
+							+ ClientUtils
+									.escapeQueryChars(applyTransformations(
+											fieldValue, transformations)));
+			ModifiableSolrParams paramsNew = new ModifiableSolrParams();
+			paramsNew.add("q",
+					property + ":" + ClientUtils.escapeQueryChars(fieldValue));
+
+			SolrDocumentList solrOldList = enrichmentService
+					.getProductionSolrServer().query(paramsOld).getResults();
+			SolrDocumentList solrNewList = enrichmentService.getSolrServer()
+					.query(paramsNew).getResults();
+
+			if (solrOldList.size() == 1 && solrNewList.size() == 1) {
+				finalId = solrOldList.get(0).getFirstValue("europeana_id")
+						.toString();
+				newId = solrOldList.get(0).getFirstValue("europeana_id")
+						.toString();
+			}
+			if (finalId != null && newId != null) {
+				EuropeanaId id = new EuropeanaId();
+				id.setOldId(finalId);
+				id.setLastAccess(0);
+				id.setTimestamp(new Date().getTime());
+				id.setNewId(newId);
+				saveEuropeanaId(id);
+			}
+		} catch (SolrServerException e) {
+			log.log(Level.SEVERE, e.getMessage());
+		}
 	}
 
 	private void createLookupEntry(String newId, String collectionId,
@@ -348,8 +451,9 @@ public class LookupCreationPlugin<I> extends
 	}
 
 	private String hashExists(String collectionId, String fileName,
-			FullBean fullBean) throws EdmFieldNotFoundException,
-			EdmValueNotFoundException, NullPointerException {
+			FullBean fullBean, String transformations)
+			throws EdmFieldNotFoundException, EdmValueNotFoundException,
+			NullPointerException {
 		SipCreatorUtils sipCreatorUtils = new SipCreatorUtils();
 		sipCreatorUtils.setRepository(repository);
 		String hashField = sipCreatorUtils.getHashField(fileName, fileName);
@@ -362,6 +466,7 @@ public class LookupCreationPlugin<I> extends
 									hashField, "[")
 									: hashField, fullBean.getAbout())
 					.getEdmValue(fullBean);
+			val = applyTransformations(val, transformations);
 			if (val != null) {
 				return HashUtils.createHash(val);
 			}
@@ -379,6 +484,54 @@ public class LookupCreationPlugin<I> extends
 			}
 		}
 		return null;
+	}
+
+	private String applyTransformations(String val, String transformations) {
+		if (transformations == null) {
+			return val;
+		}
+		if (transformations.contains(".")) {
+			String[] transforms = StringUtils.split(transformations, ".");
+
+			for (String transform : transforms) {
+				if (StringUtils.startsWith(transform, "replace")) {
+					String[] replacements = StringUtils.split(
+							StringUtils.substringBetween(transform, "(", ")"),
+							",");
+					val = StringUtils.replace(val, replacements[0],
+							replacements[1]);
+				}
+				if (StringUtils.startsWith(transform, "substringBetween")) {
+					String[] replacements = StringUtils.split(
+							StringUtils.substringBetween(transform, "(", ")"),
+							",");
+					val = StringUtils.substringBetween(val, replacements[0],
+							replacements[1]);
+				}
+				if (StringUtils.startsWith(transform, "substringBeforeFirst(")) {
+					String replacements = StringUtils.substringBetween(
+							transform, "(", ")");
+					val = StringUtils.substringBefore(val, replacements);
+				}
+				if (StringUtils.startsWith(transform, "substringBeforeLast(")) {
+					String replacements = StringUtils.substringBetween(
+							transform, "(", ")");
+					val = StringUtils.substringBeforeLast(val, replacements);
+				}
+				if (StringUtils.startsWith(transform, "substringAfterLast(")) {
+					String replacements = StringUtils.substringBetween(
+							transform, "(", ")");
+					val = StringUtils.substringAfterLast(val, replacements);
+				}
+				if (StringUtils.startsWith(transform, "substringAfter(")) {
+					String replacements = StringUtils.substringBetween(
+							transform, "(", ")");
+					val = StringUtils.substringAfter(val, replacements);
+				}
+			}
+
+		}
+		return val;
 	}
 
 	private void saveEuropeanaId(EuropeanaId europeanaId) {
