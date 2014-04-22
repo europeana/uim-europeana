@@ -15,14 +15,14 @@ public class EnrichmentWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>,I>
 			super("F: Enrich Collection",
 			        "Enrich and Ingest Records into SOLR and MONGODB");
 				
-			        setStart(new BatchWorkflowStart());
-			        addStep((IngestionPlugin<MetaDataRecord<I>, I>) new EnrichmentPlugin());
+			        setStart(new BatchWorkflowStart<I>());
+			        addStep(new EnrichmentPlugin<I>());
 
 		}
 	
 	@Override
 	public boolean isSavepoint(String pluginIdentifier) {
-		return true;
+		return false;
 	}
 
 	@Override

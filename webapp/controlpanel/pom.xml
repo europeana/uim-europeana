@@ -146,8 +146,8 @@
 							javax.xml.transform,
 							javax.xml.transform.stream,
 							javax.xml.namespace,
-							javax.servlet,
-							javax.servlet.http,
+							javax.servlet;version=2.5.0,
+							javax.servlet.http;version=2.5.0,
 							javax.net,
 							javax.net.ssl,
 							javax.management,
@@ -255,11 +255,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>europeana-uim-plugin-solrosgi</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>${project.groupId}</groupId> -->
+<!-- 			<artifactId>europeana-uim-plugin-solrosgi</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>eu.europeana</groupId>

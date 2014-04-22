@@ -37,7 +37,8 @@ public enum UimConfigurationProperty {
 	SUGARCRM_USERNAME("sugarcrm.username"),
 	SUGARCRM_PASSWORD("sugarcrm.password"),
 	UIM_REPOSITORY("uim.repository"),
-	SOLR_PRODUCTION_HOSTURL("solr.productionHostUrl");
+	SOLR_PRODUCTION_HOSTURL("solr.productionHostUrl"),
+	ENRICHMENT_PATH("enrichment.path");
 	
 	String field;
 	private UimConfigurationProperty(String field){

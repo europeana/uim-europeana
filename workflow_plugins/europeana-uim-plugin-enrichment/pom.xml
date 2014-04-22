@@ -15,12 +15,24 @@
 
 	<dependencies>
 
+		<!-- <dependency> -->
+		<!-- <groupId>annocultor</groupId> -->
+		<!-- <artifactId>annocultor</artifactId> -->
+		<!-- <version>3.0.0</version> -->
+
+		<!-- </dependency> -->
+
 		<dependency>
-			<groupId>annocultor</groupId>
-			<artifactId>annocultor</artifactId>
-			<version>3.0.0</version>
-		
+			<groupId>eu.europeana.enrichment</groupId>
+			<artifactId>enrichment-framework-common</artifactId>
+			<version>0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrichment</groupId>
+			<artifactId>enrichment-framework-client</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -50,10 +62,21 @@
 			<version>0.99.1-patched</version>
 		</dependency>
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>16.0.1</version>
+		</dependency>
+		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-xc</artifactId>
 			<version>1.9.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-annotation_1.2_spec</artifactId>
+			<version>1.0.MR2-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>wstx-asl</artifactId>
@@ -92,11 +115,11 @@
 			<version>2.7.2</version>
 			<scope>compile</scope>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<scope>test</scope> -->
-<!-- 			<groupId>org.springframework</groupId> -->
-<!-- 			<artifactId>spring-test</artifactId> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <scope>test</scope> -->
+		<!-- <groupId>org.springframework</groupId> -->
+		<!-- <artifactId>spring-test</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
@@ -108,11 +131,11 @@
 			<scope>provided</scope>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<scope>test</scope> -->
-<!-- 			<groupId>org.springframework</groupId> -->
-<!-- 			<artifactId>spring-test</artifactId> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <scope>test</scope> -->
+		<!-- <groupId>org.springframework</groupId> -->
+		<!-- <artifactId>spring-test</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
@@ -125,7 +148,12 @@
 			<version>2.2</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jaxb_2.2_spec</artifactId>
+			<version>1.0.1</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -158,29 +186,45 @@
 						<Export-Package>eu.europeana.uim.enrichment.*</Export-Package>
 						<Import-Package>
 							org.osgi.framework; version=1.5.0,
-							javax.annotation; version=0.0.0,
-							javax.crypto; version=0.0.0,
-							javax.crypto.spec; version=0.0.0,
-							javax.imageio; version=0.0.0,
-							javax.imageio.spi; version=0.0.0,
-							javax.management; version=0.0.0,
-							javax.naming; version=0.0.0,
-							javax.naming.spi; version=0.0.0,
-							javax.net; version=0.0.0,
-							javax.net.ssl; version=0.0.0,
-							javax.security.auth; version=0.0.0,
+							javax.crypto;
+							version=0.0.0,
+							javax.annotation;version=0.0.0,
+							javax.crypto.spec;
+							version=0.0.0,
+							javax.imageio;
+							version=0.0.0,
+							javax.imageio.spi;
+							version=0.0.0,
+							javax.management;
+							version=0.0.0,
+							javax.naming;
+							version=0.0.0,
+							javax.naming.spi;
+							version=0.0.0,
+							javax.net;
+							version=0.0.0,
+							javax.net.ssl;
+							version=0.0.0,
+							javax.security.auth;
+							version=0.0.0,
 							javax.security.auth.x500;
 							version=0.0.0,
-							javax.sql; version=0.0.0,
+							javax.sql;
+							version=0.0.0,
 							javax.swing;
 							version=0.0.0,
-							javax.swing.border; version=0.0.0,
+							javax.swing.border;
+							version=0.0.0,
 							javax.swing.event; version=0.0.0,
-							javax.swing.plaf; version=0.0.0,
+							javax.swing.plaf;
+							version=0.0.0,
 							javax.swing.table; version=0.0.0,
-							javax.swing.text; version=0.0.0,
+							javax.swing.text;
+							version=0.0.0,
 							javax.swing.tree; version=0.0.0,
-							javax.tools; version=0.0.0,
+							javax.tools;
+							version=0.0.0,
+							javax.xml.bind;version=0.0.0,
 							org.ietf.jgss; version=0.0.0,
 							org.osgi.service.blueprint;
 							version=1.0.1,
@@ -220,7 +264,8 @@
 							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.storage,
 							eu.europeana.uim.common.progress,
-							eu.europeana.uim.logging; version=0.0.0,
+							eu.europeana.uim.logging;
+							version=0.0.0,
 							!org.apache.http.impl.client,
 							!org.apache.http.client.*,
 							!*
@@ -298,11 +343,11 @@
 		</pluginManagement>
 	</build>
 
-	<repositories>
-		<repository>
-			<id>aduna</id>
-			<name>aduna-releases</name>
-			<url>http://artifactory.eanadev.org/artifactory/aduna-cache</url>
-		</repository>
-	</repositories>
+<!-- 	<repositories> -->
+<!-- 		<repository> -->
+<!-- 			<id>aduna</id> -->
+<!-- 			<name>aduna-releases</name> -->
+<!-- 			<url>http://artifactory.eanadev.org/artifactory/aduna-cache</url> -->
+<!-- 		</repository> -->
+<!-- 	</repositories> -->
 </project>

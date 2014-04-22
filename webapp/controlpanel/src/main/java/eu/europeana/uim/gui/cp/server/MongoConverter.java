@@ -267,6 +267,11 @@ public final class MongoConverter {
 				"getRdaGr2DateOfBirth", EdmLabel.AG_RDAGR2_DATEOFBIRTH));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
 				"getRdaGr2DateOfDeath", EdmLabel.AG_RDAGR2_DATEOFDEATH));
+//		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
+//				"getRdaGr2PlaceOfBirth", EdmLabel.AG_RDAGR2_PLACEOFBIRTH));
+//		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
+//				"getRdaGr2PlaceOfDeath", EdmLabel.AG_RDAGR2_PLACEOFDEATH));
+		
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
 				"getRdaGr2DateOfEstablishment",
 				EdmLabel.AG_RDAGR2_DATEOFESTABLISHMENT));

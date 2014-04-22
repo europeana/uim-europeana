@@ -551,7 +551,7 @@ public class LookupCreationPlugin<I> extends
                             transform, "(", ")");
                     val = val + replacements;
                 }
-               
+
             }
 
         }

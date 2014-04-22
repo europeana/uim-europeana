@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
-import eu.europeana.corelib.definitions.jibx.EuropeanaType;
-import eu.europeana.corelib.definitions.jibx.ProxyType;
+import eu.europeana.corelib.solr.entity.ProxyImpl;
 
 /**
  * String heuristics for date normalization
@@ -42,7 +42,7 @@ public class EuropeanaDateUtils {
 		PropertyReader.loadPropertiesFromFile(path);
 	}
 
-	public List<String> createEuropeanaYears(ProxyType proxy) {
+	public List<String> createEuropeanaYears(ProxyImpl proxy) {
 		List<String> years = new ArrayList<String>();
 		try {
 
@@ -55,20 +55,35 @@ public class EuropeanaDateUtils {
 								"UTF-8");
 				bc = StringUtils.split(bcList, "\n");
 			}
-			if (proxy.getChoiceList() != null) {
-				for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
-					if (choice.ifDate()) {
-						years.addAll(refineDates(bc, choice.getDate()
-								.getString()));
-
+			
+			if(proxy.getDcDate()!=null){
+				for(Entry<String, List<String>> entry:proxy.getDcDate().entrySet()){
+					for(String date:entry.getValue()){
+						years.addAll(refineDates(bc, date));
 					}
-					if (choice.ifTemporal()) {
-						years.addAll(refineDates(bc, choice.getTemporal()
-								.getString()));
+				}
+			}
+			
+			if(proxy.getDctermsTemporal()!=null){
+				for(Entry<String, List<String>> entry:proxy.getDctermsTemporal().entrySet()){
+					for(String date:entry.getValue()){
+						years.addAll(refineDates(bc, date));
 					}
-					
-					if(choice.ifCreated()&& choice.getCreated().getString()!=null){
-						years.addAll(refineDates(bc,choice.getCreated().getString()));
+				}
+			}
+			
+			if(proxy.getDctermsCreated()!=null){
+				for(Entry<String, List<String>> entry:proxy.getDctermsCreated().entrySet()){
+					for(String date:entry.getValue()){
+						years.addAll(refineDates(bc, date));
+					}
+				}
+			}
+			
+			if(proxy.getDctermsIssued()!=null){
+				for(Entry<String, List<String>> entry:proxy.getDctermsIssued().entrySet()){
+					for(String date:entry.getValue()){
+						years.addAll(refineDates(bc, date));
 					}
 				}
 			}
