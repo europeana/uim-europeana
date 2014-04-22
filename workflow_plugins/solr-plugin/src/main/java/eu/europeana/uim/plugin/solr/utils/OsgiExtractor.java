@@ -130,7 +130,13 @@ public class OsgiExtractor extends Extractor {
 										+ entity.getUri() + " resolved in HTML");
 							}
 							String ref = resource;
-							
+							// if
+							// (StringUtils.isNotEmpty(controlledVocabulary.getReplaceUrl()))
+							// {
+							// ref = StringUtils.replace(resource,
+							// controlledVocabulary.getURI(),
+							// controlledVocabulary.getReplaceUrl());
+							// }
 							boolean exists = false;
 							boolean hasInternalRules = false;
 							double num = Math.random();
@@ -162,7 +168,8 @@ public class OsgiExtractor extends Extractor {
 								Map<String, List> entityCache = createDereferencingMapRDF(
 										controlledVocabulary, ref,
 										entity.getContent(), iterations);
-								
+								System.out.println("Entity cache for size "
+										+ num + ": " + entityCache.size());
 								synchronized (memCache) {
 									memCache.getEntityCache().put(
 											entity.getUri(), entityCache);
@@ -404,11 +411,10 @@ public class OsgiExtractor extends Extractor {
 															.get("?object")
 															.asResource()
 															.getURI());
-											String broader = element.get("?object")
-													.asResource()
-													.getURI();
 											Map<String, List> conceptDen = denormalize(
-													broader,
+													element.get("?object")
+															.asResource()
+															.getURI(),
 													controlledVocabulary,
 													iterations - 1, true);
 											if (conceptDen !=null && conceptDen.size()>0) {
@@ -615,11 +621,12 @@ public class OsgiExtractor extends Extractor {
 	}
 
 	private EntityImpl retrieveValueFromResource(String resource) {
-		EntityImpl 
+		EntityImpl entity;
+		synchronized (this) {
 			entity = datastore.find(EntityImpl.class).filter("uri", resource)
 					.get();
+		}
 		if (entity == null) {
-			System.out.println("retrieving from web");
 			String val = retrieveValue(resource);
 			if (val.length() > 0) {
 				EntityImpl newEntity = new EntityImpl();
@@ -636,7 +643,6 @@ public class OsgiExtractor extends Extractor {
 			}
 			return null;
 		} else {
-			System.out.println("retrieving form DB");
 			if (new Date().getTime() - entity.getTimestamp() < UPDATETIMESTAMP) {
 				return entity;
 			} else {
@@ -665,7 +671,6 @@ public class OsgiExtractor extends Extractor {
 				// resource = StringUtils.replace(resource,
 				// vocabulary.getURI(), vocabulary.getReplaceUrl());
 				// }
-				System.out.println("retrieveing resource: " + resource);
 				urlConnection = new URL(resource).openConnection();
 				urlConnection
 						.setRequestProperty("accept",
@@ -1041,18 +1046,25 @@ public class OsgiExtractor extends Extractor {
 	public ControlledVocabularyImpl getControlledVocabulary(
 			Datastore datastore, String field, String filter)
 			throws UnknownHostException, MongoException {
-		
-			List<ControlledVocabularyImpl> vocabularies = null;
-			
-			for(String vocKey : VocMemCache
-					.getMemCache(solrWorkFlowService).keySet()){
-				if(filter.startsWith(vocKey)){
-					vocabularies = VocMemCache
-							.getMemCache(solrWorkFlowService).get(vocKey);
-					break;
-				}
-			}
-
+		String[] splitName = filter.split("/");
+		if (splitName.length > 3) {
+			String vocabularyName = splitName[0] + "/" + splitName[1] + "/"
+					+ splitName[2] + "/";
+			List<ControlledVocabularyImpl> vocabularies = VocMemCache
+					.getMemCache(solrWorkFlowService).get(vocabularyName);
+			// if (vocabularies.size() == 0) {
+			// for (Entry<String, List<ControlledVocabularyImpl>> vocs :
+			// VocMemCache
+			// .getMemCache(solrWorkFlowService).entrySet()) {
+			// for (ControlledVocabularyImpl voc : vocs.getValue()) {
+			// if (voc.getReplaceUrl() != null
+			// && StringUtils.equals(voc.getReplaceUrl(),
+			// vocabularyName)) {
+			// vocabularies.add(voc);
+			// }
+			// }
+			// }
+			// }
 			if (vocabularies != null) {
 				for (ControlledVocabularyImpl vocabulary : vocabularies) {
 					for (String rule : vocabulary.getRules()) {
@@ -1065,7 +1077,7 @@ public class OsgiExtractor extends Extractor {
 
 				}
 			}
-		
+		}
 		return null;
 	}
 
