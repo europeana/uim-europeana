@@ -721,11 +721,10 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 			@Override
 			public void onSubmitComplete(SubmitCompleteEvent event) {
 				if (radioButton.getValue() || radioButton1.getValue()
-						|| rbImportFromFile.getValue() || rbUseOther.getValue()) {
+						) {
 					uploadControlledVocabulary();
-					fillVocabularyTable();
-
 				}
+                                fillVocabularyTable();
 			}
 		});
 		return form;
@@ -738,15 +737,10 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 		vocabulary = new ControlledVocabularyDTO();
 		vocabulary.setName(DOM.getElementById("vocabularyName")
 				.<InputElement> cast().getValue());
-		vocabulary.setSuffix(DOM.getElementById("vocabularySuffix")
-				.<InputElement> cast().getValue());
-		vocabulary.setLocation(retrieveFileName());
 		vocabulary.setUri(DOM.getElementById("vocabularyURI")
 				.<InputElement> cast().getValue());
 		vocabulary.setRules(DOM.getElementById("vocabularyRules")
 				.<InputElement> cast().getValue().split(" "));
-		// vocabulary.setReplaceUrl(DOM.getElementById("vocabularyReplaceUrl")
-		// .<InputElement> cast().getValue());
 
 		importedVocabulary.importVocabulary(vocabulary,
 				new AsyncCallback<ControlledVocabularyDTO>() {
@@ -766,22 +760,7 @@ public class ImportControlledVocabularyWidget extends IngestionWidget {
 				});
 	}
 
-	/**
-	 * Extract the File name out of a URL or URI. It is equal to File.getName();
-	 * 
-	 * @return the File name.
-	 */
-	private String retrieveFileName() {
-		if (DOM.getElementById("vocabularyName").<InputElement> cast()
-				.getValue().contains("/")) {
-			String[] directoryLocation = DOM.getElementById("vocabularyName")
-					.<InputElement> cast().getValue().split("/");
-			return directoryLocation[directoryLocation.length - 1];
-		} else {
-			return DOM.getElementById("vocabularyName").<InputElement> cast()
-					.getValue();
-		}
-	}
+	
 
 	/**
 	 * Fill the mapping tables(initially they will be empty)
