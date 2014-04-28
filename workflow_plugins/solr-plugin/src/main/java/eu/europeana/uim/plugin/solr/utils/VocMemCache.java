@@ -37,4 +37,25 @@ public class VocMemCache {
 		}
 		return vocMemCache;
 	}
+        
+        public static void clearCache(SolrWorkflowService solrWorkflowService){
+            if (extractor == null) {
+				extractor = solrWorkflowService.getExtractor();
+				extractor.setDatastore(solrWorkflowService.getDatastore());
+			}
+			List<ControlledVocabularyImpl> vocs = extractor
+					.getControlledVocabularies();
+
+			vocMemCache = new HashMap<String, List<ControlledVocabularyImpl>>();
+			List<ControlledVocabularyImpl> vocsInMap;
+			for (ControlledVocabularyImpl voc : vocs) {
+				if (vocMemCache.containsKey(voc.getURI())) {
+					vocsInMap = vocMemCache.get(voc.getURI());
+				} else {
+					vocsInMap = new ArrayList<ControlledVocabularyImpl>();
+				}
+				vocsInMap.add(voc);
+				vocMemCache.put(voc.getURI(), vocsInMap);
+			}
+        }
 }

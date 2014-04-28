@@ -14,7 +14,6 @@
  *  See the Licence for the specific language governing permissions and limitations under
  *  the Licence.
  */
-
 package eu.europeana.uim.plugin.solr.service;
 
 import java.io.ByteArrayOutputStream;
@@ -42,10 +41,13 @@ import org.theeuropeanlibrary.model.common.qualifier.Status;
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.EuropeanaProxy;
+import eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice;
 import eu.europeana.corelib.definitions.jibx.LiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
+import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
+import eu.europeana.corelib.definitions.jibx.Subject;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.Year;
@@ -66,574 +68,605 @@ import eu.europeana.uim.plugin.solr.helpers.TimespanDereferencer;
 import eu.europeana.uim.plugin.solr.helpers.WebResourceDereferencer;
 import eu.europeana.uim.plugin.solr.utils.EuropeanaDateUtils;
 import eu.europeana.uim.plugin.solr.utils.JibxUtils;
+import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
+import eu.europeana.uim.plugin.solr.utils.VocMemCache;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 
 /**
- * This is the main class implementing the UIM functionality for the solr
- * workflow plugin exposed as an OSGI service.
- * 
+ * This is the main class implementing the UIM functionality for the solr workflow plugin exposed as an OSGI service.
+ *
  * @author Georgios Markakis
  * @author Yorgos.Mamakis@ kb.nl
- * 
+ *
  */
 public class SolrWorkflowPlugin<I> extends
-		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
+        AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
-	private final static String OVERRIDECHECKS = "override.all.checks";
-	@SuppressWarnings("rawtypes")
-	private final static TKey<SolrWorkflowPlugin, Long> date = TKey.register(
-			SolrWorkflowPlugin.class, "enrichment", Long.class);
-	private static SolrWorkflowService solrWorkflowService;
-	private static IBindingFactory bfact;
-	private static final Logger log = Logger.getLogger(SolrWorkflowPlugin.class
-			.getName());
-	/**
-	 * The parameters used by this WorkflowStart
-	 */
-	private static final List<String> params = new ArrayList<String>() {
-		private static final long serialVersionUID = 1L;
-		{
-			add(OVERRIDECHECKS);
-		}
-	};
+    private final static String OVERRIDECHECKS = "override.all.checks";
+    private final static String CLEARCACHE = "clear.vocabulary.cache";
+    private final static String LIBRARYOFCONGRESS = "loc.dataset";
+    @SuppressWarnings("rawtypes")
+    private final static TKey<SolrWorkflowPlugin, Long> date = TKey.register(
+            SolrWorkflowPlugin.class, "enrichment", Long.class);
+    private static SolrWorkflowService solrWorkflowService;
+    private static IBindingFactory bfact;
+    private static final Logger log = Logger.getLogger(SolrWorkflowPlugin.class
+            .getName());
+    /**
+     * The parameters used by this WorkflowStart
+     */
+    private static final List<String> params = new ArrayList<String>() {
+        private static final long serialVersionUID = 1L;
 
-	/**
-	 * 
-	 */
-	public SolrWorkflowPlugin(SolrWorkflowService solrWorkflowService) {
-		super("solr_workflow", "Solr Repository Ingestion Plugin");
-		SolrWorkflowPlugin.solrWorkflowService = solrWorkflowService;
+        {
+            add(OVERRIDECHECKS);
+            add(CLEARCACHE);
+            add(LIBRARYOFCONGRESS);
+        }
+    };
 
-		try {
-			bfact = BindingDirectory.getFactory(RDF.class);
-		} catch (JiBXException e) {
-			log.log(Level.SEVERE,
-					"Error initializing Jibx Factory:" + e.getMessage());
-		}
+    /**
+     *
+     */
+    public SolrWorkflowPlugin(SolrWorkflowService solrWorkflowService) {
+        super("solr_workflow", "Solr Repository Ingestion Plugin");
+        SolrWorkflowPlugin.solrWorkflowService = solrWorkflowService;
 
-	}
+        try {
+            bfact = BindingDirectory.getFactory(RDF.class);
+        } catch (JiBXException e) {
+            log.log(Level.SEVERE,
+                    "Error initializing Jibx Factory:" + e.getMessage());
+        }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.
-	 * MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
-	 */
-	@Override
-	public boolean process(MetaDataRecord<I> mdr,
-			ExecutionContext<MetaDataRecord<I>, I> context)
-			throws IngestionPluginFailedException, CorruptedDatasetException {
-		mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
+    }
 
-		String overrideChecks = context.getProperties().getProperty(
-				OVERRIDECHECKS);
-		boolean check = false;
-		if (StringUtils.isNotEmpty(overrideChecks)) {
-			check = Boolean.parseBoolean(overrideChecks);
-		}
-		SimpleDateFormat sdf = new SimpleDateFormat(
-				"EEE MMM dd HH:mm:ss Z yyyy", Locale.US);
-		try {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.api.IngestionPlugin#processRecord(eu.europeana.uim.
+     * MetaDataRecord, eu.europeana.uim.api.ExecutionContext)
+     */
+    @Override
+    public boolean process(MetaDataRecord<I> mdr,
+            ExecutionContext<MetaDataRecord<I>, I> context)
+            throws IngestionPluginFailedException, CorruptedDatasetException {
+        mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
 
-			Date updateDate = sdf.parse((mdr.getValues(
-					EuropeanaModelRegistry.UIMUPDATEDDATE).size() > 0) ? mdr
-					.getValues(EuropeanaModelRegistry.UIMUPDATEDDATE).get(0)
-					: new Date(0).toString());
-			Date ingestionDate = new Date(context.getValue(date));
+        String overrideChecks = context.getProperties().getProperty(
+                OVERRIDECHECKS);
+        boolean check = false;
+        if (StringUtils.isNotEmpty(overrideChecks)) {
+            check = Boolean.parseBoolean(overrideChecks);
+        }
+        if (StringUtils.isNotEmpty(context.getProperties().getProperty(
+                CLEARCACHE))) {
+            if (Boolean.parseBoolean(context.getProperties().getProperty(
+                    CLEARCACHE))) {
+                OsgiExtractor.clearCache();
+                VocMemCache.clearCache(solrWorkflowService);
+            }
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(
+                "EEE MMM dd HH:mm:ss Z yyyy", Locale.US);
+        try {
 
-			if (updateDate.after(ingestionDate)
-					|| updateDate.toString().equals(ingestionDate.toString())
-					|| check) {
-				if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
-						|| !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
-								.equals(Status.DELETED)) {
-					try {
+            Date updateDate = sdf.parse((mdr.getValues(
+                    EuropeanaModelRegistry.UIMUPDATEDDATE).size() > 0) ? mdr
+                    .getValues(EuropeanaModelRegistry.UIMUPDATEDDATE).get(0)
+                    : new Date(0).toString());
+            Date ingestionDate = new Date(context.getValue(date));
 
-						String value = mdr.getValues(
-								EuropeanaModelRegistry.EDMRECORD).get(0);
-						IUnmarshallingContext uctx = bfact
-								.createUnmarshallingContext();
-						IMarshallingContext marshallingContext = bfact
-								.createMarshallingContext();
-						marshallingContext.setIndent(2);
-						RDF rdf = (RDF) uctx
-								.unmarshalDocument(new StringReader(value));
-						RDF rdfCopy = clone(rdf);
-						if (rdf.getAgentList() != null) {
-							for (AgentType agent : rdf.getAgentList()) {
-								dereferenceAgent(rdfCopy, agent);
-							}
-						}
-						if (rdf.getConceptList() != null) {
-							for (Concept concept : rdf.getConceptList()) {
-								dereferenceConcept(rdfCopy, concept);
-							}
-						}
+            if (updateDate.after(ingestionDate)
+                    || updateDate.toString().equals(ingestionDate.toString())
+                    || check) {
+                if (mdr.getValues(EuropeanaModelRegistry.STATUS).size() == 0
+                        || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
+                        .equals(Status.DELETED)) {
+                    try {
 
-						if (rdf.getPlaceList() != null) {
-							for (PlaceType place : rdf.getPlaceList()) {
-								dereferencePlace(rdfCopy, place);
-							}
-						}
+                        String value = mdr.getValues(
+                                EuropeanaModelRegistry.EDMRECORD).get(0);
+                        IUnmarshallingContext uctx = bfact
+                                .createUnmarshallingContext();
+                        IMarshallingContext marshallingContext = bfact
+                                .createMarshallingContext();
+                        marshallingContext.setIndent(2);
+                        RDF rdf = (RDF) uctx
+                                .unmarshalDocument(new StringReader(value));
+                        RDF rdfCopy = clone(rdf);
+                        if (rdf.getAgentList() != null) {
+                            for (AgentType agent : rdf.getAgentList()) {
+                                dereferenceAgent(rdfCopy, agent);
+                            }
+                        }
+                        if (rdf.getConceptList() != null) {
+                            for (Concept concept : rdf.getConceptList()) {
+                                dereferenceConcept(rdfCopy, concept);
+                            }
+                        }
 
-						for (ProxyType proxy : rdf.getProxyList()) {
-							if (proxy.getEuropeanaProxy() == null
-									|| !proxy.getEuropeanaProxy()
-											.isEuropeanaProxy()) {
-								dereferenceProxy(rdfCopy, proxy);
-							}
-						}
+                        if (rdf.getPlaceList() != null) {
+                            for (PlaceType place : rdf.getPlaceList()) {
+                                dereferencePlace(rdfCopy, place);
+                            }
+                        }
 
-						if (rdf.getTimeSpanList() != null) {
-							for (TimeSpanType timespan : rdf.getTimeSpanList()) {
-								dereferenceTimespan(rdfCopy, timespan);
-							}
-						}
-						if (rdf.getWebResourceList() != null) {
-							for (WebResourceType webresource : rdf
-									.getWebResourceList()) {
-								dereferenceWebResource(rdfCopy, webresource);
-							}
-						}
+                        for (ProxyType proxy : rdf.getProxyList()) {
+                            if (proxy.getEuropeanaProxy() == null
+                                    || !proxy.getEuropeanaProxy()
+                                    .isEuropeanaProxy()) {
+                                if (StringUtils.isNotEmpty(context.getProperties().getProperty(
+                                        LIBRARYOFCONGRESS))) {
+                                    if (Boolean.parseBoolean(context.getProperties().getProperty(
+                                            LIBRARYOFCONGRESS))) {
+                                        for (Choice choice : proxy.getChoiceList()) {
+                                            if (choice.ifSubject()) {
+                                                if (StringUtils.startsWith(choice.getSubject().getString(), "sh")
+                                                        && StringUtils.isNumeric(StringUtils.substringAfter(choice.
+                                                                        getSubject().getString(), "sh"))) {
+                                                    Subject sbj = choice.getSubject();
+                                                    String subject = "http://data.europeana.eu/concept/loc/" + sbj.
+                                                            getString();
+                                                    ResourceOrLiteralType.Resource rs
+                                                            = new ResourceOrLiteralType.Resource();
+                                                    rs.setResource(subject);
+                                                    Subject sbjNrm = new Subject();
+                                                    sbjNrm.setResource(rs);
+                                                    sbjNrm.setLang(new ResourceOrLiteralType.Lang());
+                                                    sbjNrm.setString("");
+                                                    choice.setSubject(sbjNrm);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                dereferenceProxy(rdfCopy, proxy);
+                            }
+                        }
 
-						ByteArrayOutputStream out = new ByteArrayOutputStream();
-						RDF rdfFinal = cleanRDF(rdfCopy);
+                        if (rdf.getTimeSpanList() != null) {
+                            for (TimeSpanType timespan : rdf.getTimeSpanList()) {
+                                dereferenceTimespan(rdfCopy, timespan);
+                            }
+                        }
+                        if (rdf.getWebResourceList() != null) {
+                            for (WebResourceType webresource : rdf
+                                    .getWebResourceList()) {
+                                dereferenceWebResource(rdfCopy, webresource);
+                            }
+                        }
 
-						ProxyType europeanaProxy = new ProxyType();
-						EuropeanaProxy prx = new EuropeanaProxy();
-						prx.setEuropeanaProxy(true);
-						europeanaProxy.setEuropeanaProxy(prx);
-						List<String> years = new ArrayList<String>();
-						for (ProxyType proxy : rdfFinal.getProxyList()) {
-							years.addAll(new EuropeanaDateUtils()
-									.createEuropeanaYears(proxy));
-							europeanaProxy.setType(proxy.getType());
-						}
-						List<Year> yearList = new ArrayList<Year>();
-						for (String year : years) {
-							Year yearObj = new Year();
-							Lang lang = new Lang();
-							lang.setLang("eur");
-							yearObj.setLang(lang);
-							yearObj.setString(year);
-							yearList.add(yearObj);
-						}
-						europeanaProxy.setYearList(yearList);
-						for (ProxyType proxy : rdfFinal.getProxyList()) {
-							if (proxy != null
-									&& proxy.getEuropeanaProxy() != null
-									&& proxy.getEuropeanaProxy()
-											.isEuropeanaProxy()) {
-								rdfFinal.getProxyList().remove(proxy);
-							}
-						}
-						rdfFinal.getProxyList().add(europeanaProxy);
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        RDF rdfFinal = cleanRDF(rdfCopy);
 
-						marshallingContext.marshalDocument(rdfFinal, "UTF-8",
-								null, out);
-						String der = out.toString("UTF-8");
+                        ProxyType europeanaProxy = new ProxyType();
+                        EuropeanaProxy prx = new EuropeanaProxy();
+                        prx.setEuropeanaProxy(true);
+                        europeanaProxy.setEuropeanaProxy(prx);
+                        List<String> years = new ArrayList<String>();
+                        for (ProxyType proxy : rdfFinal.getProxyList()) {
+                            years.addAll(new EuropeanaDateUtils()
+                                    .createEuropeanaYears(proxy));
+                            europeanaProxy.setType(proxy.getType());
+                        }
+                        List<Year> yearList = new ArrayList<Year>();
+                        for (String year : years) {
+                            Year yearObj = new Year();
+                            Lang lang = new Lang();
+                            lang.setLang("eur");
+                            yearObj.setLang(lang);
+                            yearObj.setString(year);
+                            yearList.add(yearObj);
+                        }
+                        europeanaProxy.setYearList(yearList);
+                        for (ProxyType proxy : rdfFinal.getProxyList()) {
+                            if (proxy != null
+                                    && proxy.getEuropeanaProxy() != null
+                                    && proxy.getEuropeanaProxy()
+                                    .isEuropeanaProxy()) {
+                                rdfFinal.getProxyList().remove(proxy);
+                            }
+                        }
+                        rdfFinal.getProxyList().add(europeanaProxy);
 
-						mdr.addValue(
-								EuropeanaModelRegistry.EDMDEREFERENCEDRECORD,
-								der);
-						return true;
+                        marshallingContext.marshalDocument(rdfFinal, "UTF-8",
+                                null, out);
+                        String der = out.toString("UTF-8");
 
-					} catch (JiBXException e) {
-						e.printStackTrace();
-						context.getLoggingEngine().logFailed(
-								Level.SEVERE,
-								this,
-								e,
-								"JiBX unmarshalling has failed with the following error: "
-										+ e.getMessage());
+                        mdr.addValue(
+                                EuropeanaModelRegistry.EDMDEREFERENCEDRECORD,
+                                der);
+                        return true;
 
-					} catch (MalformedURLException e) {
-						log.log(Level.SEVERE,
+                    } catch (JiBXException e) {
+                        e.printStackTrace();
+                        context.getLoggingEngine().logFailed(
+                                Level.SEVERE,
+                                this,
+                                e,
+                                "JiBX unmarshalling has failed with the following error: "
+                                + e.getMessage());
 
-						"Error: " + e.getMessage());
-						e.printStackTrace();
-					} catch (IOException e) {
-						log.log(Level.SEVERE,
+                    } catch (MalformedURLException e) {
+                        log.log(Level.SEVERE,
+                                "Error: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        log.log(Level.SEVERE,
+                                "Error: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (SecurityException e) {
+                        log.log(Level.SEVERE,
+                                "Error: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (IllegalArgumentException e) {
+                        log.log(Level.SEVERE,
+                                "Error: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        log.log(Level.SEVERE,
+                                "Error: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        log.log(Level.SEVERE,
+                                "Error: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        log.log(Level.SEVERE,
+                                "Error: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        log.log(Level.SEVERE,
+                                "Error: " + e.getMessage());
+                        e.printStackTrace();
+                    }
 
-						"Error: " + e.getMessage());
-						e.printStackTrace();
-					} catch (SecurityException e) {
-						log.log(Level.SEVERE,
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
-						"Error: " + e.getMessage());
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						log.log(Level.SEVERE,
+    private RDF clone(RDF rdf) {
+        RDF rdfCopy = new RDF();
+        if (rdf.getAgentList() != null) {
+            rdfCopy.setAgentList(copyList(rdf.getAgentList()));
+        }
+        if (rdf.getPlaceList() != null) {
+            rdfCopy.setPlaceList(copyList(rdf.getPlaceList()));
+        }
+        if (rdf.getConceptList() != null) {
+            rdfCopy.setConceptList(copyList(rdf.getConceptList()));
+        }
+        if (rdf.getEuropeanaAggregationList() != null) {
+            rdfCopy.setEuropeanaAggregationList(copyList(rdf
+                    .getEuropeanaAggregationList()));
+        }
+        if (rdf.getAggregationList() != null) {
+            rdfCopy.setAggregationList(copyList(rdf.getAggregationList()));
+        }
+        if (rdf.getProvidedCHOList() != null) {
+            rdfCopy.setProvidedCHOList(copyList(rdf.getProvidedCHOList()));
+        }
+        if (rdf.getProxyList() != null) {
+            rdfCopy.setProxyList(copyList(rdf.getProxyList()));
+        }
+        if (rdf.getTimeSpanList() != null) {
+            rdfCopy.setTimeSpanList(rdf.getTimeSpanList());
+        }
+        if (rdf.getWebResourceList() != null) {
+            rdfCopy.setWebResourceList(copyList(rdf.getWebResourceList()));
+        }
+        return rdfCopy;
+    }
 
-						"Error: " + e.getMessage());
-						e.printStackTrace();
-					} catch (NoSuchMethodException e) {
-						log.log(Level.SEVERE,
+    private <T> List<T> copyList(List<T> originalList) {
+        List<T> copy = new ArrayList<T>(originalList.size());
+        for (int i = 0; i < originalList.size(); i++) {
 
-						"Error: " + e.getMessage());
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						log.log(Level.SEVERE,
+            copy.add(originalList.get(0));
+        }
+        Collections.copy(copy, originalList);
+        return copy;
+    }
 
-						"Error: " + e.getMessage());
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
-						log.log(Level.SEVERE,
+    private RDF cleanRDF(RDF rdf) {
+        RDF rdfFinal = new RDF();
+        List<AgentType> agents = new ArrayList<AgentType>();
+        List<TimeSpanType> timespans = new ArrayList<TimeSpanType>();
+        List<PlaceType> places = new ArrayList<PlaceType>();
+        List<Concept> concepts = new ArrayList<Concept>();
+        JibxUtils utils = new JibxUtils();
 
-						"Error: " + e.getMessage());
-						e.printStackTrace();
-					} catch (InstantiationException e) {
-						log.log(Level.SEVERE,
+        if (rdf.getAgentList() != null) {
 
-						"Error: " + e.getMessage());
-						e.printStackTrace();
-					}
+            agents.addAll(rdf.getAgentList());
 
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+            for (int i = 0; i < agents.size() - 1; i++) {
+                AgentType sAgent = agents.get(i);
+                for (int k = i + 1; k < agents.size(); k++) {
+                    AgentType fAgent = agents.get(k);
+                    if (StringUtils.contains(fAgent.getAbout(),
+                            sAgent.getAbout())
+                            || StringUtils.contains(fAgent.getAbout(),
+                                    sAgent.getAbout())) {
 
-	private RDF clone(RDF rdf) {
-		RDF rdfCopy = new RDF();
-		if (rdf.getAgentList() != null) {
-			rdfCopy.setAgentList(copyList(rdf.getAgentList()));
-		}
-		if (rdf.getPlaceList() != null) {
-			rdfCopy.setPlaceList(copyList(rdf.getPlaceList()));
-		}
-		if (rdf.getConceptList() != null) {
-			rdfCopy.setConceptList(copyList(rdf.getConceptList()));
-		}
-		if (rdf.getEuropeanaAggregationList() != null) {
-			rdfCopy.setEuropeanaAggregationList(copyList(rdf
-					.getEuropeanaAggregationList()));
-		}
-		if (rdf.getAggregationList() != null) {
-			rdfCopy.setAggregationList(copyList(rdf.getAggregationList()));
-		}
-		if (rdf.getProvidedCHOList() != null) {
-			rdfCopy.setProvidedCHOList(copyList(rdf.getProvidedCHOList()));
-		}
-		if (rdf.getProxyList() != null) {
-			rdfCopy.setProxyList(copyList(rdf.getProxyList()));
-		}
-		if (rdf.getTimeSpanList() != null) {
-			rdfCopy.setTimeSpanList(rdf.getTimeSpanList());
-		}
-		if (rdf.getWebResourceList() != null) {
-			rdfCopy.setWebResourceList(copyList(rdf.getWebResourceList()));
-		}
-		return rdfCopy;
-	}
+                        agents.set(i, utils.mergeAgentFields(fAgent, sAgent));
+                        sAgent = agents.get(i);
+                        agents.remove(k);
+                        k--;
+                    }
+                }
 
-	private <T> List<T> copyList(List<T> originalList) {
-		List<T> copy = new ArrayList<T>(originalList.size());
-		for (int i = 0; i < originalList.size(); i++) {
+            }
+            rdfFinal.setAgentList(agents);
+        }
+        if (rdf.getConceptList() != null) {
+            concepts.addAll(rdf.getConceptList());
+            for (int i = 0; i < concepts.size() - 1; i++) {
+                Concept sConcept = concepts.get(i);
+                for (int k = i + 1; k < concepts.size(); k++) {
+                    Concept fConcept = concepts.get(k);
+                    if (StringUtils.contains(fConcept.getAbout(),
+                            sConcept.getAbout())
+                            || StringUtils.contains(sConcept.getAbout(),
+                                    fConcept.getAbout())) {
+                        concepts.set(i,
+                                utils.mergeConceptsField(fConcept, sConcept));
+                        sConcept = concepts.get(i);
+                        concepts.remove(k);
+                        k--;
+                    }
+                }
+            }
 
-			copy.add(originalList.get(0));
-		}
-		Collections.copy(copy, originalList);
-		return copy;
-	}
+            rdfFinal.setConceptList(concepts);
+        }
+        if (rdf.getTimeSpanList() != null) {
+            timespans.addAll(rdf.getTimeSpanList());
+            for (int i = 0; i < timespans.size() - 1; i++) {
+                TimeSpanType sTs = timespans.get(i);
+                for (int k = i + 1; k < timespans.size(); k++) {
+                    TimeSpanType fTs = timespans.get(k);
+                    if (StringUtils.contains(fTs.getAbout(), sTs.getAbout())
+                            || StringUtils.contains(sTs.getAbout(),
+                                    fTs.getAbout())) {
+                        timespans.set(i, utils.mergeTimespanFields(fTs, sTs));
+                        sTs = timespans.get(i);
+                        timespans.remove(k);
+                        k--;
+                    }
+                }
+            }
+            rdfFinal.setTimeSpanList(timespans);
+        }
+        if (rdf.getPlaceList() != null) {
+            places.addAll(rdf.getPlaceList());
 
-	private RDF cleanRDF(RDF rdf) {
-		RDF rdfFinal = new RDF();
-		List<AgentType> agents = new ArrayList<AgentType>();
-		List<TimeSpanType> timespans = new ArrayList<TimeSpanType>();
-		List<PlaceType> places = new ArrayList<PlaceType>();
-		List<Concept> concepts = new ArrayList<Concept>();
-		JibxUtils utils = new JibxUtils();
+            for (int i = 0; i < places.size() - 1; i++) {
+                PlaceType sPlace = places.get(i);
+                for (int k = i + 1; k < places.size(); k++) {
+                    PlaceType fPlace = places.get(k);
+                    if (StringUtils
+                            .equals(fPlace.getAbout(), sPlace.getAbout())
+                            || StringUtils.contains(sPlace.getAbout(),
+                                    fPlace.getAbout())) {
+                        if (fPlace.getAbout() != null
+                                && sPlace.getAbout() != null) {
+                            places.set(i,
+                                    utils.mergePlacesFields(fPlace, sPlace));
+                        }
+                        sPlace = places.get(i);
+                        places.remove(k);
+                        k--;
 
-		if (rdf.getAgentList() != null) {
+                    }
+                }
+            }
 
-			agents.addAll(rdf.getAgentList());
+            rdfFinal.setPlaceList(places);
+        }
+        rdfFinal.setAggregationList(rdf.getAggregationList());
+        rdfFinal.setProxyList(rdf.getProxyList());
+        rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
+        rdfFinal.setEuropeanaAggregationList(rdf.getEuropeanaAggregationList());
+        rdfFinal.setWebResourceList(rdf.getWebResourceList());
 
-			for (int i = 0; i < agents.size() - 1; i++) {
-				AgentType sAgent = agents.get(i);
-				for (int k = i + 1; k < agents.size(); k++) {
-					AgentType fAgent = agents.get(k);
-					if (StringUtils.contains(fAgent.getAbout(),
-							sAgent.getAbout())
-							|| StringUtils.contains(fAgent.getAbout(),
-									sAgent.getAbout())) {
+        return rdfFinal;
+    }
 
-						agents.set(i, utils.mergeAgentFields(fAgent, sAgent));
-						sAgent = agents.get(i);
-						agents.remove(k);
-						k--;
-					}
-				}
+    private void dereferenceWebResource(RDF rdf, WebResourceType webResource)
+            throws MalformedURLException, IOException, SecurityException,
+            IllegalArgumentException, InstantiationException,
+            IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
+        Dereferencer der = new WebResourceDereferencer(solrWorkflowService);
+        try {
+            der.dereference(rdf, webResource);
+        } catch (ResourceNotRDFException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+    }
 
-			}
-			rdfFinal.setAgentList(agents);
-		}
-		if (rdf.getConceptList() != null) {
-			concepts.addAll(rdf.getConceptList());
-			for (int i = 0; i < concepts.size() - 1; i++) {
-				Concept sConcept = concepts.get(i);
-				for (int k = i + 1; k < concepts.size(); k++) {
-					Concept fConcept = concepts.get(k);
-					if (StringUtils.contains(fConcept.getAbout(),
-							sConcept.getAbout())
-							|| StringUtils.contains(sConcept.getAbout(),
-									fConcept.getAbout())) {
-						concepts.set(i,
-								utils.mergeConceptsField(fConcept, sConcept));
-						sConcept = concepts.get(i);
-						concepts.remove(k);
-						k--;
-					}
-				}
-			}
+    private void dereferenceTimespan(RDF rdf, TimeSpanType timeSpan)
+            throws MalformedURLException, IOException, SecurityException,
+            IllegalArgumentException, InstantiationException,
+            IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
+        TimespanDereferencer der = new TimespanDereferencer(solrWorkflowService);
+        try {
+            der.dereference(rdf, timeSpan);
+        } catch (ResourceNotRDFException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+    }
 
-			rdfFinal.setConceptList(concepts);
-		}
-		if (rdf.getTimeSpanList() != null) {
-			timespans.addAll(rdf.getTimeSpanList());
-			for (int i = 0; i < timespans.size() - 1; i++) {
-				TimeSpanType sTs = timespans.get(i);
-				for (int k = i + 1; k < timespans.size(); k++) {
-					TimeSpanType fTs = timespans.get(k);
-					if (StringUtils.contains(fTs.getAbout(), sTs.getAbout())
-							|| StringUtils.contains(sTs.getAbout(),
-									fTs.getAbout())) {
-						timespans.set(i, utils.mergeTimespanFields(fTs, sTs));
-						sTs = timespans.get(i);
-						timespans.remove(k);
-						k--;
-					}
-				}
-			}
-			rdfFinal.setTimeSpanList(timespans);
-		}
-		if (rdf.getPlaceList() != null) {
-			places.addAll(rdf.getPlaceList());
+    private void dereferenceProxy(RDF rdf, ProxyType proxy)
+            throws MalformedURLException, IOException, SecurityException,
+            IllegalArgumentException, InstantiationException,
+            IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
+        Dereferencer der = new ProxyDereferencer(solrWorkflowService);
+        try {
+            der.dereference(rdf, proxy);
+        } catch (ResourceNotRDFException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+    }
 
-			for (int i = 0; i < places.size() - 1; i++) {
-				PlaceType sPlace = places.get(i);
-				for (int k = i + 1; k < places.size(); k++) {
-					PlaceType fPlace = places.get(k);
-					if (StringUtils
-							.equals(fPlace.getAbout(), sPlace.getAbout())
-							|| StringUtils.contains(sPlace.getAbout(),
-									fPlace.getAbout())) {
-						if (fPlace.getAbout() != null
-								&& sPlace.getAbout() != null) {
-							places.set(i,
-									utils.mergePlacesFields(fPlace, sPlace));
-						}
-						sPlace = places.get(i);
-						places.remove(k);
-						k--;
+    private void dereferencePlace(RDF rdf, PlaceType place)
+            throws MalformedURLException, IOException, SecurityException,
+            IllegalArgumentException, InstantiationException,
+            IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
+        Dereferencer der = new PlaceDereferencer(solrWorkflowService);
+        try {
+            der.dereference(rdf, place);
+        } catch (ResourceNotRDFException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+    }
 
-					}
-				}
-			}
+    private void dereferenceConcept(RDF rdf, Concept concept)
+            throws MalformedURLException, IOException, SecurityException,
+            IllegalArgumentException, InstantiationException,
+            IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
+        Dereferencer der = new ConceptDereferencer(solrWorkflowService);
+        try {
+            der.dereference(rdf, concept);
+        } catch (ResourceNotRDFException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+    }
 
-			rdfFinal.setPlaceList(places);
-		}
-		rdfFinal.setAggregationList(rdf.getAggregationList());
-		rdfFinal.setProxyList(rdf.getProxyList());
-		rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
-		rdfFinal.setEuropeanaAggregationList(rdf.getEuropeanaAggregationList());
-		rdfFinal.setWebResourceList(rdf.getWebResourceList());
+    private void dereferenceAgent(RDF rdf, AgentType agent)
+            throws MalformedURLException, IOException, SecurityException,
+            IllegalArgumentException, InstantiationException,
+            IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
+        Dereferencer der = new AgentDereferencer(solrWorkflowService);
+        try {
+            der.dereference(rdf, agent);
+        } catch (ResourceNotRDFException e) {
+            log.log(Level.SEVERE, e.getMessage());
+        }
+    }
 
-		return rdfFinal;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.Plugin#initialize()
+     */
+    @Override
+    public void initialize() {
+    }
 
-	private void dereferenceWebResource(RDF rdf, WebResourceType webResource)
-			throws MalformedURLException, IOException, SecurityException,
-			IllegalArgumentException, InstantiationException,
-			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
-		Dereferencer der = new WebResourceDereferencer(solrWorkflowService);
-		try {
-			der.dereference(rdf, webResource);
-		} catch (ResourceNotRDFException e) {
-			log.log(Level.SEVERE, e.getMessage());
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.Plugin#shutdown()
+     */
+    @Override
+    public void shutdown() {
+    }
 
-	private void dereferenceTimespan(RDF rdf, TimeSpanType timeSpan)
-			throws MalformedURLException, IOException, SecurityException,
-			IllegalArgumentException, InstantiationException,
-			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
-		TimespanDereferencer der = new TimespanDereferencer(solrWorkflowService);
-		try {
-			der.dereference(rdf, timeSpan);
-		} catch (ResourceNotRDFException e) {
-			log.log(Level.SEVERE, e.getMessage());
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.
+     * orchestration.ExecutionContext)
+     */
+    @Override
+    public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
+            throws IngestionPluginFailedException {
+    }
 
-	private void dereferenceProxy(RDF rdf, ProxyType proxy)
-			throws MalformedURLException, IOException, SecurityException,
-			IllegalArgumentException, InstantiationException,
-			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
-		Dereferencer der = new ProxyDereferencer(solrWorkflowService);
-		try {
-			der.dereference(rdf, proxy);
-		} catch (ResourceNotRDFException e) {
-			log.log(Level.SEVERE, e.getMessage());
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.
+     * orchestration.ExecutionContext)
+     */
+    @Override
+    public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
+            throws IngestionPluginFailedException {
+        if (((Collection<I>) context.getDataSet())
+                .getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
+                        .toString()) != null) {
+            context.putValue(date, Long.parseLong(((Collection<I>) context
+                    .getDataSet())
+                    .getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
+                            .toString())));
 
-	private void dereferencePlace(RDF rdf, PlaceType place)
-			throws MalformedURLException, IOException, SecurityException,
-			IllegalArgumentException, InstantiationException,
-			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
-		Dereferencer der = new PlaceDereferencer(solrWorkflowService);
-		try {
-			der.dereference(rdf, place);
-		} catch (ResourceNotRDFException e) {
-			log.log(Level.SEVERE, e.getMessage());
-		}
-	}
+        } else {
+            context.putValue(date, new Date().getTime());
+        }
+    }
 
-	private void dereferenceConcept(RDF rdf, Concept concept)
-			throws MalformedURLException, IOException, SecurityException,
-			IllegalArgumentException, InstantiationException,
-			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
-		Dereferencer der = new ConceptDereferencer(solrWorkflowService);
-		try {
-			der.dereference(rdf, concept);
-		} catch (ResourceNotRDFException e) {
-			log.log(Level.SEVERE, e.getMessage());
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.Plugin#getPreferredThreadCount()
+     */
+    @Override
+    public int getPreferredThreadCount() {
+        return 12;
+    }
 
-	private void dereferenceAgent(RDF rdf, AgentType agent)
-			throws MalformedURLException, IOException, SecurityException,
-			IllegalArgumentException, InstantiationException,
-			IllegalAccessException, NoSuchMethodException,
-			InvocationTargetException {
-		Dereferencer der = new AgentDereferencer(solrWorkflowService);
-		try {
-			der.dereference(rdf, agent);
-		} catch (ResourceNotRDFException e) {
-			log.log(Level.SEVERE, e.getMessage());
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.Plugin#getMaximumThreadCount()
+     */
+    @Override
+    public int getMaximumThreadCount() {
+        return 15;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.Plugin#initialize()
-	 */
-	@Override
-	public void initialize() {
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getInputFields()
+     */
+    @Override
+    public TKey<?, ?>[] getInputFields() {
+        return null;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.Plugin#shutdown()
-	 */
-	@Override
-	public void shutdown() {
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
+     */
+    @Override
+    public TKey<?, ?>[] getOptionalFields() {
+        return null;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.
-	 * orchestration.ExecutionContext)
-	 */
-	@Override
-	public void completed(ExecutionContext<MetaDataRecord<I>, I> context)
-			throws IngestionPluginFailedException {
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOutputFields()
+     */
+    @Override
+    public TKey<?, ?>[] getOutputFields() {
+        return null;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.
-	 * orchestration.ExecutionContext)
-	 */
-	@Override
-	public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
-			throws IngestionPluginFailedException {
-		if (((Collection<I>) context.getDataSet())
-				.getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
-						.toString()) != null) {
-			context.putValue(date, Long.parseLong(((Collection<I>) context
-					.getDataSet())
-					.getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
-							.toString())));
-
-		} else {
-			context.putValue(date, new Date().getTime());
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.Plugin#getPreferredThreadCount()
-	 */
-	@Override
-	public int getPreferredThreadCount() {
-		return 12;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.Plugin#getMaximumThreadCount()
-	 */
-	@Override
-	public int getMaximumThreadCount() {
-		return 15;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getInputFields()
-	 */
-	@Override
-	public TKey<?, ?>[] getInputFields() {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
-	 */
-	@Override
-	public TKey<?, ?>[] getOptionalFields() {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOutputFields()
-	 */
-	@Override
-	public TKey<?, ?>[] getOutputFields() {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eu.europeana.uim.plugin.Plugin#getParameters()
-	 */
-	@Override
-	public List<String> getParameters() {
-		return params;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eu.europeana.uim.plugin.Plugin#getParameters()
+     */
+    @Override
+    public List<String> getParameters() {
+        return params;
+    }
 
 }

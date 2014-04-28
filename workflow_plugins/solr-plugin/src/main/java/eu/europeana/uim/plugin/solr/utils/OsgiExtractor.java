@@ -81,7 +81,10 @@ public class OsgiExtractor extends Extractor {
 
 		OsgiExtractor.solrWorkFlowService = solrWorkflowService;
 	}
-
+        
+        public static void clearCache(){
+            MemCache.getInstance().setEntityCache(new HashMap<String, Map<String, List>>());
+        }
 	public List<EdmMappedField> getEdmLabel(
 			ControlledVocabularyImpl vocabulary, String field) {
 
