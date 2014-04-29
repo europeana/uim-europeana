@@ -338,10 +338,10 @@ public class LookupCreationPlugin<I> extends
             if (solrOldList.size() == 1 && solrNewList.size() == 1) {
                 finalId = solrOldList.get(0).getFirstValue("europeana_id")
                         .toString();
-                newId = solrOldList.get(0).getFirstValue("europeana_id")
+                newId = solrNewList.get(0).getFirstValue("europeana_id")
                         .toString();
             }
-            if (finalId != null && newId != null) {
+            if (finalId != null && newId != null && !newId.equalsIgnoreCase(finalId)) {
                 EuropeanaId id = new EuropeanaId();
                 id.setOldId(finalId);
                 id.setLastAccess(0);
