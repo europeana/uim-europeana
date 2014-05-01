@@ -83,6 +83,7 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
+import eu.europeana.corelib.solr.utils.construct.SolrDocumentHandler;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -430,6 +431,7 @@ public class EnrichmentPlugin<I> extends
                     try {
                         SolrInputDocument basicDocument = new SolrConstructor()
                                 .constructSolrDocument(rdf);
+                        
                         FullBeanImpl fBean = new MongoConstructor()
                                 .constructFullBean(rdf);
                         List<InputValue> inputValues = new EnrichmentUtils()
@@ -462,21 +464,21 @@ public class EnrichmentPlugin<I> extends
                                             get(collection).
                                             get(inputValue.getValue().
                                                     toLowerCase()) != null) {
-                                        int i =0;
+                                        int i = 0;
                                         while (enrichmentQueryCache.
                                                 get(collection).
                                                 get(inputValue.getValue().
-                                                        toLowerCase()).equals(State.PENDING) && i<100) {
+                                                        toLowerCase()).equals(State.PENDING) && i < 100) {
                                             try {
-                                                 i++;
+                                                i++;
                                                 Thread.sleep(100);
-                                               
-                                                if(i==100){
+
+                                                if (i == 100) {
                                                     notEnriched.add(inputValue);
                                                     enrichmentQueryCache.
-                                                get(collection).
-                                                put(inputValue.getValue().
-                                                        toLowerCase(),State.DONE);
+                                                            get(collection).
+                                                            put(inputValue.getValue().
+                                                                    toLowerCase(), State.DONE);
                                                 }
                                             } catch (InterruptedException ex) {
                                                 Logger.getLogger(EnrichmentPlugin.class.getName()).
@@ -495,22 +497,22 @@ public class EnrichmentPlugin<I> extends
                             enrichedEntities.addAll(enriched);
                         }
                         for (InputValue val : inputValues) {
-                           
-                                if (enrichmentQueryCache.
-                                        get(collection).get(val.getValue().toLowerCase()) != State.DONE) {
-                                    enrichmentQueryCache.
-                                            get(collection).put(val.getValue().toLowerCase(), State.DONE);
-                                }
-                            
+
+                            if (enrichmentQueryCache.
+                                    get(collection).get(val.getValue().toLowerCase()) != State.DONE) {
+                                enrichmentQueryCache.
+                                        get(collection).put(val.getValue().toLowerCase(), State.DONE);
+                            }
+
                         }
                         ProxyImpl europeanaProxy = EuropeanaProxyUtils
                                 .getEuropeanaProxy(fBean);
                         docGen.addEntities(basicDocument, fBean,
                                 europeanaProxy, enrichedEntities);
 
-                        basicDocument.addField(
-                                EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
-                                previewsOnlyInPortal);
+//                        basicDocument.addField(
+//                                EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
+//                                previewsOnlyInPortal);
                         fBean.getAggregations()
                                 .get(0)
                                 .setEdmPreviewNoDistribute(
@@ -519,9 +521,9 @@ public class EnrichmentPlugin<I> extends
                         int completeness = RecordCompletenessRanking
                                 .rankRecordCompleteness(basicDocument);
                         fBean.setEuropeanaCompleteness(completeness);
-                        basicDocument.addField(
-                                EdmLabel.EUROPEANA_COMPLETENESS.toString(),
-                                completeness);
+//                        basicDocument.addField(
+//                                EdmLabel.EUROPEANA_COMPLETENESS.toString(),
+//                                completeness);
                         fBean.setEuropeanaCollectionName(new String[]{mdr
                             .getCollection().getName()});
                         if (fBean.getEuropeanaAggregation().getEdmLanguage()
@@ -537,16 +539,22 @@ public class EnrichmentPlugin<I> extends
                         }
                         fBean.getEuropeanaAggregation().setAbout(
                                 "/aggregation/europeana" + fBean.getAbout());
-                        basicDocument.setField(
-                                EdmLabel.EDM_EUROPEANA_AGGREGATION.toString(),
-                                "/aggregation/europeana" + fBean.getAbout());
+//                        basicDocument.setField(
+//                                EdmLabel.EDM_EUROPEANA_AGGREGATION.toString(),
+//                                "/aggregation/europeana" + fBean.getAbout());
                         fBean.getEuropeanaAggregation().setAggregatedCHO(
                                 "/item" + fBean.getAbout());
-                        basicDocument.setField(
-                                "europeana_aggregation_ore_aggregatedCHO",
-                                "/item" + fBean.getAbout());
-                        basicDocument.setField("europeana_collectionName", mdr
-                                .getCollection().getName());
+//                        basicDocument.setField(
+//                                "europeana_aggregation_ore_aggregatedCHO",
+//                                "/item" + fBean.getAbout());
+//                        basicDocument.setField("europeana_collectionName", mdr
+//                                .getCollection().getName());
+                        fBean.setEuropeanaCollectionName(new String[]{mdr
+                               .getCollection().getName()});
+                        if(europeanaProxy.getYear()!=null){
+                            
+                        fBean.setYear(europeanaProxy.getYear().get("eur").toArray(new String[europeanaProxy.getYear().get("eur").size()]));
+                        }
                         ProxyImpl providerProxy = EuropeanaProxyUtils
                                 .getProviderProxy(fBean);
                         List<String> titles = new ArrayList<String>();
@@ -576,13 +584,13 @@ public class EnrichmentPlugin<I> extends
                                     timestampCreated.getTime());
                         }
                         fBean.setTimestampCreated(timestampCreated);
-                        basicDocument.addField("timestamp_created",
-                                timestampCreated);
+//                        basicDocument.addField("timestamp_created",
+//                                timestampCreated);
                         mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
                         Date timestampUpdated = new Date();
                         fBean.setTimestampUpdated(timestampUpdated);
-                        basicDocument.addField("timestamp_update",
-                                timestampUpdated);
+//                        basicDocument.addField("timestamp_update",
+//                                timestampUpdated);
                         mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
                                 timestampUpdated.getTime());
                         String overrideEnrichment = context.getProperties()
@@ -591,7 +599,7 @@ public class EnrichmentPlugin<I> extends
                         proxies.add(providerProxy);
                         proxies.add(europeanaProxy);
                         fBean.setProxies(proxies);
-                        
+
                         docGen.updateProviderAggregationInSolr(fBean,
                                 basicDocument);
                         docGen.updateEuropeanaProxyInSolr(fBean, basicDocument);
@@ -621,7 +629,8 @@ public class EnrichmentPlugin<I> extends
 
                         context.putValue(addedTKey,
                                 context.getValue(addedTKey) + 1);
-                        solrServer.add(basicDocument);
+                        new SolrDocumentHandler().save(fBean,solrServer);
+//                        solrServer.add(basicDocument);
                         return true;
                     } catch (MalformedURLException e) {
                         log.log(Level.SEVERE,
@@ -647,7 +656,10 @@ public class EnrichmentPlugin<I> extends
                     }
                     return false;
                 } else {
-                    boolean res = handler.removeRecord(solrServer, rdf);
+                    boolean res = true;
+                    if (check) {
+                        res = handler.removeRecord(solrServer, rdf);
+                    }
                     if (res) {
                         context.putValue(deletedTKey,
                                 context.getValue(deletedTKey) + 1);

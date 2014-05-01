@@ -43,24 +43,24 @@ public class SolrDocumentGenerator {
 		proxy.setProxyIn(new String[] { "/aggregation/provider"
 				+ fBean.getAbout() });
 		fBean.getProxies().set(index, proxy);
-		basicDocument.setField(EdmLabel.ORE_PROXY.toString(), proxy.getAbout());
-		basicDocument.setField(EdmLabel.PROXY_ORE_PROXY_FOR.toString(),
-				proxy.getProxyFor());
-		basicDocument.setField(EdmLabel.PROXY_ORE_PROXY_IN.toString(),
-				proxy.getProxyIn());
+//		basicDocument.setField(EdmLabel.ORE_PROXY.toString(), proxy.getAbout());
+//		basicDocument.setField(EdmLabel.PROXY_ORE_PROXY_FOR.toString(),
+//				proxy.getProxyFor());
+//		basicDocument.setField(EdmLabel.PROXY_ORE_PROXY_IN.toString(),
+//				proxy.getProxyIn());
 
 	}
 
 	public void updateEuropeanaProxyInSolr(FullBeanImpl fBean,
 			SolrInputDocument basicDocument) {
 		ProxyImpl proxy = EuropeanaProxyUtils.getEuropeanaProxy(fBean);
-		basicDocument.setField(EdmLabel.ORE_PROXY.toString(), proxy.getAbout());
-		basicDocument.setField(EdmLabel.PROXY_ORE_PROXY_FOR.toString(),
-				proxy.getProxyFor());
-		basicDocument.setField(EdmLabel.PROXY_ORE_PROXY_IN.toString(),
-				proxy.getProxyIn());
-		basicDocument.setField(EdmLabel.EDM_ISEUROPEANA_PROXY.toString(),
-				proxy.isEuropeanaProxy());
+//		basicDocument.setField(EdmLabel.ORE_PROXY.toString(), proxy.getAbout());
+//		basicDocument.setField(EdmLabel.PROXY_ORE_PROXY_FOR.toString(),
+//				proxy.getProxyFor());
+//		basicDocument.setField(EdmLabel.PROXY_ORE_PROXY_IN.toString(),
+//				proxy.getProxyIn());
+//		basicDocument.setField(EdmLabel.EDM_ISEUROPEANA_PROXY.toString(),
+//				proxy.isEuropeanaProxy());
 		for (EnrichmentFields field : EnrichmentFields.values()) {
 			field.appendInDoc(basicDocument, proxy);
 		}
@@ -72,12 +72,12 @@ public class SolrDocumentGenerator {
 		AggregationImpl ag = fBean.getAggregations().get(0);
 		ag.setAbout("/aggregation/provider" + fBean.getAbout());
 		ag.setAggregatedCHO("/item" + fBean.getAbout());
-		basicDocument.setField(
-				EdmLabel.PROVIDER_AGGREGATION_ORE_AGGREGATION.toString(),
-				"/aggregation/provider" + fBean.getAbout());
-		basicDocument.setField(
-				EdmLabel.PROVIDER_AGGREGATION_EDM_AGGREGATED_CHO.toString(),
-				"/item" + fBean.getAbout());
+//		basicDocument.setField(
+//				EdmLabel.PROVIDER_AGGREGATION_ORE_AGGREGATION.toString(),
+//				"/aggregation/provider" + fBean.getAbout());
+//		basicDocument.setField(
+//				EdmLabel.PROVIDER_AGGREGATION_EDM_AGGREGATED_CHO.toString(),
+//				"/item" + fBean.getAbout());
 		fBean.getAggregations().set(0, ag);
 
 	}
@@ -181,7 +181,7 @@ public class SolrDocumentGenerator {
 			}
 
 		}
-		new TimespanSolrCreator().create(basicDocument, ts);
+//		new TimespanSolrCreator().create(basicDocument, ts);
 
 	}
 
@@ -242,7 +242,7 @@ public class SolrDocumentGenerator {
 			}
 
 		}
-		new PlaceSolrCreator().create(basicDocument, place);
+//		new PlaceSolrCreator().create(basicDocument, place);
 
 	}
 
@@ -302,7 +302,7 @@ public class SolrDocumentGenerator {
 			}
 
 		}
-		new AgentSolrCreator().create(basicDocument, agent);
+//		new AgentSolrCreator().create(basicDocument, agent);
 
 	}
 
