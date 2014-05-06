@@ -300,7 +300,7 @@ public class LookupCreationPlugin<I> extends
                                 fieldValue,
                                 edmValue,
                                 context.getProperties().getProperty(
-                                        USE_FUNCTIONS));
+                                        USE_FUNCTIONS), StringUtils.substringAfter(rdf.getProvidedCHOList().get(0).getAbout(), "/item"));
                     }
 
                 }
@@ -313,11 +313,10 @@ public class LookupCreationPlugin<I> extends
     }
 
     private void generateRedirectsFromCustomField(String fieldValue,
-            String property, String transformations) {
+            String property, String transformations, String newId) {
 
         try {
             String finalId = null;
-            String newId = null;
             ModifiableSolrParams paramsOld = new ModifiableSolrParams();
             paramsOld.add(
                     "q",
@@ -326,19 +325,12 @@ public class LookupCreationPlugin<I> extends
                     + ClientUtils
                     .escapeQueryChars(applyTransformations(
                                     fieldValue, transformations)));
-            ModifiableSolrParams paramsNew = new ModifiableSolrParams();
-            paramsNew.add("q",
-                    property + ":" + ClientUtils.escapeQueryChars(fieldValue));
-
+       
             SolrDocumentList solrOldList = enrichmentService
                     .getProductionSolrServer().query(paramsOld).getResults();
-            SolrDocumentList solrNewList = enrichmentService.getSolrServer()
-                    .query(paramsNew).getResults();
-
-            if (solrOldList.size() == 1 && solrNewList.size() == 1) {
+           
+            if (solrOldList.size() == 1 ) {
                 finalId = solrOldList.get(0).getFirstValue("europeana_id")
-                        .toString();
-                newId = solrNewList.get(0).getFirstValue("europeana_id")
                         .toString();
             }
             if (finalId != null && newId != null && !newId.equalsIgnoreCase(finalId)) {
