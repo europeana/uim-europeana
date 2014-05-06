@@ -38,16 +38,32 @@ public class EuropeanaDateUtils {
 			if (proxy.getChoiceList() != null) {
 				for (EuropeanaType.Choice choice : proxy.getChoiceList()) {
 					if (choice.ifDate()) {
-						years.addAll(refineDates(bc, choice.getDate()
-								.getString()));
+                                            List<String> year = refineDates(bc, choice.getDate()
+								.getString());
+                                            for(String yr :year){
+						if(!years.contains(yr)){
+                                                years.add(yr);
+                                                }
+                                            }
 
 					}
 					if (choice.ifTemporal()) {
-						years.addAll(refineDates(bc, choice.getTemporal()
-								.getString()));
+						List<String> year = refineDates(bc, choice.getTemporal()
+								.getString());
+                                            for(String yr :year){
+						if(!years.contains(yr)){
+                                                years.add(yr);
+                                                }
+                                            }
 					}
 					if(choice.ifCreated()&& choice.getCreated().getString()!=null){
-						years.addAll(refineDates(bc,choice.getCreated().getString()));
+						List<String> year = refineDates(bc, choice.getCreated()
+								.getString());
+                                            for(String yr :year){
+						if(!years.contains(yr)){
+                                                years.add(yr);
+                                                }
+                                            }
 					}
 				}
 			}

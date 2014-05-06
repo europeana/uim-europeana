@@ -162,23 +162,7 @@ public class SolrDocumentGenerator {
 				}
 				map.put("def", values);
 				europeanaProxy.setDcDate(map);
-			} else if (enrichedEntity.getOriginalField().equals(
-					"proxy_edm_year")) {
-				Map<String, List<String>> map = europeanaProxy.getYear();
-				List<String> values;
-				if (map == null) {
-					map = new HashMap<String, List<String>>();
-					values = new ArrayList<String>();
-
-				} else {
-					values = map.get("eur");
-				}
-				if (!values.contains(ts.getAbout())) {
-					values.add(ts.getAbout());
-				}
-				map.put("eur", values);
-				europeanaProxy.setYear(map);
-			}
+			} 
 
 		}
 //		new TimespanSolrCreator().create(basicDocument, ts);
