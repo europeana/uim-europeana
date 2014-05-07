@@ -60,11 +60,11 @@ public class EuropeanaDateUtils {
             if (proxy.getDcDate() != null) {
                 for (Entry<String, List<String>> entry : proxy.getDcDate().entrySet()) {
                     for (String date : entry.getValue()) {
-
-                        if (!years.contains(date)) {
-                            years.add(date);
+                        for (String refined : refineDates(bc, date)) {
+                            if (!years.contains(refined)) {
+                                years.add(refined);
+                            }
                         }
-
                     }
                 }
             }
@@ -72,8 +72,10 @@ public class EuropeanaDateUtils {
             if (proxy.getDctermsTemporal() != null) {
                 for (Entry<String, List<String>> entry : proxy.getDctermsTemporal().entrySet()) {
                     for (String date : entry.getValue()) {
-                        if (!years.contains(date)) {
-                            years.add(date);
+                        for (String refined : refineDates(bc, date)) {
+                            if (!years.contains(refined)) {
+                                years.add(refined);
+                            }
                         }
                     }
                 }
@@ -82,8 +84,10 @@ public class EuropeanaDateUtils {
             if (proxy.getDctermsCreated() != null) {
                 for (Entry<String, List<String>> entry : proxy.getDctermsCreated().entrySet()) {
                     for (String date : entry.getValue()) {
-                        if (!years.contains(date)) {
-                            years.add(date);
+                       for (String refined : refineDates(bc, date)) {
+                            if (!years.contains(refined)) {
+                                years.add(refined);
+                            }
                         }
                     }
                 }
@@ -92,8 +96,10 @@ public class EuropeanaDateUtils {
             if (proxy.getDctermsIssued() != null) {
                 for (Entry<String, List<String>> entry : proxy.getDctermsIssued().entrySet()) {
                     for (String date : entry.getValue()) {
-                        if (!years.contains(date)) {
-                            years.add(date);
+                        for (String refined : refineDates(bc, date)) {
+                            if (!years.contains(refined)) {
+                                years.add(refined);
+                            }
                         }
                     }
                 }

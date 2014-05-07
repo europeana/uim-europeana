@@ -300,7 +300,7 @@ public class LookupCreationPlugin<I> extends
                                 fieldValue,
                                 edmValue,
                                 context.getProperties().getProperty(
-                                        USE_FUNCTIONS), StringUtils.substringAfter(rdf.getProvidedCHOList().get(0).getAbout(), "/item"));
+                                        USE_FUNCTIONS), rdf.getProvidedCHOList().get(0).getAbout());
                     }
 
                 }
@@ -325,7 +325,11 @@ public class LookupCreationPlugin<I> extends
                     + ClientUtils
                     .escapeQueryChars(applyTransformations(
                                     fieldValue, transformations)));
-       
+            System.out.println(property
+                    + ":"
+                    + ClientUtils
+                    .escapeQueryChars(applyTransformations(
+                                    fieldValue, transformations)));
             SolrDocumentList solrOldList = enrichmentService
                     .getProductionSolrServer().query(paramsOld).getResults();
            
@@ -437,7 +441,7 @@ public class LookupCreationPlugin<I> extends
     @Override
     public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
             throws IngestionPluginFailedException {
-
+        System.out.println(enrichmentService.getProductionSolrServer().getBaseURL());
     }
 
     @Override
