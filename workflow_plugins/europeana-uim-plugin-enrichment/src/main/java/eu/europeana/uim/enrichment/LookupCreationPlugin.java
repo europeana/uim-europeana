@@ -183,15 +183,9 @@ public class LookupCreationPlugin<I> extends
                     value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD)
                             .get(0);
                 }
-                uctx = bfact.createUnmarshallingContext();
-                RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-                String collectionId = (String) mdr.getCollection()
+                 String fileName;
+                 String collectionId = (String) mdr.getCollection()
                         .getMnemonic();
-                if (context.getProperties().getProperty(OVERRIDESIPCREATOR)
-                        == null
-                        && context.getProperties()
-                        .getProperty(USE_CUSTOM_FIELD) == null) {
-                    String fileName;
                     String oldCollectionId = enrichmentService
                             .getCollectionMongoServer().findOldCollectionId(
                                     collectionId);
@@ -200,6 +194,14 @@ public class LookupCreationPlugin<I> extends
                     } else {
                         fileName = (String) mdr.getCollection().getName();
                     }
+                uctx = bfact.createUnmarshallingContext();
+                RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+                
+                if (context.getProperties().getProperty(OVERRIDESIPCREATOR)
+                        == null
+                        && context.getProperties()
+                        .getProperty(USE_CUSTOM_FIELD) == null) {
+                   
 
                     FullBeanImpl fullBean = constructFullBeanMock(rdf,
                             collectionId);
@@ -218,7 +220,7 @@ public class LookupCreationPlugin<I> extends
                     }
 
                     if (StringUtils.isNotEmpty(hash)) {
-                        createLookupEntry(fullBean, collectionId, hash);
+                        createLookupEntry(fullBean, fileName, collectionId, hash);
                         return true;
                     }
                 } else {
@@ -253,7 +255,7 @@ public class LookupCreationPlugin<I> extends
                         }
                         createLookupEntry(
                                 rdf.getProvidedCHOList().get(0).getAbout(),
-                                collectionId,
+                                fileName,collectionId,
                                 applyTransformations(
                                         fieldValue,
                                         context.getProperties().getProperty(
@@ -332,8 +334,8 @@ public class LookupCreationPlugin<I> extends
                                     fieldValue, transformations)));
             SolrDocumentList solrOldList = enrichmentService
                     .getProductionSolrServer().query(paramsOld).getResults();
-           
-            if (solrOldList.size() == 1 ) {
+
+            if (solrOldList.size() == 1) {
                 finalId = solrOldList.get(0).getFirstValue("europeana_id")
                         .toString();
             }
@@ -350,27 +352,62 @@ public class LookupCreationPlugin<I> extends
         }
     }
 
-    private void createLookupEntry(String newId, String collectionId,
+    private void createLookupEntry(String newId, String oldCollectionId, String newCollectionId,
             String value) {
         ModifiableSolrParams params = new ModifiableSolrParams();
-        String finalId = EuropeanaUriUtils.createEuropeanaId(collectionId,
-                value);
-        params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
-        try {
-            SolrDocumentList solrList = enrichmentService
-                    .getProductionSolrServer().query(params).getResults();
-            if (solrList.size() > 0 && !(finalId.equals(newId))) {
-                EuropeanaId id = new EuropeanaId();
-                id.setOldId(finalId);
-                id.setLastAccess(0);
-                id.setTimestamp(new Date().getTime());
-                id.setNewId(newId);
-                saveEuropeanaId(id);
+        if (oldCollectionId.equals(newCollectionId)) {
+            String finalId = EuropeanaUriUtils.createEuropeanaId(oldCollectionId,
+                    value);
+            params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
+            try {
+                SolrDocumentList solrList = enrichmentService
+                        .getProductionSolrServer().query(params).getResults();
+                if (solrList.size() > 0 && !(finalId.equals(newId))) {
+                    EuropeanaId id = new EuropeanaId();
+                    id.setOldId(finalId);
+                    id.setLastAccess(0);
+                    id.setTimestamp(new Date().getTime());
+                    id.setNewId(newId);
+                    saveEuropeanaId(id);
 
+                }
+
+            } catch (SolrServerException e) {
+                log.log(Level.SEVERE, e.getMessage());
             }
+        } else {
+            String finalId = EuropeanaUriUtils.createEuropeanaId(oldCollectionId,
+                    value);
+            params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
+            try {
+                SolrDocumentList solrList = enrichmentService
+                        .getProductionSolrServer().query(params).getResults();
+                if (solrList.size() > 0 && !(finalId.equals(newId))) {
+                    EuropeanaId id = new EuropeanaId();
+                    id.setOldId(finalId);
+                    id.setLastAccess(0);
+                    id.setTimestamp(new Date().getTime());
+                    id.setNewId(newId);
+                    saveEuropeanaId(id);
 
-        } catch (SolrServerException e) {
-            log.log(Level.SEVERE, e.getMessage());
+                } else if(solrList.size()==0) {
+                     finalId = EuropeanaUriUtils.createEuropeanaId(newCollectionId,
+                    value);
+                    params.set("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
+                    if (solrList.size() > 0 && !(finalId.equals(newId))) {
+                    EuropeanaId id = new EuropeanaId();
+                    id.setOldId(finalId);
+                    id.setLastAccess(0);
+                    id.setTimestamp(new Date().getTime());
+                    id.setNewId(newId);
+                    saveEuropeanaId(id);
+
+                }
+                }
+
+            } catch (SolrServerException e) {
+                log.log(Level.SEVERE, e.getMessage());
+            }
         }
     }
 
@@ -496,61 +533,63 @@ public class LookupCreationPlugin<I> extends
         if (transformations == null) {
             return val;
         }
+        String[] transforms = null;
         if (transformations.contains(").")) {
-            String[] transforms = StringUtils.split(transformations, ").");
-
-            for (String transform : transforms) {
-                if (!transform.endsWith(")")) {
-                    transform = transform + ")";
-                }
-                if (StringUtils.startsWith(transform, "replace")) {
-                    String[] replacements = StringUtils.split(
-                            StringUtils.substringBetween(transform, "(", ")"),
-                            ",");
-                    val = StringUtils.replace(val, replacements[0],
-                            replacements[1]);
-                }
-                if (StringUtils.startsWith(transform, "substringBetween(")) {
-                    String[] replacements = StringUtils.split(
-                            StringUtils.substringBetween(transform, "(", ")"),
-                            ",");
-                    val = StringUtils.substringBetween(val, replacements[0],
-                            replacements[1]);
-                }
-                if (StringUtils.startsWith(transform, "substringBeforeFirst(")) {
-                    String replacements = StringUtils.substringBetween(
-                            transform, "(", ")");
-                    val = StringUtils.substringBefore(val, replacements);
-                }
-                if (StringUtils.startsWith(transform, "substringBeforeLast(")) {
-                    String replacements = StringUtils.substringBetween(
-                            transform, "(", ")");
-                    val = StringUtils.substringBeforeLast(val, replacements);
-                }
-                if (StringUtils.startsWith(transform, "substringAfterLast(")) {
-                    String replacements = StringUtils.substringBetween(
-                            transform, "(", ")");
-                    val = StringUtils.substringAfterLast(val, replacements);
-                }
-                if (StringUtils.startsWith(transform, "substringAfterFirst(")) {
-                    String replacements = StringUtils.substringBetween(
-                            transform, "(", ")");
-                    val = StringUtils.substringAfter(val, replacements);
-                }
-                if (StringUtils.startsWith(transform, "concatBefore(")) {
-                    String replacements = StringUtils.substringBetween(
-                            transform, "(", ")");
-                    val = replacements + val;
-                }
-                if (StringUtils.startsWith(transform, "concatAfter(")) {
-                    String replacements = StringUtils.substringBetween(
-                            transform, "(", ")");
-                    val = val + replacements;
-                }
-
+            transforms = StringUtils.split(transformations, ").");
+        } else if (!transformations.contains(").") && transformations.endsWith(")")) {
+            transforms = new String[]{transformations};
+        }
+        for (String transform : transforms) {
+            if (!transform.endsWith(")")) {
+                transform = transform + ")";
+            }
+            if (StringUtils.startsWith(transform, "replace")) {
+                String[] replacements = StringUtils.split(
+                        StringUtils.substringBetween(transform, "(", ")"),
+                        ",");
+                val = StringUtils.replace(val, replacements[0],
+                        replacements[1]);
+            }
+            if (StringUtils.startsWith(transform, "substringBetween(")) {
+                String[] replacements = StringUtils.split(
+                        StringUtils.substringBetween(transform, "(", ")"),
+                        ",");
+                val = StringUtils.substringBetween(val, replacements[0],
+                        replacements[1]);
+            }
+            if (StringUtils.startsWith(transform, "substringBeforeFirst(")) {
+                String replacements = StringUtils.substringBetween(
+                        transform, "(", ")");
+                val = StringUtils.substringBefore(val, replacements);
+            }
+            if (StringUtils.startsWith(transform, "substringBeforeLast(")) {
+                String replacements = StringUtils.substringBetween(
+                        transform, "(", ")");
+                val = StringUtils.substringBeforeLast(val, replacements);
+            }
+            if (StringUtils.startsWith(transform, "substringAfterLast(")) {
+                String replacements = StringUtils.substringBetween(
+                        transform, "(", ")");
+                val = StringUtils.substringAfterLast(val, replacements);
+            }
+            if (StringUtils.startsWith(transform, "substringAfterFirst(")) {
+                String replacements = StringUtils.substringBetween(
+                        transform, "(", ")");
+                val = StringUtils.substringAfter(val, replacements);
+            }
+            if (StringUtils.startsWith(transform, "concatBefore(")) {
+                String replacements = StringUtils.substringBetween(
+                        transform, "(", ")");
+                val = replacements + val;
+            }
+            if (StringUtils.startsWith(transform, "concatAfter(")) {
+                String replacements = StringUtils.substringBetween(
+                        transform, "(", ")");
+                val = val + replacements;
             }
 
         }
+
         return val;
     }
 
@@ -560,30 +599,56 @@ public class LookupCreationPlugin<I> extends
 
     }
 
-    private void createLookupEntry(FullBean fullBean, String collectionId,
+    private void createLookupEntry(FullBean fullBean, String oldCollectionId, String newCollectionId,
             String hash) {
 
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.add(
                 "q",
                 "europeana_id:"
-                + ClientUtils.escapeQueryChars("/" + collectionId + "/"
+                + ClientUtils.escapeQueryChars("/" + oldCollectionId + "/"
                         + hash));
-        try {
-            SolrDocumentList solrList = enrichmentService
-                    .getProductionSolrServer().query(params).getResults();
-            if (solrList.size() > 0) {
-                EuropeanaId id = new EuropeanaId();
-                id.setOldId("/" + collectionId + "/" + hash);
-                id.setLastAccess(0);
-                id.setTimestamp(new Date().getTime());
-                id.setNewId(fullBean.getAbout());
-                saveEuropeanaId(id);
+        if (oldCollectionId.equals(newCollectionId)) {
+            try {
+                SolrDocumentList solrList = enrichmentService
+                        .getProductionSolrServer().query(params).getResults();
+                if (solrList.size() > 0) {
+                    EuropeanaId id = new EuropeanaId();
+                    id.setOldId("/" + oldCollectionId + "/" + hash);
+                    id.setLastAccess(0);
+                    id.setTimestamp(new Date().getTime());
+                    id.setNewId(fullBean.getAbout());
+                    saveEuropeanaId(id);
 
+                }
+
+            } catch (SolrServerException e) {
+                log.log(Level.SEVERE, e.getMessage());
             }
+        } else {
+            try {
+                SolrDocumentList solrList = enrichmentService
+                        .getProductionSolrServer().query(params).getResults();
+                if (solrList.size() > 0) {
+                    EuropeanaId id = new EuropeanaId();
+                    id.setOldId("/" + oldCollectionId + "/" + hash);
+                    id.setLastAccess(0);
+                    id.setTimestamp(new Date().getTime());
+                    id.setNewId(fullBean.getAbout());
+                    saveEuropeanaId(id);
 
-        } catch (SolrServerException e) {
-            log.log(Level.SEVERE, e.getMessage());
+                } else {
+                    EuropeanaId id = new EuropeanaId();
+                    id.setOldId("/" + newCollectionId + "/" + hash);
+                    id.setLastAccess(0);
+                    id.setTimestamp(new Date().getTime());
+                    id.setNewId(fullBean.getAbout());
+                    saveEuropeanaId(id);
+                }
+
+            } catch (SolrServerException e) {
+                log.log(Level.SEVERE, e.getMessage());
+            }
         }
     }
 
