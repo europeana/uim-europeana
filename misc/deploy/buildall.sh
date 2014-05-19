@@ -8,39 +8,13 @@
 
 cd $UIM_SOURCE/uim-core/
 git pull
-
-cd $UIM_SOURCE/uim-core/framework/trunk
-mvn clean install -DskipTests
-
-cd $UIM_SOURCE/uim-core/external/sugar/trunk
-mvn clean install -DskipTests
-
-cd $UIM_SOURCE/uim-core/external/repox/trunk
-mvn clean install -DskipTests
-
-cd $UIM_SOURCE/uim-core/framework/trunk/gui
-mvn clean install -DskipTests
-
-cd $UIM_SOURCE/uim-core/logging/database/trunk
 mvn clean compile process-classes test-compile test jar:test-jar source:jar install -DskipTests  
 
-cd  $UIM_SOURCE/uim-core/model/trunk
-mvn clean install -DskipTests
-
-cd $UIM_SOURCE/uim-core/plugins/check/trunk
-mvn clean install -DskipTests
-
-cd $UIM_SOURCE/uim-core/plugins/solr/trunk/solr4
-mvn clean install -DskipTests
-
-cd $UIM_SOURCE/uim-core/storage/mongo/trunk
-mvn clean install -DskipTests
-
-#Build Annocultor
+#Build Enrichment framework
 cd $UIM_SOURCE/tools
 git pull
 
-cd $UIM_SOURCE/tools/annocultor_solr4
+cd $UIM_SOURCE/tools/europeana-enrichment-framework/enrichment
 mvn clean install -DskipTests
 
 #Build Core Library
@@ -50,7 +24,8 @@ mvn clean install -DskipTests
 
 #Build Europeana UIM components
 cd $UIM_SOURCE/uim-europeana
-git pull
+
+git pull origin master
 mvn clean install -DskipTests
 
 #Stop Karaf
