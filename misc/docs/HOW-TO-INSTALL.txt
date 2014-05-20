@@ -1,320 +1,667 @@
-Installation Instructions:
+﻿Installation Instructions:
+
+
+
+
 
 
 
 ------------------------------------------------------
+
 UIM Prerequisite Applications
+
 ------------------------------------------------------
+
+
 
 SugarCRM Specific Files
 
+
+
 1. Install apache web server 
+
 sudo apt-get install apache2
 
 
+
+
+
 2.Install MySql
+
 sudo apt-get install mysql-server mysql-client
+
 sudo apt-get install php5-mysql
+
 (root password: !cultur3)
+
 sudo apt-get install phpmyadmin
 
+
+
 3) Install Java
+
 sudo apt-get install sun-java6-jdk (Java 1.6.X)
+
+
 
 export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/jre/
 
+
+
 4) Install Maven (2.2.1)
+
 sudo apt-get install maven2
+
 (Maven 2.2.1 and above is required maven 3 is not fully supported by our maven files yet)
 
-5) Install Subversion
-sudo apt-get install subversion
+
+
+5) Install Git
+
+sudo apt-get install git
+
+
 
 5)Install Postgres (9.1)
+
 (Ubuntu)
+
 sudo apt-get install python-software-properties
+
 sudo add-apt-repository ppa:pitti/postgresql
+
 sudo apt-get install postgresql-9.1
 
+
+
 (Debian)
+
 nano /etc/apt/sources.list
+
 Add the following line
+
 deb http://backports.debian.org/debian-backports squeeze-backports main
+
 apt-get update
+
 apt-get upgrade
+
 apt-get -t squeeze-backports install postgresql-9.1
+
+
 
 6)Install Mongo
 
 
 
+Download version 2.0.x (2.0.9 being the latest one on the 2.0.x branch)
+
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.0.9.tgz
+
+tar -xvzf mongodb-linux-x86_64-2.0.9.tgz
+
 
 
 7)Install RabbitMQ (2.8.4):
 
+
+
 wget http://www.rabbitmq.com/releases/rabbitmq-server/v2.8.4/rabbitmq-server_2.8.4-1_all.deb
+
+
 
 chmod 777 rabbitmq-server_2.8.4-1_all.deb
 
+
+
 tar xvf rabbitmq-server_2.8.4-1_all.deb
+
+
 
 sudo dpkg -i rabbitmq-server_2.8.4-1_all.deb
 
+
+
 sudo apt-get install erlang-nox
+
+
 
 sudo apt-get -f install
 
+
+
 This will get it up and running.
+
+
 
 now install the webmanagement console
 
+
+
 sudo rabbitmq-plugins enable rabbitmq_management
+
+
 
 then 
 
+
+
 sudo invoke-rc.d rabbitmq-server stop
+
 sudo invoke-rc.d rabbitmq-server start
+
+
 
 then go to http://<broker_installation_server>:55672/#
 
+
+
 Go to 'Queues' option
 
+
+
 Create the following Queues:
+
 MintInboundQueue
+
 MintOutboundQueue
+
 RPCQueue
 
+
+
 With the default settings 
+
 Durability: durable
+
 Auto delete: no
+
+
+
 
 
 6)Install Tomcat 6
 
+
+
 You can use the latest version of apache tomcat from here:
+
 http://tomcat.apache.org/download-60.cgi
+
+
 
 Utar or Unzip the file to a specific directory 
 
+
+
 edit .bashrc
+
 export CATALINA_HOME=<YOUR_TOMCAT_INSTALLATION_DIR>
 
+
+
 ------------------------------------------------------
+
 UIM Specific Web Applications (external)
+
 ------------------------------------------------------
+
+
 
 7. SugarCRM (Prerequistes: apche2 httpserver and mysql have already been successfully installed)
 
+
+
 First create a user for your mysql database: 
+
+
 
 mysql -u root -p
 
+
+
 CREATE DATABASE sugarcrm;
 
+
+
  
+
 Downlodad the following files to your machine: 
 
+
+
 (SugarCRM source file)
+
 http://sugarcrm-testenv.isti.cnr.it/backups/sugarcrmlatestfiles.zip
 
+
+
 (SugarCRM database dump)
+
 http://sugarcrm-testenv.isti.cnr.it/backups/latestsugardump.sql
 
+
+
 Unzip the sugarcrm files into the apache public folder (usually /var/www/)
+
 and ensure that all the permissions are set correctly.
+
+
 
 Then load the sql dump into the running mysql instance by issuing:
 
+
+
 mysql -h hostname -u user --password=password databasename < filename
 
+
+
 You should manyally edit the config php in the /var/www/ folder and more specifically the
+
 following section:
 
+
+
   'dbconfig' =>
+
   array (
+
     'db_host_name' => 'localhost',
+
     'db_host_instance' => 'SQLEXPRESS',
+
     'db_user_name' => '<mysql username>',
+
     'db_password' => '<mysql password>',
+
     'db_name' => 'sugarcrm',
+
     'db_type' => 'mysql',
+
   ),
+
+
+
+
 
 
 
 8. REPOX (Prerequisites: Apache Tomcat has been installed, Postgres 9.1 has been installed)
 
+
+
 First create the relevant database in the underlying Postgres database:
 
+
+
 sudo su postgres
+
 psql
+
 CREATE USER repox2 WITH PASSWORD '!culture';
+
 CREATE DATABASE repox2 ENCODING 'UTF-8' TEMPLATE template0  OWNER repox2;
+
+
+
 
 
 Then get the leatest version from the REPOX artifactory here:
 
+
+
 http://digmap3.ist.utl.pt:8080/artifactory
+
 (All Repox versions are located under libs-release-local:repox/REPOX)
+
+
 
 Rename the REPOX.<version_release> to repoxUI_Europeana.war
 
+
+
 then chmod 774 repoxUI_Europeana.war
+
+
 
 copy the repoxUI_Europeana.war into the webapps folder of your Tomcat installation
 
+
+
 The application will be deployed but it will not be ready yet.
+
+
 
 Now edit the /webapps/repoxUI_Europeana/WEB-INF/classes/configuration.properties file
 
+
+
 and add/modify the following lines:
 
+
+
 database.driverClassName org.postgresql.Driver
+
 database.url jdbc:postgresql:repox2
+
 database.user repox2
+
 database.password <the password that you defined>
 
+
+
 You should also replace the paths of the local folder where Repox stores local information with the 
+
 desire output folder.
 
+
+
 Restart the Tomcat server for the changes to take effect...
+
+
+
+
+
 
 
 
 
 9. Mint (Prerequisites: Apache Tomcat, Postgres, RabbitMQ have been installed)
 
+
+
 First intialize the database:
+
 CREATE USER mint2 WITH PASSWORD '<your password>';
+
 CREATE DATABASE mint2 ENCODING 'UTF-8' TEMPLATE template0  OWNER mint2;
+
 alter role mint2 set search_path to mint2,public;
+
 grant all on database mint2 to mint2;
 
+
+
 Execute the following 2 scripts:
+
 <MINT_SOURCE_CODE>mint2\src\main\webapp\WEB-INF\src\createSchema.sql
+
 <MINT_SOURCE_CODE>mint2\src\main\webapp\WEB-INF\src\schemaUpdates.sql
+
+
+
 
 
 Download the latest version from the Europeana artifactory:
 
-(http://europeanalabs.eu/artifactory)
-mint-releases-local:gr/ntua/mint2Maven/1.1
 
-Rename the file to europeanamint.war and copy it to the tomcat webapps folder.
+
+http://artifactory.eanadev.org/artifactory/webapp/browserepo.html?15&pathId=mint-releases-local:europeanamint/europeanamint/europeanamint/europeanamint-europeanamint.war
+
+
 
 Go to /webapps/europeanamint/WEB-INF/classes
 
+
+
 In hibernate.properties file ensure that the following information is as follows:
 
+
+
 hibernate.connection.driver_class org.postgresql.Driver
+
 hibernate.connection.url jdbc:postgresql://localhost:5432/mint2
+
 hibernate.connection.username mint2
+
 hibernate.connection.password <password for mint2>
 
 
+
+
+
 In mint properties edit the following sections:
+
 #Repox related data
+
 repox.url = jdbc:postgresql://localhost:5432/repox2
+
 repox.user = repox2
+
 repox.password = <password of repox2 user>
 
 
+
+
+
 #Queue info
+
 queue.host = localhost <change this to pont to the server where the RabbitMQ instance is Running>
+
 queue.inbound.name = MintInboundQueue
+
 queue.outbound.name = MintOutboundQueue
+
 queue.rpc.name = RPCQueue
+
 queue.consumers.No = 10 <change this from the default value of 0 to another value preferably 10 or below>
 
+
+
 #webservices base url
+
 mint.api.base = localhost <the external DNS name of the server where MINT is Running>
+
 mint.api.port = 8080 <the port where the Apache Tomcat server is running>
+
 mint.api.database = europeanamint <change this by default always to europeana mint>
+
 mint.api.verb = getransformation
+
+
 
 Restart the Tomcat server for the changes to take effect...
 
 
-6.1) Install BIRT
+
+
+
+10) Install BIRT
+
+
 
 Download the latest BIRT runtime from here:
+
 http://www.eclipse.org/downloads/download.php?file=/birt/downloads/drops/R-R1-4_2_1-201209181113/birt-runtime-4_2_1.zip
+
+
 
 Unzip it and copy the birt.war file into your tomcat webapps folder
 
 
+11) Europeana Enrichment Framework (Optional in case of local installation)
+
+Download the latest code from the following repository:
+
+git clone https://github.com/europeana/tools.git
+
+cd europeana-enrichment-framework/enrichment/enrichment-framework-gui/src/main/resources
+
+Change gui.properties to contain (in case of installation to a local tomcat instance)
+
+enrichment.properties=http://localhost:8080/enrichment-framework-rest-0.1-SNAPSHOT/enrich/
+
+cd {PATH_TO_SOURCE}/europeana-enrichment-framework/enrichment/enrichment-framework-service/src/main/resources
+
+Change enrichment.properties to contain
+
+vocabulary.path={PATH_TO_SOURCE}/tools/europeana-enrichment-framework/enrichment-framework-service/src/test/resources/vocabularies
+
+cd {PATH_TO_SOURCE}/europeana-enrichment-framework/enrichment/enrichment-framework-rest/src/main/resources
+
+Change enrichment.properties to contain
+
+vocabulary.path={PATH_TO_SOURCE}/tools/europeana-enrichment-framework/enrichment-framework-service/src/test/resources/vocabularies
+
+##NOTE##
+i) This is temporary until the code for the crawler is finalized
+ii) If the Database does not exist it will be automatically created and populated. It preconditions the existence of a MongoDB
+
+cd ../../../..
+
+mvn clean install
+
+Copy the two war files generated in 
+
+{PATH_TO_SOURCE}/tools/europeana-enrichment-framework/enrichment-framework-rest/target
+and 
+{PATH_TO_SOURCE}/tools/europeana-enrichment-framework/enrichment-framework-gui/target 
+
+to Tomcat webapps folder
+
+If you want to use a remote instance skip this test
+
 
 ------------------------------------------------------
+
 UIM Core & Europeana Specific Plugins
+
 ------------------------------------------------------
 
-7) Installing Apache Karaf (version 2.2.0)
 
-Get Karaf version 2.2.0 
 
-wget http://archive.apache.org/dist/karaf/2.2.0/apache-karaf-2.2.0.tar.gz
+12) Installing Apache Karaf (version 2.2.11)
+
+
+
+Get Karaf version 2.2.11 
+
+
+
+wget http://archive.apache.org/dist/karaf/2.2.11/apache-karaf-2.2.11.tar.gz
+
+
 
 unzip it, check the permissions.
+
  
+
 Setting up uim.properties
 
+
+
 In order for uim to work a new configuration file is required
+
 A sample of the file is accessible in:
 
-http://europeanalabs.eu/browser/europeana/uim/misc/deploy/uim.properties
+
+
+https://github.com/europeana/uim-europeana/blob/master/misc/deploy/uim.properties
+
+
 
 Just deploy and change the variables to the appropriate instances of the servers required
+
 place it on the karaf folder before you startup karaf
 
 
-/apache-karaf-2.2.0/bin/start to start it.
+Parameters that need special attention
+
+Before Christ translations parameter 
+uim.bclist.path
+
+Reference file
+https://github.com/europeana/uim-europeana/tree/master/workflow_plugins/solr-plugin/src/main/resources/bcList.txt
+
+Location where Sip-Creator mappings are located
+uim.repository
 
 
-8) Install UIM Core & Europeana Specifcic Plugins
+/apache-karaf-2.2.11/bin/start to start it.
 
-Chackout from europeana svn:
-1.The UIM Core
-svn co https://europeanalabs.eu/svn/uim/trunk/uim uim
-cd uim
-mvn clean install -DskipTests -P europeana
 
-2. Annocultor for enrichment plugin
-svn co https://europeanalabs.eu/svn/europeana/trunk/tools/annocultor_solr3.5 annocultor
-mvn clean install -DskipTests
-export ANNOCULTOR_HOME=/path/to/annocultor/converters/europeana (linux)
-set ANNOCULTOR_HOME=\path\to\annocultor\converters\europeana (windows)
 
-3. Solr Plugin
-Solr plugin requires bcList.txt placed somewhere within the karaf installation folder. 
-Its location should be parameterized in uim.properties file
 
-4. The UIM Europeana Specific Compenents:
-svn co https://europeanalabs.eu/svn/europeana/trunk/uim europeanacomponents
-cd europeanacomponents
-mvn clean install -DskipTests
+
+13) Install UIM Core & Europeana Specific Plugins
+
+
+
+Checkout from europeana git account the following:
+
+
+mkdir gitSource
+cd gitSource
+
+git clone https://github.com/europeana/uim-core.git
+
+git clone https://github.com/europeana/corelib.git
+
+(if 11 has not been executed)
+git clone https://github.com/europeana/tools.git 
+
+git clone https://github.com/europeana/uim-europeana.git
+
+
+export UIM_SOURCE={PATH_TO_GITSOURCE}/gitSource
+
+export KARAF_UIM_HOME={PATH_TO_KARAF}
+
+cd uim-europeana/misc/deploy
+
+sh buildall.sh
+
+
 
 
 5. Linkchecker:
-Make sure that the following dependencies are dep-loyed locally and their 
+
+Make sure that the following dependencies are deployed locally and their 
+
 paths within UIM are properly defined:
 
+
+
 1.ImageMagic & Postscript
+
 Download & installation instructions here: http://www.imagemagick.org/script/index.php 
+
 (do this only on Windows installations): http://pages.cs.wisc.edu/~ghost/
 
+
+
 2.Deploy the *.rptdesign files located in
-europeana\trunk\uim\workflow_plugins\linkchecker\src\main\resources
+
+workflow_plugins\linkchecker\src\main\resources
+
 (linkcheck_overview.rptdesign & thumbler_overview.rptdesign) files in the
+
 /webapps/birt/reports folder in your tomcat installation
+
+
+
 
 
 Logging Engine:
 
+
+
 Create the 
+
+
 
 CREATE USER loguser WITH PASSWORD '<your password>';
 
+
+
 CREATE DATABASE logdb ENCODING 'UTF-8' TEMPLATE template0  OWNER loguser;
+
+
+
+
+
+
+
 
 
 
