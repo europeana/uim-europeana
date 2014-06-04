@@ -39,9 +39,9 @@ public class ExtendedEdmMongoServer extends EdmMongoServerImpl implements EdmMon
 
     public ExtendedEdmMongoServer(Mongo mongo, String mongoDB, String username,
             String password) throws MongoDBException {
-        super();
+        super(mongo,mongoDB,username,password);
         this.mongoServer = mongo;
-        this.databaseName = databaseName;
+        this.databaseName = mongoDB;
         this.username = username;
         this.password = password;
     }
