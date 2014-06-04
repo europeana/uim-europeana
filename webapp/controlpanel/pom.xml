@@ -115,7 +115,7 @@
 							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,
 							corelib-solr,corelib-solr-tools,corelib-solr-dereference,corelib-definitions,corelib-utils,
 							corelib-solr-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
-							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,validation-api
+							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,validation-api,publication-common
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
@@ -188,7 +188,11 @@
 	</build>
 
 	<dependencies>
-
+<dependency>
+                    <groupId>eu.europeana.publication</groupId>
+                    <artifactId>publication-common</artifactId>
+                    <version>0.0.1-SNAPSHOT</version>
+                </dependency>
 		<dependency>
 			<groupId>javax.xml.stream</groupId>
 			<artifactId>stax-api</artifactId>
