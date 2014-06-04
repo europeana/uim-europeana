@@ -445,10 +445,7 @@ public enum RdfMethod {
 		@Override
 		public <T, V> T returnObject(T clazz, V obj) {
 			HasMet pref = new HasMet();
-			pref.setString(((LiteralType) obj).getString());
-			if (((LiteralType) obj).getLang() != null) {
-				pref.setLang(((LiteralType) obj).getLang());
-			}
+			pref.setResource(((ResourceType) obj).getResource());
 			return (T) pref;
 		}
 	},
