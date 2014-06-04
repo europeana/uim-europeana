@@ -427,7 +427,7 @@ public class EnrichmentPlugin<I> extends
                 RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
                 List<Status> status = mdr
                         .getValues(EuropeanaModelRegistry.STATUS);
-                if (!(status != null && status.get(0).equals(Status.DELETED))) {
+                if (!(status != null && status.size()>0 && status.get(0).equals(Status.DELETED))) {
                     try {
                         SolrInputDocument basicDocument = new SolrConstructor()
                                 .constructSolrDocument(rdf);
