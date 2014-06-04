@@ -16,12 +16,23 @@
             <groupId>eu.europeana.corelib</groupId>
             <artifactId>corelib-solr-tools</artifactId>
             <version>${corelib.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.code.morphia</groupId>
+                    <artifactId>morphia</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>eu.europeana.corelib</groupId>
             <artifactId>corelib-utils</artifactId>
             <version>${corelib.version}</version>
         </dependency>
+        <dependency>
+                    <groupId>eu.europeana.publication</groupId>
+                    <artifactId>publication-common</artifactId>
+                    <version>0.0.1-SNAPSHOT</version>
+                </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -83,7 +94,7 @@
                             gnu.trove.set.hash,
                             !*
                         </Import-Package>
-                        <Embed-Dependency>corelib-utils,corelib-solr-tools,morphia,mongo-java-driver,corelib-solr-definitions,corelib-solr-dereference,commons-codec,commons-lang,commons-io</Embed-Dependency>
+                        <Embed-Dependency>publication-common,corelib-utils,corelib-solr-tools,morphia,mongo-java-driver,corelib-solr-definitions,corelib-solr-dereference,commons-codec,commons-lang,commons-io</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Bundle-Activator>eu.europeana.dedup.osgi.service.MongoBundleActivator</Bundle-Activator>
                         <!-- add ,plugin.xml if it's present i.e. src/main/resources,plugin.xml -->

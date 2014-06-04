@@ -16,6 +16,10 @@
  */
 package eu.europeana.dedup.osgi.service;
 
+import com.google.code.morphia.Datastore;
+import com.google.code.morphia.Morphia;
+import com.google.code.morphia.mapping.DefaultCreator;
+import com.mongodb.DBObject;
 import java.io.StringWriter;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -45,263 +49,258 @@ import eu.europeana.dedup.utils.UimConfigurationProperty;
 import eu.europeana.uim.common.BlockingInitializer;
 
 /**
- * 
+ *
  * @author Georgios Markakis <gwarkx@hotmail.com>
  * @since 27 Sep 2012
  */
 public class DeduplicationServiceImpl implements DeduplicationService {
 
-	/**
-	 * Set the Logging variable to use logging within this class
-	 */
-	private static final Logger log = Logger
-			.getLogger(DeduplicationServiceImpl.class.getName());
+    /**
+     * Set the Logging variable to use logging within this class
+     */
+    private static final Logger log = Logger
+            .getLogger(DeduplicationServiceImpl.class.getName());
 
-	EuropeanaIdRegistryMongoServerImpl mongoserver;
+    EuropeanaIdRegistryMongoServerImpl mongoserver;
 
-	private IBindingFactory bfact;
-	
-	
-	
-	/**
-	 * Default Constructor
-	 */
-	public DeduplicationServiceImpl() {
+    private IBindingFactory bfact;
 
-		try {
-			
-			bfact = BindingDirectory.getFactory(RDF.class);
-			final Mongo mongo = new Mongo(
-					PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-					Integer.parseInt(PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
+    /**
+     * Default Constructor
+     */
+    public DeduplicationServiceImpl() {
 
-			BlockingInitializer initializer = new BlockingInitializer() {
-				@Override
-				public void initializeInternal() {
-					try {
-						status = STATUS_BOOTING;
-						mongoserver = new EuropeanaIdRegistryMongoServerImpl(mongo,
-								PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY));
+        try {
 
-						boolean test = mongoserver.oldIdExists("something");
-						boolean test2 = mongoserver.getDatastore()
-								.find(FailedRecord.class)
-								.filter("collectionId", "test").asList() != null;
-						log.log(java.util.logging.Level.INFO, "OK");
-						status = STATUS_INITIALIZED;
-					} catch (Throwable t) {
-						log.log(java.util.logging.Level.SEVERE,
-								"Failed to initialize Deduplication Service.",
-								t);
-						status = STATUS_FAILED;
-					}
-				}
-			};
-			initializer.initialize(EuropeanaIdRegistryMongoServerImpl.class
-					.getClassLoader());
+            bfact = BindingDirectory.getFactory(RDF.class);
+            final Mongo mongo = new Mongo(
+                    PropertyReader
+                    .getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+                    Integer.parseInt(PropertyReader
+                            .getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
 
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MongoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JiBXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            BlockingInitializer initializer = new BlockingInitializer() {
+                @Override
+                public void initializeInternal() {
+                    try {
+                        status = STATUS_BOOTING;
+                        mongoserver = new EuropeanaIdRegistryMongoServerImpl(mongo,
+                                PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY), "",
+                                "");
+                        Morphia morphia = new Morphia();
+                        morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+                            @Override
+                            protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+                                return MongoBundleActivator.getBundleClassLoader();
+                            }
+                        });
+                        morphia.map(EuropeanaIdRegistry.class);
+                        morphia.map(FailedRecord.class);
+                        Datastore datastore = morphia.createDatastore(mongo, PropertyReader.getProperty(
+                                UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY));
 
-	}
+                        datastore.ensureIndexes();
+                        mongoserver.setDatastore(datastore);
+                        boolean test = mongoserver.oldIdExists("something");
+                        boolean test2 = mongoserver.getDatastore()
+                                .find(FailedRecord.class)
+                                .filter("collectionId", "test").asList() != null;
+                        log.log(java.util.logging.Level.INFO, "OK");
+                        status = STATUS_INITIALIZED;
+                    } catch (Throwable t) {
+                        log.log(java.util.logging.Level.SEVERE,
+                                "Failed to initialize Deduplication Service.",
+                                t);
+                        status = STATUS_FAILED;
+                    }
+                }
+            };
+            initializer.initialize(EuropeanaIdRegistryMongoServerImpl.class
+                    .getClassLoader());
 
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#retrieveEuropeanaIDFromOld(java.lang.String)
-	 */
-	@Override
-	public List<String> retrieveEuropeanaIDFromOld(String oldID,String collectionID) {
-		
-		List<String> retlist = new ArrayList<String>();
-		
-		List<EuropeanaIdRegistry> results = mongoserver.retrieveEuropeanaIdFromOriginal(oldID, collectionID);
-		
-		for(EuropeanaIdRegistry result: results){
-			retlist.add(result.getEid());
-		}
-		return retlist;
-	}
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MongoException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JiBXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	
-	
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteEuropeanaID(java.lang.String)
-	 */
-	@Override
-	public void deleteEuropeanaID(String newEuropeanaID) {
-		mongoserver.deleteEuropeanaIdFromNew(newEuropeanaID);
-	}
-	
-	
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.europeana.dedup.osgi.service.DeduplicationService#deduplicateRecord
-	 * (java.lang.String, java.lang.String)
-	 */
-	@Override
-	public List<DeduplicationResult> deduplicateRecord(String collectionID,
-			String sessionid, String edmRecord) throws DeduplicationException,JiBXException {
+    }
 
-		List<DeduplicationResult> deduplist = new ArrayList<DeduplicationResult>();
-		Decoupler dec = new Decoupler();
-		List<RDF> decoupledResults = dec.decouple(edmRecord);
-		for (RDF result : decoupledResults) {
-			DeduplicationResult dedupres = new DeduplicationResult();
-			dedupres.setEdm(unmarshall(result));
-			List<ProxyType> proxylist = result.getProxyList();
-			String nonUUID = null;
-			for (ProxyType proxy : proxylist) {
-					nonUUID = proxy.getAbout();
-				}
-			
-			LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
-					collectionID, dedupres.getEdm(), sessionid);
-			updateInternalReferences(result, lookup.getEuropeanaID());
-			dedupres.setEdm(unmarshall(result));
-			dedupres.setLookupresult(lookup);
-			dedupres.setDerivedRecordID(lookup.getEuropeanaID());
-			deduplist.add(dedupres);
-		}
+    /* (non-Javadoc)
+     * @see eu.europeana.dedup.osgi.service.DeduplicationService#retrieveEuropeanaIDFromOld(java.lang.String)
+     */
+    @Override
+    public List<String> retrieveEuropeanaIDFromOld(String oldID, String collectionID) {
 
-		return deduplist;
+        List<String> retlist = new ArrayList<String>();
 
-	}
+        List<EuropeanaIdRegistry> results = mongoserver.retrieveEuropeanaIdFromOriginal(oldID, collectionID);
 
-	/**
-	 * Updates europeanaID references in the provided EDM JIBX representation
-	 * 
-	 * @param edm
-	 * @param newID
-	 */
-	private void updateInternalReferences(RDF edm, String newID) {
-		 List<ProxyType> proxylist = edm.getProxyList();
-		 List<Aggregation> aggregationlist = edm.getAggregationList();
-		 List<ProvidedCHOType> prcholist = edm.getProvidedCHOList();
+        for (EuropeanaIdRegistry result : results) {
+            retlist.add(result.getEid());
+        }
+        return retlist;
+    }
 
-		for (ProxyType proxy : proxylist) {
-			proxy.setAbout(newID);
-		}
+    /* (non-Javadoc)
+     * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteEuropeanaID(java.lang.String)
+     */
+    @Override
+    public void deleteEuropeanaID(String newEuropeanaID) {
+        mongoserver.deleteEuropeanaIdFromNew(newEuropeanaID);
+    }
 
-		for (ProvidedCHOType cho : prcholist) {
-			String origId = cho.getAbout();
-			cho.setAbout(newID);
-			
-			for (Aggregation aggregation : aggregationlist) {
-				 AggregatedCHO aggrcho = aggregation.getAggregatedCHO();
-				 if(aggrcho != null && origId.equals(aggrcho.getResource())){
-					 aggregation.getAggregatedCHO().setResource(newID);
-				 }				 
-			}
-		}
-		
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.dedup.osgi.service.DeduplicationService#deduplicateRecord
+     * (java.lang.String, java.lang.String)
+     */
+    @Override
+    public List<DeduplicationResult> deduplicateRecord(String collectionID,
+            String sessionid, String edmRecord) throws DeduplicationException, JiBXException {
 
-	/**
-	 * @param edm
-	 * @return
-	 * @throws JiBXException
-	 */
-	private String unmarshall(RDF edm) throws JiBXException {
-		IMarshallingContext mctx = bfact.createMarshallingContext();
-		mctx.setIndent(2);
-		StringWriter stringWriter = new StringWriter();
-		mctx.setOutput(stringWriter);
-		mctx.marshalDocument(edm);
-		String edmstring = stringWriter.toString();
+        List<DeduplicationResult> deduplist = new ArrayList<DeduplicationResult>();
+        Decoupler dec = new Decoupler();
+        List<RDF> decoupledResults = dec.decouple(edmRecord);
+        for (RDF result : decoupledResults) {
+            DeduplicationResult dedupres = new DeduplicationResult();
+            dedupres.setEdm(unmarshall(result));
+            List<ProxyType> proxylist = result.getProxyList();
+            String nonUUID = null;
+            for (ProxyType proxy : proxylist) {
+                nonUUID = proxy.getAbout();
+            }
 
-		return edmstring;
-	}
+            LookupResult lookup = mongoserver.lookupUiniqueId(nonUUID,
+                    collectionID, dedupres.getEdm(), sessionid);
+            updateInternalReferences(result, lookup.getEuropeanaID());
+            dedupres.setEdm(unmarshall(result));
+            dedupres.setLookupresult(lookup);
+            dedupres.setDerivedRecordID(lookup.getEuropeanaID());
+            deduplist.add(dedupres);
+        }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * eu.europeana.dedup.osgi.service.DeduplicationService#getFailedRecords
-	 * (java.lang.String)
-	 */
-	@Override
-	public List<Map<String, String>> getFailedRecords(String collectionId) {
+        return deduplist;
 
-		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-		ExtendedBlockingInitializer initializer = new ExtendedBlockingInitializer(
-				collectionId, list) {
+    }
 
-			@Override
-			protected void initializeInternal() {
-				list = mongoserver.getFailedRecords(str);
-			}
-		};
-		initializer.initialize(EuropeanaIdRegistryMongoServerImpl.class
-				.getClassLoader());
+    /**
+     * Updates europeanaID references in the provided EDM JIBX representation
+     *
+     * @param edm
+     * @param newID
+     */
+    private void updateInternalReferences(RDF edm, String newID) {
+        List<ProxyType> proxylist = edm.getProxyList();
+        List<Aggregation> aggregationlist = edm.getAggregationList();
+        List<ProvidedCHOType> prcholist = edm.getProvidedCHOList();
 
-		return initializer.getList();
-	}
+        for (ProxyType proxy : proxylist) {
+            proxy.setAbout(newID);
+        }
 
+        for (ProvidedCHOType cho : prcholist) {
+            String origId = cho.getAbout();
+            cho.setAbout(newID);
 
+            for (Aggregation aggregation : aggregationlist) {
+                AggregatedCHO aggrcho = aggregation.getAggregatedCHO();
+                if (aggrcho != null && origId.equals(aggrcho.getResource())) {
+                    aggregation.getAggregatedCHO().setResource(newID);
+                }
+            }
+        }
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#createUpdateIdStatus(java.lang.String, java.lang.String, eu.europeana.corelib.tools.lookuptable.LookupState)
-	 */
-	@Override
-	public void createUpdateIdStatus(String oldEuropeanaID,String newEuropeanaID,String collectionID,String xml,LookupState state) {
-		mongoserver.createFailedRecord(state, collectionID, oldEuropeanaID, newEuropeanaID, xml);
-	}
+    }
 
+    /**
+     * @param edm
+     * @return
+     * @throws JiBXException
+     */
+    private String unmarshall(RDF edm) throws JiBXException {
+        IMarshallingContext mctx = bfact.createMarshallingContext();
+        mctx.setIndent(2);
+        StringWriter stringWriter = new StringWriter();
+        mctx.setOutput(stringWriter);
+        mctx.marshalDocument(edm);
+        String edmstring = stringWriter.toString();
 
+        return edmstring;
+    }
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteFailedRecord(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void deleteFailedRecord(String europeanaId,String collectionID) {
-		mongoserver.deleteFailedRecord(europeanaId,collectionID);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * eu.europeana.dedup.osgi.service.DeduplicationService#getFailedRecords
+     * (java.lang.String)
+     */
+    @Override
+    public List<Map<String, String>> getFailedRecords(String collectionId) {
 
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+        ExtendedBlockingInitializer initializer = new ExtendedBlockingInitializer(
+                collectionId, list) {
 
+                    @Override
+                    protected void initializeInternal() {
+                        list = mongoserver.getFailedRecords(str);
+                    }
+                };
+        initializer.initialize(EuropeanaIdRegistryMongoServerImpl.class
+                .getClassLoader());
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#markdeleted(java.lang.String, boolean)
-	 */
-	@Override
-	public void markdeleted(String europeanaID, boolean isdeleted) {
-		mongoserver.markdeleted(europeanaID, isdeleted);
-	}
+        return initializer.getList();
+    }
 
+    /* (non-Javadoc)
+     * @see eu.europeana.dedup.osgi.service.DeduplicationService#createUpdateIdStatus(java.lang.String, java.lang.String, eu.europeana.corelib.tools.lookuptable.LookupState)
+     */
+    @Override
+    public void createUpdateIdStatus(String oldEuropeanaID, String newEuropeanaID, String collectionID, String xml,
+            LookupState state) {
+        mongoserver.createFailedRecord(state, collectionID, oldEuropeanaID, newEuropeanaID, xml);
+    }
 
+    /* (non-Javadoc)
+     * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteFailedRecord(java.lang.String, java.lang.String)
+     */
+    @Override
+    public void deleteFailedRecord(String europeanaId, String collectionID) {
+        mongoserver.deleteFailedRecord(europeanaId, collectionID);
+    }
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#isdeleted(java.lang.String)
-	 */
-	@Override
-	public boolean isdeleted(String europeanaID) {
-		return mongoserver.isdeleted(europeanaID);
-	}
+    /* (non-Javadoc)
+     * @see eu.europeana.dedup.osgi.service.DeduplicationService#markdeleted(java.lang.String, boolean)
+     */
+    @Override
+    public void markdeleted(String europeanaID, boolean isdeleted) {
+        mongoserver.markdeleted(europeanaID, isdeleted);
+    }
 
+    /* (non-Javadoc)
+     * @see eu.europeana.dedup.osgi.service.DeduplicationService#isdeleted(java.lang.String)
+     */
+    @Override
+    public boolean isdeleted(String europeanaID) {
+        return mongoserver.isdeleted(europeanaID);
+    }
 
+    /* (non-Javadoc)
+     * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteFailedRecords(java.lang.String)
+     */
+    @Override
+    public void deleteFailedRecords(String collectionID) {
+        mongoserver.deleteFailedRecords(collectionID);
 
-	/* (non-Javadoc)
-	 * @see eu.europeana.dedup.osgi.service.DeduplicationService#deleteFailedRecords(java.lang.String)
-	 */
-	@Override
-	public void deleteFailedRecords(String collectionID) {
-		mongoserver.deleteFailedRecords(collectionID);
-		
-	}
-
-
+    }
 
 }
