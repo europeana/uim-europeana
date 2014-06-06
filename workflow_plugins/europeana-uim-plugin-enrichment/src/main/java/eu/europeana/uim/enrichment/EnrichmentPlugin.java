@@ -43,7 +43,6 @@ import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.utils.EdmUtils;
@@ -84,6 +83,7 @@ import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.utils.construct.SolrDocumentHandler;
+import eu.europeana.uim.logging.LoggingEngine;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -119,7 +119,7 @@ public class EnrichmentPlugin<I> extends
             = new SolrDocumentGenerator();
     private static Map<String, Map<String, State>> enrichmentQueryCache = Collections.
             synchronizedMap(new HashMap<String, Map<String, State>>());
-
+    private static LoggingEngine logEngine;
     // Caches
     private static EntityCache entityCache = new EntityCache();
 
@@ -261,6 +261,7 @@ public class EnrichmentPlugin<I> extends
         context.putValue(processCalledTKey, 0l);
         context.putValue(deletedTKey, 0l);
         context.putValue(addedTKey, 0l);
+        logEngine = context.getLoggingEngine();
         try {
             solrServer = enrichmentService.getSolrServer();
 
@@ -299,6 +300,9 @@ public class EnrichmentPlugin<I> extends
             }
 
         } catch (Exception e) {
+            if(logEngine!=null){
+                logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+            }
             log.log(Level.SEVERE, e.getMessage());
         }
         String sugarCrmId = collection
@@ -314,9 +318,15 @@ public class EnrichmentPlugin<I> extends
                                 .getProperty(
                                         UimConfigurationProperty.SUGARCRM_PASSWORD));
             } catch (LoginFailureException e) {
+                if(logEngine!=null){
+                logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+            }
                 log.log(Level.SEVERE,
                         "Error updating Sugar Session id. " + e.getMessage());
             } catch (Exception e) {
+                if(logEngine!=null){
+                logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+            }
                 log.log(Level.SEVERE,
                         "Generic SugarCRM error. " + e.getMessage());
             }
@@ -334,6 +344,10 @@ public class EnrichmentPlugin<I> extends
             log.log(Level.SEVERE,
                     "Record could not be retrieved. " + e.getMessage());
         }
+        if(logEngine!=null){
+                logEngine.log(Level.INFO, "Preview Only in portal acquired with value: "
+                + previewsOnlyInPortal);
+            }
         log.log(Level.INFO, "Preview Only in portal acquired with value: "
                 + previewsOnlyInPortal);
     }
@@ -360,15 +374,19 @@ public class EnrichmentPlugin<I> extends
                 "Process called " + processCount);
         try {
             solrServer.commit();
-            context.getLoggingEngine().log(context.getExecution(), Level.INFO,
+            logEngine.log(context.getExecution(), Level.INFO,
                     "Added " + recordNumber + " documents");
             log.log(Level.INFO, "Added " + recordNumber + " documents");
-            context.getLoggingEngine().log(context.getExecution(), Level.INFO,
+            logEngine.log(context.getExecution(), Level.INFO,
                     "Deleted are " + deleted);
             log.log(Level.INFO, "Deleted are " + deleted);
         } catch (SolrServerException e) {
+            logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+                    e.getMessage());
             log.log(Level.SEVERE, e.getMessage());
         } catch (IOException e) {
+            logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+                    e.getMessage());
             log.log(Level.SEVERE, e.getMessage());
         }
         log.log(Level.INFO, "Committed in Solr Server");
@@ -633,22 +651,20 @@ public class EnrichmentPlugin<I> extends
 //                        solrServer.add(basicDocument);
                         return true;
                     } catch (MalformedURLException e) {
+                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+                    e.getMessage());
                         log.log(Level.SEVERE,
                                 "Malformed URL Exception occured with error "
                                 + e.getMessage() + "\nRetrying");
-                    } catch (InstantiationException e) {
-                        log.log(Level.SEVERE,
-                                "Instantiation Exception occured with error "
-                                + e.getMessage() + "\nRetrying");
-                    } catch (IllegalAccessException e) {
-                        log.log(Level.SEVERE,
-                                "Illegal Access Exception occured with error "
-                                + e.getMessage() + "\nRetrying");
-                    } catch (IOException e) {
+                    }  catch (IOException e) {
+                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+                    e.getMessage());
                         log.log(Level.SEVERE,
                                 "IO Exception occured with error "
                                 + e.getMessage() + "\nRetrying");
                     } catch (Exception e) {
+                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+                    e.getMessage());
                         e.printStackTrace();
                         log.log(Level.SEVERE,
                                 "Generic Exception occured with error "
@@ -670,6 +686,8 @@ public class EnrichmentPlugin<I> extends
                     try {
                         context.getStorageEngine().updateMetaDataRecord(mdr);
                     } catch (StorageEngineException e) {
+                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+                    e.getMessage());
                         log.log(Level.SEVERE,
                                 "Storage Engine Exception occured with error "
                                 + e.getMessage() + "\nRetrying");
@@ -678,10 +696,14 @@ public class EnrichmentPlugin<I> extends
                 }
             }
         } catch (JiBXException e) {
+            logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+                    e.getMessage());
             log.log(Level.SEVERE,
                     "JibX Exception occured with error " + e.getMessage()
                     + "\nRetrying");
         } catch (ParseException e) {
+            logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+                    e.getMessage());
             log.log(Level.SEVERE,
                     "Parse Exception occured with error " + e.getMessage()
                     + "\nRetrying");
