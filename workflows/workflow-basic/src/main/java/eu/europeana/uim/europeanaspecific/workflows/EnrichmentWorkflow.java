@@ -1,8 +1,6 @@
 package eu.europeana.uim.europeanaspecific.workflows;
 
 import eu.europeana.uim.enrichment.EnrichmentPlugin;
-import eu.europeana.uim.enrichment.LookupCreationPlugin;
-import eu.europeana.uim.plugin.ingestion.IngestionPlugin;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.util.BatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;

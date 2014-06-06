@@ -239,6 +239,7 @@
 							version=0.0.0,
 							eu.europeana.uim.plugin.ingestion;
 							version=0.0.0,
+                                                    eu.europeana.uim.plugin,
 							eu.europeana.uim.sugar;
 							version=0.0.0,
 							eu.europeana.uim.sugar.model;
