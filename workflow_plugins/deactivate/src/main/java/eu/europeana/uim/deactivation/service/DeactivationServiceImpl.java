@@ -1,5 +1,6 @@
 package eu.europeana.uim.deactivation.service;
 
+import com.google.code.morphia.Morphia;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -78,6 +79,7 @@ public class DeactivationServiceImpl implements DeactivationService {
 						mongoServer = new ExtendedEdmMongoServer(new Mongo(
 								mongoHost, Integer.parseInt(mongoPort)),
 								mongoDB, "", "");
+                                                mongoServer.createDatastore(new Morphia());
 						mongoServer.getFullBean("test");
 					} catch (NumberFormatException e) {
 						// TODO Auto-generated catch block
