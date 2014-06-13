@@ -52,6 +52,7 @@ import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.corelib.definitions.jibx.Year;
 import eu.europeana.uim.common.TKey;
+import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.orchestration.ExecutionContext;
@@ -93,6 +94,7 @@ public class SolrWorkflowPlugin<I> extends
     private static IBindingFactory bfact;
     private static final Logger log = Logger.getLogger(SolrWorkflowPlugin.class
             .getName());
+    private static LoggingEngine logEngine;
     /**
      * The parameters used by this WorkflowStart
      */
@@ -290,42 +292,70 @@ public class SolrWorkflowPlugin<I> extends
                                 + e.getMessage());
 
                     } catch (MalformedURLException e) {
+                        if (logEngine != null) {
+                            logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                        }
                         log.log(Level.SEVERE,
                                 "Error: " + e.getMessage());
                         e.printStackTrace();
                     } catch (IOException e) {
+                        if (logEngine != null) {
+                            logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                        }
                         log.log(Level.SEVERE,
                                 "Error: " + e.getMessage());
                         e.printStackTrace();
                     } catch (SecurityException e) {
+                        if (logEngine != null) {
+                            logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                        }
                         log.log(Level.SEVERE,
                                 "Error: " + e.getMessage());
                         e.printStackTrace();
                     } catch (IllegalArgumentException e) {
+                        if (logEngine != null) {
+                            logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                        }
                         log.log(Level.SEVERE,
                                 "Error: " + e.getMessage());
                         e.printStackTrace();
                     } catch (NoSuchMethodException e) {
+                        if (logEngine != null) {
+                            logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                        }
                         log.log(Level.SEVERE,
                                 "Error: " + e.getMessage());
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
+                        if (logEngine != null) {
+                            logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                        }
                         log.log(Level.SEVERE,
                                 "Error: " + e.getMessage());
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
+                        if (logEngine != null) {
+                            logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                        }
                         log.log(Level.SEVERE,
                                 "Error: " + e.getMessage());
                         e.printStackTrace();
                     } catch (InstantiationException e) {
+                        if (logEngine != null) {
+                            logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                        }
                         log.log(Level.SEVERE,
                                 "Error: " + e.getMessage());
+
                         e.printStackTrace();
                     }
 
                 }
             }
         } catch (Exception e) {
+            if (logEngine != null) {
+                logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+            }
             e.printStackTrace();
         }
         return false;
@@ -595,6 +625,7 @@ public class SolrWorkflowPlugin<I> extends
     @Override
     public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
             throws IngestionPluginFailedException {
+        logEngine = context.getLoggingEngine();
         if (((Collection<I>) context.getDataSet())
                 .getValue(ControlledVocabularyProxy.LASTINGESTION_DATE
                         .toString()) != null) {

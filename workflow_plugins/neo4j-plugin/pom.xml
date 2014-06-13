@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<!-- Licensed to the Apache Software Foundation (ASF) under one or more 
+		contributor license agreements. See the NOTICE file distributed with this 
+		work for additional information regarding copyright ownership. The ASF licenses 
+		this file to You under the Apache License, Version 2.0 (the "License"); you 
+		may not use this file except in compliance with the License. You may obtain 
+		a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless 
+		required by applicable law or agreed to in writing, software distributed 
+		under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+		OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+		the specific language governing permissions and limitations under the License. -->
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>europeana-uim-europeanaspecific</artifactId>
+		<groupId>eu.europeana.europeanauim</groupId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+
+	<artifactId>neo4jplugin</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>Unified Ingestion Manager: Neo4j plugin</name>
+	<description>neo4jplugin OSGi blueprint bundle project.</description>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>europeana-datamodel-definitions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>europeana-uim-plugin-sugarcrmclient</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-run</artifactId>
+			<version>${jibx.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-extras</artifactId>
+			<version>${jibx.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-community</artifactId>
+			<version>2.0.3</version>
+			<!-- <exclusions> -->
+			<!-- <exclusion> -->
+			<!-- <groupId>org.neo4j</groupId> -->
+			<!-- <artifactId>neo4j-lucene-index</artifactId> -->
+			<!-- </exclusion> -->
+			<!-- </exclusions> -->
+		</dependency>
+
+		<!-- <dependency> -->
+		<!-- <groupId>com.keatext</groupId> -->
+		<!-- <artifactId>neo4j-lucene4-index</artifactId> -->
+		<!-- <version>1.9.M01-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-rest-graphdb</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-neo4j</artifactId>
+			<version>3.2.0.BUILD-SNAPSHOT</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.0-api</artifactId>
+			<version>1.0.0.Final</version>
+			<optional>true</optional>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.0.0.GA</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>3.2.2.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>3.2.2.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>3.2.2.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>3.2.2.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>3.2.2.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>3.2.2.RELEASE</version>
+		</dependency>
+
+
+
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>eu.europeana.europeanauim</groupId>
+				<artifactId>neo4jplugin</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-core</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+
+
+	<build>
+		<resources>
+			<!-- standard Maven folder -->
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<!-- plus root folder -->
+			<resource>
+				<directory>.</directory>
+				<includes>
+					<include>META-INF/*</include>
+					<include>OSGI-INF/*</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+
+				<extensions>true</extensions>
+				<configuration>
+					<obrRepository>NONE</obrRepository>
+					<manifestLocation>META-INF</manifestLocation>
+					<instructions>
+						<Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
+						<Import-Package>
+							org.osgi.framework; version=1.5.0,
+							javax.annotation; version=0.0.0,
+							javax.imageio;
+							version=0.0.0,
+							javax.management; version=0.0.0,
+							javax.naming;
+							version=0.0.0,
+							javax.net; version=0.0.0,
+							javax.security.auth;
+							version=0.0.0,
+							javax.swing; version=0.0.0,
+							javax.swing.border;
+							version=0.0.0,
+							javax.swing.event; version=0.0.0,
+							javax.swing.text;
+							version=0.0.0,
+							javax.xml.datatype; version=0.0.0,
+							javax.xml.namespace;
+							version=0.0.0,
+							javax.xml.parsers;
+							version=0.0.0,
+							javax.xml.transform; version=0.0.0,
+							javax.xml.transform.dom;
+							version=0.0.0,
+							javax.xml.transform.sax;
+							version=0.0.0,
+							javax.xml.transform.stream; version=0.0.0,
+							javax.xml.validation;
+							version=0.0.0,
+							javax.xml.xpath;
+							version=0.0.0,
+							org.w3c.dom;
+							version=0.0.0,
+							org.w3c.dom.events;
+							version=0.0.0,
+							org.w3c.dom.ls;
+							version=0.0.0,
+							org.w3c.dom.ranges;
+							version=0.0.0,
+							org.w3c.dom.xpath; version=0.0.0,
+							org.xml.sax;
+							version=0.0.0,
+							org.xml.sax.ext; version=0.0.0,
+							org.xml.sax.helpers;
+							version=0.0.0,
+							org.osgi.service.blueprint;
+							version=1.0.1,
+							eu.europeana.uim.common; version=0.0.0,
+							eu.europeana.uim.store;
+							version=0.0.0,
+							eu.europeana.uim.logging;
+							version=0.0.0,
+							eu.europeana.uim.orchestration; version=0.0.0,
+							eu.europeana.uim.plugin; version=0.0.0,
+							eu.europeana.uim.plugin.ingestion; version=0.0.0,
+							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues;
+							version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.solr4,
+							eu.europeana.uim.plugin.source,
+							eu.europeana.uim.util,
+							eu.europeana.uim.workflow,
+							org.theeuropeanlibrary.model.common.qualifier,
+							org.apache.solr.common.util,
+							org.apache.solr.client.solrj.impl,
+							org.apache.solr.common,
+							org.apache.solr.client.solrj,
+							org.apache.solr.common.params,
+							org.apache.solr.client.solrj.response,
+							org.apache.solr.client.solrj.beans,
+							org.apache.commons.lang.time,
+							org.apache.solr.client.solrj.request,
+							org.w3c.dom.traversal,
+							org.slf4j.*,
+							org.apache.solr.client.solrj.util,
+							org.jibx.runtime;
+							version=1.2.3,
+							org.jibx.runtime.impl; version=1.2.3,
+							org.jibx.extras; version=1.2.3,
+							javax.net.ssl,
+							!*
+						</Import-Package>
+						<Include-Resource>src/main/resources</Include-Resource>
+						<Embed-Dependency>
+							*;scope=compile|runtime;artifactId=!europeana-uim-plugin-solr3|europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
+						</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>package</phase>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<repositories>
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Snapshots</name>
+			<url>http://repo.spring.io/snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<name>NEO4J</name>
+			<url>http://m2.neo4j.org/content/groups/public</url>
+			<id>NEO4J</id>
+		</repository>
+	</repositories>
+</project>

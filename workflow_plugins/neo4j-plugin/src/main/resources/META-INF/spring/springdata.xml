@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+       	http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/neo4j
+		http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:spring-configured />
+	<context:annotation-config />
+	<context:component-scan base-package="eu.europeana.neo4j.spring" />
+
+	<!-- NOE4J using Spring DataGraph - for processed data -->
+	<!-- REST Connection to Neo4j server -->
+	<neo4j:config graphDatabaseService="graphDatabaseService" />
+	<neo4j:repositories base-package="eu.europeana.neo4j.spring" />
+
+	<bean id="graphDatabaseService"
+		class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">
+	    <!-- 
+-->	    <constructor-arg value="http://localhost:7474/db/data/" />
+	     
+		<!--<constructor-arg value="http://linked-data-test.eanadev.org:7474/db/data/" />-->
+	</bean>
+	
+	<bean id="conversionService"
+		class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<bean class="eu.europeana.corelib.solr.utils.converters.Map2StringConverterFactory" />
+				<bean class="eu.europeana.corelib.solr.utils.converters.String2MapConverterFactory" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="edmserviceBean" class="eu.europeana.neo4j.spring.EDMRepositoryService" />
+	
+	<bean id="graphconstructor" class="eu.europeana.uim.neo4jplugin.impl.GraphConstructorSpring">
+	   <constructor-arg ref="edmrepositoryservice" />
+	</bean>
+	
+	<bean id="edmrepositoryservice" class="eu.europeana.uim.neo4jplugin.impl.EDMRepositoryService" />
+
+
+</beans>
