@@ -78,7 +78,7 @@ public class GraphConstructorSpring extends DefaultHandler implements Neo4jServe
     private StringBuffer curCharValue = new StringBuffer(1024);
 
     private EDMRepositoryService edmservice;
-    private Neo4jTemplate template;
+//    private Neo4jTemplate template;
     private static Mongo mongo;
     private static Datastore ds = null;
     private static DB db = null;
@@ -94,7 +94,7 @@ public class GraphConstructorSpring extends DefaultHandler implements Neo4jServe
      */
     GraphConstructorSpring() {
         this.edmservice = new EDMRepositoryService();
-        this.template = edmservice.getTemplate();
+        //this.template = edmservice.getTemplate();
         init();
     }
 
@@ -103,13 +103,14 @@ public class GraphConstructorSpring extends DefaultHandler implements Neo4jServe
      */
     GraphConstructorSpring(EDMRepositoryService edmservice) {
         this.edmservice = edmservice;
-        this.template = edmservice.getTemplate();
+        //this.template = edmservice.getTemplate();
         init();
     }
 
     public void init() {
         try {
-            graphDb = template.getGraphDatabaseService();
+          //  graphDb = template.getGraphDatabaseService();
+            graphDb = edmservice.getDb();
             tx = graphDb.beginTx();
 
             org.mapdb.DB mdb = DBMaker.newMemoryDB().make();
@@ -217,10 +218,10 @@ public class GraphConstructorSpring extends DefaultHandler implements Neo4jServe
         }
     }
 
-    public void parseMorphiaEntity(FullBeanImpl fullbean) {
+    public void parseMorphiaEntity(String rdf) {
 
-        if (fullbean != null) {
-            String rdf = EdmUtils.toEDM(fullbean, false);
+        if (rdf != null) {
+//            String rdf = EdmUtils.toEDM(fullbean, false);
 
             //Extract references from XML
             parseXML(rdf);
@@ -440,9 +441,9 @@ public class GraphConstructorSpring extends DefaultHandler implements Neo4jServe
                     if (nodemap.get("rdf:about") != null) {
                         System.out.println("Generating element:" + nodemap.get("rdf:about"));
 
-//                        RestNode node2 = batchRestApi.createNode(nodemap);
+                        RestNode node2 = batchRestApi.createNode(nodemap);
                       
-                        RestNode node2 = batchRestApi.getOrCreateNode(index, "rdf:about", nodemap.get("rdf:about"), nodemap);
+                       // RestNode node2 = batchRestApi.getOrCreateNode(index, "rdf:about", nodemap.get("rdf:about"), nodemap);
                         nodeCache.put((String) nodemap.get("rdf:about"), node2);
                         index.add(node2, "rdf:about", nodemap.get("rdf:about"));
                     }
@@ -459,56 +460,56 @@ public class GraphConstructorSpring extends DefaultHandler implements Neo4jServe
     /**
      *
      */
-    public void generateNodeLinks2() {
-        System.out.println("Generating links");
-        Iterator<String> it = relationsmap.keySet().iterator();
-
-        if (nodeIndex == null) {
-            nodeIndex = template.getIndex("edmsearch2");
-        }
-
-        while (it.hasNext()) {
-
-            String id = processEntityID(it.next());
-            System.out.println("Trying to retrieve Node with ID:" + id);
-
-            Node nd = nodeIndex.get("rdf:about", id).getSingle();
-
-            if (nd == null) {
-                System.out.println("Unfortunately nothing returned here:" + id);
-            } else {
-                System.out.println("Success!!");
-            }
-
-            Map<String, String> values = relationsmap.get(id);
-
-            Set<String> set = values.keySet();
-
-            Iterator<String> it2 = set.iterator();
-
-            while (it2.hasNext()) {
-                String reference = processEntityID(it2.next());
-                String linkname = values.get(reference);
-
-                System.out.println("Trying to retieve Reference (" + linkname + "): " + reference + " | of" + id);
-
-                //Transaction tx = graphDb.beginTx();
-                try {
-                    Node ndref = nodeIndex.get("rdf:about", reference).getSingle();
-                    if (ndref != null) {
-                        System.out.println("Found!" + reference);
-                        Relationship relationship = nd.createRelationshipTo(ndref, new RelType(linkname));
-                        //tx.success();
-                    } else {
-                        System.out.println("Tzifos");
-                    }
-
-                } finally {
-                    //tx.finish();
-                }
-            }
-        }
-    }
+//    public void generateNodeLinks2() {
+//        System.out.println("Generating links");
+//        Iterator<String> it = relationsmap.keySet().iterator();
+//
+//        if (nodeIndex == null) {
+//            nodeIndex = template.getIndex("edmsearch2");
+//        }
+//
+//        while (it.hasNext()) {
+//
+//            String id = processEntityID(it.next());
+//            System.out.println("Trying to retrieve Node with ID:" + id);
+//
+//            Node nd = nodeIndex.get("rdf:about", id).getSingle();
+//
+//            if (nd == null) {
+//                System.out.println("Unfortunately nothing returned here:" + id);
+//            } else {
+//                System.out.println("Success!!");
+//            }
+//
+//            Map<String, String> values = relationsmap.get(id);
+//
+//            Set<String> set = values.keySet();
+//
+//            Iterator<String> it2 = set.iterator();
+//
+//            while (it2.hasNext()) {
+//                String reference = processEntityID(it2.next());
+//                String linkname = values.get(reference);
+//
+//                System.out.println("Trying to retieve Reference (" + linkname + "): " + reference + " | of" + id);
+//
+//                //Transaction tx = graphDb.beginTx();
+//                try {
+//                    Node ndref = nodeIndex.get("rdf:about", reference).getSingle();
+//                    if (ndref != null) {
+//                        System.out.println("Found!" + reference);
+//                        Relationship relationship = nd.createRelationshipTo(ndref, new RelType(linkname));
+//                        //tx.success();
+//                    } else {
+//                        System.out.println("Tzifos");
+//                    }
+//
+//                } finally {
+//                    //tx.finish();
+//                }
+//            }
+//        }
+//    }
 
     public void generateNodeLinks3() {
         Iterator<String> it = relationsmap.keySet().iterator();
@@ -633,7 +634,7 @@ public class GraphConstructorSpring extends DefaultHandler implements Neo4jServe
      */
     public void saveNeo4jBean(AbstractEdmEntity bean) {
 
-        edmservice.getEdmrepository().save(bean);
+       // edmservice.getEdmrepository().save(bean);
 
     }
 
@@ -642,7 +643,7 @@ public class GraphConstructorSpring extends DefaultHandler implements Neo4jServe
      */
     public void saveNeo4jBean(List<AbstractEdmEntity> beans) {
 
-        edmservice.getEdmrepository().save(beans);
+        //edmservice.getEdmrepository().save(beans);
 
     }
 

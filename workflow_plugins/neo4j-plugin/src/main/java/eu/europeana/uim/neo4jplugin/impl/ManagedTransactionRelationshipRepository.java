@@ -17,17 +17,18 @@ import org.springframework.data.neo4j.support.Neo4jTemplate;
 public class ManagedTransactionRelationshipRepository {
 
     private final ManagedTransaction transaction;
-    private final Neo4jTemplate neo4jTemplate;
+  
+   //private final Neo4jTemplate neo4jTemplate;
 
     public ManagedTransactionRelationshipRepository(ManagedTransaction transaction, Neo4jTemplate neo4jTemplate) {
         this.transaction = transaction;
-        this.neo4jTemplate = neo4jTemplate;
+       // this.neo4jTemplate = neo4jTemplate;
     }
 
-    public void createRelationShip(Node entity1, Node entity2, String relationship,
-            Map<String, Object> properties) {
-        
-        transaction.prepareTransaction();
-        neo4jTemplate.createRelationshipBetween(entity1, entity2, relationship, properties);
-    }
+//    public void createRelationShip(Node entity1, Node entity2, String relationship,
+//            Map<String, Object> properties) {
+//        
+//        transaction.prepareTransaction();
+//        neo4jTemplate.createRelationshipBetween(entity1, entity2, relationship, properties);
+//    }
 }

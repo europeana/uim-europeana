@@ -149,53 +149,53 @@ public class GraphImporterPlugin<I> extends
         try {
             Neo4jConstructor neo4jConstructor = new Neo4jConstructor();
             uctx = bfact.createUnmarshallingContext();
-            RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+           // RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
             if (graphconstructor != null) {
-                FullBeanImpl bean = neo4jConstructor.constructFullBean(rdf, graphconstructor);
-
-//                        basicDocument.addField(
-//                                EdmLabel.EUROPEANA_COMPLETENESS.toString(),
-//                                completeness);
-                bean.setEuropeanaCollectionName(new String[]{mdr
-                    .getCollection().getName()});
-                if (bean.getEuropeanaAggregation().getEdmLanguage()
-                        != null) {
-                    bean.setLanguage(new String[]{bean
-                        .getEuropeanaAggregation().getEdmLanguage()
-                        .values().iterator().next().get(0)});
-                }
-                if (bean.getEuropeanaAggregation().getEdmLandingPage()
-                        == null) {
-                    bean.getEuropeanaAggregation().setEdmLandingPage(
-                            "http://testuri");
-                }
-
-                bean.setEuropeanaCollectionName(new String[]{mdr
-                    .getCollection().getName()});
-
-                Date timestampCreated = new Date();
-                if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
-                        != null
-                        && mdr.getValues(
-                                EuropeanaModelRegistry.INITIALSAVE)
-                        .size() > 0) {
-                    timestampCreated = new Date(mdr.getValues(
-                            EuropeanaModelRegistry.INITIALSAVE).get(0));
-                } else {
-                    mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
-                            timestampCreated.getTime());
-                }
-                bean.setTimestampCreated(timestampCreated);
-//                        basicDocument.addField("timestamp_created",
-//                                timestampCreated);
-                mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
-                Date timestampUpdated = new Date();
-                bean.setTimestampUpdated(timestampUpdated);
-//                        basicDocument.addField("timestamp_update",
-//                                timestampUpdated);
-                mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
-                        timestampUpdated.getTime());
-                graphconstructor.parseMorphiaEntity(bean);
+//                FullBeanImpl bean = neo4jConstructor.constructFullBean(rdf, graphconstructor);
+//
+////                        basicDocument.addField(
+////                                EdmLabel.EUROPEANA_COMPLETENESS.toString(),
+////                                completeness);
+//                bean.setEuropeanaCollectionName(new String[]{mdr
+//                    .getCollection().getName()});
+//                if (bean.getEuropeanaAggregation().getEdmLanguage()
+//                        != null) {
+//                    bean.setLanguage(new String[]{bean
+//                        .getEuropeanaAggregation().getEdmLanguage()
+//                        .values().iterator().next().get(0)});
+//                }
+//                if (bean.getEuropeanaAggregation().getEdmLandingPage()
+//                        == null) {
+//                    bean.getEuropeanaAggregation().setEdmLandingPage(
+//                            "http://testuri");
+//                }
+//
+//                bean.setEuropeanaCollectionName(new String[]{mdr
+//                    .getCollection().getName()});
+//
+//                Date timestampCreated = new Date();
+//                if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
+//                        != null
+//                        && mdr.getValues(
+//                                EuropeanaModelRegistry.INITIALSAVE)
+//                        .size() > 0) {
+//                    timestampCreated = new Date(mdr.getValues(
+//                            EuropeanaModelRegistry.INITIALSAVE).get(0));
+//                } else {
+//                    mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
+//                            timestampCreated.getTime());
+//                }
+//                bean.setTimestampCreated(timestampCreated);
+////                        basicDocument.addField("timestamp_created",
+////                                timestampCreated);
+//                mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
+//                Date timestampUpdated = new Date();
+//                bean.setTimestampUpdated(timestampUpdated);
+////                        basicDocument.addField("timestamp_update",
+////                                timestampUpdated);
+//                mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
+//                        timestampUpdated.getTime());
+                graphconstructor.parseMorphiaEntity(value);
                 //graphconstructor.extractRDFLinkReferences(value);
                 if (operations > 100) {
                     operations=0;
@@ -212,19 +212,7 @@ public class GraphImporterPlugin<I> extends
         } catch (JiBXException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        } 
 
         return false;
     }
