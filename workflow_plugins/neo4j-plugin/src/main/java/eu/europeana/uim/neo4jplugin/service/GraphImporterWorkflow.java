@@ -15,7 +15,7 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
 public class GraphImporterWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>,I> {
 
 	public GraphImporterWorkflow(EDMRepositoryOSGIServiceProvider provider) {
-		super("GraphImporterWorkflow", "GraphImporterWorkflow");
+		super("K.Hierarchical Objects Plugin", "K.Hierarchical Objects Plugin");
         setStart(new BatchWorkflowStart<I>());
         
         GraphImporterPlugin<I> graphPlugin = new GraphImporterPlugin<I>(provider);

@@ -22,6 +22,7 @@ import com.mongodb.Mongo;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.corelib.tools.lookuptable.impl.EuropeanaIdMongoServerImpl;
+import eu.europeana.publication.common.IDocument;
 
 /**
  * TODO: change to reflect the changes in the Interface definition
@@ -48,4 +49,6 @@ public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServerImpl imple
 	public EuropeanaId retrieveEuropeanaIdFromOld(String oldId) {
 		return datastore.find(EuropeanaId.class).field("oldId").equal(oldId).get();
 	}
+
+    
 }

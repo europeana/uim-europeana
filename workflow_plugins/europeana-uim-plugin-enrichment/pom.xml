@@ -71,12 +71,16 @@
 			<artifactId>jackson-xc</artifactId>
 			<version>1.9.9</version>
 		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.apache.geronimo.specs</groupId> -->
+<!-- 			<artifactId>geronimo-annotation_1.2_spec</artifactId> -->
+<!-- 			<version>1.0.MR2-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-annotation_1.2_spec</artifactId>
-			<version>1.0.MR2-SNAPSHOT</version>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>wstx-asl</artifactId>
@@ -154,6 +158,30 @@
 			<version>1.0.1</version>
 			<scope>compile</scope>
 		</dependency>
+	 <dependency>
+	  <artifactId>corelib-solr</artifactId>
+	  <groupId>eu.europeana.corelib</groupId>
+	  <type>jar</type>
+	  <version>2.0-SNAPSHOT</version>
+	  <exclusions>
+	   <exclusion>
+	    <artifactId>jersey-client</artifactId>
+	    <groupId>com.sun.jersey</groupId>
+	   </exclusion>
+	   <exclusion>
+	    <artifactId>jersey-core</artifactId>
+	    <groupId>com.sun.jersey</groupId>
+	   </exclusion>
+	   <exclusion>
+	    <artifactId>jersey-multipart</artifactId>
+	    <groupId>com.sun.jersey.contribs</groupId>
+	   </exclusion>
+	   <exclusion>
+	    <artifactId>jersey-server</artifactId>
+	    <groupId>com.sun.jersey</groupId>
+	   </exclusion>
+	  </exclusions>
+	 </dependency>
 	</dependencies>
 
 	<build>
@@ -225,12 +253,15 @@
 							javax.tools;
 							version=0.0.0,
 							javax.xml.bind;version=0.0.0,
-							org.ietf.jgss; version=0.0.0,
+							org.ietf.jgss;
+							version=0.0.0,
 							org.osgi.service.blueprint;
 							version=1.0.1,
-							jline; version=2.5.0,
+							jline;
+							version=2.5.0,
 							javax.servlet; version=2.5.0,
-							javax.servlet.http; version=2.5.0,
+							javax.servlet.http;
+							version=2.5.0,
 							eu.europeana.uim.common;
 							version=0.0.0,
 							eu.europeana.uim.store;
@@ -239,7 +270,7 @@
 							version=0.0.0,
 							eu.europeana.uim.plugin.ingestion;
 							version=0.0.0,
-                                                    eu.europeana.uim.plugin,
+							eu.europeana.uim.plugin,
 							eu.europeana.uim.sugar;
 							version=0.0.0,
 							eu.europeana.uim.sugar.model;
@@ -300,8 +331,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -344,11 +375,11 @@
 		</pluginManagement>
 	</build>
 
-<!-- 	<repositories> -->
-<!-- 		<repository> -->
-<!-- 			<id>aduna</id> -->
-<!-- 			<name>aduna-releases</name> -->
-<!-- 			<url>http://artifactory.eanadev.org/artifactory/aduna-cache</url> -->
-<!-- 		</repository> -->
-<!-- 	</repositories> -->
+	<!-- <repositories> -->
+	<!-- <repository> -->
+	<!-- <id>aduna</id> -->
+	<!-- <name>aduna-releases</name> -->
+	<!-- <url>http://artifactory.eanadev.org/artifactory/aduna-cache</url> -->
+	<!-- </repository> -->
+	<!-- </repositories> -->
 </project>

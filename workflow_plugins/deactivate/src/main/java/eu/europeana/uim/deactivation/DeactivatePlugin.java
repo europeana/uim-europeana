@@ -26,6 +26,17 @@ import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.rest.graphdb.RestAPI;
+import org.neo4j.rest.graphdb.RestGraphDatabase;
+import org.neo4j.rest.graphdb.batch.BatchCallback;
+import org.neo4j.rest.graphdb.index.RestIndex;
 
 /**
  * Collection Deactivation Plugin
@@ -112,7 +123,7 @@ public class DeactivatePlugin<I> extends
 					"europeana_collectionName:" + collectionId + "*");
 			log.log(Level.INFO,"removing from mongo");
 			clearData(dService.getMongoServer(), collectionId);
-
+                        clearData(dService.getGraphDb(),dService.getNeo4jIndex(),collectionId);
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -218,4 +229,106 @@ public class DeactivatePlugin<I> extends
 		DeactivatePlugin.dService = dService;
 	}
 
+    private void clearData(RestGraphDatabase graphDb, String neo4jIndex, String collectionId) {
+         RestIndex<Node> restIndex = graphDb.getRestAPI().getIndex(neo4jIndex);
+         List<Node> deletionNodes = new ArrayList<Node>();
+         IndexHits<Node> nodes = restIndex.query("rdf_about", "/"+collectionId+"/*");
+            if (nodes.size() > 0) {
+
+                while(nodes.iterator().hasNext()){
+                    deletionNodes.add(nodes.iterator().next());
+                }
+                
+                
+
+            }
+        
+        removeFromIndex(deletionNodes,graphDb,neo4jIndex);
+        removeRelationships(deletionNodes,graphDb);
+        removeNodes(deletionNodes,graphDb);
+    }
+
+    public void removeFromIndex(List<Node> deletionNodes,RestGraphDatabase graphDb, String neo4jIndex) {
+        final List<Node> tempList = new ArrayList<Node>();
+        int i = 0;
+
+        for (Node node : deletionNodes) {
+
+            tempList.add(node);
+
+            if (tempList.size() == 1000 || i == deletionNodes.size()) {
+               Transaction tx = graphDb.getRestAPI().beginTx();
+                for (Node tempNode : tempList) {
+                   graphDb.getRestAPI().getIndex(neo4jIndex).remove(tempNode);
+                }
+                tempList.clear();
+                tx.success();
+                tx.finish();
+
+            }
+
+            i++;
+        }
+    }
+
+    public void removeRelationships(List<Node> deletionNodes,RestGraphDatabase graphDb) {
+        final Set<Relationship> relationships = new HashSet<Relationship>();
+
+        int i = 0;
+        for (Node node : deletionNodes) {
+            Iterable<Relationship> rels = node.getRelationships();
+            Iterator<Relationship> relIterator = rels.iterator();
+            while (relIterator.hasNext()) {
+                relationships.add(relIterator.next());
+            }
+
+            if (relationships.size() >= 50 || i == deletionNodes.size()) {
+               Transaction tx = graphDb.getRestAPI().beginTx();
+               graphDb.getRestAPI().executeBatch(new BatchCallback<Node>() {
+
+                    @Override
+                    public Node recordBatch(RestAPI batchRestApi) {
+                        for (Relationship node : relationships) {
+                            node.delete();
+
+                        } 
+                        return null;
+                    }
+                   
+                });
+                 relationships.clear();
+                tx.success();
+                tx.finish();
+            }
+            i++;
+        }
+    }
+
+    public void removeNodes(List<Node> deletionNodes,RestGraphDatabase graphDb) {
+        final List<Node> tempList = new ArrayList<Node>();
+        int i = 0;
+        for (Node node : deletionNodes) {
+
+            tempList.add(node);
+
+            if (tempList.size() == 50 || i == deletionNodes.size()) {
+                Transaction tx = graphDb.getRestAPI().beginTx();
+                graphDb.getRestAPI().executeBatch(new BatchCallback<Node>() {
+
+                    @Override
+                    public Node recordBatch(RestAPI batchRestApi) {
+                        for (Node node : tempList) {
+                            node.delete();
+                        }
+                        return null;
+                    }
+
+                });
+                tempList.clear();
+                tx.success();
+                tx.finish();
+            }
+            i++;
+        }
+}
 }

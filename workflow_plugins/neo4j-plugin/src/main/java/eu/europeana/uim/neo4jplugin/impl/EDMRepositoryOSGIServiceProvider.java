@@ -11,13 +11,13 @@ import eu.europeana.uim.common.BlockingInitializer;
  */
 public class EDMRepositoryOSGIServiceProvider {
 
-	private  GraphConstructorSpring graphconstructor;
+	private  GraphConstructor graphconstructor;
 	
-	public GraphConstructorSpring getGraphconstructor() {
+	public GraphConstructor getGraphconstructor() {
 		return graphconstructor;
 	}
 
-	public void setGraphconstructor(GraphConstructorSpring graphconstructor) {
+	public void setGraphconstructor(GraphConstructor graphconstructor) {
 		this.graphconstructor = graphconstructor;
 	}
 
@@ -29,7 +29,7 @@ public class EDMRepositoryOSGIServiceProvider {
 	            public void initializeInternal() {
 	                try {
 	                    status = STATUS_BOOTING;
-	                    graphconstructor= new GraphConstructorSpring();
+	                    graphconstructor= new GraphConstructor();
 	                    status = STATUS_INITIALIZED;
 	                } catch (Throwable t) {
                             t.printStackTrace();
@@ -38,7 +38,7 @@ public class EDMRepositoryOSGIServiceProvider {
 	            }
 	        };
 	        
-	        initializer.initialize(GraphConstructorSpring.class.getClassLoader());
+	        initializer.initialize(GraphConstructor.class.getClassLoader());
 	        
             
             if(graphconstructor ==  null){

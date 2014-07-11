@@ -17,7 +17,9 @@ public enum UimConfigurationProperty {
 	SOLR_CORE_SUGGESTIONS("solr.core.suggestions"),
 	MONGO_DB_COLLECTIONS("mongo.db.collections"),
 	MONGO_DB_EUROPEANA_ID("mongo.db.europeanaId"),
-	UIM_REPOSITORY("uim.repository");
+	UIM_REPOSITORY("uim.repository"),
+        NEO4JPATH("neo4j.path"),
+        NEO4JINDEX("neo4j.index");
 	
 	String field;
 	private UimConfigurationProperty(String field){

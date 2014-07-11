@@ -18,16 +18,19 @@ import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
 import eu.europeana.europeanauim.utils.PropertyReader;
 import eu.europeana.europeanauim.utils.UimConfigurationProperty;
 import eu.europeana.uim.common.BlockingInitializer;
+import org.neo4j.rest.graphdb.RestGraphDatabase;
 
 public class DeactivationServiceImpl implements DeactivationService {
 
 	private static HttpSolrServer solrServer;
 	private static ExtendedEdmMongoServer mongoServer;
+        private static RestGraphDatabase graphDb;
 	private static String mongoDB;
 	private static String mongoHost;
 	private static String mongoPort;
 	private static String solrUrl;
 	private static String solrCore;
+        private static String index;
 	private static CollectionMongoServer collectionMongoServer;
 
 	public DeactivationServiceImpl() {
@@ -55,7 +58,12 @@ public class DeactivationServiceImpl implements DeactivationService {
 					.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
 			solrCore = PropertyReader
 					.getProperty(UimConfigurationProperty.SOLR_CORE);
-
+                        
+                        index = PropertyReader
+					.getProperty(UimConfigurationProperty.NEO4JINDEX);
+                        
+                        graphDb = new RestGraphDatabase(PropertyReader
+					.getProperty(UimConfigurationProperty.NEO4JPATH));
 			BlockingInitializer solrInit = new BlockingInitializer() {
 
 				@Override
@@ -133,4 +141,14 @@ public class DeactivationServiceImpl implements DeactivationService {
 	public CollectionMongoServer getCollectionMongoServer() {
 		return collectionMongoServer;
 	}
+
+    @Override
+    public RestGraphDatabase getGraphDb() {
+        return graphDb;
+    }
+
+    @Override
+    public String getNeo4jIndex() {
+        return index;
+    }
 }
