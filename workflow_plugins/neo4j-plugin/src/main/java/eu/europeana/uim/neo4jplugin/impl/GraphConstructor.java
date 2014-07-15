@@ -18,23 +18,40 @@ package eu.europeana.uim.neo4jplugin.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.management.InvalidAttributeValueException;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
+import org.eclipse.jetty.util.ConcurrentHashSet;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.traversal.Evaluators;
+import org.neo4j.graphdb.traversal.Traverser;
+import org.neo4j.kernel.Uniqueness;
 import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.neo4j.rest.graphdb.batch.BatchCallback;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.services.RequestType;
+import org.neo4j.rest.graphdb.traversal.RestTraversal;
 
 import eu.europeana.corelib.definitions.solr.DocType;
 import eu.europeana.corelib.neo4j.entity.RelType;
@@ -42,19 +59,6 @@ import eu.europeana.corelib.neo4j.entity.Relation;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.utils.EuropeanaUriUtils;
-
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.management.InvalidAttributeValueException;
-
-import org.eclipse.jetty.util.ConcurrentHashSet;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.traversal.Evaluators;
-import org.neo4j.graphdb.traversal.Traverser;
-import org.neo4j.kernel.Uniqueness;
-import org.neo4j.rest.graphdb.traversal.RestTraversal;
 
 /**
  * @author Georgios Markakis (gwarkx@hotmail.com)
@@ -69,7 +73,6 @@ public class GraphConstructor {
 
 	private Map<String, Map<String, RestNode>> retNodeMap;
 	private Map<String, List<String>> deletionCandidates;
-	private Map<String, List<Node>> deletionNodes;
 	private Map<String, Set<String>> parents;
 
 	private EDMRepositoryService edmservice;
@@ -108,90 +111,87 @@ public class GraphConstructor {
 		edmexistsmap = new ConcurrentHashMap<String, Map<String, Boolean>>();
 		retNodeMap = new ConcurrentHashMap<String, Map<String, RestNode>>();
 		deletionCandidates = new ConcurrentHashMap<String, List<String>>();
-		deletionNodes = new ConcurrentHashMap<String, List<Node>>();
 		parents = new ConcurrentHashMap<String, Set<String>>();
 		restapi = graphDb.getRestAPI();
 		index = edmservice.getIndex();
-
 		if (!graphDb.index().existsForNodes(index)) {
 			graphDb.index().forNodes(index);
 		}
 
 	}
 
-	private void createBatch(final List<Rel> rels) {
-		tx = graphDb.beginTx();
-		restapi.executeBatch(new BatchCallback<RestNode>() {
-
-			@Override
-			public RestNode recordBatch(RestAPI batchRestApi) {
-				try {
-					for (Rel rel : rels) {
-						try {
-
-							batchRestApi.createRelationship(rel.getNodeFrom(),
-									rel.getNodeTo(), new Relation(rel
-											.getRelType().getRelType()), null);
-
-						} catch (Exception e) {
-							System.out.println(e.getMessage()
-									+ " : "
-									+ rel.getNodeFrom()
-											.getProperty("rdf:about") + " "
-									+ rel.getNodeTo().getProperty("rdf:about"));
-
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		});
-		tx.success();
-		tx.finish();
-	}
+	
 
 	private void createAbsoluteSequence(Set<String> parent, RelType relType,
 			Direction dir) {
+
+		// Simulate Cypher query
+
+		// start n =
+		// node:edmsearch2(rdf_about="/9200300/BibliographicResource_3000052917524")
+		// match (n)-[:`dcterms:hasPart`]->(child) WHERE NOT
+		// (child)-[:`edm:isNextInSequence`]->() return n, child;
+
 		RestIndex<Node> restIndex = restapi.getIndex(index);
-		List<Rel> rels = new CopyOnWriteArrayList<>();
+
+		ObjectNode obj = JsonNodeFactory.instance.objectNode();
+
+		HttpClient httpClient = new HttpClient();
+
+		ArrayNode statements = JsonNodeFactory.instance.arrayNode();
+		obj.put("statements", statements);
+		int i = 0;
 		for (String par : parent) {
-			IndexHits<Node> parentNode = restIndex.get("rdf_about", par);
-			Node node;
-			if (parentNode.size() > 0) {
-				node = parentNode.getSingle();
-				RestTraversal traversal = (RestTraversal) graphDb
-						.traversalDescription();
-				traversal.evaluator(Evaluators.excludeStartPosition());
+			String query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
+					+ "WHERE NOT (child)-[:`edm:isNextInSequence`]->() CREATE (child)-[:isFirstInSequence]->(n);";
+			if (dir.equals(Direction.INCOMING)) {
+				query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
+						+ "WHERE NOT (child)<-[:`edm:isNextInSequence`]-() CREATE (child)-[:isLastInSequence]->(n);";
+			}
+			ObjectNode statement = JsonNodeFactory.instance.objectNode();
+			statement.put("statement", query);
+			ObjectNode parameters = statement.with("parameters");
+			statements.add(statement);
+			parameters.put("id", par);
+			if (i == 1000) {
 
-				traversal.uniqueness(Uniqueness.RELATIONSHIP_GLOBAL);
-				traversal.breadthFirst();
-				traversal.maxDepth(1);
-
-				traversal.relationships(
-						new Relation(RelType.DCTERMS_ISPARTOF.getRelType()),
-						Direction.INCOMING);
-
-				Traverser tr = traversal.traverse(node);
-				Iterator<Node> resIter = tr.nodes().iterator();
-				while (resIter.hasNext()) {
-
-					Node child = resIter.next();
-					if (!child.hasRelationship(new Relation(
-							RelType.EDM_ISNEXTINSEQUENCE.getRelType()), dir)) {
-						rels.add(new Rel(node, child, relType));
-
-						break;
-					}
-
+				try {
+					String str = new ObjectMapper().writeValueAsString(obj);
+					PostMethod httpMethod = new PostMethod(
+							restapi.getBaseUri()+"/transaction/commit");
+					httpMethod.setRequestBody(str);
+					System.out.println(str);
+					httpMethod.setRequestHeader("content-type",
+							"application/json");
+					httpMethod.setRequestHeader("X-Stream", "true");
+					httpClient.executeMethod(httpMethod);
+					System.out.println(httpMethod.getStatusCode());
+					statements.removeAll();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+				i = 0;
 			}
 
+			i++;
 		}
-
-		createBatch(rels);
+		try {
+			String str = new ObjectMapper().writeValueAsString(obj);
+			PostMethod httpMethod = new PostMethod(
+					restapi.getBaseUri()+"/transaction/commit");
+			httpMethod.setRequestBody(str);
+			System.out.println(str);
+			httpMethod.setRequestHeader("content-type", "application/json");
+			httpMethod.setRequestHeader("X-Stream", "true");
+			httpClient.executeMethod(httpMethod);
+			System.out.println(httpMethod.getStatusCode());
+			statements.removeAll();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+
+
 
 	private void createIsFirstInSequence(Set<String> parent) {
 		createAbsoluteSequence(parent, RelType.ISFIRSTINSEQUENCE,
@@ -203,31 +203,6 @@ public class GraphConstructor {
 				Direction.INCOMING);
 	}
 
-	private class Rel {
-
-		private Node nodeFrom;
-		private Node nodeTo;
-		private RelType relType;
-
-		public Rel(Node nodeFrom, Node nodeTo, RelType relType) {
-			this.nodeFrom = nodeFrom;
-			this.nodeTo = nodeTo;
-			this.relType = relType;
-		}
-
-		public Node getNodeFrom() {
-			return nodeFrom;
-		}
-
-		public Node getNodeTo() {
-			return nodeTo;
-		}
-
-		public RelType getRelType() {
-			return relType;
-		}
-
-	}
 
 	private class RelTemp {
 
@@ -284,6 +259,8 @@ public class GraphConstructor {
 		}
 
 	}
+
+	
 
 	public synchronized void parseMorphiaEntity(FullBeanImpl fullbean) {
 
@@ -420,8 +397,7 @@ public class GraphConstructor {
 			map.put(key, edmCollection.get(key));
 			i++;
 
-			if (map.size() == 50 || edmCollection.size() == i) {
-				// First get nodes from the index
+			if (map.size() == 1000 || edmCollection.size() == i) {
 				final Map<String, Node> retNodes = new HashMap<String, Node>();
 				Set<String> idset = map.keySet();
 				Iterator<String> idsetIterator = idset.iterator();
@@ -434,7 +410,7 @@ public class GraphConstructor {
 						edmExistsCollection.put(nodeKey, Boolean.TRUE);
 					} else {
 						retNodes.put(nodeKey, null);
-						edmExistsCollection.put(nodeKey, Boolean.TRUE);
+						edmExistsCollection.put(nodeKey, Boolean.FALSE);
 					}
 
 				}
@@ -500,39 +476,61 @@ public class GraphConstructor {
 
 	public void generateNodeLinks(String mnemonic)
 			throws InvalidAttributeValueException {
+
 		Set<RelTemp> relTemps = relationsmap.get(mnemonic);
-		List<Rel> rels = new ArrayList<Rel>();
+		int i = 0;
+		ObjectNode obj = JsonNodeFactory.instance.objectNode();
+
+		HttpClient httpClient = new HttpClient();
+
+		ArrayNode statements = JsonNodeFactory.instance.arrayNode();
+		obj.put("statements", statements);
 		for (RelTemp relTemp : relTemps) {
 			final String id = relTemp.getFrom();
-			RestIndex<Node> restindex = restapi.getIndex(index);
-			IndexHits<Node> ndRes = restindex.get("rdf_about", id);
 
-			if (ndRes != null && ndRes.size() > 0) {
-				Node nd = ndRes.getSingle();
+			final String reference = relTemp.getTo();
+			final String linkname = relTemp.getRel();
+			ObjectNode statement = JsonNodeFactory.instance.objectNode();
+			statement
+					.put("statement",
+							"start from = node:edmsearch2(rdf_about={from}), to = node:edmsearch2(rdf_about={to}) create unique (from)-[:`"
+									+ linkname + "`]->(to)");
+			ObjectNode parameters = statement.with("parameters");
+			statements.add(statement);
+			parameters.put("from", id);
+			parameters.put("to", reference);
+			if (i == 1000) {
 
-				final String reference = relTemp.getTo();
-				final String linkname = relTemp.getRel();
-				IndexHits<Node> ndRefRes = restindex
-						.get("rdf_about", reference);
-				if (ndRefRes != null && ndRefRes.size() > 0) {
-					Node ndref = ndRefRes.getSingle();
-					Rel rel = new Rel(nd, ndref, RelType.getByRelType(linkname));
-					rels.add(rel);
-					if (rels.size() == 100) {
-
-						createBatch(rels);
-						rels.clear();
-					}
-
+				try {
+					String str = new ObjectMapper().writeValueAsString(obj);
+					PostMethod httpMethod = new PostMethod(
+							restapi.getBaseUri()+"/transaction/commit");
+					httpMethod.setRequestBody(str);
+					httpMethod.setRequestHeader("content-type",
+							"application/json");
+					httpMethod.setRequestHeader("X-Stream", "true");
+					httpClient.executeMethod(httpMethod);
+					statements.removeAll();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-
+				i = 0;
 			}
 
-		}
-		createBatch(rels);
-		rels.clear();
-		// nodeCache.get(mnemonic).clear();
+			i++;
 
+		}
+		try {
+			String str = new ObjectMapper().writeValueAsString(obj);
+			PostMethod httpMethod = new PostMethod(
+					restapi.getBaseUri()+"/transaction/commit");
+			httpMethod.setRequestBody(str);
+			httpMethod.setRequestHeader("content-type", "application/json");
+			httpClient.executeMethod(httpMethod);
+			statements.removeAll();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		relationsmap.get(mnemonic).clear();
 		edmelementsmap.get(mnemonic).clear();
 		if (retNodeMap != null && retNodeMap.get(mnemonic) != null) {
@@ -540,79 +538,10 @@ public class GraphConstructor {
 		}
 		createIsFirstInSequence(parents.get(mnemonic));
 		createIsLastInSequence(parents.get(mnemonic));
-		createHierarchyIndex(parents.get(mnemonic));
 	}
 
-	private void createHierarchyIndex(Set<String> parent) {
-		RestIndex<Node> restIndex = restapi.getIndex(index);
-		for (String par : parent) {
-			IndexHits<Node> parentNode = restIndex.get("rdf_about", par);
-			Node node;
-			if (parentNode.size() > 0) {
-				node = parentNode.getSingle();
-				RestTraversal traversal = (RestTraversal) graphDb
-						.traversalDescription();
-				traversal.evaluator(Evaluators.excludeStartPosition());
 
-				traversal.uniqueness(Uniqueness.RELATIONSHIP_GLOBAL);
-				traversal.breadthFirst();
-				traversal.maxDepth(1);
-
-				traversal.relationships(
-						new Relation(RelType.ISFIRSTINSEQUENCE.getRelType()),
-						Direction.OUTGOING);
-
-				Traverser tr = traversal.traverse(node);
-				Iterator<Node> resIter = tr.nodes().iterator();
-				while (resIter.hasNext()) {
-
-					Node child = resIter.next();
-					Node startNode = child;
-					boolean isLast = false;
-					int i = 1;
-					while (!isLast) {
-						RestTraversal traversal2 = (RestTraversal) graphDb
-								.traversalDescription();
-						traversal2.evaluator(Evaluators.excludeStartPosition());
-
-						traversal2.uniqueness(Uniqueness.RELATIONSHIP_GLOBAL);
-						traversal2.breadthFirst();
-						traversal2.maxDepth(1);
-
-						traversal2.relationships(new Relation(
-								RelType.EDM_ISNEXTINSEQUENCE.getRelType()),
-								Direction.INCOMING);
-
-						Traverser tr2 = traversal2.traverse(startNode);
-						Iterator<Node> resIter2 = tr2.nodes().iterator();
-						while (resIter2.hasNext()) {
-							if (startNode.hasRelationship(new Relation(
-									RelType.EDM_ISNEXTINSEQUENCE.getRelType()),
-									Direction.INCOMING)) {
-								Relationship rel = startNode
-										.getSingleRelationship(
-												new Relation(
-														RelType.EDM_ISNEXTINSEQUENCE
-																.getRelType()),
-												Direction.INCOMING);
-								rel.setProperty("index", i);
-
-								startNode = resIter2.next();
-								i++;
-								isLast = false;
-							} else {
-								isLast = true;
-							}
-
-						}
-					}
-
-				}
-			}
-
-		}
-
-	}
+	
 
 	private String processEntityID(String id) {
 
@@ -633,36 +562,13 @@ public class GraphConstructor {
 	}
 
 	public void deleteNodes(String mnemonic) {
-		// RestIndex<Node> restIndex;
-		// if (graphDb.index().existsForNodes(index)) {
-		// restIndex = restapi.getIndex(index);
-		// } else {
-		// restIndex = graphDb.index().forNodes(index);
-		// }
-
-		// List<String> deletionCandidatesCollection =
-		// deletionCandidates.get(mnemonic);
-		// List<Node> deletionNodesCollection = new ArrayList<>();
-		// if (deletionCandidatesCollection != null) {
-		// for (String id : deletionCandidatesCollection) {
-		// IndexHits<Node> nodes = restIndex.get("rdf_about", id);
-		// if (nodes.size() > 0) {
-		//
-		// Node node = nodes.getSingle();
-		// deletionNodesCollection.add(node);
-		//
-		// }
-		// }
-		// deletionNodes.put(mnemonic, deletionNodesCollection);
+		
 		removeRelationships(mnemonic);
 		removeNodes(mnemonic);
-		// removeFromIndex(mnemonic);
 		if (deletionCandidates != null
 				&& deletionCandidates.get(mnemonic) != null) {
 			deletionCandidates.get(mnemonic).clear();
 		}
-		// deletionNodes.get(mnemonic).clear();
-		// }
 	}
 
 	public void removeFromIndex(String mnemonic) {
@@ -711,7 +617,7 @@ public class GraphConstructor {
 						relationships.add(relIterator.next());
 
 					}
-					if (relationships.size() >= 100) {
+					if (relationships.size() >= 500) {
 						removeRelationships(relationships);
 					}
 				}
