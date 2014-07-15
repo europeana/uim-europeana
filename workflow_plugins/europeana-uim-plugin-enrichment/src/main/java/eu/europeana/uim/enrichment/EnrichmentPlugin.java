@@ -648,7 +648,7 @@ public class EnrichmentPlugin<I> extends
                         context.putValue(addedTKey,
                                 context.getValue(addedTKey) + 1);
                         fBean.setState(eu.europeana.publication.common.State.ACCEPTED);
-                        new SolrDocumentHandler().save(fBean,solrServer);
+                        new SolrDocumentHandler(solrServer).save(fBean);
 //                        solrServer.add(basicDocument);
                         return true;
                     } catch (MalformedURLException e) {
