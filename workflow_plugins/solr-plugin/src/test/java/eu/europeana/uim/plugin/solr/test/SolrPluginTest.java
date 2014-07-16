@@ -17,6 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +33,6 @@ import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.distribution.Version;
-
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EdmMappedField;
@@ -56,7 +56,7 @@ import eu.europeana.uim.sugar.SugarCrmRecord;
 import eu.europeana.uim.sugar.SugarCrmService;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMServiceImpl;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl;
-
+@Ignore
 public class SolrPluginTest {
  
 	private final String record = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><record><first><item><name>previews_only_on_europeana_por_c</name><type>0</type></item></first></record>";
