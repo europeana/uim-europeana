@@ -134,10 +134,10 @@ public class GraphConstructor {
 		int i = 0;
 		for (String par : parent) {
 			String query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
-					+ "WHERE NOT (child)-[:`edm:isNextInSequence`]->() CREATE UNIQUE (child)-[:isFirstInSequence]->(n);";
+					+ "WHERE NOT (child)-[:`edm:isNextInSequence`]->() CREATE (child)-[:isFirstInSequence]->(n);";
 			if (dir.equals(Direction.INCOMING)) {
 				query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
-						+ "WHERE NOT (child)<-[:`edm:isNextInSequence`]-() CREATE UNIQUE (child)-[:isLastInSequence]->(n);";
+						+ "WHERE NOT (child)<-[:`edm:isNextInSequence`]-() CREATE (child)-[:isLastInSequence]->(n);";
 			}
 			ObjectNode statement = JsonNodeFactory.instance.objectNode();
 			statement.put("statement", query);

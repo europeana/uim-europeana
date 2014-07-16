@@ -80,6 +80,7 @@ public class LookupCreationPlugin<I> extends
     private final static String OVERRIDESIPCREATOR = "override.sipcreator.field";
     private final static String USE_CUSTOM_FIELD = "redirect.use.custom.field";
     private final static String USE_FUNCTIONS = "redirect.use.custom.functions";
+    private final static String CREATE_HASH = "redirect.field.create.hash";
 
     public LookupCreationPlugin(String name, String description) {
         super(name, description);
@@ -114,6 +115,7 @@ public class LookupCreationPlugin<I> extends
 
         {
             add(OVERRIDESIPCREATOR);
+            add(CREATE_HASH);
             add(USE_CUSTOM_FIELD);
             add(USE_FUNCTIONS);
         }
@@ -227,6 +229,11 @@ public class LookupCreationPlugin<I> extends
                     String fieldValue = "";
                     if (context.getProperties().getProperty(OVERRIDESIPCREATOR)
                             != null) {
+                    	boolean createHash = false;
+                    	if(context.getProperties().getProperty(OVERRIDESIPCREATOR)
+                            != null){
+                    		createHash = true;
+                    	}
                         if (context.getProperties()
                                 .getProperty(OVERRIDESIPCREATOR)
                                 .equalsIgnoreCase("edm:isShownAt")) {
@@ -257,7 +264,7 @@ public class LookupCreationPlugin<I> extends
                                 rdf.getProvidedCHOList().get(0).getAbout(),
                                 fileName,collectionId,
                                 applyTransformations(
-                                        fieldValue,
+                                        createHash?HashUtils.createHash(fieldValue):fieldValue,
                                         context.getProperties().getProperty(
                                                 USE_FUNCTIONS)));
                     } else {
@@ -290,7 +297,7 @@ public class LookupCreationPlugin<I> extends
                                 .equalsIgnoreCase("owl:sameAs")) {
                             fieldValue = rdf.getProvidedCHOList().get(0)
                                     .getSameAList().get(0).getResource();
-                            edmValue = "provider_aggregation_owl_sameAs";
+                           edmValue = "proxy_owl_sameAs";
                         } else if (context.getProperties()
                                 .getProperty(USE_CUSTOM_FIELD)
                                 .equalsIgnoreCase("edm:object")) {
