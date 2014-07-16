@@ -125,15 +125,6 @@ public class GraphConstructor {
 	private void createAbsoluteSequence(Set<String> parent, RelType relType,
 			Direction dir) {
 
-		// Simulate Cypher query
-
-		// start n =
-		// node:edmsearch2(rdf_about="/9200300/BibliographicResource_3000052917524")
-		// match (n)-[:`dcterms:hasPart`]->(child) WHERE NOT
-		// (child)-[:`edm:isNextInSequence`]->() return n, child;
-
-		RestIndex<Node> restIndex = restapi.getIndex(index);
-
 		ObjectNode obj = JsonNodeFactory.instance.objectNode();
 
 		HttpClient httpClient = new HttpClient();
@@ -143,10 +134,10 @@ public class GraphConstructor {
 		int i = 0;
 		for (String par : parent) {
 			String query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
-					+ "WHERE NOT (child)-[:`edm:isNextInSequence`]->() CREATE (child)-[:isFirstInSequence]->(n);";
+					+ "WHERE NOT (child)-[:`edm:isNextInSequence`]->() CREATE UNIQUE (child)-[:isFirstInSequence]->(n);";
 			if (dir.equals(Direction.INCOMING)) {
 				query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
-						+ "WHERE NOT (child)<-[:`edm:isNextInSequence`]-() CREATE (child)-[:isLastInSequence]->(n);";
+						+ "WHERE NOT (child)<-[:`edm:isNextInSequence`]-() CREATE UNIQUE (child)-[:isLastInSequence]->(n);";
 			}
 			ObjectNode statement = JsonNodeFactory.instance.objectNode();
 			statement.put("statement", query);
@@ -160,7 +151,6 @@ public class GraphConstructor {
 					PostMethod httpMethod = new PostMethod(
 							restapi.getBaseUri()+"/transaction/commit");
 					httpMethod.setRequestBody(str);
-					System.out.println(str);
 					httpMethod.setRequestHeader("content-type",
 							"application/json");
 					httpMethod.setRequestHeader("X-Stream", "true");
