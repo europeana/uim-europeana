@@ -571,7 +571,7 @@ public class EnrichmentPlugin<I> extends
                                .getCollection().getName()});
                         if(europeanaProxy.getYear()!=null){
                             
-                        fBean.setYear(europeanaProxy.getYear().get("eur").toArray(new String[europeanaProxy.getYear().get("eur").size()]));
+                        fBean.setYear(europeanaProxy.getYear().get("def").toArray(new String[europeanaProxy.getYear().get("def").size()]));
                         }
                         ProxyImpl providerProxy = EuropeanaProxyUtils
                                 .getProviderProxy(fBean);

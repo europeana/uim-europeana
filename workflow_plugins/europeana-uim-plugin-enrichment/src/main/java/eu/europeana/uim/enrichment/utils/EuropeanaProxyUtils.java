@@ -32,7 +32,7 @@ public class EuropeanaProxyUtils {
 		europeanaProxy.setEuropeanaProxy(true);
 		Map<String, List<String>> yearMap = new HashMap<String, List<String>>();
 		ProxyImpl providerProxy = getProviderProxy(fbean);
-		yearMap.put("eur",
+		yearMap.put("def",
 				new EuropeanaDateUtils().createEuropeanaYears(providerProxy));
 		europeanaProxy.setYear(yearMap);
 		europeanaProxy.setEdmType(providerProxy.getEdmType());

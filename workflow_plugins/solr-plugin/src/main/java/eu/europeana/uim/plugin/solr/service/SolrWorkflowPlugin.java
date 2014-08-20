@@ -257,7 +257,7 @@ public class SolrWorkflowPlugin<I> extends
                         for (String year : years) {
                             Year yearObj = new Year();
                             Lang lang = new Lang();
-                            lang.setLang("eur");
+                            lang.setLang("def");
                             yearObj.setLang(lang);
                             yearObj.setString(year);
                             yearList.add(yearObj);
