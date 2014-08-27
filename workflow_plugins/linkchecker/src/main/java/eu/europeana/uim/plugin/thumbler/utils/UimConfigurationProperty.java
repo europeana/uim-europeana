@@ -7,11 +7,11 @@ package eu.europeana.uim.plugin.thumbler.utils;
  */
 public enum UimConfigurationProperty {
 
-	MONGO_HOSTURL("mongo.hostUrl"),
-	MONGO_HOSTPORT("mongo.hostPort"),
-	MONGO_DB_IMAGE("mongo.db.image"),
-	UIM_STORAGE_LOCATION("uim.storage.location"),
-	IMAGEMAGICK_PATH("imagemagick.path");
+	CLIENT_HOSTURL("harvester.hostUrl"),
+	CLIENT_HOSTPORT("harvester.hostPort"),
+        CLIENT_DB("harvester.db")
+        ;
+	
 	
 	String field;
 	private UimConfigurationProperty(String field){

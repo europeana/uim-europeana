@@ -1,260 +1,247 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>europeana-uim-europeanaspecific</artifactId>
-		<groupId>eu.europeana.europeanauim</groupId>
-		<version>1.0.0-SNAPSHOT</version>
-	</parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>europeana-uim-europeanaspecific</artifactId>
+        <groupId>eu.europeana.europeanauim</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>europeana-uim-plugin-linkchecker</artifactId>
-	<packaging>bundle</packaging>
-	<name>Unified Ingestion Manager: Europeana LinkChecker - Thumbler Plugin</name>
+    <artifactId>europeana-uim-plugin-linkchecker</artifactId>
+    <packaging>bundle</packaging>
+    <name>Unified Ingestion Manager: Europeana LinkChecker - Thumbler Plugin</name>
 
-	<dependencies>
-		<!-- JUnit dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
+    <dependencies>
+        <!-- JUnit dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>org.theeuropeanlibrary</groupId>
-			<artifactId>tel-uim-plugin-check-link-collection</artifactId>
-			<version>${europeana.uim.version}</version>
-		</dependency>
+      
+        <dependency>
+            <groupId>${europeana.uim.groupId}</groupId>
+            <artifactId>europeana-uim-model-europeana</artifactId>
+            <version>${europeana.uim.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>${europeana.uim.groupId}</groupId>
-			<artifactId>europeana-uim-model-europeana</artifactId>
-			<version>${europeana.uim.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>${europeana.uim.groupId}</groupId>
-			<artifactId>europeana-uim-model-adapters</artifactId>
-			<version>${europeana.uim.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.jibx</groupId>
+            <artifactId>jibx-run</artifactId>
+            <version>${jibx.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-		</dependency>
+      
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>harvester-client</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana</groupId>
+            <artifactId>harvester-persistence</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>16.0.1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.0</version>
+        </dependency>
+    </dependencies>
 
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.1</version>
-		</dependency>
+    <build>
+        <resources>
+            <!-- standard Maven folder -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- plus root folder -->
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>plugin.xml</include>
+                    <include>OSGI-INF/*</include>
+                </includes>
+            </resource>
+        </resources>
 
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jibx</groupId>
-			<artifactId>jibx-run</artifactId>
-			<version>${jibx.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>2.7.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.code.morphia</groupId>
-			<artifactId>morphia</artifactId>
-			<version>0.99</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.im4java</groupId>
-			<artifactId>im4java</artifactId>
-			<version>1.3.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.imgscalr</groupId>
-			<artifactId>imgscalr-lib</artifactId>
-			<version>4.2</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<resources>
-			<!-- standard Maven folder -->
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-			<!-- plus root folder -->
-			<resource>
-				<directory>.</directory>
-				<includes>
-					<include>plugin.xml</include>
-					<include>OSGI-INF/*</include>
-				</includes>
-			</resource>
-		</resources>
-
-		<plugins>
+        <plugins>
 
 
-			<!-- alternative maven-bundle-plugin configuration -->
-			<!-- see http://felix.apache.org/site/maven-bundle-plugin-bnd.html for 
-				more info -->
+            <!-- alternative maven-bundle-plugin configuration -->
+            <!-- see http://felix.apache.org/site/maven-bundle-plugin-bnd.html for 
+            more info -->
 
 
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<!-- <obrRepository>NONE</obrRepository> -->
-					<manifestLocation>META-INF</manifestLocation>
-					<instructions>
-						<Import-Package>
-							eu.europeana.uim,
-							eu.europeana.uim.common,
-							eu.europeana.uim.plugin,
-							eu.europeana.uim.store,
-							eu.europeana.uim.storage,
-							eu.europeana.uim.util,
-							eu.europeana.uim.sugar,
-							eu.europeana.uim.workflow,
-							eu.europeana.uim.plugin.source,
-							eu.europeana.uim.plugin.ingestion,
-							eu.europeana.uim.orchestration,
-							eu.europeana.uim.logging,
-							eu.europeana.uim.adapter,
-							org.theeuropeanlibrary.collections.guarded,
-							org.theeuropeanlibrary.model.common,
-							org.theeuropeanlibrary.model.common.qualifier,
-							org.theeuropeanlibrary.model.tel,
-							eu.europeana.uim.model.europeana,
-							eu.europeana.uim.common.progress,
-							eu.europeana.uim.model.adapters.*,
-							org.osgi.service.blueprint,
-							org.apache.commons.io,
-							javax.net.ssl,
-							javax.management.*,
-							javax.imageio.*,
-							org.jibx.runtime,
-							org.jibx.runtime.impl,
-							org.w3c.dom,
-							javax.xml.transform,
-							javax.xml.transform.dom,
-							javax.xml.parsers,
-							javax.xml.transform.stream,
-							org.xml.sax,
-							javax.net,
-							org.apache.commons.lang,
-							!*
-						</Import-Package>
-						<Embed-Dependency>tel-uim-plugin-check-link-collection,commons-logging,corelib-db,
-							commons-codec,httpcore,httpclient,commons-httpclient,mongo-java-driver,morphia,
-							corelib-definitions,corelib-solr-definitions,spring-test,im4java,jibx-run,
-							corelib-utils,imgscalr-lib,sanselan
-						</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Include-Resource>src/main/resources</Include-Resource>
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>package</phase>
-						<goals>
-							<goal>bundle</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <!-- <obrRepository>NONE</obrRepository> -->
+                    <manifestLocation>META-INF</manifestLocation>
+                    <instructions>
+                        <Import-Package>
+                            eu.europeana.uim,
+                            eu.europeana.uim.common,
+                            eu.europeana.uim.plugin,
+                            eu.europeana.uim.store,
+                            eu.europeana.uim.storage,
+                            eu.europeana.uim.util,
+                            eu.europeana.uim.sugar,
+                            eu.europeana.uim.workflow,
+                            eu.europeana.uim.plugin.source,
+                            eu.europeana.uim.plugin.ingestion,
+                            eu.europeana.uim.orchestration,
+                            eu.europeana.uim.logging,
+                            eu.europeana.uim.adapter,
+                            org.theeuropeanlibrary.collections.guarded,
+                            org.theeuropeanlibrary.model.common,
+                            org.theeuropeanlibrary.model.common.qualifier,
+                            org.theeuropeanlibrary.model.tel,
+                            eu.europeana.uim.model.europeana,
+                            eu.europeana.uim.common.progress,
+                            eu.europeana.uim.model.adapters.*,
+                            org.osgi.service.blueprint,
+                            org.apache.commons.io,
+                            javax.net.ssl,
+                            javax.management.*,
+                            javax.imageio.*,
+                            org.jibx.runtime,
+                            org.jibx.runtime.impl,
+                            org.w3c.dom,
+                            javax.xml.transform,
+                            javax.xml.transform.dom,
+                            javax.xml.parsers,
+                            javax.xml.transform.stream,
+                            org.xml.sax,
+                            javax.net,
+                            org.apache.commons.lang,
+                            !*
+                        </Import-Package>
+                        <Embed-Dependency>morphia,
+                            corelib-definitions,corelib-solr-definitions,spring-test,jibx-run,harvester-client,harvester-persistence,
+                            mongo-java-driver,log4j-core,log4j-api,guava,commons-lang3
+                            
+                        </Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
+                        <Include-Resource>src/main/resources</Include-Resource>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.8.1</version>
-				<configuration>
-					<parallel>methods</parallel>
-					<threadCount>10</threadCount>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <parallel>methods</parallel>
+                    <threadCount>10</threadCount>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
 
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.felix
-										</groupId>
-										<artifactId>
-											maven-bundle-plugin
-										</artifactId>
-										<versionRange>
-											[2.1.0,)
-										</versionRange>
-										<goals>
-											<goal>bundle</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings 
+                only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.felix
+                                        </groupId>
+                                        <artifactId>
+                                            maven-bundle-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.1.0,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>bundle</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
