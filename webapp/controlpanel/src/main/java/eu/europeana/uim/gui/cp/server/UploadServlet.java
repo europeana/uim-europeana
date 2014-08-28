@@ -21,106 +21,107 @@ import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 
 /**
  * Servlet with upload capabilities for local files
- * 
+ *
  * @author Yorgos.Mamakis@ kb.nl
- * 
+ *
  */
 public class UploadServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8392834299256226392L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 8392834299256226392L;
 
-	private static String TMP_DIR_PATH = PropertyReader
-			.getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION);
-	private File tmpDir;
-	private static String DESTINATION_DIR_PATH = PropertyReader
-			.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
-	private File destinationDir;
+    private static String TMP_DIR_PATH = PropertyReader
+            .getProperty(UimConfigurationProperty.UIM_STORAGE_LOCATION);
+    private File tmpDir;
+    private static String DESTINATION_DIR_PATH = PropertyReader
+            .getProperty(UimConfigurationProperty.UIM_REPOSITORY);
+    private File destinationDir;
 
-	/**
-	 * Initialization method
-	 */
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
+    /**
+     * Initialization method
+     */
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
 
-	}
+    }
 
-	/**
-	 * Method for handling GET requests. Left here for debugging reasons, will
-	 * be removed in the final version as FileUploadServlet does NOT support GET
-	 * requiests
-	 */
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		doPost(request, response);
-	}
+    /**
+     * Method for handling GET requests. Left here for debugging reasons, will be removed in the final version as
+     * FileUploadServlet does NOT support GET requiests
+     */
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
+    }
 
-	/**
-	 * Method for handling POST requests. It uses two repositories (a temp and a
-	 * produxation)
-	 */
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+    /**
+     * Method for handling POST requests. It uses two repositories (a temp and a produxation)
+     */
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
 
-		tmpDir = new File(TMP_DIR_PATH);
-		if (!tmpDir.isDirectory()) {
-			throw new ServletException(TMP_DIR_PATH + " is not a directory");
-		}
+        tmpDir = new File(TMP_DIR_PATH);
+        if (!tmpDir.isDirectory()) {
+            throw new ServletException(TMP_DIR_PATH + " is not a directory");
+        }
 
-		destinationDir = new File(DESTINATION_DIR_PATH);
-		if (!destinationDir.isDirectory()) {
-			throw new ServletException(DESTINATION_DIR_PATH
-					+ " is not a directory");
-		}
+        destinationDir = new File(DESTINATION_DIR_PATH);
+        if (!destinationDir.isDirectory()) {
+            throw new ServletException(DESTINATION_DIR_PATH
+                    + " is not a directory");
+        }
 
-		DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+        DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+        /*
+         * Set the size threshold, above which content will be stored on disk.
+         */
+        fileItemFactory.setSizeThreshold(1024 * 1024); // 1 MB
 		/*
-		 * Set the size threshold, above which content will be stored on disk.
-		 */
-		fileItemFactory.setSizeThreshold(1024 * 1024); // 1 MB
-		/*
-		 * Set the temporary directory to store the uploaded files of size above
-		 * threshold.
-		 */
-		fileItemFactory.setRepository(tmpDir);
+         * Set the temporary directory to store the uploaded files of size above
+         * threshold.
+         */
+        fileItemFactory.setRepository(tmpDir);
 
-		ServletFileUpload uploadHandler = new ServletFileUpload(fileItemFactory);
-		try {
+        ServletFileUpload uploadHandler = new ServletFileUpload(fileItemFactory);
+        try {
 
-			@SuppressWarnings("unchecked")
-			List<FileItem> items = uploadHandler.parseRequest(request);
-			String vocName = "";
-			for (FileItem item : items) {
-				if (item.isFormField()){
-					if(StringUtils.equals(item.getFieldName(),"vocabularyName")){
-						vocName = item.getString();
-					}
-					continue;
-				}
-					
-				File file = new File(destinationDir, vocName);
-				file.createNewFile();
-				item.write(file);
-				response.setStatus(HttpServletResponse.SC_CREATED);
-				response.getWriter()
-						.print("The file was created successfully.");
-				response.flushBuffer();
+            @SuppressWarnings("unchecked")
+            List<FileItem> items = uploadHandler.parseRequest(request);
+            String vocName = "";
+            for (FileItem item : items) {
+                if (item.isFormField()) {
+                    if (StringUtils.equals(item.getFieldName(), "vocabularyName")) {
+                        vocName = item.getString();
+                        
+                    }
+                    continue;
+                }
+                if(vocName.equals("")){
+                    vocName = item.getName();
+                }
+                File file = new File(destinationDir, vocName);
+                file.createNewFile();
+                item.write(file);
+                response.setStatus(HttpServletResponse.SC_CREATED);
+                response.getWriter()
+                        .print("The file was created successfully.");
+                response.flushBuffer();
 
-			}
-		} catch (FileUploadException ex) {
-			ex.printStackTrace();
-			response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-			response.getWriter().print("The file was not created");
-			response.flushBuffer();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-			response.getWriter().print("The file was not created");
-			response.flushBuffer();
-		}
+            }
+        } catch (FileUploadException ex) {
+            ex.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+            response.getWriter().print("The file was not created");
+            response.flushBuffer();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().print("The file was not created");
+            response.flushBuffer();
+        }
 
-	}
+    }
 
 }
