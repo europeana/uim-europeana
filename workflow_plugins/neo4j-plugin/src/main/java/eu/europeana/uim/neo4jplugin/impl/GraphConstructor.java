@@ -53,637 +53,647 @@ import eu.europeana.corelib.neo4j.entity.RelType;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.utils.EuropeanaUriUtils;
+import java.math.BigDecimal;
 import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Georgios Markakis (gwarkx@hotmail.com)
  *
- *         Mar 13, 2014
+ * Mar 13, 2014
  */
 public class GraphConstructor {
 
-	private Map<String, Set<RelTemp>> relationsmap;
-	private Map<String, Map<String, Map<String, Object>>> edmelementsmap;
-	private Map<String, Map<String, Boolean>> edmexistsmap;
+    private Map<String, Set<RelTemp>> relationsmap;
+    private Map<String, Map<String, Map<String, Object>>> edmelementsmap;
+    private Map<String, Map<String, Boolean>> edmexistsmap;
 
-	private Map<String, Map<String, RestNode>> retNodeMap;
-	private Map<String, List<String>> deletionCandidates;
-	private Map<String, Set<String>> parents;
+    private Map<String, Map<String, RestNode>> retNodeMap;
+    private Map<String, List<String>> deletionCandidates;
+    private Map<String, Set<String>> parents;
 
-	private EDMRepositoryService edmservice;
-	private Transaction tx;
+    private EDMRepositoryService edmservice;
+    private Transaction tx;
 
-	private RestGraphDatabase graphDb;
+    private RestGraphDatabase graphDb;
 
-	private RestAPI restapi;
+    private RestAPI restapi;
 
-	private String index;
+    private String index;
 
-	/**
+    /**
      *
      */
-	GraphConstructor() {
-		this.edmservice = new EDMRepositoryService();
-		init();
-	}
+    GraphConstructor() {
+        this.edmservice = new EDMRepositoryService();
+        init();
+    }
 
-	/**
+    /**
      *
      */
-	GraphConstructor(EDMRepositoryService edmservice) {
-		this.edmservice = edmservice;
-		init();
-	}
-
-	public void init() {
-
-		graphDb = edmservice.getGraphDatabaseService();
-
-		tx = graphDb.beginTx();
-
-		relationsmap = new ConcurrentHashMap<String, Set<RelTemp>>();
-		edmelementsmap = new ConcurrentHashMap<String, Map<String, Map<String, Object>>>();
-		edmexistsmap = new ConcurrentHashMap<String, Map<String, Boolean>>();
-		retNodeMap = new ConcurrentHashMap<String, Map<String, RestNode>>();
-		deletionCandidates = new ConcurrentHashMap<String, List<String>>();
-		parents = new ConcurrentHashMap<String, Set<String>>();
-		restapi = graphDb.getRestAPI();
-		index = edmservice.getIndex();
-		if (!graphDb.index().existsForNodes(index)) {
-			graphDb.index().forNodes(index);
-		}
-
-	}
-
-	
-
-	private void createAbsoluteSequence(Set<String> parent, RelType relType,
-			Direction dir) {
-
-		ObjectNode obj = JsonNodeFactory.instance.objectNode();
-
-		HttpClient httpClient = new HttpClient();
-
-		ArrayNode statements = JsonNodeFactory.instance.arrayNode();
-		obj.put("statements", statements);
-		int i = 0;
-		for (String par : parent) {
-			String query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
-					+ "WHERE NOT (child)-[:`edm:isNextInSequence`]->() CREATE (child)-[:isFirstInSequence]->(n);";
-			if (dir.equals(Direction.INCOMING)) {
-				query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
-						+ "WHERE NOT (child)<-[:`edm:isNextInSequence`]-() CREATE (child)-[:isLastInSequence]->(n);";
-			}
-			ObjectNode statement = JsonNodeFactory.instance.objectNode();
-			statement.put("statement", query);
-			ObjectNode parameters = statement.with("parameters");
-			statements.add(statement);
-			parameters.put("id", par);
-			if (i == 1000) {
-
-				try {
-					String str = new ObjectMapper().writeValueAsString(obj);
-					PostMethod httpMethod = new PostMethod(
-							restapi.getBaseUri()+"/transaction/commit");
-					httpMethod.setRequestBody(str);
-					httpMethod.setRequestHeader("content-type",
-							"application/json");
-					httpMethod.setRequestHeader("X-Stream", "true");
-					httpClient.executeMethod(httpMethod);
-					System.out.println(httpMethod.getStatusCode());
-					statements.removeAll();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				i = 0;
-			}
-
-			i++;
-		}
-		try {
-			String str = new ObjectMapper().writeValueAsString(obj);
-			PostMethod httpMethod = new PostMethod(
-					restapi.getBaseUri()+"/transaction/commit");
-			httpMethod.setRequestBody(str);
-			System.out.println(str);
-			httpMethod.setRequestHeader("content-type", "application/json");
-			httpMethod.setRequestHeader("X-Stream", "true");
-			httpClient.executeMethod(httpMethod);
-			System.out.println(httpMethod.getStatusCode());
-			statements.removeAll();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-
-
-	private void createIsFirstInSequence(Set<String> parent) {
-		createAbsoluteSequence(parent, RelType.ISFIRSTINSEQUENCE,
-				Direction.OUTGOING);
-	}
-
-	private void createIsLastInSequence(Set<String> parent) {
-		createAbsoluteSequence(parent, RelType.ISLASTINSEQUENCE,
-				Direction.INCOMING);
-	}
-
-
-	private class RelTemp {
-
-		private String from;
-		private String to;
-		private String rel;
-
-		public RelTemp(String from, String to, String rel) {
-			this.from = from;
-			this.to = to;
-			this.rel = rel;
-		}
-
-		public String getFrom() {
-			return from;
-		}
-
-		public String getTo() {
-			return to;
-		}
-
-		public String getRel() {
-			return rel;
-		}
-
-		@Override
-		public int hashCode() {
-			int hash = 7;
-			hash = 67 * hash + Objects.hashCode(this.from);
-			hash = 67 * hash + Objects.hashCode(this.to);
-			hash = 67 * hash + Objects.hashCode(this.rel);
-			return hash;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (obj == null) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			final RelTemp other = (RelTemp) obj;
-			if (!Objects.equals(this.from, other.from)) {
-				return false;
-			}
-			if (!Objects.equals(this.to, other.to)) {
-				return false;
-			}
-			if (!Objects.equals(this.rel, other.rel)) {
-				return false;
-			}
-			return true;
-		}
-
-	}
-
-	
-
-	public synchronized void parseMorphiaEntity(FullBeanImpl fullbean) {
-
-		if (fullbean != null) {
-
-			String id = processEntityID(fullbean.getAbout());
-			ProxyImpl provProxy = getEuropeanaProxy(fullbean);
-
-			DocType docType = fullbean.getType();
-			Map<String, Object> elementsToSave = new HashMap<String, Object>();
-			String collection = fullbean.getEuropeanaCollectionName()[0]
-					.split("_")[0];
-			Map<String, Map<String, Object>> elementsForCollection = edmelementsmap
-					.get(collection);
-			Set<String> parent = parents.get(collection);
-			if (parent == null) {
-				parent = new ConcurrentHashSet<>();
-			}
-			if (elementsForCollection == null) {
-				elementsForCollection = new ConcurrentHashMap<String, Map<String, Object>>();
-			}
-			elementsToSave.put("rdf:about", id);
-			if (provProxy.getDcDescription() != null) {
-				Map<String, List<String>> description = provProxy
-						.getDcDescription();
-				for (Entry<String, List<String>> entry : description.entrySet()) {
-					List<String> langStr = new ArrayList<>();
-					langStr.addAll(entry.getValue());
-					elementsToSave.put(
-							"dc:description_xml:lang_" + entry.getKey(),
-							langStr);
-				}
-			}
-
-			if (provProxy.getDcTitle() != null) {
-				Map<String, List<String>> titles = provProxy.getDcTitle();
-				for (Entry<String, List<String>> entry : titles.entrySet()) {
-					List<String> langStr = new ArrayList<>();
-					langStr.addAll(entry.getValue());
-					elementsToSave.put("dc:title_xml:lang_" + entry.getKey(),
-							langStr);
-				}
-			}
-			elementsToSave.put("edm:type", docType);
-			elementsForCollection.put(id, elementsToSave);
-			edmelementsmap.put(collection, elementsForCollection);
-			Set<RelTemp> relationsMapCollection = relationsmap.get(collection);
-			if (relationsMapCollection == null) {
-				relationsMapCollection = new ConcurrentHashSet<RelTemp>();
-			}
-			if (provProxy.getDctermsHasPart() != null) {
-				for (Entry<String, List<String>> entry : provProxy
-						.getDctermsHasPart().entrySet()) {
-					for (String str : entry.getValue()) {
-						String procId = EuropeanaUriUtils.createEuropeanaId(
-								collection, str);
-						relationsMapCollection.add(new RelTemp(id, procId,
-								"dcterms:hasPart"));
-						relationsMapCollection.add(new RelTemp(procId, id,
-								"dcterms:isPartOf"));
-						parent.add(id);
-					}
-				}
-			}
-			if (provProxy.getDctermsIsPartOf() != null) {
-				for (Entry<String, List<String>> entry : provProxy
-						.getDctermsIsPartOf().entrySet()) {
-					for (String str : entry.getValue()) {
-						String procId = EuropeanaUriUtils.createEuropeanaId(
-								collection, str);
-						relationsMapCollection.add(new RelTemp(id, procId,
-								"dcterms:isPartOf"));
-						relationsMapCollection.add(new RelTemp(procId, id,
-								"dcterms:hasPart"));
-						parent.add(procId);
-					}
-				}
-			}
-
-			if (provProxy.getEdmIsNextInSequence() != null) {
-
-				for (String str : provProxy.getEdmIsNextInSequence()) {
-					relationsMapCollection.add(new RelTemp(id,
-							EuropeanaUriUtils
-									.createEuropeanaId(collection, str),
-							"edm:isNextInSequence"));
-				}
-			}
-
-			relationsmap.put(collection, relationsMapCollection);
-			parents.put(collection, parent);
-		}
-
-	}
-
-	private ProxyImpl getEuropeanaProxy(FullBeanImpl fullbean) {
-		for (ProxyImpl proxy : fullbean.getProxies()) {
-			if (!proxy.isEuropeanaProxy()) {
-				return proxy;
-			}
-		}
-		return null;
-	}
-
-	public void save() {
-		tx.success();
-		tx.finish();
-	}
-
-	public void computeDependencies(String collectionId) {
-		Set<RelTemp> map = relationsmap.get(collectionId);
-		System.out.println("Relationships are: " + map.size());
-	}
-
-	public void generateNodes(final String collectionId) {
-		computeDependencies(collectionId);
-		final ConcurrentHashMap<String, Map<String, Object>> map = new ConcurrentHashMap<String, Map<String, Object>>();
-		int i = 0;
-		RestIndex<Node> index2;
-		try {
-			index2 = restapi.getIndex(index);
-		} catch (Exception e) {
-
-			index2 = graphDb.index().forNodes(index);
-
-		}
-		final RestIndex<Node> index = index2;
-		Map<String, Map<String, Object>> edmCollection = edmelementsmap
-				.get(collectionId);
-		Map<String, Boolean> edmExistsCollection = new ConcurrentHashMap<String, Boolean>();
-		final Map<String, Node> nodeList = new HashMap<String, Node>();
-		for (String key : edmCollection.keySet()) {
-
-			map.put(key, edmCollection.get(key));
-			i++;
-
-			if (map.size() == 1000 || edmCollection.size() == i) {
-				final Map<String, Node> retNodes = new HashMap<String, Node>();
-				Set<String> idset = map.keySet();
-				Iterator<String> idsetIterator = idset.iterator();
-				while (idsetIterator.hasNext()) {
-					String nodeKey = idsetIterator.next();
-					IndexHits<Node> savedNodes = index
-							.get("rdf_about", nodeKey);
-					if (savedNodes.size() > 0) {
-						retNodes.put(nodeKey, savedNodes.getSingle());
-						edmExistsCollection.put(nodeKey, Boolean.TRUE);
-					} else {
-						retNodes.put(nodeKey, null);
-						edmExistsCollection.put(nodeKey, Boolean.FALSE);
-					}
-
-				}
-
-				tx = graphDb.beginTx();
-				try {
-					RestNode relationship = graphDb.getRestAPI().executeBatch(
-							new BatchCallback<RestNode>() {
-
-								@Override
-								public RestNode recordBatch(RestAPI batchRestApi) {
-
-									for (Entry<String, Node> entryNode : retNodes
-											.entrySet()) {
-
-										Map<String, Object> nodemap = map
-												.get(entryNode.getKey());
-										Node node2;
-										if (entryNode.getValue() != null) {
-											node2 = entryNode.getValue();
-
-											restapi.execute(
-													RequestType.PUT,
-													graphDb.getRestAPI()
-															.getBaseUri()
-															+ "/node/"
-															+ node2.getId()
-															+ "/properties",
-													nodemap);
-										} else {
-											node2 = restapi.createNode(nodemap);
-
-										}
-
-										nodeList.put((String) nodemap
-												.get("rdf:about"), node2);
-									}
-
-									return null;
-
-								}
-
-							});
-
-					tx.success();
-					tx.finish();
-					tx = graphDb.beginTx();
-					for (Entry<String, Node> node : nodeList.entrySet()) {
-						restapi.addToIndex(node.getValue(), index, "rdf_about",
-								node.getKey());
-					}
-					tx.success();
-					tx.finish();
-					nodeList.clear();
-					map.clear();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		edmexistsmap.put(collectionId, edmExistsCollection);
-	}
-
-	public void generateNodeLinks(String mnemonic)
-			throws InvalidAttributeValueException {
-
-		Set<RelTemp> relTemps = relationsmap.get(mnemonic);
-		int i = 0;
-		ObjectNode obj = JsonNodeFactory.instance.objectNode();
-
-		HttpClient httpClient = new HttpClient();
-
-		ArrayNode statements = JsonNodeFactory.instance.arrayNode();
-		obj.put("statements", statements);
-		for (RelTemp relTemp : relTemps) {
-			final String id = relTemp.getFrom();
-
-			final String reference = relTemp.getTo();
-			final String linkname = relTemp.getRel();
-			ObjectNode statement = JsonNodeFactory.instance.objectNode();
-			statement
-					.put("statement",
-							"start from = node:edmsearch2(rdf_about={from}), to = node:edmsearch2(rdf_about={to}) create unique (from)-[:`"
-									+ linkname + "`]->(to)");
-			ObjectNode parameters = statement.with("parameters");
-			statements.add(statement);
-			parameters.put("from", id);
-			parameters.put("to", reference);
-			  if(StringUtils.equals(linkname, "dcterms:hasPart")){
-                        ObjectNode hasChildren = JsonNodeFactory.instance.objectNode();
-                        ObjectNode parent = statement.with("parameters");
-                        parent.put("from",id);
-                        hasChildren.put("statement", "START n = node:edmsearch2 (rdf_about = {from}) SET n.hasChildren=true return n");
-                        statements.add(hasChildren);
-                        }
-                        if (i == 500) {
-
-				try {
-					String str = new ObjectMapper().writeValueAsString(obj);
-					PostMethod httpMethod = new PostMethod(
-							restapi.getBaseUri()+"/transaction/commit");
-					httpMethod.setRequestBody(str);
-					httpMethod.setRequestHeader("content-type",
-							"application/json");
-					httpMethod.setRequestHeader("X-Stream", "true");
-					httpClient.executeMethod(httpMethod);
-					statements.removeAll();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				i = 0;
-			}
-
-			i++;
-
-		}
-		try {
-			String str = new ObjectMapper().writeValueAsString(obj);
-			PostMethod httpMethod = new PostMethod(
-					restapi.getBaseUri()+"/transaction/commit");
-			httpMethod.setRequestBody(str);
-			httpMethod.setRequestHeader("content-type", "application/json");
-			httpClient.executeMethod(httpMethod);
-			statements.removeAll();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		relationsmap.get(mnemonic).clear();
-		edmelementsmap.get(mnemonic).clear();
-		if (retNodeMap != null && retNodeMap.get(mnemonic) != null) {
-			retNodeMap.get(mnemonic).clear();
-		}
-		createIsFirstInSequence(parents.get(mnemonic));
-		createIsLastInSequence(parents.get(mnemonic));
-	}
-
-
-	
-
-	private String processEntityID(String id) {
-
-		String prid = id.replace("http://data.europeana.eu", "");
-		prid = prid.replace("/item/", "/");
-		return prid;
-	}
-
-	public void populateDeletionCandidates(String id, String mnemonic) {
-		List<String> deletionCandidatesCollection = deletionCandidates
-				.get(mnemonic);
-
-		if (deletionCandidatesCollection == null) {
-			deletionCandidatesCollection = new ArrayList<>();
-		}
-		deletionCandidatesCollection.add(id);
-		deletionCandidates.put(mnemonic, deletionCandidatesCollection);
-	}
-
-	public void deleteNodes(String mnemonic) {
-		
-		removeRelationships(mnemonic);
-		removeNodes(mnemonic);
-		if (deletionCandidates != null
-				&& deletionCandidates.get(mnemonic) != null) {
-			deletionCandidates.get(mnemonic).clear();
-		}
-	}
-
-	public void removeFromIndex(String mnemonic) {
-		final List<Node> tempList = new ArrayList<Node>();
-		int i = 0;
-		RestIndex<Node> restIndex = restapi.getIndex(index);
-		List<String> deleNodes = deletionCandidates.get(mnemonic);
-		if (deleNodes != null) {
-			for (String node : deleNodes) {
-
-				IndexHits<Node> retNodes = restIndex.get("rdf_about", node);
-				if (retNodes.size() > 0) {
-					tempList.add(retNodes.getSingle());
-				}
-				if (tempList.size() == 1000 || i == deleNodes.size()) {
-
-					tx = restapi.beginTx();
-					for (Node tempNode : tempList) {
-						restIndex.remove(tempNode);
-					}
-					tempList.clear();
-					tx.success();
-					tx.finish();
-
-				}
-
-				i++;
-			}
-		}
-	}
-
-	public void removeRelationships(String mnemonic) {
-		final Set<Relationship> relationships = new HashSet<Relationship>();
-
-		RestIndex<Node> restIndex = restapi.getIndex(index);
-		List<String> deleNodes = deletionCandidates.get(mnemonic);
-		if (deleNodes != null) {
-			for (String node : deleNodes) {
-				IndexHits<Node> retNodes = restIndex.get("rdf_about", node);
-				if (retNodes.size() > 0) {
-
-					Iterable<Relationship> rels = retNodes.getSingle()
-							.getRelationships();
-					Iterator<Relationship> relIterator = rels.iterator();
-					while (relIterator.hasNext()) {
-						relationships.add(relIterator.next());
-
-					}
-					if (relationships.size() >= 100) {
-						removeRelationships(relationships);
-					}
-				}
-
-			}
-			removeRelationships(relationships);
-		}
-	}
-
-	private void removeRelationships(final Set<Relationship> relationships) {
-		tx = restapi.beginTx();
-		restapi.executeBatch(new BatchCallback<Node>() {
-
-			@Override
-			public Node recordBatch(RestAPI batchRestApi) {
-				for (Relationship node : relationships) {
-					node.delete();
-
-				}
-				return null;
-			}
-
-		});
-		relationships.clear();
-		tx.success();
-		tx.finish();
-	}
-
-	public void removeNodes(String mnemonic) {
-		final List<Node> tempList = new ArrayList<Node>();
-		RestIndex<Node> restIndex = restapi.getIndex(index);
-		List<String> deleNodes = deletionCandidates.get(mnemonic);
-		if (deleNodes != null) {
-			for (String node : deleNodes) {
-				IndexHits<Node> retNodes = restIndex.get("rdf_about", node);
-				if (retNodes.size() > 0) {
-					tempList.add(retNodes.getSingle());
-
-					if (tempList.size() >= 100) {
-						remNodes(tempList);
-					}
-				}
-
-			}
-			remNodes(tempList);
-		}
-	}
-
-	private void remNodes(final List<Node> nodes) {
-		RestIndex<Node> restIndex = restapi.getIndex(index);
-		tx = restapi.beginTx();
-		for (Node nd : nodes) {
-			restIndex.remove(nd);
-		}
-
-		tx.success();
-		tx.finish();
-		tx = restapi.beginTx();
-		restapi.executeBatch(new BatchCallback<Node>() {
-
-			@Override
-			public Node recordBatch(RestAPI batchRestApi) {
-				for (Node node : nodes) {
-					node.delete();
-
-				}
-				return null;
-			}
-
-		});
-
-		tx.success();
-		tx.finish();
-
-		nodes.clear();
-	}
+    GraphConstructor(EDMRepositoryService edmservice) {
+        this.edmservice = edmservice;
+        init();
+    }
+
+    public void init() {
+
+        graphDb = edmservice.getGraphDatabaseService();
+
+        tx = graphDb.beginTx();
+
+        relationsmap = new ConcurrentHashMap<String, Set<RelTemp>>();
+        edmelementsmap = new ConcurrentHashMap<String, Map<String, Map<String, Object>>>();
+        edmexistsmap = new ConcurrentHashMap<String, Map<String, Boolean>>();
+        retNodeMap = new ConcurrentHashMap<String, Map<String, RestNode>>();
+        deletionCandidates = new ConcurrentHashMap<String, List<String>>();
+        parents = new ConcurrentHashMap<String, Set<String>>();
+        restapi = graphDb.getRestAPI();
+        index = edmservice.getIndex();
+        if (!graphDb.index().existsForNodes(index)) {
+            graphDb.index().forNodes(index);
+        }
+
+    }
+
+    private void createAbsoluteSequence(Set<String> parent, RelType relType,
+            Direction dir) {
+
+        ObjectNode obj = JsonNodeFactory.instance.objectNode();
+
+        HttpClient httpClient = new HttpClient();
+
+        ArrayNode statements = JsonNodeFactory.instance.arrayNode();
+        obj.put("statements", statements);
+        int i = 0;
+        for (String par : parent) {
+            String query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
+                    + "WHERE NOT (child)-[:`edm:isNextInSequence`]->() CREATE (child)-[:isFirstInSequence]->(n);";
+            if (dir.equals(Direction.INCOMING)) {
+                query = "start n = node:edmsearch2(rdf_about={id}) match (n)-[:`dcterms:hasPart`]->(child) "
+                        + "WHERE NOT (child)<-[:`edm:isNextInSequence`]-() CREATE (child)-[:isLastInSequence]->(n);";
+            }
+            ObjectNode statement = JsonNodeFactory.instance.objectNode();
+            statement.put("statement", query);
+            ObjectNode parameters = statement.with("parameters");
+            statements.add(statement);
+            parameters.put("id", par);
+            if (i == 1000) {
+
+                try {
+                    String str = new ObjectMapper().writeValueAsString(obj);
+                    PostMethod httpMethod = new PostMethod(
+                            restapi.getBaseUri() + "/transaction/commit");
+                    httpMethod.setRequestBody(str);
+                    httpMethod.setRequestHeader("content-type",
+                            "application/json");
+                    httpMethod.setRequestHeader("X-Stream", "true");
+                    httpClient.executeMethod(httpMethod);
+                    //System.out.println(httpMethod.getStatusCode());
+                    statements.removeAll();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                i = 0;
+            }
+
+            i++;
+        }
+        try {
+            String str = new ObjectMapper().writeValueAsString(obj);
+            PostMethod httpMethod = new PostMethod(
+                    restapi.getBaseUri() + "/transaction/commit");
+            httpMethod.setRequestBody(str);
+            //System.out.println(str);
+            httpMethod.setRequestHeader("content-type", "application/json");
+            httpMethod.setRequestHeader("X-Stream", "true");
+            httpClient.executeMethod(httpMethod);
+            //System.out.println(httpMethod.getStatusCode());
+            statements.removeAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createIsFirstInSequence(Set<String> parent) {
+        createAbsoluteSequence(parent, RelType.ISFIRSTINSEQUENCE,
+                Direction.OUTGOING);
+    }
+
+    private void createIsLastInSequence(Set<String> parent) {
+        createAbsoluteSequence(parent, RelType.ISLASTINSEQUENCE,
+                Direction.INCOMING);
+    }
+
+    private class RelTemp {
+
+        private String from;
+        private String to;
+        private String rel;
+
+        public RelTemp(String from, String to, String rel) {
+            this.from = from;
+            this.to = to;
+            this.rel = rel;
+        }
+
+        public String getFrom() {
+            return from;
+        }
+
+        public String getTo() {
+            return to;
+        }
+
+        public String getRel() {
+            return rel;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 67 * hash + Objects.hashCode(this.from);
+            hash = 67 * hash + Objects.hashCode(this.to);
+            hash = 67 * hash + Objects.hashCode(this.rel);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final RelTemp other = (RelTemp) obj;
+            if (!Objects.equals(this.from, other.from)) {
+                return false;
+            }
+            if (!Objects.equals(this.to, other.to)) {
+                return false;
+            }
+            if (!Objects.equals(this.rel, other.rel)) {
+                return false;
+            }
+            return true;
+        }
+
+    }
+
+    public synchronized void parseMorphiaEntity(FullBeanImpl fullbean) {
+
+        if (fullbean != null) {
+
+            String id = processEntityID(fullbean.getAbout());
+            ProxyImpl provProxy = getEuropeanaProxy(fullbean);
+
+            DocType docType = fullbean.getType();
+            Map<String, Object> elementsToSave = new HashMap<String, Object>();
+            String collection = fullbean.getEuropeanaCollectionName()[0]
+                    .split("_")[0];
+            Map<String, Map<String, Object>> elementsForCollection = edmelementsmap
+                    .get(collection);
+            Set<String> parent = parents.get(collection);
+            if (parent == null) {
+                parent = new ConcurrentHashSet<>();
+            }
+            if (elementsForCollection == null) {
+                elementsForCollection = new ConcurrentHashMap<String, Map<String, Object>>();
+            }
+            elementsToSave.put("rdf:about", id);
+            if (provProxy.getDcDescription() != null) {
+                Map<String, List<String>> description = provProxy
+                        .getDcDescription();
+                for (Entry<String, List<String>> entry : description.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    langStr.addAll(entry.getValue());
+                    elementsToSave.put(
+                            "dc:description_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
+
+            if (provProxy.getDcTitle() != null) {
+                Map<String, List<String>> titles = provProxy.getDcTitle();
+                for (Entry<String, List<String>> entry : titles.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    langStr.addAll(entry.getValue());
+                    elementsToSave.put("dc:title_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
+            elementsToSave.put("edm:type", docType);
+            elementsForCollection.put(id, elementsToSave);
+            edmelementsmap.put(collection, elementsForCollection);
+            Set<RelTemp> relationsMapCollection = relationsmap.get(collection);
+            if (relationsMapCollection == null) {
+                relationsMapCollection = new ConcurrentHashSet<RelTemp>();
+            }
+            if (provProxy.getDctermsHasPart() != null) {
+                for (Entry<String, List<String>> entry : provProxy
+                        .getDctermsHasPart().entrySet()) {
+                    for (String str : entry.getValue()) {
+                        String procId = EuropeanaUriUtils.createEuropeanaId(
+                                collection, str);
+                        relationsMapCollection.add(new RelTemp(id, procId,
+                                "dcterms:hasPart"));
+                        relationsMapCollection.add(new RelTemp(procId, id,
+                                "dcterms:isPartOf"));
+                        parent.add(id);
+                    }
+                }
+            }
+            if (provProxy.getDctermsIsPartOf() != null) {
+                for (Entry<String, List<String>> entry : provProxy
+                        .getDctermsIsPartOf().entrySet()) {
+                    for (String str : entry.getValue()) {
+                        String procId = EuropeanaUriUtils.createEuropeanaId(
+                                collection, str);
+                        relationsMapCollection.add(new RelTemp(id, procId,
+                                "dcterms:isPartOf"));
+                        relationsMapCollection.add(new RelTemp(procId, id,
+                                "dcterms:hasPart"));
+                        parent.add(procId);
+                    }
+                }
+            }
+
+            if (provProxy.getEdmIsNextInSequence() != null) {
+
+                for (String str : provProxy.getEdmIsNextInSequence()) {
+                    relationsMapCollection.add(new RelTemp(id,
+                            EuropeanaUriUtils
+                            .createEuropeanaId(collection, str),
+                            "edm:isNextInSequence"));
+                }
+            }
+
+            relationsmap.put(collection, relationsMapCollection);
+            parents.put(collection, parent);
+        }
+
+    }
+
+    private ProxyImpl getEuropeanaProxy(FullBeanImpl fullbean) {
+        for (ProxyImpl proxy : fullbean.getProxies()) {
+            if (!proxy.isEuropeanaProxy()) {
+                return proxy;
+            }
+        }
+        return null;
+    }
+
+    public void save() {
+        tx.success();
+        tx.finish();
+    }
+
+    public void computeDependencies(String collectionId) {
+        Set<RelTemp> map = relationsmap.get(collectionId);
+        System.out.println("Relationships are: " + map.size());
+    }
+
+    public void generateNodes(final String collectionId) {
+        computeDependencies(collectionId);
+        final ConcurrentHashMap<String, Map<String, Object>> map = new ConcurrentHashMap<String, Map<String, Object>>();
+        int i = 0;
+        RestIndex<Node> index2;
+        try {
+            index2 = restapi.getIndex(index);
+        } catch (Exception e) {
+
+            index2 = graphDb.index().forNodes(index);
+
+        }
+        final RestIndex<Node> index = index2;
+        Map<String, Map<String, Object>> edmCollection = edmelementsmap
+                .get(collectionId);
+        Map<String, Boolean> edmExistsCollection = new ConcurrentHashMap<String, Boolean>();
+        final Map<String, Node> nodeList = new HashMap<String, Node>();
+        for (String key : edmCollection.keySet()) {
+
+            map.put(key, edmCollection.get(key));
+            i++;
+
+            if (map.size() == 1000 || edmCollection.size() == i) {
+                final Map<String, Node> retNodes = new HashMap<String, Node>();
+                Set<String> idset = map.keySet();
+                Iterator<String> idsetIterator = idset.iterator();
+                while (idsetIterator.hasNext()) {
+                    String nodeKey = idsetIterator.next();
+                    IndexHits<Node> savedNodes = index
+                            .get("rdf_about", nodeKey);
+                    if (savedNodes.size() > 0) {
+                        retNodes.put(nodeKey, savedNodes.getSingle());
+                        edmExistsCollection.put(nodeKey, Boolean.TRUE);
+                    } else {
+                        retNodes.put(nodeKey, null);
+                        edmExistsCollection.put(nodeKey, Boolean.FALSE);
+                    }
+
+                }
+
+                tx = graphDb.beginTx();
+                try {
+                    RestNode relationship = graphDb.getRestAPI().executeBatch(
+                            new BatchCallback<RestNode>() {
+
+                                @Override
+                                public RestNode recordBatch(RestAPI batchRestApi) {
+
+                                    for (Entry<String, Node> entryNode : retNodes
+                                    .entrySet()) {
+
+                                        Map<String, Object> nodemap = map
+                                        .get(entryNode.getKey());
+                                        Node node2;
+                                        if (entryNode.getValue() != null) {
+                                            node2 = entryNode.getValue();
+
+                                            restapi.execute(
+                                                    RequestType.PUT,
+                                                    graphDb.getRestAPI()
+                                                    .getBaseUri()
+                                                    + "/node/"
+                                                    + node2.getId()
+                                                    + "/properties",
+                                                    nodemap);
+                                        } else {
+                                            node2 = restapi.createNode(nodemap);
+
+                                        }
+
+                                        nodeList.put((String) nodemap
+                                                .get("rdf:about"), node2);
+                                    }
+
+                                    return null;
+
+                                }
+
+                            });
+
+                    tx.success();
+                    tx.finish();
+                    tx = graphDb.beginTx();
+                    for (Entry<String, Node> node : nodeList.entrySet()) {
+                        restapi.addToIndex(node.getValue(), index, "rdf_about",
+                                node.getKey());
+                    }
+                    tx.success();
+                    tx.finish();
+                    nodeList.clear();
+                    map.clear();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        edmexistsmap.put(collectionId, edmExistsCollection);
+    }
+
+    public void generateNodeLinks(String mnemonic)
+            throws InvalidAttributeValueException {
+
+        Set<RelTemp> relTemps = relationsmap.get(mnemonic);
+        int i = 0;
+        ObjectNode obj = JsonNodeFactory.instance.objectNode();
+        ObjectNode objIndex = JsonNodeFactory.instance.objectNode();
+        HttpClient httpClient = new HttpClient();
+
+        ArrayNode statements = JsonNodeFactory.instance.arrayNode();
+        obj.put("statements", statements);
+
+        ArrayNode statementsIndex = JsonNodeFactory.instance.arrayNode();
+        objIndex.put("statements", statementsIndex);
+        for (RelTemp relTemp : relTemps) {
+            final String id = relTemp.getFrom();
+
+            final String reference = relTemp.getTo();
+            final String linkname = relTemp.getRel();
+            ObjectNode statement = JsonNodeFactory.instance.objectNode();
+            statement
+                    .put("statement",
+                            "start from = node:edmsearch2(rdf_about={from}), to = node:edmsearch2(rdf_about={to}) create unique (from)-[:`"
+                            + linkname + "`]->(to)");
+            ObjectNode parameters = statement.with("parameters");
+            statements.add(statement);
+            parameters.put("from", id);
+            parameters.put("to", reference);
+            if (StringUtils.equals(linkname, "dcterms:hasPart")) {
+                ObjectNode hasChildren = JsonNodeFactory.instance.objectNode();
+                ObjectNode parent = hasChildren.with("parameters");
+
+                hasChildren.put("statement", "start n = node:edmsearch2 (rdf_about = {from}) SET n.hasChildren=true return n");
+                parent.put("from", id);
+                statementsIndex.add(hasChildren);
+            }
+            if (i == 1000) {
+
+                try {
+                    String str = new ObjectMapper().writeValueAsString(obj);
+                    PostMethod httpMethod = new PostMethod(
+                            restapi.getBaseUri() + "/transaction/commit");
+                    httpMethod.setRequestBody(str);
+                    httpMethod.setRequestHeader("content-type",
+                            "application/json");
+                    httpMethod.setRequestHeader("X-Stream", "true");
+                    httpClient.executeMethod(httpMethod);
+                    statements.removeAll();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    String str = new ObjectMapper().writeValueAsString(objIndex);
+                    PostMethod httpMethod = new PostMethod(
+                            restapi.getBaseUri() + "/transaction/commit");
+                    httpMethod.setRequestBody(str);
+                    httpMethod.setRequestHeader("content-type",
+                            "application/json");
+                    httpMethod.setRequestHeader("X-Stream", "true");
+                    httpClient.executeMethod(httpMethod);
+                    statementsIndex.removeAll();
+                    System.out.println("called the method");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                i = 0;
+            }
+
+            i++;
+
+        }
+        try {
+            String str = new ObjectMapper().writeValueAsString(obj);
+            PostMethod httpMethod = new PostMethod(
+                    restapi.getBaseUri() + "/transaction/commit");
+            httpMethod.setRequestBody(str);
+            httpMethod.setRequestHeader("content-type", "application/json");
+            httpClient.executeMethod(httpMethod);
+            statements.removeAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        relationsmap.get(mnemonic).clear();
+        edmelementsmap.get(mnemonic).clear();
+        if (retNodeMap != null && retNodeMap.get(mnemonic) != null) {
+            retNodeMap.get(mnemonic).clear();
+        }
+        createIsFirstInSequence(parents.get(mnemonic));
+        createIsLastInSequence(parents.get(mnemonic));
+    }
+
+    private String processEntityID(String id) {
+
+        String prid = id.replace("http://data.europeana.eu", "");
+        prid = prid.replace("/item/", "/");
+        return prid;
+    }
+
+    public void populateDeletionCandidates(String id, String mnemonic) {
+        List<String> deletionCandidatesCollection = deletionCandidates
+                .get(mnemonic);
+
+        if (deletionCandidatesCollection == null) {
+            deletionCandidatesCollection = new ArrayList<>();
+        }
+        deletionCandidatesCollection.add(id);
+        deletionCandidates.put(mnemonic, deletionCandidatesCollection);
+    }
+
+    public void deleteNodes(String mnemonic) {
+
+        removeRelationships(mnemonic);
+        removeNodes(mnemonic);
+        if (deletionCandidates != null
+                && deletionCandidates.get(mnemonic) != null) {
+            deletionCandidates.get(mnemonic).clear();
+        }
+    }
+
+    public void removeFromIndex(String mnemonic) {
+        final List<Node> tempList = new ArrayList<Node>();
+        int i = 0;
+        RestIndex<Node> restIndex = restapi.getIndex(index);
+        List<String> deleNodes = deletionCandidates.get(mnemonic);
+        if (deleNodes != null) {
+            for (String node : deleNodes) {
+
+                IndexHits<Node> retNodes = restIndex.get("rdf_about", node);
+                if (retNodes.size() > 0) {
+                    tempList.add(retNodes.getSingle());
+                }
+                if (tempList.size() == 1000 || i == deleNodes.size()) {
+
+                    tx = restapi.beginTx();
+                    for (Node tempNode : tempList) {
+                        restIndex.remove(tempNode);
+                    }
+                    tempList.clear();
+                    tx.success();
+                    tx.finish();
+
+                }
+
+                i++;
+            }
+        }
+    }
+
+    public void removeRelationships(String mnemonic) {
+        final Set<Relationship> relationships = new HashSet<Relationship>();
+
+        RestIndex<Node> restIndex = restapi.getIndex(index);
+        List<String> deleNodes = deletionCandidates.get(mnemonic);
+        if (deleNodes != null) {
+            for (String node : deleNodes) {
+                IndexHits<Node> retNodes = restIndex.get("rdf_about", node);
+                if (retNodes.size() > 0) {
+
+                    Iterable<Relationship> rels = retNodes.getSingle()
+                            .getRelationships();
+                    Iterator<Relationship> relIterator = rels.iterator();
+                    while (relIterator.hasNext()) {
+                        relationships.add(relIterator.next());
+
+                    }
+                    if (relationships.size() >= 100) {
+                        removeRelationships(relationships);
+                    }
+                }
+
+            }
+            removeRelationships(relationships);
+        }
+    }
+
+    private void removeRelationships(final Set<Relationship> relationships) {
+        tx = restapi.beginTx();
+        restapi.executeBatch(new BatchCallback<Node>() {
+
+            @Override
+            public Node recordBatch(RestAPI batchRestApi) {
+                for (Relationship node : relationships) {
+                    node.delete();
+
+                }
+                return null;
+            }
+
+        });
+        relationships.clear();
+        tx.success();
+        tx.finish();
+    }
+
+    public void removeNodes(String mnemonic) {
+        final List<Node> tempList = new ArrayList<Node>();
+        RestIndex<Node> restIndex = restapi.getIndex(index);
+        List<String> deleNodes = deletionCandidates.get(mnemonic);
+        if (deleNodes != null) {
+            for (String node : deleNodes) {
+                IndexHits<Node> retNodes = restIndex.get("rdf_about", node);
+                if (retNodes.size() > 0) {
+                    tempList.add(retNodes.getSingle());
+
+                    if (tempList.size() >= 100) {
+                        remNodes(tempList);
+                    }
+                }
+
+            }
+            remNodes(tempList);
+        }
+    }
+
+    private void remNodes(final List<Node> nodes) {
+        RestIndex<Node> restIndex = restapi.getIndex(index);
+        tx = restapi.beginTx();
+        for (Node nd : nodes) {
+            restIndex.remove(nd);
+        }
+
+        tx.success();
+        tx.finish();
+        tx = restapi.beginTx();
+        restapi.executeBatch(new BatchCallback<Node>() {
+
+            @Override
+            public Node recordBatch(RestAPI batchRestApi) {
+                for (Node node : nodes) {
+                    node.delete();
+
+                }
+                return null;
+            }
+
+        });
+
+        tx.success();
+        tx.finish();
+
+        nodes.clear();
+    }
 }
