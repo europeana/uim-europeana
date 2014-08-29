@@ -59,6 +59,7 @@ import eu.europeana.corelib.neo4j.entity.Relation;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.utils.EuropeanaUriUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Georgios Markakis (gwarkx@hotmail.com)
@@ -489,7 +490,14 @@ public class GraphConstructor {
 			statements.add(statement);
 			parameters.put("from", id);
 			parameters.put("to", reference);
-			if (i == 1000) {
+			  if(StringUtils.equals(linkname, "dcterms:hasPart")){
+                        ObjectNode hasChildren = JsonNodeFactory.instance.objectNode();
+                        ObjectNode parent = statement.with("parameters");
+                        parent.put("from",id);
+                        hasChildren.put("statement", "START n = node:edmsearch2 (rdf_about = {from}) SET n.hasChildren=true return n");
+                        statements.add(hasChildren);
+                        }
+                        if (i == 500) {
 
 				try {
 					String str = new ObjectMapper().writeValueAsString(obj);
