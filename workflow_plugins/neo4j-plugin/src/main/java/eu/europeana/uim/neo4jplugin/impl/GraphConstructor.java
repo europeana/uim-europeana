@@ -536,6 +536,20 @@ public class GraphConstructor {
         } catch (Exception e) {
             e.printStackTrace();
         }
+         try {
+                    String str = new ObjectMapper().writeValueAsString(objIndex);
+                    PostMethod httpMethod = new PostMethod(
+                            restapi.getBaseUri() + "/transaction/commit");
+                    httpMethod.setRequestBody(str);
+                    httpMethod.setRequestHeader("content-type",
+                            "application/json");
+                    httpMethod.setRequestHeader("X-Stream", "true");
+                    httpClient.executeMethod(httpMethod);
+                    statementsIndex.removeAll();
+                    System.out.println("called the method");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         relationsmap.get(mnemonic).clear();
         edmelementsmap.get(mnemonic).clear();
         if (retNodeMap != null && retNodeMap.get(mnemonic) != null) {
