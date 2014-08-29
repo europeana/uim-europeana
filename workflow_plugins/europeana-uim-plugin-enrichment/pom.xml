@@ -319,14 +319,14 @@
                             version=1.0.0.SNAPSHOT,
                             org.theeuropeanlibrary.model.common.qualifier;
                             version=1.0.0.SNAPSHOT,
-                            org.apache.solr.common.util;
-                            version=4.0.0,
-                            org.apache.solr.client.solrj.impl; version=4.0.0,
-                            org.apache.solr.common; version=4.0.0,
-                            org.apache.solr.client.solrj; version=4.0.0,
-                            org.apache.solr.common.params; version=4.0.0,
-                            org.apache.solr.client.solrj.response; version=4.0.0,
-                            org.apache.solr.client.solrj.beans; version=4.0.0,
+<!--                             org.apache.solr.common.util; -->
+<!--                             version=4.9.0, -->
+<!--                             org.apache.solr.client.solrj.impl; version=4.9.0, -->
+<!--                             org.apache.solr.common; version=4.9.0, -->
+<!--                             org.apache.solr.client.solrj; version=4.9.0, -->
+<!--                             org.apache.solr.common.params; version=4.9.0, -->
+<!--                             org.apache.solr.client.solrj.response; version=4.9.0, -->
+<!--                             org.apache.solr.client.solrj.beans; version=4.9.0, -->
                             org.jibx.runtime,
                             org.jibx.runtime.impl,
                             org.jibx.extras,
@@ -342,7 +342,7 @@
                         </Import-Package>
                         <Include-Resource>src/main/resources</Include-Resource>
                         <Embed-Dependency>
-                            *;scope=compile|runtime;artifactId=!europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
+                            *;scope=compile|runtime;artifactId=!europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|spring-context-support
 
                         </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
