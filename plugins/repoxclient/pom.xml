@@ -35,6 +35,38 @@
 			<version>${europeana.uim.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.karaf.shell</groupId>
+			<artifactId>org.apache.karaf.shell.console</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-solr-dereference</artifactId>
+			<version>${corelib.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-db</artifactId>
+			<version>${corelib.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 

@@ -607,7 +607,7 @@ public class GraphConstructor {
 						relationships.add(relIterator.next());
 
 					}
-					if (relationships.size() >= 500) {
+					if (relationships.size() >= 100) {
 						removeRelationships(relationships);
 					}
 				}
