@@ -53,7 +53,11 @@ import eu.europeana.corelib.neo4j.entity.RelType;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.utils.EuropeanaUriUtils;
-import java.math.BigDecimal;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -357,6 +361,8 @@ public class GraphConstructor {
     public void generateNodes(final String collectionId) {
         computeDependencies(collectionId);
         final ConcurrentHashMap<String, Map<String, Object>> map = new ConcurrentHashMap<String, Map<String, Object>>();
+        File f = new File("urls");
+        List<String> urls = new ArrayList<>();
         int i = 0;
         RestIndex<Node> index2;
         try {
@@ -440,6 +446,7 @@ public class GraphConstructor {
                     for (Entry<String, Node> node : nodeList.entrySet()) {
                         restapi.addToIndex(node.getValue(), index, "rdf_about",
                                 node.getKey());
+                        urls.add(node.getKey());
                     }
                     tx.success();
                     tx.finish();
@@ -449,6 +456,11 @@ public class GraphConstructor {
                     e.printStackTrace();
                 }
             }
+        }
+        try {
+            FileUtils.writeLines(f, urls);
+        } catch (IOException ex) {
+            Logger.getLogger(GraphConstructor.class.getName()).log(Level.SEVERE, null, ex);
         }
         edmexistsmap.put(collectionId, edmExistsCollection);
     }
@@ -460,6 +472,7 @@ public class GraphConstructor {
         int i = 0;
         ObjectNode obj = JsonNodeFactory.instance.objectNode();
         ObjectNode objIndex = JsonNodeFactory.instance.objectNode();
+        ObjectNode parentIndex = JsonNodeFactory.instance.objectNode();
         HttpClient httpClient = new HttpClient();
 
         ArrayNode statements = JsonNodeFactory.instance.arrayNode();
@@ -467,6 +480,9 @@ public class GraphConstructor {
 
         ArrayNode statementsIndex = JsonNodeFactory.instance.arrayNode();
         objIndex.put("statements", statementsIndex);
+
+        ArrayNode parentCreationIndex = JsonNodeFactory.instance.arrayNode();
+        parentIndex.put("statements", parentCreationIndex);
         for (RelTemp relTemp : relTemps) {
             final String id = relTemp.getFrom();
 
@@ -485,9 +501,27 @@ public class GraphConstructor {
                 ObjectNode hasChildren = JsonNodeFactory.instance.objectNode();
                 ObjectNode parent = hasChildren.with("parameters");
 
-                hasChildren.put("statement", "start n = node:edmsearch2 (rdf_about = {from}) SET n.hasChildren=true return n");
+                hasChildren.put("statement",
+                        "start n = node:edmsearch2 (rdf_about = {from}) SET n.hasChildren=true return n");
                 parent.put("from", id);
                 statementsIndex.add(hasChildren);
+            }
+
+            if (StringUtils.equals(linkname, "dcterms:isPartOf")) {
+                RestIndex index = restapi.getIndex("edmsearch2");
+                if (index.get("rdf_about", reference).size() > 0) {
+                    System.out.println("Found parent:" + reference);
+                    ObjectNode hasParent = JsonNodeFactory.instance.objectNode();
+
+                    ObjectNode parent = hasParent.with("parameters");
+
+                    hasParent.put("statement",
+                            "start n = node:edmsearch2 (rdf_about = {from}) SET n.hasParent={to} return n");
+                    parent.put("to", reference);
+                    parent.put("from", id);
+
+                    parentCreationIndex.add(hasParent);
+                }
             }
             if (i == 1000) {
 
@@ -515,7 +549,20 @@ public class GraphConstructor {
                     httpMethod.setRequestHeader("X-Stream", "true");
                     httpClient.executeMethod(httpMethod);
                     statementsIndex.removeAll();
-                    System.out.println("called the method");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    String str = new ObjectMapper().writeValueAsString(parentIndex);
+                    PostMethod httpMethod = new PostMethod(
+                            restapi.getBaseUri() + "/transaction/commit");
+                    httpMethod.setRequestBody(str);
+                    httpMethod.setRequestHeader("content-type",
+                            "application/json");
+                    httpMethod.setRequestHeader("X-Stream", "true");
+                    httpClient.executeMethod(httpMethod);
+                    
+                    parentCreationIndex.removeAll();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -533,6 +580,33 @@ public class GraphConstructor {
             httpMethod.setRequestHeader("content-type", "application/json");
             httpClient.executeMethod(httpMethod);
             statements.removeAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            String str = new ObjectMapper().writeValueAsString(objIndex);
+            PostMethod httpMethod = new PostMethod(
+                    restapi.getBaseUri() + "/transaction/commit");
+            httpMethod.setRequestBody(str);
+            httpMethod.setRequestHeader("content-type",
+                    "application/json");
+            httpMethod.setRequestHeader("X-Stream", "true");
+            httpClient.executeMethod(httpMethod);
+            statementsIndex.removeAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            String str = new ObjectMapper().writeValueAsString(parentIndex);
+            PostMethod httpMethod = new PostMethod(
+                    restapi.getBaseUri() + "/transaction/commit");
+            httpMethod.setRequestBody(str);
+            httpMethod.setRequestHeader("content-type",
+                    "application/json");
+            httpMethod.setRequestHeader("X-Stream", "true");
+            httpClient.executeMethod(httpMethod);
+            System.out.println(str);
+            parentIndex.removeAll();
         } catch (Exception e) {
             e.printStackTrace();
         }
