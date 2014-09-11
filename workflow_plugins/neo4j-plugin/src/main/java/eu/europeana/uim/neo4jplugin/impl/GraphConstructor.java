@@ -57,7 +57,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -142,7 +144,7 @@ public class GraphConstructor {
             ObjectNode parameters = statement.with("parameters");
             statements.add(statement);
             parameters.put("id", par);
-            if (i == 1000) {
+            if (i == 500) {
 
                 try {
                     String str = new ObjectMapper().writeValueAsString(obj);
@@ -382,7 +384,7 @@ public class GraphConstructor {
             map.put(key, edmCollection.get(key));
             i++;
 
-            if (map.size() == 1000 || edmCollection.size() == i) {
+            if (map.size() == 500 || edmCollection.size() == i) {
                 final Map<String, Node> retNodes = new HashMap<String, Node>();
                 Set<String> idset = map.keySet();
                 Iterator<String> idsetIterator = idset.iterator();
@@ -467,7 +469,7 @@ public class GraphConstructor {
 
     public void generateNodeLinks(String mnemonic)
             throws InvalidAttributeValueException {
-
+        Set<String> parentIds = new HashSet<>();
         Set<RelTemp> relTemps = relationsmap.get(mnemonic);
         int i = 0;
         ObjectNode obj = JsonNodeFactory.instance.objectNode();
@@ -483,6 +485,7 @@ public class GraphConstructor {
 
         ArrayNode parentCreationIndex = JsonNodeFactory.instance.arrayNode();
         parentIndex.put("statements", parentCreationIndex);
+        long start = System.currentTimeMillis();
         for (RelTemp relTemp : relTemps) {
             final String id = relTemp.getFrom();
 
@@ -504,13 +507,13 @@ public class GraphConstructor {
                 hasChildren.put("statement",
                         "start n = node:edmsearch2 (rdf_about = {from}) SET n.hasChildren=true return n");
                 parent.put("from", id);
+                parentIds.add(id);
                 statementsIndex.add(hasChildren);
             }
 
             if (StringUtils.equals(linkname, "dcterms:isPartOf")) {
                 RestIndex index = restapi.getIndex("edmsearch2");
                 if (index.get("rdf_about", reference).size() > 0) {
-                    System.out.println("Found parent:" + reference);
                     ObjectNode hasParent = JsonNodeFactory.instance.objectNode();
 
                     ObjectNode parent = hasParent.with("parameters");
@@ -523,8 +526,9 @@ public class GraphConstructor {
                     parentCreationIndex.add(hasParent);
                 }
             }
-            if (i == 1000) {
-
+            if (i == 500) {
+                Logger.getLogger(this.getClass().getName()).info("Reached 1000 in " +(System.currentTimeMillis()-start) +" ms");
+                start = System.currentTimeMillis();
                 try {
                     String str = new ObjectMapper().writeValueAsString(obj);
                     PostMethod httpMethod = new PostMethod(
@@ -615,6 +619,12 @@ public class GraphConstructor {
         if (retNodeMap != null && retNodeMap.get(mnemonic) != null) {
             retNodeMap.get(mnemonic).clear();
         }
+        
+        try {
+            FileUtils.writeLines(new File("parents-"+mnemonic), parentIds);
+        } catch (IOException ex) {
+            Logger.getLogger(GraphConstructor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         createIsFirstInSequence(parents.get(mnemonic));
         createIsLastInSequence(parents.get(mnemonic));
     }
@@ -659,7 +669,7 @@ public class GraphConstructor {
                 if (retNodes.size() > 0) {
                     tempList.add(retNodes.getSingle());
                 }
-                if (tempList.size() == 1000 || i == deleNodes.size()) {
+                if (tempList.size() == 500 || i == deleNodes.size()) {
 
                     tx = restapi.beginTx();
                     for (Node tempNode : tempList) {
