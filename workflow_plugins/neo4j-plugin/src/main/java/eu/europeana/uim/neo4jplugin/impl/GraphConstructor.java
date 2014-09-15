@@ -57,9 +57,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -128,6 +127,9 @@ public class GraphConstructor {
         ObjectNode obj = JsonNodeFactory.instance.objectNode();
 
         HttpClient httpClient = new HttpClient();
+        HttpClientParams paramss = httpClient.getParams();
+        paramss.setConnectionManagerTimeout(300000);
+        httpClient.setParams(paramss);
 
         ArrayNode statements = JsonNodeFactory.instance.arrayNode();
         obj.put("statements", statements);
@@ -144,7 +146,7 @@ public class GraphConstructor {
             ObjectNode parameters = statement.with("parameters");
             statements.add(statement);
             parameters.put("id", par);
-            if (i == 500) {
+            if (i == 100) {
 
                 try {
                     String str = new ObjectMapper().writeValueAsString(obj);
@@ -360,7 +362,11 @@ public class GraphConstructor {
         System.out.println("Relationships are: " + map.size());
     }
 
-    public void generateNodes(final String collectionId) {
+    public void generateNodes(final String collectionId){
+        generateNodes(collectionId, 100);
+    }
+    
+    public void generateNodes(final String collectionId, int limit) {
         computeDependencies(collectionId);
         final ConcurrentHashMap<String, Map<String, Object>> map = new ConcurrentHashMap<String, Map<String, Object>>();
         File f = new File("urls");
@@ -374,6 +380,7 @@ public class GraphConstructor {
             index2 = graphDb.index().forNodes(index);
 
         }
+        
         final RestIndex<Node> index = index2;
         Map<String, Map<String, Object>> edmCollection = edmelementsmap
                 .get(collectionId);
@@ -384,7 +391,7 @@ public class GraphConstructor {
             map.put(key, edmCollection.get(key));
             i++;
 
-            if (map.size() == 500 || edmCollection.size() == i) {
+            if (map.size() == limit || edmCollection.size() == i) {
                 final Map<String, Node> retNodes = new HashMap<String, Node>();
                 Set<String> idset = map.keySet();
                 Iterator<String> idsetIterator = idset.iterator();
@@ -403,6 +410,7 @@ public class GraphConstructor {
                 }
 
                 tx = graphDb.beginTx();
+                
                 try {
                     RestNode relationship = graphDb.getRestAPI().executeBatch(
                             new BatchCallback<RestNode>() {
@@ -526,7 +534,7 @@ public class GraphConstructor {
                     parentCreationIndex.add(hasParent);
                 }
             }
-            if (i == 500) {
+            if (i == 100) {
                 Logger.getLogger(this.getClass().getName()).info("Reached 1000 in " +(System.currentTimeMillis()-start) +" ms");
                 start = System.currentTimeMillis();
                 try {
@@ -669,7 +677,7 @@ public class GraphConstructor {
                 if (retNodes.size() > 0) {
                     tempList.add(retNodes.getSingle());
                 }
-                if (tempList.size() == 500 || i == deleNodes.size()) {
+                if (tempList.size() == 100 || i == deleNodes.size()) {
 
                     tx = restapi.beginTx();
                     for (Node tempNode : tempList) {

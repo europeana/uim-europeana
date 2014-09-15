@@ -41,9 +41,7 @@ public class GraphImporterPlugin<I> extends
         AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
     private final static String INCLUDE_DELETED = "include.deleted";
-    private final static String OVERRIDECHECKS = "override.all.checks.force.delete";
-    private final static String OVERRIDEENRICHMENT = "override.enrichment.save";
-    private final static String FORCELASTUPDATE = "override.last.update.check";
+    private final static String LIMIT = "commit.limit";
 
     /**
      *
@@ -59,9 +57,7 @@ public class GraphImporterPlugin<I> extends
 
         {
             add(INCLUDE_DELETED);
-            add(OVERRIDECHECKS);
-            add(OVERRIDEENRICHMENT);
-            add(FORCELASTUPDATE);
+            add(LIMIT);
         }
     };
 
@@ -198,7 +194,7 @@ public class GraphImporterPlugin<I> extends
                     mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
                             timestampUpdated.getTime());
                     graphconstructor.parseMorphiaEntity(bean);
-                   
+
                 } else {
                     throw new IngestionPluginFailedException("Cannot get a reference to the Neo4j endpoint");
                 }
@@ -221,7 +217,8 @@ public class GraphImporterPlugin<I> extends
             }
             return true;
         } else {
-            graphconstructor.populateDeletionCandidates((String) mdr.getId(),((Collection) context.getExecution().getDataSet()).getMnemonic());
+            graphconstructor.populateDeletionCandidates((String) mdr.getId(), ((Collection) context.getExecution().
+                    getDataSet()).getMnemonic());
         }
 
         return false;
@@ -230,9 +227,14 @@ public class GraphImporterPlugin<I> extends
     public void completed(ExecutionContext<MetaDataRecord<I>, I> execution)
             throws IngestionPluginFailedException {
         graphconstructor.deleteNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic());
-
-        graphconstructor.generateNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic());
-           // graphconstructor.addToIndex(((Collection) execution.getExecution().getDataSet()).getMnemonic());
+        int limit = 100;
+        if (execution.getProperties().getProperty(
+                LIMIT) != null) {
+            limit = Integer.parseInt(execution.getProperties().getProperty(
+                LIMIT));
+        }
+        graphconstructor.generateNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic(),limit);
+        // graphconstructor.addToIndex(((Collection) execution.getExecution().getDataSet()).getMnemonic());
 
         try {
             graphconstructor.generateNodeLinks(((Collection) execution.getExecution().getDataSet()).getMnemonic());
