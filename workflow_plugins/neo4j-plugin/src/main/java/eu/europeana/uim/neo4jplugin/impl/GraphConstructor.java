@@ -270,18 +270,6 @@ public class GraphConstructor {
                 elementsForCollection = new ConcurrentHashMap<String, Map<String, Object>>();
             }
             elementsToSave.put("rdf:about", id);
-            if (provProxy.getDcDescription() != null) {
-                Map<String, List<String>> description = provProxy
-                        .getDcDescription();
-                for (Entry<String, List<String>> entry : description.entrySet()) {
-                    List<String> langStr = new ArrayList<>();
-                    langStr.addAll(entry.getValue());
-                    elementsToSave.put(
-                            "dc:description_xml:lang_" + entry.getKey(),
-                            langStr);
-                }
-            }
-
             if (provProxy.getDcTitle() != null) {
                 Map<String, List<String>> titles = provProxy.getDcTitle();
                 for (Entry<String, List<String>> entry : titles.entrySet()) {
@@ -291,6 +279,20 @@ public class GraphConstructor {
                             langStr);
                 }
             }
+            if (provProxy.getDcTitle() == null && provProxy.getDcDescription() != null) {
+                Map<String, List<String>> description = provProxy
+                        .getDcDescription();
+                for (Entry<String, List<String>> entry : description.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    for (String str : entry.getValue()) {
+                        langStr.add(StringUtils.substring(str, 0, 255));
+                    }
+                    elementsToSave.put(
+                            "dc:description_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
+
             elementsToSave.put("edm:type", docType);
             elementsForCollection.put(id, elementsToSave);
             edmelementsmap.put(collection, elementsForCollection);
@@ -362,10 +364,10 @@ public class GraphConstructor {
         System.out.println("Relationships are: " + map.size());
     }
 
-    public void generateNodes(final String collectionId){
-        generateNodes(collectionId, 100);
+    public void generateNodes(final String collectionId) {
+        generateNodes(collectionId, 1000);
     }
-    
+
     public void generateNodes(final String collectionId, int limit) {
         computeDependencies(collectionId);
         final ConcurrentHashMap<String, Map<String, Object>> map = new ConcurrentHashMap<String, Map<String, Object>>();
@@ -380,7 +382,7 @@ public class GraphConstructor {
             index2 = graphDb.index().forNodes(index);
 
         }
-        
+
         final RestIndex<Node> index = index2;
         Map<String, Map<String, Object>> edmCollection = edmelementsmap
                 .get(collectionId);
@@ -410,7 +412,7 @@ public class GraphConstructor {
                 }
 
                 tx = graphDb.beginTx();
-                
+
                 try {
                     RestNode relationship = graphDb.getRestAPI().executeBatch(
                             new BatchCallback<RestNode>() {
@@ -535,7 +537,8 @@ public class GraphConstructor {
                 }
             }
             if (i == 100) {
-                Logger.getLogger(this.getClass().getName()).info("Reached 1000 in " +(System.currentTimeMillis()-start) +" ms");
+                Logger.getLogger(this.getClass().getName()).info("Reached 1000 in " + (System.currentTimeMillis()
+                        - start) + " ms");
                 start = System.currentTimeMillis();
                 try {
                     String str = new ObjectMapper().writeValueAsString(obj);
@@ -573,7 +576,7 @@ public class GraphConstructor {
                             "application/json");
                     httpMethod.setRequestHeader("X-Stream", "true");
                     httpClient.executeMethod(httpMethod);
-                    
+
                     parentCreationIndex.removeAll();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -627,9 +630,9 @@ public class GraphConstructor {
         if (retNodeMap != null && retNodeMap.get(mnemonic) != null) {
             retNodeMap.get(mnemonic).clear();
         }
-        
+
         try {
-            FileUtils.writeLines(new File("parents-"+mnemonic), parentIds);
+            FileUtils.writeLines(new File("parents-" + mnemonic), parentIds);
         } catch (IOException ex) {
             Logger.getLogger(GraphConstructor.class.getName()).log(Level.SEVERE, null, ex);
         }
