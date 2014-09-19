@@ -227,7 +227,7 @@ public class GraphImporterPlugin<I> extends
     public void completed(ExecutionContext<MetaDataRecord<I>, I> execution)
             throws IngestionPluginFailedException {
         graphconstructor.deleteNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic());
-        int limit = 100;
+        int limit = 1000;
         if (execution.getProperties().getProperty(
                 LIMIT) != null) {
             limit = Integer.parseInt(execution.getProperties().getProperty(
