@@ -675,9 +675,7 @@ public class EnrichmentPlugin<I> extends
                     return false;
                 } else {
                     boolean res = true;
-                    if (checkUpdate||check) {
                         res = handler.removeRecord(solrServer, rdf);
-                    }
                     if (res) {
                         context.putValue(deletedTKey,
                                 context.getValue(deletedTKey) + 1);
