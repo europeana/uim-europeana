@@ -272,6 +272,8 @@ public class EnrichmentPlugin<I> extends
             }
             handler = new FullBeanHandler(mongoServer);
             collection = (Collection) context.getExecution().getDataSet();
+            enrichmentQueryCache.put(collection.getMnemonic(),
+                    Collections.synchronizedMap(new HashMap<String, State>()));
             String overrideChecks = context.getProperties().getProperty(
                     OVERRIDECHECKS);
             boolean check = false;
@@ -335,8 +337,7 @@ public class EnrichmentPlugin<I> extends
             previewsOnlyInPortal = sugarCrmRecord
                     .getItemValue(
                             EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
-            enrichmentQueryCache.put(collection.getMnemonic(),
-                    Collections.synchronizedMap(new HashMap<String, State>()));
+            
         } catch (QueryResultException e) {
             log.log(Level.SEVERE, "Error retrieving SugarCRM record");
             previewsOnlyInPortal = "false";
@@ -674,7 +675,7 @@ public class EnrichmentPlugin<I> extends
                     return false;
                 } else {
                     boolean res = true;
-                    if (check) {
+                    if (checkUpdate) {
                         res = handler.removeRecord(solrServer, rdf);
                     }
                     if (res) {
