@@ -16,6 +16,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
 
+import eu.europeana.corelib.solr.utils.construct.FullBeanHandler;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.deactivation.service.DeactivationService;
 import eu.europeana.uim.deactivation.service.ExtendedEdmMongoServer;
@@ -26,9 +27,11 @@ import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -48,7 +51,8 @@ public class DeactivatePlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static DeactivationService dService;
-	private final static Logger log = Logger.getLogger(DeactivatePlugin.class.getName());
+	private final static Logger log = Logger.getLogger(DeactivatePlugin.class
+			.getName());
 
 	public DeactivatePlugin(String name, String description) {
 		super(name, description);
@@ -111,27 +115,29 @@ public class DeactivatePlugin<I> extends
 			Collection collection = (Collection) arg0.getExecution()
 					.getDataSet();
 			String collectionId = collection.getName().split("_")[0];
-			log.log(Level.INFO,"Removing collectionId: " +collectionId);
+			log.log(Level.INFO, "Removing collectionId: " + collectionId);
 			String newCollectionId = dService.getCollectionMongoServer()
 					.findNewCollectionId(collection.getName().split("_")[0]);
-			log.log(Level.INFO,"New collection id is:"+newCollectionId);
+			log.log(Level.INFO, "New collection id is:" + newCollectionId);
 			if (newCollectionId != null) {
 				collectionId = newCollectionId;
 			}
-			log.log(Level.INFO,"removing from solr");
+			log.log(Level.INFO, "removing from solr");
 			dService.getSolrServer().deleteByQuery(
 					"europeana_collectionName:" + collectionId + "*");
-			log.log(Level.INFO,"removing from mongo");
-			clearData(dService.getMongoServer(), collectionId);
-                        clearData(dService.getGraphDb(),dService.getNeo4jIndex(),collectionId);
+			log.log(Level.INFO, "removing from mongo");
+			new FullBeanHandler(dService.getMongoServer())
+					.clearData(collectionId);
+			clearData(dService.getGraphDb(), dService.getNeo4jIndex(),
+					collectionId);
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			log.log(Level.SEVERE,e.getMessage());
+			log.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			log.log(Level.SEVERE,e.getMessage());
+			log.log(Level.SEVERE, e.getMessage());
 		}
 
 	}
@@ -157,40 +163,6 @@ public class DeactivatePlugin<I> extends
 		return true;
 	}
 
-	private void clearData(ExtendedEdmMongoServer mongoServer2,
-			String collection) {
-		DBCollection records = mongoServer2.getDatastore().getDB()
-				.getCollection("record");
-		DBCollection proxies = mongoServer2.getDatastore().getDB()
-				.getCollection("Proxy");
-		DBCollection providedCHOs = mongoServer2.getDatastore().getDB()
-				.getCollection("ProvidedCHO");
-		DBCollection aggregations = mongoServer2.getDatastore().getDB()
-				.getCollection("Aggregation");
-		DBCollection europeanaAggregations = mongoServer2.getDatastore()
-				.getDB().getCollection("EuropeanaAggregation");
-
-		DBObject query = new BasicDBObject("about", Pattern.compile("^/"
-				+ collection + "/"));
-		DBObject proxyQuery = new BasicDBObject("about", 
-				Pattern.compile("^/proxy/provider/" + collection + "/"));
-		DBObject europeanaProxyQuery = new BasicDBObject("about",
-				  Pattern.compile("^/proxy/europeana/" + collection + "/"));
-
-		DBObject providedCHOQuery = new BasicDBObject("about", Pattern.compile("^/item/" + collection + "/"));
-		DBObject aggregationQuery = new BasicDBObject("about", Pattern.compile("^/aggregation/provider/" + collection + "/"));
-		DBObject europeanaAggregationQuery = new BasicDBObject("about",
-				 Pattern.compile("^/aggregation/europeana/" + collection + "/"));
-
-		europeanaAggregations.remove(europeanaAggregationQuery,
-				WriteConcern.FSYNC_SAFE);
-		records.remove(query, WriteConcern.FSYNC_SAFE);
-		proxies.remove(europeanaProxyQuery, WriteConcern.FSYNC_SAFE);
-		proxies.remove(proxyQuery, WriteConcern.FSYNC_SAFE);
-		providedCHOs.remove(providedCHOQuery, WriteConcern.FSYNC_SAFE);
-		aggregations.remove(aggregationQuery, WriteConcern.FSYNC_SAFE);
-	}
-
 	/*
 	 * (non catch (IOException e) { // TODO Auto-generated catch block
 	 * e.printStackTrace(); }-Javadoc)
@@ -214,10 +186,10 @@ public class DeactivatePlugin<I> extends
 			dService.getSolrServer().commit();
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
-			log.log(Level.SEVERE,e.getMessage());
+			log.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			log.log(Level.SEVERE,e.getMessage());
+			log.log(Level.SEVERE, e.getMessage());
 		}
 	}
 
@@ -229,106 +201,108 @@ public class DeactivatePlugin<I> extends
 		DeactivatePlugin.dService = dService;
 	}
 
-    private void clearData(RestGraphDatabase graphDb, String neo4jIndex, String collectionId) {
-         RestIndex<Node> restIndex = graphDb.getRestAPI().getIndex(neo4jIndex);
-         List<Node> deletionNodes = new ArrayList<Node>();
-         IndexHits<Node> nodes = restIndex.query("rdf_about", "/"+collectionId+"/*");
-            if (nodes.size() > 0) {
+	private void clearData(RestGraphDatabase graphDb, String neo4jIndex,
+			String collectionId) {
+		RestIndex<Node> restIndex = graphDb.getRestAPI().getIndex(neo4jIndex);
+		List<Node> deletionNodes = new ArrayList<Node>();
+		IndexHits<Node> nodes = restIndex.query("rdf_about", "/" + collectionId
+				+ "/*");
+		if (nodes.size() > 0) {
 
-                while(nodes.iterator().hasNext()){
-                    deletionNodes.add(nodes.iterator().next());
-                }
-                
-                
+			while (nodes.iterator().hasNext()) {
+				deletionNodes.add(nodes.iterator().next());
+			}
 
-            }
-        
-        removeFromIndex(deletionNodes,graphDb,neo4jIndex);
-        removeRelationships(deletionNodes,graphDb);
-        removeNodes(deletionNodes,graphDb);
-    }
+		}
 
-    public void removeFromIndex(List<Node> deletionNodes,RestGraphDatabase graphDb, String neo4jIndex) {
-        final List<Node> tempList = new ArrayList<Node>();
-        int i = 0;
+		removeFromIndex(deletionNodes, graphDb, neo4jIndex);
+		removeRelationships(deletionNodes, graphDb);
+		removeNodes(deletionNodes, graphDb);
+	}
 
-        for (Node node : deletionNodes) {
+	public void removeFromIndex(List<Node> deletionNodes,
+			RestGraphDatabase graphDb, String neo4jIndex) {
+		final List<Node> tempList = new ArrayList<Node>();
+		int i = 0;
 
-            tempList.add(node);
+		for (Node node : deletionNodes) {
 
-            if (tempList.size() == 1000 || i == deletionNodes.size()) {
-               Transaction tx = graphDb.getRestAPI().beginTx();
-                for (Node tempNode : tempList) {
-                   graphDb.getRestAPI().getIndex(neo4jIndex).remove(tempNode);
-                }
-                tempList.clear();
-                tx.success();
-                tx.finish();
+			tempList.add(node);
 
-            }
+			if (tempList.size() == 1000 || i == deletionNodes.size()) {
+				Transaction tx = graphDb.getRestAPI().beginTx();
+				for (Node tempNode : tempList) {
+					graphDb.getRestAPI().getIndex(neo4jIndex).remove(tempNode);
+				}
+				tempList.clear();
+				tx.success();
+				tx.finish();
 
-            i++;
-        }
-    }
+			}
 
-    public void removeRelationships(List<Node> deletionNodes,RestGraphDatabase graphDb) {
-        final Set<Relationship> relationships = new HashSet<Relationship>();
+			i++;
+		}
+	}
 
-        int i = 0;
-        for (Node node : deletionNodes) {
-            Iterable<Relationship> rels = node.getRelationships();
-            Iterator<Relationship> relIterator = rels.iterator();
-            while (relIterator.hasNext()) {
-                relationships.add(relIterator.next());
-            }
+	public void removeRelationships(List<Node> deletionNodes,
+			RestGraphDatabase graphDb) {
+		final Set<Relationship> relationships = new HashSet<Relationship>();
 
-            if (relationships.size() >= 50 || i == deletionNodes.size()) {
-               Transaction tx = graphDb.getRestAPI().beginTx();
-               graphDb.getRestAPI().executeBatch(new BatchCallback<Node>() {
+		int i = 0;
+		for (Node node : deletionNodes) {
+			Iterable<Relationship> rels = node.getRelationships();
+			Iterator<Relationship> relIterator = rels.iterator();
+			while (relIterator.hasNext()) {
+				relationships.add(relIterator.next());
+			}
 
-                    @Override
-                    public Node recordBatch(RestAPI batchRestApi) {
-                        for (Relationship node : relationships) {
-                            node.delete();
+			if (relationships.size() >= 50 || i == deletionNodes.size()) {
+				Transaction tx = graphDb.getRestAPI().beginTx();
+				graphDb.getRestAPI().executeBatch(new BatchCallback<Node>() {
 
-                        } 
-                        return null;
-                    }
-                   
-                });
-                 relationships.clear();
-                tx.success();
-                tx.finish();
-            }
-            i++;
-        }
-    }
+					@Override
+					public Node recordBatch(RestAPI batchRestApi) {
+						for (Relationship node : relationships) {
+							node.delete();
 
-    public void removeNodes(List<Node> deletionNodes,RestGraphDatabase graphDb) {
-        final List<Node> tempList = new ArrayList<Node>();
-        int i = 0;
-        for (Node node : deletionNodes) {
+						}
+						return null;
+					}
 
-            tempList.add(node);
+				});
+				relationships.clear();
+				tx.success();
+				tx.finish();
+			}
+			i++;
+		}
+	}
 
-            if (tempList.size() == 50 || i == deletionNodes.size()) {
-                Transaction tx = graphDb.getRestAPI().beginTx();
-                graphDb.getRestAPI().executeBatch(new BatchCallback<Node>() {
+	public void removeNodes(List<Node> deletionNodes, RestGraphDatabase graphDb) {
+		final List<Node> tempList = new ArrayList<Node>();
+		int i = 0;
+		for (Node node : deletionNodes) {
 
-                    @Override
-                    public Node recordBatch(RestAPI batchRestApi) {
-                        for (Node node : tempList) {
-                            node.delete();
-                        }
-                        return null;
-                    }
+			tempList.add(node);
 
-                });
-                tempList.clear();
-                tx.success();
-                tx.finish();
-            }
-            i++;
-        }
-}
+			if (tempList.size() == 50 || i == deletionNodes.size()) {
+				Transaction tx = graphDb.getRestAPI().beginTx();
+				graphDb.getRestAPI().executeBatch(new BatchCallback<Node>() {
+
+					@Override
+					public Node recordBatch(RestAPI batchRestApi) {
+						for (Node node : tempList) {
+							node.delete();
+						}
+						return null;
+					}
+
+				});
+				tempList.clear();
+				tx.success();
+				tx.finish();
+			}
+			i++;
+		}
+	}
 }
