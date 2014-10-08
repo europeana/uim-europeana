@@ -441,7 +441,7 @@ public class EnrichmentPlugin<I> extends
             Date ingestionDate = new Date(context.getValue(date));
             if (updateDate.after(ingestionDate)
                     || updateDate.toString().equals(ingestionDate.toString())
-                    || check || checkUpdate) {
+                    || check || checkUpdate) { 
                 IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
                 RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
                 List<Status> status = mdr

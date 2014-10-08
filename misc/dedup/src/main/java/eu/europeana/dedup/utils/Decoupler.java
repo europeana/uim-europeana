@@ -20,19 +20,24 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.List;
+
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.ConformsTo;
 import eu.europeana.corelib.definitions.jibx.Created;
+import eu.europeana.corelib.definitions.jibx.Dataset;
 import eu.europeana.corelib.definitions.jibx.Description;
 import eu.europeana.corelib.definitions.jibx.EuropeanaAggregationType;
 import eu.europeana.corelib.definitions.jibx.Extent;
@@ -43,16 +48,18 @@ import eu.europeana.corelib.definitions.jibx.IsFormatOf;
 import eu.europeana.corelib.definitions.jibx.IsNextInSequence;
 import eu.europeana.corelib.definitions.jibx.IsPartOf;
 import eu.europeana.corelib.definitions.jibx.Issued;
+import eu.europeana.corelib.definitions.jibx.License;
+import eu.europeana.corelib.definitions.jibx.Organization;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
+import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 import eu.europeana.corelib.definitions.jibx.Rights;
 import eu.europeana.corelib.definitions.jibx.Source;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
 import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.dedup.osgi.service.exceptions.DeduplicationException;
-import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
 
 /**
  * Helper Class that checks if a received EDM record contains
@@ -133,14 +140,52 @@ public class Decoupler {
 			appendWebResources(aggregations, stub, cleandoc);
 			HashSet<String> resrefs = processWebresources(cleandoc);
 			appendContextualEntities(proxy, stub, cleandoc,resrefs);
+			appendCCLicences(cleandoc,stub);
 			edmList.add(cleandoc);
 		}
 		
 		return edmList;
 	}
 
+	/**
+	 * Append the cc:License on the RDF
+	 * @param cleandoc
+	 * @param stub
+	 */
 	
-	
+	private void appendCCLicences(RDF cleandoc, InfoStub stub) {
+		Map<String,License> licAbout = new HashMap<String,License>();
+		Set<License> found = new HashSet<>();
+		for(License lic :stub.licenseList){
+			licAbout.put(lic.getAbout(),lic);
+		}
+		
+		for(Aggregation aggregation:cleandoc.getAggregationList()){
+			if(licAbout.keySet().contains(aggregation.getRights().getResource())){
+				found.add(licAbout.get(aggregation.getRights().getResource()));
+			}
+		}
+		
+		if(cleandoc.getEuropeanaAggregationList()!=null){
+			for(EuropeanaAggregationType aggregation:cleandoc.getEuropeanaAggregationList()){
+				if(licAbout.keySet().contains(aggregation.getRights().getResource())){
+					found.add(licAbout.get(aggregation.getRights().getResource()));
+				}
+			}
+		}
+		
+		if(cleandoc.getWebResourceList()!=null){
+			for(WebResourceType wResource:cleandoc.getWebResourceList()){
+				if(licAbout.keySet().contains(wResource.getRights().getResource())){
+					found.add(licAbout.get(wResource.getRights().getResource()));
+				}
+			}
+		}
+		
+		cleandoc.setLicenseList(new ArrayList<>(found));
+	}
+
+
 	/**
 	 * Extract contextual resources references from Webresources.
 	 * 
@@ -602,7 +647,9 @@ public class Decoupler {
 		Vector<PlaceType> placeList = new Vector<PlaceType>();
 		Vector<TimeSpanType> timeList = new Vector<TimeSpanType>();
 		Vector<WebResourceType> webresourceList = new Vector<WebResourceType>();
-		
+		Vector<Organization> organizationList = new Vector<>();
+		Vector<Dataset> datasetList = new Vector<>();
+		Vector<License> licenseList = new Vector<>();
 		/**
 		 * Default constructor
 		 * @param edmXML
@@ -651,7 +698,15 @@ public class Decoupler {
 			if(edmXML.getWebResourceList()!=null){
 				webresourceList.addAll(edmXML.getWebResourceList());
 			}
-
+			if(edmXML.getDatasetList()!=null){
+				datasetList.addAll(edmXML.getDatasetList());
+			}
+			if(edmXML.getOrganizationList()!=null){
+				organizationList.addAll(edmXML.getOrganizationList());
+			}
+			if(edmXML.getLicenseList()!=null){
+				licenseList.addAll(edmXML.getLicenseList());
+			}
 		}
 
 	}
