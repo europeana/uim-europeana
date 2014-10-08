@@ -391,6 +391,15 @@ public class SolrWorkflowPlugin<I> extends
         if (rdf.getWebResourceList() != null) {
             rdfCopy.setWebResourceList(copyList(rdf.getWebResourceList()));
         }
+        if(rdf.getOrganizationList()!=null){
+        	rdfCopy.setOrganizationList(copyList(rdf.getOrganizationList()));
+        }
+        if(rdf.getDatasetList()!=null){
+        	rdfCopy.setDatasetList(copyList(rdf.getDatasetList()));
+        }
+        if(rdf.getOrganizationList()!=null){
+        	rdfCopy.setLicenseList(copyList(rdf.getLicenseList()));
+        }
         return rdfCopy;
     }
 
