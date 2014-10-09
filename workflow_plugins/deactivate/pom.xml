@@ -154,6 +154,7 @@
 							javax.imageio; version=0.0.0,
 							javax.management; version=0.0.0,
 							javax.net; version=0.0.0,
+							 javax.net.ssl,
 							javax.security.auth; version=0.0.0,
 							javax.xml.namespace; version=0.0.0,
 							javax.xml.parsers; version=0.0.0,
