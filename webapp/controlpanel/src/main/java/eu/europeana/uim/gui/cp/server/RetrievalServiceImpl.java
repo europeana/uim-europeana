@@ -27,9 +27,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,6 +52,7 @@ import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -63,14 +64,13 @@ import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.EuropeanaAggregationImpl;
+import eu.europeana.corelib.solr.entity.LicenseImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
 import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
-import eu.europeana.uim.storage.StorageEngine;
-import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.gui.cp.client.services.RetrievalService;
@@ -87,6 +87,8 @@ import eu.europeana.uim.gui.cp.shared.validation.NGramResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.SearchResultDTO;
 import eu.europeana.uim.model.europeana.EuropeanaLink;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.storage.StorageEngine;
+import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
 import eu.europeana.uim.store.MetaDataRecord.QualifiedValue;
@@ -560,6 +562,14 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 							.convertWebResource(webResource));
 				}
 			}
+			
+		}
+		
+		List<LicenseImpl> licenses = fullBean.getLicenses();
+		if(licenses!=null){
+			for(LicenseImpl lic:licenses){
+				fieldValues.addAll(MongoConverter.convertLicense(lic));
+			}
 		}
 		mongoFields.setFieldValue(fieldValues);
 		return mongoFields;
@@ -588,6 +598,9 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				for (String str : (String[]) entry.getValue()) {
 					values.add(str);
 				}
+			}
+			if(entry.getValue() instanceof Date){
+				values.add(((Date) entry.getValue()).toString());
 			}
 			fieldValue.setFieldValue(values);
 			fieldValues.add(fieldValue);

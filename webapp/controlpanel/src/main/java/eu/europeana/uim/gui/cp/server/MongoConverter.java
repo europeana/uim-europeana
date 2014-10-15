@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import eu.europeana.corelib.definitions.jibx.Date;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.definitions.solr.DocType;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.EuropeanaAggregationImpl;
+import eu.europeana.corelib.solr.entity.LicenseImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
@@ -29,6 +31,14 @@ import eu.europeana.uim.gui.cp.shared.validation.FieldValueDTO;
  */
 public final class MongoConverter {
 
+	public static List<FieldValueDTO> convertLicense(LicenseImpl license){
+		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
+		fieldValueList.add(getFieldValues(LicenseImpl.class,license,"getAbout",EdmLabel.LIC_RDF_ABOUT));
+		fieldValueList.add(getFieldValues(LicenseImpl.class,license,"getOdrlInheritFrom",EdmLabel.LIC_ODRL_INHERITED_FROM));
+		fieldValueList.add(getFieldValues(LicenseImpl.class,license,"getCcDeprecatedOn",EdmLabel.LIC_CC_DEPRECATED_ON));
+		return fieldValueList;
+	}
+	
 	public static List<FieldValueDTO> convertAggregation(
 			AggregationImpl aggregation) {
 		List<FieldValueDTO> fieldValueList = new ArrayList<FieldValueDTO>();
@@ -142,6 +152,8 @@ public final class MongoConverter {
 				"getEdmCurrentLocation", EdmLabel.PROXY_EDM_CURRENT_LOCATION));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getEdmHasType",
 				EdmLabel.PROXY_EDM_HAS_TYPE));
+		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy, "getEdmHasMet",
+				EdmLabel.PROXY_EDM_HAS_MET));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
 				"getEdmIncorporates", EdmLabel.PROXY_EDM_INCORPORATES));
 		fieldValueList.add(getFieldValues(ProxyImpl.class, proxy,
@@ -267,10 +279,10 @@ public final class MongoConverter {
 				"getRdaGr2DateOfBirth", EdmLabel.AG_RDAGR2_DATEOFBIRTH));
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
 				"getRdaGr2DateOfDeath", EdmLabel.AG_RDAGR2_DATEOFDEATH));
-//		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-//				"getRdaGr2PlaceOfBirth", EdmLabel.AG_RDAGR2_PLACEOFBIRTH));
-//		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
-//				"getRdaGr2PlaceOfDeath", EdmLabel.AG_RDAGR2_PLACEOFDEATH));
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
+				"getRdaGr2PlaceOfBirth", EdmLabel.AG_RDAGR2_PLACEOFBIRTH));
+		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
+				"getRdaGr2PlaceOfDeath", EdmLabel.AG_RDAGR2_PLACEOFDEATH));
 		
 		fieldValueList.add(getFieldValues(AgentImpl.class, agent,
 				"getRdaGr2DateOfEstablishment",
@@ -411,6 +423,8 @@ public final class MongoConverter {
 				"getIsNextInSequence", EdmLabel.WR_EDM_IS_NEXT_IN_SEQUENCE));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
 				"getWebResourceEdmRights", EdmLabel.WR_EDM_RIGHTS));
+		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
+				"getOwlSameAs", EdmLabel.WR_OWL_SAMEAS));
 		return fieldValueList;
 	}
 
@@ -490,6 +504,11 @@ public final class MongoConverter {
 			if(field.getClass().isAssignableFrom(DocType.class)){
 				String val = ((DocType)field).toString();
 				values.add(val);
+			}
+			
+			if(field.getClass().isAssignableFrom(java.util.Date.class)){
+				java.util.Date val = (java.util.Date) field;
+				values.add(val.toString());
 			}
 			}
 
