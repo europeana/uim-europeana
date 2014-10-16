@@ -425,6 +425,8 @@ public final class MongoConverter {
 				"getWebResourceEdmRights", EdmLabel.WR_EDM_RIGHTS));
 		fieldValueList.add(getFieldValues(WebResourceImpl.class, webResource,
 				"getOwlSameAs", EdmLabel.WR_OWL_SAMEAS));
+                
+                
 		return fieldValueList;
 	}
 
