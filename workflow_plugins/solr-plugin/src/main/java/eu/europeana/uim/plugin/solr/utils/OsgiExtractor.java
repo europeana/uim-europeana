@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -226,10 +227,12 @@ public class OsgiExtractor extends Extractor {
 		PlaceType lastPlace = null;
 		RDFReaderF rdfReader = solrWorkFlowService.getRDFReaderF();
 		Model model = ModelFactory.createDefaultModel();
-
+		try{
 		rdfReader.getReader().read(model,
-				new ByteArrayInputStream(xmlString.getBytes()), "");
-
+				new ByteArrayInputStream(xmlString.getBytes("UTF-8")), "");
+		} catch (UnsupportedEncodingException e){
+			e.printStackTrace();
+		}
 		Map<String, String> prefixNS = model.getNsPrefixMap();
 		StringBuilder sb = new StringBuilder();
 		for (Entry<String, String> prefix : prefixNS.entrySet()) {

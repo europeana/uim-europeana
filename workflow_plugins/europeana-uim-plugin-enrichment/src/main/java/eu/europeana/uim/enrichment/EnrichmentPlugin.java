@@ -532,11 +532,11 @@ public class EnrichmentPlugin<I> extends
 //                        basicDocument.addField(
 //                                EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
 //                                previewsOnlyInPortal);
+                        
+                        boolean prOO  = StringUtils.contains(previewsOnlyInPortal, "1");
                         fBean.getAggregations()
                                 .get(0)
-                                .setEdmPreviewNoDistribute(
-                                        Boolean.parseBoolean(
-                                                previewsOnlyInPortal));
+                                .setEdmPreviewNoDistribute(prOO);
                         int completeness = RecordCompletenessRanking
                                 .rankRecordCompleteness(basicDocument);
                         fBean.setEuropeanaCompleteness(completeness);
