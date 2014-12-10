@@ -36,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -43,15 +44,21 @@ import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
+import eu.europeana.corelib.edm.utils.EdmUtils;
+import eu.europeana.corelib.edm.utils.MongoConstructor;
+import eu.europeana.corelib.edm.utils.SolrConstructor;
+import eu.europeana.corelib.edm.utils.construct.FullBeanHandler;
+import eu.europeana.corelib.edm.utils.construct.SolrDocumentHandler;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
+import eu.europeana.corelib.solr.entity.AgentImpl;
+import eu.europeana.corelib.solr.entity.ConceptImpl;
+import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
-import eu.europeana.corelib.solr.utils.EdmUtils;
-import eu.europeana.corelib.solr.utils.MongoConstructor;
-import eu.europeana.corelib.solr.utils.SolrConstructor;
-import eu.europeana.corelib.solr.utils.construct.FullBeanHandler;
+import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.enrichment.api.external.EntityWrapper;
 import eu.europeana.enrichment.api.external.InputValue;
 import eu.europeana.enrichment.rest.client.EnrichmentDriver;
+import eu.europeana.publication.common.State;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.EnrichmentUtils;
@@ -63,6 +70,7 @@ import eu.europeana.uim.enrichment.utils.RecordCompletenessRanking;
 import eu.europeana.uim.enrichment.utils.RetrievedEntity;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.enrichment.utils.solr.SolrDocumentGenerator;
+import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaRetrievableField;
@@ -77,14 +85,6 @@ import eu.europeana.uim.sugar.LoginFailureException;
 import eu.europeana.uim.sugar.QueryResultException;
 import eu.europeana.uim.sugar.SugarCrmRecord;
 import eu.europeana.uim.sugar.SugarCrmService;
-
-import eu.europeana.corelib.solr.entity.TimespanImpl;
-import eu.europeana.corelib.solr.entity.ConceptImpl;
-import eu.europeana.corelib.solr.entity.PlaceImpl;
-import eu.europeana.corelib.solr.entity.AgentImpl;
-import eu.europeana.corelib.solr.utils.construct.SolrDocumentHandler;
-import eu.europeana.uim.logging.LoggingEngine;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Enrichment plugin implementation

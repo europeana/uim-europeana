@@ -3,35 +3,14 @@ package eu.europeana.uim.deactivation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
-import org.apache.solr.client.solrj.SolrServerException;
-import org.theeuropeanlibrary.model.common.qualifier.Status;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.WriteConcern;
-
-import eu.europeana.corelib.solr.utils.construct.FullBeanHandler;
-import eu.europeana.uim.common.TKey;
-import eu.europeana.uim.deactivation.service.DeactivationService;
-import eu.europeana.uim.deactivation.service.ExtendedEdmMongoServer;
-import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
-import eu.europeana.uim.orchestration.ExecutionContext;
-import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
-import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
-import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
-import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.MetaDataRecord;
-
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -40,6 +19,18 @@ import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.neo4j.rest.graphdb.batch.BatchCallback;
 import org.neo4j.rest.graphdb.index.RestIndex;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
+
+import eu.europeana.corelib.edm.utils.construct.FullBeanHandler;
+import eu.europeana.uim.common.TKey;
+import eu.europeana.uim.deactivation.service.DeactivationService;
+import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.orchestration.ExecutionContext;
+import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
+import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
+import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.MetaDataRecord;
 
 /**
  * Collection Deactivation Plugin

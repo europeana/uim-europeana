@@ -6,6 +6,7 @@
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
 	    <version>1.0.0-SNAPSHOT</version>
+	    <relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -130,7 +131,7 @@
 						<Export-Package>
 							eu.europeana.uim.europeanaspecific.workflowstarts.*,
 						</Export-Package>
-						<Embed-Dependency>oclc-harvester2,log4j,xalan,corelib-solr-definitions,commons-compress,commons-lang</Embed-Dependency>
+						<Embed-Dependency>oclc-harvester2,log4j,xalan,corelib-edm-definitions,commons-compress,commons-lang</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>

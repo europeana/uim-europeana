@@ -1,13 +1,19 @@
 package eu.europeana.uim.deactivation.service;
 
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.mapping.DefaultCreator;
 import com.mongodb.DBObject;
-import java.util.List;
-
 import com.mongodb.Mongo;
 import com.mongodb.WriteConcern;
+
+import eu.europeana.corelib.edm.exceptions.MongoDBException;
+import eu.europeana.corelib.mongo.server.EdmMongoServer;
+import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
@@ -22,12 +28,6 @@ import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-
-import eu.europeana.corelib.solr.exceptions.MongoDBException;
-import eu.europeana.corelib.solr.server.EdmMongoServer;
-import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
-import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
-import org.apache.commons.lang.StringUtils;
 
 public class ExtendedEdmMongoServer extends EdmMongoServerImpl implements EdmMongoServer {
 

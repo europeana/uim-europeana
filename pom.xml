@@ -27,7 +27,7 @@
 		<module>misc/europeana-uim-workflows-startups</module>
 		<module>workflow_plugins/europeana-uim-plugin-enrichment</module>
 		<module>workflow_plugins/linkchecker</module>
-		<module>workflow_plugins/solr-plugin</module>
+		<module>workflow_plugins/dereference-plugin</module>
 		<module>workflow_plugins/deactivate</module>
 		<module>workflow_plugins/europeana-uim-plugin-publish</module>
                 <module>workflow_plugins/neo4j-plugin</module>
@@ -45,12 +45,12 @@
 		<spring.ws.version>2.1.0.RELEASE</spring.ws.version>
 		<spring.quartz.version>1.6.2</spring.quartz.version>
 		<equinox.ver>3.2.2</equinox.ver>
-		<jibx.version>1.2.3</jibx.version>
+		<jibx.version>1.2.5</jibx.version>
 		<junit-version>4.5</junit-version>
 		<pax-exam-version>1.2.4</pax-exam-version>
 		<europeana.uim.version>2.0.1-SNAPSHOT</europeana.uim.version>
 		<europeana.uim.groupId>eu.europeana</europeana.uim.groupId>
-		<corelib.version>2.0-SNAPSHOT</corelib.version>
+		<corelib.version>2.1-SNAPSHOT</corelib.version>
 	</properties>
 
 
@@ -76,22 +76,27 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-dereference</artifactId>
+			<artifactId>corelib-dereference</artifactId>
 			<version>${corelib.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-definitions</artifactId>
+			<artifactId>corelib-edm-definitions</artifactId>
 			<version>${corelib.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr</artifactId>
+			<artifactId>corelib-storage</artifactId>
 			<version>${corelib.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-tools</artifactId>
+			<artifactId>corelib-hierarchies</artifactId>
+			<version>${corelib.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-lookup</artifactId>
 			<version>${corelib.version}</version>
 		</dependency>
 		<dependency>
@@ -239,9 +244,7 @@
 											<goal>manifest</goal>
 										</goals>
 									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
+									
 								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>

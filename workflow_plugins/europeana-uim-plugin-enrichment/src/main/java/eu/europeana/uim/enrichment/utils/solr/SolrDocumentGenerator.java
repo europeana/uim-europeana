@@ -10,8 +10,11 @@ import org.apache.solr.common.SolrInputDocument;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 
-import eu.europeana.corelib.definitions.model.EdmLabel;
-import eu.europeana.corelib.definitions.solr.beans.FullBean;
+import eu.europeana.corelib.definitions.edm.beans.FullBean;
+import eu.europeana.corelib.definitions.edm.entity.Agent;
+import eu.europeana.corelib.definitions.edm.entity.Concept;
+import eu.europeana.corelib.definitions.edm.entity.Place;
+import eu.europeana.corelib.definitions.edm.entity.Timespan;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
@@ -82,7 +85,7 @@ public class SolrDocumentGenerator {
 
 	}
 
-	public void addEntities(SolrInputDocument basicDocument, FullBean fBean,
+	public void addEntities(SolrInputDocument basicDocument, FullBeanImpl fBean,
 			ProxyImpl europeanaProxy, List<RetrievedEntity> enrichedEntities)
 			throws JsonParseException, JsonMappingException, IOException {
 
@@ -112,13 +115,13 @@ public class SolrDocumentGenerator {
 			FullBean fBean, ProxyImpl europeanaProxy,
 			RetrievedEntity enrichedEntity) throws JsonParseException,
 			JsonMappingException, IOException {
-		TimespanImpl ts =(TimespanImpl) enrichedEntity.getEntity();
-		List<TimespanImpl> tsList = (List<TimespanImpl>) fBean.getTimespans();
+		Timespan ts =(Timespan) enrichedEntity.getEntity();
+		List<Timespan> tsList = (List<Timespan>) fBean.getTimespans();
 		if (tsList == null) {
-			tsList = new ArrayList<TimespanImpl>();
+			tsList = new ArrayList<Timespan>();
 		}
 		boolean isContained = false;
-		for (TimespanImpl contained : tsList) {
+		for (Timespan contained : tsList) {
 			if (contained.getAbout().equals(ts.getAbout())) {
 				isContained = true;
 			}
@@ -172,14 +175,14 @@ public class SolrDocumentGenerator {
 	private void appendPlace(SolrInputDocument basicDocument, FullBean fBean,
 			ProxyImpl europeanaProxy, RetrievedEntity enrichedEntity)
 			throws JsonParseException, JsonMappingException, IOException {
-		PlaceImpl place = (PlaceImpl)enrichedEntity.getEntity();
+		Place place = (Place)enrichedEntity.getEntity();
 
-		List<PlaceImpl> placeList = (List<PlaceImpl>) fBean.getPlaces();
+		List<Place> placeList = (List<Place>) fBean.getPlaces();
 		if (placeList == null) {
-			placeList = new ArrayList<PlaceImpl>();
+			placeList = new ArrayList<Place>();
 		}
 		boolean isContained = false;
-		for (PlaceImpl contained : placeList) {
+		for (Place contained : placeList) {
 			if (contained.getAbout().equals(place.getAbout())) {
 				isContained = true;
 			}
@@ -233,14 +236,14 @@ public class SolrDocumentGenerator {
 	private void appendAgent(SolrInputDocument basicDocument, FullBean fBean,
 			ProxyImpl europeanaProxy, RetrievedEntity enrichedEntity)
 			throws JsonParseException, JsonMappingException, IOException {
-		AgentImpl agent = (AgentImpl) enrichedEntity.getEntity();
+		Agent agent = (Agent) enrichedEntity.getEntity();
 
-		List<AgentImpl> agentList = (List<AgentImpl>) fBean.getAgents();
+		List<Agent> agentList = (List<Agent>) fBean.getAgents();
 		if (agentList == null) {
-			agentList = new ArrayList<AgentImpl>();
+			agentList = new ArrayList<Agent>();
 		}
 		boolean isContained = false;
-		for (AgentImpl contained : agentList) {
+		for (Agent contained : agentList) {
 			if (contained.getAbout().equals(agent.getAbout())) {
 				isContained = true;
 			}
@@ -293,14 +296,14 @@ public class SolrDocumentGenerator {
 	private void appendConcept(SolrInputDocument basicDocument, FullBean fBean,
 			ProxyImpl europeanaProxy, RetrievedEntity enrichedEntity)
 			throws JsonParseException, JsonMappingException, IOException {
-		ConceptImpl concept = (ConceptImpl)enrichedEntity.getEntity();
+		Concept concept = (Concept)enrichedEntity.getEntity();
 
-		List<ConceptImpl> conceptList = (List<ConceptImpl>) fBean.getConcepts();
+		List<Concept> conceptList = (List<Concept>) fBean.getConcepts();
 		if (conceptList == null) {
-			conceptList = new ArrayList<ConceptImpl>();
+			conceptList = new ArrayList<Concept>();
 		}
 		boolean isContained = false;
-		for (ConceptImpl contained : conceptList) {
+		for (Concept contained : conceptList) {
 			if (contained.getAbout().equals(concept.getAbout())) {
 				isContained = true;
 			}

@@ -20,8 +20,6 @@
  */
 package eu.europeana.uim.gui.cp.client.utils;
 
-import eu.europeana.uim.gui.cp.server.util.PropertyReader;
-import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 
 
 /**

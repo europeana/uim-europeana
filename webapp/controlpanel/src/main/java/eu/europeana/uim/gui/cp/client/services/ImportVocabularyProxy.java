@@ -1,6 +1,7 @@
 package eu.europeana.uim.gui.cp.client.services;
 
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;

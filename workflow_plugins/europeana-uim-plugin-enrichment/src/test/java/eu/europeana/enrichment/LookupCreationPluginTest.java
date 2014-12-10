@@ -12,7 +12,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,12 +19,15 @@ import com.mongodb.Mongo;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfig;
+import de.flapdoodle.embed.mongo.config.IMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.runtime.Network;
+import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
+import eu.europeana.corelib.lookup.impl.EuropeanaIdMongoServerImpl;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
-import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
-import eu.europeana.corelib.tools.lookuptable.impl.EuropeanaIdMongoServerImpl;
 import eu.europeana.uim.enrichment.LookupCreationPlugin;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.service.impl.EnrichmentServiceImpl;
@@ -49,7 +51,9 @@ public class LookupCreationPluginTest {
 	public void testProcess() {
 		try {
 			String RECORD =FileUtils.readFileToString(new File("src/test/resources/edm_concept.xml"));
-			MongodConfig conf = new MongodConfig(Version.V2_0_7, 10003, false);
+			IMongodConfig conf = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
+			        .net(new Net(10001, Network.localhostIsIPv6()))
+			        .build();
 			MongodStarter runtime = MongodStarter.getDefaultInstance();
 			MongodExecutable mongoExec = runtime.prepare(conf);
 			mongoExec.start();

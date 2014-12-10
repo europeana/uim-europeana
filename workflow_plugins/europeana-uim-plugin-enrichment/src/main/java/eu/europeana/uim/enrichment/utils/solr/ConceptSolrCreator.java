@@ -5,8 +5,8 @@ import java.util.Collection;
 
 import org.apache.solr.common.SolrInputDocument;
 
+import eu.europeana.corelib.definitions.edm.entity.Concept;
 import eu.europeana.corelib.definitions.model.EdmLabel;
-import eu.europeana.corelib.solr.entity.ConceptImpl;
 /*
 	CC_SKOS_BROADER("cc_skos_broader", SolrType.NOT_STORED), 
 	CC_SKOS_NARROWER("cc_skos_narrower", SolrType.NOT_STORED),
@@ -21,7 +21,7 @@ import eu.europeana.corelib.solr.entity.ConceptImpl;
  */
 public class ConceptSolrCreator {
 
-	public void create(SolrInputDocument doc, ConceptImpl concept){
+	public void create(SolrInputDocument doc, Concept concept){
 		Collection<Object> values = doc.getFieldValues(
 				EdmLabel.SKOS_CONCEPT.toString());
 		if (values == null) {

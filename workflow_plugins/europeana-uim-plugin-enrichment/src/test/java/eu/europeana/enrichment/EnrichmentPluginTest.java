@@ -22,13 +22,17 @@ import com.mongodb.Mongo;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfig;
+import de.flapdoodle.embed.mongo.config.IMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.config.Storage;
 import de.flapdoodle.embed.mongo.distribution.Version;
-import eu.europeana.corelib.solr.exceptions.MongoDBException;
+import de.flapdoodle.embed.process.runtime.Network;
+import eu.europeana.corelib.edm.exceptions.MongoDBException;
+import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
+import eu.europeana.corelib.lookup.impl.EuropeanaIdMongoServerImpl;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
-import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
-import eu.europeana.corelib.tools.lookuptable.impl.EuropeanaIdMongoServerImpl;
 import eu.europeana.uim.enrichment.EnrichmentPlugin;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.service.impl.EnrichmentServiceImpl;
@@ -60,8 +64,10 @@ public class EnrichmentPluginTest {
 		try {
 			String RECORD = FileUtils.readFileToString(new File(
 					"src/test/resources/edm_concept.xml"));
-
-			MongodConfig conf = new MongodConfig(Version.V2_0_7, 10001, false,"src/test/resources/annocultor_db");
+			 Storage replication = new Storage("src/test/resources/annocultor_db",null,0);
+			IMongodConfig conf = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
+			        .net(new Net(10001, Network.localhostIsIPv6())).replication(replication)
+			        .build();
 			
 			MongodStarter runtime = MongodStarter.getDefaultInstance();
 			MongodExecutable mongoExec = runtime.prepare(conf);

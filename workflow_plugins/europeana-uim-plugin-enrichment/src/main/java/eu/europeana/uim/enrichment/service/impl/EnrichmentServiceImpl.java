@@ -26,6 +26,8 @@ import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
+import eu.europeana.corelib.edm.exceptions.MongoDBException;
+import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
@@ -40,11 +42,9 @@ import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-import eu.europeana.corelib.solr.exceptions.MongoDBException;
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
-import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
@@ -181,6 +181,9 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 			};
 					mongoInitializer.initialize(OsgiEdmMongoServer.class.getClassLoader());
 					
+					
+					
+				
 			idserver = new OsgiEuropeanaIdMongoServer(new Mongo(mongoHost,
 					Integer.parseInt(mongoPort)), "EuropeanaId");
 			idserver.createDatastore();

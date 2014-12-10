@@ -1,12 +1,12 @@
 package eu.europeana.uim.gui.cp.client.services;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import eu.europeana.uim.gui.cp.shared.validation.EdmRecordDTO;
 import eu.europeana.uim.gui.cp.shared.validation.LinksResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.MetaDataResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.NGramResultDTO;
 import eu.europeana.uim.gui.cp.shared.validation.SearchResultDTO;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Definition of the asynchronous service to retrieve orchestration dependent information from the

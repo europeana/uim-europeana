@@ -79,17 +79,17 @@ public class ImageCachingPlugin<I> extends
 
     @Override
     public TKey<?, ?>[] getInputFields() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     @Override
     public TKey<?, ?>[] getOptionalFields() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     @Override
     public TKey<?, ?>[] getOutputFields() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     @Override
@@ -161,7 +161,6 @@ public class ImageCachingPlugin<I> extends
 
     @Override
     public void shutdown() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

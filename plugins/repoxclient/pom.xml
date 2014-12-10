@@ -47,7 +47,7 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-solr-dereference</artifactId>
+			<artifactId>corelib-dereference</artifactId>
 			<version>${corelib.version}</version>
 			<exclusions>
 				<exclusion>

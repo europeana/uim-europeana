@@ -10,6 +10,7 @@ package eu.europeana.uim.gui.cp.client.europeanawidgets;
  *
  */
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.EventTarget;

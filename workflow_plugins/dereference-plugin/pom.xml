@@ -6,11 +6,12 @@
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
 		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>europeana-uim-plugin-solrosgi</artifactId>
+	<artifactId>europeana-uim-plugin-dereference</artifactId>
 	<packaging>bundle</packaging>
-	<name>Unified Ingestion Manager: Solr Workflow Plugin</name>
+	<name>Unified Ingestion Manager: Dereferencing Plugin</name>
 
 	<dependencies>
 

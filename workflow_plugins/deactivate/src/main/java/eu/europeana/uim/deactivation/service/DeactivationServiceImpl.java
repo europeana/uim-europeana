@@ -1,24 +1,24 @@
 package eu.europeana.uim.deactivation.service;
 
-import com.google.code.morphia.Morphia;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.neo4j.rest.graphdb.RestGraphDatabase;
 
+import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
-import eu.europeana.corelib.solr.exceptions.MongoDBException;
-import eu.europeana.corelib.solr.server.EdmMongoServer;
+import eu.europeana.corelib.edm.exceptions.MongoDBException;
+import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
+import eu.europeana.corelib.mongo.server.EdmMongoServer;
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
-import eu.europeana.corelib.tools.lookuptable.impl.CollectionMongoServerImpl;
 import eu.europeana.europeanauim.utils.PropertyReader;
 import eu.europeana.europeanauim.utils.UimConfigurationProperty;
 import eu.europeana.uim.common.BlockingInitializer;
-import org.neo4j.rest.graphdb.RestGraphDatabase;
 
 public class DeactivationServiceImpl implements DeactivationService {
 

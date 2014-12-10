@@ -20,12 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import eu.europeana.uim.gui.cp.client.services.RetrievalServiceAsync;
-import eu.europeana.uim.gui.cp.shared.validation.LinkDTO;
-import eu.europeana.uim.gui.cp.shared.validation.LinksResultDTO;
-import eu.europeana.uim.gui.cp.shared.validation.MetaDataRecordDTO;
-import eu.europeana.uim.gui.cp.shared.validation.MetaDataResultDTO;
+
 import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -42,10 +39,10 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -54,13 +51,16 @@ import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.RangeChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
+
 import eu.europeana.uim.gui.cp.client.IngestionWidget;
 import eu.europeana.uim.gui.cp.client.services.RepositoryServiceAsync;
+import eu.europeana.uim.gui.cp.client.services.RetrievalServiceAsync;
 import eu.europeana.uim.gui.cp.shared.CollectionDTO;
 import eu.europeana.uim.gui.cp.shared.ProviderDTO;
-import java.io.UnsupportedEncodingException;
-import com.google.gwt.http.client.URL;
-import com.google.gwt.cell.client.CheckboxCell;
+import eu.europeana.uim.gui.cp.shared.validation.LinkDTO;
+import eu.europeana.uim.gui.cp.shared.validation.LinksResultDTO;
+import eu.europeana.uim.gui.cp.shared.validation.MetaDataRecordDTO;
+import eu.europeana.uim.gui.cp.shared.validation.MetaDataResultDTO;
 
 /**
  * Table view showing current links for link checking

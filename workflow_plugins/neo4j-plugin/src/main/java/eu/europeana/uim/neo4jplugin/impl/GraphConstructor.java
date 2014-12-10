@@ -53,10 +53,12 @@ import eu.europeana.corelib.neo4j.entity.RelType;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.utils.EuropeanaUriUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;

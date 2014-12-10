@@ -8,8 +8,12 @@ import org.junit.Test;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfig;
+import de.flapdoodle.embed.mongo.config.IMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.config.Storage;
 import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.runtime.Network;
 
 
 public class EnrichmentTest {
@@ -26,8 +30,11 @@ public class EnrichmentTest {
 				ua.extract();
 			}
 			
-			MongodConfig conf = new MongodConfig(Version.V2_0_7, 10000,
-					false,ANNOCULTOR_DB);
+			 Storage replication = new Storage(ANNOCULTOR_DB,null,0);
+				IMongodConfig conf = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
+				        .net(new Net(10001, Network.localhostIsIPv6())).replication(replication)
+				        .build();
+				
 			MongodStarter runtime = MongodStarter.getDefaultInstance();
 			MongodExecutable mongoExec = runtime.prepare(conf);
 			mongoExec.start();

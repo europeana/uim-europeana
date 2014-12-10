@@ -5,8 +5,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import eu.europeana.uim.gui.cp.client.services.ReportingServiceAsync;
-
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.TextCell;
@@ -35,6 +33,7 @@ import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 import eu.europeana.uim.gui.cp.client.IngestionWidget;
+import eu.europeana.uim.gui.cp.client.services.ReportingServiceAsync;
 import eu.europeana.uim.gui.cp.shared.ExecutionDTO;
 
 /**

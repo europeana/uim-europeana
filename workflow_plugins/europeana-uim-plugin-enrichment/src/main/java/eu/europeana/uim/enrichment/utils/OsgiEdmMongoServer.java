@@ -24,7 +24,8 @@ import com.google.code.morphia.mapping.DefaultCreator;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 
-import eu.europeana.corelib.definitions.solr.beans.FullBean;
+import eu.europeana.corelib.edm.exceptions.MongoDBException;
+import eu.europeana.corelib.mongo.server.EdmMongoServer;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
 import eu.europeana.corelib.solr.entity.AggregationImpl;
@@ -40,8 +41,6 @@ import eu.europeana.corelib.solr.entity.ProvidedCHOImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-import eu.europeana.corelib.solr.exceptions.MongoDBException;
-import eu.europeana.corelib.solr.server.EdmMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.uim.enrichment.MongoBundleActivator;
 
@@ -107,7 +106,7 @@ public class OsgiEdmMongoServer implements EdmMongoServer{
 		return datastore.find(clazz).filter("about", about).get();
 	}
 	
-	public  FullBean getFullBean(String id) {
+	public  FullBeanImpl getFullBean(String id) {
 		if (datastore.find(FullBeanImpl.class).field("about").equal(id).get() != null) {
 			return datastore.find(FullBeanImpl.class).field("about").equal(id)
 					.get();
@@ -128,7 +127,7 @@ public class OsgiEdmMongoServer implements EdmMongoServer{
 
 
 	@Override
-	public FullBean resolve(String id) {
+	public FullBeanImpl resolve(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

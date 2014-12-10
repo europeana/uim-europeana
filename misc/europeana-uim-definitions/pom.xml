@@ -5,6 +5,7 @@
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
 	    <version>1.0.0-SNAPSHOT</version>
+	    <relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>europeana-datamodel-definitions</artifactId>

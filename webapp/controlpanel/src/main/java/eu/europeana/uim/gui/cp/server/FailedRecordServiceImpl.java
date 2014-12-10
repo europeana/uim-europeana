@@ -8,7 +8,6 @@ import org.apache.commons.lang.StringUtils;
 
 import com.mongodb.MongoException;
 
-import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.corelib.tools.lookuptable.LookupState;
 import eu.europeana.uim.gui.cp.client.services.FailedRecordService;
 import eu.europeana.uim.gui.cp.server.engine.ExpandedOsgiEngine;

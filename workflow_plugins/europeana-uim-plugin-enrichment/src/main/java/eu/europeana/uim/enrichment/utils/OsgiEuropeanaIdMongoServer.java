@@ -19,10 +19,9 @@ package eu.europeana.uim.enrichment.utils;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 
+import eu.europeana.corelib.lookup.impl.EuropeanaIdMongoServerImpl;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
-import eu.europeana.corelib.tools.lookuptable.impl.EuropeanaIdMongoServerImpl;
-import eu.europeana.publication.common.IDocument;
 
 /**
  * TODO: change to reflect the changes in the Interface definition
