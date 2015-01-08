@@ -45,28 +45,28 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-dereference</artifactId>
-			<version>${corelib.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-db</artifactId>
-			<version>${corelib.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.corelib</groupId> -->
+<!-- 			<artifactId>corelib-dereference</artifactId> -->
+<!-- 			<version>${corelib.version}</version> -->
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<artifactId>slf4j-api</artifactId> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.corelib</groupId> -->
+<!-- 			<artifactId>corelib-db</artifactId> -->
+<!-- 			<version>${corelib.version}</version> -->
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<artifactId>slf4j-api</artifactId> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+<!-- 		</dependency> -->
 	</dependencies>
 
 
@@ -153,7 +153,7 @@
 							org.springframework.jms,com.springsource.javax.xml.rpc,
 							com.springsource.com.sun.xml.messaging.saaj,com.springsource.org.joda.time,
 							com.springsource.org.xmlpull,jibx-run,jibx-extras,spring-core,org.apache.servicemix.bundles.aopalliance,
-							spring-asm,spring-expression,spring-beans,spring-aop,spring-context,spring-context-support,spring-web</Embed-Dependency>
+							spring-asm,spring-expression,spring-beans,spring-aop,spring-context,spring-context-support,spring-web,spring-core</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
