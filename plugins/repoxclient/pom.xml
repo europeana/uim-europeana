@@ -139,6 +139,8 @@
 							javax.xml.transform.dom,
 							javax.xml.stream.util,
 							javax.xml.transform.sax,
+							 org.springframework.util,
+							  org.springframework.http,
 							!*
 						</Import-Package>
 						<Embed-Dependency>europeana-uim-plugin-clientbindings,com.springsource.org.quartz,
