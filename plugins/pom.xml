@@ -195,6 +195,10 @@
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
 			<url>http://artifactory.eanadev.org/artifactory/com.springsource.repository.bundles.external</url>
 		</repository>
-
+    <repository>
+            <id>artifactory.eanadev.org</id>
+            <name>artifactory.eanadev.org-releases</name>
+            <url>http://artifactory.eanadev.org/artifactory/ext-release-local</url>
+        </repository>
 	</repositories>
 </project>
