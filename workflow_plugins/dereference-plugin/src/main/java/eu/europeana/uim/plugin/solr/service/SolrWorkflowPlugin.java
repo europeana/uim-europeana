@@ -397,7 +397,7 @@ public class SolrWorkflowPlugin<I> extends
         if(rdf.getDatasetList()!=null){
         	rdfCopy.setDatasetList(copyList(rdf.getDatasetList()));
         }
-        if(rdf.getOrganizationList()!=null){
+        if(rdf.getLicenseList()!=null){
         	rdfCopy.setLicenseList(copyList(rdf.getLicenseList()));
         }
         return rdfCopy;
@@ -514,7 +514,9 @@ public class SolrWorkflowPlugin<I> extends
         rdfFinal.setProvidedCHOList(rdf.getProvidedCHOList());
         rdfFinal.setEuropeanaAggregationList(rdf.getEuropeanaAggregationList());
         rdfFinal.setWebResourceList(rdf.getWebResourceList());
-
+        rdfFinal.setLicenseList(rdf.getLicenseList());
+        rdfFinal.setOrganizationList(rdf.getOrganizationList());
+        rdfFinal.setDatasetList(rdf.getDatasetList());
         return rdfFinal;
     }
 
