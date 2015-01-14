@@ -199,6 +199,9 @@
             <id>artifactory.eanadev.org</id>
             <name>artifactory.eanadev.org-releases</name>
             <url>http://artifactory.eanadev.org/artifactory/ext-release-local</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
         </repository>
 	</repositories>
 </project>
