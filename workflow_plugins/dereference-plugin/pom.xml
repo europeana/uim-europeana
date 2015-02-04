@@ -22,7 +22,7 @@
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	<dependency>
+		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-annotation_1.2_spec</artifactId>
 			<version>1.0.MR2-SNAPSHOT</version>
@@ -50,8 +50,8 @@
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
 			<version>0.99.1-patched</version>
-<!-- 			<version>0.99</version> -->
-<!-- 			<scope>compile</scope> -->
+			<!-- <version>0.99</version> -->
+			<!-- <scope>compile</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
@@ -126,34 +126,39 @@
 			<artifactId>mongo-jackson-mapper</artifactId>
 			<version>1.4.2</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.apache.jena</groupId> -->
-<!-- 			<artifactId>apache-jena</artifactId> -->
-<!-- 			<type>pom</type> -->
-<!-- 			<version>2.7.4</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.6.6</version>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.jena</groupId> -->
+		<!-- <artifactId>apache-jena</artifactId> -->
+		<!-- <type>pom</type> -->
+		<!-- <version>2.7.4</version> -->
+		<!-- </dependency> -->
 
-<dependency>
-	<groupId>com.hp.hpl.jena</groupId>
-	<artifactId>jena</artifactId>
-	<version>2.6.4</version>
-</dependency>
-<dependency>
-	<groupId>com.hp.hpl.jena</groupId>
-	<artifactId>iri</artifactId>
-	<version>0.8</version>
-</dependency>
-<dependency>
-	<groupId>com.ibm.icu</groupId>
-	<artifactId>icu4j</artifactId>
-	<version>50.1.1</version>
-</dependency>
-   <dependency>
-	<groupId>com.hp.hpl.jena</groupId>
-	<artifactId>arq</artifactId>
-	<version>2.8.8</version>
-</dependency>         
-<dependency>
+		<dependency>
+			<groupId>com.hp.hpl.jena</groupId>
+			<artifactId>jena</artifactId>
+			<version>2.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hp.hpl.jena</groupId>
+			<artifactId>iri</artifactId>
+			<version>0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>50.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hp.hpl.jena</groupId>
+			<artifactId>arq</artifactId>
+			<version>2.8.8</version>
+		</dependency>
+		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
 			<version>1.33</version>
@@ -191,38 +196,58 @@
 					<instructions>
 						<Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
 						<Import-Package>
-						org.osgi.framework; version=1.5.0,
+							org.osgi.framework; version=1.5.0,
 							javax.annotation; version=0.0.0,
-							javax.imageio; version=0.0.0,
+							javax.imageio;
+							version=0.0.0,
 							javax.management; version=0.0.0,
-							javax.naming; version=0.0.0,
+							javax.naming;
+							version=0.0.0,
 							javax.net; version=0.0.0,
-							javax.security.auth; version=0.0.0,
+							javax.security.auth;
+							version=0.0.0,
 							javax.swing; version=0.0.0,
-							javax.swing.border; version=0.0.0,
+							javax.swing.border;
+							version=0.0.0,
 							javax.swing.event; version=0.0.0,
-							javax.swing.text; version=0.0.0,
+							javax.swing.text;
+							version=0.0.0,
 							javax.xml.datatype; version=0.0.0,
-							javax.xml.namespace; version=0.0.0,
-							javax.xml.parsers; version=0.0.0,
+							javax.xml.namespace;
+							version=0.0.0,
+							javax.xml.parsers;
+							version=0.0.0,
 							javax.xml.transform; version=0.0.0,
-							javax.xml.transform.dom; version=0.0.0,
-							javax.xml.transform.sax; version=0.0.0,
+							javax.xml.transform.dom;
+							version=0.0.0,
+							javax.xml.transform.sax;
+							version=0.0.0,
 							javax.xml.transform.stream; version=0.0.0,
-							javax.xml.validation; version=0.0.0,
-							javax.xml.xpath; version=0.0.0,
-							org.w3c.dom; version=0.0.0,
-							org.w3c.dom.events; version=0.0.0,
-							org.w3c.dom.ls; version=0.0.0,
-							org.w3c.dom.ranges; version=0.0.0,
+							javax.xml.validation;
+							version=0.0.0,
+							javax.xml.xpath;
+							version=0.0.0,
+							org.w3c.dom;
+							version=0.0.0,
+							org.w3c.dom.events;
+							version=0.0.0,
+							org.w3c.dom.ls;
+							version=0.0.0,
+							org.w3c.dom.ranges;
+							version=0.0.0,
 							org.w3c.dom.xpath; version=0.0.0,
-							org.xml.sax; version=0.0.0,
+							org.xml.sax;
+							version=0.0.0,
 							org.xml.sax.ext; version=0.0.0,
-							org.xml.sax.helpers; version=0.0.0,
-							org.osgi.service.blueprint; version=1.0.1,
+							org.xml.sax.helpers;
+							version=0.0.0,
+							org.osgi.service.blueprint;
+							version=1.0.1,
 							eu.europeana.uim.common; version=0.0.0,
-							eu.europeana.uim.store; version=0.0.0,
-							eu.europeana.uim.logging; version=0.0.0,
+							eu.europeana.uim.store;
+							version=0.0.0,
+							eu.europeana.uim.logging;
+							version=0.0.0,
 							eu.europeana.uim.orchestration; version=0.0.0,
 							eu.europeana.uim.plugin; version=0.0.0,
 							eu.europeana.uim.plugin.ingestion; version=0.0.0,
@@ -244,10 +269,12 @@
 							org.apache.solr.client.solrj.request,
 							org.w3c.dom.traversal,
 							org.slf4j.*,
+							org.slf4j.bridge.*,
 							org.apache.solr.client.solrj.util,
-							org.jibx.runtime; version=1.2.3,
-							org.jibx.runtime.impl; version=1.2.3,
-							org.jibx.extras; version=1.2.3,
+							org.jibx.runtime;
+							version=1.2.5,
+							org.jibx.runtime.impl; version=1.2.5,
+							org.jibx.extras; version=1.2.5,
 							!*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
@@ -278,12 +305,17 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<configuration>
+						<source>1.7</source>
+						<target>1.7</target>
+						<testSource>1.7</testSource>
+						<testTarget>1.7</testTarget>
+					</configuration>
 				</configuration>
 			</plugin>
+
 		</plugins>
-				<pluginManagement>
+		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
@@ -317,9 +349,28 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.18.1</version>
+					<configuration>
+						<argLine>-XX:-UseSplitVerifier</argLine>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
-
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>

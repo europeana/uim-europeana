@@ -239,10 +239,8 @@ public class SolrWorkflowPlugin<I> extends
                                 dereferenceWebResource(rdfCopy, webresource);
                             }
                         }
-
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         RDF rdfFinal = cleanRDF(rdfCopy);
-
                         ProxyType europeanaProxy = new ProxyType();
                         EuropeanaProxy prx = new EuropeanaProxy();
                         prx.setEuropeanaProxy(true);

@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>europeana-uim-plugins</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-	    <version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 
@@ -18,9 +18,9 @@
 
 	<build>
 
-	<!-- ================================================ -->
-	<!-- JIBX plugin Configuration                        -->
-	<!-- ================================================ -->
+		<!-- ================================================ -->
+		<!-- JIBX plugin Configuration -->
+		<!-- ================================================ -->
 
 		<defaultGoal>install</defaultGoal>
 		<plugins>
@@ -30,7 +30,7 @@
 				<version>${jibx.version}</version>
 				<executions>
 
-					
+
 					<execution>
 						<id>generate-java-code-from-schema (Mint)</id>
 						<goals>
@@ -47,8 +47,8 @@
 							</options>
 						</configuration>
 					</execution>
-					
-					
+
+
 					<execution>
 						<id>generate-java-code-from-schema (Repox)</id>
 						<goals>
@@ -65,7 +65,7 @@
 							</options>
 						</configuration>
 					</execution>
-					
+
 					<execution>
 						<id>generate-java-code-from-schema (Sugarcrm)</id>
 						<goals>
@@ -82,9 +82,9 @@
 							</options>
 						</configuration>
 					</execution>
-					
-					
-					
+
+
+
 					<execution>
 						<id>compile-binding (Mint)</id>
 						<goals>
@@ -98,7 +98,7 @@
 							<verify>false</verify>
 						</configuration>
 					</execution>
-				
+
 					<execution>
 						<id>compile-binding (Sugar)</id>
 						<goals>
@@ -112,7 +112,7 @@
 							<verify>false</verify>
 						</configuration>
 					</execution>
-					
+
 					<execution>
 						<id>compile-binding (Repox)</id>
 						<goals>
@@ -126,7 +126,7 @@
 							<verify>false</verify>
 						</configuration>
 					</execution>
-					
+
 				</executions>
 			</plugin>
 			<plugin>
@@ -136,6 +136,8 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
+					<testSource>1.7</testSource>
+					<testTarget>1.7</testTarget>
 				</configuration>
 			</plugin>
 
@@ -143,7 +145,8 @@
 
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -176,7 +179,18 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
 
 </project>

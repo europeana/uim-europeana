@@ -156,9 +156,6 @@ public class OsgiExtractor extends Extractor {
 												internalRule)) {
 											exists = true;
 											controlledVocabulary = voc;
-											System.out.println("Rule for "
-													+ num + " found: "
-													+ internalRule);
 										}
 									}
 								}
@@ -172,8 +169,6 @@ public class OsgiExtractor extends Extractor {
 								Map<String, List> entityCache = createDereferencingMapRDF(
 										controlledVocabulary, ref,
 										entity.getContent(), iterations);
-								System.out.println("Entity cache for size "
-										+ num + ": " + entityCache.size());
 								synchronized (memCache) {
 									memCache.getEntityCache().put(
 											entity.getUri(), entityCache);
@@ -671,12 +666,6 @@ public class OsgiExtractor extends Extractor {
 		if (resource != null) {
 			try {
 
-				// if (StringUtils.isNotBlank(vocabulary.getReplaceUrl())) {
-				// System.out.println("replacing with "
-				// + vocabulary.getReplaceUrl());
-				// resource = StringUtils.replace(resource,
-				// vocabulary.getURI(), vocabulary.getReplaceUrl());
-				// }
 				urlConnection = new URL(resource).openConnection();
 				urlConnection
 						.setRequestProperty("accept",
@@ -700,7 +689,6 @@ public class OsgiExtractor extends Extractor {
 			throws InstantiationException, IllegalAccessException,
 			SecurityException, NoSuchMethodException, IllegalArgumentException,
 			InvocationTargetException {
-		System.out.println("Creating new agent " + clazz.getCanonicalName());
 		T obj = clazz.newInstance();
 		Class<?>[] cls = new Class<?>[1];
 		cls[0] = (String.class);
@@ -1058,19 +1046,6 @@ public class OsgiExtractor extends Extractor {
 					+ splitName[2] + "/";
 			List<ControlledVocabularyImpl> vocabularies = VocMemCache
 					.getMemCache(solrWorkFlowService).get(vocabularyName);
-			// if (vocabularies.size() == 0) {
-			// for (Entry<String, List<ControlledVocabularyImpl>> vocs :
-			// VocMemCache
-			// .getMemCache(solrWorkFlowService).entrySet()) {
-			// for (ControlledVocabularyImpl voc : vocs.getValue()) {
-			// if (voc.getReplaceUrl() != null
-			// && StringUtils.equals(voc.getReplaceUrl(),
-			// vocabularyName)) {
-			// vocabularies.add(voc);
-			// }
-			// }
-			// }
-			// }
 			if (vocabularies != null) {
 				for (ControlledVocabularyImpl vocabulary : vocabularies) {
 					for (String rule : vocabulary.getRules()) {

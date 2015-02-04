@@ -10,27 +10,40 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.common.SolrInputDocument;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.rest.graphdb.RestAPI;
+import org.neo4j.rest.graphdb.RestGraphDatabase;
+import org.neo4j.rest.graphdb.entity.RestNode;
+import org.neo4j.rest.graphdb.index.RestIndex;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.IMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.runtime.Network;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.edm.exceptions.MongoDBException;
 import eu.europeana.corelib.edm.utils.MongoConstructor;
-import eu.europeana.corelib.edm.utils.SolrConstructor;
+import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
-import eu.europeana.europeanauim.utils.PropertyReader;
-import eu.europeana.europeanauim.utils.UimConfigurationProperty;
+import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.uim.deactivation.DeactivatePlugin;
 import eu.europeana.uim.deactivation.service.DeactivationServiceImpl;
 import eu.europeana.uim.deactivation.service.ExtendedEdmMongoServer;
@@ -85,8 +98,8 @@ public class DeactivatePluginTest {
 			+ "<edm:language>eu</edm:language>"
 			+ "<edm:rights>www</edm:rights>"
 			+ "</edm:EuropeanaAggregation></rdf:RDF>";
-	DeactivationServiceImpl dService;
-
+	private DeactivationServiceImpl dService;
+	private MongodExecutable mongodExecutable;
 	/**
 	 * Test deactivation plugin
 	 * 
@@ -96,15 +109,11 @@ public class DeactivatePluginTest {
 	 * @throws NumberFormatException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Ignore
+	
 	@Test
 	public void testDeactivation() throws NumberFormatException,
 			MongoDBException, UnknownHostException, MongoException {
-		String proplocation = DeactivatePluginTest.class.getProtectionDomain()
-				.getCodeSource().getLocation()
-				+ "uimTest.properties";
-		String truncated = proplocation.replace("file:", "");
-		PropertyReader.loadPropertiesFromFile(truncated);
+		
 		dService = mock(DeactivationServiceImpl.class);
 		dService.initialize();
 
@@ -125,36 +134,55 @@ public class DeactivatePluginTest {
 
 		DeactivatePlugin plugin = new DeactivatePlugin("test", "test");
 		plugin.setdService(dService);
-
+		dService.initialize();
 		when(context.getExecution()).thenReturn(execution);
 		when(context.getProperties()).thenReturn(properties);
 		when(context.getLoggingEngine()).thenReturn(logging);
 		when(context.getDataSet()).thenReturn(collection);
 		List<String> tmpList = mock(List.class);
 		tmpList.add(RECORD);
+		
+		
 		when(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD))
 				.thenReturn(tmpList);
 		when(tmpList.get(0)).thenReturn(RECORD);
+		HttpSolrServer solr = mock(HttpSolrServer.class);
+		ExtendedEdmMongoServer mongo = new ExtendedEdmMongoServer(new Mongo("localhost",10000), "test", "", "");
+		CollectionMongoServer colMongo = mock(CollectionMongoServerImpl.class);
 		when(dService.getSolrServer())
 				.thenReturn(
-						new HttpSolrServer(
-								PropertyReader
-										.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
-										+ PropertyReader
-												.getProperty(UimConfigurationProperty.SOLR_CORE)));
+						solr);
 		when(dService.getMongoServer())
 				.thenReturn(
-						new ExtendedEdmMongoServer(
-								new Mongo(
-										PropertyReader
-												.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-										Integer.parseInt(PropertyReader
-												.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-								PropertyReader
-										.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA),
-								"", ""));
+						mongo);
+		when(dService.getCollectionMongoServer()).thenReturn(colMongo);
+		when(colMongo.findNewCollectionId("12345")).thenReturn("12345");
+		RestGraphDatabase graphdb = mock(RestGraphDatabase.class);
+		String neo4j = "edmSearch2";
+		RestIndex nodeIndex = mock(RestIndex.class);
+		Transaction tx = mock(Transaction.class);
+		RestAPI api = mock(RestAPI.class);
+		IndexHits<Node> indexhits = mock(IndexHits.class);
+		ResourceIterator<Node> iter = mock(ResourceIterator.class);
+		when(dService.getGraphDb()).thenReturn(graphdb);
+		when(dService.getNeo4jIndex()).thenReturn("edmSearch2");
+		when(graphdb.getRestAPI()).thenReturn(api);
+		when(api.getIndex(neo4j)).thenReturn(nodeIndex);
+		when(api.beginTx()).thenReturn(tx);
+		when(nodeIndex.query("rdf_about", "/12345/*")).thenReturn(indexhits);
+		when(indexhits.iterator()).thenReturn(iter);
+		when(iter.hasNext()).thenReturn(true);
+		when(indexhits.size()).thenReturn(1);
+		when(iter.hasNext()).thenReturn(false);
+		List<Node> mockNodes = mock(List.class);
+		
+		Node n = new RestNode("test",api);
+		when(iter.next()).thenReturn(n);
+		mockNodes.add(n);
 		plugin.initialize(context);
-
+		
+		
+		
 		Assert.assertTrue(plugin.process(mdr, context));
 
 		plugin.completed(context);
@@ -177,26 +205,18 @@ public class DeactivatePluginTest {
 			bfact = BindingDirectory.getFactory(RDF.class);
 			IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
 			RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(RECORD));
-			SolrInputDocument doc = new SolrConstructor()
-					.constructSolrDocument(rdf);
-			new HttpSolrServer(
-					PropertyReader
-							.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
-							+ PropertyReader
-									.getProperty(UimConfigurationProperty.SOLR_CORE))
-					.add(doc);
-			ExtendedEdmMongoServer mongoServer = new ExtendedEdmMongoServer(
-					new Mongo(
-							PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-							Integer.parseInt(PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-					PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA),
-					"", "");
 			FullBeanImpl fullBean = new MongoConstructor().constructFullBean(
 					rdf);
-			mongoServer.getDatastore().save(fullBean);
+			ExtendedEdmMongoServer mongo = new ExtendedEdmMongoServer(new Mongo("localhost",10000), "test", "", "");
+			mongo.getDatastore().save(fullBean.getAgents());
+			mongo.getDatastore().save(fullBean.getAggregations());
+			mongo.getDatastore().save(fullBean.getConcepts());
+			mongo.getDatastore().save(fullBean.getEuropeanaAggregation());
+			mongo.getDatastore().save(fullBean.getPlaces());
+			mongo.getDatastore().save(fullBean.getProvidedCHOs());
+			mongo.getDatastore().save(fullBean.getProxies());
+			mongo.getDatastore().save(fullBean.getTimespans());
+			mongo.getDatastore().save(fullBean);
 		} catch (JiBXException e) {
 
 		} catch (MalformedURLException e) {
@@ -211,10 +231,31 @@ public class DeactivatePluginTest {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SolrServerException e) {
+		} 
+	}
+
+	
+	@Before
+	public void prepare(){
+		try {
+			IMongodConfig conf = new MongodConfigBuilder().version(Version.Main.PRODUCTION)
+			        .net(new Net(10000, Network.localhostIsIPv6())).build();
+			        MongodStarter runtime = MongodStarter.getDefaultInstance();
+
+		mongodExecutable = runtime.prepare(conf);
+		mongodExecutable.start();
+			       
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		
+	}
+	
+	@After
+	public void destroy(){
+		mongodExecutable.stop();
 	}
 
 }

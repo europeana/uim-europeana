@@ -5,8 +5,8 @@
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-	    <version>1.0.0-SNAPSHOT</version>
-	    <relativePath>../../pom.xml</relativePath>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -66,25 +66,25 @@
 			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-model-common</artifactId>
 			<version>${europeana.uim.version}</version>
-		</dependency> 
+		</dependency>
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-uim-dedup</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-        <dependency>
-    <groupId>org.apache.maven.surefire</groupId>
-    <artifactId>surefire-junit4</artifactId>
-    <version>2.18.1</version>
-    <scope>test</scope>
-</dependency>
+		<dependency>
+			<groupId>org.apache.maven.surefire</groupId>
+			<artifactId>surefire-junit4</artifactId>
+			<version>2.18.1</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 
@@ -149,9 +149,35 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
+					<testSource>1.7</testSource>
+					<testTarget>1.7</testTarget>
+				</configuration>
+			</plugin>
+
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.18.1</version>
+					<configuration>
+						<argLine>-XX:-UseSplitVerifier</argLine>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<aggregate>true</aggregate>
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
-
+	</reporting>
 </project>

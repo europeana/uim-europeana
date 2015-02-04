@@ -50,7 +50,7 @@
 		</bundle>
 		<bundle>mvn:eu.europeana.europeanauim/europeana-uim-plugin-linkchecker/1.0.0-SNAPSHOT
 		</bundle>
-		<bundle>mvn:eu.europeana.europeanauim/europeana-uim-plugin-solrosgi/1.0.0-SNAPSHOT
+		<bundle>mvn:eu.europeana.europeanauim/europeana-uim-plugin-dereference/1.0.0-SNAPSHOT
 		</bundle>
 		<bundle>mvn:eu.europeana.europeanauim/europeana-uim-plugin-enrichment/1.0.0-SNAPSHOT
 		</bundle>

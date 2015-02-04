@@ -198,7 +198,7 @@ public class DeactivatePlugin<I> extends
 		List<Node> deletionNodes = new ArrayList<Node>();
 		IndexHits<Node> nodes = restIndex.query("rdf_about", "/" + collectionId
 				+ "/*");
-		if (nodes.size() > 0) {
+		if (nodes!=null &&nodes.size() > 0) {
 
 			while (nodes.iterator().hasNext()) {
 				deletionNodes.add(nodes.iterator().next());
@@ -211,7 +211,7 @@ public class DeactivatePlugin<I> extends
 		removeNodes(deletionNodes, graphDb);
 	}
 
-	public void removeFromIndex(List<Node> deletionNodes,
+	private void removeFromIndex(List<Node> deletionNodes,
 			RestGraphDatabase graphDb, String neo4jIndex) {
 		final List<Node> tempList = new ArrayList<Node>();
 		int i = 0;
@@ -235,7 +235,7 @@ public class DeactivatePlugin<I> extends
 		}
 	}
 
-	public void removeRelationships(List<Node> deletionNodes,
+	private void removeRelationships(List<Node> deletionNodes,
 			RestGraphDatabase graphDb) {
 		final Set<Relationship> relationships = new HashSet<Relationship>();
 
@@ -269,7 +269,7 @@ public class DeactivatePlugin<I> extends
 		}
 	}
 
-	public void removeNodes(List<Node> deletionNodes, RestGraphDatabase graphDb) {
+	private void removeNodes(List<Node> deletionNodes, RestGraphDatabase graphDb) {
 		final List<Node> tempList = new ArrayList<Node>();
 		int i = 0;
 		for (Node node : deletionNodes) {
