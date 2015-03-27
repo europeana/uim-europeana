@@ -19,7 +19,7 @@
 		<!-- Ingestion Plugins dependencies -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>europeana-uim-plugin-solrosgi</artifactId>
+			<artifactId>europeana-uim-plugin-dereference</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
