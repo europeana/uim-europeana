@@ -45,28 +45,40 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>eu.europeana.corelib</groupId> -->
-<!-- 			<artifactId>corelib-dereference</artifactId> -->
-<!-- 			<version>${corelib.version}</version> -->
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<artifactId>slf4j-api</artifactId> -->
-<!-- 					<groupId>org.slf4j</groupId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>eu.europeana.corelib</groupId> -->
-<!-- 			<artifactId>corelib-db</artifactId> -->
-<!-- 			<version>${corelib.version}</version> -->
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<artifactId>slf4j-api</artifactId> -->
-<!-- 					<groupId>org.slf4j</groupId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>eu.europeana.corelib</groupId> -->
+		<!-- <artifactId>corelib-dereference</artifactId> -->
+		<!-- <version>${corelib.version}</version> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>slf4j-api</artifactId> -->
+		<!-- <groupId>org.slf4j</groupId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>eu.europeana.corelib</groupId> -->
+		<!-- <artifactId>corelib-db</artifactId> -->
+		<!-- <version>${corelib.version}</version> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <artifactId>slf4j-api</artifactId> -->
+		<!-- <groupId>org.slf4j</groupId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
+
+		<!-- Need explicit declaration here -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>3.1.1.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>3.1.1.RELEASE</version>
+		</dependency>
 	</dependencies>
 
 
@@ -139,8 +151,8 @@
 							javax.xml.transform.dom,
 							javax.xml.stream.util,
 							javax.xml.transform.sax,
-							 
-							  
+
+
 							!*
 						</Import-Package>
 						<Embed-Dependency>europeana-uim-plugin-clientbindings,com.springsource.org.quartz,
@@ -173,24 +185,24 @@
 					</execution>
 				</executions>
 			</plugin>
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-surefire-plugin</artifactId> -->
-<!-- 				<version>2.18.1</version> -->
-<!-- 				<configuration> -->
-<!-- 					<argLine>-XX:-UseSplitVerifier</argLine> -->
-<!-- 				</configuration> -->
-<!-- 			</plugin> -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-surefire-plugin</artifactId> -->
+			<!-- <version>2.18.1</version> -->
+			<!-- <configuration> -->
+			<!-- <argLine>-XX:-UseSplitVerifier</argLine> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
 			<plugin>
 				<inherited>true</inherited>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				    <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                     <testSource>1.7</testSource>
-                    <testTarget>1.7</testTarget>
-                </configuration>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<testSource>1.7</testSource>
+					<testTarget>1.7</testTarget>
+				</configuration>
 			</plugin>
 		</plugins>
 		<pluginManagement>
