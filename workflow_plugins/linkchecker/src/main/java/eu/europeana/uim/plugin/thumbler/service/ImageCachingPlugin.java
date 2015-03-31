@@ -121,17 +121,17 @@ public class ImageCachingPlugin<I> extends
                 List<SourceDocumentReference> docRefs = new ArrayList<>();
                 Set<String> urls = getUrls(rdf);
                 for (String url : urls) {
-                    SourceDocumentReference docRef = new SourceDocumentReference(owner, url, null, null, 1l,
-                            null);
+                    SourceDocumentReference docRef = new SourceDocumentReference(owner, null, url, null, null, 1l,
+                            null, null);
                     docRefs.add(docRef);
                     tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.CONDITIONAL_DOWNLOAD,
-                            docRef.getId()));
+                            docRef.getId(), null));
                 }
                 client.createOrModifySourceDocumentReference(docRefs);
                 int priority = context.getProperties().getProperty(
                         "collection.priority") != null ? Integer.parseInt(context.getProperties().getProperty(
                                         "collection.priority")) : 50;
-                ProcessingJob job = new ProcessingJob(priority, new Date(), owner, tasks, JobState.READY);
+                ProcessingJob job = new ProcessingJob(priority, new Date(), owner, tasks, JobState.READY, record);
                 client.createProcessingJob(job);
                 client.startJob(job.getId());
 

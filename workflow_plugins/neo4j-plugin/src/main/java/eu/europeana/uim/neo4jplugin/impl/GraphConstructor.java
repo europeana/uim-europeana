@@ -58,6 +58,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.io.FileUtils;
@@ -640,6 +641,20 @@ public class GraphConstructor {
         }
         createIsFirstInSequence(parents.get(mnemonic));
         createIsLastInSequence(parents.get(mnemonic));
+        createFakeSequence(parents.get(mnemonic));
+    }
+
+    private void createFakeSequence(Set<String> parents) {
+        HttpClient httpClient = new HttpClient();
+        for (String parent : parents) {
+            GetMethod method = new GetMethod(StringUtils.remove(restapi.getBaseUri(), "/db/data/") + "/order/fakeorder/nodeId/" + StringUtils.replace(parent, "/", "%2F"));
+            try {
+                System.out.println(method.getPath());
+                httpClient.executeMethod(method);
+            } catch (IOException ex) {
+                Logger.getLogger(GraphConstructor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     private String processEntityID(String id) {
