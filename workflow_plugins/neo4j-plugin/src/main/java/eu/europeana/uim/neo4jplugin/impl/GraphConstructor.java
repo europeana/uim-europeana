@@ -282,7 +282,7 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-            if (provProxy.getDcTitle() == null && provProxy.getDcDescription() != null) {
+            if (provProxy.getDcDescription() != null) {
                 Map<String, List<String>> description = provProxy
                         .getDcDescription();
                 for (Entry<String, List<String>> entry : description.entrySet()) {
@@ -295,7 +295,46 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-
+            if(provProxy.getDctermsIssued()!=null){
+                 Map<String, List<String>> issued = provProxy
+                        .getDctermsIssued();
+                for (Entry<String, List<String>> entry : issued.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    for (String str : entry.getValue()) {
+                        langStr.add(StringUtils.substring(str, 0, 255));
+                    }
+                    elementsToSave.put(
+                            "dcterms:issued_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
+            if(provProxy.getDcDate()!=null){
+                 Map<String, List<String>> date = provProxy
+                        .getDcDate();
+                for (Entry<String, List<String>> entry : date.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    for (String str : entry.getValue()) {
+                        langStr.add(StringUtils.substring(str, 0, 255));
+                    }
+                    elementsToSave.put(
+                            "dc:date_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
+            
+            if(provProxy.getDctermsCreated()!=null){
+                 Map<String, List<String>> created = provProxy
+                        .getDctermsCreated();
+                for (Entry<String, List<String>> entry : created.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    for (String str : entry.getValue()) {
+                        langStr.add(StringUtils.substring(str, 0, 255));
+                    }
+                    elementsToSave.put(
+                            "dcterms:created_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
             elementsToSave.put("edm:type", docType);
             elementsForCollection.put(id, elementsToSave);
             edmelementsmap.put(collection, elementsForCollection);
