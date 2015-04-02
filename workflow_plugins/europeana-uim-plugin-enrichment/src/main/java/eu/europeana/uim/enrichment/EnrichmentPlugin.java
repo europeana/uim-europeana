@@ -16,6 +16,7 @@
  */
 package eu.europeana.uim.enrichment;
 
+import eu.europeana.corelib.definitions.edm.entity.WebResource;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -51,6 +52,7 @@ import eu.europeana.corelib.edm.utils.construct.FullBeanHandler;
 import eu.europeana.corelib.edm.utils.construct.SolrDocumentHandler;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
 import eu.europeana.corelib.solr.entity.AgentImpl;
+import eu.europeana.corelib.solr.entity.AggregationImpl;
 import eu.europeana.corelib.solr.entity.ConceptImpl;
 import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
@@ -58,9 +60,10 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.enrichment.api.external.EntityWrapper;
 import eu.europeana.enrichment.api.external.InputValue;
 import eu.europeana.enrichment.rest.client.EnrichmentDriver;
-import eu.europeana.publication.common.State;
+import eu.europeana.harvester.client.HarvesterClientImpl;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
+import eu.europeana.uim.enrichment.service.InstanceCreator;
 import eu.europeana.uim.enrichment.utils.EnrichmentUtils;
 import eu.europeana.uim.enrichment.utils.EntityCache;
 import eu.europeana.uim.enrichment.utils.EuropeanaProxyUtils;
@@ -122,6 +125,7 @@ public class EnrichmentPlugin<I> extends
     private static LoggingEngine logEngine;
     // Caches
     private static EntityCache entityCache = new EntityCache();
+    private static InstanceCreator creator;
 
     public EnrichmentPlugin(String name, String description) {
         super(name, description);
@@ -302,7 +306,7 @@ public class EnrichmentPlugin<I> extends
             }
 
         } catch (Exception e) {
-            if(logEngine!=null){
+            if (logEngine != null) {
                 logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
             }
             log.log(Level.SEVERE, e.getMessage());
@@ -320,15 +324,15 @@ public class EnrichmentPlugin<I> extends
                                 .getProperty(
                                         UimConfigurationProperty.SUGARCRM_PASSWORD));
             } catch (LoginFailureException e) {
-                if(logEngine!=null){
-                logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
-            }
+                if (logEngine != null) {
+                    logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                }
                 log.log(Level.SEVERE,
                         "Error updating Sugar Session id. " + e.getMessage());
             } catch (Exception e) {
-                if(logEngine!=null){
-                logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
-            }
+                if (logEngine != null) {
+                    logEngine.logFailed(Level.SEVERE, this, e, e.getMessage());
+                }
                 log.log(Level.SEVERE,
                         "Generic SugarCRM error. " + e.getMessage());
             }
@@ -337,7 +341,7 @@ public class EnrichmentPlugin<I> extends
             previewsOnlyInPortal = sugarCrmRecord
                     .getItemValue(
                             EuropeanaRetrievableField.PREVIEWS_ONLY_IN_PORTAL);
-            
+
         } catch (QueryResultException e) {
             log.log(Level.SEVERE, "Error retrieving SugarCRM record");
             previewsOnlyInPortal = "false";
@@ -345,10 +349,10 @@ public class EnrichmentPlugin<I> extends
             log.log(Level.SEVERE,
                     "Record could not be retrieved. " + e.getMessage());
         }
-        if(logEngine!=null){
-                logEngine.log(Level.INFO, "Preview Only in portal acquired with value: "
-                + previewsOnlyInPortal);
-            }
+        if (logEngine != null) {
+            logEngine.log(Level.INFO, "Preview Only in portal acquired with value: "
+                    + previewsOnlyInPortal);
+        }
         log.log(Level.INFO, "Preview Only in portal acquired with value: "
                 + previewsOnlyInPortal);
     }
@@ -382,11 +386,11 @@ public class EnrichmentPlugin<I> extends
                     "Deleted are " + deleted);
             log.log(Level.INFO, "Deleted are " + deleted);
         } catch (SolrServerException e) {
-            logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
                     e.getMessage());
             log.log(Level.SEVERE, e.getMessage());
         } catch (IOException e) {
-            logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
                     e.getMessage());
             log.log(Level.SEVERE, e.getMessage());
         }
@@ -436,21 +440,21 @@ public class EnrichmentPlugin<I> extends
         try {
             Date updateDate = sdf.parse((mdr.getValues(
                     EuropeanaModelRegistry.UIMUPDATEDDATE).size() > 0) ? mdr
-                    .getValues(EuropeanaModelRegistry.UIMUPDATEDDATE).get(0)
-                    : new Date(0).toString());
+                            .getValues(EuropeanaModelRegistry.UIMUPDATEDDATE).get(0)
+                            : new Date(0).toString());
             Date ingestionDate = new Date(context.getValue(date));
             if (updateDate.after(ingestionDate)
                     || updateDate.toString().equals(ingestionDate.toString())
-                    || check || checkUpdate) { 
+                    || check || checkUpdate) {
                 IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
                 RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
                 List<Status> status = mdr
                         .getValues(EuropeanaModelRegistry.STATUS);
-                if (!(status != null && status.size()>0 && status.get(0).equals(Status.DELETED))) {
+                if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED))) {
                     try {
                         SolrInputDocument basicDocument = new SolrConstructor()
                                 .constructSolrDocument(rdf);
-                        
+
                         FullBeanImpl fBean = new MongoConstructor()
                                 .constructFullBean(rdf);
                         List<InputValue> inputValues = new EnrichmentUtils()
@@ -532,8 +536,7 @@ public class EnrichmentPlugin<I> extends
 //                        basicDocument.addField(
 //                                EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
 //                                previewsOnlyInPortal);
-                        
-                        boolean prOO  = StringUtils.contains(previewsOnlyInPortal, "1");
+                        boolean prOO = StringUtils.contains(previewsOnlyInPortal, "1");
                         fBean.getAggregations()
                                 .get(0)
                                 .setEdmPreviewNoDistribute(prOO);
@@ -569,10 +572,10 @@ public class EnrichmentPlugin<I> extends
 //                        basicDocument.setField("europeana_collectionName", mdr
 //                                .getCollection().getName());
                         fBean.setEuropeanaCollectionName(new String[]{mdr
-                               .getCollection().getName()});
-                        if(europeanaProxy.getYear()!=null){
-                            
-                        fBean.setYear(europeanaProxy.getYear().get("def").toArray(new String[europeanaProxy.getYear().get("def").size()]));
+                            .getCollection().getName()});
+                        if (europeanaProxy.getYear() != null) {
+
+                            fBean.setYear(europeanaProxy.getYear().get("def").toArray(new String[europeanaProxy.getYear().get("def").size()]));
                         }
                         ProxyImpl providerProxy = EuropeanaProxyUtils
                                 .getProviderProxy(fBean);
@@ -632,6 +635,15 @@ public class EnrichmentPlugin<I> extends
                         } else {
                             saved = handler.updateFullBean(fBean);
                         }
+                        if (check) {
+                            HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+                            AggregationImpl aggr = fBean.getAggregations().get(0);
+                            if (aggr.getWebResources() != null) {
+                                for (WebResource wr : aggr.getWebResources()) {
+                                    client.updateSourceDocumentProcesssingStatisticsForUrl(wr.getAbout());
+                                }
+                            }
+                        }
                         boolean overrideWriteBack = false;
                         if (StringUtils.isNotEmpty(overrideEnrichment)) {
                             overrideWriteBack = Boolean
@@ -653,20 +665,20 @@ public class EnrichmentPlugin<I> extends
 //                        solrServer.add(basicDocument);
                         return true;
                     } catch (MalformedURLException e) {
-                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
-                    e.getMessage());
+                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
+                                e.getMessage());
                         log.log(Level.SEVERE,
                                 "Malformed URL Exception occured with error "
                                 + e.getMessage() + "\nRetrying");
-                    }  catch (IOException e) {
-                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
-                    e.getMessage());
+                    } catch (IOException e) {
+                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
+                                e.getMessage());
                         log.log(Level.SEVERE,
                                 "IO Exception occured with error "
                                 + e.getMessage() + "\nRetrying");
                     } catch (Exception e) {
-                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
-                    e.getMessage());
+                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
+                                e.getMessage());
                         e.printStackTrace();
                         log.log(Level.SEVERE,
                                 "Generic Exception occured with error "
@@ -675,7 +687,7 @@ public class EnrichmentPlugin<I> extends
                     return false;
                 } else {
                     boolean res = true;
-                        res = handler.removeRecord(solrServer, rdf);
+                    res = handler.removeRecord(solrServer, rdf);
                     if (res) {
                         context.putValue(deletedTKey,
                                 context.getValue(deletedTKey) + 1);
@@ -686,8 +698,8 @@ public class EnrichmentPlugin<I> extends
                     try {
                         context.getStorageEngine().updateMetaDataRecord(mdr);
                     } catch (StorageEngineException e) {
-                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
-                    e.getMessage());
+                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
+                                e.getMessage());
                         log.log(Level.SEVERE,
                                 "Storage Engine Exception occured with error "
                                 + e.getMessage() + "\nRetrying");
@@ -696,13 +708,13 @@ public class EnrichmentPlugin<I> extends
                 }
             }
         } catch (JiBXException e) {
-            logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
                     e.getMessage());
             log.log(Level.SEVERE,
                     "JibX Exception occured with error " + e.getMessage()
                     + "\nRetrying");
         } catch (ParseException e) {
-            logEngine.logFailed(context.getExecution(), Level.SEVERE, this,e,
+            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
                     e.getMessage());
             log.log(Level.SEVERE,
                     "Parse Exception occured with error " + e.getMessage()
@@ -717,6 +729,10 @@ public class EnrichmentPlugin<I> extends
 
     public void setEnrichmentService(EnrichmentService enrichmentService) {
         EnrichmentPlugin.enrichmentService = enrichmentService;
+    }
+
+    public void setCreator(InstanceCreator creator) {
+        EnrichmentPlugin.creator = creator;
     }
 
     private List<RetrievedEntity> convertToObjects(

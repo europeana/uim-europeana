@@ -8,11 +8,12 @@ package eu.europeana.uim.plugin.thumbler.service;
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.harvester.client.HarvesterClientImpl;
 import eu.europeana.harvester.domain.DocumentReferenceTaskType;
 import eu.europeana.harvester.domain.JobState;
 import eu.europeana.harvester.domain.ProcessingJob;
+import eu.europeana.harvester.domain.ProcessingJobSubTask;
+import eu.europeana.harvester.domain.ProcessingJobSubTaskType;
 import eu.europeana.harvester.domain.ProcessingJobTaskDocumentReference;
 import eu.europeana.harvester.domain.ReferenceOwner;
 import eu.europeana.harvester.domain.SourceDocumentReference;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -119,18 +121,26 @@ public class ImageCachingPlugin<I> extends
                 ReferenceOwner owner = new ReferenceOwner(provider, collection, record);
                 List<ProcessingJobTaskDocumentReference> tasks = new ArrayList<>();
                 List<SourceDocumentReference> docRefs = new ArrayList<>();
-                Set<String> urls = getUrls(rdf);
-                for (String url : urls) {
-                    SourceDocumentReference docRef = new SourceDocumentReference(owner, null, url, null, null, 1l,
-                            null, null);
+                Set<Link> urls = getUrls(rdf);
+                for (Link url : urls) {
+                    SourceDocumentReference docRef = new SourceDocumentReference(owner, null, url.getUrl(), null, null, 1l,
+                            null, true);
                     docRefs.add(docRef);
+
+                    List<ProcessingJobSubTask> jobTask = new ArrayList<>();
+                    ProcessingJobSubTask subTask = new ProcessingJobSubTask(ProcessingJobSubTaskType.META_EXTRACTION, null);
+                    jobTask.add(subTask);
+                    if (url.getIsEdmObject()) {
+                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.COLOR_EXTRACTION, null));
+                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, null));
+                    }
                     tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.CONDITIONAL_DOWNLOAD,
-                            docRef.getId(), null));
+                            docRef.getId(), jobTask));
                 }
                 client.createOrModifySourceDocumentReference(docRefs);
                 int priority = context.getProperties().getProperty(
                         "collection.priority") != null ? Integer.parseInt(context.getProperties().getProperty(
-                                        "collection.priority")) : 50;
+                                                "collection.priority")) : 50;
                 ProcessingJob job = new ProcessingJob(priority, new Date(), owner, tasks, JobState.READY, record);
                 client.createProcessingJob(job);
                 client.startJob(job.getId());
@@ -178,34 +188,74 @@ public class ImageCachingPlugin<I> extends
         return 10;
     }
 
-    private Set<String> getUrls(RDF rdf) {
-        Set<String> urls = new HashSet<>();
+    private Set<Link> getUrls(RDF rdf) {
+        Set<Link> urls = new HashSet<>();
         Aggregation aggr = rdf.getAggregationList().get(0);
 
         if (aggr.getIsShownBy() != null) {
             String url = aggr.getIsShownBy().getResource();
-            urls.add(url);
+            urls.add(new Link(url, false));
         }
         if (aggr.getObject() != null) {
             String url = aggr.getObject().getResource();
-            urls.add(url);
+            urls.add(new Link(url, true));
         }
         if (aggr.getHasViewList() != null) {
             for (HasView hasView : aggr.getHasViewList()) {
                 String url = hasView.getResource();
-                urls.add(url);
+                urls.add(new Link(url, false));
             }
         }
-         if(rdf.getWebResourceList()!=null){
-        for (WebResourceType wr : rdf.getWebResourceList()) {
-            String url = wr.getAbout();
-            urls.add(url);
-        }
-         }
+
         return urls;
     }
 
     public void setCreator(InstanceCreator creator) {
         this.creator = creator;
+    }
+
+    private class Link {
+
+        private String url;
+        private Boolean isEdmObject;
+
+        public Link(String url, Boolean isEdmObject) {
+            this.url = url;
+            this.isEdmObject = isEdmObject;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public Boolean getIsEdmObject() {
+            return isEdmObject;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 97 * hash + Objects.hashCode(this.url);
+            hash = 97 * hash + Objects.hashCode(this.isEdmObject);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Link other = (Link) obj;
+            if (!Objects.equals(this.url, other.url)) {
+                return false;
+            }
+            if (!Objects.equals(this.isEdmObject, other.isEdmObject)) {
+                return false;
+            }
+            return true;
+        }
     }
 }

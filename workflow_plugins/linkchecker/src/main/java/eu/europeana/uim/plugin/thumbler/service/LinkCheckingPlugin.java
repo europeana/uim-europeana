@@ -13,6 +13,7 @@ import eu.europeana.harvester.client.HarvesterClientImpl;
 import eu.europeana.harvester.domain.DocumentReferenceTaskType;
 import eu.europeana.harvester.domain.JobState;
 import eu.europeana.harvester.domain.ProcessingJob;
+import eu.europeana.harvester.domain.ProcessingJobSubTask;
 import eu.europeana.harvester.domain.ProcessingJobTaskDocumentReference;
 import eu.europeana.harvester.domain.ReferenceOwner;
 import eu.europeana.harvester.domain.SourceDocumentReference;
@@ -122,6 +123,8 @@ public class LinkCheckingPlugin<I> extends
                             null, null);
                     docRefs.add(docRef);
                     tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.CHECK_LINK, docRef.getId(), null));
+                    
+                  
                 }
                 client.createOrModifySourceDocumentReference(docRefs);
                 int priority =context.getProperties().getProperty(
@@ -197,12 +200,6 @@ public class LinkCheckingPlugin<I> extends
                 String url = hasView.getResource();
                 urls.add(url);
             }
-        }
-        if(rdf.getWebResourceList()!=null){
-        for (WebResourceType wr:rdf.getWebResourceList() ) {
-            String url = wr.getAbout();
-            urls.add(url);
-        }
         }
         return urls;
     }
