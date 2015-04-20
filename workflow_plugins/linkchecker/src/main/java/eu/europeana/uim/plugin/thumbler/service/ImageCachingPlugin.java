@@ -134,7 +134,7 @@ public class ImageCachingPlugin<I> extends
                         jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.COLOR_EXTRACTION, null));
                         jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, null));
                     }
-                    tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.CONDITIONAL_DOWNLOAD,
+                    tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.UNCONDITIONAL_DOWNLOAD,
                             docRef.getId(), jobTask));
                 }
                 client.createOrModifySourceDocumentReference(docRefs);
