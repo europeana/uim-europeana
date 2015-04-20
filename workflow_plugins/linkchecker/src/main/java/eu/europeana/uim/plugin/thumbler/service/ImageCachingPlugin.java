@@ -10,6 +10,7 @@ import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.harvester.client.HarvesterClientImpl;
 import eu.europeana.harvester.domain.DocumentReferenceTaskType;
+import eu.europeana.harvester.domain.GenericSubTaskConfiguration;
 import eu.europeana.harvester.domain.JobState;
 import eu.europeana.harvester.domain.ProcessingJob;
 import eu.europeana.harvester.domain.ProcessingJobSubTask;
@@ -17,6 +18,7 @@ import eu.europeana.harvester.domain.ProcessingJobSubTaskType;
 import eu.europeana.harvester.domain.ProcessingJobTaskDocumentReference;
 import eu.europeana.harvester.domain.ReferenceOwner;
 import eu.europeana.harvester.domain.SourceDocumentReference;
+import eu.europeana.harvester.domain.ThumbnailConfig;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.orchestration.ExecutionContext;
@@ -26,6 +28,7 @@ import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.plugin.thumbler.InstanceCreator;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
+
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +38,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -132,7 +136,8 @@ public class ImageCachingPlugin<I> extends
                     jobTask.add(subTask);
                     if (url.getIsEdmObject()) {
                         jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.COLOR_EXTRACTION, null));
-                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, null));
+                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, new GenericSubTaskConfiguration(new ThumbnailConfig(180,180))));
+                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, new GenericSubTaskConfiguration(new ThumbnailConfig(200,200))));
                     }
                     tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.UNCONDITIONAL_DOWNLOAD,
                             docRef.getId(), jobTask));
