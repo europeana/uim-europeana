@@ -19,6 +19,7 @@ package eu.europeana.uim.repoxclient.workflow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.orchestration.ExecutionContext;
@@ -29,6 +30,7 @@ import eu.europeana.uim.repox.HarvestingOperationException;
 import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.repox.model.HarvestingState;
 import eu.europeana.uim.repox.model.RepoxHarvestingStatus;
+import eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT;
 import eu.europeana.uim.store.Collection;
 
 /**
@@ -38,7 +40,7 @@ import eu.europeana.uim.store.Collection;
  */
 public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I>{
 
-	private static RepoxUIMService repoxservice;
+	private static RepoxUIMServiceT repoxservice;
 	//private static SugarCrmService sugarservice;
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String fullingest = "repox.fullingest";
@@ -55,14 +57,14 @@ public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collec
 	
 	
 	/**
-	 * @param repoxservice
+	 * @param repoxservice2
 	 * @param name
 	 * @param description
 	 */
-	public RepoxInitHarvestingPlugin(RepoxUIMService repoxservice,
+	public RepoxInitHarvestingPlugin(RepoxUIMServiceT repoxservice2,
 			String name, String description) {
 		super(name, description);
-		RepoxInitHarvestingPlugin.repoxservice = repoxservice;
+		RepoxInitHarvestingPlugin.repoxservice = repoxservice2;
 	}
 
 	
@@ -72,63 +74,63 @@ public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collec
 	@Override
 	public  void completed(ExecutionContext<Collection<I>,I> context)
 			throws IngestionPluginFailedException {
-		
-		Collection<?> coll =  (Collection<?>) context.getDataSet();
-		
-		try {
-			
-			boolean collectionExists = repoxservice.datasourceExists(coll);
-			
-			if(collectionExists){
-				repoxservice.initiateHarvestingfromUIMObj(coll, true);
-				
-				RepoxHarvestingStatus status = repoxservice.getHarvestingStatus(coll);
-				
-				context.getExecution().setActive(true);
-				
-				while(status.getStatus() == HarvestingState.RUNNING || status.getStatus() == HarvestingState.undefined){
-					String norecords = status.getRecords()==null? "0":status.getRecords().split("/")[0];
-					Thread.sleep(100);
-					context.getExecution().setProcessedCount(Integer.parseInt(norecords));
-					status = repoxservice.getHarvestingStatus(coll);
-				}
-				
-				context.getExecution().setActive(false);
-
-				/*
-				String sugarID = coll.getValue("sugarCRMID");
-				switch(status.getStatus()){
-				case OK:
-					sugarservice.changeEntryStatus(sugarID, 
-							EuropeanaDatasetStates.READY_FOR_REPLICATION);
-					break;
-				case ERROR:
-					sugarservice.changeEntryStatus(sugarID, 
-							EuropeanaDatasetStates.HARVESTING_PENDING);
-					break;
-				
-				}
-				*/
-				String log = repoxservice.getHarvestLog(coll);
-				context.getLoggingEngine().log(Level.INFO, "Repox Harvesting Session Results",log);
-				
-			}
-			else{
-				
-			}
-		} catch (DataSourceOperationException e) {
-			throw new IngestionPluginFailedException("Error during accessing remote Datasource from UIM",e);
-		} catch (HarvestingOperationException e) {
-			throw new IngestionPluginFailedException("Error while initiating harvestiing at the remote " +
-					"Datasource from UIM",e);
-		} 
-		/*
-		catch (QueryResultException e) {
-			throw new IngestionPluginFailedException("Error while trying to write information back to SugarCRM",e);	
-		} */
-		catch (InterruptedException e) {
-			throw new IngestionPluginFailedException("InterruptedException",e);
-		}
+//		
+//		Collection<?> coll =  (Collection<?>) context.getDataSet();
+//		
+//		try {
+//			
+//			boolean collectionExists = repoxservice.datasourceExists(coll);
+//			
+//			if(collectionExists){
+//				repoxservice.initiateHarvestingfromUIMObj(coll, true);
+//				
+//				RepoxHarvestingStatus status = repoxservice.getHarvestingStatus(coll);
+//				
+//				context.getExecution().setActive(true);
+//				
+//				while(status.getStatus() == HarvestingState.RUNNING || status.getStatus() == HarvestingState.undefined){
+//					String norecords = status.getRecords()==null? "0":status.getRecords().split("/")[0];
+//					Thread.sleep(100);
+//					context.getExecution().setProcessedCount(Integer.parseInt(norecords));
+//					status = repoxservice.getHarvestingStatus(coll);
+//				}
+//				
+//				context.getExecution().setActive(false);
+//
+//				/*
+//				String sugarID = coll.getValue("sugarCRMID");
+//				switch(status.getStatus()){
+//				case OK:
+//					sugarservice.changeEntryStatus(sugarID, 
+//							EuropeanaDatasetStates.READY_FOR_REPLICATION);
+//					break;
+//				case ERROR:
+//					sugarservice.changeEntryStatus(sugarID, 
+//							EuropeanaDatasetStates.HARVESTING_PENDING);
+//					break;
+//				
+//				}
+//				*/
+//				String log = repoxservice.getHarvestLog(coll);
+//				context.getLoggingEngine().log(Level.INFO, "Repox Harvesting Session Results",log);
+//				
+//			}
+//			else{
+//				
+//			}
+//		} catch (DataSourceOperationException e) {
+//			throw new IngestionPluginFailedException("Error during accessing remote Datasource from UIM",e);
+//		} catch (HarvestingOperationException e) {
+//			throw new IngestionPluginFailedException("Error while initiating harvestiing at the remote " +
+//					"Datasource from UIM",e);
+//		} 
+//		/*
+//		catch (QueryResultException e) {
+//			throw new IngestionPluginFailedException("Error while trying to write information back to SugarCRM",e);	
+//		} */
+//		catch (InterruptedException e) {
+//			throw new IngestionPluginFailedException("InterruptedException",e);
+//		}
 	}
 
 	/* (non-Javadoc)

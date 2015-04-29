@@ -9,7 +9,7 @@
 	</bean>
 
 	<service id="repoxAgentService" ref="repoxAgent"
-		interface="eu.europeana.uim.repox.RepoxUIMService" />
+		interface="eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT" />
 
 	<reference id="registry" interface="eu.europeana.uim.Registry" />
 

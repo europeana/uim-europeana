@@ -19,7 +19,6 @@ package eu.europeana.uim.repoxclient.command;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-
 import java.util.List;
 
 import org.apache.felix.gogo.commands.Action;
@@ -31,6 +30,7 @@ import org.apache.felix.service.command.Function;
 
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.repox.RepoxUIMService;
+import eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT;
 import eu.europeana.uim.repoxclient.utils.CommandUtils;
 
 
@@ -47,7 +47,7 @@ public class RepoxPluginCommand implements Function, Action {
 		info, createaggregator, deleteaggregator, updateaggregator, createprovider, deleteprovider, updateprovider, createdatasource, deletedatasource, updatedatasource, retrieveaggregators, retrieveproviders, retrievedatasources, initiateharvesting, getharvestingstatus, getactiveharvests
 	}
 
-	private RepoxUIMService repoxservice;
+	private RepoxUIMServiceT repoxservice;
 	private Registry registry;
 
 	@Option(name = "-o", aliases = { "--operation" }, required = false)
@@ -83,7 +83,7 @@ public class RepoxPluginCommand implements Function, Action {
 	/**
 	 * @param repoxservice
 	 */
-	public RepoxPluginCommand(RepoxUIMService repoxservice) {
+	public RepoxPluginCommand(RepoxUIMServiceT repoxservice) {
 		this.repoxservice = repoxservice;
 	}
 
@@ -104,16 +104,23 @@ public class RepoxPluginCommand implements Function, Action {
 		if (operation == null) {
 			out.println("Please specify an operation with the '-o' option. Possible values are:");
 			out.println("info                                                       \t\t\t\t Connection info to Sugarcrm");
-			out.println("createaggregator <country_code,country_url>                          \t\t\t\t Creates a new aggregator");
-			out.println("deleteaggregator <country_code>                                   \t\t\t\t Delete an aggregator");
-			out.println("updateaggregator <country_code,aggr_name,aggr_name_code,aggr_url>                                     \t\t\t\t Updates an aggregator");
+			out.println("createaggregator <id, name, nameCode, homepage>                          \t\t\t\t Creates a new aggregator");
+			out.println("deleteaggregator <aggregatorId>                                   \t\t\t\t Delete an aggregator");
+			out.println("updateaggregator <id, newId, name, nameCode, homepage>                                     \t\t\t\t Updates an aggregator");
+			
+			
+			
 			out.println("createprovider  <prov_name,prov_mnemonic,prov_url,prov_descr,prov_country, prov_URL,prov_SgrID,prov_Type,prov_OAI_prfx> \t\t\t\t Create a provider");
 			out.println("deleteprovider  <prov_name,prov_mnemonic>                       \t\t\t\t Delete a provider");
 			out.println("updateprovider  <prov_name,prov_mnemonic,prov_url,prov_descr,prov_country, prov_URL,prov_SgrID,prov_Type,prov_OAI_prfx>  \t\t\t\t Update a provider");
 			out.println("createdatasource  <prov_name,prov_mnemonic,coll_lang,coll_mnemonic,coll_name,coll_OAIPMHURI,coll_OAI_prfx> \t\t\t\t Initializes workflows according ot records states ");
 			out.println("deletedatasource <datasource_name>                           \t\t\t\t Creates Collection/Providers objects from a record");
 			out.println("updatedatasource <prov_name,prov_mnemonic,coll_lang,coll_mnemonic,coll_name,coll_OAIPMHURI,coll_OAI_prfx> \t\t\t\t Adds a note attachment to a specific record");
-			out.println("retrieveaggregators                                         \t\t\t\t Retrieves all Aggregators");
+			
+			
+			out.println("retrieveaggregators <offset, number>                                         \t\t\t\t Retrieves all Aggregators");
+			
+			
 			out.println("retrieveproviders                                     \t\t\t\t Retrieves all Providers");
 			out.println("retrievedatasources                                    \t\t\t\t Retrieves all Datasources");
 			out.println("initiateharvesting <prov_name,prov_mnemonic,coll_name,coll_mnemonic>                       \t\t\t\t Initiate the harvesting of a datasource");
@@ -135,7 +142,7 @@ public class RepoxPluginCommand implements Function, Action {
 
 		// --------------------Repox aggregator actions-----------------
 		case createaggregator:
-			out.println(CommandUtils.createAggregator(repoxservice, argument0, argument1, out, in));
+			out.println(CommandUtils.createAggregator(repoxservice, argument0, argument1, argument2, argument3, out, in));
 			break;
 
 		case deleteaggregator:
@@ -144,72 +151,72 @@ public class RepoxPluginCommand implements Function, Action {
 			break;
 
 		case updateaggregator:
-			out.println(CommandUtils.updateAggregator(repoxservice, argument0, argument1, argument2, argument3, out, in));
+			out.println(CommandUtils.updateAggregator(repoxservice, argument0, argument1, argument2, argument3, argument4, out, in));
 			
 			break;
 
 		// ------------Repox provider actions---------------
-		case createprovider:
-			
-			out.println(CommandUtils.executeCreateUpdateProviderAction("create", repoxservice,registry,argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7, out, in));
-			
-			break;
-
-		case deleteprovider:
-			out.println(CommandUtils.deleteProvider(repoxservice, registry, argument0, argument1, out, in));
-			break;
-
-		case updateprovider:
-			out.println(CommandUtils.executeCreateUpdateProviderAction("update", repoxservice,registry,argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7, out, in));
-			
-			break;
-
-		// --------------Data sources Actions---------------
-		case createdatasource:
-			out.println(CommandUtils.createUpdateDataSource("create",repoxservice, registry, argument0,argument1,argument2,argument3,argument4, argument5, argument6, out,in));
-			
-			
-			break;
-
-		case updatedatasource:
-			out.println(CommandUtils.createUpdateDataSource("update",repoxservice, registry, argument0,argument1,argument2,argument3,argument4, argument5, argument6, out,in));
-
-			break;
-
-		case deletedatasource:
-			out.println(CommandUtils.deleteDatasource(repoxservice,registry,argument0,argument1,argument2,argument3,argument4, out, in));
-			
-			break;
+//		case createprovider:
+//			
+//			out.println(CommandUtils.executeCreateUpdateProviderAction("create", repoxservice,registry,argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7, out, in));
+//			
+//			break;
+//
+//		case deleteprovider:
+//			out.println(CommandUtils.deleteProvider(repoxservice, registry, argument0, argument1, out, in));
+//			break;
+//
+//		case updateprovider:
+//			out.println(CommandUtils.executeCreateUpdateProviderAction("update", repoxservice,registry,argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7, out, in));
+//			
+//			break;
+//
+//		// --------------Data sources Actions---------------
+//		case createdatasource:
+//			out.println(CommandUtils.createUpdateDataSource("create",repoxservice, registry, argument0,argument1,argument2,argument3,argument4, argument5, argument6, out,in));
+//			
+//			
+//			break;
+//
+//		case updatedatasource:
+//			out.println(CommandUtils.createUpdateDataSource("update",repoxservice, registry, argument0,argument1,argument2,argument3,argument4, argument5, argument6, out,in));
+//
+//			break;
+//
+//		case deletedatasource:
+//			out.println(CommandUtils.deleteDatasource(repoxservice,registry,argument0,argument1,argument2,argument3,argument4, out, in));
+//			
+//			break;
 
 		case retrieveaggregators:
-			out.println (CommandUtils.retrieveAggregators(repoxservice,out, in));
+			out.println (CommandUtils.retrieveAggregators(repoxservice, argument0, argument1, out, in));
 			
 			break;
 
-		case retrieveproviders:
-			out.println(CommandUtils.retrieveProviders(repoxservice,out,in));
-			break;
-
-		case retrievedatasources:
-			out.println(CommandUtils.retrieveDatasources(repoxservice,out,in));
-			break;
-
-		// -------------Harvesting--------------
-
-		case initiateharvesting:
-			out.println(CommandUtils.initiateHarvesting(repoxservice,registry, argument0,argument1,argument2,argument3, out,in));
-			
-			break;
-
-		case getharvestingstatus:
-			out.println(CommandUtils.getHarvestingStatus(repoxservice,registry,argument0,argument1,argument2,argument3,argument4,out,in));
-			
-			break;
-
-		case getactiveharvests:
-			out.println(CommandUtils.getActiveHarvests(repoxservice, out,in));
-			
-			break;
+//		case retrieveproviders:
+//			out.println(CommandUtils.retrieveProviders(repoxservice,out,in));
+//			break;
+//
+//		case retrievedatasources:
+//			out.println(CommandUtils.retrieveDatasources(repoxservice,out,in));
+//			break;
+//
+//		// -------------Harvesting--------------
+//
+//		case initiateharvesting:
+//			out.println(CommandUtils.initiateHarvesting(repoxservice,registry, argument0,argument1,argument2,argument3, out,in));
+//			
+//			break;
+//
+//		case getharvestingstatus:
+//			out.println(CommandUtils.getHarvestingStatus(repoxservice,registry,argument0,argument1,argument2,argument3,argument4,out,in));
+//			
+//			break;
+//
+//		case getactiveharvests:
+//			out.println(CommandUtils.getActiveHarvests(repoxservice, out,in));
+//			
+//			break;
 		}
 			
 		return null;

@@ -16,7 +16,7 @@
  */
 package eu.europeana.uim.repoxclient.workflow;
 
-import eu.europeana.uim.repox.RepoxUIMService;
+import eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.util.CollectionBatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
@@ -29,7 +29,7 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
 public class RepoxHarvestingWorkflow<I> extends AbstractWorkflow<Collection<I>,I>{
 
 	
-	public RepoxHarvestingWorkflow(RepoxUIMService repoxservice) {
+	public RepoxHarvestingWorkflow(RepoxUIMServiceT repoxservice) {
 		super("A: Harvest Remote Repox Datasource", "Initiates a remote harvesting at " +
 				"the remote Repox server");
 		
