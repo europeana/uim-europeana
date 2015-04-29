@@ -24,18 +24,12 @@ import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.common.TKey;
-import eu.europeana.uim.model.europeanaspecific.fieldvalues.EuropeanaDatasetStates;
 import eu.europeana.uim.repox.DataSourceOperationException;
 import eu.europeana.uim.repox.HarvestingOperationException;
 import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.repox.model.HarvestingState;
 import eu.europeana.uim.repox.model.RepoxHarvestingStatus;
 import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.MetaDataRecord;
-import eu.europeana.uim.store.UimDataSet;
-import eu.europeana.uim.sugar.QueryResultException;
-import eu.europeana.uim.sugar.SugarCrmService;
-import eu.europeana.uim.util.BatchWorkflowStart;
 
 /**
  *
@@ -45,7 +39,7 @@ import eu.europeana.uim.util.BatchWorkflowStart;
 public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I>{
 
 	private static RepoxUIMService repoxservice;
-	private static SugarCrmService sugarservice;
+	//private static SugarCrmService sugarservice;
 	/** Property which allows to overwrite base url from collection/provider */
 	public static final String fullingest = "repox.fullingest";
 	
@@ -62,15 +56,13 @@ public class RepoxInitHarvestingPlugin<I> extends AbstractIngestionPlugin<Collec
 	
 	/**
 	 * @param repoxservice
-	 * @param sugarservice
 	 * @param name
 	 * @param description
 	 */
 	public RepoxInitHarvestingPlugin(RepoxUIMService repoxservice,
-			SugarCrmService sugarservice,String name, String description) {
+			String name, String description) {
 		super(name, description);
 		RepoxInitHarvestingPlugin.repoxservice = repoxservice;
-		RepoxInitHarvestingPlugin.sugarservice = sugarservice;
 	}
 
 	

@@ -17,13 +17,10 @@
 package eu.europeana.uim.repoxclient.command;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.felix.gogo.commands.Action;
 import org.apache.felix.gogo.commands.Argument;
@@ -33,18 +30,9 @@ import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Function;
 
 import eu.europeana.uim.Registry;
-import eu.europeana.uim.storage.StorageEngine;
-import eu.europeana.uim.repox.AggregatorOperationException;
-import eu.europeana.uim.repox.DataSourceOperationException;
-import eu.europeana.uim.repox.HarvestingOperationException;
-import eu.europeana.uim.repox.ProviderOperationException;
 import eu.europeana.uim.repox.RepoxUIMService;
-import eu.europeana.uim.repoxclient.jibxbindings.Success;
 import eu.europeana.uim.repoxclient.utils.CommandUtils;
 
-import eu.europeana.uim.store.Collection;
-
-import eu.europeana.uim.store.Provider;
 
 /**
  * Apache Karaf command line extension for RepoxUIM plugin

@@ -1,363 +1,207 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 
-	<parent>
-		<artifactId>europeana-uim-plugins</artifactId>
-		<groupId>eu.europeana.europeanauim</groupId>
-		<version>1.0.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <artifactId>europeana-uim-plugins</artifactId>
+        <groupId>eu.europeana.europeanauim</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>europeana-uim-plugin-repox</artifactId>
-	<packaging>bundle</packaging>
-	<name>Unified Ingestion Manager: RepoxClient UIM Plugin</name>
+    <artifactId>europeana-uim-plugin-repox</artifactId>
+    <packaging>bundle</packaging>
+    <name>Unified Ingestion Manager: RepoxClient UIM Plugin</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>repox</groupId>
-			<artifactId>repox-client-rest-jersey</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
-		</dependency>
-
-		<!-- <dependency> -->
-		<!-- <groupId>repox</groupId> -->
-		<!-- <artifactId>repox-commons</artifactId> -->
-		<!-- <version>3.0.0-SNAPSHOT</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>javax.ws.rs</groupId> -->
-		<!-- <artifactId>javax.ws.rs-api</artifactId> -->
-		<!-- <version>2.0.1</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.slf4j</groupId> -->
-		<!-- <artifactId>slf4j-api</artifactId> -->
-		<!-- <version>1.7.12</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.slf4j</groupId> -->
-		<!-- <artifactId>slf4j-log4j12</artifactId> -->
-		<!-- <version>1.7.12</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>log4j</groupId> -->
-		<!-- <artifactId>log4j</artifactId> -->
-		<!-- <version>1.2.17</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.glassfish.jersey.core</groupId> -->
-		<!-- <artifactId>jersey-client</artifactId> -->
-		<!-- <version>2.17</version> -->
-		<!-- </dependency> -->
-
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.glassfish.jersey.bundles.repackaged</groupId> -->
-		<!-- <artifactId>jersey-guava</artifactId> -->
-		<!-- <version>2.17</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.glassfish.hk2</groupId> -->
-		<!-- <artifactId>hk2-api</artifactId> -->
-		<!-- <version>2.4.0-b10</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.glassfish.hk2</groupId> -->
-		<!-- <artifactId>hk2-locator</artifactId> -->
-		<!-- <version>2.4.0-b10</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.glassfish.hk2</groupId> -->
-		<!-- <artifactId>hk2-utils</artifactId> -->
-		<!-- <version>2.4.0-b10</version> -->
-		<!-- </dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>org.glassfish.hk2.external</groupId> -->
-		<!-- <artifactId>javax.inject</artifactId> -->
-		<!-- <version>2.4.0-b10</version> -->
-		<!-- </dependency> -->
-
-		<!-- Jibx Bindings -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>europeana-uim-plugin-clientbindings</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>europeana-datamodel-definitions</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>${europeana.uim.groupId}</groupId>
-			<artifactId>europeana-uim-external-repox-api</artifactId>
-			<version>${europeana.uim.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.karaf.shell</groupId>
-			<artifactId>org.apache.karaf.shell.console</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>eu.europeana.corelib</groupId> -->
-		<!-- <artifactId>corelib-dereference</artifactId> -->
-		<!-- <version>${corelib.version}</version> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>slf4j-api</artifactId> -->
-		<!-- <groupId>org.slf4j</groupId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>eu.europeana.corelib</groupId> -->
-		<!-- <artifactId>corelib-db</artifactId> -->
-		<!-- <version>${corelib.version}</version> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>slf4j-api</artifactId> -->
-		<!-- <groupId>org.slf4j</groupId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
-		<!-- </dependency> -->
-
-		<!-- Need explicit declaration here -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>3.1.1.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>3.1.1.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-hierarchies</artifactId>
-			<version>${corelib.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jersey-core</artifactId>
-					<groupId>com.sun.jersey</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jersey-client</artifactId>
-					<groupId>com.sun.jersey</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-db</artifactId>
-			<version>${corelib.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>javassist</artifactId>
-					<groupId>javassist</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>repox</groupId>
+            <artifactId>repox-client-rest-jersey</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>osgi-resource-locator</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>europeana-datamodel-definitions</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${europeana.uim.groupId}</groupId>
+            <artifactId>europeana-uim-external-repox-api</artifactId>
+            <version>${europeana.uim.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jaxb_2.2_spec</artifactId>
+            <version>1.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.shell</groupId>
+            <artifactId>org.apache.karaf.shell.console</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
 
 
-	<build>
-		<resources>
-			<!-- standard Maven folder -->
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-			<!-- plus root folder -->
-			<resource>
-				<directory>.</directory>
-				<includes>
-					<include>OSGI-INF/*</include>
-				</includes>
-			</resource>
-		</resources>
+    <build>
+        <resources>
+            <!-- standard Maven folder -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- plus root folder -->
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>OSGI-INF/*</include>
+                </includes>
+            </resource>
+        </resources>
 
-		<plugins>
+        <plugins>
 
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<obrRepository>NONE</obrRepository>
-					<manifestLocation>META-INF</manifestLocation>
-					<instructions>
-						<Export-Package>eu.europeana.uim.repoxclient.*</Export-Package>
-						<Import-Package>
-							org.osgi.service.packageadmin; version=1.2.0,
-							org.xml.sax;
-							version=0.0.0,
-							<!-- org.apache.log4j; version=1.2.15, -->
-							org.osgi.service.blueprint; version=1.0.1,
-							org.osgi.service.blueprint.container; version=1.0.1,
-							org.apache.felix.gogo.commands; version=0.6.1,
-							org.apache.felix.gogo.commands.basic; version=0.6.1,
-							org.apache.felix.service.command; version=0.6.1,
-							org.apache.karaf.shell.console; version=2.2.0,
-							org.apache.karaf.shell.console.commands; version=2.2.0,
-							eu.europeana.uim.common; version=0.0.0,
-							eu.europeana.uim.store;
-							version=0.0.0,
-							org.apache.commons.lang; version=2.4.0,
-							org.apache.commons.io; version=2.1.0,
-							eu.europeana.uim;
-							version=0.0.0,
-							eu.europeana.uim.adapter;
-							version=0.0.0,
-							eu.europeana.uim.logging; version=0.0.0,
-							eu.europeana.uim.orchestration; version=0.0.0,
-							eu.europeana.uim.plugin; version=0.0.0,
-							eu.europeana.uim.plugin.ingestion; version=0.0.0,
-							eu.europeana.uim.plugin.source; version=0.0.0,
-							eu.europeana.uim.resource; version=0.0.0,
-							eu.europeana.uim.storage; version=0.0.0,
-							eu.europeana.uim.util;
-							version=0.0.0,
-							eu.europeana.uim.workflow; version=0.0.0,
-							eu.europeana.uim.sugar; version=0.0.0,
-							eu.europeana.uim.sugar.model; version=0.0.0,
-							eu.europeana.uim.repox; version=0.0.0,
-							eu.europeana.uim.repox.model; version=0.0.0,
-							eu.europeana.uim.model.europeanaspecific.fieldvalues,
-							javax.xml.transform,
-							javax.xml.parsers,
-							org.w3c.dom,
-							javax.xml.stream,
-							javax.xml.transform.stream,
-							javax.xml.transform.dom,
-							javax.xml.stream.util,
-							javax.xml.transform.sax,
-							<!-- pt.utl.ist.util.exceptions, -->
-							<!-- eu.europeana.repox.rest.client.accessors, -->
-							<!-- org.slf4j, -->
-							<!-- org.glassfish.jersey, -->
-
-
-							!*
-						</Import-Package>
-						<Embed-Dependency>
-							europeana-uim-plugin-clientbindings,com.springsource.org.quartz,
-							stax,com.springsource.javax.activation,com.springsource.javax.servlet,spring-ws-core,spring-ws,
-							com.springsource.javax.xml.stream,com.springsource.org.apache.commons.logging,
-							com.springsource.org.aopalliance,org.springframework.oxm,org.springframework.web,
-							org.springframework.web.servlet,com.springsource.javax.xml.bind,org.springframework.xml,
-							com.springsource.javax.xml.soap,com.springsource.org.apache.commons.codec,
-							com.springsource.org.apache.commons.httpclient,
-							org.springframework.jms,com.springsource.javax.mail,com.springsource.javax.jms,
-							com.springsource.javax.xml.rpc,com.springsource.javax.ejb,com.springsource.javax.mail,
-							org.springframework.jms,com.springsource.javax.xml.rpc,
-							com.springsource.com.sun.xml.messaging.saaj,com.springsource.org.joda.time,
-							com.springsource.org.xmlpull,jibx-run,jibx-extras,spring-core,org.apache.servicemix.bundles.aopalliance,
-							spring-asm,spring-expression,spring-beans,spring-aop,spring-context,spring-context-support,spring-web,spring-core,
-							javax.ws.rs-api, repox-commons, repox-client-rest-jersey,
-							slf4j-api, slf4j-log4j12, log4j, jersey-client, jersey-common,
-							hk2-api, hk2-locator, hk2-utils, jersey-guava, javax.inject,
-							jersey-server, jsr311-api,
-							jersey-core, jersey-container-servlet,
-							jersey-container-servlet-core,
-							jersey-entity-filtering,
-							jersey-media-jaxb, jersey-media-json-jackson,
-							jersey-media-multipart,javax-inject, javassist
-							<!-- *;scope=compile|runtime|provided -->
-						</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>package</phase>
-						<goals>
-							<goal>bundle</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- <plugin> -->
-			<!-- <groupId>org.apache.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-surefire-plugin</artifactId> -->
-			<!-- <version>2.18.1</version> -->
-			<!-- <configuration> -->
-			<!-- <argLine>-XX:-UseSplitVerifier</argLine> -->
-			<!-- </configuration> -->
-			<!-- </plugin> -->
-			<plugin>
-				<inherited>true</inherited>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<testSource>1.7</testSource>
-					<testTarget>1.7</testTarget>
-				</configuration>
-			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.felix
-										</groupId>
-										<artifactId>
-											maven-bundle-plugin
-										</artifactId>
-										<versionRange>
-											[2.1.0,)
-										</versionRange>
-										<goals>
-											<goal>bundle</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <obrRepository>NONE</obrRepository>
+                    <manifestLocation>META-INF</manifestLocation>
+                    <instructions>
+                        <Export-Package>eu.europeana.uim.repoxclient.*</Export-Package>
+                        <Import-Package>
+                            org.osgi.service.packageadmin; version=1.2.0,
+                            org.xml.sax;
+                            version=0.0.0,
+                            org.osgi.service.blueprint; version=1.0.1,
+                            org.osgi.service.blueprint.container; version=1.0.1,
+                            org.apache.felix.gogo.commands; version=0.6.1,
+                            org.apache.felix.gogo.commands.basic; version=0.6.1,
+                            org.apache.felix.service.command; version=0.6.1,
+                            org.apache.karaf.shell.console; version=2.2.0,
+                            org.apache.karaf.shell.console.commands; version=2.2.0,
+                            eu.europeana.uim.common; version=0.0.0,
+                            eu.europeana.uim.store;
+                            version=0.0.0,
+                            javax.net;
+                            version=0.0.0,
+                            javax.net.ssl;
+                            version=0.0.0,
+                            javax.security.auth;
+                            version=0.0.0,
+                            javax.security.auth.x500;
+                            version=0.0.0,
+                            javax.sql;
+                            version=0.0.0,
+                            javax.xml.bind;version=0.0.0,
+                            org.apache.commons.lang; version=2.4.0,
+                            org.apache.commons.io; version=2.1.0,
+                            eu.europeana.uim;
+                            version=0.0.0,
+                            eu.europeana.uim.adapter;
+                            version=0.0.0,
+                            eu.europeana.uim.logging; version=0.0.0,
+                            eu.europeana.uim.orchestration; version=0.0.0,
+                            eu.europeana.uim.plugin; version=0.0.0,
+                            eu.europeana.uim.plugin.ingestion; version=0.0.0,
+                            eu.europeana.uim.plugin.source; version=0.0.0,
+                            eu.europeana.uim.resource; version=0.0.0,
+                            eu.europeana.uim.storage; version=0.0.0,
+                            eu.europeana.uim.util;
+                            version=0.0.0,
+                            eu.europeana.uim.workflow; version=0.0.0,
+                            eu.europeana.uim.repox; version=0.0.0,
+                            eu.europeana.uim.repox.model; version=0.0.0,
+                            eu.europeana.uim.model.europeanaspecific.fieldvalues,
+                            !*
+                        </Import-Package>
+                        <Embed-Dependency>
+                            *;scope=compile|runtime
+                        </Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+  
+            <plugin>
+                <inherited>true</inherited>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <testSource>1.7</testSource>
+                    <testTarget>1.7</testTarget>
+                </configuration>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings 
+                only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.felix
+                                        </groupId>
+                                        <artifactId>
+                                            maven-bundle-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.1.0,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>bundle</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 
 </project>

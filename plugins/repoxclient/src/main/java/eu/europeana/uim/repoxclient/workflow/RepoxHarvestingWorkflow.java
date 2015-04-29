@@ -18,7 +18,6 @@ package eu.europeana.uim.repoxclient.workflow;
 
 import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.sugar.SugarCrmService;
 import eu.europeana.uim.util.CollectionBatchWorkflowStart;
 import eu.europeana.uim.workflow.AbstractWorkflow;
 
@@ -30,14 +29,13 @@ import eu.europeana.uim.workflow.AbstractWorkflow;
 public class RepoxHarvestingWorkflow<I> extends AbstractWorkflow<Collection<I>,I>{
 
 	
-	public RepoxHarvestingWorkflow(RepoxUIMService repoxservice,
-			SugarCrmService sugarservice) {
+	public RepoxHarvestingWorkflow(RepoxUIMService repoxservice) {
 		super("A: Harvest Remote Repox Datasource", "Initiates a remote harvesting at " +
 				"the remote Repox server");
 		
         setStart(new CollectionBatchWorkflowStart<I>());
-        addStep(new RepoxInitHarvestingPlugin<I>(repoxservice, sugarservice,
-        		"Repox Harvesting Plugin","Preforms the remote operation"));
+        addStep(new RepoxInitHarvestingPlugin<I>(repoxservice,
+        		"Repox Harvesting Plugin","Performs the remote operation"));
 	}
 	
 	/* (non-Javadoc)
