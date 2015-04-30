@@ -23,6 +23,8 @@ import java.util.Set;
 import javax.ws.rs.InternalServerErrorException;
 
 import pt.utl.ist.dataProvider.Aggregator;
+import pt.utl.ist.dataProvider.DataProvider;
+import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
 import pt.utl.ist.util.exceptions.InvalidArgumentsException;
@@ -105,7 +107,7 @@ public class CommandUtils {
     String id = assignValue("Id", argument0, out, in);
     String name = assignValue("Name", argument1, out, in);
     String nameCode = assignValue("Name Code", argument2, out, in);
-    String homepage = assignValue("URL", argument3, out, in);
+    String homepage = assignValue("Homepage", argument3, out, in);
 
     repoxservice.createAggregator(id, name, nameCode, homepage);
     return "Aggregator created successfully. \n";
@@ -156,115 +158,177 @@ public class CommandUtils {
     String newId = assignValue("New Id", argument1, out, in);
     String name = assignValue("Name", argument2, out, in);
     String nameCode = assignValue("Name Code", argument3, out, in);
-    String homepage = assignValue("URL", argument4, out, in);
+    String homepage = assignValue("Homepage", argument4, out, in);
 
     repoxservice.updateAggregator(id, newId, name, nameCode, homepage);
     return "Aggregator updated succesfully";
   }
 
   /**
-   * Creates or Updates a Provider
+   * Creates a Provider
    * 
-   * @param action - "create" or "update"
    * @param repoxservice - The instance of the repox
    * @param registry - The instance of the registry
-   * @param argument0 - Provider Name
-   * @param argument1 - Provider Mnemonic
-   * @param argument2 - Provider URL
-   * @param argument3 - Provider Description
-   * @param argument4 - Provider Country
-   * @param argument5 - Provider Website
-   * @param argument6 - Provider SugarCRM ID
+   * @param argument0 - Aggregator Id
+   * @param argument1 - Provider Id
+   * @param argument2 - Provider Name
+   * @param argument3 - Provider Country
+   * @param argument4 - Provider description
+   * @param argument5 - Provider Name Code
+   * @param argument6 - Provider URL
    * @param argument7 - Provider Type
-   * @param argument8 - Provider OAI-PMH Metadata Type prefix
+   * @param argument8 - Provider Email
    * @param out - Console Output
    * @param in - Console Input
-   * @return Provider creation or update confirmation
+   * @return Provider creation confirmation
    * @throws Exception
    */
   @SuppressWarnings("unchecked")
-  public static String executeCreateUpdateProviderAction(String action,
-      RepoxUIMService repoxservice, Registry registry, String argument0, String argument1,
-      String argument2, String argument3, String argument4, String argument5, String argument6,
-      String argument7, PrintStream out, BufferedReader in) throws Exception {
-
-    String providerName = assignValue("Provider Name", argument0, out, in);
-    String providerMnemonic = assignValue(provMemonicVar, argument1, out, in);
-    String providerUrl = assignValue("Provider URL", argument2, out, in);
-    String providerDescription = assignValue("Provider Description", argument3, out, in);
-    String providerCountryName = assignValue("Provider Country", argument4, out, in);
-    String providerSugarId = assignValue("Provider SugarCRM ID", argument5, out, in);
-    String providerType = assignValue("Provider Type", argument6, out, in);
-    String providerOaiMetadataPrefix =
-        assignValue("Provider OAI Metadata Prefix", argument7, out, in);
+  public static String executeCreateProvider(RepoxUIMServiceT repoxservice, Registry registry,
+      String argument0, String argument1, String argument2, String argument3, String argument4,
+      String argument5, String argument6, String argument7, String argument8, PrintStream out,
+      BufferedReader in) {
 
     try {
+      String aggregatorId = assignValue("Aggregator Id", argument0, out, in);
+      String id = assignValue("Id", argument1, out, in);
+      String name = assignValue("Name", argument2, out, in);
+      String country = assignValue("Country", argument3, out, in);
+      String description = assignValue("Description", argument4, out, in);
+      String nameCode = assignValue("Name Code", argument5, out, in);
+      String homepage = assignValue("Homepage", argument6, out, in);
+      String providerType = assignValue("Provider Type", argument7, out, in);
+      String email = assignValue("Email", argument8, out, in);
 
       StorageEngine<?> engine = registry.getStorageEngine();
       @SuppressWarnings("rawtypes")
       Provider prov = engine.createProvider();
       prov.setAggregator(false);
-      prov.setMnemonic(providerMnemonic);
-      prov.setName(providerName);
-      prov.setOaiBaseUrl(providerUrl);
+      prov.setMnemonic(id);
+      prov.setName(name);
+      prov.setOaiBaseUrl("");
 
-      prov.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, providerDescription);
-      prov.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, providerCountryName);
-      prov.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, providerUrl);
-      prov.putValue(ControlledVocabularyProxy.SUGARCRMID, providerSugarId);
+      prov.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, description);
+      prov.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, country);
+      prov.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, homepage);
+      prov.putValue(ControlledVocabularyProxy.SUGARCRMID, id);
       prov.putValue(ControlledVocabularyProxy.PROVIDERTYPE, providerType);
-      prov.setOaiMetadataPrefix(providerOaiMetadataPrefix);
+      prov.setOaiMetadataPrefix("");
       engine.updateProvider(prov);
       engine.checkpoint();
-      if (action.equals("create")) {
-        repoxservice.createProviderfromUIMObj(prov);
-      } else if (action.equals("update")) {
-        repoxservice.updateProviderfromUIMObj(prov);
-      } else {
-        return "Unknown command " + action;
-      }
-      return "Provider " + action + "d successfully. ";
+      repoxservice.createProvider(aggregatorId, id, name, country, description, nameCode, homepage,
+          ProviderType.get(providerType), email);
+    } catch (InternalServerErrorException | InvalidArgumentsException | MissingArgumentsException
+        | AlreadyExistsException | DoesNotExistException e) {
+      return "Error in creating the provider in repox. " + e.getMessage();
+    } catch (StorageEngineException e) {
 
-    } catch (ProviderOperationException e) {
-      return "Error in " + action.substring(0, action.length() - 1) + "ing the provider. "
-          + e.getMessage();
+      return "Error in creating the provider. " + e.getMessage();
+    } catch (IOException e) {
+      return "Error in creating the provider. " + e.getMessage();
     }
-
+    return "Provider created succesfully";
   }
 
   /**
-   * Deletes a provider
+   * Updates a Provider
+   * 
+   * @param repoxservice - The instance of the repox
+   * @param registry - The instance of the registry
+   * @param argument0 - Provider Id
+   * @param argument1 - Provider New Id
+   * @param argument2 - Aggregator New Id
+   * @param argument3 - Provider Name
+   * @param argument4 - Provider Country
+   * @param argument5 - Provider Description
+   * @param argument6 - Provider Name Code
+   * @param argument7 - Provider Homepage
+   * @param argument8 - Provider Type
+   * @param argument9 - Provider Email
+   * @param out - Console Output
+   * @param in - Console Input
+   * @return Provider creation confirmation
+   * @throws Exception
+   */
+  @SuppressWarnings("unchecked")
+  public static String executeUpdateProvider(RepoxUIMServiceT repoxservice, Registry registry,
+      String argument0, String argument1, String argument2, String argument3, String argument4,
+      String argument5, String argument6, String argument7, String argument8, String argument9,
+      PrintStream out, BufferedReader in) {
+
+    try {
+
+      String id = assignValue("Id", argument0, out, in);
+      String newId = assignValue("New Id", argument1, out, in);
+      String newAggregatorId = assignValue("New Aggregator Id", argument2, out, in);
+      String name = assignValue("Name", argument3, out, in);
+      String country = assignValue("Country", argument4, out, in);
+      String description = assignValue("Description", argument5, out, in);
+      String nameCode = assignValue("Name Code", argument6, out, in);
+      String homepage = assignValue("Homepage", argument7, out, in);
+      String providerType = assignValue("Provider Type", argument8, out, in);
+      String email = assignValue("Email", argument9, out, in);
+
+      StorageEngine<?> engine = registry.getStorageEngine();
+      @SuppressWarnings("rawtypes")
+      Provider prov = engine.findProvider(id);
+      prov.setAggregator(false);
+      prov.setMnemonic((newId != null && !newId.equals("")) ? newId : id);
+      prov.setName(name);
+      prov.setOaiBaseUrl("");
+
+      prov.putValue(ControlledVocabularyProxy.PROVIDERDESCRIPTION, description);
+      prov.putValue(ControlledVocabularyProxy.PROVIDERCOUNTRY, country);
+      prov.putValue(ControlledVocabularyProxy.PROVIDERWEBSITE, homepage);
+      prov.putValue(ControlledVocabularyProxy.SUGARCRMID, id);
+      prov.putValue(ControlledVocabularyProxy.PROVIDERTYPE, providerType);
+      prov.setOaiMetadataPrefix("");
+      engine.updateProvider(prov);
+      engine.checkpoint();
+      repoxservice.updateProvider(id, newId, newAggregatorId, name, country, description, nameCode,
+          homepage, ProviderType.get(providerType), email);
+
+    } catch (InternalServerErrorException | InvalidArgumentsException | MissingArgumentsException
+        | AlreadyExistsException | DoesNotExistException e) {
+      return "Error in updating the provider in repox. " + e.getMessage();
+    } catch (StorageEngineException e) {
+      return "Error in updating the provider. " + e.getMessage();
+    } catch (IOException e) {
+      return "Error in updating the provider. " + e.getMessage();
+    }
+    return "Provider updated succesfully";
+  }
+
+  /**
+   * Deletes a provider.
    * 
    * @param repoxservice - The instance of the Repox service
    * @param registry - The instance of the registry
-   * @param argument0 - Provider Name
-   * @param argument1 - Provider Mnemonic
+   * @param argument0 - Provider Id
    * @param out - Console Output
    * @param in - Console Input
    * @return Provider deletion confirmation
    * @throws IOException
    * @throws StorageEngineException
    */
-  public static String deleteProvider(RepoxUIMService repoxservice, Registry registry,
-      String argument0, String argument1, PrintStream out, BufferedReader in) throws IOException,
+  public static String deleteProvider(RepoxUIMServiceT repoxservice, Registry registry,
+      String argument0, PrintStream out, BufferedReader in) throws IOException,
       StorageEngineException {
-    String providerName = assignValue("Provider Name", argument0, out, in);
-    String providerMnemonic = assignValue(provMemonicVar, argument1, out, in);
+    String providerId = assignValue("Provider Id", argument0, out, in);
 
     try {
-
       StorageEngine<?> engine = registry.getStorageEngine();
       @SuppressWarnings("rawtypes")
-      Provider provider = engine.createProvider();
-      provider.setName(providerName);
-      provider.setMnemonic(providerMnemonic);
-      provider.putValue(repoxIDVar, providerName + "r0");
-      repoxservice.deleteProviderfromUIMObj(provider);
+      Provider provider = engine.findProvider(providerId);
+      provider.setMnemonic(providerId);
+      provider.putValue(repoxIDVar, providerId);
+      engine.updateProvider(provider);
+      engine.checkpoint();
+      repoxservice.deleteProvider(providerId);
       return "Provider deleted successfully.";
-    } catch (ProviderOperationException e) {
-      return "Error in deleting the provider. " + e.getMessage();
+    } catch (InternalServerErrorException | DoesNotExistException e) {
+      return "Error in deleting the provider in repox. " + e.getMessage();
     }
-
   }
 
 
@@ -287,7 +351,6 @@ public class CommandUtils {
    * @throws IOException
    * @throws StorageEngineException
    */
-
 
   @SuppressWarnings("unchecked")
   public static String createUpdateDataSource(String action, RepoxUIMService repoxservice,
@@ -394,7 +457,9 @@ public class CommandUtils {
   /**
    * Retrieves all agreggators
    * 
-   * @param repoxservice - Theservice to look the aggregators in
+   * @param repoxservice - The service to look the aggregators in
+   * @param argument0 - Provider Offset
+   * @param argument1 - Provider Number
    * @param out - Console output
    * @param in - Console input
    * @return The aggregators
@@ -406,47 +471,54 @@ public class CommandUtils {
       String argument1, PrintStream out, BufferedReader in) throws NumberFormatException,
       InvalidArgumentsException, IOException {
 
-    String offset = assignValue("Id", argument0, out, in);
-    String number = assignValue("New Id", argument1, out, in);
+    String offset = assignValue("Offset", argument0, out, in);
+    String number = assignValue("Number", argument1, out, in);
 
     List<Aggregator> aggregatorList =
         repoxservice.getAggregatorList(Integer.parseInt(offset), Integer.parseInt(number));
     StringBuffer sb = new StringBuffer();
-    sb.append("Id\t\t\tName\t\t\tNameCode\t\t\tURL\n\n");
 
+    sb.append(String.format("%-30s %-30s %-30s %-30s %n%n", "ID", "Name", "NameCode", "Homepage"));
     for (Aggregator aggregator : aggregatorList)
-      sb.append(aggregator.getId() + tripleTVar + aggregator.getName() + tripleTVar
-          + aggregator.getNameCode() + tripleTVar + aggregator.getHomepage() + "\n");
+      sb.append(String.format("%-30s %-30s %-30s %-30s %n%n", aggregator.getId(), aggregator.getName(), aggregator.getNameCode(), aggregator.getHomepage()));
 
     return sb.toString();
   }
 
   /**
-   * Retrieve all providers
+   * Retrieve all providers for aggregator.
    * 
    * @param repoxservice - The instance of the service to look for providers
+   * @param argument0 - Aggregator Id
+   * @param argument1 - Provider Offset
+   * @param argument2 - Provider Number
    * @param out - Console Output
    * @param in - Console Input
    * @return All Providers
+   * @throws IOException
+   * @throws DoesNotExistException
+   * @throws InvalidArgumentsException
+   * @throws NumberFormatException
    */
-  public static String retrieveProviders(RepoxUIMService repoxservice, PrintStream out,
-      BufferedReader in) {
+  public static String retrieveProviders(RepoxUIMServiceT repoxservice, String argument0,
+      String argument1, String argument2, PrintStream out, BufferedReader in) throws IOException,
+      NumberFormatException, InvalidArgumentsException, DoesNotExistException {
+
+    String aggregatorId = assignValue("Aggregator Id", argument0, out, in);
+    String offset = assignValue("Offset", argument1, out, in);
+    String number = assignValue("Number", argument2, out, in);
+
+    List<DataProvider> providerList =
+        repoxservice.getProviderList(aggregatorId, Integer.parseInt(offset),
+            Integer.parseInt(number));
     StringBuffer sb = new StringBuffer();
-    try {
-      Set<Provider<?>> providers = repoxservice.retrieveProviders();
-      sb.append("ID\t\t\tName\t\t\tMnemonic\t\t\tBase URL\t\t\tOAI Prefix\t\t\tDescription\t\t\tCountry\t\t\tWebsite\t\t\tSugarCRM ID\t\t\tType\n\n");
-      for (Provider<?> provider : providers) {
-        sb.append(provider.getId() + tripleTVar + provider.getName() + tripleTVar
-            + provider.getMnemonic() + tripleTVar + provider.getOaiBaseUrl() + tripleTVar
-            + provider.getOaiMetadataPrefix() + tripleTVar
-            + provider.getValue("providerDescription") + tripleTVar
-            + provider.getValue("providerCountry") + tripleTVar
-            + provider.getValue("providerWebsite") + tripleTVar + provider.getValue("sugarID")
-            + tripleTVar + provider.getValue("providerType") + "\n");
-      }
-    } catch (Exception e) {
-      sb.append("Error occurred in the retrieval of providers. ");
-      sb.append(e.getMessage());
+    sb.append(String.format("%-30s %-30s %-30s %-30s %-30s %-30s %-30s %n%n", "ID", "Name", "NameCode",
+        "Homepage", "Description", "Country", "Type"));
+    for (DataProvider dataProvider : providerList) {
+      sb.append(String.format("%-30s %-30s %-30s %-30s %-30s %-30s %-30s %n", dataProvider.getId(),
+          dataProvider.getName(), dataProvider.getNameCode(), dataProvider.getHomepage(),
+          dataProvider.getDescription(), dataProvider.getCountry(), dataProvider.getProviderType()
+              .toString()));
     }
     return sb.toString();
   }

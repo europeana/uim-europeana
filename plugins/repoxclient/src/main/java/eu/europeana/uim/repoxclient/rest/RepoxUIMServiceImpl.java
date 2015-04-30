@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.utl.ist.dataProvider.Aggregator;
+import pt.utl.ist.dataProvider.DataProvider;
+import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
 import pt.utl.ist.util.exceptions.InvalidArgumentsException;
@@ -59,16 +61,16 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       LOGGER.error("AggregatorAccessor has a malformed URL {}", defaultURI);
       e.printStackTrace();
     }
-    
+
     try {
       ps = new ProvidersAccessor(new URL(defaultURI), "temporary", "temporary");
     } catch (MalformedURLException e) {
       LOGGER.error("ProvidersAccessor has a malformed URL {}", defaultURI);
       e.printStackTrace();
     }
-    
+
   }
-  
+
   @Override
   public RepoxConnectionStatus showConnectionStatus() {
     RepoxConnectionStatus status = new RepoxConnectionStatus();
@@ -113,173 +115,48 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
     return as.getAggregatorList(offset, number);
   }
 
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see eu.europeana.uim.repox.RepoxUIMService#providerExists(eu.europeana.uim.store.Provider)
-  // */
-  // @Override
-  // public boolean providerExists(Provider<?> provider) throws ProviderOperationException {
-  //
-  // // String provId = provider.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (provId == null) {
-  // // return false;
-  // // }
-  // //
-  // //
-  // // eu.europeana.uim.repoxclient.jibxbindings.Provider prov =
-  // // repoxRestClient.retrieveProvider(provId);
-  // //
-  // // boolean exists = prov != null ? true : false;
-  // //
-  // // return exists;
-  // return false;
-  //
-  // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // *
-  // eu.europeana.uim.repox.RepoxUIMService#createProviderfromUIMObj(eu.europeana.uim.store.Provider
-  // * )
-  // */
-  // @Override
-  // public void createProviderfromUIMObj(Provider uimProv) throws ProviderOperationException {
-  //
-  // // if (uimProv.isAggregator()) {
-  // // throw new ProviderOperationException("The requested object is not a Provider");
-  // // }
-  // //
-  // //
-  // // eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv =
-  // // JibxObjectProvider.createProvider(uimProv);
-  // //
-  // // Aggregator aggr = new Aggregator();
-  // //
-  // // if (jibxProv.getCountry().getCountry() == null) {
-  // // aggr.setId("euaggregatorr0");
-  // // } else {
-  // // aggr.setId(jibxProv.getCountry().getCountry() + defaultAggrgatorIDPostfix);
-  // // }
-  // //
-  // // eu.europeana.uim.repoxclient.jibxbindings.Provider createdProv =
-  // // repoxRestClient.createProvider(jibxProv, aggr);
-  // //
-  // //
-  // // uimProv.putValue(ControlledVocabularyProxy.REPOXID, createdProv.getId());
-  // //
-  // // StorageEngine<?> engine = registry.getStorageEngine();
-  // //
-  // // // Store the created RepoxID into the UIM object
-  // // try {
-  // // engine.updateProvider(uimProv);
-  // // engine.checkpoint();
-  // // } catch (StorageEngineException e) {
-  // // throw new ProviderOperationException("Updating UIM Provider object failed");
-  // // }
-  //
-  // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // *
-  // eu.europeana.uim.repox.RepoxUIMService#deleteProviderfromUIMObj(eu.europeana.uim.store.Provider
-  // * )
-  // */
-  // @Override
-  // public void deleteProviderfromUIMObj(Provider<?> prov) throws ProviderOperationException {
-  //
-  // // String id = prov.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (id == null) {
-  // // throw new ProviderOperationException("Missing repoxID element from Provider object");
-  // // }
-  // //
-  // //
-  // // repoxRestClient.deleteProvider(id);
-  //
-  // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // *
-  // eu.europeana.uim.repox.RepoxUIMService#updateProviderfromUIMObj(eu.europeana.uim.store.Provider
-  // * )
-  // */
-  // @Override
-  // public void updateProviderfromUIMObj(Provider<?> uimProv) throws ProviderOperationException {
-  //
-  // // if (uimProv.isAggregator()) {
-  // // throw new ProviderOperationException("The requested object is not a Provider");
-  // // }
-  // //
-  // // String id = uimProv.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (id == null) {
-  // // throw new ProviderOperationException("Missing repoxID element from Provider object");
-  // // }
-  // //
-  // // eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv =
-  // // JibxObjectProvider.createProvider(uimProv);
-  // //
-  // // jibxProv.setId(id);
-  // //
-  // // repoxRestClient.updateProvider(jibxProv);
-  // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see eu.europeana.uim.repox.RepoxUIMService#retrieveProviders()
-  // */
-  // @Override
-  // public Set<Provider<?>> retrieveProviders() throws ProviderOperationException {
-  // // StorageEngine<?> engine = registry.getStorageEngine();
-  // //
-  // // HashSet<Provider<?>> uimProviders = new HashSet<Provider<?>>();
-  // //
-  // // DataProviders provs = repoxRestClient.retrieveProviders();
-  // //
-  // // ArrayList<eu.europeana.uim.repoxclient.jibxbindings.Provider> provList =
-  // // (ArrayList<eu.europeana.uim.repoxclient.jibxbindings.Provider>) provs.getProviderList();
-  // //
-  // // for (eu.europeana.uim.repoxclient.jibxbindings.Provider prov : provList) {
-  // //
-  // // if (prov.getNameCode() != null) {
-  // // String id = prov.getNameCode().getNameCode();
-  // //
-  // // try {
-  // // Provider<?> uimprov = engine.findProvider(id);
-  // // if (uimprov != null) {
-  // // uimProviders.add(uimprov);
-  // // }
-  // // } catch (StorageEngineException e) {
-  // // // TODO Decide what to do here
-  // // }
-  // // }
-  // //
-  // // }
-  // //
-  // // return uimProviders;
-  // return null;
-  // }
+  /******************** Provider Calls ********************/
+
+  @Override
+  public boolean providerExists(String id) {
+    try {
+      ps.getProvider(id);
+    } catch (DoesNotExistException e) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public List<DataProvider> getProviderList(String aggregatorId, int offset, int number)
+      throws InvalidArgumentsException, DoesNotExistException {
+    return ps.getProviderList(aggregatorId, offset, number);
+  }
+
+  @Override
+  public void createProvider(String aggregatorId, String id, String name, String country,
+      String description, String nameCode, String homepage, ProviderType providerType, String email)
+      throws InvalidArgumentsException, MissingArgumentsException, AlreadyExistsException,
+      InternalServerErrorException, DoesNotExistException {
+    ps.createProvider(aggregatorId, id, name, country, description, nameCode, homepage,
+        providerType, email);
+  }
+  
+  @Override
+  public void deleteProvider(String providerId) throws DoesNotExistException,
+      InternalServerErrorException {
+    ps.deleteProvider(providerId);
+  }
+  
+  @Override
+  public void updateProvider(String id, String newId, String newAggregatorId, String name,
+      String country, String description, String nameCode, String homepage,
+      ProviderType providerType, String email) throws InvalidArgumentsException,
+      DoesNotExistException, MissingArgumentsException, AlreadyExistsException {
+    ps.updateProvider(id, newId, newAggregatorId, name, country, description, nameCode, homepage, providerType, email);
+  }
+  
+  
   //
   //
   //
@@ -899,5 +776,10 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   public Registry getRegistry() {
     return registry;
   }
+
+
+
+
+
 
 }

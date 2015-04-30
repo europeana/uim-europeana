@@ -11,7 +11,9 @@
 	<service id="repoxAgentService" ref="repoxAgent"
 		interface="eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT" />
 
-	<reference id="registry" interface="eu.europeana.uim.Registry" />
+	<bp:reference id="registry" interface="eu.europeana.uim.Registry" />
+	
+	
 
    <!--Plugins & Workflow Plugins-->  
     <bean id="repoxHarvestWf" class="eu.europeana.uim.repoxclient.workflow.RepoxHarvestingWorkflow">
