@@ -39,6 +39,9 @@ import pt.utl.ist.dataProvider.dataSource.RecordIdPolicy;
 import pt.utl.ist.marc.CharacterEncoding;
 import pt.utl.ist.marc.iso2709.shared.Iso2709Variant;
 import pt.utl.ist.metadataTransformation.MetadataTransformation;
+import pt.utl.ist.task.DataSourceExportTask;
+import pt.utl.ist.task.DataSourceIngestTask;
+import pt.utl.ist.task.Task;
 import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
@@ -665,93 +668,81 @@ public class CommandUtils {
   }
 
   /**
-   * Initiate Harvesting of a collection
+   * Initiate Harvesting of a datasource
    * 
    * @param repoxservice - The instance of the Service
    * @param registry - The instance of the registry
-   * @param argument0 - Provider Name
-   * @param argument1 - Provider Mnemonic
-   * @param argument2 - Datasource Name
-   * @param argument3 - Datasource Mnemonic
+   * @param argument0 - Datasource Id
+   * @param argument1 - Harvesting Type
    * @param out - Console output
    * @param in - Console Input
    * @return Confirmation of the initiation of harvesting
    * @throws IOException
    * @throws StorageEngineException
    */
-  public static String initiateHarvesting(RepoxUIMService repoxservice, Registry registry,
-      String argument0, String argument1, String argument2, String argument3, PrintStream out,
-      BufferedReader in) throws IOException, StorageEngineException {
+  public static String initiateHarvesting(RepoxUIMServiceT repoxservice, Registry registry,
+      String argument0, String argument1, PrintStream out, BufferedReader in) throws IOException,
+      StorageEngineException {
 
-    String providerName = assignValue(provnameVar, argument0, out, in);
-    String providerMnemonic = assignValue(provMemonicVar, argument1, out, in);
-    String dsName = assignValue(dsnameVar, argument2, out, in);
-    String dsMnemonic = assignValue(dsmnemonicVar, argument3, out, in);
+    String datasourceId = assignValue("Datasource Id", argument0, out, in);
+    String type = assignValue("Type", argument1, out, in);
+    // StorageEngine<?> engine = registry.getStorageEngine();
+    //
+    //
+    // @SuppressWarnings("rawtypes")
+    // Provider provider = engine.createProvider();
+    // provider.setName(providerName);
+    // provider.setMnemonic(providerMnemonic);
+    // provider.putValue(repoxIDVar, providerName + "r0");
+    //
+    // @SuppressWarnings("unchecked")
+    // Collection<?> coll = engine.createCollection(provider);
+    // coll.setName(dsName);
+    // coll.setMnemonic(dsMnemonic);
+    // coll.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
+
     try {
-      StorageEngine<?> engine = registry.getStorageEngine();
-
-
-      @SuppressWarnings("rawtypes")
-      Provider provider = engine.createProvider();
-      provider.setName(providerName);
-      provider.setMnemonic(providerMnemonic);
-      provider.putValue(repoxIDVar, providerName + "r0");
-
-      @SuppressWarnings("unchecked")
-      Collection<?> coll = engine.createCollection(provider);
-      coll.setName(dsName);
-      coll.setMnemonic(dsMnemonic);
-      coll.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
-
-      repoxservice.initiateHarvestingfromUIMObj(coll, true);
+      repoxservice.initiateHarvesting(datasourceId, type);
       return "Harvesting has been initiated. ";
-    } catch (HarvestingOperationException e) {
-      return "Harvesting initiation failed. " + e.getMessage();
+    } catch (InternalServerErrorException | AlreadyExistsException | DoesNotExistException e) {
+      return "Error in starting harvesting in repox. " + e.getMessage();
     }
   }
 
   /**
-   * Gets the harvesting status
+   * Gets the harvesting status.
    * 
    * @param repoxservice - The instance of the service
    * @param registry - The instance of the registry
-   * @param argument0 - Provider Name
-   * @param argument1 - Provider Mnemonic
-   * @param argument2 - Datasource Language
-   * @param argument3 - Datasource Name
-   * @param argument4 - Datasource Mnemonic
+   * @param argument0 - Datasource Id
    * @param out - Console output
    * @param in - Console input
    * @return The harvesting status
    * @throws IOException
    * @throws StorageEngineException
    */
-  public static String getHarvestingStatus(RepoxUIMService repoxservice, Registry registry,
-      String argument0, String argument1, String argument2, String argument3, String argument4,
-      PrintStream out, BufferedReader in) throws IOException, StorageEngineException {
+  public static String getHarvestingStatus(RepoxUIMServiceT repoxservice, Registry registry,
+      String argument0, PrintStream out, BufferedReader in) throws IOException,
+      StorageEngineException {
 
-    String providerName = assignValue(provnameVar, argument0, out, in);
-    String providerMnemonic = assignValue(provMemonicVar, argument1, out, in);
-    String dsLanguage = assignValue("Datasource Language", argument2, out, in);
-    String dsName = assignValue(dsnameVar, argument3, out, in);
-    String dsMnemonic = assignValue(dsmnemonicVar, argument4, out, in);
+    String datasourceId = assignValue("Datasource Id", argument0, out, in);
+    // StorageEngine<?> engine = registry.getStorageEngine();
+    //
+    // @SuppressWarnings("rawtypes")
+    // Provider provider = engine.createProvider();
+    // provider.setName(providerName);
+    // provider.setMnemonic(providerMnemonic);
+    // provider.putValue(repoxIDVar, providerName + "r0");
+    //
+    // Collection<?> coll = engine.createCollection(provider);
+    // coll.setName(dsName);
+    // coll.setMnemonic(dsMnemonic);
+    // coll.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
+    // RepoxHarvestingStatus res = repoxservice.getHarvestingStatus(coll);
     try {
-      StorageEngine<?> engine = registry.getStorageEngine();
-
-      @SuppressWarnings("rawtypes")
-      Provider provider = engine.createProvider();
-      provider.setName(providerName);
-      provider.setMnemonic(providerMnemonic);
-      provider.putValue(repoxIDVar, providerName + "r0");
-
-      Collection<?> coll = engine.createCollection(provider);
-      coll.setName(dsName);
-      coll.setMnemonic(dsMnemonic);
-      coll.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
-      RepoxHarvestingStatus res = repoxservice.getHarvestingStatus(coll);
-      return "Status \n" + res.getStatus();
-    } catch (HarvestingOperationException e) {
-      return "Error in getting harvest status for collection " + dsName + ". " + e.getMessage();
+      return "Status: \n" + repoxservice.getHarvestingStatus(datasourceId);
+    } catch (InternalServerErrorException | DoesNotExistException e) {
+      return "Error in geting harvesting status in repox. " + e.getMessage();
     }
   }
 
@@ -763,24 +754,20 @@ public class CommandUtils {
    * @param in - Console Input
    * @return - The active Harvests
    */
-  public static String getActiveHarvests(RepoxUIMService repoxservice, PrintStream out,
+  public static String getActiveHarvests(RepoxUIMServiceT repoxservice, PrintStream out,
       BufferedReader in) {
+    List<Task> currentHarvestsList = repoxservice.getCurrentHarvestsList();
+    
     StringBuffer sb = new StringBuffer();
-    try {
-      sb.append("Provider\tID        \tCollectionID\tName\tMnemonic\tLast Modified\tLast Synchronized\tOAI-PMH Base URL\tOAI-PMH Metadata Prefix");
-      HashSet<Collection<?>> collectionSet =
-          (HashSet<Collection<?>>) repoxservice.getActiveHarvestingSessions();
-      for (Collection<?> col : collectionSet) {
-        sb.append(col.getProvider() + "\t" + col.getId() + "\t" + col.getValue("collectionId")
-            + "\t" + col.getLanguage() + "\t" + col.getName() + "\t" + col.getMnemonic() + "\t"
-            + col.getLastModified() + "\t" + col.getLastSynchronized() + "\t"
-            + col.getOaiBaseUrl(true) + "\t" + col.getOaiMetadataPrefix(true) + "\t"
-            + col.getOaiSet() + "\n");
+    sb.append(String.format("%-30s %-30s %-30s %n%n", "Datasource Id", "Task Id", "Status"));
+    
+    for(Task task : currentHarvestsList)
+    {
+      if(task instanceof DataSourceIngestTask)
+      {
+        DataSourceIngestTask dsit = (DataSourceIngestTask)task;
+        sb.append(String.format("%-30s %-30s %-30s %-30s %n", dsit.getDataSourceId(), dsit.getTaskId(), dsit.getStatus()));
       }
-
-    } catch (HarvestingOperationException e) {
-      sb.append("Error in getting active harvests. ");
-      sb.append(e.getMessage());
     }
     return sb.toString();
   }

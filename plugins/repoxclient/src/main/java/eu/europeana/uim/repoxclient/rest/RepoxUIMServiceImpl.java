@@ -33,6 +33,7 @@ import pt.utl.ist.dataProvider.dataSource.RecordIdPolicy;
 import pt.utl.ist.marc.CharacterEncoding;
 import pt.utl.ist.marc.iso2709.shared.Iso2709Variant;
 import pt.utl.ist.metadataTransformation.MetadataTransformation;
+import pt.utl.ist.task.Task;
 import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
@@ -40,6 +41,7 @@ import pt.utl.ist.util.exceptions.InvalidArgumentsException;
 import pt.utl.ist.util.exceptions.MissingArgumentsException;
 import eu.europeana.repox.rest.client.accessors.AggregatorsAccessor;
 import eu.europeana.repox.rest.client.accessors.DatasetsAccessor;
+import eu.europeana.repox.rest.client.accessors.HarvestAccessor;
 import eu.europeana.repox.rest.client.accessors.ProvidersAccessor;
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.repox.model.RepoxConnectionStatus;
@@ -60,6 +62,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   private static AggregatorsAccessor as;
   private static ProvidersAccessor ps;
   private static DatasetsAccessor ds;
+  private static HarvestAccessor hs;
   private static String defaultURI;
 
   public RepoxUIMServiceImpl() {
@@ -83,6 +86,13 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       ds = new DatasetsAccessor(new URL(defaultURI), "temporary", "temporary");
     } catch (MalformedURLException e) {
       LOGGER.error("DatasetsAccessor has a malformed URL {}", defaultURI);
+      e.printStackTrace();
+    }
+
+    try {
+      hs = new HarvestAccessor(new URL(defaultURI), "temporary", "temporary");
+    } catch (MalformedURLException e) {
+      LOGGER.error("HarvestAccessor has a malformed URL {}", defaultURI);
       e.printStackTrace();
     }
   }
@@ -208,7 +218,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
         metadataFormat, marcFormat, exportDir, recordIdPolicy, extractStrategy, retrieveStrategy,
         characterEncoding, isoVariant, sourceDirectory, recordXPath, metadataTransformations);
   }
-  
+
   @Override
   public void updateDatasourceOai(String id, String newId, String name, String nameCode,
       boolean isSample, String schema, String description, String namespace, String metadataFormat,
@@ -216,18 +226,39 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
       throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
       AlreadyExistsException, InternalServerErrorException {
-    ds.updateDatasetOai(id, newId, name, nameCode, isSample, schema, description, namespace, metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy, metadataTransformations);
+    ds.updateDatasetOai(id, newId, name, nameCode, isSample, schema, description, namespace,
+        metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy,
+        metadataTransformations);
   }
-  
+
   @Override
   public void deleteDataset(String datasetId) throws DoesNotExistException {
     ds.deleteDataset(datasetId);
   }
-  
+
   @Override
   public List<DataSourceContainer> getDatasetList(String providerId, int offset, int number)
       throws InvalidArgumentsException, DoesNotExistException {
     return ds.getDatasetList(providerId, offset, number);
+  }
+
+  /******************** Harvesting Calls ********************/
+  
+  @Override
+  public void initiateHarvesting(String id, String type) throws AlreadyExistsException,
+      DoesNotExistException, InternalServerErrorException {
+    hs.startHarvest(id, type);
+  }
+  
+  @Override
+  public String getHarvestingStatus(String id) throws DoesNotExistException,
+      InternalServerErrorException {
+    return hs.getDatasetHarvestingStatus(id);
+  }
+  
+  @Override
+  public List<Task> getCurrentHarvestsList() {
+    return hs.getCurrentHarvestsList();
   }
 
 
@@ -319,28 +350,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   // throw new UnsupportedOperationException("Not implemented yet");
   // }
   //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // * eu.europeana.uim.repox.RepoxUIMService#initiateHarvestingfromUIMObj(eu.europeana.uim.store.
-  // * Collection, boolean)
-  // */
-  // @Override
-  // public void initiateHarvestingfromUIMObj(Collection<?> col, boolean isfull)
-  // throws HarvestingOperationException {
-  //
-  // // String id = col.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (id == null) {
-  // // throw new HarvestingOperationException("Missing repoxID element from Collection object");
-  // // }
-  // // repoxRestClient.initiateHarvesting(id, isfull);
-  // }
-  //
-  //
+
   //
   // /*
   // * (non-Javadoc)
@@ -384,84 +394,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   // //
   // // repoxRestClient.cancelHarvesting(id);
   // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // * eu.europeana.uim.repox.RepoxUIMService#getHarvestingStatus(eu.europeana.uim.store.Collection)
-  // */
-  // @Override
-  // public RepoxHarvestingStatus getHarvestingStatus(Collection<?> col)
-  // throws HarvestingOperationException {
-  // // String id = col.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (id == null) {
-  // // throw new HarvestingOperationException("Missing repoxID element from Collection object");
-  // // }
-  // // HarvestingStatus jibxstatus = repoxRestClient.getHarvestingStatus(id);
-  // //
-  // // RepoxHarvestingStatus returnStatus = new RepoxHarvestingStatus();
-  // //
-  // // returnStatus.setStatus(HarvestingState.valueOf(jibxstatus.getStatus().getStatus()));
-  // //
-  // // if (jibxstatus.getPercentage() != null) {
-  // // returnStatus.setPercentage(jibxstatus.getPercentage().getPercentage());
-  // // }
-  // //
-  // // if (jibxstatus.getRecords() != null) {
-  // //
-  // // returnStatus.setRecords(jibxstatus.getRecords().getRecords());
-  // // }
-  // //
-  // // if (jibxstatus.getTimeLeft() != null) {
-  // // returnStatus.setTimeLeft(jibxstatus.getTimeLeft().getTimeLeft());
-  // // }
-  // //
-  // //
-  // // return returnStatus;
-  // return null;
-  //
-  // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see eu.europeana.uim.repox.RepoxUIMService#getActiveHarvestingSessions()
-  // */
-  // @Override
-  // public Set<Collection<?>> getActiveHarvestingSessions() throws HarvestingOperationException {
-  //
-  // // StorageEngine<?> engine = registry.getStorageEngine();
-  // //
-  // // HashSet<Collection<?>> uimCollections = new HashSet<Collection<?>>();
-  // //
-  // // RunningTasks rTasks = repoxRestClient.getActiveHarvestingSessions();
-  // //
-  // // ArrayList<DataSource> sourceList = (ArrayList<DataSource>) rTasks.getDataSourceList();
-  // //
-  // // for (DataSource src : sourceList) {
-  // //
-  // // String id = src.getDataSource();
-  // //
-  // // try {
-  // // Collection<?> coll = engine.findCollection(id);
-  // // uimCollections.add(coll);
-  // // } catch (StorageEngineException e) {
-  // // // TODO Decide what to do here
-  // // }
-  // //
-  // // }
-  // //
-  // // return uimCollections;
-  //
-  // return null;
-  // }
-  //
   //
   //
   // /*
@@ -586,9 +518,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
     return registry;
   }
 
-
-
- 
 
 
 
