@@ -45,7 +45,7 @@ import eu.europeana.uim.repoxclient.utils.CommandUtils;
 public class RepoxPluginCommand implements Function, Action {
 
 	enum Operation {
-		info, createaggregator, deleteaggregator, updateaggregator, createprovider, deleteprovider, updateprovider, createdatasource, deletedatasource, updatedatasource, retrieveaggregators, retrieveproviders, retrievedatasources, initiateharvesting, getharvestingstatus, getactiveharvests
+		info, createaggregator, deleteaggregator, updateaggregator, createprovider, deleteprovider, updateprovider, createdatasourceoai, deletedatasource, updatedatasourceoai, retrieveaggregators, retrieveproviders, retrievedatasources, initiateharvesting, getharvestingstatus, getactiveharvests
 	}
 
 	private RepoxUIMServiceT repoxservice;
@@ -87,6 +87,15 @@ public class RepoxPluginCommand implements Function, Action {
 	@Argument(index = 10)
     private String argument10;
 
+    @Argument(index = 11)
+    private String argument11;
+    
+    @Argument(index = 12)
+    private String argument12;
+    
+    @Argument(index = 13)
+    private String argument13;
+
 	/**
 	 * @param repoxservice
 	 */
@@ -110,11 +119,11 @@ public class RepoxPluginCommand implements Function, Action {
 
 		if (operation == null) {
 		  out.println("Please specify an operation with the '-o' option. Possible values are:");
-		  out.printf("%-50s %50s %n", "info", "Connection info to Sugarcrm");
-		  out.printf("%-50s %50s %n", "createaggregator <id, name, nameCode, homepage>", "Creates a new aggregator");
-		  out.printf("%-50s %50s %n", "deleteaggregator <aggregatorId>", "Delete an aggregator");
-		  out.printf("%-50s %50s %n", "updateaggregator <id, newId, name, nameCode, homepage>", "Updates an aggregator");
-		  out.printf("%-50s %50s %n", "retrieveaggregators <offset, number>", "Retrieves all Aggregators");
+		  out.printf("%-250s %-50s %n", "info", "Connection info to Sugarcrm");
+		  out.printf("%-250s %-50s %n", "createaggregator <id, name, nameCode, homepage>", "Creates a new aggregator");
+		  out.printf("%-250s %-50s %n", "deleteaggregator <aggregatorId>", "Delete an aggregator");
+		  out.printf("%-250s %-50s %n", "updateaggregator <id, newId, name, nameCode, homepage>", "Updates an aggregator");
+		  out.printf("%-250s %-50s %n", "retrieveaggregators <offset, number>", "Retrieves all Aggregators");
 		  
 		 
 //			out.println("info                                                       \t\t\t\t Connection info to Sugarcrm");
@@ -123,10 +132,10 @@ public class RepoxPluginCommand implements Function, Action {
 //			out.println("updateaggregator <id, newId, name, nameCode, homepage>                                     \t\t\t\t Updates an aggregator");
 //	        out.println("retrieveaggregators <offset, number>                                         \t\t\t\t Retrieves all Aggregators");
 			
-		  out.printf("%-50s %50s %n", "createprovider  <aggregatorId, id, name, country, description, nameCode, homepage, providerType, String email>", "Create a provider");
-		  out.printf("%-50s %50s %n", "deleteprovider  <providerId>", "Delete a provider");
-		  out.printf("%-50s %50s %n", "updateprovider  <id, newId, newAggregatorId, name, country, description, nameCode, homepage, providerType, email>", "Update a provider");
-		  out.printf("%-50s %50s %n", "retrieveproviders <aggregatorId, offset, number>", "Retrieves all Providers from aggregatorId");
+		  out.printf("%-250s %-50s %n", "createprovider  <aggregatorId, id, name, country, description, nameCode, homepage, providerType, String email>", "Create a provider");
+		  out.printf("%-250s %-50s %n", "deleteprovider  <providerId>", "Delete a provider");
+		  out.printf("%-250s %-50s %n", "updateprovider  <id, newId, newAggregatorId, name, country, description, nameCode, homepage, providerType, email>", "Update a provider");
+		  out.printf("%-250s %-50s %n", "retrieveproviders <aggregatorId, offset, number>", "Retrieves all Providers from aggregatorId");
 		  
 //			out.println("createprovider  <aggregatorId, id, name, country, description, nameCode, homepage, providerType, String email> \t\t\t\t Create a provider");
 //			out.println("deleteprovider  <providerId>                       \t\t\t\t Delete a provider");
@@ -134,11 +143,14 @@ public class RepoxPluginCommand implements Function, Action {
 //			out.println("retrieveproviders <aggregatorId, offset, number>                                     \t\t\t\t Retrieves all Providers from aggregatorId");
 
 			
-			
-			out.println("createdatasource  <prov_name,prov_mnemonic,coll_lang,coll_mnemonic,coll_name,coll_OAIPMHURI,coll_OAI_prfx> \t\t\t\t Initializes workflows according ot records states ");
-			out.println("deletedatasource <datasource_name>                           \t\t\t\t Creates Collection/Providers objects from a record");
-			out.println("updatedatasource <prov_name,prov_mnemonic,coll_lang,coll_mnemonic,coll_name,coll_OAIPMHURI,coll_OAI_prfx> \t\t\t\t Adds a note attachment to a specific record");
-			out.println("retrievedatasources                                    \t\t\t\t Retrieves all Datasources");
+		  out.printf("%-250s %-50s %n", "createdatasourceoai  <prov_id, ds_id, name, name_code, sample, schema, description, namespace, metadata_format, marc_format, oai_url, oai_setm export_dir>", "Create a datasource OAI");
+		  out.printf("%-250s %-50s %n", "updatedatasourceoai  <ds_id, ds_new_id, name, name_code, sample, schema, description, namespace, metadata_format, marc_format, oai_url, oai_setm export_dir>", "Create a datasource OAI");
+		  
+		  out.printf("%-250s %-50s %n", "deletedatasource  <ds_id>", "Delete a datasource");
+		  out.printf("%-250s %-50s %n", "retrievedatasources  <providerId, offset, number>", "Retrieves all datasources from providerId");
+		  
+		  
+		  
 			out.println("initiateharvesting <prov_name,prov_mnemonic,coll_name,coll_mnemonic>                       \t\t\t\t Initiate the harvesting of a datasource");
 			out.println("getharvestingstatus <prov_name,prov_mnemonic,coll_name,coll_mnemonic>                 \t\t\t\t Get the status of a harvest of a datasource");
 			out.println("getactiveharvests                                       \t\t\t\t Get the active harvests");
@@ -192,37 +204,25 @@ public class RepoxPluginCommand implements Function, Action {
          case retrieveproviders:
          out.println(CommandUtils.retrieveProviders(repoxservice, argument0, argument1, argument2, out, in));
          break;
-			
-			
-			
-			
-			
-//		// --------------Data sources Actions---------------
-//		case createdatasource:
-//			out.println(CommandUtils.createUpdateDataSource("create",repoxservice, registry, argument0,argument1,argument2,argument3,argument4, argument5, argument6, out,in));
-//			
-//			
-//			break;
-//
-//		case updatedatasource:
-//			out.println(CommandUtils.createUpdateDataSource("update",repoxservice, registry, argument0,argument1,argument2,argument3,argument4, argument5, argument6, out,in));
-//
-//			break;
-//
-//		case deletedatasource:
-//			out.println(CommandUtils.deleteDatasource(repoxservice,registry,argument0,argument1,argument2,argument3,argument4, out, in));
-//			
-//			break;
 
+		// --------------Data sources Actions---------------
+		case createdatasourceoai:
+			out.println(CommandUtils.createDataSourceOai(repoxservice, repoxservice.getRegistry(), argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7, argument8, argument9, argument10, argument11, argument12, out, in));
+			break;
 
+		case updatedatasourceoai:
+			out.println(CommandUtils.updateDataSourceOai(repoxservice, repoxservice.getRegistry(), argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7, argument8, argument9, argument10, argument11, argument12, out, in));
+			break;
 
+		case deletedatasource:
+			out.println(CommandUtils.deleteDatasource(repoxservice,repoxservice.getRegistry(),argument0, out, in));
+			break;
+			
+		case retrievedatasources:
+			out.println(CommandUtils.retrieveDatasources(repoxservice, argument0, argument1, argument2,out,in));
+			break;
 
-//		case retrievedatasources:
-//			out.println(CommandUtils.retrieveDatasources(repoxservice,out,in));
-//			break;
-//
-//		// -------------Harvesting--------------
-//
+		// -------------Harvesting--------------
 //		case initiateharvesting:
 //			out.println(CommandUtils.initiateHarvesting(repoxservice,registry, argument0,argument1,argument2,argument3, out,in));
 //			

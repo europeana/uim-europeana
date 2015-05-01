@@ -16,14 +16,29 @@ package eu.europeana.uim.repoxclient.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.InternalServerErrorException;
 
+import org.dom4j.DocumentException;
+
 import pt.utl.ist.dataProvider.Aggregator;
 import pt.utl.ist.dataProvider.DataProvider;
+import pt.utl.ist.dataProvider.DataSource;
+import pt.utl.ist.dataProvider.DataSourceContainer;
+import pt.utl.ist.dataProvider.DefaultDataSourceContainer;
+import pt.utl.ist.dataProvider.dataSource.FileExtractStrategy;
+import pt.utl.ist.dataProvider.dataSource.FileRetrieveStrategy;
+import pt.utl.ist.dataProvider.dataSource.IdExtractedRecordIdPolicy;
+import pt.utl.ist.dataProvider.dataSource.IdProvidedRecordIdPolicy;
+import pt.utl.ist.dataProvider.dataSource.RecordIdPolicy;
+import pt.utl.ist.marc.CharacterEncoding;
+import pt.utl.ist.marc.iso2709.shared.Iso2709Variant;
+import pt.utl.ist.metadataTransformation.MetadataTransformation;
 import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
@@ -331,20 +346,24 @@ public class CommandUtils {
     }
   }
 
-
   /**
-   * Creates/Updates a Datasource
+   * Creates a Datasource OAI.
    * 
-   * @param action - The action to peerform "create" or "update"
    * @param repoxservice - The instance of the Repox service
    * @param registry - The instance of the registry
-   * @param argument0 - Provider Name
-   * @param argument1 - Provider Mnemonic
-   * @param argument2 - Datasource Language
-   * @param argument3 - Datasource Name
-   * @param argument4 - Datasource Mnemonic
-   * @param argument5 - Datasource OAI-PMH URI
-   * @param argument6 - Datasource Metadata Prefix
+   * @param argument0 - Provider Id
+   * @param argument1 - Datasource Id
+   * @param argument2 - Name
+   * @param argument3 - Name Code
+   * @param argument4 - Is Sample
+   * @param argument5 - Schema
+   * @param argument6 - Description
+   * @param argument7 - Namespace
+   * @param argument8 - Metadata Format
+   * @param argument9 - Marc Format
+   * @param argument10 - OAI URL
+   * @param argument11 - OAI Set
+   * @param argument12 - Export Directory
    * @param out - Console Output
    * @param in - Console Input
    * @return Datasource creation confirmation
@@ -353,53 +372,144 @@ public class CommandUtils {
    */
 
   @SuppressWarnings("unchecked")
-  public static String createUpdateDataSource(String action, RepoxUIMService repoxservice,
-      Registry registry, String argument0, String argument1, String argument2, String argument3,
-      String argument4, String argument5, String argument6, PrintStream out, BufferedReader in)
-      throws IOException, StorageEngineException {
+  public static String createDataSourceOai(RepoxUIMServiceT repoxservice, Registry registry,
+      String argument0, String argument1, String argument2, String argument3, String argument4,
+      String argument5, String argument6, String argument7, String argument8, String argument9,
+      String argument10, String argument11, String argument12, PrintStream out, BufferedReader in) {
 
-
-    String providerName = assignValue(provnameVar, argument0, out, in);
-    String providerMnemonic = assignValue(provMemonicVar, argument1, out, in);
-    String dsLanguage = assignValue("Datasource Language", argument2, out, in);
-    String dsName = assignValue(dsnameVar, argument3, out, in);
-    String dsMnemonic = assignValue(dsmnemonicVar, argument4, out, in);
-    String dsOAIPMHURI = assignValue("Datasource OAI-PMH URI", argument5, out, in);
-    String dsOAIMetadataPrefix = assignValue("Datasource Metadata Prefix", argument6, out, in);
     try {
+
+      String providerId = assignValue("Provider Id", argument0, out, in);
+      String id = assignValue("Datasource Id", argument1, out, in);
+      String name = assignValue("Name", argument2, out, in);
+      String nameCode = assignValue("Name Code", argument3, out, in);
+      String isSample = assignValue("Is Sample", argument4, out, in);
+      String schema = assignValue("Schema", argument5, out, in);
+      String description = assignValue("Description", argument6, out, in);
+      String namespace = assignValue("Namespace", argument7, out, in);
+      String metadataFormat = assignValue("Metadata Format", argument8, out, in);
+      String marcFormat = assignValue("Marc Format", argument9, out, in);
+      String oaiUrl = assignValue("OAI URL", argument10, out, in);
+      String oaiSet = assignValue("OAI Set", argument11, out, in);
+      String exportDir = assignValue("Export Directory", argument12, out, in);
 
       StorageEngine<?> engine = registry.getStorageEngine();
 
       @SuppressWarnings("rawtypes")
       Provider provider = engine.createProvider();
-      provider.setName(providerName);
-      provider.setMnemonic(providerMnemonic);
-      provider.putValue(repoxIDVar, providerName + "r0");
+      // provider.setName(providerName);
+      provider.setMnemonic(providerId);
+      // provider.putValue(repoxIDVar, providerName + "r0");
 
       @SuppressWarnings("rawtypes")
       Collection collection = engine.createCollection(provider);
 
-      collection.setLanguage(dsLanguage);
-      collection.setMnemonic(dsMnemonic);
-      collection.setName(dsName);
-      collection.setOaiBaseUrl(dsOAIPMHURI);
-      collection.setOaiMetadataPrefix(dsOAIMetadataPrefix);
-      collection.putValue("collectionID", dsName + "r0");
+      // collection.setLanguage(dsLanguage);
+      collection.setMnemonic(id);
+      collection.setName(name);
+      collection.setOaiBaseUrl(oaiUrl);
+      collection.setOaiMetadataPrefix(metadataFormat);
+      collection.putValue("collectionID", name + "r0");
 
       engine.updateCollection(collection);
       engine.checkpoint();
-      if (action.equals("create")) {
-        repoxservice.createDatasourcefromUIMObj(collection, provider);
-      } else if (action.equals("update")) {
-        repoxservice.updateDatasourcefromUIMObj(collection);
-      } else {
-        return "Unknown command " + action;
-      }
-      return "Datasource " + action + "d successfully";
-    } catch (DataSourceOperationException e) {
-      return "Error in " + action.substring(0, action.length() - 1) + "ing the Collection. "
-          + e.getMessage();
+      RecordIdPolicy repoxRecordIdPolicy = new IdProvidedRecordIdPolicy(); // only for testing
+
+      repoxservice.createDatasourceOai(providerId, id, name, nameCode,
+          Boolean.parseBoolean(isSample), schema, description, namespace, metadataFormat,
+          marcFormat, oaiUrl, oaiSet, exportDir, repoxRecordIdPolicy, null);
+    } catch (InternalServerErrorException | InvalidArgumentsException | DoesNotExistException
+        | MissingArgumentsException | AlreadyExistsException e) {
+      return "Error in creating the datasource in repox. " + e.getMessage();
+    } catch (StorageEngineException e) {
+      return "Error in creating the datasource. " + e.getMessage();
+    } catch (IOException e) {
+      return "Error in creating the datasource. " + e.getMessage();
     }
+    return "Datasource created succesfully";
+  }
+
+
+  /**
+   * Creates a Update OAI.
+   * 
+   * @param repoxservice - The instance of the Repox service
+   * @param registry - The instance of the registry
+   * @param argument0 - Datasource Id
+   * @param argument1 - Datasource New Id
+   * @param argument2 - Name
+   * @param argument3 - Name Code
+   * @param argument4 - Is Sample
+   * @param argument5 - Schema
+   * @param argument6 - Description
+   * @param argument7 - Namespace
+   * @param argument8 - Metadata Format
+   * @param argument9 - Marc Format
+   * @param argument10 - OAI URL
+   * @param argument11 - OAI Set
+   * @param argument12 - Export Directory
+   * @param out - Console Output
+   * @param in - Console Input
+   * @return Datasource update confirmation
+   * @throws IOException
+   * @throws StorageEngineException
+   */
+  @SuppressWarnings("unchecked")
+  public static String updateDataSourceOai(RepoxUIMServiceT repoxservice, Registry registry,
+      String argument0, String argument1, String argument2, String argument3, String argument4,
+      String argument5, String argument6, String argument7, String argument8, String argument9,
+      String argument10, String argument11, String argument12, PrintStream out, BufferedReader in) {
+
+    try {
+
+      String providerId = assignValue("Provider Id", argument0, out, in);
+      String id = assignValue("Datasource Id", argument1, out, in);
+      String name = assignValue("Name", argument2, out, in);
+      String nameCode = assignValue("Name Code", argument3, out, in);
+      String isSample = assignValue("Is Sample", argument4, out, in);
+      String schema = assignValue("Schema", argument5, out, in);
+      String description = assignValue("Description", argument6, out, in);
+      String namespace = assignValue("Namespace", argument7, out, in);
+      String metadataFormat = assignValue("Metadata Format", argument8, out, in);
+      String marcFormat = assignValue("Marc Format", argument9, out, in);
+      String oaiUrl = assignValue("OAI URL", argument10, out, in);
+      String oaiSet = assignValue("OAI Set", argument11, out, in);
+      String exportDir = assignValue("Export Directory", argument12, out, in);
+
+      StorageEngine<?> engine = registry.getStorageEngine();
+
+      @SuppressWarnings("rawtypes")
+      Provider provider = engine.createProvider();
+      // provider.setName(providerName);
+      provider.setMnemonic(providerId);
+      // provider.putValue(repoxIDVar, providerName + "r0");
+
+      @SuppressWarnings("rawtypes")
+      Collection collection = engine.createCollection(provider);
+
+      // collection.setLanguage(dsLanguage);
+      collection.setMnemonic(id);
+      collection.setName(name);
+      collection.setOaiBaseUrl(oaiUrl);
+      collection.setOaiMetadataPrefix(metadataFormat);
+      collection.putValue("collectionID", name + "r0");
+
+      engine.updateCollection(collection);
+      engine.checkpoint();
+      RecordIdPolicy repoxRecordIdPolicy = new IdProvidedRecordIdPolicy(); // only for testing
+
+      repoxservice.updateDatasourceOai(providerId, id, name, nameCode,
+          Boolean.parseBoolean(isSample), schema, description, namespace, metadataFormat,
+          marcFormat, oaiUrl, oaiSet, exportDir, repoxRecordIdPolicy, null);
+    } catch (InternalServerErrorException | InvalidArgumentsException | DoesNotExistException
+        | MissingArgumentsException | AlreadyExistsException e) {
+      return "Error in updating the datasource in repox. " + e.getMessage();
+    } catch (StorageEngineException e) {
+      return "Error in updating the datasource. " + e.getMessage();
+    } catch (IOException e) {
+      return "Error in updating the datasource. " + e.getMessage();
+    }
+    return "Datasource updated succesfully";
   }
 
   /**
@@ -408,10 +518,7 @@ public class CommandUtils {
    * @param repoxservice - The instance of the Repox service
    * @param registry - The instance of the Registry
    * @param argument0 - Provider Name
-   * @param argument1 - Provider Mnemonic
-   * @param argument2 - Datasource Language
-   * @param argument3 - Datasource Name
-   * @param argument4 - Datasource Mnemonic
+   * 
    * @param out - Console output
    * @param in - Console input
    * @return Datasource deletion confirmation
@@ -419,38 +526,33 @@ public class CommandUtils {
    * @throws StorageEngineException
    */
   @SuppressWarnings("unchecked")
-  public static String deleteDatasource(RepoxUIMService repoxservice, Registry registry,
-      String argument0, String argument1, String argument2, String argument3, String argument4,
-      PrintStream out, BufferedReader in) throws IOException, StorageEngineException {
-    String providerName = assignValue(provnameVar, argument0, out, in);
-    String providerMnemonic = assignValue(provMemonicVar, argument1, out, in);
-    @SuppressWarnings("unused")
-    String dsLanguage = assignValue("Datasource Language", argument2, out, in);
-    String dsName = assignValue(dsnameVar, argument3, out, in);
-    String dsMnemonic = assignValue(dsmnemonicVar, argument4, out, in);
+  public static String deleteDatasource(RepoxUIMServiceT repoxservice, Registry registry,
+      String argument0, PrintStream out, BufferedReader in) throws IOException,
+      StorageEngineException {
+    String id = assignValue("Datasource Id", argument0, out, in);
     try {
 
-      StorageEngine<?> engine = registry.getStorageEngine();
+      // StorageEngine<?> engine = registry.getStorageEngine();
+      //
+      // @SuppressWarnings("rawtypes")
+      // Provider provider = engine.createProvider();
+      // provider.setName(providerName);
+      // provider.setMnemonic(providerMnemonic);
+      // provider.putValue(repoxIDVar, providerName + "r0");
+      //
+      // @SuppressWarnings("rawtypes")
+      // Collection collection = engine.createCollection(provider);
+      // collection.setMnemonic(dsMnemonic);
+      // collection.setName(dsName);
+      // collection.putValue("collectionID", dsName + "r0");
+      // collection.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
+      // engine.updateCollection(collection);
+      // engine.checkpoint();
 
-      @SuppressWarnings("rawtypes")
-      Provider provider = engine.createProvider();
-      provider.setName(providerName);
-      provider.setMnemonic(providerMnemonic);
-      provider.putValue(repoxIDVar, providerName + "r0");
-
-      @SuppressWarnings("rawtypes")
-      Collection collection = engine.createCollection(provider);
-      collection.setMnemonic(dsMnemonic);
-      collection.setName(dsName);
-      collection.putValue("collectionID", dsName + "r0");
-      collection.putValue(repoxIDVar, dsName + dsMnemonic + "r0");
-      engine.updateCollection(collection);
-      engine.checkpoint();
-
-      repoxservice.deleteDatasourcefromUIMObj(collection);
+      repoxservice.deleteDataset(id);
       return "Datasource deleted successfully";
-    } catch (DataSourceOperationException e) {
-      return "Error in creating the Collection. " + e.getMessage();
+    } catch (DoesNotExistException e) {
+      return "Error in deleting the datasource in repox. " + e.getMessage();
     }
   }
 
@@ -480,7 +582,8 @@ public class CommandUtils {
 
     sb.append(String.format("%-30s %-30s %-30s %-30s %n%n", "ID", "Name", "NameCode", "Homepage"));
     for (Aggregator aggregator : aggregatorList)
-      sb.append(String.format("%-30s %-30s %-30s %-30s %n%n", aggregator.getId(), aggregator.getName(), aggregator.getNameCode(), aggregator.getHomepage()));
+      sb.append(String.format("%-30s %-30s %-30s %-30s %n%n", aggregator.getId(),
+          aggregator.getName(), aggregator.getNameCode(), aggregator.getHomepage()));
 
     return sb.toString();
   }
@@ -512,8 +615,8 @@ public class CommandUtils {
         repoxservice.getProviderList(aggregatorId, Integer.parseInt(offset),
             Integer.parseInt(number));
     StringBuffer sb = new StringBuffer();
-    sb.append(String.format("%-30s %-30s %-30s %-30s %-30s %-30s %-30s %n%n", "ID", "Name", "NameCode",
-        "Homepage", "Description", "Country", "Type"));
+    sb.append(String.format("%-30s %-30s %-30s %-30s %-30s %-30s %-30s %n%n", "ID", "Name",
+        "NameCode", "Homepage", "Description", "Country", "Type"));
     for (DataProvider dataProvider : providerList) {
       sb.append(String.format("%-30s %-30s %-30s %-30s %-30s %-30s %-30s %n", dataProvider.getId(),
           dataProvider.getName(), dataProvider.getNameCode(), dataProvider.getHomepage(),
@@ -531,26 +634,34 @@ public class CommandUtils {
    * @param in - Console input
    * @return The datasources
    */
-  public static String retrieveDatasources(RepoxUIMService repoxservice, PrintStream out,
-      BufferedReader in) {
-    StringBuffer sb = new StringBuffer();
+  public static String retrieveDatasources(RepoxUIMServiceT repoxservice, String argument0,
+      String argument1, String argument2, PrintStream out, BufferedReader in) {
     try {
-      sb.append("Provider\tID        \tCollectionID\tName\tMnemonic\tLast Modified\tLast Synchronized\tOAI-PMH Base URL\tOAI-PMH Metadata Prefix");
-      HashSet<Collection<?>> dsCol = (HashSet<Collection<?>>) repoxservice.retrieveDataSources();
-      for (Collection<?> col : dsCol) {
-        sb.append(col.getProvider() + "\t" + col.getId() + "\t" + col.getValue("collectionId")
-            + "\t" + col.getLanguage() + "\t" + col.getName() + "\t" + col.getMnemonic() + "\t"
-            + col.getLastModified() + "\t" + col.getLastSynchronized() + "\t"
-            + col.getOaiBaseUrl(true) + "\t" + col.getOaiMetadataPrefix(true) + "\t"
-            + col.getOaiSet() + "\n");
+      String providerId = assignValue("Provider Id", argument0, out, in);
+      String offset = assignValue("Offset", argument1, out, in);
+      String number = assignValue("Number", argument2, out, in);
 
+      List<DataSourceContainer> datasetList =
+          repoxservice.getDatasetList(providerId, Integer.parseInt(offset),
+              Integer.parseInt(number));
+
+      StringBuffer sb = new StringBuffer();
+      sb.append(String.format("%-30s %-30s %-30s %-30s %-30s %-30s %-30s %n%n", "ID", "Name",
+          "NameCode", "Description", "ExportDir", "Last Update", "Status"));
+
+      for (DataSourceContainer dataSourceContainer : datasetList) {
+        DefaultDataSourceContainer ddsc = (DefaultDataSourceContainer) dataSourceContainer;
+        DataSource dataSource = ddsc.getDataSource();
+        sb.append(String.format("%-30s %-30s %-30s %-30s %-30s %-30s %-30s %n", dataSource.getId(),
+            ddsc.getName(), ddsc.getNameCode(), dataSource.getDescription(),
+            dataSource.getExportDir(), dataSource.getLastUpdate(), dataSource.getStatus()));
       }
-
-    } catch (DataSourceOperationException e) {
-      sb.append("Error occurred in the retrieval of Datasources.");
-      sb.append(e.getMessage());
+      return sb.toString();
+    } catch (IOException e) {
+      return "Error in reading the datasource. " + e.getMessage();
+    } catch (NumberFormatException | InvalidArgumentsException | DoesNotExistException e) {
+      return "Error in reading datasources in repox. " + e.getMessage();
     }
-    return sb.toString();
   }
 
   /**

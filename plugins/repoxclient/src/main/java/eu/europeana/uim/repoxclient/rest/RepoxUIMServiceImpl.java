@@ -17,6 +17,7 @@ package eu.europeana.uim.repoxclient.rest;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
 
@@ -25,12 +26,20 @@ import org.slf4j.LoggerFactory;
 
 import pt.utl.ist.dataProvider.Aggregator;
 import pt.utl.ist.dataProvider.DataProvider;
+import pt.utl.ist.dataProvider.DataSourceContainer;
+import pt.utl.ist.dataProvider.dataSource.FileExtractStrategy;
+import pt.utl.ist.dataProvider.dataSource.FileRetrieveStrategy;
+import pt.utl.ist.dataProvider.dataSource.RecordIdPolicy;
+import pt.utl.ist.marc.CharacterEncoding;
+import pt.utl.ist.marc.iso2709.shared.Iso2709Variant;
+import pt.utl.ist.metadataTransformation.MetadataTransformation;
 import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
 import pt.utl.ist.util.exceptions.InvalidArgumentsException;
 import pt.utl.ist.util.exceptions.MissingArgumentsException;
 import eu.europeana.repox.rest.client.accessors.AggregatorsAccessor;
+import eu.europeana.repox.rest.client.accessors.DatasetsAccessor;
 import eu.europeana.repox.rest.client.accessors.ProvidersAccessor;
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.repox.model.RepoxConnectionStatus;
@@ -50,6 +59,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
 
   private static AggregatorsAccessor as;
   private static ProvidersAccessor ps;
+  private static DatasetsAccessor ds;
   private static String defaultURI;
 
   public RepoxUIMServiceImpl() {
@@ -69,6 +79,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       e.printStackTrace();
     }
 
+    try {
+      ds = new DatasetsAccessor(new URL(defaultURI), "temporary", "temporary");
+    } catch (MalformedURLException e) {
+      LOGGER.error("DatasetsAccessor has a malformed URL {}", defaultURI);
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -141,248 +157,80 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
     ps.createProvider(aggregatorId, id, name, country, description, nameCode, homepage,
         providerType, email);
   }
-  
+
   @Override
   public void deleteProvider(String providerId) throws DoesNotExistException,
       InternalServerErrorException {
     ps.deleteProvider(providerId);
   }
-  
+
   @Override
   public void updateProvider(String id, String newId, String newAggregatorId, String name,
       String country, String description, String nameCode, String homepage,
       ProviderType providerType, String email) throws InvalidArgumentsException,
       DoesNotExistException, MissingArgumentsException, AlreadyExistsException {
-    ps.updateProvider(id, newId, newAggregatorId, name, country, description, nameCode, homepage, providerType, email);
+    ps.updateProvider(id, newId, newAggregatorId, name, country, description, nameCode, homepage,
+        providerType, email);
+  }
+
+  @Override
+  public boolean datasourceExists(String id) {
+    try {
+      ds.getDataset(id);
+    } catch (DoesNotExistException e) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public void createDatasourceOai(String providerId, String id, String name, String nameCode,
+      boolean isSample, String schema, String description, String namespace, String metadataFormat,
+      String marcFormat, String oaiUrl, String oaiSet, String exportDir,
+      RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException {
+    ds.createDatasetOai(providerId, id, name, nameCode, isSample, schema, description, namespace,
+        metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy,
+        metadataTransformations);
+  }
+
+  @Override
+  public void createDatasetFile(String providerId, String id, String name, String nameCode,
+      boolean isSample, String schema, String description, String namespace, String metadataFormat,
+      String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
+      FileExtractStrategy extractStrategy, FileRetrieveStrategy retrieveStrategy,
+      CharacterEncoding characterEncoding, Iso2709Variant isoVariant, String sourceDirectory,
+      String recordXPath, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException {
+    ds.createDatasetFile(providerId, id, name, nameCode, isSample, schema, description, namespace,
+        metadataFormat, marcFormat, exportDir, recordIdPolicy, extractStrategy, retrieveStrategy,
+        characterEncoding, isoVariant, sourceDirectory, recordXPath, metadataTransformations);
   }
   
+  @Override
+  public void updateDatasourceOai(String id, String newId, String name, String nameCode,
+      boolean isSample, String schema, String description, String namespace, String metadataFormat,
+      String marcFormat, String oaiUrl, String oaiSet, String exportDir,
+      RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException {
+    ds.updateDatasetOai(id, newId, name, nameCode, isSample, schema, description, namespace, metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy, metadataTransformations);
+  }
   
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // eu.europeana.uim.repox.RepoxUIMService#datasourceExists(eu.europeana.uim.store.Collection)
-  // */
-  // @Override
-  // public boolean datasourceExists(Collection<?> col) throws DataSourceOperationException {
-  //
-  // // String colid = col.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (colid == null) {
-  // // return false;
-  // // }
-  // //
-  // // Source src = repoxRestClient.retrieveDataSource(colid);
-  // //
-  // // boolean exists = src != null ? true : false;
-  // //
-  // // return exists;
-  // return false;
-  // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // *
-  // eu.europeana.uim.repox.RepoxUIMService#createDatasourcefromUIMObj(eu.europeana.uim.store.Collection
-  // * , eu.europeana.uim.store.Provider)
-  // */
-  // @Override
-  // public void createDatasourcefromUIMObj(Collection col, Provider prov)
-  // throws DataSourceOperationException {
-  //
-  //
-  // // String htypeString = col.getValue(ControlledVocabularyProxy.HARVESTING_TYPE);
-  // //
-  // // if (htypeString == null) {
-  // // throw new DataSourceOperationException("Error during the creation of a Datasource: "
-  // // + htypeInfo);
-  // // }
-  // //
-  // // DSType harvestingtype = DSType.valueOf(htypeString);
-  // //
-  // // if (harvestingtype == null) {
-  // // throw new DataSourceOperationException(
-  // // "Error during the creation of a Datasource: "
-  // // +
-  // // "HARVESTING_TYPE for the specific object does not match the predefined acceptable values.");
-  // // }
-  // //
-  // //
-  // // Source ds = JibxObjectProvider.createDataSource(col, harvestingtype);
-  // // eu.europeana.uim.repoxclient.jibxbindings.Provider jibxProv =
-  // // new eu.europeana.uim.repoxclient.jibxbindings.Provider();
-  // // jibxProv.setId(col.getProvider().getValue(ControlledVocabularyProxy.REPOXID));
-  // //
-  // //
-  // // Source retsource = null;
-  // //
-  // // switch (harvestingtype) {
-  // // case oai_pmh:
-  // // retsource = repoxRestClient.createDatasourceOAI(ds, jibxProv);
-  // // break;
-  // //
-  // // case z39_50:
-  // // Z3950Methods z3950method =
-  // // Z3950Methods.valueOf(col.getValue(ControlledVocabularyProxy.Z3950METHOD));
-  // // switch (z3950method) {
-  // // case timestamp:
-  // // retsource = repoxRestClient.createDatasourceZ3950Timestamp(ds, jibxProv);
-  // // break;
-  // // case filepath:
-  // // retsource = repoxRestClient.createDatasourceZ3950IdFile(ds, jibxProv);
-  // // break;
-  // // case maximumid:
-  // // retsource = repoxRestClient.createDatasourceZ3950IdSequence(ds, jibxProv);
-  // // break;
-  // // }
-  // // break;
-  // //
-  // // case ftp:
-  // // retsource = repoxRestClient.createDatasourceFtp(ds, jibxProv);
-  // // break;
-  // //
-  // // case http:
-  // // retsource = repoxRestClient.createDatasourceHttp(ds, jibxProv);
-  // // break;
-  // //
-  // // case folder:
-  // // retsource = repoxRestClient.createDatasourceFolder(ds, jibxProv);
-  // // break;
-  // // default:
-  // // throw new DataSourceOperationException(
-  // // "Error during the creation of a Datasource: "
-  // // +
-  // // "HARVESTING_TYPE for the specific object does not match the predefined acceptable values.");
-  // // }
-  // //
-  // //
-  // // col.putValue(ControlledVocabularyProxy.REPOXID, retsource.getId());
-  // //
-  // // StorageEngine<?> engine = registry.getStorageEngine();
-  // //
-  // // // Store the created RepoxID into the UIM object
-  // // try {
-  // // engine.updateCollection(col);
-  // // engine.checkpoint();
-  // // } catch (StorageEngineException e) {
-  // // throw new DataSourceOperationException("Updating UIM Collection object failed");
-  // // }
-  //
-  //
-  //
-  // }
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // *
-  // eu.europeana.uim.repox.RepoxUIMService#updateDatasourcefromUIMObj(eu.europeana.uim.store.Collection
-  // * )
-  // */
-  // @Override
-  // public void updateDatasourcefromUIMObj(Collection col) throws DataSourceOperationException {
-  //
-  // // Create Id from Collection name and mnemonic
-  // // String htypeString = col.getValue(ControlledVocabularyProxy.HARVESTING_TYPE);
-  // //
-  // // if (htypeString == null) {
-  // // throw new DataSourceOperationException("Error during the creation of a Datasource: "
-  // // + htypeInfo);
-  // // }
-  // //
-  // // DSType harvestingtype = DSType.valueOf(htypeString);
-  // //
-  // // if (harvestingtype == null) {
-  // // throw new DataSourceOperationException(
-  // // "Error during the creation of a Datasource: "
-  // // +
-  // // "HARVESTING_TYPE for the specific object does not match the predefined acceptable values.");
-  // // }
-  // //
-  // // String id = col.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (id == null) {
-  // // throw new DataSourceOperationException("Missing repoxID element from Collection object");
-  // // }
-  // //
-  // // Source ds = JibxObjectProvider.createDataSource(col, harvestingtype);
-  // // ds.setId(col.getValue(ControlledVocabularyProxy.REPOXID));
-  // //
-  // //
-  // // switch (harvestingtype) {
-  // // case oai_pmh:
-  // // repoxRestClient.updateDatasourceOAI(ds);
-  // // break;
-  // //
-  // // case z39_50:
-  // // Z3950Methods z3950method =
-  // // Z3950Methods.valueOf(col.getValue(ControlledVocabularyProxy.Z3950METHOD));
-  // // switch (z3950method) {
-  // // case timestamp:
-  // // repoxRestClient.updateDatasourceZ3950Timestamp(ds);
-  // // break;
-  // // case filepath:
-  // // repoxRestClient.updateDatasourceZ3950IdFile(ds);
-  // // break;
-  // // case maximumid:
-  // // repoxRestClient.updateDatasourceZ3950IdSequence(ds);
-  // // break;
-  // // default:
-  // // throw new DataSourceOperationException(
-  // // "Z3950 Method Value used for the creation of a datasource was invalid.");
-  // // }
-  // // break;
-  // //
-  // // case ftp:
-  // // repoxRestClient.updateDatasourceFtp(ds);
-  // // break;
-  // //
-  // // case http:
-  // // repoxRestClient.updateDatasourceHttp(ds);
-  // // break;
-  // //
-  // // case folder:
-  // // repoxRestClient.updateDatasourceFolder(ds);
-  // // break;
-  // //
-  // // default:
-  // // throw new DataSourceOperationException(
-  // // "Harvesting Type Value used for the creation of a datasource was invalid.");
-  // // }
-  //
-  //
-  // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // *
-  // eu.europeana.uim.repox.RepoxUIMService#deleteDatasourcefromUIMObj(eu.europeana.uim.store.Collection
-  // * )
-  // */
-  // @Override
-  // public void deleteDatasourcefromUIMObj(Collection<?> col) throws DataSourceOperationException {
-  // //
-  // // String id = col.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (id == null) {
-  // // throw new DataSourceOperationException("Missing repoxID element from Collection object");
-  // // }
-  // // repoxRestClient.deleteDatasource(id);
-  // }
-  //
+  @Override
+  public void deleteDataset(String datasetId) throws DoesNotExistException {
+    ds.deleteDataset(datasetId);
+  }
+  
+  @Override
+  public List<DataSourceContainer> getDatasetList(String providerId, int offset, int number)
+      throws InvalidArgumentsException, DoesNotExistException {
+    return ds.getDatasetList(providerId, offset, number);
+  }
+
+
   // /*
   // * (non-Javadoc)
   // *
@@ -458,46 +306,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   //
   // }
   //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see eu.europeana.uim.repox.RepoxUIMService#retrieveDataSources()
-  // */
-  // @Override
-  // public HashSet<Collection<?>> retrieveDataSources() throws DataSourceOperationException {
-  //
-  // // StorageEngine<?> engine = registry.getStorageEngine();
-  // //
-  // // HashSet<Collection<?>> uimCollections = new HashSet<Collection<?>>();
-  // //
-  // // DataSources datasources = repoxRestClient.retrieveDataSources();
-  // //
-  // // ArrayList<Source> sourceList = (ArrayList<Source>) datasources.getSourceList();
-  // //
-  // // for (Source src : sourceList) {
-  // //
-  // // if (src.getNameCode() != null) {
-  // // String id = src.getNameCode();
-  // //
-  // // try {
-  // // Collection<?> coll = engine.findCollection(id);
-  // // if (coll != null) {
-  // // uimCollections.add(coll);
-  // // }
-  // // } catch (StorageEngineException e) {
-  // // // TODO Decide what to do here
-  // // }
-  // // }
-  // //
-  // // }
-  // //
-  // // return uimCollections;
-  // return null;
-  // }
-  //
-  //
+
   //
   // /*
   // * (non-Javadoc)
@@ -779,6 +588,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
 
 
 
+ 
 
 
 

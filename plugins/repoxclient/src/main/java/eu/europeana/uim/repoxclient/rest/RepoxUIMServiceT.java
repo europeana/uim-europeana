@@ -14,11 +14,19 @@
 package eu.europeana.uim.repoxclient.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
 
 import pt.utl.ist.dataProvider.Aggregator;
 import pt.utl.ist.dataProvider.DataProvider;
+import pt.utl.ist.dataProvider.DataSourceContainer;
+import pt.utl.ist.dataProvider.dataSource.FileExtractStrategy;
+import pt.utl.ist.dataProvider.dataSource.FileRetrieveStrategy;
+import pt.utl.ist.dataProvider.dataSource.RecordIdPolicy;
+import pt.utl.ist.marc.CharacterEncoding;
+import pt.utl.ist.marc.iso2709.shared.Iso2709Variant;
+import pt.utl.ist.metadataTransformation.MetadataTransformation;
 import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
@@ -68,7 +76,7 @@ public interface RepoxUIMServiceT {
       InternalServerErrorException;
 
   /**
-   * Retrieve the aggregator with the provided id.
+   * Check if aggregator exists.
    * 
    * @param aggregatorId
    * @return boolean value
@@ -108,7 +116,7 @@ public interface RepoxUIMServiceT {
   /******************** Provider Calls ********************/
 
   /**
-   * Retrieve the provider with the provided id.
+   * Check if provider exists.
    * 
    * @param id
    * @return boolean value
@@ -185,6 +193,141 @@ public interface RepoxUIMServiceT {
       String description, String nameCode, String homepage, ProviderType providerType, String email)
       throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
       AlreadyExistsException;
+  
+  /******************** Datasource Calls ********************/
+  
+  /**
+   * Check if datasource exists.
+   * 
+   * @param id
+   * @return boolean value
+   */
+  boolean datasourceExists(String id);
+  
+  /**
+   * Create a dataset oai.
+   * 
+   * @param providerId
+   * @param id
+   * @param name
+   * @param nameCode
+   * @param isSample
+   * @param schema
+   * @param description
+   * @param namespace
+   * @param metadataFormat
+   * @param marcFormat
+   * @param oaiUrl
+   * @param oaiSet
+   * @param exportDir
+   * @param recordIdPolicy
+   * @param metadataTransformations
+   * @throws InvalidArgumentsException
+   * @throws DoesNotExistException
+   * @throws MissingArgumentsException
+   * @throws AlreadyExistsException
+   * @throws InternalServerErrorException
+   */
+  void createDatasourceOai(String providerId, String id, String name, String nameCode,
+      boolean isSample, String schema, String description, String namespace, String metadataFormat,
+      String marcFormat, String oaiUrl, String oaiSet, String exportDir,
+      RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations) throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException;
+  
+  /**
+   * Create a dataset directory, ftp, http.
+   * 
+   * @param providerId
+   * @param id
+   * @param name
+   * @param nameCode
+   * @param isSample
+   * @param schema
+   * @param description
+   * @param namespace
+   * @param metadataFormat
+   * @param marcFormat
+   * @param exportDir
+   * @param recordIdPolicy
+   * @param extractStrategy
+   * @param retrieveStrategy
+   * @param characterEncoding
+   * @param isoVariant
+   * @param sourceDirectory
+   * @param recordXPath
+   * @param metadataTransformations
+   * @throws InvalidArgumentsException
+   * @throws DoesNotExistException
+   * @throws MissingArgumentsException
+   * @throws AlreadyExistsException
+   * @throws InternalServerErrorException
+   */
+  void createDatasetFile(String providerId, String id, String name, String nameCode,
+      boolean isSample, String schema, String description, String namespace, String metadataFormat,
+      String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
+      FileExtractStrategy extractStrategy, FileRetrieveStrategy retrieveStrategy,
+      CharacterEncoding characterEncoding, Iso2709Variant isoVariant, String sourceDirectory,
+      String recordXPath, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException;
+  
+  /**
+   * Update a dataset by specifying the Id.
+   * 
+   * @param id
+   * @param newId
+   * @param name
+   * @param nameCode
+   * @param isSample
+   * @param schema
+   * @param description
+   * @param namespace
+   * @param metadataFormat
+   * @param marcFormat
+   * @param oaiUrl
+   * @param oaiSet
+   * @param exportDir
+   * @param recordIdPolicy
+   * @param metadataTransformations
+   * @throws InvalidArgumentsException
+   * @throws DoesNotExistException
+   * @throws MissingArgumentsException
+   * @throws AlreadyExistsException
+   * @throws InternalServerErrorException
+   */
+  void updateDatasourceOai(String id, String newId, String name, String nameCode,
+      boolean isSample, String schema, String description, String namespace, String metadataFormat,
+      String marcFormat, String oaiUrl, String oaiSet, String exportDir,
+      RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException;
+  
+  /**
+   * Delete an dataset by specifying the Id.
+   * 
+   * @param datasetId
+   * @throws DoesNotExistException
+   */
+  void deleteDataset(String datasetId) throws DoesNotExistException;
+  
+  /**
+   * 
+   * Get a list of datasets in the specified range. Returned number can be smaller than the
+   * requested. Offset not allowed negative. If number is negative then it returns all the items
+   * from offset until the total number of items.
+   * 
+   * @param providerId
+   * @param offset
+   * @param number
+   * @return
+   * @throws InvalidArgumentsException
+   * @throws DoesNotExistException
+   */
+  List<DataSourceContainer> getDatasetList(String providerId, int offset, int number)
+      throws InvalidArgumentsException, DoesNotExistException;
+  
+  
+  
   
   public void setRegistry(Registry registry);
 
