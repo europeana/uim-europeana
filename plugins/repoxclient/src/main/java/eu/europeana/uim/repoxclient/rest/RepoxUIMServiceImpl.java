@@ -183,6 +183,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
         providerType, email);
   }
 
+  /******************** Datasource Calls ********************/
+  
   @Override
   public boolean datasourceExists(String id) {
     try {
@@ -191,6 +193,12 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       return false;
     }
     return true;
+  }
+  
+  @Override
+  public int getDatasetRecordCount(String id) throws DoesNotExistException,
+      InternalServerErrorException {
+    return ds.getDatasetRecordCount(id);
   }
 
   @Override
@@ -259,6 +267,19 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   @Override
   public List<Task> getCurrentHarvestsList() {
     return hs.getCurrentHarvestsList();
+  }
+  
+
+
+  @Override
+  public String getDatasetLastIngestLog(String id) throws DoesNotExistException,
+      InternalServerErrorException {
+    return hs.getDatasetLastIngestLog(id);
+  }
+  
+  @Override
+  public void cancelHarvest(String id) throws DoesNotExistException, InternalServerErrorException {
+    hs.cancelHarvest(id);
   }
 
 
@@ -374,25 +395,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   // // repoxRestClient.scheduleHarvesting(id, info.getDatetime(), info.getFrequency(),
   // // info.isFullingest());
   //
-  // }
-  //
-  //
-  //
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // eu.europeana.uim.repox.RepoxUIMService#cancelHarvesting(eu.europeana.uim.store.Collection)
-  // */
-  // @Override
-  // public void cancelHarvesting(Collection<?> col) throws HarvestingOperationException {
-  // // String id = col.getValue(ControlledVocabularyProxy.REPOXID);
-  // //
-  // // if (id == null) {
-  // // throw new HarvestingOperationException("Missing repoxID element from Collection object");
-  // // }
-  // //
-  // // repoxRestClient.cancelHarvesting(id);
   // }
   //
   //
@@ -517,6 +519,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   public Registry getRegistry() {
     return registry;
   }
+
+
 
 
 

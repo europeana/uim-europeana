@@ -206,6 +206,16 @@ public interface RepoxUIMServiceT {
   boolean datasourceExists(String id);
 
   /**
+   * Get the number of records of the dataset.
+   * 
+   * @param id
+   * @return
+   * @throws DoesNotExistException
+   * @throws InternalServerErrorException
+   */
+  int getDatasetRecordCount(String id) throws DoesNotExistException, InternalServerErrorException;
+
+  /**
    * Create a dataset oai.
    * 
    * @param providerId
@@ -340,7 +350,7 @@ public interface RepoxUIMServiceT {
    */
   void initiateHarvesting(String id, String type) throws AlreadyExistsException,
       DoesNotExistException, InternalServerErrorException;
-  
+
   /**
    * Gets the status of a specific dataset harvesting.
    * 
@@ -349,13 +359,34 @@ public interface RepoxUIMServiceT {
    * @throws DoesNotExistException
    * @throws InternalServerErrorException
    */
-  String getHarvestingStatus(String id)throws DoesNotExistException, InternalServerErrorException;
-  
+  String getHarvestingStatus(String id) throws DoesNotExistException, InternalServerErrorException;
+
   /**
    * Gets a list of currently executing dataset harvests.
+   * 
    * @return list with the running tasks
    */
   List<Task> getCurrentHarvestsList();
+
+  /**
+   * Gets the logs of the last ingest.
+   * 
+   * @param id
+   * @return
+   * @throws DoesNotExistException
+   * @throws InternalServerErrorException
+   */
+  String getDatasetLastIngestLog(String id) throws DoesNotExistException,
+      InternalServerErrorException;
+
+  /**
+   * Cancels a harvesting ingest.
+   * 
+   * @param id
+   * @throws DoesNotExistException
+   * @throws InternalServerErrorException
+   */
+  void cancelHarvest(String id) throws DoesNotExistException, InternalServerErrorException;
 
 
 
