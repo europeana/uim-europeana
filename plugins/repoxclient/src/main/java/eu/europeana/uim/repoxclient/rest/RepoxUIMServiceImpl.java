@@ -26,25 +26,33 @@ import org.slf4j.LoggerFactory;
 
 import pt.utl.ist.dataProvider.Aggregator;
 import pt.utl.ist.dataProvider.DataProvider;
+import pt.utl.ist.dataProvider.DataSource;
 import pt.utl.ist.dataProvider.DataSourceContainer;
 import pt.utl.ist.dataProvider.dataSource.FileExtractStrategy;
 import pt.utl.ist.dataProvider.dataSource.FileRetrieveStrategy;
 import pt.utl.ist.dataProvider.dataSource.RecordIdPolicy;
+import pt.utl.ist.ftp.FtpFileRetrieveStrategy;
+import pt.utl.ist.http.HttpFileRetrieveStrategy;
 import pt.utl.ist.marc.CharacterEncoding;
+import pt.utl.ist.marc.DirectoryImporterDataSource;
+import pt.utl.ist.marc.FolderFileRetrieveStrategy;
 import pt.utl.ist.marc.iso2709.shared.Iso2709Variant;
 import pt.utl.ist.metadataTransformation.MetadataTransformation;
+import pt.utl.ist.oai.OaiDataSource;
 import pt.utl.ist.task.Task;
 import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
 import pt.utl.ist.util.exceptions.InvalidArgumentsException;
 import pt.utl.ist.util.exceptions.MissingArgumentsException;
+import pt.utl.ist.z3950.DataSourceZ3950;
 import eu.europeana.repox.rest.client.accessors.AggregatorsAccessor;
 import eu.europeana.repox.rest.client.accessors.DatasetsAccessor;
 import eu.europeana.repox.rest.client.accessors.HarvestAccessor;
 import eu.europeana.repox.rest.client.accessors.ProvidersAccessor;
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.repox.model.RepoxConnectionStatus;
+import eu.europeana.uim.repoxclient.utils.DSType;
 import eu.europeana.uim.repoxclient.utils.PropertyReader;
 import eu.europeana.uim.repoxclient.utils.UimConfigurationProperty;
 
@@ -184,7 +192,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   }
 
   /******************** Datasource Calls ********************/
-  
+
   @Override
   public boolean datasourceExists(String id) {
     try {
@@ -194,7 +202,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
     }
     return true;
   }
-  
+
   @Override
   public int getDatasetRecordCount(String id) throws DoesNotExistException,
       InternalServerErrorException {
@@ -250,25 +258,75 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
     return ds.getDatasetList(providerId, offset, number);
   }
 
+
+  @Override
+  public boolean hasHarvestingTypeChanged(String id, DSType type) throws DoesNotExistException, InvalidArgumentsException{
+
+    DataSourceContainer dataset = ds.getDataset(id);
+
+    DataSource dataSource = dataset.getDataSource();
+    switch (type) {
+      case oai_pmh:
+        if (!(dataSource instanceof OaiDataSource)) {
+          return true;
+        }
+        break;
+      case folder:
+        if (!(dataSource instanceof DirectoryImporterDataSource)) {
+          DirectoryImporterDataSource dids = (DirectoryImporterDataSource)dataSource;
+          FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
+          if(!(retrieveStrategy instanceof FolderFileRetrieveStrategy))
+            return true;
+        }
+        break;
+      case ftp:
+        if (!(dataSource instanceof DirectoryImporterDataSource)) {
+          DirectoryImporterDataSource dids = (DirectoryImporterDataSource)dataSource;
+          FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
+          if(!(retrieveStrategy instanceof FtpFileRetrieveStrategy))
+            return true;
+        }
+        break;
+      case http:
+        if (!(dataSource instanceof DirectoryImporterDataSource)) {
+          DirectoryImporterDataSource dids = (DirectoryImporterDataSource)dataSource;
+          FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
+          if(!(retrieveStrategy instanceof HttpFileRetrieveStrategy))
+            return true;
+        }
+        break;
+      case z39_50:
+        if (!(dataSource instanceof DataSourceZ3950)) {
+          return true;
+        }
+        break;
+      case none:
+      default:
+        throw new InvalidArgumentsException(
+        "Harvesting Type Value used for the creation of a datasource was invalid.");
+        }
+    return false;
+  }
+
   /******************** Harvesting Calls ********************/
-  
+
   @Override
   public void initiateHarvesting(String id, String type) throws AlreadyExistsException,
       DoesNotExistException, InternalServerErrorException {
     hs.startHarvest(id, type);
   }
-  
+
   @Override
   public String getHarvestingStatus(String id) throws DoesNotExistException,
       InternalServerErrorException {
     return hs.getDatasetHarvestingStatus(id);
   }
-  
+
   @Override
   public List<Task> getCurrentHarvestsList() {
     return hs.getCurrentHarvestsList();
   }
-  
+
 
 
   @Override
@@ -276,88 +334,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       InternalServerErrorException {
     return hs.getDatasetLastIngestLog(id);
   }
-  
+
   @Override
   public void cancelHarvest(String id) throws DoesNotExistException, InternalServerErrorException {
     hs.cancelHarvest(id);
   }
-
-
-  // /*
-  // * (non-Javadoc)
-  // *
-  // * @see
-  // *
-  // eu.europeana.uim.repox.RepoxUIMService#hasHarvestingTypeChanged(eu.europeana.uim.store.Collection
-  // * )
-  // */
-  // @Override
-  // public boolean hasHarvestingTypeChanged(Collection<?> col) throws DataSourceOperationException
-  // {
-  //
-  // // StorageEngine<?> engine = registry.getStorageEngine();
-  // //
-  // // String stringtype = col.getValue(ControlledVocabularyProxy.HARVESTING_TYPE);
-  // //
-  // // DSType harvestingtype = DSType.valueOf(stringtype);
-  // //
-  // // DataSources datasources = repoxRestClient.retrieveDataSources();
-  // // ArrayList<Source> sourceList = (ArrayList<Source>) datasources.getSourceList();
-  // //
-  // //
-  // // for (Source src : sourceList) {
-  // //
-  // // if (src.getNameCode() != null) {
-  // // String id = src.getNameCode();
-  // // if (id.equals(col.getMnemonic())) {
-  // //
-  // // switch (harvestingtype) {
-  // // case oai_pmh:
-  // // if (!src.getType().equals("DataSourceOai")) {
-  // // return true;
-  // // }
-  // // break;
-  // // case z39_50:
-  // //
-  // // if (!src.getType().equals("DataSourceZ3950")) {
-  // // return true;
-  // // }
-  // // break;
-  // // case ftp:
-  // // if (!src.getType().equals("DataSourceDirectoryImporter")) {
-  // // return true;
-  // // }
-  // // break;
-  // //
-  // // case http:
-  // // if (!src.getType().equals("DataSourceDirectoryImporter")) {
-  // // return true;
-  // // }
-  // // break;
-  // // case folder:
-  // // if (!src.getType().equals("DataSourceDirectoryImporter")) {
-  // // return true;
-  // // }
-  // // break;
-  // // default:
-  // // throw new DataSourceOperationException(
-  // // "Harvesting Type Value used for the creation of a datasource was invalid.");
-  // // }
-  // //
-  // // return false;
-  // //
-  // // }
-  // //
-  // // }
-  // //
-  // // }
-  // //
-  //
-  //
-  // return false;
-  //
-  // }
-  //
 
   //
   // /*
@@ -519,9 +500,6 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   public Registry getRegistry() {
     return registry;
   }
-
-
-
 
 
 

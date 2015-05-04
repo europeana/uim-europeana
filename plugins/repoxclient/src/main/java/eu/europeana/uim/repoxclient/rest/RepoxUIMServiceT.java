@@ -35,6 +35,7 @@ import pt.utl.ist.util.exceptions.InvalidArgumentsException;
 import pt.utl.ist.util.exceptions.MissingArgumentsException;
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.repox.model.RepoxConnectionStatus;
+import eu.europeana.uim.repoxclient.utils.DSType;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@theeuropeanlibrary.org)
@@ -337,6 +338,11 @@ public interface RepoxUIMServiceT {
    */
   List<DataSourceContainer> getDatasetList(String providerId, int offset, int number)
       throws InvalidArgumentsException, DoesNotExistException;
+  
+  
+  
+  boolean hasHarvestingTypeChanged(String id, DSType type) throws DoesNotExistException, InvalidArgumentsException;
+  
 
 
   /**
