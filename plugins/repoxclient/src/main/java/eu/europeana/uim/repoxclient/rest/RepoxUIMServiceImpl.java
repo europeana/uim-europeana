@@ -248,6 +248,21 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   }
 
   @Override
+  public void updateDatasourceFile(String id, String newId, String name, String nameCode,
+      boolean isSample, String schema, String description, String namespace, String metadataFormat,
+      String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
+      FileExtractStrategy extractStrategy, FileRetrieveStrategy retrieveStrategy,
+      CharacterEncoding characterEncoding, Iso2709Variant isoVariant, String sourceDirectory,
+      String recordXPath, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException {
+    ds.updateDatasetFile(id, newId, name, nameCode, isSample, schema, description, namespace,
+        metadataFormat, marcFormat, exportDir, recordIdPolicy, extractStrategy, retrieveStrategy,
+        characterEncoding, isoVariant, sourceDirectory, recordXPath, metadataTransformations);
+  }
+
+
+  @Override
   public void deleteDataset(String datasetId) throws DoesNotExistException {
     ds.deleteDataset(datasetId);
   }
@@ -260,7 +275,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
 
 
   @Override
-  public boolean hasHarvestingTypeChanged(String id, DSType type) throws DoesNotExistException, InvalidArgumentsException{
+  public boolean hasHarvestingTypeChanged(String id, DSType type) throws DoesNotExistException,
+      InvalidArgumentsException {
 
     DataSourceContainer dataset = ds.getDataset(id);
 
@@ -273,25 +289,25 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
         break;
       case folder:
         if (!(dataSource instanceof DirectoryImporterDataSource)) {
-          DirectoryImporterDataSource dids = (DirectoryImporterDataSource)dataSource;
+          DirectoryImporterDataSource dids = (DirectoryImporterDataSource) dataSource;
           FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
-          if(!(retrieveStrategy instanceof FolderFileRetrieveStrategy))
+          if (!(retrieveStrategy instanceof FolderFileRetrieveStrategy))
             return true;
         }
         break;
       case ftp:
         if (!(dataSource instanceof DirectoryImporterDataSource)) {
-          DirectoryImporterDataSource dids = (DirectoryImporterDataSource)dataSource;
+          DirectoryImporterDataSource dids = (DirectoryImporterDataSource) dataSource;
           FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
-          if(!(retrieveStrategy instanceof FtpFileRetrieveStrategy))
+          if (!(retrieveStrategy instanceof FtpFileRetrieveStrategy))
             return true;
         }
         break;
       case http:
         if (!(dataSource instanceof DirectoryImporterDataSource)) {
-          DirectoryImporterDataSource dids = (DirectoryImporterDataSource)dataSource;
+          DirectoryImporterDataSource dids = (DirectoryImporterDataSource) dataSource;
           FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
-          if(!(retrieveStrategy instanceof HttpFileRetrieveStrategy))
+          if (!(retrieveStrategy instanceof HttpFileRetrieveStrategy))
             return true;
         }
         break;
@@ -303,8 +319,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       case none:
       default:
         throw new InvalidArgumentsException(
-        "Harvesting Type Value used for the creation of a datasource was invalid.");
-        }
+            "Harvesting Type Value used for the creation of a datasource was invalid.");
+    }
     return false;
   }
 
@@ -500,7 +516,5 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   public Registry getRegistry() {
     return registry;
   }
-
-
 
 }

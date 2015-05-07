@@ -314,6 +314,43 @@ public interface RepoxUIMServiceT {
       RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
       throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
       AlreadyExistsException, InternalServerErrorException;
+  
+  /**
+   * Update a dataset by specifying the Id.
+   * 
+   * @param id
+   * @param newId
+   * @param name
+   * @param nameCode
+   * @param isSample
+   * @param schema
+   * @param description
+   * @param namespace
+   * @param metadataFormat
+   * @param marcFormat
+   * @param exportDir
+   * @param recordIdPolicy
+   * @param extractStrategy
+   * @param retrieveStrategy
+   * @param characterEncoding
+   * @param isoVariant
+   * @param sourceDirectory
+   * @param recordXPath
+   * @param metadataTransformations
+   * @throws InvalidArgumentsException
+   * @throws DoesNotExistException
+   * @throws MissingArgumentsException
+   * @throws AlreadyExistsException
+   * @throws InternalServerErrorException
+   */
+  void updateDatasourceFile(String id, String newId, String name, String nameCode,
+      boolean isSample, String schema, String description, String namespace, String metadataFormat,
+      String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
+      FileExtractStrategy extractStrategy, FileRetrieveStrategy retrieveStrategy,
+      CharacterEncoding characterEncoding, Iso2709Variant isoVariant, String sourceDirectory,
+      String recordXPath, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException;
 
   /**
    * Delete an dataset by specifying the Id.
