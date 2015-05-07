@@ -13,6 +13,7 @@
  */
 package eu.europeana.uim.repoxclient.rest;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import pt.utl.ist.marc.CharacterEncoding;
 import pt.utl.ist.marc.iso2709.shared.Iso2709Variant;
 import pt.utl.ist.metadataTransformation.MetadataTransformation;
 import pt.utl.ist.task.Task;
+import pt.utl.ist.task.ScheduledTask.Frequency;
 import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
@@ -430,6 +432,22 @@ public interface RepoxUIMServiceT {
    * @throws InternalServerErrorException
    */
   void cancelHarvest(String id) throws DoesNotExistException, InternalServerErrorException;
+  
+  /**
+   * Schedules an automatic harvesting.
+   * 
+   * @param id
+   * @param firstDateTime
+   * @param frequency
+   * @param xmonths
+   * @param incremental
+   * @throws DoesNotExistException
+   * @throws MissingArgumentsException
+   * @throws AlreadyExistsException
+   */
+  void scheduleHarvest(String id, Calendar firstDateTime, Frequency frequency, int xmonths,
+      boolean incremental) throws DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException;
 
 
 

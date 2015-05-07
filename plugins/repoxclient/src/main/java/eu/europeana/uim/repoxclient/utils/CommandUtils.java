@@ -65,6 +65,7 @@ import eu.europeana.uim.store.Provider;
  * 
  * @author Yorgos Mamakis Email:yorgos.mamakis@kb.nl
  * @author Georgios Markakis <gwarkx@hotmail.com>
+ * @author Simon Tzanakis (Simon.Tzanakis@theeuropeanlibrary.org)
  * @since Oct 2012
  */
 
