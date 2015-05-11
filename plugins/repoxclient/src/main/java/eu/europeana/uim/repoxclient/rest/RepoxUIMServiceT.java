@@ -160,7 +160,7 @@ public interface RepoxUIMServiceT {
    * @throws InternalServerErrorException
    * @throws DoesNotExistException
    */
-  void createProvider(String aggregatorId, String id, String name, String country,
+  void createProvider(String aggregatorId, String id, String name, String country, String countryCode,
       String description, String nameCode, String homepage, ProviderType providerType, String email)
       throws InvalidArgumentsException, MissingArgumentsException, AlreadyExistsException,
       InternalServerErrorException, DoesNotExistException;
