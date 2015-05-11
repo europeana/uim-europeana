@@ -117,7 +117,8 @@
 							corelib-storage,corelib-common-storage,corelib-lookup,corelib-dereference,corelib-definitions,corelib-utils,
 							corelib-edm-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
 							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,
-							validation-api,publication-common,repox-client-rest-jersey,repox-commons,javax.ws.rs-api, repox-manager
+							validation-api,publication-common,repox-client-rest-jersey,javax.ws.rs-api,
+							repox-manager
 						</Embed-Dependency>
 
 						<!-- <Embed-Dependency> -->
@@ -167,6 +168,8 @@
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							javax.xml.transform.dom,
+							pt.utl.ist.util.exceptions.*, 
+							pt.utl.ist.util,
 							!org.slf4j.*,
 							!*
 						</Import-Package>
@@ -466,6 +469,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 	</dependencies>
 
 
