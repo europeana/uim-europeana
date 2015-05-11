@@ -205,7 +205,7 @@ public class CommandUtils {
   @SuppressWarnings("unchecked")
   public static String executeCreateProvider(RepoxUIMServiceT repoxservice, Registry registry,
       String argument0, String argument1, String argument2, String argument3, String argument4,
-      String argument5, String argument6, String argument7, String argument8, PrintStream out,
+      String argument5, String argument6, String argument7, String argument8, String argument9, PrintStream out,
       BufferedReader in) {
 
     try {
@@ -213,11 +213,12 @@ public class CommandUtils {
       String id = assignValue("Id", argument1, out, in);
       String name = assignValue("Name", argument2, out, in);
       String country = assignValue("Country", argument3, out, in);
-      String description = assignValue("Description", argument4, out, in);
-      String nameCode = assignValue("Name Code", argument5, out, in);
-      String homepage = assignValue("Homepage", argument6, out, in);
-      String providerType = assignValue("Provider Type", argument7, out, in);
-      String email = assignValue("Email", argument8, out, in);
+      String countryCode = assignValue("Country Code", argument4, out, in);
+      String description = assignValue("Description", argument5, out, in);
+      String nameCode = assignValue("Name Code", argument6, out, in);
+      String homepage = assignValue("Homepage", argument7, out, in);
+      String providerType = assignValue("Provider Type", argument8, out, in);
+      String email = assignValue("Email", argument9, out, in);
 
       StorageEngine<?> engine = registry.getStorageEngine();
       @SuppressWarnings("rawtypes")
@@ -235,7 +236,7 @@ public class CommandUtils {
       prov.setOaiMetadataPrefix("");
       engine.updateProvider(prov);
       engine.checkpoint();
-      repoxservice.createProvider(aggregatorId, id, name, country, description, nameCode, homepage,
+      repoxservice.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode, homepage,
           ProviderType.get(providerType), email);
     } catch (InternalServerErrorException | InvalidArgumentsException | MissingArgumentsException
         | AlreadyExistsException | DoesNotExistException e) {

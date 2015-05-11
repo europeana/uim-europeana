@@ -123,7 +123,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
         throw new ProviderOperationException("The requested object is not a Provider");
       }
       if (!repoxService.providerExists(prov.getMnemonic())) {
-          repoxService.createProvider(provCountry, prov.getMnemonic(), prov.getName(), provCountry,
+          repoxService.createProvider(provCountry, prov.getMnemonic(), prov.getName(), null, provCountry,
               "", prov.getMnemonic(), "", ProviderType.UNKNOWN, "");
       } else {
 

@@ -170,11 +170,11 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   }
 
   @Override
-  public void createProvider(String aggregatorId, String id, String name, String country,
+  public void createProvider(String aggregatorId, String id, String name, String country, String countryCode,
       String description, String nameCode, String homepage, ProviderType providerType, String email)
       throws InvalidArgumentsException, MissingArgumentsException, AlreadyExistsException,
       InternalServerErrorException, DoesNotExistException {
-    ps.createProvider(aggregatorId, id, name, country, description, nameCode, homepage,
+    ps.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode, homepage,
         providerType, email);
   }
 
