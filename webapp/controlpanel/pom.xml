@@ -117,8 +117,7 @@
 							corelib-storage,corelib-common-storage,corelib-lookup,corelib-dereference,corelib-definitions,corelib-utils,
 							corelib-edm-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
 							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,
-							validation-api,publication-common,repox-client-rest-jersey,javax.ws.rs-api,
-							repox-manager
+							validation-api,publication-common,repox-client-rest-jersey,javax.ws.rs-api
 						</Embed-Dependency>
 
 						<!-- <Embed-Dependency> -->
@@ -142,11 +141,12 @@
 							eu.europeana.uim.store.mongo.resourceentities,
 							eu.europeana.uim,
 							eu.europeana.uim.sugarcrmclient.plugin.objects.queries,
-							eu.europeana.uim.repox,
+							eu.europeana.uim.repox.*,
 							eu.europeana.uim.storage,
 							eu.europeana.uim.sugar.*,
 							eu.europeana.uim.repoxclient.*,
 							eu.europeana.uim.workflow,
+							eu.europeana.uim.resource,
 							eu.europeana.dedup.osgi.service.*,
 							org.springframework.context.*,
 							org.osgi.framework,
@@ -170,6 +170,8 @@
 							javax.xml.transform.dom,
 							pt.utl.ist.util.exceptions.*, 
 							pt.utl.ist.util,
+							pt.utl.ist.recordPackage,
+							pt.utl.ist.dataProvider.dataSource,
 							!org.slf4j.*,
 							!*
 						</Import-Package>

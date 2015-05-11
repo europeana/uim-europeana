@@ -163,7 +163,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 coll.getValue(ControlledVocabularyProxy.DESCRIPTION),
                 coll.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE),
                 coll.getOaiMetadataPrefix(false), null, coll.getOaiBaseUrl(true), coll.getOaiSet(),
-                null, new IdGeneratedRecordIdPolicy(), null);
+                "", new IdGeneratedRecordIdPolicy(), null);
             break;
 
           case z39_50:
@@ -181,7 +181,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 coll.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE),
                 coll.getOaiMetadataPrefix(false),
                 null,
-                null,
+                "",
                 new IdGeneratedRecordIdPolicy(),
                 new SimpleFileExtractStrategy(),
                 new FtpFileRetrieveStrategy(coll.getValue(ControlledVocabularyProxy.FTPSERVER),
@@ -199,7 +199,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA), coll
                     .getValue(ControlledVocabularyProxy.DESCRIPTION), coll
                     .getValue(ControlledVocabularyProxy.METADATA_NAMESPACE), coll
-                    .getOaiMetadataPrefix(false), null, null, new IdGeneratedRecordIdPolicy(),
+                    .getOaiMetadataPrefix(false), null, "", new IdGeneratedRecordIdPolicy(),
                 new SimpleFileExtractStrategy(),
                 new HttpFileRetrieveStrategy(coll.getValue(ControlledVocabularyProxy.HTTPURL)),
                 CharacterEncoding.get(coll.getValue(ControlledVocabularyProxy.Z3950CHARSET)),
@@ -214,7 +214,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA), coll
                     .getValue(ControlledVocabularyProxy.DESCRIPTION), coll
                     .getValue(ControlledVocabularyProxy.METADATA_NAMESPACE), coll
-                    .getOaiMetadataPrefix(false), null, null, new IdGeneratedRecordIdPolicy(),
+                    .getOaiMetadataPrefix(false), null, "", new IdGeneratedRecordIdPolicy(),
                 new SimpleFileExtractStrategy(), new FolderFileRetrieveStrategy(),
                 CharacterEncoding.get(coll.getValue(ControlledVocabularyProxy.Z3950CHARSET)),
                 Iso2709Variant.fromString(coll
@@ -238,7 +238,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 coll.getValue(ControlledVocabularyProxy.DESCRIPTION),
                 coll.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE),
                 coll.getOaiMetadataPrefix(false), null, coll.getOaiBaseUrl(true), coll.getOaiSet(),
-                null, new IdGeneratedRecordIdPolicy(), null);
+                "", new IdGeneratedRecordIdPolicy(), null);
             break;
 
           case z39_50:
@@ -256,7 +256,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 coll.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE),
                 coll.getOaiMetadataPrefix(false),
                 null,
-                null,
+                "",
                 new IdGeneratedRecordIdPolicy(),
                 new SimpleFileExtractStrategy(),
                 new FtpFileRetrieveStrategy(coll.getValue(ControlledVocabularyProxy.FTPSERVER),
@@ -273,7 +273,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 .getMnemonic(), false, coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA),
                 coll.getValue(ControlledVocabularyProxy.DESCRIPTION), coll
                     .getValue(ControlledVocabularyProxy.METADATA_NAMESPACE), coll
-                    .getOaiMetadataPrefix(false), null, null, new IdGeneratedRecordIdPolicy(),
+                    .getOaiMetadataPrefix(false), null, "", new IdGeneratedRecordIdPolicy(),
                 new SimpleFileExtractStrategy(),
                 new HttpFileRetrieveStrategy(coll.getValue(ControlledVocabularyProxy.HTTPURL)),
                 CharacterEncoding.get(coll.getValue(ControlledVocabularyProxy.Z3950CHARSET)),
@@ -287,7 +287,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 .getMnemonic(), false, coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA),
                 coll.getValue(ControlledVocabularyProxy.DESCRIPTION), coll
                     .getValue(ControlledVocabularyProxy.METADATA_NAMESPACE), coll
-                    .getOaiMetadataPrefix(false), null, null, new IdGeneratedRecordIdPolicy(),
+                    .getOaiMetadataPrefix(false), null, "", new IdGeneratedRecordIdPolicy(),
                 new SimpleFileExtractStrategy(), new FolderFileRetrieveStrategy(),
                 CharacterEncoding.get(coll.getValue(ControlledVocabularyProxy.Z3950CHARSET)),
                 Iso2709Variant.fromString(coll
