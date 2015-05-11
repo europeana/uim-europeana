@@ -186,10 +186,10 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
 
   @Override
   public void updateProvider(String id, String newId, String newAggregatorId, String name,
-      String country, String description, String nameCode, String homepage,
+      String country, String countryCode, String description, String nameCode, String homepage,
       ProviderType providerType, String email) throws InvalidArgumentsException,
       DoesNotExistException, MissingArgumentsException, AlreadyExistsException {
-    ps.updateProvider(id, newId, newAggregatorId, name, country, description, nameCode, homepage,
+    ps.updateProvider(id, newId, newAggregatorId, name, country, countryCode, description, nameCode, homepage,
         providerType, email);
   }
 

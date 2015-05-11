@@ -199,7 +199,7 @@ public class RepoxPluginCommand implements Function, Action {
 			break;
 
 		case updateprovider:
-			out.println(CommandUtils.executeUpdateProvider(repoxservice, repoxservice.getRegistry(), argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7, argument8, argument9, out, in));
+			out.println(CommandUtils.executeUpdateProvider(repoxservice, repoxservice.getRegistry(), argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7, argument8, argument9, argument10, out, in));
 			break;
 
          case retrieveproviders:

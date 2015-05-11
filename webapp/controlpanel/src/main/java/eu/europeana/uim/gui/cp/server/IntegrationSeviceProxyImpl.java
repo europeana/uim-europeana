@@ -129,7 +129,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
 
         // Or update an already existing REPOX provider from an
         // (updated) existing UIM provider
-        repoxService.updateProvider(prov.getMnemonic(), "", "", prov.getName(), provCountry,
+        repoxService.updateProvider(prov.getMnemonic(), "", "", prov.getName(), null, provCountry,
             "", prov.getMnemonic(), "", ProviderType.UNKNOWN, "");
       }
 

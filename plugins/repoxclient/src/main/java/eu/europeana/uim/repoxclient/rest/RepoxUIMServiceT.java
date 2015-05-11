@@ -193,7 +193,7 @@ public interface RepoxUIMServiceT {
    * @throws MissingArgumentsException
    * @throws AlreadyExistsException
    */
-  void updateProvider(String id, String newId, String newAggregatorId, String name, String country,
+  void updateProvider(String id, String newId, String newAggregatorId, String name, String country, String countryCode,
       String description, String nameCode, String homepage, ProviderType providerType, String email)
       throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
       AlreadyExistsException;

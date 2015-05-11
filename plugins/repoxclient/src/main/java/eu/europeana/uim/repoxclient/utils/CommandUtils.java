@@ -273,7 +273,7 @@ public class CommandUtils {
   @SuppressWarnings("unchecked")
   public static String executeUpdateProvider(RepoxUIMServiceT repoxservice, Registry registry,
       String argument0, String argument1, String argument2, String argument3, String argument4,
-      String argument5, String argument6, String argument7, String argument8, String argument9,
+      String argument5, String argument6, String argument7, String argument8, String argument9, String argument10,
       PrintStream out, BufferedReader in) {
 
     try {
@@ -283,11 +283,12 @@ public class CommandUtils {
       String newAggregatorId = assignValue("New Aggregator Id", argument2, out, in);
       String name = assignValue("Name", argument3, out, in);
       String country = assignValue("Country", argument4, out, in);
-      String description = assignValue("Description", argument5, out, in);
-      String nameCode = assignValue("Name Code", argument6, out, in);
-      String homepage = assignValue("Homepage", argument7, out, in);
-      String providerType = assignValue("Provider Type", argument8, out, in);
-      String email = assignValue("Email", argument9, out, in);
+      String countryCode = assignValue("Country Code", argument5, out, in);
+      String description = assignValue("Description", argument6, out, in);
+      String nameCode = assignValue("Name Code", argument7, out, in);
+      String homepage = assignValue("Homepage", argument8, out, in);
+      String providerType = assignValue("Provider Type", argument9, out, in);
+      String email = assignValue("Email", argument10, out, in);
 
       StorageEngine<?> engine = registry.getStorageEngine();
       @SuppressWarnings("rawtypes")
@@ -305,7 +306,7 @@ public class CommandUtils {
       prov.setOaiMetadataPrefix("");
       engine.updateProvider(prov);
       engine.checkpoint();
-      repoxservice.updateProvider(id, newId, newAggregatorId, name, country, description, nameCode,
+      repoxservice.updateProvider(id, newId, newAggregatorId, name, country, countryCode, description, nameCode,
           homepage, ProviderType.get(providerType), email);
 
     } catch (InternalServerErrorException | InvalidArgumentsException | MissingArgumentsException
