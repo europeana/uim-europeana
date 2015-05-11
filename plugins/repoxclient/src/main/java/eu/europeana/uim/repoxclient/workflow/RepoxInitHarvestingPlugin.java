@@ -21,16 +21,12 @@ import javax.ws.rs.InternalServerErrorException;
 
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
+import eu.europeana.uim.common.TKey;
+import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
-import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
-import eu.europeana.uim.common.TKey;
-import eu.europeana.uim.repox.DataSourceOperationException;
-import eu.europeana.uim.repox.HarvestingOperationException;
-import eu.europeana.uim.repox.RepoxUIMService;
 import eu.europeana.uim.repox.model.HarvestingState;
-import eu.europeana.uim.repox.model.RepoxHarvestingStatus;
 import eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT;
 import eu.europeana.uim.store.Collection;
 
