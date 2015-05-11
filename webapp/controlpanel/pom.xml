@@ -116,8 +116,13 @@
 							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,
 							corelib-storage,corelib-common-storage,corelib-lookup,corelib-dereference,corelib-definitions,corelib-utils,
 							corelib-edm-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
-							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,validation-api,publication-common
+							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,
+							validation-api,publication-common,repox-client-rest-jersey,repox-commons,javax.ws.rs-api, repox-manager
 						</Embed-Dependency>
+
+						<!-- <Embed-Dependency> -->
+						<!-- *;scope=compile|runtime -->
+						<!-- </Embed-Dependency> -->
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
 						<Import-Package>
@@ -134,7 +139,12 @@
 							eu.europeana.uim.store.mongo.decorators,
 							eu.europeana.uim.store.mongo,
 							eu.europeana.uim.store.mongo.resourceentities,
-							eu.europeana.uim.*,
+							eu.europeana.uim,
+							eu.europeana.uim.sugarcrmclient.plugin.objects.queries,
+							eu.europeana.uim.repox,
+							eu.europeana.uim.storage,
+							eu.europeana.uim.sugar.*,
+							eu.europeana.uim.repoxclient.*,
 							eu.europeana.uim.workflow,
 							eu.europeana.dedup.osgi.service.*,
 							org.springframework.context.*,
@@ -145,6 +155,7 @@
 							org.xml.sax.helpers,
 							javax.xml.parsers,
 							javax.xml.transform,
+							javax.xml.transform.sax,
 							javax.xml.transform.stream,
 							javax.xml.namespace,
 							javax.servlet;version=2.5.0,
@@ -237,6 +248,11 @@
 		</plugins>
 	</reporting>
 	<dependencies>
+		<dependency>
+			<groupId>repox</groupId>
+			<artifactId>repox-client-rest-jersey</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>eu.europeana.publication</groupId>
 			<artifactId>publication-common</artifactId>
