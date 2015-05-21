@@ -116,8 +116,13 @@
 							commons-io,europeana-uim-gui-common,gwt-servlet,gwt-incubator,commons-fileupload,mongo-java-driver,
 							corelib-storage,corelib-common-storage,corelib-lookup,corelib-dereference,corelib-definitions,corelib-utils,
 							corelib-edm-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
-							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,validation-api,publication-common
+							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,
+							validation-api,publication-common,repox-client-rest-jersey,javax.ws.rs-api
 						</Embed-Dependency>
+
+						<!-- <Embed-Dependency> -->
+						<!-- *;scope=compile|runtime -->
+						<!-- </Embed-Dependency> -->
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
 						<Import-Package>
@@ -134,8 +139,14 @@
 							eu.europeana.uim.store.mongo.decorators,
 							eu.europeana.uim.store.mongo,
 							eu.europeana.uim.store.mongo.resourceentities,
-							eu.europeana.uim.*,
+							eu.europeana.uim,
+							eu.europeana.uim.sugarcrmclient.plugin.objects.queries,
+							eu.europeana.uim.repox.*,
+							eu.europeana.uim.storage,
+							eu.europeana.uim.sugar.*,
+							eu.europeana.uim.repoxclient.*,
 							eu.europeana.uim.workflow,
+							eu.europeana.uim.resource,
 							eu.europeana.dedup.osgi.service.*,
 							org.springframework.context.*,
 							org.osgi.framework,
@@ -145,6 +156,7 @@
 							org.xml.sax.helpers,
 							javax.xml.parsers,
 							javax.xml.transform,
+							javax.xml.transform.sax,
 							javax.xml.transform.stream,
 							javax.xml.namespace,
 							javax.servlet;version=2.5.0,
@@ -156,6 +168,10 @@
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							javax.xml.transform.dom,
+							pt.utl.ist.util.exceptions.*, 
+							pt.utl.ist.util,
+							pt.utl.ist.recordPackage,
+							pt.utl.ist.dataProvider.dataSource,
 							!org.slf4j.*,
 							!*
 						</Import-Package>
@@ -186,6 +202,43 @@
 				</configuration>
 			</plugin>
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.felix
+										</groupId>
+										<artifactId>
+											maven-bundle-plugin
+										</artifactId>
+										<versionRange>
+											[2.1.0,)
+										</versionRange>
+										<goals>
+											<goal>manifest</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<reporting>
 		<plugins>
@@ -200,6 +253,11 @@
 		</plugins>
 	</reporting>
 	<dependencies>
+		<dependency>
+			<groupId>repox</groupId>
+			<artifactId>repox-client-rest-jersey</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>eu.europeana.publication</groupId>
 			<artifactId>publication-common</artifactId>
@@ -391,6 +449,29 @@
 			<artifactId>commons-net</artifactId>
 			<version>20030805.205232</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-hierarchies</artifactId>
+			<version>${corelib.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jersey-client</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-db</artifactId>
+			<version>${corelib.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>javassist</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 	</dependencies>
 
 
