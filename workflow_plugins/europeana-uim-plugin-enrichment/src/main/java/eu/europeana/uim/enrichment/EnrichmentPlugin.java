@@ -494,7 +494,7 @@ public class EnrichmentPlugin<I> extends
                                                         toLowerCase()).equals(State.PENDING) && i < 100) {
                                             try {
                                                 i++;
-                                                Thread.sleep(100);
+                                                Thread.sleep(10);
 
                                                 if (i == 100) {
                                                     notEnriched.add(inputValue);
