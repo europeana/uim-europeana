@@ -122,33 +122,33 @@ public class ImageCachingPlugin<I> extends
             if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED))) {
                 String record = rdf.getProvidedCHOList().get(0).getAbout();
 
-                ReferenceOwner owner = new ReferenceOwner(provider, collection, record);
-                List<ProcessingJobTaskDocumentReference> tasks = new ArrayList<>();
-                List<SourceDocumentReference> docRefs = new ArrayList<>();
-                Set<Link> urls = getUrls(rdf);
-                for (Link url : urls) {
-                    SourceDocumentReference docRef = new SourceDocumentReference(owner, null, url.getUrl(), null, null, 1l,
-                            null, true);
-                    docRefs.add(docRef);
-
-                    List<ProcessingJobSubTask> jobTask = new ArrayList<>();
-                    ProcessingJobSubTask subTask = new ProcessingJobSubTask(ProcessingJobSubTaskType.META_EXTRACTION, null);
-                    jobTask.add(subTask);
-                    if (url.getIsEdmObject()) {
-                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.COLOR_EXTRACTION, null));
-                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, new GenericSubTaskConfiguration(new ThumbnailConfig(180,180))));
-                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, new GenericSubTaskConfiguration(new ThumbnailConfig(200,200))));
-                    }
-                    tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.UNCONDITIONAL_DOWNLOAD,
-                            docRef.getId(), jobTask));
-                }
-                client.createOrModifySourceDocumentReference(docRefs);
-                int priority = context.getProperties().getProperty(
-                        "collection.priority") != null ? Integer.parseInt(context.getProperties().getProperty(
-                                                "collection.priority")) : 50;
-                ProcessingJob job = new ProcessingJob(priority, new Date(), owner, tasks, JobState.READY, record);
-                client.createProcessingJob(job);
-                client.startJob(job.getId());
+//                ReferenceOwner owner = new ReferenceOwner(provider, collection, record);
+//                List<ProcessingJobTaskDocumentReference> tasks = new ArrayList<>();
+//                List<SourceDocumentReference> docRefs = new ArrayList<>();
+//                Set<Link> urls = getUrls(rdf);
+//                for (Link url : urls) {
+//                    SourceDocumentReference docRef = new SourceDocumentReference(owner, null, url.getUrl(), null, null, 1l,
+//                            null, true);
+//                    docRefs.add(docRef);
+//
+//                    List<ProcessingJobSubTask> jobTask = new ArrayList<>();
+//                    ProcessingJobSubTask subTask = new ProcessingJobSubTask(ProcessingJobSubTaskType.META_EXTRACTION, null);
+//                    jobTask.add(subTask);
+//                    if (url.getIsEdmObject()) {
+//                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.COLOR_EXTRACTION, null));
+//                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, new GenericSubTaskConfiguration(new ThumbnailConfig(180,180))));
+//                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, new GenericSubTaskConfiguration(new ThumbnailConfig(200,200))));
+//                    }
+//                    tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.UNCONDITIONAL_DOWNLOAD,
+//                            docRef.getId(), jobTask));
+//                }
+//                client.createOrModifySourceDocumentReference(docRefs);
+//                int priority = context.getProperties().getProperty(
+//                        "collection.priority") != null ? Integer.parseInt(context.getProperties().getProperty(
+//                                                "collection.priority")) : 50;
+//                ProcessingJob job = new ProcessingJob(priority, new Date(), owner, tasks, JobState.READY, record);
+//                client.createProcessingJob(job);
+//                client.startJob(job.getId());
 
             }
         } catch (JiBXException ex) {
