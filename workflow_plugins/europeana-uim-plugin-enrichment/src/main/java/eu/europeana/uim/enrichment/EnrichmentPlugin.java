@@ -640,7 +640,7 @@ public class EnrichmentPlugin<I> extends
                             AggregationImpl aggr = fBean.getAggregations().get(0);
                             if (aggr.getWebResources() != null) {
                                 for (WebResource wr : aggr.getWebResources()) {
-                                    client.updateSourceDocumentProcesssingStatisticsForUrl(wr.getAbout());
+                                   // client.updateSourceDocumentProcesssingStatisticsForUrl(wr.getAbout());
                                 }
                             }
                         }
