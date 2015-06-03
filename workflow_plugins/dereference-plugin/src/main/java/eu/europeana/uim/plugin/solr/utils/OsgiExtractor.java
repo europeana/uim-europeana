@@ -669,7 +669,7 @@ public class OsgiExtractor extends Extractor {
 				urlConnection = new URL(resource).openConnection();
 				urlConnection
 						.setRequestProperty("accept",
-								"application/rdf+xml, text/turtle, text/n3,text/rdf+n3");
+								"application/rdf+xml");
 				InputStream inputStream = urlConnection.getInputStream();
 
 				StringWriter writer = new StringWriter();
