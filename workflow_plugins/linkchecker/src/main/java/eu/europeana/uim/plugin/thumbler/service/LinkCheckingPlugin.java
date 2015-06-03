@@ -5,18 +5,24 @@
  */
 package eu.europeana.uim.plugin.thumbler.service;
 
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IUnmarshallingContext;
+import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
+
 import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.corelib.definitions.jibx.WebResourceType;
 import eu.europeana.harvester.client.HarvesterClientImpl;
-import eu.europeana.harvester.domain.DocumentReferenceTaskType;
-import eu.europeana.harvester.domain.JobState;
-import eu.europeana.harvester.domain.ProcessingJob;
-import eu.europeana.harvester.domain.ProcessingJobSubTask;
-import eu.europeana.harvester.domain.ProcessingJobTaskDocumentReference;
-import eu.europeana.harvester.domain.ReferenceOwner;
-import eu.europeana.harvester.domain.SourceDocumentReference;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
 import eu.europeana.uim.orchestration.ExecutionContext;
@@ -26,19 +32,6 @@ import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.plugin.thumbler.InstanceCreator;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
-import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 /**
  *
