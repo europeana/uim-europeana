@@ -13,8 +13,9 @@
  */
 package eu.europeana.uim.enrichment.service.impl;
 
-import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -24,6 +25,7 @@ import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 import eu.europeana.corelib.edm.exceptions.MongoDBException;
 import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
@@ -65,15 +67,16 @@ public class EnrichmentServiceImpl implements EnrichmentService {
   private static CloudSolrServer cloudSolrProductionServer;
   private static String mongoDB = PropertyReader
       .getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
-  private static String mongoHost = PropertyReader
-      .getProperty(UimConfigurationProperty.MONGO_HOSTURL);
+  private static String[] mongoHost = PropertyReader.getProperty(
+      UimConfigurationProperty.MONGO_HOSTURL).split(",");
   private static String mongoPort = PropertyReader
       .getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
   private static String zookeeperUrl = PropertyReader
       .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURL);
-//  private static String solrUrl = PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
-//  private static String solrProductionUrl = PropertyReader
-//      .getProperty(UimConfigurationProperty.SOLR_PRODUCTION_HOSTURL);
+  // private static String solrUrl =
+  // PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
+  // private static String solrProductionUrl = PropertyReader
+  // .getProperty(UimConfigurationProperty.SOLR_PRODUCTION_HOSTURL);
   private static String solrCore = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 
   private static String[] cloudSolrUrl = PropertyReader.getProperty(
@@ -114,8 +117,14 @@ public class EnrichmentServiceImpl implements EnrichmentService {
         try {
           Morphia morphia = new Morphia();
           morphia.map(Collection.class);
+          List<ServerAddress> addresses = new ArrayList<>();
+          for (String mongoStr : mongoHost) {
+            ServerAddress address = new ServerAddress(mongoStr, 27017);
+            addresses.add(address);
+        }
+        Mongo tgtMongo = new Mongo(addresses);
           Datastore datastore =
-              morphia.createDatastore(new Mongo(mongoHost, Integer.parseInt(mongoPort)),
+              morphia.createDatastore(tgtMongo,
                   "collections");
           cmServer = new CollectionMongoServerImpl();
           datastore.ensureIndexes();
@@ -177,8 +186,14 @@ public class EnrichmentServiceImpl implements EnrichmentService {
           morphia.map(ConceptSchemeImpl.class);
           morphia.map(BasicProxyImpl.class);
           try {
+            List<ServerAddress> addresses = new ArrayList<>();
+            for (String mongoStr : mongoHost) {
+              ServerAddress address = new ServerAddress(mongoStr, 27017);
+              addresses.add(address);
+          }
+          Mongo tgtMongo = new Mongo(addresses);
             server =
-                new OsgiEdmMongoServer(new Mongo(mongoHost, Integer.parseInt(mongoPort)),
+                new OsgiEdmMongoServer(tgtMongo,
                     "europeana", uname, pass);
           } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
@@ -200,8 +215,14 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
 
 
+      List<ServerAddress> addresses = new ArrayList<>();
+      for (String mongoStr : mongoHost) {
+        ServerAddress address = new ServerAddress(mongoStr, 27017);
+        addresses.add(address);
+    }
+    Mongo tgtMongo = new Mongo(addresses);
       idserver =
-          new OsgiEuropeanaIdMongoServer(new Mongo(mongoHost, Integer.parseInt(mongoPort)),
+          new OsgiEuropeanaIdMongoServer((tgtMongo),
               "EuropeanaId");
       idserver.createDatastore();
 
@@ -218,20 +239,20 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
   }
 
-//  @Override
-//  public HttpSolrServer getSolrServer() {
-//    return solrServer;
-//  }
+  // @Override
+  // public HttpSolrServer getSolrServer() {
+  // return solrServer;
+  // }
 
   @Override
   public CloudSolrServer getCloudSolrServer() {
     return cloudSolrServer;
   }
 
-//  @Override
-//  public HttpSolrServer getProductionSolrServer() {
-//    return solrProductionServer;
-//  }
+  // @Override
+  // public HttpSolrServer getProductionSolrServer() {
+  // return solrProductionServer;
+  // }
 
   @Override
   public CloudSolrServer getProductionCloudSolrServer() {
@@ -247,11 +268,11 @@ public class EnrichmentServiceImpl implements EnrichmentService {
     EnrichmentServiceImpl.mongoDB = mongoDB;
   }
 
-  public String getMongoHost() {
+  public String[] getMongoHost() {
     return mongoHost;
   }
 
-  public void setMongoHost(String mongoHost) {
+  public void setMongoHost(String[] mongoHost) {
     EnrichmentServiceImpl.mongoHost = mongoHost;
   }
 
@@ -263,13 +284,13 @@ public class EnrichmentServiceImpl implements EnrichmentService {
     EnrichmentServiceImpl.mongoPort = mongoPort;
   }
 
-//  public String getSolrUrl() {
-//    return solrUrl;
-//  }
+  // public String getSolrUrl() {
+  // return solrUrl;
+  // }
 
-//  public void setSolrUrl(String solrUrl) {
-//    EnrichmentServiceImpl.solrUrl = solrUrl;
-//  }
+  // public void setSolrUrl(String solrUrl) {
+  // EnrichmentServiceImpl.solrUrl = solrUrl;
+  // }
 
   public String getSolrCore() {
     return solrCore;

@@ -37,17 +37,10 @@ public class HandleMappingServlet extends HttpServlet {
 		super.init(config);
 		try {
 			server = new VocabularyMongoServerImpl(
-					new Mongo(
-							PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-							Integer.parseInt(PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
+			    MongoProvider.getMongo(),
 					PropertyReader
 							.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MongoException e) {

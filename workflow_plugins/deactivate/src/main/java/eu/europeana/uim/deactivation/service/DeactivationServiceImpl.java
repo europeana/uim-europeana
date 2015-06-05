@@ -3,6 +3,8 @@ package eu.europeana.uim.deactivation.service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.neo4j.rest.graphdb.RestGraphDatabase;
@@ -10,6 +12,7 @@ import org.neo4j.rest.graphdb.RestGraphDatabase;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 import eu.europeana.corelib.edm.exceptions.MongoDBException;
 import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
@@ -84,8 +87,20 @@ public class DeactivationServiceImpl implements DeactivationService {
 				@Override
 				protected void initializeInternal() {
 					try {
-						mongoServer = new ExtendedEdmMongoServer(new Mongo(
-								mongoHost, Integer.parseInt(mongoPort)),
+				      List<ServerAddress> addresses = new ArrayList<ServerAddress>();
+				      String[] mongoHost =
+				          PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL).split(",");
+				      for (String mongoStr : mongoHost) {
+				        ServerAddress address = null;
+				        try {
+				          address = new ServerAddress(mongoStr, 27017);
+				        } catch (UnknownHostException e) {
+				          e.printStackTrace();
+				        }
+				        addresses.add(address);
+				      }
+				      Mongo tgtMongo = new Mongo(addresses);
+						mongoServer = new ExtendedEdmMongoServer(tgtMongo,
 								mongoDB, "", "");
                                                 mongoServer.createDatastore(new Morphia());
 						mongoServer.getFullBean("test");
@@ -93,9 +108,6 @@ public class DeactivationServiceImpl implements DeactivationService {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (MongoDBException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (UnknownHostException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (MongoException e) {
@@ -116,15 +128,25 @@ public class DeactivationServiceImpl implements DeactivationService {
 			@Override
 			protected void initializeInternal() {
 				try {
+				  List<ServerAddress> addresses = new ArrayList<ServerAddress>();
+                  String[] mongoHost =
+                      PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL).split(",");
+                  for (String mongoStr : mongoHost) {
+                    ServerAddress address = null;
+                    try {
+                      address = new ServerAddress(mongoStr, 27017);
+                    } catch (UnknownHostException e) {
+                      e.printStackTrace();
+                    }
+                    addresses.add(address);
+                  }
+                  Mongo tgtMongo = new Mongo(addresses);
 					collectionMongoServer = new CollectionMongoServerImpl(
-							new Mongo(mongoHost, Integer.parseInt(mongoPort)),
+							tgtMongo,
 							"collections");
 					
 					collectionMongoServer.findOldCollectionId("test");
 				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (MongoException e) {

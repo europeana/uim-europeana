@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
@@ -38,11 +39,7 @@ public class CollectionManagementProxyImpl extends
 	
 	static{
 		try {
-			collectionMongoServer = new CollectionMongoServerImpl(new Mongo(
-					MONGO_HOST, MONGO_PORT), MONGO_DB);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB);
 		} catch (MongoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,16 +72,13 @@ public class CollectionManagementProxyImpl extends
 	@Override
 	public Boolean saveOneCollection(CollectionMappingDTO collectionDTO) {
 		try {
-			collectionMongoServer = new CollectionMongoServerImpl(new Mongo(
-					MONGO_HOST, MONGO_PORT), MONGO_DB);
+			collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB);
 			collection = new Collection();
 			collection.setNewCollectionId(collectionDTO.getNewCollection());
 			collection
 					.setOldCollectionId(collectionDTO.getOriginalCollection());
 			collectionMongoServer.saveCollection(collection);
 //			collectionMongoServer.close();
-		} catch (UnknownHostException e) {
-			return false;
 		} catch (MongoException e) {
 			return false;
 		}
