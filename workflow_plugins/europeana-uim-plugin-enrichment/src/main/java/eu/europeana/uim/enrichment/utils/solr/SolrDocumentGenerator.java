@@ -166,6 +166,40 @@ public class SolrDocumentGenerator {
 				map.put("def", values);
 				europeanaProxy.setDcDate(map);
 			} 
+			else if (enrichedEntity.getOriginalField()
+					.equals("proxy_dcterms_issued")) {
+				Map<String, List<String>> map = europeanaProxy.getDctermsIssued();
+				List<String> values;
+				if (map == null) {
+					map = new HashMap<String, List<String>>();
+					values = new ArrayList<String>();
+
+				} else {
+					values = map.get("def");
+				}
+				if (!values.contains(ts.getAbout())) {
+					values.add(ts.getAbout());
+				}
+				map.put("def", values);
+				europeanaProxy.setDctermsIssued(map);
+			} 
+			else if (enrichedEntity.getOriginalField()
+					.equals("proxy_dcterms_created")) {
+				Map<String, List<String>> map = europeanaProxy.getDctermsCreated();
+				List<String> values;
+				if (map == null) {
+					map = new HashMap<String, List<String>>();
+					values = new ArrayList<String>();
+
+				} else {
+					values = map.get("def");
+				}
+				if (!values.contains(ts.getAbout())) {
+					values.add(ts.getAbout());
+				}
+				map.put("def", values);
+				europeanaProxy.setDctermsCreated(map);
+			} 
 
 		}
 //		new TimespanSolrCreator().create(basicDocument, ts);
