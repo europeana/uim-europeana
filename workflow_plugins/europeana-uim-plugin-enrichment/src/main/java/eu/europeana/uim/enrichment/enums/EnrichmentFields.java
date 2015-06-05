@@ -28,6 +28,44 @@ public enum EnrichmentFields {
 
 		}
 	},
+	DCTERMS_ISSUED("proxy_dcterms_issued") {
+		@Override
+		public List<EntityClass> getVocabularies() {
+			List<EntityClass> vocs = new ArrayList<EntityClass>();
+			vocs.add(EntityClass.TIMESPAN);
+			return vocs;
+		}
+
+		@Override
+		public void appendInDoc(SolrInputDocument doc,
+				ProxyImpl europeanaProxy) {
+			java.util.Collection<Object> col = doc.getFieldValues(value);
+			if (col != null && europeanaProxy.getDctermsIssued() != null) {
+				col.addAll(europeanaProxy.getDctermsIssued().get("def"));
+				doc.setField(value, col);
+			}
+
+		}
+	},
+	DCTERMS_CREATED("proxy_dcterms_created") {
+		@Override
+		public List<EntityClass> getVocabularies() {
+			List<EntityClass> vocs = new ArrayList<EntityClass>();
+			vocs.add(EntityClass.TIMESPAN);
+			return vocs;
+		}
+
+		@Override
+		public void appendInDoc(SolrInputDocument doc,
+				ProxyImpl europeanaProxy) {
+			java.util.Collection<Object> col = doc.getFieldValues(value);
+			if (col != null && europeanaProxy.getDctermsCreated() != null) {
+				col.addAll(europeanaProxy.getDctermsCreated().get("def"));
+				doc.setField(value, col);
+			}
+
+		}
+	},
 	DC_COVERAGE("proxy_dc_coverage") {
 		@Override
 		public List<EntityClass> getVocabularies() {
