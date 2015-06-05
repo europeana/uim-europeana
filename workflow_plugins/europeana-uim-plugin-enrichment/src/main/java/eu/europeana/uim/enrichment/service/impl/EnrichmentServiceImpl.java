@@ -89,20 +89,15 @@ public class EnrichmentServiceImpl implements EnrichmentService {
   public EnrichmentServiceImpl() {
     
     try {
-      
-      LBHttpSolrServer lbTarget = new LBHttpSolrServer("http://176.9.7.91:8080/solr,http://148.251.183.82:8080/solr,http://176.9.7.182:8080/solr,http://78.46.60.203:8080/solr");
-      CloudSolrServer cloudSolrServer = new CloudSolrServer("176.9.7.91:2181", lbTarget);
-      cloudSolrServer.setDefaultCollection("search4");
-      cloudSolrServer.connect();
 
-//      LBHttpSolrServer lbTarget = new LBHttpSolrServer(cloudSolrUrl);
-//      cloudSolrServer = new CloudSolrServer(zookeeperUrl, lbTarget);
-//      cloudSolrServer.setDefaultCollection(cloudSolrCore);
-//      cloudSolrServer.connect();
+      LBHttpSolrServer lbTarget = new LBHttpSolrServer(cloudSolrUrl);
+      cloudSolrServer = new CloudSolrServer(zookeeperUrl, lbTarget);
+      cloudSolrServer.setDefaultCollection(cloudSolrCore);
+      cloudSolrServer.connect();
       
-//      cloudSolrProductionServer = new CloudSolrServer(zookeeperUrl, lbTarget);
-//      cloudSolrProductionServer.setDefaultCollection(cloudSolrCore);
-//      cloudSolrProductionServer.connect();
+      cloudSolrProductionServer = new CloudSolrServer(zookeeperUrl, lbTarget);
+      cloudSolrProductionServer.setDefaultCollection(cloudSolrCore);
+      cloudSolrProductionServer.connect();
       
 //      solrServer = new HttpSolrServer(new URL(solrUrl) + solrCore);
 //      solrProductionServer = new HttpSolrServer(new URL(solrProductionUrl) + solrCore);
