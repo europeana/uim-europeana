@@ -55,6 +55,7 @@ import org.xml.sax.InputSource;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
@@ -69,8 +70,8 @@ import eu.europeana.corelib.solr.entity.PlaceImpl;
 import eu.europeana.corelib.solr.entity.ProxyImpl;
 import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.corelib.solr.entity.WebResourceImpl;
-import eu.europeana.corelib.edm.exceptions.MongoDBException;
-import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
+import eu.europeana.corelib.solr.exceptions.MongoDBException;
+import eu.europeana.corelib.solr.server.impl.EdmMongoServerImpl;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.gui.cp.client.services.RetrievalService;
@@ -166,15 +167,22 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				@Override
 				protected void initializeInternal() {
 					try {
-						mongoServer = new EdmMongoServerImpl(
-								new Mongo(
-										PropertyReader
-												.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-										Integer.parseInt(PropertyReader
-												.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-								PropertyReader
-										.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA),
-								"", "");
+					  List addresses = new ArrayList();
+                      String[] mongoHost = PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL).split(",");
+                      String mongoPort = PropertyReader
+                          .getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
+                      for (String mongoStr : mongoHost) {
+                          ServerAddress address = new ServerAddress(mongoStr, Integer.parseInt(mongoPort));
+                          addresses.add(address);
+                      }
+                      String uname =
+                          PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
+                              .getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
+                      String pass =
+                          PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
+                              .getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
+                      Mongo tgtMongo = new Mongo(addresses);
+						mongoServer = new EdmMongoServerImpl(tgtMongo, PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA), uname, pass);
 					} catch (NumberFormatException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

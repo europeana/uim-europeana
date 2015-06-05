@@ -9,6 +9,8 @@ public enum UimConfigurationProperty {
 
 	MONGO_HOSTURL("mongo.hostUrl"),
 	MONGO_HOSTPORT("mongo.hostPort"),
+	MONGO_USERNAME("mongo.username"),
+    MONGO_PASSWORD("mongo.password"),
 	MONGO_DB_COLLECTIONS("mongo.db.collections"),
 	MONGO_DB_VOCABULARY("mongo.db.vocabulary"),
 	MONGO_DB_EUROPEANA("mongo.db.europeana"),
