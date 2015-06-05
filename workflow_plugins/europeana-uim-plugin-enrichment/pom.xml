@@ -280,6 +280,8 @@
                             eu.europeana.uim.common.progress,
                             eu.europeana.uim.logging;
                             version=0.0.0,
+                            javax.security.sasl,
+                            javax.security.auth.login,
                             !org.apache.http.impl.client,
                             !org.apache.http.client.*,
                             !*

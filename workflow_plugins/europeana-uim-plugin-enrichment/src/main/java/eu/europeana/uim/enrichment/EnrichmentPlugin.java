@@ -17,6 +17,7 @@
 package eu.europeana.uim.enrichment;
 
 import eu.europeana.corelib.definitions.edm.entity.WebResource;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -43,6 +45,8 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
+
+import com.ctc.wstx.io.EBCDICCodec;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.edm.utils.EdmUtils;
@@ -99,7 +103,9 @@ import eu.europeana.uim.sugar.SugarCrmService;
 public class EnrichmentPlugin<I> extends
         AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
-    private static HttpSolrServer solrServer;
+//    private static HttpSolrServer solrServer;
+    private static CloudSolrServer cloudSolrServer;
+    private static CloudSolrServer productionCloudSolrServer;
     private static SugarCrmService sugarCrmService;
     private static EnrichmentService enrichmentService;
     private static String previewsOnlyInPortal;
@@ -267,7 +273,9 @@ public class EnrichmentPlugin<I> extends
         context.putValue(addedTKey, 0l);
         logEngine = context.getLoggingEngine();
         try {
-            solrServer = enrichmentService.getSolrServer();
+//            solrServer = enrichmentService.getSolrServer();
+            cloudSolrServer = enrichmentService.getCloudSolrServer();
+            productionCloudSolrServer = enrichmentService.getProductionCloudSolrServer();
 
             if (mongoServer == null) {
 
@@ -301,8 +309,12 @@ public class EnrichmentPlugin<I> extends
                     .getValue(ControlledVocabularyProxy.ISNEW.toString()))
                     || check) {
                 handler.clearData(collection.getMnemonic());
-                solrServer.deleteByQuery("europeana_collectionName:"
-                        + collection.getName().split("_")[0] + "_*");
+//                solrServer.deleteByQuery("europeana_collectionName:"
+//                        + collection.getName().split("_")[0] + "_*");
+                cloudSolrServer.deleteByQuery("europeana_collectionName:"
+                    + collection.getName().split("_")[0] + "_*");
+                productionCloudSolrServer.deleteByQuery("europeana_collectionName:"
+                    + collection.getName().split("_")[0] + "_*");
             }
 
         } catch (Exception e) {
@@ -377,23 +389,24 @@ public class EnrichmentPlugin<I> extends
                 "Adding " + recordNumber + " documents");
         context.getLoggingEngine().log(context.getExecution(), Level.INFO,
                 "Process called " + processCount);
-        try {
-            solrServer.commit();
+//        try {
+//            solrServer.commit();
+//            cloudSolrServer.commit();
             logEngine.log(context.getExecution(), Level.INFO,
                     "Added " + recordNumber + " documents");
             log.log(Level.INFO, "Added " + recordNumber + " documents");
             logEngine.log(context.getExecution(), Level.INFO,
                     "Deleted are " + deleted);
             log.log(Level.INFO, "Deleted are " + deleted);
-        } catch (SolrServerException e) {
-            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
-                    e.getMessage());
-            log.log(Level.SEVERE, e.getMessage());
-        } catch (IOException e) {
-            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
-                    e.getMessage());
-            log.log(Level.SEVERE, e.getMessage());
-        }
+//        } catch (SolrServerException e) {
+//            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
+//                    e.getMessage());
+//            log.log(Level.SEVERE, e.getMessage());
+//        } catch (IOException e) {
+//            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
+//                    e.getMessage());
+//            log.log(Level.SEVERE, e.getMessage());
+//        }
         log.log(Level.INFO, "Committed in Solr Server");
 
     }
@@ -661,7 +674,9 @@ public class EnrichmentPlugin<I> extends
                         context.putValue(addedTKey,
                                 context.getValue(addedTKey) + 1);
                         fBean.setState(eu.europeana.publication.common.State.ACCEPTED);
-                        new SolrDocumentHandler(solrServer).save(fBean);
+//                        new SolrDocumentHandler(solrServer).save(fBean);
+                        new SolrDocumentHandler(cloudSolrServer).save(fBean);
+                        new SolrDocumentHandler(productionCloudSolrServer).save(fBean);
 //                        solrServer.add(basicDocument);
                         return true;
                     } catch (MalformedURLException e) {
@@ -687,7 +702,9 @@ public class EnrichmentPlugin<I> extends
                     return false;
                 } else {
                     boolean res = true;
-                    res = handler.removeRecord(solrServer, rdf);
+//                    res = handler.removeRecord(solrServer, rdf);
+                    res = handler.removeRecord(cloudSolrServer, rdf);
+                    res = handler.removeRecord(productionCloudSolrServer, rdf);
                     if (res) {
                         context.putValue(deletedTKey,
                                 context.getValue(deletedTKey) + 1);

@@ -102,7 +102,7 @@ public class EnrichmentPluginTest {
 			HttpSolrServer solrServer = mock(HttpSolrServer.class);
 			when(serv.getCollectionMongoServer()).thenReturn(collectionServer);
 			when(serv.getEuropeanaIdMongoServer()).thenReturn(idServer);
-			when(serv.getSolrServer()).thenReturn(solrServer);
+//			when(serv.getSolrServer()).thenReturn(solrServer);
 			when(serv.getEuropeanaMongoServer()).thenReturn(edmMongoServer);
 			SolrDocumentList list = new SolrDocumentList();
 			list.add(new SolrDocument());

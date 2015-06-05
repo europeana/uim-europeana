@@ -16,6 +16,7 @@
  */
 package eu.europeana.uim.enrichment.service;
 
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
@@ -30,11 +31,13 @@ import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
  */
 public interface EnrichmentService {
 
-	/**
-	 * Get the Solr Server to save the Enriched metadata to
-	 * @return
-	 */
-	HttpSolrServer getSolrServer();
+//	/**
+//	 * Get the Solr Server to save the Enriched metadata to
+//	 * @return
+//	 */
+//	HttpSolrServer getSolrServer();
+	
+	CloudSolrServer getCloudSolrServer();
 
 	/**
 	 * Get the Mongo database name;
@@ -48,6 +51,8 @@ public interface EnrichmentService {
 
 	public OsgiEdmMongoServer getEuropeanaMongoServer();
 	
-	public HttpSolrServer getProductionSolrServer();
+//	public HttpSolrServer getProductionSolrServer();
+	
+	public CloudSolrServer getProductionCloudSolrServer();
 	
 }

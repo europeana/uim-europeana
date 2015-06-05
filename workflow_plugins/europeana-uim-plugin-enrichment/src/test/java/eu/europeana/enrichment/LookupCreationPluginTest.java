@@ -72,7 +72,7 @@ public class LookupCreationPluginTest {
 			HttpSolrServer solrServer = mock(HttpSolrServer.class);
 			when(serv.getCollectionMongoServer()).thenReturn(collectionServer);
 			when(serv.getEuropeanaIdMongoServer()).thenReturn(idServer);
-			when(serv.getSolrServer()).thenReturn(solrServer);
+//			when(serv.getSolrServer()).thenReturn(solrServer);
 			SolrDocumentList list = new SolrDocumentList();
 			list.add(new SolrDocument());
 			QueryResponse resp = mock(QueryResponse.class);

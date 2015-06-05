@@ -340,7 +340,7 @@ public class LookupCreationPlugin<I> extends
                     .escapeQueryChars(applyTransformations(
                                     fieldValue, transformations)));
             SolrDocumentList solrOldList = enrichmentService
-                    .getProductionSolrServer().query(paramsOld).getResults();
+                    .getProductionCloudSolrServer().query(paramsOld).getResults();
 
             if (solrOldList.size() == 1) {
                 finalId = solrOldList.get(0).getFirstValue("europeana_id")
@@ -368,7 +368,7 @@ public class LookupCreationPlugin<I> extends
             params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionSolrServer().query(params).getResults();
+                        .getProductionCloudSolrServer().query(params).getResults();
                 if (solrList.size() > 0 && !(finalId.equals(newId))) {
                     EuropeanaId id = new EuropeanaId();
                     id.setOldId(finalId);
@@ -388,7 +388,7 @@ public class LookupCreationPlugin<I> extends
             params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionSolrServer().query(params).getResults();
+                        .getProductionCloudSolrServer().query(params).getResults();
                 if (solrList.size() > 0 && !(finalId.equals(newId))) {
                     EuropeanaId id = new EuropeanaId();
                     id.setOldId(finalId);
@@ -485,7 +485,7 @@ public class LookupCreationPlugin<I> extends
     @Override
     public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
             throws IngestionPluginFailedException {
-        System.out.println(enrichmentService.getProductionSolrServer().getBaseURL());
+        System.out.println(enrichmentService.getProductionCloudSolrServer().getZkStateReader().getClusterState().getLiveNodes());
     }
 
     @Override
@@ -618,7 +618,7 @@ public class LookupCreationPlugin<I> extends
         if (oldCollectionId.equals(newCollectionId)) {
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionSolrServer().query(params).getResults();
+                        .getProductionCloudSolrServer().query(params).getResults();
                 if (solrList.size() > 0) {
                     EuropeanaId id = new EuropeanaId();
                     id.setOldId("/" + oldCollectionId + "/" + hash);
@@ -635,7 +635,7 @@ public class LookupCreationPlugin<I> extends
         } else {
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionSolrServer().query(params).getResults();
+                        .getProductionCloudSolrServer().query(params).getResults();
                 if (solrList.size() > 0) {
                     EuropeanaId id = new EuropeanaId();
                     id.setOldId("/" + oldCollectionId + "/" + hash);

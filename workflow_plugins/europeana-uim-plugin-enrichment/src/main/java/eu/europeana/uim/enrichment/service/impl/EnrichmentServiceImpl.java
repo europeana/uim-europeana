@@ -1,25 +1,24 @@
 /*
  * Copyright 2007-2012 The Europeana Foundation
- *
- *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
- *  by the European Commission;
- *  You may not use this work except in compliance with the Licence.
  * 
- *  You may obtain a copy of the Licence at:
- *  http://joinup.ec.europa.eu/software/page/eupl
- *
- *  Unless required by applicable law or agreed to in writing, software distributed under
- *  the Licence is distributed on an "AS IS" basis, without warranties or conditions of
- *  any kind, either express or implied.
- *  See the Licence for the specific language governing permissions and limitations under
- *  the Licence.
+ * Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved by the
+ * European Commission; You may not use this work except in compliance with the Licence.
+ * 
+ * You may obtain a copy of the Licence at: http://joinup.ec.europa.eu/software/page/eupl
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the Licence
+ * is distributed on an "AS IS" basis, without warranties or conditions of any kind, either express
+ * or implied. See the Licence for the specific language governing permissions and limitations under
+ * the Licence.
  */
 package eu.europeana.uim.enrichment.service.impl;
 
 import java.net.URL;
 import java.net.UnknownHostException;
 
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
@@ -60,216 +59,249 @@ import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
  */
 public class EnrichmentServiceImpl implements EnrichmentService {
 
-	private static HttpSolrServer solrServer;
-	private static HttpSolrServer solrProductionServer;
-	private static String mongoDB = PropertyReader
-			.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
-	private static String mongoHost = PropertyReader
-			.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
-	private static String mongoPort = PropertyReader
-			.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
-	private static String solrUrl = PropertyReader
-			.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
-	private static String solrProductionUrl = PropertyReader
-			.getProperty(UimConfigurationProperty.SOLR_PRODUCTION_HOSTURL);
-	private static String solrCore = PropertyReader
-			.getProperty(UimConfigurationProperty.SOLR_CORE);
-	private static CollectionMongoServer cmServer;
-	private static OsgiEuropeanaIdMongoServer idserver;
-	private static OsgiEdmMongoServer server;
+  private static HttpSolrServer solrServer;
+  private static HttpSolrServer solrProductionServer;
+  private static CloudSolrServer cloudSolrServer;
+  private static CloudSolrServer cloudSolrProductionServer;
+  private static String mongoDB = PropertyReader
+      .getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
+  private static String mongoHost = PropertyReader
+      .getProperty(UimConfigurationProperty.MONGO_HOSTURL);
+  private static String mongoPort = PropertyReader
+      .getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
+  private static String zookeeperUrl = PropertyReader
+      .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURL);
+//  private static String solrUrl = PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
+//  private static String solrProductionUrl = PropertyReader
+//      .getProperty(UimConfigurationProperty.SOLR_PRODUCTION_HOSTURL);
+  private static String solrCore = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
+
+  private static String[] cloudSolrUrl = PropertyReader.getProperty(
+      UimConfigurationProperty.CLOUD_SOLR_HOSTURL).split(",");
+  private static String cloudSolrCore = PropertyReader
+      .getProperty(UimConfigurationProperty.CLOUD_SOLR_CORE);
+
+  private static CollectionMongoServer cmServer;
+  private static OsgiEuropeanaIdMongoServer idserver;
+  private static OsgiEdmMongoServer server;
 
 
-	public EnrichmentServiceImpl() {
+  public EnrichmentServiceImpl() {
+    
+    try {
+      
+      LBHttpSolrServer lbTarget = new LBHttpSolrServer("http://176.9.7.91:8080/solr,http://148.251.183.82:8080/solr,http://176.9.7.182:8080/solr,http://78.46.60.203:8080/solr");
+      CloudSolrServer cloudSolrServer = new CloudSolrServer("176.9.7.91:2181", lbTarget);
+      cloudSolrServer.setDefaultCollection("search4");
+      cloudSolrServer.connect();
 
-		try {
-
-			solrServer = new HttpSolrServer(new URL(solrUrl) + solrCore);
-			solrProductionServer = new HttpSolrServer(new URL(solrProductionUrl)+solrCore);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		BlockingInitializer initializer = new BlockingInitializer() {
-
-			@Override
-			protected void initializeInternal() {
-				try {
-					Morphia morphia = new Morphia();
-					morphia.map(Collection.class);
-					Datastore datastore = morphia.createDatastore(new Mongo(
-							mongoHost, Integer.parseInt(mongoPort)),
-							"collections");
-					cmServer = new CollectionMongoServerImpl();
-					datastore.ensureIndexes();
-					cmServer.setDatastore(datastore);
-					BlockingInitializer colInitializer = new BlockingInitializer() {
-
-						@Override
-						protected void initializeInternal() {
-							Collection col = new Collection();
-							cmServer.findOldCollectionId("test");
-						}
-					};
-					colInitializer
-							.initialize(Collection.class.getClassLoader());
-				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (MongoException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}
-		};
-
-		initializer
-				.initialize(CollectionMongoServerImpl.class.getClassLoader());
-		
+//      LBHttpSolrServer lbTarget = new LBHttpSolrServer(cloudSolrUrl);
+//      cloudSolrServer = new CloudSolrServer(zookeeperUrl, lbTarget);
+//      cloudSolrServer.setDefaultCollection(cloudSolrCore);
+//      cloudSolrServer.connect();
+      
+//      cloudSolrProductionServer = new CloudSolrServer(zookeeperUrl, lbTarget);
+//      cloudSolrProductionServer.setDefaultCollection(cloudSolrCore);
+//      cloudSolrProductionServer.connect();
+      
+//      solrServer = new HttpSolrServer(new URL(solrUrl) + solrCore);
+//      solrProductionServer = new HttpSolrServer(new URL(solrProductionUrl) + solrCore);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
 
-		try {
-			
-			BlockingInitializer mongoInitializer = new BlockingInitializer() {
-				
-				@Override
-				protected void initializeInternal() {
-					// TODO Auto-generated method stub
-					String uname = PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
-					String pass = PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
-					Morphia morphia = new Morphia();
 
-					morphia.map(FullBeanImpl.class);
-					morphia.map(ProvidedCHOImpl.class);
-					morphia.map(AgentImpl.class);
-					morphia.map(AggregationImpl.class);
-					morphia.map(ConceptImpl.class);
-					morphia.map(ProxyImpl.class);
-					morphia.map(PlaceImpl.class);
-					morphia.map(TimespanImpl.class);
-					morphia.map(WebResourceImpl.class);
-					morphia.map(EuropeanaAggregationImpl.class);
-					morphia.map(EventImpl.class);
-					morphia.map(PhysicalThingImpl.class);
-					morphia.map(ConceptSchemeImpl.class);
-					morphia.map(BasicProxyImpl.class);
-					try {
-						server = new OsgiEdmMongoServer(new Mongo(mongoHost,
-								Integer.parseInt(mongoPort)), "europeana", uname, pass);
-					} catch (NumberFormatException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (MongoDBException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (UnknownHostException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (MongoException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					server.createDatastore(morphia);
-				}
-			};
-					mongoInitializer.initialize(OsgiEdmMongoServer.class.getClassLoader());
-					
-					
-					
-				
-			idserver = new OsgiEuropeanaIdMongoServer(new Mongo(mongoHost,
-					Integer.parseInt(mongoPort)), "EuropeanaId");
-			idserver.createDatastore();
+    BlockingInitializer initializer = new BlockingInitializer() {
 
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MongoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+      @Override
+      protected void initializeInternal() {      
+        try {
+          Morphia morphia = new Morphia();
+          morphia.map(Collection.class);
+          Datastore datastore =
+              morphia.createDatastore(new Mongo(mongoHost, Integer.parseInt(mongoPort)),
+                  "collections");
+          cmServer = new CollectionMongoServerImpl();
+          datastore.ensureIndexes();
+          cmServer.setDatastore(datastore);
+          BlockingInitializer colInitializer = new BlockingInitializer() {
 
-	}
+            @Override
+            protected void initializeInternal() {
+              Collection col = new Collection();
+              cmServer.findOldCollectionId("test");
+            }
+          };
+          colInitializer.initialize(Collection.class.getClassLoader());
+        } catch (NumberFormatException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        } catch (UnknownHostException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        } catch (MongoException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
 
-	@Override
-	public HttpSolrServer getSolrServer() {
-		return solrServer;
-	}
-	@Override
-	public HttpSolrServer getProductionSolrServer() {
-		return solrProductionServer;
-	}
+      }
+    };
+
+    initializer.initialize(CollectionMongoServerImpl.class.getClassLoader());
 
 
-	@Override
-	public String getMongoDB() {
-		return mongoDB;
-	}
 
-	public void setMongoDB(String mongoDB) {
-		EnrichmentServiceImpl.mongoDB = mongoDB;
-	}
+    try {
 
-	public String getMongoHost() {
-		return mongoHost;
-	}
+      BlockingInitializer mongoInitializer = new BlockingInitializer() {
 
-	public void setMongoHost(String mongoHost) {
-		EnrichmentServiceImpl.mongoHost = mongoHost;
-	}
+        @Override
+        protected void initializeInternal() {
+          // TODO Auto-generated method stub
+          String uname =
+              PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
+                  .getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
+          String pass =
+              PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
+                  .getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
+          Morphia morphia = new Morphia();
 
-	public String getMongoPort() {
-		return mongoPort;
-	}
+          morphia.map(FullBeanImpl.class);
+          morphia.map(ProvidedCHOImpl.class);
+          morphia.map(AgentImpl.class);
+          morphia.map(AggregationImpl.class);
+          morphia.map(ConceptImpl.class);
+          morphia.map(ProxyImpl.class);
+          morphia.map(PlaceImpl.class);
+          morphia.map(TimespanImpl.class);
+          morphia.map(WebResourceImpl.class);
+          morphia.map(EuropeanaAggregationImpl.class);
+          morphia.map(EventImpl.class);
+          morphia.map(PhysicalThingImpl.class);
+          morphia.map(ConceptSchemeImpl.class);
+          morphia.map(BasicProxyImpl.class);
+          try {
+            server =
+                new OsgiEdmMongoServer(new Mongo(mongoHost, Integer.parseInt(mongoPort)),
+                    "europeana", uname, pass);
+          } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (MongoDBException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (MongoException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          server.createDatastore(morphia);
+        }
+      };
+      mongoInitializer.initialize(OsgiEdmMongoServer.class.getClassLoader());
 
-	public void setMongoPort(String mongoPort) {
-		EnrichmentServiceImpl.mongoPort = mongoPort;
-	}
 
-	public String getSolrUrl() {
-		return solrUrl;
-	}
 
-	public void setSolrUrl(String solrUrl) {
-		EnrichmentServiceImpl.solrUrl = solrUrl;
-	}
+      idserver =
+          new OsgiEuropeanaIdMongoServer(new Mongo(mongoHost, Integer.parseInt(mongoPort)),
+              "EuropeanaId");
+      idserver.createDatastore();
 
-	public String getSolrCore() {
-		return solrCore;
-	}
+    } catch (NumberFormatException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (UnknownHostException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (MongoException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
-	public void setSolrCore(String solrCore) {
-		EnrichmentServiceImpl.solrCore = solrCore;
-	}
+  }
 
-	public void setSolrServer(HttpSolrServer solrServer) {
-		EnrichmentServiceImpl.solrServer = solrServer;
-	}
+//  @Override
+//  public HttpSolrServer getSolrServer() {
+//    return solrServer;
+//  }
 
-	@Override
-	public CollectionMongoServer getCollectionMongoServer() {
-		return cmServer;
-	}
+  @Override
+  public CloudSolrServer getCloudSolrServer() {
+    return cloudSolrServer;
+  }
 
-	@Override
-	public EuropeanaIdMongoServer getEuropeanaIdMongoServer() {
-		return idserver;
-	}
+//  @Override
+//  public HttpSolrServer getProductionSolrServer() {
+//    return solrProductionServer;
+//  }
 
-	@Override
-	public OsgiEdmMongoServer getEuropeanaMongoServer() {
-		// TODO Auto-generated method stub
-		return server;
-	}
+  @Override
+  public CloudSolrServer getProductionCloudSolrServer() {
+    return cloudSolrProductionServer;
+  }
+
+  @Override
+  public String getMongoDB() {
+    return mongoDB;
+  }
+
+  public void setMongoDB(String mongoDB) {
+    EnrichmentServiceImpl.mongoDB = mongoDB;
+  }
+
+  public String getMongoHost() {
+    return mongoHost;
+  }
+
+  public void setMongoHost(String mongoHost) {
+    EnrichmentServiceImpl.mongoHost = mongoHost;
+  }
+
+  public String getMongoPort() {
+    return mongoPort;
+  }
+
+  public void setMongoPort(String mongoPort) {
+    EnrichmentServiceImpl.mongoPort = mongoPort;
+  }
+
+//  public String getSolrUrl() {
+//    return solrUrl;
+//  }
+
+//  public void setSolrUrl(String solrUrl) {
+//    EnrichmentServiceImpl.solrUrl = solrUrl;
+//  }
+
+  public String getSolrCore() {
+    return solrCore;
+  }
+
+  public void setSolrCore(String solrCore) {
+    EnrichmentServiceImpl.solrCore = solrCore;
+  }
+
+  public void setSolrServer(HttpSolrServer solrServer) {
+    EnrichmentServiceImpl.solrServer = solrServer;
+  }
+
+  @Override
+  public CollectionMongoServer getCollectionMongoServer() {
+    return cmServer;
+  }
+
+  @Override
+  public EuropeanaIdMongoServer getEuropeanaIdMongoServer() {
+    return idserver;
+  }
+
+  @Override
+  public OsgiEdmMongoServer getEuropeanaMongoServer() {
+    // TODO Auto-generated method stub
+    return server;
+  }
 
 }
