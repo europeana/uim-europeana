@@ -167,29 +167,17 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				@Override
 				protected void initializeInternal() {
 					try {
-					  List addresses = new ArrayList();
-                      String[] mongoHost = PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL).split(",");
-                      String mongoPort = PropertyReader
-                          .getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
-                      for (String mongoStr : mongoHost) {
-                          ServerAddress address = new ServerAddress(mongoStr, Integer.parseInt(mongoPort));
-                          addresses.add(address);
-                      }
                       String uname =
                           PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
                               .getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
                       String pass =
                           PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
                               .getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
-                      Mongo tgtMongo = new Mongo(addresses);
-						mongoServer = new EdmMongoServerImpl(tgtMongo, PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA), uname, pass);
+						mongoServer = new EdmMongoServerImpl(MongoProvider.getMongo(), PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA), uname, pass);
 					} catch (NumberFormatException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (MongoDBException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (UnknownHostException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (MongoException e) {
