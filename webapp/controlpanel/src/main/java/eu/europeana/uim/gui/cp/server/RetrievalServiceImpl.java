@@ -42,7 +42,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.jibx.runtime.BindingDirectory;
@@ -112,13 +114,21 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 	private final static Logger log = Logger
 			.getLogger(RetrievalServiceImpl.class.getName());
 
-	private static HttpSolrServer solrServer;
+//	private static HttpSolrServer solrServer;
+	private static CloudSolrServer cloudSolrServer;
 	private static EdmMongoServerImpl mongoServer;
 
     // /** String PORTAL_SINGLE_RECORD_URL */
     private static  String PORTAL_SINGLE_RECORD_URL = "http://www.europeana.eu/portal/record/";
     private static  String PORTAL_PREVIEW_URL;
     private static  String REPOSITORY_PREVIEW_URL;
+    
+    private static String zookeeperUrl = PropertyReader
+        .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURL);
+    private static String cloudSolrCore = PropertyReader
+        .getProperty(UimConfigurationProperty.CLOUD_SOLR_CORE);
+    private static String[] cloudSolrUrl = PropertyReader.getProperty(
+        UimConfigurationProperty.CLOUD_SOLR_HOSTURL).split(",");
 	
     private static IUnmarshallingContext uctx;
 
@@ -152,15 +162,13 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 				
 				@Override
 				protected void initializeInternal() {
-					solrServer = new HttpSolrServer(
-							PropertyReader
-									.getProperty(UimConfigurationProperty.SOLR_HOSTURL)
-									+ PropertyReader
-											.getProperty(UimConfigurationProperty.SOLR_CORE));
-					
+				  LBHttpSolrServer lbTarget = new LBHttpSolrServer(cloudSolrUrl);
+				  cloudSolrServer = new CloudSolrServer(zookeeperUrl, lbTarget);
+			      cloudSolrServer.setDefaultCollection(cloudSolrCore);
+			      cloudSolrServer.connect();					
 				}
 			};
-			initializer.initialize(HttpSolrServer.class.getClassLoader());
+			initializer.initialize(CloudSolrServer.class.getClassLoader());
 			
 			BlockingInitializer mongoInitializer = new BlockingInitializer() {
 				
@@ -462,7 +470,7 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet
 			String query = "europeana_id:" + StringUtils.replace(recordId, "/", "\\/");
 			SolrQuery solrQuery = new SolrQuery().setQuery(query);
 
-			QueryResponse response = solrServer.query(solrQuery);
+			QueryResponse response = cloudSolrServer.query(solrQuery);
 			EdmFieldRecordDTO solrRecord = createSolrFields(response);
 			FullBeanImpl fullBean = (FullBeanImpl) mongoServer
 					.getFullBean(recordId);
