@@ -245,7 +245,9 @@
 											<goal>manifest</goal>
 										</goals>
 									</pluginExecutionFilter>
-
+									<action>
+										<ignore />
+									</action>
 								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
@@ -256,17 +258,17 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.18.1</version>
 					<configuration>
-                        <argLine>-XX:-UseSplitVerifier</argLine>
-                    </configuration>
+						<argLine>-XX:-UseSplitVerifier</argLine>
+					</configuration>
 				</plugin>
 				<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
-            </plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>cobertura-maven-plugin</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<aggregate>true</aggregate>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
