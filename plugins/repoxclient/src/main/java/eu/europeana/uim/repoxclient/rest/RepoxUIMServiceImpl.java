@@ -53,10 +53,15 @@ import eu.europeana.repox.rest.client.accessors.DatasetsAccessor;
 import eu.europeana.repox.rest.client.accessors.HarvestAccessor;
 import eu.europeana.repox.rest.client.accessors.ProvidersAccessor;
 import eu.europeana.uim.Registry;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.repox.model.RepoxConnectionStatus;
 import eu.europeana.uim.repoxclient.utils.DSType;
 import eu.europeana.uim.repoxclient.utils.PropertyReader;
 import eu.europeana.uim.repoxclient.utils.UimConfigurationProperty;
+import eu.europeana.uim.storage.StorageEngine;
+import eu.europeana.uim.storage.StorageEngineException;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
 
 /**
  * This Class implements the functionality exposed by the OSGI service.
@@ -170,12 +175,30 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   }
 
   @Override
-  public void createProvider(String aggregatorId, String id, String name, String country, String countryCode,
-      String description, String nameCode, String homepage, ProviderType providerType, String email)
-      throws InvalidArgumentsException, MissingArgumentsException, AlreadyExistsException,
-      InternalServerErrorException, DoesNotExistException {
-    ps.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode, homepage,
-        providerType, email);
+  public void createProvider(Provider uimProv, String aggregatorId, String id, String name,
+      String country, String countryCode, String description, String nameCode, String homepage,
+      ProviderType providerType, String email) throws InvalidArgumentsException,
+      MissingArgumentsException, AlreadyExistsException, InternalServerErrorException,
+      DoesNotExistException {
+
+    if (uimProv.isAggregator()) {
+      throw new InvalidArgumentsException("The requested object is not a Provider");
+    }
+
+    String providerId =
+        ps.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode,
+            homepage, providerType, email);
+
+    uimProv.putValue(ControlledVocabularyProxy.REPOXID, providerId);
+
+    StorageEngine<?> engine = registry.getStorageEngine();
+    // Store the created RepoxID into the UIM object
+    try {
+      engine.updateProvider(uimProv);
+      engine.checkpoint();
+    } catch (StorageEngineException e) {
+      throw new InternalServerErrorException("Updating UIM Provider object failed");
+    }
   }
 
   @Override
@@ -189,8 +212,8 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       String country, String countryCode, String description, String nameCode, String homepage,
       ProviderType providerType, String email) throws InvalidArgumentsException,
       DoesNotExistException, MissingArgumentsException, AlreadyExistsException {
-    ps.updateProvider(id, newId, newAggregatorId, name, country, countryCode, description, nameCode, homepage,
-        providerType, email);
+    ps.updateProvider(id, newId, newAggregatorId, name, country, countryCode, description,
+        nameCode, homepage, providerType, email);
   }
 
   /******************** Datasource Calls ********************/
@@ -212,29 +235,57 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   }
 
   @Override
-  public void createDatasourceOai(String providerId, String id, String name, String nameCode,
-      boolean isSample, String schema, String description, String namespace, String metadataFormat,
-      String marcFormat, String oaiUrl, String oaiSet, String exportDir,
+  public void createDatasourceOai(Collection col, String providerId, String id, String name,
+      String nameCode, boolean isSample, String schema, String description, String namespace,
+      String metadataFormat, String marcFormat, String oaiUrl, String oaiSet, String exportDir,
       RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
       throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
       AlreadyExistsException, InternalServerErrorException {
-    ds.createDatasetOai(providerId, id, name, nameCode, isSample, schema, description, namespace,
-        metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy,
-        metadataTransformations);
+    String datasetOaiId =
+        ds.createDatasetOai(providerId, id, name, nameCode, isSample, schema, description,
+            namespace, metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy,
+            metadataTransformations);
+
+    col.putValue(ControlledVocabularyProxy.REPOXID, datasetOaiId);
+
+    StorageEngine<?> engine = registry.getStorageEngine();
+
+    // Store the created RepoxID into the UIM object
+    try {
+      engine.updateCollection(col);
+      engine.checkpoint();
+    } catch (StorageEngineException e) {
+      throw new InternalServerErrorException("Updating UIM Collection object failed");
+    }
+
   }
 
   @Override
-  public void createDatasetFile(String providerId, String id, String name, String nameCode,
-      boolean isSample, String schema, String description, String namespace, String metadataFormat,
-      String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
+  public void createDatasetFile(Collection col, String providerId, String id, String name,
+      String nameCode, boolean isSample, String schema, String description, String namespace,
+      String metadataFormat, String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
       FileExtractStrategy extractStrategy, FileRetrieveStrategy retrieveStrategy,
       CharacterEncoding characterEncoding, Iso2709Variant isoVariant, String sourceDirectory,
       String recordXPath, Map<String, MetadataTransformation> metadataTransformations)
       throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
       AlreadyExistsException, InternalServerErrorException {
-    ds.createDatasetFile(providerId, id, name, nameCode, isSample, schema, description, namespace,
-        metadataFormat, marcFormat, exportDir, recordIdPolicy, extractStrategy, retrieveStrategy,
-        characterEncoding, isoVariant, sourceDirectory, recordXPath, metadataTransformations);
+    String datasetFileId =
+        ds.createDatasetFile(providerId, id, name, nameCode, isSample, schema, description,
+            namespace, metadataFormat, marcFormat, exportDir, recordIdPolicy, extractStrategy,
+            retrieveStrategy, characterEncoding, isoVariant, sourceDirectory, recordXPath,
+            metadataTransformations);
+
+    col.putValue(ControlledVocabularyProxy.REPOXID, datasetFileId);
+
+    StorageEngine<?> engine = registry.getStorageEngine();
+
+    // Store the created RepoxID into the UIM object
+    try {
+      engine.updateCollection(col);
+      engine.checkpoint();
+    } catch (StorageEngineException e) {
+      throw new InternalServerErrorException("Updating UIM Collection object failed");
+    }
   }
 
   @Override
@@ -357,7 +408,7 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
   public void cancelHarvest(String id) throws DoesNotExistException, InternalServerErrorException {
     hs.cancelHarvest(id);
   }
-  
+
   @Override
   public void scheduleHarvest(String id, Calendar firstDateTime, Frequency frequency, int xmonths,
       boolean incremental) throws DoesNotExistException, MissingArgumentsException,

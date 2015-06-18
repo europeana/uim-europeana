@@ -236,7 +236,7 @@ public class CommandUtils {
       prov.setOaiMetadataPrefix("");
       engine.updateProvider(prov);
       engine.checkpoint();
-      repoxservice.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode, homepage,
+      repoxservice.createProvider(prov, aggregatorId, id, name, country, countryCode, description, nameCode, homepage,
           ProviderType.get(providerType), email);
     } catch (InternalServerErrorException | InvalidArgumentsException | MissingArgumentsException
         | AlreadyExistsException | DoesNotExistException e) {
@@ -421,7 +421,7 @@ public class CommandUtils {
       engine.checkpoint();
       RecordIdPolicy repoxRecordIdPolicy = new IdProvidedRecordIdPolicy(); // only for testing
 
-      repoxservice.createDatasourceOai(providerId, id, name, nameCode,
+      repoxservice.createDatasourceOai(collection, providerId, id, name, nameCode,
           Boolean.parseBoolean(isSample), schema, description, namespace, metadataFormat,
           marcFormat, oaiUrl, oaiSet, exportDir, repoxRecordIdPolicy, null);
     } catch (InternalServerErrorException | InvalidArgumentsException | DoesNotExistException

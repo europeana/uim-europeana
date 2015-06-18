@@ -28,8 +28,8 @@ import pt.utl.ist.dataProvider.dataSource.RecordIdPolicy;
 import pt.utl.ist.marc.CharacterEncoding;
 import pt.utl.ist.marc.iso2709.shared.Iso2709Variant;
 import pt.utl.ist.metadataTransformation.MetadataTransformation;
-import pt.utl.ist.task.Task;
 import pt.utl.ist.task.ScheduledTask.Frequency;
+import pt.utl.ist.task.Task;
 import pt.utl.ist.util.ProviderType;
 import pt.utl.ist.util.exceptions.AlreadyExistsException;
 import pt.utl.ist.util.exceptions.DoesNotExistException;
@@ -38,6 +38,8 @@ import pt.utl.ist.util.exceptions.MissingArgumentsException;
 import eu.europeana.uim.Registry;
 import eu.europeana.uim.repox.model.RepoxConnectionStatus;
 import eu.europeana.uim.repoxclient.utils.DSType;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
 
 /**
  * @author Simon Tzanakis (Simon.Tzanakis@theeuropeanlibrary.org)
@@ -160,7 +162,7 @@ public interface RepoxUIMServiceT {
    * @throws InternalServerErrorException
    * @throws DoesNotExistException
    */
-  void createProvider(String aggregatorId, String id, String name, String country, String countryCode,
+  void createProvider(Provider uimProv, String aggregatorId, String id, String name, String country, String countryCode,
       String description, String nameCode, String homepage, ProviderType providerType, String email)
       throws InvalidArgumentsException, MissingArgumentsException, AlreadyExistsException,
       InternalServerErrorException, DoesNotExistException;
@@ -242,7 +244,7 @@ public interface RepoxUIMServiceT {
    * @throws AlreadyExistsException
    * @throws InternalServerErrorException
    */
-  void createDatasourceOai(String providerId, String id, String name, String nameCode,
+  void createDatasourceOai(Collection col, String providerId, String id, String name, String nameCode,
       boolean isSample, String schema, String description, String namespace, String metadataFormat,
       String marcFormat, String oaiUrl, String oaiSet, String exportDir,
       RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
@@ -277,7 +279,7 @@ public interface RepoxUIMServiceT {
    * @throws AlreadyExistsException
    * @throws InternalServerErrorException
    */
-  void createDatasetFile(String providerId, String id, String name, String nameCode,
+  void createDatasetFile(Collection col, String providerId, String id, String name, String nameCode,
       boolean isSample, String schema, String description, String namespace, String metadataFormat,
       String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
       FileExtractStrategy extractStrategy, FileRetrieveStrategy retrieveStrategy,

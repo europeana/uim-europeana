@@ -122,15 +122,17 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
       if (prov.isAggregator()) {
         throw new ProviderOperationException("The requested object is not a Provider");
       }
-      if (!repoxService.providerExists(prov.getMnemonic())) {
-          repoxService.createProvider(provCountry, prov.getMnemonic(), prov.getName(), null, provCountry,
-              "", prov.getMnemonic(), "", ProviderType.UNKNOWN, "");
+      if (!repoxService.providerExists(prov.getValue(ControlledVocabularyProxy.REPOXID))) {
+        repoxService.createProvider(prov, provCountry, prov.getMnemonic(), prov.getName(), null,
+            provCountry, "", prov.getMnemonic(), "", ProviderType.UNKNOWN, "");
       } else {
 
         // Or update an already existing REPOX provider from an
         // (updated) existing UIM provider
-        repoxService.updateProvider(prov.getMnemonic(), "", "", prov.getName(), null, provCountry,
-            "", prov.getMnemonic(), "", ProviderType.UNKNOWN, "");
+        repoxService
+            .updateProvider(prov.getValue(ControlledVocabularyProxy.REPOXID), "", "",
+                prov.getName(), null, provCountry, "", prov.getMnemonic(), "",
+                ProviderType.UNKNOWN, "");
       }
 
       Collection coll = sugService.updateCollectionFromRecord(originalRec, prov);
@@ -147,17 +149,37 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
                 + "HARVESTING_TYPE for the specific object does not match the predefined acceptable values.");
       }
 
-      if (!repoxService.datasourceExists(coll.getMnemonic())
-          || repoxService.hasHarvestingTypeChanged(coll.getMnemonic(),
+      //Check if dataset already exists in repox and store the REPOXID in the collection
+      if (coll.getValue(ControlledVocabularyProxy.REPOXID) == null
+          && repoxService.datasourceExists(coll.getMnemonic())) {
+        coll.putValue(ControlledVocabularyProxy.REPOXID, coll.getMnemonic());
+
+        StorageEngine<?> resengine = engine.getRegistry().getStorageEngine();
+
+        // Store the created RepoxID into the UIM object
+        try {
+          resengine.updateCollection(coll);
+          resengine.checkpoint();
+        } catch (StorageEngineException e) {
+          throw new InternalServerErrorException("Updating UIM Collection object failed");
+        }
+      }
+
+
+      if (!repoxService.datasourceExists(coll.getValue(ControlledVocabularyProxy.REPOXID))
+          || repoxService.hasHarvestingTypeChanged(
+              coll.getValue(ControlledVocabularyProxy.REPOXID),
               DSType.valueOf(coll.getValue(ControlledVocabularyProxy.HARVESTING_TYPE)))) {
         try {
-          repoxService.deleteDataset(coll.getMnemonic());
+          repoxService.deleteDataset(coll.getValue(ControlledVocabularyProxy.REPOXID));
         } catch (DoesNotExistException e) {// Do nothing since it might come here from the first
                                            // argument in the if
         }
+
         switch (harvestingtype) {
           case oai_pmh:
-            repoxService.createDatasourceOai(prov.getMnemonic(), coll.getMnemonic(),
+            repoxService.createDatasourceOai(coll,
+                prov.getValue(ControlledVocabularyProxy.REPOXID), coll.getMnemonic(),
                 coll.getName(), coll.getMnemonic(), false,
                 coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA),
                 coll.getValue(ControlledVocabularyProxy.DESCRIPTION),
@@ -171,7 +193,8 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
 
           case ftp:
             repoxService.createDatasetFile(
-                prov.getMnemonic(),
+                coll,
+                prov.getValue(ControlledVocabularyProxy.REPOXID),
                 coll.getMnemonic(),
                 coll.getName(),
                 coll.getMnemonic(),
@@ -194,9 +217,9 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
             break;
 
           case http:
-            repoxService.createDatasetFile(prov.getMnemonic(), coll.getMnemonic(), coll.getName(),
-                coll.getMnemonic(), false,
-                coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA), coll
+            repoxService.createDatasetFile(coll, prov.getValue(ControlledVocabularyProxy.REPOXID),
+                coll.getMnemonic(), coll.getName(), coll.getMnemonic(), false, coll
+                    .getValue(ControlledVocabularyProxy.METADATA_SCHEMA), coll
                     .getValue(ControlledVocabularyProxy.DESCRIPTION), coll
                     .getValue(ControlledVocabularyProxy.METADATA_NAMESPACE), coll
                     .getOaiMetadataPrefix(false), null, "", new IdGeneratedRecordIdPolicy(),
@@ -209,9 +232,9 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
             break;
 
           case folder:
-            repoxService.createDatasetFile(prov.getMnemonic(), coll.getMnemonic(), coll.getName(),
-                coll.getMnemonic(), false,
-                coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA), coll
+            repoxService.createDatasetFile(coll, prov.getValue(ControlledVocabularyProxy.REPOXID),
+                coll.getMnemonic(), coll.getName(), coll.getMnemonic(), false, coll
+                    .getValue(ControlledVocabularyProxy.METADATA_SCHEMA), coll
                     .getValue(ControlledVocabularyProxy.DESCRIPTION), coll
                     .getValue(ControlledVocabularyProxy.METADATA_NAMESPACE), coll
                     .getOaiMetadataPrefix(false), null, "", new IdGeneratedRecordIdPolicy(),
@@ -232,8 +255,8 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
       } else {
         switch (harvestingtype) {
           case oai_pmh:
-            repoxService.updateDatasourceOai(coll.getMnemonic(), null, coll.getName(),
-                coll.getMnemonic(), false,
+            repoxService.updateDatasourceOai(coll.getValue(ControlledVocabularyProxy.REPOXID),
+                null, coll.getName(), coll.getMnemonic(), false,
                 coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA),
                 coll.getValue(ControlledVocabularyProxy.DESCRIPTION),
                 coll.getValue(ControlledVocabularyProxy.METADATA_NAMESPACE),
@@ -246,7 +269,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
 
           case ftp:
             repoxService.updateDatasourceFile(
-                coll.getMnemonic(),
+                coll.getValue(ControlledVocabularyProxy.REPOXID),
                 null,
                 coll.getName(),
                 coll.getMnemonic(),
@@ -269,9 +292,10 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
             break;
 
           case http:
-            repoxService.updateDatasourceFile(coll.getMnemonic(), null, coll.getName(), coll
-                .getMnemonic(), false, coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA),
-                coll.getValue(ControlledVocabularyProxy.DESCRIPTION), coll
+            repoxService.updateDatasourceFile(coll.getValue(ControlledVocabularyProxy.REPOXID),
+                null, coll.getName(), coll.getMnemonic(), false, coll
+                    .getValue(ControlledVocabularyProxy.METADATA_SCHEMA), coll
+                    .getValue(ControlledVocabularyProxy.DESCRIPTION), coll
                     .getValue(ControlledVocabularyProxy.METADATA_NAMESPACE), coll
                     .getOaiMetadataPrefix(false), null, "", new IdGeneratedRecordIdPolicy(),
                 new SimpleFileExtractStrategy(),
@@ -283,9 +307,10 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
             break;
 
           case folder:
-            repoxService.updateDatasourceFile(coll.getMnemonic(), null, coll.getName(), coll
-                .getMnemonic(), false, coll.getValue(ControlledVocabularyProxy.METADATA_SCHEMA),
-                coll.getValue(ControlledVocabularyProxy.DESCRIPTION), coll
+            repoxService.updateDatasourceFile(coll.getValue(ControlledVocabularyProxy.REPOXID),
+                null, coll.getName(), coll.getMnemonic(), false, coll
+                    .getValue(ControlledVocabularyProxy.METADATA_SCHEMA), coll
+                    .getValue(ControlledVocabularyProxy.DESCRIPTION), coll
                     .getValue(ControlledVocabularyProxy.METADATA_NAMESPACE), coll
                     .getOaiMetadataPrefix(false), null, "", new IdGeneratedRecordIdPolicy(),
                 new SimpleFileExtractStrategy(), new FolderFileRetrieveStrategy(),
@@ -605,7 +630,8 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
           if (col.getValue(ControlledVocabularyProxy.REPOXID) != null) {
             try {
               RepoxHarvestingStatus result;
-              String harvestingStatus = repoxService.getHarvestingStatus(col.getMnemonic());
+              String harvestingStatus =
+                  repoxService.getHarvestingStatus(col.getValue(ControlledVocabularyProxy.REPOXID));
 
               HarvestingState status = HarvestingState.valueOf(harvestingStatus);
 
@@ -722,7 +748,9 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
 
       case VIEW_HARVEST_LOG:
         try {
-          String log = repoxService.getDatasetLastIngestLog(coll.getMnemonic());
+          String log =
+              repoxService
+                  .getDatasetLastIngestLog(coll.getValue(ControlledVocabularyProxy.REPOXID));
           result
               .setOperationMessage("Successfully Fetched Latest Harvest Log for Current Collection");
           result.setLogMessage(log);
@@ -737,7 +765,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
 
       case INITIATE_COMPLETE_HARVESTING:
         try {
-          repoxService.initiateHarvesting(coll.getMnemonic(), "full");
+          repoxService.initiateHarvesting(coll.getValue(ControlledVocabularyProxy.REPOXID), "full");
           result
               .setOperationMessage("Successfully initiated FULL harvesting for " + coll.getName());
           result.setLogMessage("Harvesting initiated.");
@@ -760,7 +788,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
 
       case INITIATE_INCREMENTAL_HARVESTING:
         try {
-          repoxService.initiateHarvesting(coll.getMnemonic(), "full");
+          repoxService.initiateHarvesting(coll.getValue(ControlledVocabularyProxy.REPOXID), "full");
           result.setOperationMessage("Successfully initiated INCREMENTAL harvesting for "
               + coll.getName());
           result.setLogMessage("Harvesting initiated.");
