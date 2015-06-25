@@ -58,6 +58,7 @@ import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.model.europeana.EuropeanaRedirectId;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
@@ -222,7 +223,9 @@ public class LookupCreationPlugin<I> extends
                     }
 
                     if (StringUtils.isNotEmpty(hash)) {
-                        createLookupEntry(fullBean, fileName, collectionId, hash);
+                        EuropeanaId id = createLookupEntry(fullBean, fileName, collectionId, hash);
+                        EuropeanaRedirectId europeanaRedirectId = new EuropeanaRedirectId(id.getNewId(), id.getOldId());
+                        mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, europeanaRedirectId);
                         return true;
                     }
                 } else {
@@ -260,13 +263,16 @@ public class LookupCreationPlugin<I> extends
                             fieldValue = rdf.getProvidedCHOList().get(0)
                                     .getSameAList().get(0).getResource();
                         }
-                        createLookupEntry(
+                        EuropeanaId id = createLookupEntry(
                                 rdf.getProvidedCHOList().get(0).getAbout(),
                                 fileName,collectionId,
                                 applyTransformations(
                                         createHash?HashUtils.createHash(fieldValue):fieldValue,
                                         context.getProperties().getProperty(
                                                 USE_FUNCTIONS)));
+                        
+                        EuropeanaRedirectId europeanaRedirectId = new EuropeanaRedirectId(id.getNewId(), id.getOldId());
+                        mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, europeanaRedirectId);
                     } else {
                         String edmValue = null;
                         if (context.getProperties()
@@ -305,11 +311,14 @@ public class LookupCreationPlugin<I> extends
                                     .getObject().getResource();
                             edmValue = "provider_aggregation_edm_object";
                         }
-                        generateRedirectsFromCustomField(
+                        EuropeanaId id = generateRedirectsFromCustomField(
                                 fieldValue,
                                 edmValue,
                                 context.getProperties().getProperty(
                                         USE_FUNCTIONS), rdf.getProvidedCHOList().get(0).getAbout());
+                        
+                        EuropeanaRedirectId europeanaRedirectId = new EuropeanaRedirectId(id.getNewId(), id.getOldId());
+                        mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, europeanaRedirectId);
                     }
 
                 }
@@ -321,7 +330,7 @@ public class LookupCreationPlugin<I> extends
         return false;
     }
 
-    private void generateRedirectsFromCustomField(String fieldValue,
+    private EuropeanaId generateRedirectsFromCustomField(String fieldValue,
             String property, String transformations, String newId) {
 
         try {
@@ -353,13 +362,15 @@ public class LookupCreationPlugin<I> extends
                 id.setTimestamp(new Date().getTime());
                 id.setNewId(newId);
                 saveEuropeanaId(id);
+                return id;
             }
         } catch (SolrServerException e) {
             log.log(Level.SEVERE, e.getMessage());
         }
+        return null;
     }
 
-    private void createLookupEntry(String newId, String oldCollectionId, String newCollectionId,
+    private EuropeanaId createLookupEntry(String newId, String oldCollectionId, String newCollectionId,
             String value) {
         ModifiableSolrParams params = new ModifiableSolrParams();
         if (oldCollectionId.equals(newCollectionId)) {
@@ -376,7 +387,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(newId);
                     saveEuropeanaId(id);
-
+                    return id;
                 }
 
             } catch (SolrServerException e) {
@@ -396,6 +407,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(newId);
                     saveEuropeanaId(id);
+                    return id;
 
                 } else if(solrList.size()==0) {
                      finalId = EuropeanaUriUtils.createEuropeanaId(newCollectionId,
@@ -408,6 +420,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(newId);
                     saveEuropeanaId(id);
+                    return id;
 
                 }
                 }
@@ -416,6 +429,7 @@ public class LookupCreationPlugin<I> extends
                 log.log(Level.SEVERE, e.getMessage());
             }
         }
+        return null;
     }
 
     // Generate a minimum Fullbean
@@ -603,10 +617,9 @@ public class LookupCreationPlugin<I> extends
     private void saveEuropeanaId(EuropeanaId europeanaId) {
         enrichmentService.getEuropeanaIdMongoServer().saveEuropeanaId(
                 europeanaId);
-
     }
 
-    private void createLookupEntry(FullBean fullBean, String oldCollectionId, String newCollectionId,
+    private EuropeanaId createLookupEntry(FullBean fullBean, String oldCollectionId, String newCollectionId,
             String hash) {
 
         ModifiableSolrParams params = new ModifiableSolrParams();
@@ -626,6 +639,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(fullBean.getAbout());
                     saveEuropeanaId(id);
+                    return id;
 
                 }
 
@@ -643,6 +657,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(fullBean.getAbout());
                     saveEuropeanaId(id);
+                    return id;
 
                 } else {
                     EuropeanaId id = new EuropeanaId();
@@ -651,12 +666,14 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(fullBean.getAbout());
                     saveEuropeanaId(id);
+                    return id;
                 }
 
             } catch (SolrServerException e) {
                 log.log(Level.SEVERE, e.getMessage());
             }
         }
+        return null;
     }
 
     public void setEnrichmentService(EnrichmentService service) {
