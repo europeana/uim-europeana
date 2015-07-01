@@ -49,5 +49,33 @@ public class EDMRepositoryOSGIServiceProvider {
             }
 	}
 	
+	public EDMRepositoryOSGIServiceProvider(final EDMRepositoryService edmRepositoryService){
+
+      
+      BlockingInitializer initializer = new BlockingInitializer() {
+              @Override
+              public void initializeInternal() {
+                  try {
+                      status = STATUS_BOOTING;
+                      graphconstructor= new GraphConstructor(edmRepositoryService);
+                      status = STATUS_INITIALIZED;
+                  } catch (Throwable t) {
+                          t.printStackTrace();
+                      status = STATUS_FAILED;
+                  }
+              }
+          };
+          
+          initializer.initialize(GraphConstructor.class.getClassLoader());
+          
+          
+          if(graphconstructor ==  null){
+              System.out.println("Initialization failed!!!");
+          }
+          else{
+              System.out.println("Initialization successful!!!");
+          }
+  }
+	
 	
 }

@@ -9,7 +9,9 @@ public enum UimConfigurationProperty {
 
 	
 	SOLR_HOSTURL("solr.hostUrl"),
-	SOLR_CORE("solr.core");
+	SOLR_CORE("solr.core"),
+	NEO4JPRODUCTIONPATH("neo4j.production.path"),
+    NEO4JPRODUCTIONINDEX("neo4j.production.index");
 	
 	String field;
 	private UimConfigurationProperty(String field){
