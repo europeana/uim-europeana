@@ -38,7 +38,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -121,7 +123,7 @@ public class EnrichmentPlugin<I> extends
             .getName());
     private final static String OVERRIDECHECKS
             = "override.all.checks.force.delete";
-    private final static String OVERRIDEENRICHMENT = "override.enrichment.save";
+//    private final static String OVERRIDEENRICHMENT = "override.enrichment.save";
     private final static String FORCELASTUPDATE = "override.last.update.check";
     private static FullBeanHandler handler;
     private final static SolrDocumentGenerator docGen
@@ -173,7 +175,7 @@ public class EnrichmentPlugin<I> extends
 
         {
             add(OVERRIDECHECKS);
-            add(OVERRIDEENRICHMENT);
+//            add(OVERRIDEENRICHMENT);
             add(FORCELASTUPDATE);
         }
     };
@@ -628,8 +630,8 @@ public class EnrichmentPlugin<I> extends
 //                                timestampUpdated);
                         mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
                                 timestampUpdated.getTime());
-                        String overrideEnrichment = context.getProperties()
-                                .getProperty(OVERRIDEENRICHMENT);
+//                        String overrideEnrichment = context.getProperties()
+//                                .getProperty(OVERRIDEENRICHMENT);
                         List<ProxyImpl> proxies = new ArrayList<ProxyImpl>();
                         proxies.add(providerProxy);
                         proxies.add(europeanaProxy);
@@ -657,26 +659,30 @@ public class EnrichmentPlugin<I> extends
                                 }
                             }
                         }
-                        boolean overrideWriteBack = false;
-                        if (StringUtils.isNotEmpty(overrideEnrichment)) {
-                            overrideWriteBack = Boolean
-                                    .parseBoolean(overrideEnrichment);
-                        }
-                        if (!overrideWriteBack) {
-                            mdr.deleteValues(
-                                    EuropeanaModelRegistry.EDMENRICHEDRECORD);
-                            mdr.addValue(
-                                    EuropeanaModelRegistry.EDMENRICHEDRECORD,
-                                    EdmUtils.toEDM(saved, true));
-                        }
+//                        boolean overrideWriteBack = false;
+//                        if (StringUtils.isNotEmpty(overrideEnrichment)) {
+//                            overrideWriteBack = Boolean
+//                                    .parseBoolean(overrideEnrichment);
+//                        }
+//                        if (!overrideWriteBack) {
+//                            mdr.deleteValues(
+//                                    EuropeanaModelRegistry.EDMENRICHEDRECORD);
+//                            mdr.addValue(
+//                                    EuropeanaModelRegistry.EDMENRICHEDRECORD,
+//                                    EdmUtils.toEDM(saved, true));
+//                        }
                         context.getStorageEngine().updateMetaDataRecord(mdr);
 
                         context.putValue(addedTKey,
                                 context.getValue(addedTKey) + 1);
                         fBean.setState(eu.europeana.publication.common.State.ACCEPTED);
 //                        new SolrDocumentHandler(solrServer).save(fBean);
-                        new SolrDocumentHandler(cloudSolrServer).save(fBean);
-                        new SolrDocumentHandler(productionCloudSolrServer).save(fBean);
+                        SolrInputDocument doc = new SolrDocumentHandler(cloudSolrServer).generate(fBean);
+                        ModifiableSolrParams params = new ModifiableSolrParams();
+                        params.add("q","europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
+                        params.add("fl","TOBEPOPULATED");
+                        cloudSolrServer.query(params);
+                       // new SolrDocumentHandler(productionCloudSolrServer).save(fBean);
 //                        solrServer.add(basicDocument);
                         return true;
                     } catch (MalformedURLException e) {
