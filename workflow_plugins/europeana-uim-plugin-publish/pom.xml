@@ -17,6 +17,12 @@
 
 	<url>http://maven.apache.org</url>
 	<dependencies>
+	<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-lookup</artifactId>
+			<version>${corelib.version}</version>
+		</dependency>
+	
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
