@@ -112,7 +112,7 @@ public class LinkCheckingPlugin<I> extends
             List<Status> status = mdr
                     .getValues(EuropeanaModelRegistry.STATUS);
             if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED))) {
-                String record = rdf.getProvidedCHOList().get(0).getAbout();
+               /* String record = rdf.getProvidedCHOList().get(0).getAbout();
                 ReferenceOwner owner = new ReferenceOwner(provider,collection,record);
                  List<ProcessingJobTaskDocumentReference> tasks = new ArrayList<>();
                  List<SourceDocumentReference> docRefs = new ArrayList<>();
@@ -129,7 +129,7 @@ public class LinkCheckingPlugin<I> extends
                 "collection.priority")):50;
                 ProcessingJob job = new ProcessingJob (priority, new Date(), owner, tasks, JobState.READY);
                 client.createProcessingJob(job);
-                client.startJob(job.getId());
+                client.startJob(job.getId());*/
                 
             }
         } catch (JiBXException ex) {
