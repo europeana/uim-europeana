@@ -682,8 +682,8 @@ public class GraphConstructor {
         }
         createIsFirstInSequence(parents.get(mnemonic));
         createIsLastInSequence(parents.get(mnemonic));
-        //TODO: temp removal because of unsupported functionality on the production side
-//        createFakeSequence(parents.get(mnemonic));
+
+       createFakeSequence(parents.get(mnemonic));
     }
 
     private void createFakeSequence(Set<String> parents) {
