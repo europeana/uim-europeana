@@ -281,7 +281,7 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-            if (provProxy.getDcTitle() == null && provProxy.getDcDescription() != null) {
+            if (provProxy.getDcDescription() != null) {
                 Map<String, List<String>> description = provProxy
                         .getDcDescription();
                 for (Entry<String, List<String>> entry : description.entrySet()) {
@@ -291,6 +291,47 @@ public class GraphConstructor {
                     }
                     elementsToSave.put(
                             "dc:description_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
+
+            if(provProxy.getDctermsIssued()!=null){
+                 Map<String, List<String>> issued = provProxy
+                        .getDctermsIssued();
+                for (Entry<String, List<String>> entry : issued.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    for (String str : entry.getValue()) {
+                        langStr.add(StringUtils.substring(str, 0, 255));
+                    }
+                    elementsToSave.put(
+                            "dcterms:issued_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
+            if(provProxy.getDcDate()!=null){
+                 Map<String, List<String>> date = provProxy
+                        .getDcDate();
+                for (Entry<String, List<String>> entry : date.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    for (String str : entry.getValue()) {
+                        langStr.add(StringUtils.substring(str, 0, 255));
+                    }
+                    elementsToSave.put(
+                            "dc:date_xml:lang_" + entry.getKey(),
+                            langStr);
+                }
+            }
+
+            if(provProxy.getDctermsCreated()!=null){
+                 Map<String, List<String>> created = provProxy
+                        .getDctermsCreated();
+                for (Entry<String, List<String>> entry : created.entrySet()) {
+                    List<String> langStr = new ArrayList<>();
+                    for (String str : entry.getValue()) {
+                        langStr.add(StringUtils.substring(str, 0, 255));
+                    }
+                    elementsToSave.put(
+                            "dcterms:created_xml:lang_" + entry.getKey(),
                             langStr);
                 }
             }
@@ -640,6 +681,21 @@ public class GraphConstructor {
         }
         createIsFirstInSequence(parents.get(mnemonic));
         createIsLastInSequence(parents.get(mnemonic));
+        //TODO: temp removal because of unsupported functionality on the production side
+//        createFakeSequence(parents.get(mnemonic));
+    }
+
+    private void createFakeSequence(Set<String> parents) {
+        HttpClient httpClient = new HttpClient();
+        for (String parent : parents) {
+            GetMethod method = new GetMethod(StringUtils.remove(restapi.getBaseUri(), "/db/data/") + "/order/fakeorder/nodeId/" + StringUtils.replace(parent, "/", "%2F"));
+            try {
+                System.out.println(method.getPath());
+                httpClient.executeMethod(method);
+            } catch (IOException ex) {
+                Logger.getLogger(GraphConstructor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     private String processEntityID(String id) {
