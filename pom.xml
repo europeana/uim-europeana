@@ -125,12 +125,18 @@
 			<id>artifactory.eanadev.org</id>
 			<name>artifactory.eanadev.org-releases</name>
 			<url>http://artifactory.eanadev.org/artifactory/ext-release-local</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 
 		<repository>
 			<id>ext-snapshots-local</id>
 			<name>artifactory.eanadev.org-snapshot</name>
 			<url>http://artifactory.eanadev.org/artifactory/ext-snapshot-local</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
 		</repository>
 
 		<!-- Europeana Labs Java.net Maven 2 Repository (mirror) -->
