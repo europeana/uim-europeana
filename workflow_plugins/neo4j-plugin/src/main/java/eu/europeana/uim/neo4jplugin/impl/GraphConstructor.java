@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.InvalidAttributeValueException;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
