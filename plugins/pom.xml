@@ -204,7 +204,7 @@
             </releases>
         </repository>
 		<repository>
-			<id>artifactory.eanadev.org</id>
+			<id>artifactory.eanadev.org-snapshots</id>
 			<name>artifactory.eanadev.org-snapshots</name>
 			<url>http://artifactory.eanadev.org/artifactory/ext-snapshot-local</url>
 			<releases>
