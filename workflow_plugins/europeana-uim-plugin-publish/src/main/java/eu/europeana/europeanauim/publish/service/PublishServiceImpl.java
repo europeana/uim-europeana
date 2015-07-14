@@ -20,7 +20,8 @@ import eu.europeana.europeanauim.publish.utils.UimConfigurationProperty;
 import eu.europeana.uim.common.BlockingInitializer;
 
 public class PublishServiceImpl implements PublishService {
-  SolrServer solrServer;
+  private SolrServer solrServer;
+  private SolrServer solrIngestionServer;
   private static OsgiEuropeanaIdMongoServer idserver;
   private static OsgiEuropeanaIdMongoServer idserverProduction;
   private static String[] mongoHost = PropertyReader.getProperty(
@@ -28,6 +29,7 @@ public class PublishServiceImpl implements PublishService {
   private static String[] mongoHostProduction = PropertyReader.getProperty(
       UimConfigurationProperty.MONGO_HOSTURL_PRODUCTION).split(",");
 
+  @Override
   public SolrServer getSolrServer() {
     final String solrUrl =
         PropertyReader.getProperty(UimConfigurationProperty.SOLR_CLOUD_PRODUCTION_HOSTURL);
@@ -47,10 +49,34 @@ public class PublishServiceImpl implements PublishService {
         }
       }
     };
-    solrInit.initialize(HttpSolrServer.class.getClassLoader());
+    solrInit.initialize(CloudSolrServer.class.getClassLoader());
     return solrServer;
   }
+  @Override
+  public SolrServer getSolrIngestionServer(){
+    final String solrUrl =
+            PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
+    final String solrCore =
+            PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 
+
+    BlockingInitializer solrInit = new BlockingInitializer() {
+
+      @Override
+      protected void initializeInternal() {
+        try {
+          solrIngestionServer = new CloudSolrServer(new URL(solrUrl) + solrCore);
+        } catch (MalformedURLException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+    };
+    solrInit.initialize(CloudSolrServer.class.getClassLoader());
+    return solrIngestionServer;
+  }
+
+  @Override
   public EuropeanaIdMongoServer getEuropeanaIdMongoServer() {
     List<ServerAddress> addresses = new ArrayList<>();
     for (String mongoStr : mongoHost) {
@@ -69,7 +95,8 @@ public class PublishServiceImpl implements PublishService {
     idserver.createDatastore();
     return idserver;
   }
-  
+
+  @Override
   public EuropeanaIdMongoServer getEuropeanaIdMongoServerProduction() {
     List<ServerAddress> addresses = new ArrayList<>();
     for (String mongoStr : mongoHostProduction) {

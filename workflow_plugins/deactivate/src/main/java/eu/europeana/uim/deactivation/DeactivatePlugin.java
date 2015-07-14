@@ -10,6 +10,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import eu.europeana.harvester.client.HarvesterClientImpl;
+import eu.europeana.harvester.domain.ReferenceOwner;
+import eu.europeana.uim.deactivation.service.InstanceCreator;
+import eu.europeana.uim.deactivation.service.InstanceCreatorImpl;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -42,6 +46,7 @@ public class DeactivatePlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static DeactivationService dService;
+	private static InstanceCreator creator;
 	private final static Logger log = Logger.getLogger(DeactivatePlugin.class
 			.getName());
 
@@ -121,6 +126,9 @@ public class DeactivatePlugin<I> extends
 					.clearData(collectionId);
 			clearData(dService.getGraphDb(), dService.getNeo4jIndex(),
 					collectionId);
+			 creator = new InstanceCreatorImpl();
+			HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(),creator.getConfig());
+			client.deactivateJobs(new ReferenceOwner(arg0.getDataSetCollection().getProvider().getMnemonic(),((Collection)arg0.getExecution().getDataSet()).getMnemonic(),null));
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

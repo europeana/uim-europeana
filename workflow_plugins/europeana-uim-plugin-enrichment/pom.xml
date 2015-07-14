@@ -170,6 +170,16 @@
 			<artifactId>zookeeper</artifactId>
 			<version>3.4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>harvester-client</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>JobCreator</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -21,24 +21,28 @@ import eu.europeana.corelib.definitions.edm.entity.WebResource;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import eu.europeana.harvester.client.HarvesterClient;
+import eu.europeana.harvester.domain.*;
+import eu.europeana.jobcreator.JobCreator;
+import eu.europeana.jobcreator.domain.ProcessingJobCreationOptions;
+import eu.europeana.jobcreator.domain.ProcessingJobTuple;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -67,6 +71,7 @@ import eu.europeana.enrichment.api.external.EntityWrapper;
 import eu.europeana.enrichment.api.external.InputValue;
 import eu.europeana.enrichment.rest.client.EnrichmentDriver;
 import eu.europeana.harvester.client.HarvesterClientImpl;
+
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.service.InstanceCreator;
@@ -94,6 +99,7 @@ import eu.europeana.uim.sugar.LoginFailureException;
 import eu.europeana.uim.sugar.QueryResultException;
 import eu.europeana.uim.sugar.SugarCrmRecord;
 import eu.europeana.uim.sugar.SugarCrmService;
+
 
 /**
  * Enrichment plugin implementation
@@ -175,7 +181,7 @@ public class EnrichmentPlugin<I> extends
 
         {
             add(OVERRIDECHECKS);
-//            add(OVERRIDEENRICHMENT);
+//            add(OVERRIDEENRIHMENT);
             add(FORCELASTUPDATE);
         }
     };
@@ -650,14 +656,11 @@ public class EnrichmentPlugin<I> extends
                         } else {
                             saved = handler.updateFullBean(fBean);
                         }
-                        if (check) {
-                            HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+                        if (check|| checkUpdate) {
+                            HarvesterClient client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+
                             AggregationImpl aggr = fBean.getAggregations().get(0);
-                            if (aggr.getWebResources() != null) {
-                                for (WebResource wr : aggr.getWebResources()) {
-                                   // client.updateSourceDocumentProcesssingStatisticsForUrl(wr.getAbout());
-                                }
-                            }
+                            client.createOrModify(getProcessingJobs(aggr,(String)context.getExecution().getId(),context.getDataSetCollection().getProvider().getMnemonic(),collection,fBean.getAbout()));
                         }
 //                        boolean overrideWriteBack = false;
 //                        if (StringUtils.isNotEmpty(overrideEnrichment)) {
@@ -678,10 +681,42 @@ public class EnrichmentPlugin<I> extends
                         fBean.setState(eu.europeana.publication.common.State.ACCEPTED);
 //                        new SolrDocumentHandler(solrServer).save(fBean);
                         SolrInputDocument doc = new SolrDocumentHandler(cloudSolrServer).generate(fBean);
-                        ModifiableSolrParams params = new ModifiableSolrParams();
-                        params.add("q","europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
-                        params.add("fl","TOBEPOPULATED");
-                        cloudSolrServer.query(params);
+                        if(!(check||checkUpdate)) {
+                            ModifiableSolrParams params = new ModifiableSolrParams();
+                            params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
+
+                        /*
+                        <field name="is_fulltext" type="boolean" indexed="true" stored="true" multiValued="false"/>
+		<field name="has_thumbnails" type="boolean" indexed="true" stored="true" multiValued="false"/>
+		<field name="has_media" type="boolean" indexed="true" stored="true" multiValued="false"/>
+		<field name="filter_tags" type="int" indexed="true" stored="true" multiValued="true"/>
+		<field name="facet_tags" type="int" indexed="true" stored="true" multiValued="true"/>
+                <field name="has_landingpage" type="boolean" indexed="true" stored="true" multiValued="false"/>
+                         */
+                            params.add("fl", "is_fulltext,has_thumbnails,has_media,filter_tags,facet_tags,has_landingpage");
+                            QueryResponse resp = cloudSolrServer.query(params);
+                            if(resp.getResults().size()>0){
+                                SolrDocument retrievedDoc = resp.getResults().get(0);
+                                if(retrievedDoc.containsKey("is_fulltext")){
+                                    doc.addField("is_fulltext",retrievedDoc.get("is_fulltext"));
+                                }
+                                if(retrievedDoc.containsKey("has_thumbnails")){
+                                    doc.addField("has_thumbnails",retrievedDoc.get("has_thumbnails"));
+                                }
+                                if(retrievedDoc.containsKey("has_media")){
+                                    doc.addField("has_media",retrievedDoc.get("has_media"));
+                                }
+                                if(retrievedDoc.containsKey("filter_tags")){
+                                    doc.addField("filter_tags",retrievedDoc.get("filter_tags"));
+                                }
+                                if(retrievedDoc.containsKey("facet_tags")){
+                                    doc.addField("facet_tags",retrievedDoc.get("facet_tags"));
+                                }
+                                if(retrievedDoc.containsKey("has_landingpage")){
+                                    doc.addField("has_landingpage",retrievedDoc.get("has_landingpage"));
+                                }
+                            }
+                        }
                        // new SolrDocumentHandler(productionCloudSolrServer).save(fBean);
 //                        solrServer.add(basicDocument);
                         return true;
@@ -710,7 +745,21 @@ public class EnrichmentPlugin<I> extends
                     boolean res = true;
 //                    res = handler.removeRecord(solrServer, rdf);
                     res = handler.removeRecord(cloudSolrServer, rdf);
-                    res = handler.removeRecord(productionCloudSolrServer, rdf);
+                    HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+                    try {
+                        client.setActive(rdf.getProvidedCHOList().get(0).getAbout(),new Boolean(false));
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (TimeoutException e) {
+                        e.printStackTrace();
+                    }
+
                     if (res) {
                         context.putValue(deletedTKey,
                                 context.getValue(deletedTKey) + 1);
@@ -744,6 +793,22 @@ public class EnrichmentPlugin<I> extends
                     + "\nRetrying");
         }
         return false;
+    }
+
+    private List<ProcessingJob> getProcessingJobs(AggregationImpl aggr, String executionId, String providerId, String collectionId,String recordId) {
+        ReferenceOwner owner = new ReferenceOwner(providerId,collectionId,recordId,executionId);
+
+        List<ProcessingJob> jobs = new ArrayList<>();
+        try {
+            jobs = ProcessingJobTuple.processingJobsFromList(JobCreator.createJobs(collectionId, providerId, recordId, executionId, aggr.getEdmObject(), Arrays.asList(aggr.getHasView()), aggr.getEdmIsShownBy(), aggr.getEdmIsShownAt(), 50, new ProcessingJobCreationOptions(false)));
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return jobs;
     }
 
     public void setSugarCrmService(SugarCrmService sugarCrmService) {

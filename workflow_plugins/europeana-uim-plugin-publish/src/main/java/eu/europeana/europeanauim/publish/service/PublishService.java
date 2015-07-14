@@ -15,7 +15,8 @@ public interface PublishService {
 	 * Retrieve the Solr Server to Optimize
 	 * @return
 	 */
-	public SolrServer getSolrServer();
-	public EuropeanaIdMongoServer getEuropeanaIdMongoServer();
-	public EuropeanaIdMongoServer getEuropeanaIdMongoServerProduction();
+	SolrServer getSolrServer();
+	EuropeanaIdMongoServer getEuropeanaIdMongoServer();
+	EuropeanaIdMongoServer getEuropeanaIdMongoServerProduction();
+	SolrServer getSolrIngestionServer();
 }

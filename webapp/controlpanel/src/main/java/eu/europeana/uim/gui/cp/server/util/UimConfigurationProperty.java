@@ -27,7 +27,13 @@ public enum UimConfigurationProperty {
 	LOCAL_PORT("local.port"),
 	MINT_URI("mint.hostUrl"),
 	PORTAL_URI("europeana.portal.uri"),
-	TESTPORTAL_URI("europeana.testportal.uri");
+	TESTPORTAL_URI("europeana.testportal.uri"),
+	CLIENT_HOSTURL("harvester.hostUrl"),
+	CLIENT_HOSTPORT("harvester.hostPort"),
+	CLIENT_DB("harvester.db"),
+	CLIENT_USERNAME("harvester.username"),
+	CLIENT_PASSWORD("harvester.password");
+
 	
 	String field;
 	private UimConfigurationProperty(String field){

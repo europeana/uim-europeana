@@ -6,6 +6,7 @@
 package eu.europeana.uim.gui.cp.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.google.gwt.view.client.ProvidesKey;
 
 /**
  * DTO for the initial CRF statistics reply
@@ -168,5 +169,12 @@ public class CRFReplyDTO extends CRFFailedTaskDTO implements IsSerializable{
         this.totalRecords = totalRecords;
     }
     
-    
+    public static final ProvidesKey<CRFReplyDTO> KEY_PROVIDER = new ProvidesKey<CRFReplyDTO>() {
+        @Override
+        public Object getKey(CRFReplyDTO crfReplyDTO) {
+            return crfReplyDTO == null
+                    ? null
+                    : crfReplyDTO.getExecutionId();
+        }
+    };
 }

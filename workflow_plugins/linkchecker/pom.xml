@@ -21,7 +21,11 @@
 			<scope>test</scope>
 		</dependency>
 
-
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>europeana-datamodel-definitions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-model-europeana</artifactId>

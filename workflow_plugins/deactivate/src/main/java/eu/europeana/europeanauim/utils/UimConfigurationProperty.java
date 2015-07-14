@@ -19,7 +19,10 @@ public enum UimConfigurationProperty {
 	MONGO_DB_EUROPEANA_ID("mongo.db.europeanaId"),
 	UIM_REPOSITORY("uim.repository"),
         NEO4JPATH("neo4j.path"),
-        NEO4JINDEX("neo4j.index");
+        NEO4JINDEX("neo4j.index"),
+	CLIENT_HOSTURL("harvester.hostUrl"),
+	CLIENT_HOSTPORT("harvester.hostPort"),
+	CLIENT_DB("harvester.db");
 	
 	String field;
 	private UimConfigurationProperty(String field){

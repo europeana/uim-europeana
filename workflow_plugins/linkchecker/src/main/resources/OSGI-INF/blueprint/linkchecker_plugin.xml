@@ -27,21 +27,21 @@
     <service id="instanceCreatorService" ref="instanceCreatorBean" interface="eu.europeana.uim.plugin.thumbler.InstanceCreator"/>
          
     <!-- Export the linkCheckerPlugin as a service -->
-     <bean id="linkchecker"
+    <!-- <bean id="linkchecker"
           class="eu.europeana.uim.plugin.thumbler.service.LinkCheckingPlugin">
         <property name="creator" ref="instanceCreator"/>
     </bean>
     <service id="linkCheckerPlugin" ref="linkchecker"
              interface="eu.europeana.uim.plugin.ingestion.IngestionPlugin" />
-
+-->
 
     <!-- Workflows Definitions -->
     <!-- Export the LinckCheckingWorkfow as a service -->
-    <bean id="lcw"
+    <!--<bean id="lcw"
           class="eu.europeana.uim.plugin.thumbler.workflows.LinkCheckingWorkflow" />
     <service id="linkCheckingWorkflow" ref="lcw"
              interface="eu.europeana.uim.workflow.Workflow" />
-
+-->
     <!-- Export the ImageCacheWorkflow as a service -->
     <bean id="thw"
           class="eu.europeana.uim.plugin.thumbler.workflows.ImageCacheWorkflow" />

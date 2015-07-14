@@ -4,11 +4,10 @@
  * and open the template in the editor.
  */
 
-package eu.europeana.uim.enrichment.service;
+package eu.europeana.uim.deactivation.service;
 
-import com.google.code.morphia.Datastore;
 import eu.europeana.harvester.client.HarvesterClientConfig;
-
+import eu.europeana.harvester.db.MorphiaDataStore;
 
 /**
  *
@@ -16,7 +15,7 @@ import eu.europeana.harvester.client.HarvesterClientConfig;
  */
 public interface InstanceCreator {
     
-     Datastore getDatastore();
+     MorphiaDataStore getDatastore();
     
     HarvesterClientConfig getConfig();
 }
