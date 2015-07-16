@@ -27,10 +27,9 @@ public class MongoProvider {
         }
         addresses.add(address);
       }
-      Mongo tgtMongo = new Mongo(addresses);
+      tgtMongo = new Mongo(addresses);
     }
 
     return tgtMongo;
   }
-
 }
