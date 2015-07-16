@@ -129,6 +129,7 @@
 							!eu.europeana.uim.gui.cp.*,
 							org.theeuropeanlibrary.model.common.qualifier,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues,
+							eu.europeana.uim.model.europeana,
 							eu.europeana.uim.orchestration,
 							eu.europeana.uim.plugin.ingestion,
 							eu.europeana.uim.plugin.source,
