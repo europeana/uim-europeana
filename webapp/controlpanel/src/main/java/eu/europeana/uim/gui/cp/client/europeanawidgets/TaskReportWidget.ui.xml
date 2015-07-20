@@ -20,9 +20,6 @@
         .tdLeft {
         	width:340px !important;
         }
-        .boldColumn {
-        	font-weight:bold;
-        }
     </ui:style>
      <g:HTMLPanel>
         <table cellspacing='4' cellpadding='0' style='width:100%;'>

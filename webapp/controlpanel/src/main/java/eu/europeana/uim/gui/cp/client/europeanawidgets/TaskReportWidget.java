@@ -276,11 +276,6 @@ public class TaskReportWidget extends IngestionWidget {
 
 		Column<TaskReportDTO, String> statusColumn = new Column<TaskReportDTO, String>(new ColorCell()) {	
 			@Override
-			public String getCellStyleNames(Context context, TaskReportDTO task) {
-				return "boldColumn";
-			}
-			
-			@Override
 			public String getValue(TaskReportDTO object) {
 				return object.getStatus();
 			}
@@ -380,7 +375,7 @@ public class TaskReportWidget extends IngestionWidget {
 		}
 		
 		@Override
-		public void render(com.google.gwt.cell.client.Cell.Context context, TaskReportDTO value, SafeHtmlBuilder sb) {
+		public void render(Context context, TaskReportDTO value, SafeHtmlBuilder sb) {
 			if(value.getStatus().equalsIgnoreCase("stopped") || value.getStatus().equalsIgnoreCase("finished")) {
 				sb.append(new SafeHtmlBuilder()
 						.appendHtmlConstant("<button type=\"button\" tabindex=\"-1\" style=\"visibility:hidden;\">")
@@ -416,7 +411,8 @@ public class TaskReportWidget extends IngestionWidget {
 					: value.toLowerCase().contains("finished") ? "green"
 							: "black";
 	      SafeStyles styles = SafeStylesUtils.forTrustedColor(style);
-	      SafeHtml rendered = templates.cell(styles, SafeHtmlUtils.fromString(value));
+	      SafeStyles st = SafeStylesUtils.fromTrustedString("font-weight:bold; color:" + style + ";");
+	      SafeHtml rendered = templates.cell(st, SafeHtmlUtils.fromString(value));
 	      sb.append(rendered);
 	    }   
 	}
