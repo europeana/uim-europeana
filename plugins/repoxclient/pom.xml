@@ -16,25 +16,37 @@
 	<name>Unified Ingestion Manager: RepoxClient UIM Plugin</name>
 
 	<dependencies>
-		<!-- Jibx Bindings -->
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>europeana-uim-plugin-clientbindings</artifactId>
-			<version>${project.version}</version>
+			<groupId>repox</groupId>
+			<artifactId>repox-client-rest-jersey</artifactId>
+			<version>3.0.1-SNAPSHOT</version>
 		</dependency>
-
+		<!-- <dependency> -->
+		<!-- <groupId>javax.ws.rs</groupId> -->
+		<!-- <artifactId>jsr311-api</artifactId> -->
+		<!-- <version>1.1.1</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>org.glassfish.hk2</groupId>
+			<artifactId>osgi-resource-locator</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>${europeana.uim.groupId}</groupId>
 			<artifactId>europeana-uim-external-repox-api</artifactId>
 			<version>${europeana.uim.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jaxb_2.2_spec</artifactId>
+			<version>1.0.1</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.karaf.shell</groupId>
 			<artifactId>org.apache.karaf.shell.console</artifactId>
@@ -44,40 +56,6 @@
 					<groupId>org.slf4j</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>eu.europeana.corelib</groupId> -->
-		<!-- <artifactId>corelib-dereference</artifactId> -->
-		<!-- <version>${corelib.version}</version> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>slf4j-api</artifactId> -->
-		<!-- <groupId>org.slf4j</groupId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>eu.europeana.corelib</groupId> -->
-		<!-- <artifactId>corelib-db</artifactId> -->
-		<!-- <version>${corelib.version}</version> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <artifactId>slf4j-api</artifactId> -->
-		<!-- <groupId>org.slf4j</groupId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
-		<!-- </dependency> -->
-
-		<!-- Need explicit declaration here -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>3.1.1.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>3.1.1.RELEASE</version>
 		</dependency>
 	</dependencies>
 
@@ -107,11 +85,12 @@
 					<obrRepository>NONE</obrRepository>
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
-						<Export-Package>eu.europeana.uim.repoxclient.*</Export-Package>
+						<Export-Package>eu.europeana.uim.repoxclient.*,pt.utl.ist.util.exceptions.*,
+							pt.utl.ist.util, pt.utl.ist.recordPackage, pt.utl.ist.dataProvider.dataSource</Export-Package>
 						<Import-Package>
 							org.osgi.service.packageadmin; version=1.2.0,
-							org.xml.sax; version=0.0.0,
-							org.apache.log4j; version=1.2.15,
+							org.xml.sax;
+							version=0.0.0,
 							org.osgi.service.blueprint; version=1.0.1,
 							org.osgi.service.blueprint.container; version=1.0.1,
 							org.apache.felix.gogo.commands; version=0.6.1,
@@ -122,6 +101,17 @@
 							eu.europeana.uim.common; version=0.0.0,
 							eu.europeana.uim.store;
 							version=0.0.0,
+							javax.net;
+							version=0.0.0,
+							javax.net.ssl;
+							version=0.0.0,
+							javax.security.auth;
+							version=0.0.0,
+							javax.security.auth.x500;
+							version=0.0.0,
+							javax.sql;
+							version=0.0.0,
+							javax.xml.bind;version=0.0.0,
 							org.apache.commons.lang; version=2.4.0,
 							org.apache.commons.io; version=2.1.0,
 							eu.europeana.uim;
@@ -138,36 +128,14 @@
 							eu.europeana.uim.util;
 							version=0.0.0,
 							eu.europeana.uim.workflow; version=0.0.0,
-							eu.europeana.uim.sugar; version=0.0.0,
-							eu.europeana.uim.sugar.model; version=0.0.0,
 							eu.europeana.uim.repox; version=0.0.0,
 							eu.europeana.uim.repox.model; version=0.0.0,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues,
-							javax.xml.transform,
-							javax.xml.parsers,
-							org.w3c.dom,
-							javax.xml.stream,
-							javax.xml.transform.stream,
-							javax.xml.transform.dom,
-							javax.xml.stream.util,
-							javax.xml.transform.sax,
-
-
 							!*
 						</Import-Package>
-						<Embed-Dependency>europeana-uim-plugin-clientbindings,com.springsource.org.quartz,
-							stax,com.springsource.javax.activation,com.springsource.javax.servlet,spring-ws-core,spring-ws,
-							com.springsource.javax.xml.stream,com.springsource.org.apache.commons.logging,
-							com.springsource.org.aopalliance,org.springframework.oxm,org.springframework.web,
-							org.springframework.web.servlet,com.springsource.javax.xml.bind,org.springframework.xml,
-							com.springsource.javax.xml.soap,com.springsource.org.apache.commons.codec,
-							com.springsource.org.apache.commons.httpclient,
-							org.springframework.jms,com.springsource.javax.mail,com.springsource.javax.jms,
-							com.springsource.javax.xml.rpc,com.springsource.javax.ejb,com.springsource.javax.mail,
-							org.springframework.jms,com.springsource.javax.xml.rpc,
-							com.springsource.com.sun.xml.messaging.saaj,com.springsource.org.joda.time,
-							com.springsource.org.xmlpull,jibx-run,jibx-extras,spring-core,org.apache.servicemix.bundles.aopalliance,
-							spring-asm,spring-expression,spring-beans,spring-aop,spring-context,spring-context-support,spring-web,spring-core</Embed-Dependency>
+						<Embed-Dependency>
+							*;scope=compile|runtime
+						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
@@ -185,14 +153,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> -->
-			<!-- <groupId>org.apache.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-surefire-plugin</artifactId> -->
-			<!-- <version>2.18.1</version> -->
-			<!-- <configuration> -->
-			<!-- <argLine>-XX:-UseSplitVerifier</argLine> -->
-			<!-- </configuration> -->
-			<!-- </plugin> -->
+
 			<plugin>
 				<inherited>true</inherited>
 				<groupId>org.apache.maven.plugins</groupId>

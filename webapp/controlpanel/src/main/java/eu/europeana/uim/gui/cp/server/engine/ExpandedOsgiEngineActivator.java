@@ -26,7 +26,7 @@ import org.osgi.framework.ServiceReference;
 
 import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.Registry;
-import eu.europeana.uim.repox.RepoxUIMService;
+import eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT;
 import eu.europeana.uim.sugar.SugarCrmService;
 
 
@@ -46,7 +46,7 @@ public class ExpandedOsgiEngineActivator implements BundleActivator {
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
         Registry registry = null;
-        RepoxUIMService repoxService = null;
+        RepoxUIMServiceT repoxService = null;
         SugarCrmService sugarCrmService = null;
         DeduplicationService dedupService = null;
         int wait = 0;
@@ -68,9 +68,9 @@ public class ExpandedOsgiEngineActivator implements BundleActivator {
         
         
         while (repoxService == null && wait++ < 10) {
-            ServiceReference repoxRef = bundleContext.getServiceReference("eu.europeana.uim.repox.RepoxUIMService");
+            ServiceReference repoxRef = bundleContext.getServiceReference("eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT");
             if (repoxRef != null) {
-            	repoxService = (RepoxUIMService)bundleContext.getService(repoxRef);
+            	repoxService = (RepoxUIMServiceT)bundleContext.getService(repoxRef);
             }
             Thread.sleep(1000);
         }

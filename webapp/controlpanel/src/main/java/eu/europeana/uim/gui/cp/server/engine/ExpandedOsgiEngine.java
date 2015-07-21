@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 import eu.europeana.dedup.osgi.service.DeduplicationService;
 import eu.europeana.uim.Registry;
-import eu.europeana.uim.repox.RepoxUIMService;
+import eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT;
 import eu.europeana.uim.sugar.SugarCrmService;
 
 /**
@@ -37,7 +37,7 @@ public class ExpandedOsgiEngine extends OsgiEngine {
     private static Logger log = Logger.getLogger(ExpandedOsgiEngine.class.getName());
 	
 	
-	    private final RepoxUIMService repoxService;
+	    private final RepoxUIMServiceT repoxService;
 	    
 	    private final SugarCrmService sugarCrmService;
 	    
@@ -48,7 +48,7 @@ public class ExpandedOsgiEngine extends OsgiEngine {
 	     * 
 	     * @param registry
 	     */
-	    public ExpandedOsgiEngine(Registry registry,RepoxUIMService repoxService,SugarCrmService sugarCrmService, DeduplicationService dedupService) {
+	    public ExpandedOsgiEngine(Registry registry,RepoxUIMServiceT repoxService,SugarCrmService sugarCrmService, DeduplicationService dedupService) {
 	    	super(registry);
 	       this.repoxService = repoxService;
 	       this.sugarCrmService = sugarCrmService;
@@ -58,7 +58,7 @@ public class ExpandedOsgiEngine extends OsgiEngine {
 		/**
 		 * @return the repoxService
 		 */
-		public RepoxUIMService getRepoxService() {
+		public RepoxUIMServiceT getRepoxService() {
 			return repoxService;
 		}
 

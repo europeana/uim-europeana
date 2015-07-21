@@ -295,8 +295,7 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-            //TODO: temp removal because of unsupported functionality on the portal
-            /*
+
             if(provProxy.getDctermsIssued()!=null){
                  Map<String, List<String>> issued = provProxy
                         .getDctermsIssued();
@@ -323,7 +322,7 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-            
+
             if(provProxy.getDctermsCreated()!=null){
                  Map<String, List<String>> created = provProxy
                         .getDctermsCreated();
@@ -337,7 +336,7 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-                    */
+
             elementsToSave.put("edm:type", docType);
             elementsForCollection.put(id, elementsToSave);
             edmelementsmap.put(collection, elementsForCollection);
@@ -683,8 +682,8 @@ public class GraphConstructor {
         }
         createIsFirstInSequence(parents.get(mnemonic));
         createIsLastInSequence(parents.get(mnemonic));
-        //TODO: temp removal because of unsupported functionality on the production side
-//        createFakeSequence(parents.get(mnemonic));
+
+       createFakeSequence(parents.get(mnemonic));
     }
 
     private void createFakeSequence(Set<String> parents) {
