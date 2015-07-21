@@ -6,13 +6,17 @@
 
 package eu.europeana.uim.deactivation.service;
 
+import com.google.code.morphia.Datastore;
+import com.google.code.morphia.Morphia;
+import com.mongodb.MongoClient;
 import eu.europeana.europeanauim.utils.PropertyReader;
 import eu.europeana.europeanauim.utils.UimConfigurationProperty;
 import eu.europeana.harvester.client.HarvesterClientConfig;
-import eu.europeana.harvester.db.MorphiaDataStore;
+
 import eu.europeana.harvester.domain.ProcessingJob;
 import eu.europeana.harvester.domain.SourceDocumentReference;
 import eu.europeana.uim.common.BlockingInitializer;
+import org.apache.commons.lang.StringUtils;
 
 
 import java.io.IOException;
@@ -24,7 +28,7 @@ import java.util.logging.Logger;
  * @author gmamakis
  */
 public class InstanceCreatorImpl implements InstanceCreator {
-    static MorphiaDataStore ds;
+    static Datastore ds;
     static HarvesterClientConfig config;
     
     public InstanceCreatorImpl(){
@@ -34,9 +38,18 @@ public class InstanceCreatorImpl implements InstanceCreator {
             String mongoHost = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTURL);
             int mongoPort = Integer.parseInt(PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTPORT));
             String dbName = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_DB);
-            
-            ds = new MorphiaDataStore(mongoHost, mongoPort, dbName);
-            config = new HarvesterClientConfig();
+
+
+
+            String username = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_USERNAME);
+            String password = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_PASSWORD);
+            MongoClient mongo = new MongoClient(mongoHost, mongoPort);
+            Morphia morphia = new Morphia();
+            if(StringUtils.isNotEmpty(password)) {
+                ds = morphia.createDatastore(mongo, dbName, username, password.toCharArray());
+            } else {
+                ds = morphia.createDatastore(mongo, dbName);
+            }
             
             BlockingInitializer sdr = new BlockingInitializer() {
 
@@ -62,7 +75,7 @@ public class InstanceCreatorImpl implements InstanceCreator {
     
     
     @Override
-    public MorphiaDataStore getDatastore(){
+    public Datastore getDatastore(){
         return ds;
     }
     

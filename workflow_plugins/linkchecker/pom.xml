@@ -55,6 +55,11 @@
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>JobCreator</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>

@@ -6,8 +6,9 @@
 
 package eu.europeana.uim.deactivation.service;
 
+import com.google.code.morphia.Datastore;
 import eu.europeana.harvester.client.HarvesterClientConfig;
-import eu.europeana.harvester.db.MorphiaDataStore;
+
 
 /**
  *
@@ -15,7 +16,7 @@ import eu.europeana.harvester.db.MorphiaDataStore;
  */
 public interface InstanceCreator {
     
-     MorphiaDataStore getDatastore();
+     Datastore getDatastore();
     
     HarvesterClientConfig getConfig();
 }

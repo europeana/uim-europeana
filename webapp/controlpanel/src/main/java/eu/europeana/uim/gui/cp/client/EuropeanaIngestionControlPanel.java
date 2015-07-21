@@ -13,6 +13,7 @@ import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportResourcesWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkCachingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkReportingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkValidationWidget;
+import eu.europeana.uim.gui.cp.client.europeanawidgets.TaskReportWidget;
 import eu.europeana.uim.gui.cp.client.management.IngestionTriggerWidget;
 import eu.europeana.uim.gui.cp.client.monitoring.IngestionDetailWidget;
 import eu.europeana.uim.gui.cp.client.services.CollectionManagementProxy;
@@ -33,6 +34,8 @@ import eu.europeana.uim.gui.cp.client.services.ResourceService;
 import eu.europeana.uim.gui.cp.client.services.ResourceServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.RetrievalService;
 import eu.europeana.uim.gui.cp.client.services.RetrievalServiceAsync;
+import eu.europeana.uim.gui.cp.client.services.TaskReportService;
+import eu.europeana.uim.gui.cp.client.services.TaskReportServiceAsync;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -77,6 +80,8 @@ public class EuropeanaIngestionControlPanel extends
 				.create(ReportingService.class);
 		final FailedRecordServiceAsync failedRecordService = (FailedRecordServiceAsync) GWT
 				.create(FailedRecordService.class);
+		final TaskReportServiceAsync taskReportService = (TaskReportServiceAsync) GWT
+				.create(TaskReportService.class);
 		// Initialize Panel Components here
 		treeModel.addMenuEntry("Monitoring", new IngestionDetailWidget(
 				executionService), RunAsyncCode
@@ -91,6 +96,10 @@ public class EuropeanaIngestionControlPanel extends
 				new ExpandedResourceManagementWidget(repositoryService,
 						resourceService, integrationService), RunAsyncCode
 						.runAsyncCode(ExpandedResourceManagementWidget.class));
+		treeModel.addMenuEntry("Managing", new TaskReportWidget(
+				"Re-indexing Service", "This page allows you to preview the task reports, filter the task reports by task report query or task report status, create new task reports.",
+				taskReportService), RunAsyncCode
+				.runAsyncCode(TaskReportWidget.class));
 		treeModel.addMenuEntry("Validation", new LinkValidationWidget(
 				repositoryService, retrievalService), RunAsyncCode
 				.runAsyncCode(LinkValidationWidget.class));

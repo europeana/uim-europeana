@@ -82,6 +82,11 @@
 	</servlet>
 
 
+	<servlet>
+		<servlet-name>taskReportsService</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.TaskReportServiceImpl</servlet-class>
+	</servlet>
+	
 	<servlet-mapping>
 		<servlet-name>logFileService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/logfile</url-pattern>
@@ -89,6 +94,10 @@
 	<servlet-mapping>
 		<servlet-name>failedRecordsService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/failedrecords</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>taskReportsService</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/taskreports</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>repositoryService</servlet-name>
