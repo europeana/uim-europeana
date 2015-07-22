@@ -18,6 +18,7 @@ import eu.europeana.reindexing.common.TaskReport;
 import eu.europeana.uim.gui.cp.client.services.TaskReportService;
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportDTO;
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportResultDTO;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 
@@ -76,7 +77,7 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
         			.field("taskId").equal(stopTaskId);
         	UpdateOperations<TaskReport> stopTaskReportOperation = datastore
         			.createUpdateOperations(TaskReport.class).set("status",
-        					"stopped");
+        					Status.STOPPED);
         	datastore.update(query, stopTaskReportOperation);     	
         }
         
@@ -109,12 +110,13 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 		for (TaskReport report : taskReports) {
 			TaskReportDTO reportDTO = new TaskReportDTO();
 			reportDTO.setTaskId(report.getTaskId());
-			reportDTO.setStatus(report.getStatus().name());
+			reportDTO.setStatus(StringUtils.upperCase(report.getStatus().name()));
 			reportDTO.setDateCreated(formatDate(report.getDateCreated()));
 			reportDTO.setDateUpdated(formatDate(report.getDateUpdated()));
 			reportDTO.setProcessed(report.getProcessed());
 			reportDTO.setTotal(report.getTotal());
 			reportDTO.setQuery(report.getQuery());
+			taskReportsDTO.add(reportDTO);
 		}
 		return taskReportsDTO;
 	}

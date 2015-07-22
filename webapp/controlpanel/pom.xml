@@ -117,7 +117,8 @@
 							corelib-storage,corelib-common-storage,corelib-lookup,corelib-dereference,corelib-definitions,corelib-utils,
 							corelib-edm-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
 							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,
-							validation-api,publication-common,repox-client-rest-jersey,javax.ws.rs-api
+							validation-api,publication-common,repox-client-rest-jersey,javax.ws.rs-api,zookeeper,
+							reindexing-common-external,harvester-client,harvester-persistence,noggit, guava,log4j-api, log4j-core
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
@@ -168,6 +169,8 @@
 							pt.utl.ist.util,
 							pt.utl.ist.recordPackage,
 							pt.utl.ist.dataProvider.dataSource,
+							javax.security.sasl,
+							javax.security.auth.login,
 							!org.slf4j.*,
 							!*
 						</Import-Package>
@@ -227,6 +230,32 @@
             <artifactId>reindexing-common-external</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+			<version>3.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>harvester-client</artifactId>
+			<version>0.1-SNAPSHOT</version>
+
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>JobCreator</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>javax.xml.stream</groupId>
 			<artifactId>stax-api</artifactId>
@@ -361,12 +390,12 @@
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
-			<version>4.0.0</version>
+			<version>4.10.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-core</artifactId>
-			<version>4.0.0</version>
+			<version>4.10.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -435,7 +464,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>16.0.1</version>
+		</dependency>
 	</dependencies>
 
 

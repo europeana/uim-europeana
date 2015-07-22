@@ -105,6 +105,11 @@
 			<artifactId>com.springsource.org.apache.commons.io</artifactId>
 			<version>1.4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-lookup</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -178,7 +183,7 @@
 						</Import-Package>
 						<Embed-Dependency>morphia,
 							corelib-definitions,corelib-edm-definitions,spring-test,jibx-run,harvester-client,harvester-persistence,
-							mongo-java-driver,log4j-core,log4j-api,guava,commons-lang3,com.springsource.org.apache.commons.io
+							mongo-java-driver,log4j-core,log4j-api,guava,commons-lang3,com.springsource.org.apache.commons.io,corelib-lookup,corelib-common-storage
 
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>

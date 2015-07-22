@@ -554,9 +554,7 @@ public class EnrichmentPlugin<I> extends
                         docGen.addEntities(basicDocument, fBean,
                                 europeanaProxy, enrichedEntities);
 
-//                        basicDocument.addField(
-//                                EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
-//                                previewsOnlyInPortal);
+
                         boolean prOO = StringUtils.contains(previewsOnlyInPortal, "1");
                         fBean.getAggregations()
                                 .get(0)
@@ -564,9 +562,7 @@ public class EnrichmentPlugin<I> extends
                         int completeness = RecordCompletenessRanking
                                 .rankRecordCompleteness(basicDocument);
                         fBean.setEuropeanaCompleteness(completeness);
-//                        basicDocument.addField(
-//                                EdmLabel.EUROPEANA_COMPLETENESS.toString(),
-//                                completeness);
+
                         fBean.setEuropeanaCollectionName(new String[]{mdr
                             .getCollection().getName()});
                         if (fBean.getEuropeanaAggregation().getEdmLanguage()
@@ -582,16 +578,10 @@ public class EnrichmentPlugin<I> extends
                         }
                         fBean.getEuropeanaAggregation().setAbout(
                                 "/aggregation/europeana" + fBean.getAbout());
-//                        basicDocument.setField(
-//                                EdmLabel.EDM_EUROPEANA_AGGREGATION.toString(),
-//                                "/aggregation/europeana" + fBean.getAbout());
+
                         fBean.getEuropeanaAggregation().setAggregatedCHO(
                                 "/item" + fBean.getAbout());
-//                        basicDocument.setField(
-//                                "europeana_aggregation_ore_aggregatedCHO",
-//                                "/item" + fBean.getAbout());
-//                        basicDocument.setField("europeana_collectionName", mdr
-//                                .getCollection().getName());
+
                         fBean.setEuropeanaCollectionName(new String[]{mdr
                             .getCollection().getName()});
                         if (europeanaProxy.getYear() != null) {
@@ -627,17 +617,14 @@ public class EnrichmentPlugin<I> extends
                                     timestampCreated.getTime());
                         }
                         fBean.setTimestampCreated(timestampCreated);
-//                        basicDocument.addField("timestamp_created",
-//                                timestampCreated);
+
                         mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
                         Date timestampUpdated = new Date();
                         fBean.setTimestampUpdated(timestampUpdated);
-//                        basicDocument.addField("timestamp_update",
-//                                timestampUpdated);
+
                         mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
                                 timestampUpdated.getTime());
-//                        String overrideEnrichment = context.getProperties()
-//                                .getProperty(OVERRIDEENRICHMENT);
+
                         List<ProxyImpl> proxies = new ArrayList<ProxyImpl>();
                         proxies.add(providerProxy);
                         proxies.add(europeanaProxy);
@@ -662,37 +649,19 @@ public class EnrichmentPlugin<I> extends
                             AggregationImpl aggr = fBean.getAggregations().get(0);
                             client.createOrModify(getProcessingJobs(aggr,(String)context.getExecution().getId(),context.getDataSetCollection().getProvider().getMnemonic(),collection,fBean.getAbout()));
                         }
-//                        boolean overrideWriteBack = false;
-//                        if (StringUtils.isNotEmpty(overrideEnrichment)) {
-//                            overrideWriteBack = Boolean
-//                                    .parseBoolean(overrideEnrichment);
-//                        }
-//                        if (!overrideWriteBack) {
-//                            mdr.deleteValues(
-//                                    EuropeanaModelRegistry.EDMENRICHEDRECORD);
-//                            mdr.addValue(
-//                                    EuropeanaModelRegistry.EDMENRICHEDRECORD,
-//                                    EdmUtils.toEDM(saved, true));
-//                        }
+
                         context.getStorageEngine().updateMetaDataRecord(mdr);
 
                         context.putValue(addedTKey,
                                 context.getValue(addedTKey) + 1);
                         fBean.setState(eu.europeana.publication.common.State.ACCEPTED);
-//                        new SolrDocumentHandler(solrServer).save(fBean);
+
                         SolrInputDocument doc = new SolrDocumentHandler(cloudSolrServer).generate(fBean);
                         if(!(check||checkUpdate)) {
                             ModifiableSolrParams params = new ModifiableSolrParams();
                             params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
 
-                        /*
-                        <field name="is_fulltext" type="boolean" indexed="true" stored="true" multiValued="false"/>
-		<field name="has_thumbnails" type="boolean" indexed="true" stored="true" multiValued="false"/>
-		<field name="has_media" type="boolean" indexed="true" stored="true" multiValued="false"/>
-		<field name="filter_tags" type="int" indexed="true" stored="true" multiValued="true"/>
-		<field name="facet_tags" type="int" indexed="true" stored="true" multiValued="true"/>
-                <field name="has_landingpage" type="boolean" indexed="true" stored="true" multiValued="false"/>
-                         */
+
                             params.add("fl", "is_fulltext,has_thumbnails,has_media,filter_tags,facet_tags,has_landingpage");
                             QueryResponse resp = cloudSolrServer.query(params);
                             if(resp.getResults().size()>0){
@@ -717,8 +686,8 @@ public class EnrichmentPlugin<I> extends
                                 }
                             }
                         }
-                       // new SolrDocumentHandler(productionCloudSolrServer).save(fBean);
-//                        solrServer.add(basicDocument);
+
+                        cloudSolrServer.add(doc);
                         return true;
                     } catch (MalformedURLException e) {
                         logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,

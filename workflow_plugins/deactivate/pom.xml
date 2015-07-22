@@ -56,6 +56,11 @@
 			<artifactId>harvester-client</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>JobCreator</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 		<!--Optional Jars (for certain features) but required by maven for building. -->
 		<dependency>
 			<groupId>cglib</groupId>

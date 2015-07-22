@@ -7,9 +7,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import eu.europeana.corelib.edm.utils.construct.FullBeanHandler;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
@@ -45,6 +51,17 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
     // TODO Auto-generated constructor stub
   }
 
+  static {
+    try {
+      // Should be placed in a static block for performance reasons
+      bfact = BindingDirectory.getFactory(RDF.class);
+
+    } catch (JiBXException e) {
+      e.printStackTrace();
+      log.log(Level.SEVERE, "Error creating the JibX factory");
+    }
+
+  }
   public PublishPlugin(PublishService publishService, String name, String description) {
     super(name, description);
     PublishPlugin.publishService = publishService;
@@ -86,15 +103,57 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
         FullBeanImpl fBean = new MongoConstructor().constructFullBean(rdf);
         SolrInputDocument doc =
             new SolrDocumentHandler(publishService.getSolrServer()).generate(fBean);
-        // TODO Add CRF fields here
 
-        publishService.getSolrServer().add(doc);
 
-      } catch (JiBXException e) {
-        logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e, e.getMessage());
-        log.log(Level.SEVERE, "JiBXException occured with error " + e.getMessage() + "\n");
+          ModifiableSolrParams params = new ModifiableSolrParams();
+          params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
+
+          params.add("fl", "is_fulltext,has_thumbnails,has_media,filter_tags,facet_tags,has_landingpage");
+          QueryResponse resp = publishService.getSolrIngestionServer().query(params);
+          if(resp.getResults().size()>0) {
+            SolrDocument retrievedDoc = resp.getResults().get(0);
+            if (retrievedDoc.containsKey("is_fulltext")) {
+              doc.addField("is_fulltext", retrievedDoc.get("is_fulltext"));
+            }
+            if (retrievedDoc.containsKey("has_thumbnails")) {
+              doc.addField("has_thumbnails", retrievedDoc.get("has_thumbnails"));
+            }
+            if (retrievedDoc.containsKey("has_media")) {
+              doc.addField("has_media", retrievedDoc.get("has_media"));
+            }
+            if (retrievedDoc.containsKey("filter_tags")) {
+              doc.addField("filter_tags", retrievedDoc.get("filter_tags"));
+            }
+            if (retrievedDoc.containsKey("facet_tags")) {
+              doc.addField("facet_tags", retrievedDoc.get("facet_tags"));
+            }
+            if (retrievedDoc.containsKey("has_landingpage")) {
+              doc.addField("has_landingpage", retrievedDoc.get("has_landingpage"));
+            }
+            publishService.getSolrServer().add(doc);
+            FullBeanImpl saved;
+            if (publishService.getMongoProduction().getFullBean(fBean.getAbout()) == null) {
+              new FullBeanHandler(publishService.getMongoProduction()).saveEdmClasses(fBean, true);
+              publishService.getMongoProduction().getDatastore().save(fBean);
+              saved = (FullBeanImpl) publishService.getMongoProduction()
+                      .getFullBean(fBean.getAbout());
+            } else {
+              saved =  new FullBeanHandler(publishService.getMongoProduction()).updateFullBean(fBean);
+            }
+
+          }
+        } catch (IllegalAccessException e) {
         e.printStackTrace();
-        return false;
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (JiBXException e) {
+        e.printStackTrace();
+      } catch (InstantiationException e) {
+        e.printStackTrace();
+      } catch (SolrServerException e) {
+        e.printStackTrace();
+
+
       } catch (Exception e) {
         logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e, e.getMessage());
         e.printStackTrace();
@@ -140,7 +199,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
 
         FullBeanImpl fBean = new MongoConstructor().constructFullBean(rdf);
 
-        publishService.getSolrServer().deleteById(fBean.getId());
+        publishService.getSolrServer().deleteById(fBean.getAbout());
 
       } catch (JiBXException e) {
         logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e, e.getMessage());
@@ -159,17 +218,9 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
 
   public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
       throws IngestionPluginFailedException {
-    SolrServer solrServer = publishService.getSolrServer();
+
     logEngine = context.getLoggingEngine();
-    try {
-      solrServer.optimize();
-    } catch (SolrServerException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+
 
   }
 
