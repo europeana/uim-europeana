@@ -46,10 +46,10 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 	}
 	
 	@Override
-	public TaskReportResultDTO getTaskReports(int offset, int maxSize, boolean isActive, String filterQuery, String newTaskReportQuery, long stopTaskId) {
+	public TaskReportResultDTO getTaskReports(int offset, int maxSize, boolean showActiveOnly, String filterQuery, String newTaskReportQuery, long stopTaskId) {
 		//FIXME remove stub and retrieve real task reports here!
 		//List<TaskReportDTO> reportsDTO = stub(isActive, filterQuery, newTaskReportQuery, stopTaskId);
-		List<TaskReport> reports = getTaskReportsFromMongo(isActive, filterQuery, newTaskReportQuery, stopTaskId);
+		List<TaskReport> reports = getTaskReportsFromMongo(showActiveOnly, filterQuery, newTaskReportQuery, stopTaskId);
 		List<TaskReportDTO> reportsDTO = convertTaskReportsToDTO(reports);
 		
 		//create TaskReportResultDTO with provided offset and max value of the results
@@ -70,33 +70,30 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 	 * 
 	 * @return task reports (full list or only unfinished ones).
 	 */
-	private List<TaskReport> getTaskReportsFromMongo(boolean isActive, String filterQuery, String newTaskReportQuery, long stopTaskId) {
+	private List<TaskReport> getTaskReportsFromMongo(boolean showActiveOnly, String filterQuery, String newTaskReportQuery, long stopTaskId) {
 		//first stop the task report
         if (stopTaskId > 0) {
-        	Query<TaskReport> query = datastore.createQuery(TaskReport.class)
-        			.field("taskId").equal(stopTaskId);
-        	UpdateOperations<TaskReport> stopTaskReportOperation = datastore
-        			.createUpdateOperations(TaskReport.class).set("status",
-        					Status.STOPPED);
+        	Query<TaskReport> query = datastore.createQuery(TaskReport.class).field("taskId").equal(stopTaskId);
+        	UpdateOperations<TaskReport> stopTaskReportOperation = datastore.createUpdateOperations(TaskReport.class).set("status", Status.STOPPED);
         	datastore.update(query, stopTaskReportOperation);     	
         }
         
-        //add new task report
+        //add new task report if there is one
         if (newTaskReportQuery != null && !newTaskReportQuery.isEmpty()) {
         	datastore.save(createNewTaskReport(newTaskReportQuery));
         }
         //return all task reports
-        if (filterQuery == null && !isActive) {
+        if ((filterQuery == null || filterQuery.isEmpty()) && !showActiveOnly) {
         	return  datastore.find(TaskReport.class).asList();
         //return only unfinished task reports
-        } else if (filterQuery == null && isActive) {        	
+        } else if ((filterQuery == null || filterQuery.isEmpty()) && showActiveOnly) {        	
         	return datastore.find(TaskReport.class).field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
         //return all filtered by query 'filterQuery' task reports
-        } else if (filterQuery != null && !isActive) {
+        } else if (filterQuery != null && !filterQuery.isEmpty() && !showActiveOnly) {
         	return datastore.find(TaskReport.class).filter("query", filterQuery).asList();
         //return only unfinished filtered by query 'filterQuery' task reports
         } else {
-        	return datastore.find(TaskReport.class).filter("query", filterQuery).field("status").notEqual(Status.FINISHED).asList();
+        	return datastore.find(TaskReport.class).filter("query", filterQuery).field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
         }
 	}
 	
@@ -147,64 +144,64 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
         return (new SimpleDateFormat("dd-MM-yyyy")).format(new Date(dateUpdated));
 	}
 
-	//FIXME stub for testing!
-	private List<TaskReportDTO> stub(boolean isActive, String filterQuery, String newTaskReportQuery, long stopTaskId) {
-		List<TaskReportDTO> reports = new ArrayList<TaskReportDTO>();
-		TaskReportDTO report;
-		for (int i = 0 ; i < 10; i++) {
-			report = new TaskReportDTO();
-			report.setTaskId(i);
-			report.setStatus(i == stopTaskId ? "STOPPED" : (i % 2 == 0) ? "INITIAL" : "PROCESSING");
-			report.setDateCreated("29-11-2014");
-			report.setDateUpdated("29-11-2014");
-			report.setProcessed(10 + i);
-			report.setTotal(100);
-			report.setQuery((i % 2 == 0) ? "stub query" : "*:*");
-			reports.add(report);
-		}
-		for (int i = 10 ; i < 30; i++) {
-			report = new TaskReportDTO();
-			report.setTaskId(i);
-			report.setStatus(i == stopTaskId ? "STOPPED" : i < 10 ? ((i % 2 == 0) ? "INITIAL" : "FINISHED") : ((i % 2 == 0) ? "FINISHED" : "INITIAL"));
-			report.setDateCreated("29-10-2002");
-			report.setDateUpdated("29-10-2002");
-			report.setProcessed(10 + i);
-			report.setTotal(100);
-			report.setQuery((i % 2 == 0) ? "*:*" : "bla-bla");
-			reports.add(report);
-		}
-		List<TaskReportDTO> reportsToDisplay = null;
-		if (newTaskReportQuery != null && !newTaskReportQuery.isEmpty()) {
-			TaskReportDTO newReport = new TaskReportDTO();
-			newReport = new TaskReportDTO();
-			newReport.setTaskId(System.currentTimeMillis());
-			newReport.setStatus("INITIAL");
-			newReport.setDateCreated("14-07-2015");
-			newReport.setDateUpdated("14-07-2015");
-			newReport.setProcessed(0);
-			newReport.setQuery(newTaskReportQuery);
-			reports.add(0,newReport);
-		}
-		if (filterQuery == null || filterQuery.isEmpty()) {
-			reportsToDisplay = reports;
-		}  else {
-			reportsToDisplay = new ArrayList<TaskReportDTO>();
-			for (TaskReportDTO r : reports) {
-				if (r.getQuery() != null && r.getQuery().equals(filterQuery)) {
-					reportsToDisplay.add(r);
-				}
-			}
-		}
-		if (isActive) {
-			List<TaskReportDTO> unfinishedReports = new ArrayList<TaskReportDTO>();
-			for (TaskReportDTO r : reportsToDisplay) {
-				if (!r.getStatus().equalsIgnoreCase("FINISHED") && !r.getStatus().equalsIgnoreCase("STOPPED")) {
-					unfinishedReports.add(r);
-				}
-			}
-			return unfinishedReports;
-		} else {
-			return reportsToDisplay;
-		}
-	}
+//	//stub for testing!
+//	private List<TaskReportDTO> stub(boolean isActive, String filterQuery, String newTaskReportQuery, long stopTaskId) {
+//		List<TaskReportDTO> reports = new ArrayList<TaskReportDTO>();
+//		TaskReportDTO report;
+//		for (int i = 0 ; i < 10; i++) {
+//			report = new TaskReportDTO();
+//			report.setTaskId(i);
+//			report.setStatus(i == stopTaskId ? "STOPPED" : (i % 2 == 0) ? "INITIAL" : "PROCESSING");
+//			report.setDateCreated("29-11-2014");
+//			report.setDateUpdated("29-11-2014");
+//			report.setProcessed(10 + i);
+//			report.setTotal(100);
+//			report.setQuery((i % 2 == 0) ? "stub query" : "*:*");
+//			reports.add(report);
+//		}
+//		for (int i = 10 ; i < 30; i++) {
+//			report = new TaskReportDTO();
+//			report.setTaskId(i);
+//			report.setStatus(i == stopTaskId ? "STOPPED" : i < 10 ? ((i % 2 == 0) ? "INITIAL" : "FINISHED") : ((i % 2 == 0) ? "FINISHED" : "INITIAL"));
+//			report.setDateCreated("29-10-2002");
+//			report.setDateUpdated("29-10-2002");
+//			report.setProcessed(10 + i);
+//			report.setTotal(100);
+//			report.setQuery((i % 2 == 0) ? "*:*" : "bla-bla");
+//			reports.add(report);
+//		}
+//		List<TaskReportDTO> reportsToDisplay = null;
+//		if (newTaskReportQuery != null && !newTaskReportQuery.isEmpty()) {
+//			TaskReportDTO newReport = new TaskReportDTO();
+//			newReport = new TaskReportDTO();
+//			newReport.setTaskId(System.currentTimeMillis());
+//			newReport.setStatus("INITIAL");
+//			newReport.setDateCreated("14-07-2015");
+//			newReport.setDateUpdated("14-07-2015");
+//			newReport.setProcessed(0);
+//			newReport.setQuery(newTaskReportQuery);
+//			reports.add(0,newReport);
+//		}
+//		if (filterQuery == null || filterQuery.isEmpty()) {
+//			reportsToDisplay = reports;
+//		}  else {
+//			reportsToDisplay = new ArrayList<TaskReportDTO>();
+//			for (TaskReportDTO r : reports) {
+//				if (r.getQuery() != null && r.getQuery().equals(filterQuery)) {
+//					reportsToDisplay.add(r);
+//				}
+//			}
+//		}
+//		if (isActive) {
+//			List<TaskReportDTO> unfinishedReports = new ArrayList<TaskReportDTO>();
+//			for (TaskReportDTO r : reportsToDisplay) {
+//				if (!r.getStatus().equalsIgnoreCase("FINISHED") && !r.getStatus().equalsIgnoreCase("STOPPED")) {
+//					unfinishedReports.add(r);
+//				}
+//			}
+//			return unfinishedReports;
+//		} else {
+//			return reportsToDisplay;
+//		}
+//	}
 }
