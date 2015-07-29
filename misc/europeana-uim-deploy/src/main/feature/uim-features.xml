@@ -20,12 +20,13 @@
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-plugin-sugarcrmclient/1.0.0-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-plugin-repox/1.0.0-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-plugin-mint/1.0.0-SNAPSHOT</bundle>
-		<bundle start-level='85'>mvn:eu.europeana/europeana-uim-plugin-solr4/2.0.0-SNAPSHOT</bundle>
+		
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-plugin-linkchecker/1.0.0-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-plugin-dereference/1.0.0-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-plugin-enrichment/1.0.0-SNAPSHOT</bundle>
                 <bundle start-level='85'>mvn:eu.europeana.europeanauim/neo4jplugin/1.0.0-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-plugin-deactivate/1.0.0-SNAPSHOT</bundle>
+		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-plugin-publish/1.0.0-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-workflows-startups/1.0.0-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-workflows-basic/1.0.0-SNAPSHOT</bundle>
 		<bundle start-level='85'>mvn:eu.europeana.europeanauim/europeana-uim-gui-controlpanel/1.0.0-SNAPSHOT/war</bundle>

@@ -18,7 +18,7 @@ public class GraphImporterWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>
 		super("K.Hierarchical Objects Plugin", "K.Hierarchical Objects Plugin");
         setStart(new BatchWorkflowStart<I>());
         
-        GraphImporterPlugin<I> graphPlugin = new GraphImporterPlugin<I>(provider);
+        GraphImporterPlugin<I> graphPlugin = new GraphImporterPlugin<I>(provider,true);
         addStep(graphPlugin);
 	}
 
@@ -28,7 +28,7 @@ public class GraphImporterWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>
 	 */
 	@Override
 	public boolean isSavepoint(String pluginIdentifier) {
-		return false;
+		return true;
 	}
 
 	/* (non-Javadoc)

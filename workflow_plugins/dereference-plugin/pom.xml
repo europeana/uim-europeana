@@ -258,19 +258,11 @@
 							eu.europeana.uim.util,
 							eu.europeana.uim.workflow,
 							org.theeuropeanlibrary.model.common.qualifier,
-							org.apache.solr.common.util,
-							org.apache.solr.client.solrj.impl,
-							org.apache.solr.common,
-							org.apache.solr.client.solrj,
-							org.apache.solr.common.params,
-							org.apache.solr.client.solrj.response,
-							org.apache.solr.client.solrj.beans,
-							org.apache.commons.lang.time,
-							org.apache.solr.client.solrj.request,
+
 							org.w3c.dom.traversal,
 							org.slf4j.*,
 							org.slf4j.bridge.*,
-							org.apache.solr.client.solrj.util,
+
 							org.jibx.runtime;
 							version=1.2.5,
 							org.jibx.runtime.impl; version=1.2.5,
@@ -305,12 +297,10 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<configuration>
 						<source>1.7</source>
 						<target>1.7</target>
 						<testSource>1.7</testSource>
 						<testTarget>1.7</testTarget>
-					</configuration>
 				</configuration>
 			</plugin>
 

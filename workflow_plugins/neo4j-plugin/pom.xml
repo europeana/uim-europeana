@@ -145,7 +145,7 @@
 					<obrRepository>NONE</obrRepository>
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
-						<Export-Package>eu.europeana.uim.plugin.solr.*</Export-Package>
+						<Export-Package>eu.europeana.uim.neo4jplugin.*</Export-Package>
 						<Import-Package>
 							org.osgi.framework; version=1.5.0,
 							javax.annotation; version=0.0.0,
@@ -205,22 +205,16 @@
 							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues;
 							version=1.0.0.SNAPSHOT,
-							eu.europeana.uim.solr4,
+
 							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.util,
 							eu.europeana.uim.workflow,
 							org.theeuropeanlibrary.model.common.qualifier,
-							org.apache.solr.common.util,
-							org.apache.solr.client.solrj.impl,
-							org.apache.solr.common,
-							org.apache.solr.client.solrj,
-							org.apache.solr.common.params,
-							org.apache.solr.client.solrj.response,
-							org.apache.solr.client.solrj.beans,
+
 							org.apache.commons.lang.time,
-							org.apache.solr.client.solrj.request,
+
 							org.w3c.dom.traversal,
-							org.apache.solr.client.solrj.util,
+
 							org.jibx.runtime;
 							version=1.2.3,
 							org.jibx.runtime.impl; version=1.2.3,

@@ -51,6 +51,8 @@ public class GraphImporterPlugin<I> extends
     private static GraphConstructor graphconstructor;
     private static IBindingFactory bfact;
 
+    private static boolean firstTime;
+
     /**
      * The parameters used by this WorkflowStart
      */
@@ -67,11 +69,12 @@ public class GraphImporterPlugin<I> extends
      * @param name
      * @param description
      */
-    public GraphImporterPlugin(EDMRepositoryOSGIServiceProvider provider) {
+    public GraphImporterPlugin(EDMRepositoryOSGIServiceProvider provider, boolean isFirstTime) {
 
         super("GraphImporterPlugin", "GraphImporterPlugin");
         init();
         this.graphconstructor = provider.getGraphconstructor();
+        firstTime = isFirstTime;
     }
 
     /**
@@ -130,99 +133,99 @@ public class GraphImporterPlugin<I> extends
     public boolean process(MetaDataRecord<I> mdr,
             ExecutionContext<MetaDataRecord<I>, I> context)
             throws IngestionPluginFailedException, CorruptedDatasetException {
-
-        String value = null;
-        List<Status> status = mdr
-                .getValues(EuropeanaModelRegistry.STATUS);
-        String includedeleted = context.getProperties().getProperty(
-                INCLUDE_DELETED);
-        boolean check = Boolean.parseBoolean(includedeleted);
-        if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED)) || check) {
-            if (mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD) != null
-                    && mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD)
-                    .size() > 0) {
-                value = mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD)
-                        .get(0);
-            } else if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
-                    && mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
-                    .size() > 0) {
-                value = mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
-                        .get(0);
-            } else {
-                value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
-            }
-
-            IUnmarshallingContext uctx;
-            try {
-                MongoConstructor neo4jConstructor = new MongoConstructor();
-                uctx = bfact.createUnmarshallingContext();
-                RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-                if (graphconstructor != null) {
-                    FullBeanImpl bean = neo4jConstructor.constructFullBean(rdf);
-
-                    bean.setEuropeanaCollectionName(new String[]{mdr
-                        .getCollection().getName()});
-                    if (bean.getEuropeanaAggregation().getEdmLanguage()
-                            != null) {
-                        bean.setLanguage(new String[]{bean
-                            .getEuropeanaAggregation().getEdmLanguage()
-                            .values().iterator().next().get(0)});
-                    }
-                    if (bean.getEuropeanaAggregation().getEdmLandingPage()
-                            == null) {
-                        bean.getEuropeanaAggregation().setEdmLandingPage(
-                                "http://testuri");
-                    }
-
-                    bean.setEuropeanaCollectionName(new String[]{mdr
-                        .getCollection().getName()});
-
-                    Date timestampCreated = new Date();
-                    if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
-                            != null
-                            && mdr.getValues(
-                                    EuropeanaModelRegistry.INITIALSAVE)
-                            .size() > 0) {
-                        timestampCreated = new Date(mdr.getValues(
-                                EuropeanaModelRegistry.INITIALSAVE).get(0));
-                    } else {
-                        mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
-                                timestampCreated.getTime());
-                    }
-                    bean.setTimestampCreated(timestampCreated);
-                    mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
-                    Date timestampUpdated = new Date();
-                    bean.setTimestampUpdated(timestampUpdated);
-                    mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
-                            timestampUpdated.getTime());
-                    graphconstructor.parseMorphiaEntity(bean);
-
+        if(firstTime||mdr.getFirstValue(EuropeanaModelRegistry.ISHIERARCHY)!=null) {
+            String value = null;
+            List<Status> status = mdr
+                    .getValues(EuropeanaModelRegistry.STATUS);
+            String includedeleted = context.getProperties().getProperty(
+                    INCLUDE_DELETED);
+            boolean check = Boolean.parseBoolean(includedeleted);
+            if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED)) || check) {
+                if (mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD) != null
+                        && mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD)
+                        .size() > 0) {
+                    value = mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD)
+                            .get(0);
+                } else if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
+                        && mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+                        .size() > 0) {
+                    value = mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
+                            .get(0);
                 } else {
-                    throw new IngestionPluginFailedException("Cannot get a reference to the Neo4j endpoint");
+                    value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
                 }
 
-            } catch (JiBXException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return true;
-        } else {
-            graphconstructor.populateDeletionCandidates((String) mdr.getId(), ((Collection) context.getExecution().
-                    getDataSet()).getMnemonic());
-        }
+                IUnmarshallingContext uctx;
+                try {
+                    MongoConstructor neo4jConstructor = new MongoConstructor();
+                    uctx = bfact.createUnmarshallingContext();
+                    RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+                    if (graphconstructor != null) {
+                        FullBeanImpl bean = neo4jConstructor.constructFullBean(rdf);
 
+                        bean.setEuropeanaCollectionName(new String[]{mdr
+                                .getCollection().getName()});
+                        if (bean.getEuropeanaAggregation().getEdmLanguage()
+                                != null) {
+                            bean.setLanguage(new String[]{bean
+                                    .getEuropeanaAggregation().getEdmLanguage()
+                                    .values().iterator().next().get(0)});
+                        }
+                        if (bean.getEuropeanaAggregation().getEdmLandingPage()
+                                == null) {
+                            bean.getEuropeanaAggregation().setEdmLandingPage(
+                                    "http://testuri");
+                        }
+
+                        bean.setEuropeanaCollectionName(new String[]{mdr
+                                .getCollection().getName()});
+
+                        Date timestampCreated = new Date();
+                        if (mdr.getValues(EuropeanaModelRegistry.INITIALSAVE)
+                                != null
+                                && mdr.getValues(
+                                EuropeanaModelRegistry.INITIALSAVE)
+                                .size() > 0) {
+                            timestampCreated = new Date(mdr.getValues(
+                                    EuropeanaModelRegistry.INITIALSAVE).get(0));
+                        } else {
+                            mdr.addValue(EuropeanaModelRegistry.INITIALSAVE,
+                                    timestampCreated.getTime());
+                        }
+                        bean.setTimestampCreated(timestampCreated);
+                        mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
+                        Date timestampUpdated = new Date();
+                        bean.setTimestampUpdated(timestampUpdated);
+                        mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
+                                timestampUpdated.getTime());
+                        graphconstructor.parseMorphiaEntity(bean);
+                        mdr.addValue(EuropeanaModelRegistry.ISHIERARCHY,new Boolean(true));
+                    } else {
+                        throw new IngestionPluginFailedException("Cannot get a reference to the Neo4j endpoint");
+                    }
+
+                } catch (JiBXException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (MalformedURLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return true;
+            } else {
+                graphconstructor.populateDeletionCandidates((String) mdr.getId(), ((Collection) context.getExecution().
+                        getDataSet()).getMnemonic());
+            }
+        }
         return false;
     }
 

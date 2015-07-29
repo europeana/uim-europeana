@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.mongodb.ServerAddress;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
@@ -64,9 +65,11 @@ public class DeduplicationServiceImpl implements DeduplicationService {
     private static final Logger log = Logger
             .getLogger(DeduplicationServiceImpl.class.getName());
 
-    EuropeanaIdRegistryMongoServerImpl mongoserver;
+    private static EuropeanaIdRegistryMongoServerImpl mongoserver;
 
     private IBindingFactory bfact;
+    private static String[] mongoHost = PropertyReader.getProperty(
+            UimConfigurationProperty.MONGO_HOSTURL).split(",");
 
     /**
      * Default Constructor
@@ -76,11 +79,12 @@ public class DeduplicationServiceImpl implements DeduplicationService {
         try {
 
             bfact = BindingDirectory.getFactory(RDF.class);
-            final Mongo mongo = new Mongo(
-                    PropertyReader
-                    .getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-                    Integer.parseInt(PropertyReader
-                            .getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
+            List<ServerAddress> addresses = new ArrayList<>();
+            for (String mongoStr : mongoHost) {
+                ServerAddress address = new ServerAddress(mongoStr, 27017);
+                addresses.add(address);
+            }
+            final Mongo mongo = new Mongo(addresses);
 
             BlockingInitializer initializer = new BlockingInitializer() {
                 @Override

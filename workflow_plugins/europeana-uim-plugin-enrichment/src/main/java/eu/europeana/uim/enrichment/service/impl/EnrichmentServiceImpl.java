@@ -65,12 +65,13 @@ public class EnrichmentServiceImpl implements EnrichmentService {
   private static HttpSolrServer solrProductionServer;
   private static CloudSolrServer cloudSolrServer;
   private static CloudSolrServer cloudSolrProductionServer;
-  private static String mongoDB = PropertyReader
+  private static String mongoDBEuropeana = PropertyReader
       .getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
   private static String[] mongoHost = PropertyReader.getProperty(
       UimConfigurationProperty.MONGO_HOSTURL).split(",");
   private static String mongoPort = PropertyReader
       .getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
+  private static String mongoDB = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
   private static String zookeeperUrl = PropertyReader
       .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURL);
   // private static String solrUrl =
@@ -194,7 +195,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
           Mongo tgtMongo = new Mongo(addresses);
             server =
                 new OsgiEdmMongoServer(tgtMongo,
-                    "europeana", uname, pass);
+                    mongoDBEuropeana, uname, pass);
           } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

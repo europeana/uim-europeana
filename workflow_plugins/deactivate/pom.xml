@@ -203,15 +203,6 @@
 							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
 							org.theeuropeanlibrary.model.common.qualifier;
 							version=1.0.0.SNAPSHOT,
-							org.apache.solr.client.solrj.request; version=4.0.0,
-							org.apache.solr.common.util; version=4.0.0,
-							org.apache.solr.client.solrj.impl; version=4.0.0,
-							org.apache.solr.client.solrj.util; version=4.0.0,
-							org.apache.solr.common; version=4.0.0,
-							org.apache.solr.client.solrj; version=4.0.0,
-							org.apache.solr.common.params; version=4.0.0,
-							org.apache.solr.client.solrj.response; version=4.0.0,
-							org.apache.solr.client.solrj.beans; version=4.0.0,
 							!*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>

@@ -22,7 +22,139 @@
 			<artifactId>corelib-lookup</artifactId>
 			<version>${corelib.version}</version>
 		</dependency>
-	
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-logging</artifactId>
+			<version>${corelib.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-search</artifactId>
+			<version>${corelib.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+			<version>3.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>8.1.17.v20150415</version>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-community</artifactId>
+			<version>2.1.2</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>neo4j-cypher-compiler-2.0</artifactId>
+					<groupId>org.neo4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>neo4j-cypher-compiler-1.9</artifactId>
+					<groupId>org.neo4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.13</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.0.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-rest-graphdb</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-kernel</artifactId>
+			<version>2.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-storage</artifactId>
+			<version>${corelib.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>javax.servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-common-storage</artifactId>
+			<version>${corelib.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.corelib</groupId>
+			<artifactId>corelib-web</artifactId>
+			<version>${corelib.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.publication</groupId>
+			<artifactId>publication-common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>1.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-core</artifactId>
+			<version>1.9.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.oro</artifactId>
+			<version>2.0.8_5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
@@ -33,8 +165,17 @@
 			<artifactId>neo4jplugin</artifactId>
 			<groupId>${project.groupId}</groupId>
 			<version>${project.version}</version>
-		</dependency>	
-		
+		</dependency>
+		<dependency>
+			<artifactId>guava</artifactId>
+			<groupId>com.google.guava</groupId>
+			<version>16.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.10</version>
+		</dependency>
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>wstx-asl</artifactId>
@@ -47,7 +188,111 @@
 			</exclusions>
 			<scope>compile</scope>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.qdox</groupId>
+			<artifactId>qdox</artifactId>
+			<version>1.12.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.proxytoys</groupId>
+			<artifactId>proxytoys</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>stax</groupId>
+			<artifactId>stax</artifactId>
+			<version>1.2.0_rc2-dev</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>bsh</groupId>
+			<artifactId>bsh</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atomikos</groupId>
+			<artifactId>transactions-jta</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atomikos</groupId>
+			<artifactId>transactions-jdbc</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atomikos</groupId>
+			<artifactId>transactions-jms</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.caucho</groupId>
+			<artifactId>burlap</artifactId>
+			<version>2.1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>com.caucho</groupId>
+			<artifactId>hessian</artifactId>
+			<version>2.1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>1.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-core</artifactId>
+			<version>1.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>1.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm.websphere</groupId>
+			<artifactId>uow</artifactId>
+			<version>6.0.2.17</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-stax-api_1.0_spec</artifactId>
@@ -91,60 +336,145 @@
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
 						<Export-Package>eu.europeana.europeanauim.publish.*</Export-Package>
+
 						<Import-Package>
-							org.apache.solr.*;version="4.0.0",
-							org.apache.lucene.*;version="4.0.0",
-							!org.hibernate,
-							!org.joda.time,
-							!org.codehaus.jackson.*,
-							!org.codehaus.jackson.map.*,
-							!org.dom4j.*,
-							!org.imgscalr.*,
-							!org.relaxng.datatype.*,
-							!org.jdom.*,
-							!org.apache.log,
-							!org.apache.log.*,
-							!net.sf.cglib.asm.util,
-							!org.apache.tools.ant.*,
-							!org.testng.*,
-							!com.sun.msv.*,
-							!com.sun.jdi,
-							!com.sun.jdi.*,
-							!com.sun.jdmk.comm,
-							!com.ibm.uvm.tools,
-							!com.werken.xpath,
-							!com.saxonica.validate,
-							!javax.jmdns,
-							!javax.transaction,
-							!javax.transaction.*,
-							!javax.persistence,
-							!nu.xom,
-							!org.apache.xml.resolver,
-							!org.apache.xml.resolver.*,
-							!org.apache.xml.serializer,
-							!org.apache.xml.serialize,
-							!org.apache.sanselan,
-							!org.apache.sanselan.formats.jpeg.xmp,
-							!org.hibernate.annotations,
-							!org.hibernate.annotation.*,
-							!org.springframework.security.authentication.encoding,
-							!org.springframework.transaction.annotation,
-							!sun.io.*,
-							!org.codehaus.jettison,
-							!org.codehaus.jettison.*,
-							!sun.misc,
-							!sun.reflect,
-							!net.vz.mongodb.jackson,
-							!com.google.code.morphia.*,
-							!com.mongodb.*,
-							!org.bson.types.*,
-							*
+							org.osgi.framework; version=1.5.0,
+							javax.crypto;
+							version=0.0.0,
+							javax.annotation;version=0.0.0,
+							javax.crypto.spec;
+							version=0.0.0,
+							javax.imageio;
+							version=0.0.0,
+							javax.imageio.spi;
+							version=0.0.0,
+							javax.management;
+							version=0.0.0,
+							javax.naming;
+							version=0.0.0,
+							javax.naming.spi;
+							version=0.0.0,
+							javax.net;
+							version=0.0.0,
+							javax.net.ssl;
+							version=0.0.0,
+							javax.security.auth;
+							version=0.0.0,
+							javax.security.auth.x500;
+							version=0.0.0,
+							javax.sql;
+							version=0.0.0,
+							javax.swing;
+							version=0.0.0,
+							javax.swing.border;
+							version=0.0.0,
+							javax.swing.event; version=0.0.0,
+							javax.swing.plaf;
+							version=0.0.0,
+							javax.swing.table; version=0.0.0,
+							javax.swing.text;
+							version=0.0.0,
+							javax.swing.tree; version=0.0.0,
+							javax.tools;
+							version=0.0.0,
+							javax.xml.bind;version=0.0.0,
+							javax.xml.datatype,
+							org.ietf.jgss;
+							version=0.0.0,
+							org.osgi.service.blueprint;
+							version=1.0.1,
+							jline;
+							version=2.5.0,
+							javax.servlet; version=2.5.0,
+							javax.servlet.http;
+							version=2.5.0,
+							eu.europeana.uim.common;
+							version=0.0.0,
+							eu.europeana.uim.store;
+							version=0.0.0,
+							eu.europeana.uim.orchestration;
+							version=0.0.0,
+							eu.europeana.uim.plugin.ingestion;
+							version=0.0.0,
+							eu.europeana.uim.plugin,
+							eu.europeana.uim.sugar;
+							version=0.0.0,
+							eu.europeana.uim.sugar.model;
+							version=0.0.0,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues;
+							version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.model.europeana;
+							version=1.0.0.SNAPSHOT,
+							org.theeuropeanlibrary.model.common.qualifier;
+							version=1.0.0.SNAPSHOT,
+							org.jibx.runtime,
+							org.jibx.runtime.impl,
+							org.jibx.extras,
+							eu.europeana.uim.europeanaspecific.workflowstarts.*,
+							eu.europeana.uim.plugin.source,
+							eu.europeana.uim.storage,
+							eu.europeana.uim.common.progress,
+							eu.europeana.uim.logging;
+							version=0.0.0,
+							javax.security.sasl,
+							javax.security.auth.login,
+							javax.xml.namespace;
+							version=0.0.0,
+							javax.xml.parsers;
+							version=0.0.0,
+							javax.xml.transform; version=0.0.0,
+							javax.xml.transform.dom;
+							version=0.0.0,
+							javax.xml.transform.sax;
+							version=0.0.0,
+							javax.xml.transform.stream; version=0.0.0,
+							javax.xml.validation;
+							version=0.0.0,
+							javax.xml.xpath;
+							version=0.0.0,
+							org.w3c.dom;
+							version=0.0.0,
+							org.w3c.dom.events;
+							version=0.0.0,
+							org.w3c.dom.ls;
+							version=0.0.0,
+							org.w3c.dom.ranges;
+							version=0.0.0,
+							org.w3c.dom.xpath; version=0.0.0,
+							org.xml.sax;
+							version=0.0.0,
+							org.xml.sax.ext; version=0.0.0,
+							org.xml.sax.helpers;
+							version=0.0.0,
+
+
+							eu.europeana.uim.util,
+							eu.europeana.uim.workflow,
+
+
+
+
+							!org.apache.http.impl.client,
+							!org.apache.http.client.*,
+							!*
+
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>
-							*;scope=compile|runtime;artifactId=!europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
+							*;scope=compile|runtime;artifactId=!europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support|uim-plugin-solr4
 						</Embed-Dependency>
-
+						<Embed-Transitive>true</Embed-Transitive>
+						<DynamicImport-Package>com.sun.management,
+							com.sun.source.tree,
+							com.sun.source.util,
+							com.sun.tools.javac.model,
+							com.sun.tools.javac.processing,
+							com.sun.tools.javac.tree,
+							com.sun.tools.javac.util,
+							com.sun.tools.javac,
+							com.sun.tools.javadoc,
+							com.caucho.hessian
+						</DynamicImport-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -225,6 +555,12 @@
             </plugin>
         </plugins>
     </reporting>
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<url>http://repo.spring.io/libs-milestone/</url>
+		</repository>
+	</repositories>
 </project>
 
 

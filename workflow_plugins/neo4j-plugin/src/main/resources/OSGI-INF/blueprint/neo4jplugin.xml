@@ -20,6 +20,7 @@
 
     <bean id="neo4jPluginBean" class="eu.europeana.uim.neo4jplugin.service.GraphImporterPlugin">
       <argument ref="neo4jEndpointProvider"/>
+        <argument value="true"/>
     </bean>
     
     <bean id="neo4jWorkflowBean" class="eu.europeana.uim.neo4jplugin.service.GraphImporterWorkflow">

@@ -18,10 +18,11 @@ public class MongoProvider {
       List<ServerAddress> addresses = new ArrayList<ServerAddress>();
       String[] mongoHost =
           PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL).split(",");
+      String mongoPort = PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
       for (String mongoStr : mongoHost) {
         ServerAddress address = null;
         try {
-          address = new ServerAddress(mongoStr, 27017);
+          address = new ServerAddress(mongoStr, Integer.parseInt(mongoPort));
         } catch (UnknownHostException e) {
           e.printStackTrace();
         }

@@ -321,8 +321,8 @@ public class EnrichmentPlugin<I> extends
 //                        + collection.getName().split("_")[0] + "_*");
                 cloudSolrServer.deleteByQuery("europeana_collectionName:"
                     + collection.getName().split("_")[0] + "_*");
-                productionCloudSolrServer.deleteByQuery("europeana_collectionName:"
-                    + collection.getName().split("_")[0] + "_*");
+               // productionCloudSolrServer.deleteByQuery("europeana_collectionName:"
+               //     + collection.getName().split("_")[0] + "_*");
             }
 
         } catch (Exception e) {
@@ -480,80 +480,25 @@ public class EnrichmentPlugin<I> extends
                                 .constructFullBean(rdf);
                         List<InputValue> inputValues = new EnrichmentUtils()
                                 .createValuesForEnrichment(basicDocument);
-                        List<InputValue> notEnriched
-                                = new ArrayList<InputValue>();
+
                         List<RetrievedEntity> enrichedEntities
                                 = new ArrayList();
 
-                        for (InputValue inputValue : inputValues) {
-                            if (StringUtils.isNotBlank(inputValue.getValue())) {
-                                if (entityCache.containsEntity(inputValue
-                                        .getValue().toLowerCase())) {
-                                    enrichedEntities.addAll(entityCache
-                                            .retrieveEntities(inputValue.
-                                                    getValue()
-                                                    .toLowerCase(), inputValue.
-                                                    getOriginalField()));
-                                } else {
-                                    if (enrichmentQueryCache.get(collection)
-                                            != null && enrichmentQueryCache.
-                                            get(collection).
-                                            get(inputValue.getValue().
-                                                    toLowerCase()) == null) {
-                                        notEnriched.add(inputValue);
-                                        enrichmentQueryCache.get(collection).
-                                                put(inputValue.getValue().toLowerCase(), State.PENDING);
-                                    } else if (enrichmentQueryCache.get(collection)
-                                            != null && enrichmentQueryCache.
-                                            get(collection).
-                                            get(inputValue.getValue().
-                                                    toLowerCase()) != null) {
-                                        int i = 0;
-                                        while (enrichmentQueryCache.
-                                                get(collection).
-                                                get(inputValue.getValue().
-                                                        toLowerCase()).equals(State.PENDING) && i < 100) {
-                                            try {
-                                                i++;
-                                                Thread.sleep(10);
-
-                                                if (i == 100) {
-                                                    notEnriched.add(inputValue);
-                                                    enrichmentQueryCache.
-                                                            get(collection).
-                                                            put(inputValue.getValue().
-                                                                    toLowerCase(), State.DONE);
-                                                }
-                                            } catch (InterruptedException ex) {
-                                                Logger.getLogger(EnrichmentPlugin.class.getName()).
-                                                        log(Level.SEVERE, null, ex);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (notEnriched.size() > 0) {
-                            List<RetrievedEntity> enriched = convertToObjects(
+                        List<RetrievedEntity> enriched = new ArrayList<>();
+                        if (inputValues.size() > 0) {
+                           enriched = convertToObjects(
                                     enricher.enrich(
-                                            notEnriched, false));
-                            entityCache.addEntities(enriched);
+                                            inputValues, false));
+
                             enrichedEntities.addAll(enriched);
                         }
-                        for (InputValue val : inputValues) {
 
-                            if (enrichmentQueryCache.
-                                    get(collection).get(val.getValue().toLowerCase()) != State.DONE) {
-                                enrichmentQueryCache.
-                                        get(collection).put(val.getValue().toLowerCase(), State.DONE);
-                            }
-
-                        }
                         ProxyImpl europeanaProxy = EuropeanaProxyUtils
                                 .getEuropeanaProxy(fBean);
-                        docGen.addEntities(basicDocument, fBean,
-                                europeanaProxy, enrichedEntities);
-
+                        if(enriched.size()>0) {
+                            docGen.addEntities(basicDocument, fBean,
+                                    europeanaProxy, enrichedEntities);
+                        }
 
                         boolean prOO = StringUtils.contains(previewsOnlyInPortal, "1");
                         fBean.getAggregations()
@@ -649,7 +594,7 @@ public class EnrichmentPlugin<I> extends
                             AggregationImpl aggr = fBean.getAggregations().get(0);
                             client.createOrModify(getProcessingJobs(aggr,(String)context.getExecution().getId(),context.getDataSetCollection().getProvider().getMnemonic(),collection,fBean.getAbout()));
                         }
-
+                        mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,EdmUtils.toEDM(saved,true));
                         context.getStorageEngine().updateMetaDataRecord(mdr);
 
                         context.putValue(addedTKey,
@@ -769,7 +714,7 @@ public class EnrichmentPlugin<I> extends
 
         List<ProcessingJob> jobs = new ArrayList<>();
         try {
-            jobs = ProcessingJobTuple.processingJobsFromList(JobCreator.createJobs(collectionId, providerId, recordId, executionId, aggr.getEdmObject(), Arrays.asList(aggr.getHasView()), aggr.getEdmIsShownBy(), aggr.getEdmIsShownAt(), 50, new ProcessingJobCreationOptions(false)));
+            jobs = ProcessingJobTuple.processingJobsFromList(JobCreator.createJobs(collectionId, providerId, recordId, executionId, aggr.getEdmObject(), aggr.getHasView()!=null?Arrays.asList(aggr.getHasView()):null, aggr.getEdmIsShownBy(), aggr.getEdmIsShownAt(), 50, new ProcessingJobCreationOptions(false)));
 
         } catch (UnknownHostException e) {
             e.printStackTrace();

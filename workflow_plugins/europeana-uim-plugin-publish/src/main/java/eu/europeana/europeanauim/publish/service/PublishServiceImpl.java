@@ -21,10 +21,13 @@ import eu.europeana.europeanauim.publish.utils.OsgiEuropeanaIdMongoServer;
 import eu.europeana.europeanauim.publish.utils.PropertyReader;
 import eu.europeana.europeanauim.publish.utils.UimConfigurationProperty;
 import eu.europeana.uim.common.BlockingInitializer;
+import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
 
 public class PublishServiceImpl implements PublishService {
-  private SolrServer solrServer;
-  private SolrServer solrIngestionServer;
+  private CloudSolrServer solrServer;
+  private CloudSolrServer solrIngestionServer;
+  private String zookeeperUrl;
+  private String zookeeperUrlProduction;
   private static OsgiEuropeanaIdMongoServer idserver;
   private static OsgiEuropeanaIdMongoServer idserverProduction;
   private static String[] mongoHost = PropertyReader.getProperty(
@@ -57,39 +60,41 @@ public class PublishServiceImpl implements PublishService {
     final String solrCore =
             PropertyReader.getProperty(UimConfigurationProperty.SOLR_CLOUD_PRODUCTION_CORE);
 
+    zookeeperUrlProduction = PropertyReader.getProperty(UimConfigurationProperty.ZOOKEEPER_PRODUCTION_HOSTURL);
+    zookeeperUrl = PropertyReader.getProperty(UimConfigurationProperty.ZOOKEEPER_INGESTION_HOSTURL);
 
-    BlockingInitializer solrInit = new BlockingInitializer() {
+  try{
 
-      @Override
-      protected void initializeInternal() {
-        try {
-          solrServer = new CloudSolrServer(new URL(solrUrl) + solrCore);
+          LBHttpSolrServer lbTarget = new LBHttpSolrServer(solrUrl.split(","));
+          solrServer = new CloudSolrServer(zookeeperUrlProduction, lbTarget);
+          solrServer.setDefaultCollection(solrCore);
+          solrServer.connect();
+         // solrServer = new CloudSolrServer(new URL(solrUrl) + solrCore);
         } catch (MalformedURLException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
         }
-      }
-    };
-    solrInit.initialize(CloudSolrServer.class.getClassLoader());
+
     final String solrIngestionUrl =
             PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
     final String solrIngestionCore =
             PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 
 
-    BlockingInitializer solrIngestionInit = new BlockingInitializer() {
 
-      @Override
-      protected void initializeInternal() {
-        try {
-          solrIngestionServer = new CloudSolrServer(new URL(solrIngestionUrl) + solrIngestionCore);
-        } catch (MalformedURLException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }
-    };
-    solrIngestionInit.initialize(CloudSolrServer.class.getClassLoader());
+    LBHttpSolrServer lbTarget = null;
+    try {
+      lbTarget = new LBHttpSolrServer(solrIngestionUrl.split(","));
+    solrIngestionServer = new CloudSolrServer(zookeeperUrl, lbTarget);
+    solrIngestionServer.setDefaultCollection(solrIngestionCore);
+    solrIngestionServer.connect();
+    } catch (MalformedURLException e1) {
+      e1.printStackTrace();
+    }
+
+          //solrIngestionServer = new CloudSolrServer(new URL(solrIngestionUrl) + solrIngestionCore);
+
+
 
     List<ServerAddress> addresses = new ArrayList<>();
     for (String mongoStr : mongoHost) {

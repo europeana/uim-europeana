@@ -13,7 +13,7 @@ public class PublishWorkflow extends AbstractWorkflow {
 
 
   public PublishWorkflow(PublishService publishService) {
-    super("H: Publish Data",
+    super("I: Publish Data",
         "Workflow that optimizes the Solr Index, cuilds uggesters and spellchecking");
     setStart(new BatchWorkflowStart());
     addStep(new PublishPlugin(publishService, "Publish Plugin", "Publish Plugin"));
@@ -22,7 +22,7 @@ public class PublishWorkflow extends AbstractWorkflow {
     String serverIndex = PropertyReader.getProperty(UimConfigurationProperty.NEO4JPRODUCTIONINDEX);
     EDMRepositoryOSGIServiceProvider provider =
         new EDMRepositoryOSGIServiceProvider(new EDMRepositoryService(serverUrl, serverIndex));
-    GraphImporterPlugin graphPlugin = new GraphImporterPlugin(provider);
+    GraphImporterPlugin graphPlugin = new GraphImporterPlugin(provider,false);
     addStep(graphPlugin);
   }
 

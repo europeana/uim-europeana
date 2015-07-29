@@ -431,6 +431,7 @@ public class ZipLoader<I> {
 			mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 			//Removed previous versions of Dereferenced EDM XML
 			//mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
+			mdr.deleteValues(EuropeanaModelRegistry.ISHIERARCHY);
 		}
 
 		mdr.addValue(EuropeanaModelRegistry.UIMUPDATEDDATE,

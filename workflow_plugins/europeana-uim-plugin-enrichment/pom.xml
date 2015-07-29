@@ -284,14 +284,6 @@
 							version=1.0.0.SNAPSHOT,
 							org.theeuropeanlibrary.model.common.qualifier;
 							version=1.0.0.SNAPSHOT,
-							<!-- org.apache.solr.common.util; -->
-							<!-- version=4.10.1, -->
-							<!-- org.apache.solr.client.solrj.impl; version=4.10.1, -->
-							<!-- org.apache.solr.common; version=4.10.1, -->
-							<!-- org.apache.solr.client.solrj; version=4.10.1, -->
-							<!-- org.apache.solr.common.params; version=4.10.1, -->
-							<!-- org.apache.solr.client.solrj.response; version=4.10.1, -->
-							<!-- org.apache.solr.client.solrj.beans; version=4.10.1, -->
 							org.jibx.runtime,
 							org.jibx.runtime.impl,
 							org.jibx.extras,

@@ -145,6 +145,7 @@
 							eu.europeana.uim.workflow,
 							eu.europeana.uim.resource,
 							eu.europeana.dedup.osgi.service.*,
+							eu.europeana.uim.model.europeana,
 							org.springframework.context.*,
 							org.osgi.framework,
 							org.w3c.dom,
