@@ -6,9 +6,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.code.morphia.Morphia;
 import eu.europeana.corelib.edm.exceptions.MongoDBException;
 import eu.europeana.corelib.mongo.server.EdmMongoServer;
 import eu.europeana.corelib.mongo.server.impl.EdmMongoServerImpl;
+import eu.europeana.europeanauim.publish.OsgiEdmMongoServer;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -39,20 +41,20 @@ public class PublishServiceImpl implements PublishService {
   private static String mongoDbProduction = PropertyReader.getProperty(
           UimConfigurationProperty.MONGO_PRODUCTION_DB);
   @Override
-  public  EdmMongoServer getMongoIngestion() {
+  public  OsgiEdmMongoServer getMongoIngestion() {
     return mongoIngestion;
   }
 
 
   @Override
-  public  EdmMongoServer getMongoProduction() {
+  public  OsgiEdmMongoServer getMongoProduction() {
     return mongoProduction;
   }
 
 
 
-  private static EdmMongoServer mongoIngestion;
-  private static EdmMongoServer mongoProduction;
+  private static OsgiEdmMongoServer mongoIngestion;
+  private static OsgiEdmMongoServer mongoProduction;
 
   public PublishServiceImpl(){
     final String solrUrl =
@@ -107,7 +109,7 @@ public class PublishServiceImpl implements PublishService {
         e.printStackTrace();
       }
     }
-    Mongo tgtMongo = new Mongo(addresses);
+    final Mongo tgtMongo = new Mongo(addresses);
 
     idserver = new OsgiEuropeanaIdMongoServer((tgtMongo), "EuropeanaId");
     idserver.createDatastore();
@@ -122,18 +124,43 @@ public class PublishServiceImpl implements PublishService {
         e.printStackTrace();
       }
     }
-    Mongo tgtProductionMongo = new Mongo(addressesProduction);
+    final Mongo tgtProductionMongo = new Mongo(addressesProduction);
 
     idserverProduction = new OsgiEuropeanaIdMongoServer((tgtProductionMongo), "EuropeanaId");
     idserverProduction.createDatastore();
 
-    try {
-      mongoIngestion = new EdmMongoServerImpl((tgtMongo),mongoDbIngestion,"","");
+    BlockingInitializer initializer = new BlockingInitializer() {
+      @Override
+      protected void initializeInternal() {
+        try {
+          mongoIngestion = new OsgiEdmMongoServer((tgtMongo),mongoDbIngestion,"","");
+          Morphia morphia = new Morphia();
+          mongoIngestion.createDatastore(morphia);
+          mongoIngestion.getFullBean("test");
+        } catch (MongoDBException e) {
+          e.printStackTrace();
+        }
 
-      mongoProduction = new EdmMongoServerImpl((tgtProductionMongo),mongoDbProduction,"","");
-    } catch (MongoDBException e) {
-      e.printStackTrace();
-    }
+      }
+    };
+    initializer.initialize(OsgiEdmMongoServer.class.getClassLoader());
+
+
+    BlockingInitializer initializer1 = new BlockingInitializer() {
+      @Override
+      protected void initializeInternal() {
+        try {
+          mongoProduction = new OsgiEdmMongoServer((tgtProductionMongo),mongoDbProduction,"","");
+          Morphia morphia = new Morphia();
+          mongoProduction.createDatastore(morphia);
+          mongoProduction.getFullBean("test");
+        } catch (MongoDBException e) {
+          e.printStackTrace();
+        }
+      }
+    };
+    initializer1.initialize(OsgiEdmMongoServer.class.getClassLoader());
+
   }
 
 

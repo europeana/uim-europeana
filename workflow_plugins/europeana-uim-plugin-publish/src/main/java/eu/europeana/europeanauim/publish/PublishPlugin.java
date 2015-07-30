@@ -156,7 +156,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
                         uctx = bfact.createUnmarshallingContext();
                         RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 
-                        FullBeanImpl fBean = (FullBeanImpl) publishService.getMongoIngestion().getFullBean((String)mdr.getId());
+                        FullBeanImpl fBean = (FullBeanImpl) publishService.getMongoIngestion().getFullBean((String) mdr.getId());
                         SolrInputDocument doc =
                                 new SolrDocumentHandler(publishService.getSolrServer()).generate(fBean);
 
@@ -217,7 +217,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
 
                     // Check if a redirect exist and push it to production
                     if (mdr.getValues(EuropeanaModelRegistry.EDMRECORDREDIRECT) != null
-                            && mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD).size() > 0) {
+                            && mdr.getValues(EuropeanaModelRegistry.EDMRECORDREDIRECT).size() > 0) {
                         // Push redirects to production
                         EuropeanaId europeanaId =
                                 publishService
@@ -343,12 +343,12 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
 
     public int getPreferredThreadCount() {
         // TODO Auto-generated method stub
-        return 1;
+        return 24;
     }
 
     public int getMaximumThreadCount() {
         // TODO Auto-generated method stub
-        return 1;
+        return 30;
     }
 
 }

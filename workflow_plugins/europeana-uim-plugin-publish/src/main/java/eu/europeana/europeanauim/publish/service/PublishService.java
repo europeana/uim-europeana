@@ -1,6 +1,7 @@
 package eu.europeana.europeanauim.publish.service;
 
 import eu.europeana.corelib.mongo.server.EdmMongoServer;
+import eu.europeana.europeanauim.publish.OsgiEdmMongoServer;
 import org.apache.solr.client.solrj.SolrServer;
 
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
@@ -12,9 +13,9 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
  */
 public interface PublishService {
 
-	EdmMongoServer getMongoIngestion();
+	OsgiEdmMongoServer getMongoIngestion();
 
-	EdmMongoServer getMongoProduction();
+	OsgiEdmMongoServer getMongoProduction();
 
 	/**
 	 * Retrieve the Solr Server to Optimize
