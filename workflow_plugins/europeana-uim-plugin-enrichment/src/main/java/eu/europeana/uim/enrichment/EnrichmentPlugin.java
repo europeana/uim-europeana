@@ -720,6 +720,8 @@ public class EnrichmentPlugin<I> extends
             e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
 
         return jobs;
