@@ -116,7 +116,7 @@ public final class MintAMPQClientAsyncImpl extends MintAbstractAMPQClient implem
 	 */
 	protected static MintAMPQClientASync getClient() throws MintOSGIClientException{
 		
-		if(instance != null){
+		if(instance != null && receiveChannel!=null && receiveChannel.isOpen()){
 			return instance;
 		}
 		else{

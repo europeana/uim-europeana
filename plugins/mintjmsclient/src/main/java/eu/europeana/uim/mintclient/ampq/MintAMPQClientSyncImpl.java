@@ -93,7 +93,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 */
 	protected static MintAMPQClientSync getClient() throws MintOSGIClientException {
 		
-		if(instance != null){
+		if(instance != null&& receiveChannel!=null && receiveChannel.isOpen()){
 			return instance;
 		}
 		else{
@@ -161,11 +161,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public CreateUserResponse createUser(CreateUserCommand command) throws MintOSGIClientException, MintRemoteException {
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();
-		  }
+			  getClient();
 	  }
 		String correlationId = MintClientUtils.createCorrelationId();
 		CreateUserAction cu = new CreateUserAction();
@@ -189,11 +185,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public GetImportsResponse getImports(GetImportsCommand command) throws MintOSGIClientException, MintRemoteException {
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();
-		  }
+			 getClient();
 	  }
 		String correlationId = MintClientUtils.createCorrelationId();
 		GetImportsAction cu = new GetImportsAction();
@@ -215,11 +207,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public CreateImportResponse createImports(CreateImportCommand command) throws MintOSGIClientException, MintRemoteException {
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();
-		  }
+		 getClient();
 	  }
 		String correlationId = MintClientUtils.createCorrelationId();
 		
@@ -248,11 +236,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public GetTransformationsResponse getTransformations(GetTransformationsCommand command) throws MintOSGIClientException, MintRemoteException {
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();
-		  }
+		  getClient();
 	  }
 		String correlationId = MintClientUtils.createCorrelationId();
 		GetTransformationsAction cu = new GetTransformationsAction();
@@ -274,11 +258,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	@Override
 	public PublicationResponse publishCollection(PublicationCommand command) throws MintOSGIClientException, MintRemoteException {
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();
-		  }
+		  getClient();
 	  }
 		String correlationId = MintClientUtils.createCorrelationId();
 		PublicationAction cu = new PublicationAction();
@@ -303,11 +283,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 			OrganizationExistsCommand command) throws MintOSGIClientException,
 			MintRemoteException {
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();
-		  }
+		 getClient();
 	  }
 		String correlationId = MintClientUtils.createCorrelationId();
 		OrganizationExistsAction action  = new OrganizationExistsAction();
@@ -331,11 +307,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	public UserExistsResponse userExists(UserExistsCommand command)
 			throws MintOSGIClientException, MintRemoteException {
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();
-		  }
+		  getClient();
 	  }
 		String correlationId = MintClientUtils.createCorrelationId();
 		UserExistsAction action = new UserExistsAction();
@@ -359,11 +331,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	public ImportExistsResponse importExists(ImportExistsCommand command)
 			throws MintOSGIClientException, MintRemoteException {
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();
-		  }
+		 getClient();
 	  }
 		String correlationId = MintClientUtils.createCorrelationId();
 		ImportExistsAction action = new ImportExistsAction();
@@ -389,11 +357,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 	 */
 	private String handleSynchronousDelivery(String correlationID) throws MintRemoteException, MintOSGIClientException{
 	  if(!receiveChannel.isOpen()) {
-		  try {
-			  receiveChannel.basicConsume(rndReplyqueue, true, consumer);
-		  } catch (IOException e) {
-			  e.printStackTrace();e.printStackTrace();
-		  }
+		  getClient();
 	  }
 	    while (true) {
 	    	QueueingConsumer.Delivery delivery;
