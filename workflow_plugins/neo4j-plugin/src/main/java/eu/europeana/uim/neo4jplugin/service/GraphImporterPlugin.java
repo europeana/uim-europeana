@@ -132,7 +132,7 @@ public class GraphImporterPlugin<I> extends
     public boolean process(MetaDataRecord<I> mdr,
                            ExecutionContext<MetaDataRecord<I>, I> context)
             throws IngestionPluginFailedException, CorruptedDatasetException {
-        if (firstTime || mdr.getValues(EuropeanaModelRegistry.ISHIERARCHY) != null && mdr.getValues(EuropeanaModelRegistry.ISHIERARCHY).size() > 0 && mdr.getFirstValue(EuropeanaModelRegistry.ISHIERARCHY)) {
+        if (firstTime || (mdr.getValues(EuropeanaModelRegistry.ISHIERARCHY) != null && mdr.getValues(EuropeanaModelRegistry.ISHIERARCHY).size() > 0 && mdr.getFirstValue(EuropeanaModelRegistry.ISHIERARCHY))) {
             String value = null;
             List<Status> status = mdr
                     .getValues(EuropeanaModelRegistry.STATUS);
