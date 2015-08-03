@@ -185,9 +185,14 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       throw new InvalidArgumentsException("The requested object is not a Provider");
     }
 
-    String providerId =
-        ps.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode,
-            homepage, providerType, email);
+    String providerId = null;
+    try {
+      providerId =
+          ps.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode,
+              homepage, providerType, email);
+    } catch (AlreadyExistsException e) {
+      providerId = e.getDatasetId();
+    }
 
     uimProv.putValue(ControlledVocabularyProxy.REPOXID, providerId);
 
@@ -241,10 +246,15 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
       throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
       AlreadyExistsException, InternalServerErrorException {
-    String datasetOaiId =
-        ds.createDatasetOai(providerId, id, name, nameCode, isSample, schema, description,
-            namespace, metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy,
-            metadataTransformations);
+    String datasetOaiId = null;
+    try {
+      datasetOaiId =
+          ds.createDatasetOai(providerId, id, name, nameCode, isSample, schema, description,
+              namespace, metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy,
+              metadataTransformations);
+    } catch (AlreadyExistsException e) {
+      datasetOaiId = e.getDatasetId();
+    }
 
     col.putValue(ControlledVocabularyProxy.REPOXID, datasetOaiId);
 
@@ -269,11 +279,16 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
       String recordXPath, Map<String, MetadataTransformation> metadataTransformations)
       throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
       AlreadyExistsException, InternalServerErrorException {
-    String datasetFileId =
+    String datasetFileId = null;
+    try{
+    datasetFileId =
         ds.createDatasetFile(providerId, id, name, nameCode, isSample, schema, description,
             namespace, metadataFormat, marcFormat, exportDir, recordIdPolicy, extractStrategy,
             retrieveStrategy, characterEncoding, isoVariant, sourceDirectory, recordXPath,
             metadataTransformations);
+  } catch (AlreadyExistsException e) {
+    datasetFileId = e.getDatasetId();
+  }
 
     col.putValue(ControlledVocabularyProxy.REPOXID, datasetFileId);
 
