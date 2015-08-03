@@ -72,6 +72,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
   private static String mongoPort = PropertyReader
       .getProperty(UimConfigurationProperty.MONGO_HOSTPORT);
   private static String mongoDB = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA);
+  private static String mongoDBEuropeanaID = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA_ID);
   private static String zookeeperUrl = PropertyReader
       .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURL);
   // private static String solrUrl =
@@ -224,7 +225,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
     Mongo tgtMongo = new Mongo(addresses);
       idserver =
           new OsgiEuropeanaIdMongoServer((tgtMongo),
-              "EuropeanaId");
+              mongoDBEuropeanaID);
       idserver.createDatastore();
 
     } catch (NumberFormatException e) {
