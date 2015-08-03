@@ -185,9 +185,14 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
             throw new InvalidArgumentsException("The requested object is not a Provider");
         }
 
-        String providerId =
-                ps.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode,
-                        homepage, providerType, email);
+    String providerId = null;
+    try {
+      providerId =
+          ps.createProvider(aggregatorId, id, name, country, countryCode, description, nameCode,
+              homepage, providerType, email);
+    } catch (AlreadyExistsException e) {
+      providerId = e.getDatasetId();
+    }
 
         uimProv.putValue(ControlledVocabularyProxy.REPOXID, providerId);
 
@@ -234,17 +239,22 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
         return ds.getDatasetRecordCount(id);
     }
 
-    @Override
-    public void createDatasourceOai(Collection col, String providerId, String id, String name,
-                                    String nameCode, boolean isSample, String schema, String description, String namespace,
-                                    String metadataFormat, String marcFormat, String oaiUrl, String oaiSet, String exportDir,
-                                    RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
-            throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
-            AlreadyExistsException, InternalServerErrorException {
-        String datasetOaiId =
-                ds.createDatasetOai(providerId, id, name, nameCode, isSample, schema, description,
-                        namespace, metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy,
-                        metadataTransformations);
+  @Override
+  public void createDatasourceOai(Collection col, String providerId, String id, String name,
+      String nameCode, boolean isSample, String schema, String description, String namespace,
+      String metadataFormat, String marcFormat, String oaiUrl, String oaiSet, String exportDir,
+      RecordIdPolicy recordIdPolicy, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException {
+    String datasetOaiId = null;
+    try {
+      datasetOaiId =
+          ds.createDatasetOai(providerId, id, name, nameCode, isSample, schema, description,
+              namespace, metadataFormat, marcFormat, oaiUrl, oaiSet, exportDir, recordIdPolicy,
+              metadataTransformations);
+    } catch (AlreadyExistsException e) {
+      datasetOaiId = e.getDatasetId();
+    }
 
         col.putValue(ControlledVocabularyProxy.REPOXID, datasetOaiId);
 
@@ -260,20 +270,25 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
 
     }
 
-    @Override
-    public void createDatasetFile(Collection col, String providerId, String id, String name,
-                                  String nameCode, boolean isSample, String schema, String description, String namespace,
-                                  String metadataFormat, String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
-                                  FileExtractStrategy extractStrategy, FileRetrieveStrategy retrieveStrategy,
-                                  CharacterEncoding characterEncoding, Iso2709Variant isoVariant, String sourceDirectory,
-                                  String recordXPath, Map<String, MetadataTransformation> metadataTransformations)
-            throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
-            AlreadyExistsException, InternalServerErrorException {
-        String datasetFileId =
-                ds.createDatasetFile(providerId, id, name, nameCode, isSample, schema, description,
-                        namespace, metadataFormat, marcFormat, exportDir, recordIdPolicy, extractStrategy,
-                        retrieveStrategy, characterEncoding, isoVariant, sourceDirectory, recordXPath,
-                        metadataTransformations);
+  @Override
+  public void createDatasetFile(Collection col, String providerId, String id, String name,
+      String nameCode, boolean isSample, String schema, String description, String namespace,
+      String metadataFormat, String marcFormat, String exportDir, RecordIdPolicy recordIdPolicy,
+      FileExtractStrategy extractStrategy, FileRetrieveStrategy retrieveStrategy,
+      CharacterEncoding characterEncoding, Iso2709Variant isoVariant, String sourceDirectory,
+      String recordXPath, Map<String, MetadataTransformation> metadataTransformations)
+      throws InvalidArgumentsException, DoesNotExistException, MissingArgumentsException,
+      AlreadyExistsException, InternalServerErrorException {
+    String datasetFileId = null;
+    try{
+    datasetFileId =
+        ds.createDatasetFile(providerId, id, name, nameCode, isSample, schema, description,
+            namespace, metadataFormat, marcFormat, exportDir, recordIdPolicy, extractStrategy,
+            retrieveStrategy, characterEncoding, isoVariant, sourceDirectory, recordXPath,
+            metadataTransformations);
+  } catch (AlreadyExistsException e) {
+    datasetFileId = e.getDatasetId();
+  }
 
         col.putValue(ControlledVocabularyProxy.REPOXID, datasetFileId);
 
