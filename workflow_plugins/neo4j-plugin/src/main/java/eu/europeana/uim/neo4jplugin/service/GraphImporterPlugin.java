@@ -73,6 +73,7 @@ public class GraphImporterPlugin<I> extends
         super("GraphImporterPlugin", "GraphImporterPlugin");
         init();
         this.graphconstructor = provider.getGraphconstructor();
+        graphconstructor.init();
         firstTime = isFirstTime;
     }
 
@@ -198,7 +199,7 @@ public class GraphImporterPlugin<I> extends
                         mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
                                 timestampUpdated.getTime());
                         graphconstructor.parseMorphiaEntity(bean);
-                        mdr.addValue(EuropeanaModelRegistry.ISHIERARCHY, new Boolean(true));
+                        mdr.addValue(EuropeanaModelRegistry.ISHIERARCHY, true);
                     } else {
                         throw new IngestionPluginFailedException("Cannot get a reference to the Neo4j endpoint");
                     }
