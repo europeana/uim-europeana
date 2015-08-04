@@ -405,7 +405,9 @@ public class GraphConstructor {
 
     public void computeDependencies(String collectionId) {
         Set<RelTemp> map = relationsmap.get(collectionId);
-        System.out.println("Relationships are: " + map.size());
+        if(map!=null) {
+            System.out.println("Relationships are: " + map.size());
+        }
     }
 
     public void generateNodes(final String collectionId) {
@@ -413,7 +415,7 @@ public class GraphConstructor {
     }
 
     public void generateNodes(final String collectionId, int limit) {
-        computeDependencies(collectionId);
+        //computeDependencies(collectionId);
         final ConcurrentHashMap<String, Map<String, Object>> map = new ConcurrentHashMap<String, Map<String, Object>>();
         File f = new File("urls");
         List<String> urls = new ArrayList<>();

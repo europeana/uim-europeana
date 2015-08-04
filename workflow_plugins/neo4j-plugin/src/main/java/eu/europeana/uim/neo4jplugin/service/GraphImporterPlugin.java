@@ -37,7 +37,6 @@ import javax.management.InvalidAttributeValueException;
 
 /**
  * @author geomark
- *
  */
 public class GraphImporterPlugin<I> extends
         AbstractIngestionPlugin<MetaDataRecord<I>, I> {
@@ -74,6 +73,7 @@ public class GraphImporterPlugin<I> extends
         super("GraphImporterPlugin", "GraphImporterPlugin");
         init();
         this.graphconstructor = provider.getGraphconstructor();
+        graphconstructor.init();
         firstTime = isFirstTime;
     }
 
@@ -131,9 +131,9 @@ public class GraphImporterPlugin<I> extends
      * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana.uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
      */
     public boolean process(MetaDataRecord<I> mdr,
-            ExecutionContext<MetaDataRecord<I>, I> context)
+                           ExecutionContext<MetaDataRecord<I>, I> context)
             throws IngestionPluginFailedException, CorruptedDatasetException {
-        if(firstTime||mdr.getFirstValue(EuropeanaModelRegistry.ISHIERARCHY)!=null) {
+        if (firstTime || (mdr.getValues(EuropeanaModelRegistry.ISHIERARCHY) != null && mdr.getValues(EuropeanaModelRegistry.ISHIERARCHY).size() > 0 && mdr.getFirstValue(EuropeanaModelRegistry.ISHIERARCHY))) {
             String value = null;
             List<Status> status = mdr
                     .getValues(EuropeanaModelRegistry.STATUS);
@@ -199,7 +199,7 @@ public class GraphImporterPlugin<I> extends
                         mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
                                 timestampUpdated.getTime());
                         graphconstructor.parseMorphiaEntity(bean);
-                        mdr.addValue(EuropeanaModelRegistry.ISHIERARCHY,new Boolean(true));
+                        mdr.addValue(EuropeanaModelRegistry.ISHIERARCHY, true);
                     } else {
                         throw new IngestionPluginFailedException("Cannot get a reference to the Neo4j endpoint");
                     }
@@ -236,9 +236,9 @@ public class GraphImporterPlugin<I> extends
         if (execution.getProperties().getProperty(
                 LIMIT) != null) {
             limit = Integer.parseInt(execution.getProperties().getProperty(
-                LIMIT));
+                    LIMIT));
         }
-        graphconstructor.generateNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic(),limit);
+        graphconstructor.generateNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic(), limit);
         // graphconstructor.addToIndex(((Collection) execution.getExecution().getDataSet()).getMnemonic());
 
         try {

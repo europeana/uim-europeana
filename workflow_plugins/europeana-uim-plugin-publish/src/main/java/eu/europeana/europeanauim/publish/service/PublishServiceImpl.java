@@ -40,6 +40,8 @@ public class PublishServiceImpl implements PublishService {
           UimConfigurationProperty.MONGO_INGESTION_DB);
   private static String mongoDbProduction = PropertyReader.getProperty(
           UimConfigurationProperty.MONGO_PRODUCTION_DB);
+  private static String mongoDBEuropeanaIDIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGODB_EUROPEANA_ID);
+  private static String mongoDBEuropeanaIDProduction = PropertyReader.getProperty(UimConfigurationProperty.MONGODB_EUROPEANA_ID_PRODUCTION);
   @Override
   public  OsgiEdmMongoServer getMongoIngestion() {
     return mongoIngestion;
@@ -111,7 +113,7 @@ public class PublishServiceImpl implements PublishService {
     }
     final Mongo tgtMongo = new Mongo(addresses);
 
-    idserver = new OsgiEuropeanaIdMongoServer((tgtMongo), "EuropeanaId");
+    idserver = new OsgiEuropeanaIdMongoServer((tgtMongo), mongoDBEuropeanaIDIngestion);
     idserver.createDatastore();
     List<ServerAddress> addressesProduction = new ArrayList<>();
     for (String mongoStr : mongoHostProduction) {
@@ -126,7 +128,7 @@ public class PublishServiceImpl implements PublishService {
     }
     final Mongo tgtProductionMongo = new Mongo(addressesProduction);
 
-    idserverProduction = new OsgiEuropeanaIdMongoServer((tgtProductionMongo), "EuropeanaId");
+    idserverProduction = new OsgiEuropeanaIdMongoServer((tgtProductionMongo), mongoDBEuropeanaIDProduction);
     idserverProduction.createDatastore();
 
     BlockingInitializer initializer = new BlockingInitializer() {

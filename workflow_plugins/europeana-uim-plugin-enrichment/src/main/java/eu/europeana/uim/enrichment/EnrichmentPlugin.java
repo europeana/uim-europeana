@@ -744,8 +744,14 @@ public class EnrichmentPlugin<I> extends
         List<RetrievedEntity> entities = new ArrayList<RetrievedEntity>();
         for (EntityWrapper entity : enrichments) {
             RetrievedEntity ret = new RetrievedEntity();
-            ret.setOriginalField(entity.getOriginalField());
-            ret.setOriginalLabel(entity.getOriginalValue());
+            //This can be null
+            if(entity.getOriginalField()!=null) {
+                ret.setOriginalField(entity.getOriginalField());
+            }
+            //This should not but just in case
+            if(entity.getOriginalValue()!=null) {
+                ret.setOriginalLabel(entity.getOriginalValue());
+            }
             ret.setUri(entity.getUrl());
             if (entity.getClassName().equals(TimespanImpl.class.getName())) {
                 ret.setEntity(new ObjectMapper().readValue(entity.

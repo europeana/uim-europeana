@@ -15,7 +15,13 @@ public enum UimConfigurationProperty {
 	NEO4JPRODUCTIONPATH("neo4j.production.path"),
     NEO4JPRODUCTIONINDEX("neo4j.production.index"),
     MONGO_HOSTURL("mongo.hostUrl"),
-	MONGO_HOSTURL_PRODUCTION("mongo.hostUrl.production"), MONGO_INGESTION_DB("mongo.db.europeana"), MONGO_PRODUCTION_DB("mongo.db.europeana.production"), ZOOKEEPER_PRODUCTION_HOSTURL("zookeeper.production.host"), ZOOKEEPER_INGESTION_HOSTURL("zookeeper.host");
+	MONGO_HOSTURL_PRODUCTION("mongo.hostUrl.production"), 
+        MONGO_INGESTION_DB("mongo.db.europeana"), 
+        MONGO_PRODUCTION_DB("mongo.db.europeana.production"), 
+        ZOOKEEPER_PRODUCTION_HOSTURL("zookeeper.production.host"), 
+        ZOOKEEPER_INGESTION_HOSTURL("zookeeper.host"),
+        MONGODB_EUROPEANA_ID("mongo.db.europeanaId"),
+        MONGODB_EUROPEANA_ID_PRODUCTION("mongo.db.europeanaId.production");
 	
 	String field;
 	private UimConfigurationProperty(String field){
