@@ -16,26 +16,6 @@
  */
 package eu.europeana.uim.enrichment;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
-import org.theeuropeanlibrary.model.common.qualifier.Status;
-
 import eu.europeana.corelib.definitions.edm.beans.FullBean;
 import eu.europeana.corelib.definitions.edm.entity.ProvidedCHO;
 import eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice;
@@ -64,6 +44,22 @@ import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.store.MetaDataRecord;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IUnmarshallingContext;
+import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
+
+import java.io.StringReader;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Redirect creation plugin
@@ -224,8 +220,8 @@ public class LookupCreationPlugin<I> extends
 
                     if (StringUtils.isNotEmpty(hash)) {
                         EuropeanaId id = createLookupEntry(fullBean, fileName, collectionId, hash);
-                        EuropeanaRedirectId europeanaRedirectId = new EuropeanaRedirectId(id.getNewId(), id.getOldId());
-                        mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, europeanaRedirectId);
+
+                        mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
                         return true;
                     }
                 } else {
@@ -270,9 +266,10 @@ public class LookupCreationPlugin<I> extends
                                         createHash?HashUtils.createHash(fieldValue):fieldValue,
                                         context.getProperties().getProperty(
                                                 USE_FUNCTIONS)));
-                        
-                        EuropeanaRedirectId europeanaRedirectId = new EuropeanaRedirectId(id.getNewId(), id.getOldId());
-                        mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, europeanaRedirectId);
+                        if(id!=null) {
+
+                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
+                        }
                     } else {
                         String edmValue = null;
                         if (context.getProperties()
@@ -316,9 +313,10 @@ public class LookupCreationPlugin<I> extends
                                 edmValue,
                                 context.getProperties().getProperty(
                                         USE_FUNCTIONS), rdf.getProvidedCHOList().get(0).getAbout());
-                        
-                        EuropeanaRedirectId europeanaRedirectId = new EuropeanaRedirectId(id.getNewId(), id.getOldId());
-                        mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, europeanaRedirectId);
+                        if(id!=null) {
+
+                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
+                        }
                     }
 
                 }
@@ -339,17 +337,19 @@ public class LookupCreationPlugin<I> extends
             paramsOld.add(
                     "q",
                     property
-                    + ":"
-                    + ClientUtils
-                    .escapeQueryChars(applyTransformations(
+                            + ":"
+                            + ClientUtils
+                            .escapeQueryChars(applyTransformations(
                                     fieldValue, transformations)));
             System.out.println(property
                     + ":"
                     + ClientUtils
                     .escapeQueryChars(applyTransformations(
                                     fieldValue, transformations)));
-            SolrDocumentList solrOldList = enrichmentService
-                    .getProductionCloudSolrServer().query(paramsOld).getResults();
+            CloudSolrServer solrServerProduction = enrichmentService
+                    .getProductionCloudSolrServer();
+
+            SolrDocumentList solrOldList = solrServerProduction.query(paramsOld).getResults();
 
             if (solrOldList.size() == 1) {
                 finalId = solrOldList.get(0).getFirstValue("europeana_id")

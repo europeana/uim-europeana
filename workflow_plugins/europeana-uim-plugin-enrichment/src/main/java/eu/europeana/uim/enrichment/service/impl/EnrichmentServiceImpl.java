@@ -75,6 +75,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
   private static String mongoDBEuropeanaID = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANA_ID);
   private static String zookeeperUrl = PropertyReader
       .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURL);
+  private static String zookeeperUrlProduction = PropertyReader
+          .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURLPRODUCTION);
   // private static String solrUrl =
   // PropertyReader.getProperty(UimConfigurationProperty.SOLR_HOSTURL);
   // private static String solrProductionUrl = PropertyReader
@@ -83,6 +85,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
   private static String[] cloudSolrUrl = PropertyReader.getProperty(
       UimConfigurationProperty.CLOUD_SOLR_HOSTURL).split(",");
+  private static String[] cloudSolrUrlProduction = PropertyReader.getProperty(
+          UimConfigurationProperty.SOLR_PRODUCTION_HOSTURL).split(",");
   private static String cloudSolrCore = PropertyReader
       .getProperty(UimConfigurationProperty.CLOUD_SOLR_CORE);
 
@@ -99,8 +103,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
       cloudSolrServer = new CloudSolrServer(zookeeperUrl, lbTarget);
       cloudSolrServer.setDefaultCollection(cloudSolrCore);
       cloudSolrServer.connect();
-      
-      cloudSolrProductionServer = new CloudSolrServer(zookeeperUrl, lbTarget);
+      LBHttpSolrServer lbTargetProduction = new LBHttpSolrServer(cloudSolrUrlProduction);
+      cloudSolrProductionServer = new CloudSolrServer(zookeeperUrlProduction, lbTargetProduction);
       cloudSolrProductionServer.setDefaultCollection(cloudSolrCore);
       cloudSolrProductionServer.connect();
       

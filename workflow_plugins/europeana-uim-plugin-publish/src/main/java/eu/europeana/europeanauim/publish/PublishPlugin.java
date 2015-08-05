@@ -223,7 +223,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
                                 publishService
                                         .getEuropeanaIdMongoServer()
                                         .retrieveEuropeanaIdFromNew(
-                                                mdr.getValues(EuropeanaModelRegistry.EDMRECORDREDIRECT).get(0).getNewId())
+                                                (String)mdr.getId())
                                         .get(0);
                         publishService.getEuropeanaIdMongoServerProduction().saveEuropeanaId(europeanaId);
                         // Remove it from the mdr
@@ -303,7 +303,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
         }
         if (Boolean.parseBoolean(collection
                 .getValue(ControlledVocabularyProxy.ISNEW.toString()))
-                || check) {
+                || (collection.getValue("forcedelete")!= null || Boolean.parseBoolean(collection.getValue("forcedelete")))||check) {
 
 
             handler.clearData(collection.getMnemonic());

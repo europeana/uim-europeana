@@ -73,7 +73,7 @@ public class GraphImporterPlugin<I> extends
         super("GraphImporterPlugin", "GraphImporterPlugin");
         init();
         this.graphconstructor = provider.getGraphconstructor();
-        graphconstructor.init();
+
         firstTime = isFirstTime;
     }
 
@@ -134,6 +134,8 @@ public class GraphImporterPlugin<I> extends
                            ExecutionContext<MetaDataRecord<I>, I> context)
             throws IngestionPluginFailedException, CorruptedDatasetException {
         if (firstTime || (mdr.getValues(EuropeanaModelRegistry.ISHIERARCHY) != null && mdr.getValues(EuropeanaModelRegistry.ISHIERARCHY).size() > 0 && mdr.getFirstValue(EuropeanaModelRegistry.ISHIERARCHY))) {
+            Collection col = (Collection)context.getExecution().getDataSet();
+            col.putValue("isHierarchy","true");
             String value = null;
             List<Status> status = mdr
                     .getValues(EuropeanaModelRegistry.STATUS);
@@ -231,20 +233,23 @@ public class GraphImporterPlugin<I> extends
 
     public void completed(ExecutionContext<MetaDataRecord<I>, I> execution)
             throws IngestionPluginFailedException {
-        graphconstructor.deleteNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic());
-        int limit = 1000;
-        if (execution.getProperties().getProperty(
-                LIMIT) != null) {
-            limit = Integer.parseInt(execution.getProperties().getProperty(
-                    LIMIT));
-        }
-        graphconstructor.generateNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic(), limit);
-        // graphconstructor.addToIndex(((Collection) execution.getExecution().getDataSet()).getMnemonic());
+        Collection col = (Collection) execution.getExecution().getDataSet();
+        if(firstTime || Boolean.parseBoolean(col.getValue("isHierarchy"))) {
+            graphconstructor.deleteNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic());
+            int limit = 1000;
+            if (execution.getProperties().getProperty(
+                    LIMIT) != null) {
+                limit = Integer.parseInt(execution.getProperties().getProperty(
+                        LIMIT));
+            }
+            graphconstructor.generateNodes(((Collection) execution.getExecution().getDataSet()).getMnemonic(), limit);
+            // graphconstructor.addToIndex(((Collection) execution.getExecution().getDataSet()).getMnemonic());
 
-        try {
-            graphconstructor.generateNodeLinks(((Collection) execution.getExecution().getDataSet()).getMnemonic());
-        } catch (InvalidAttributeValueException ex) {
-            Logger.getLogger(GraphImporterPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                graphconstructor.generateNodeLinks(((Collection) execution.getExecution().getDataSet()).getMnemonic());
+            } catch (InvalidAttributeValueException ex) {
+                Logger.getLogger(GraphImporterPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 

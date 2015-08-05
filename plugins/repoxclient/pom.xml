@@ -21,6 +21,12 @@
 			<artifactId>repox-client-rest-jersey</artifactId>
 			<version>3.0.1-SNAPSHOT</version>
 		</dependency>
+		<!--<dependency>
+			<groupId>repox</groupId>
+			<artifactId>repox-manager</artifactId>
+			<version>3.0.1-SNAPSHOT</version>
+		</dependency>
+			-->
 		<!-- <dependency> -->
 		<!-- <groupId>javax.ws.rs</groupId> -->
 		<!-- <artifactId>jsr311-api</artifactId> -->
@@ -131,7 +137,6 @@
 							eu.europeana.uim.repox; version=0.0.0,
 							eu.europeana.uim.repox.model; version=0.0.0,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues,
-							pt.utl.ist.http,
 							!*
 						</Import-Package>
 						<Embed-Dependency>

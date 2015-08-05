@@ -321,6 +321,7 @@ public class EnrichmentPlugin<I> extends
 //                        + collection.getName().split("_")[0] + "_*");
                 cloudSolrServer.deleteByQuery("europeana_collectionName:"
                     + collection.getName().split("_")[0] + "_*");
+                collection.putValue("forcedelete","true");
                // productionCloudSolrServer.deleteByQuery("europeana_collectionName:"
                //     + collection.getName().split("_")[0] + "_*");
             }
@@ -473,6 +474,7 @@ public class EnrichmentPlugin<I> extends
                         .getValues(EuropeanaModelRegistry.STATUS);
                 if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED))) {
                     try {
+                        mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
                         SolrInputDocument basicDocument = new SolrConstructor()
                                 .constructSolrDocument(rdf);
 
@@ -599,6 +601,7 @@ public class EnrichmentPlugin<I> extends
 
                         context.putValue(addedTKey,
                                 context.getValue(addedTKey) + 1);
+                        context.getStorageEngine().checkpoint();
                         fBean.setState(eu.europeana.publication.common.State.ACCEPTED);
 
                         SolrInputDocument doc = new SolrDocumentHandler(cloudSolrServer).generate(fBean);
@@ -743,30 +746,32 @@ public class EnrichmentPlugin<I> extends
             List<EntityWrapper> enrichments) throws IOException {
         List<RetrievedEntity> entities = new ArrayList<RetrievedEntity>();
         for (EntityWrapper entity : enrichments) {
-            RetrievedEntity ret = new RetrievedEntity();
-            //This can be null
-            if(entity.getOriginalField()!=null) {
-                ret.setOriginalField(entity.getOriginalField());
+            if(entity!=null) {
+                RetrievedEntity ret = new RetrievedEntity();
+                //This can be null
+                if (entity.getOriginalField() != null) {
+                    ret.setOriginalField(entity.getOriginalField());
+                }
+                //This should not but just in case
+                if (entity.getOriginalValue() != null) {
+                    ret.setOriginalLabel(entity.getOriginalValue());
+                }
+                ret.setUri(entity.getUrl());
+                if (entity.getClassName().equals(TimespanImpl.class.getName())) {
+                    ret.setEntity(new ObjectMapper().readValue(entity.
+                            getContextualEntity(), TimespanImpl.class));
+                } else if (entity.getClassName().equals(AgentImpl.class.getName())) {
+                    ret.setEntity(new ObjectMapper().readValue(entity.
+                            getContextualEntity(), AgentImpl.class));
+                } else if (entity.getClassName().equals(ConceptImpl.class.getName())) {
+                    ret.setEntity(new ObjectMapper().readValue(entity.
+                            getContextualEntity(), ConceptImpl.class));
+                } else {
+                    ret.setEntity(new ObjectMapper().readValue(entity.
+                            getContextualEntity(), PlaceImpl.class));
+                }
+                entities.add(ret);
             }
-            //This should not but just in case
-            if(entity.getOriginalValue()!=null) {
-                ret.setOriginalLabel(entity.getOriginalValue());
-            }
-            ret.setUri(entity.getUrl());
-            if (entity.getClassName().equals(TimespanImpl.class.getName())) {
-                ret.setEntity(new ObjectMapper().readValue(entity.
-                        getContextualEntity(), TimespanImpl.class));
-            } else if (entity.getClassName().equals(AgentImpl.class.getName())) {
-                ret.setEntity(new ObjectMapper().readValue(entity.
-                        getContextualEntity(), AgentImpl.class));
-            } else if (entity.getClassName().equals(ConceptImpl.class.getName())) {
-                ret.setEntity(new ObjectMapper().readValue(entity.
-                        getContextualEntity(), ConceptImpl.class));
-            } else {
-                ret.setEntity(new ObjectMapper().readValue(entity.
-                        getContextualEntity(), PlaceImpl.class));
-            }
-            entities.add(ret);
         }
 
         return entities;
