@@ -21,12 +21,8 @@
 			<artifactId>repox-client-rest-jersey</artifactId>
 			<version>3.0.1-SNAPSHOT</version>
 		</dependency>
-		<!--<dependency>
-			<groupId>repox</groupId>
-			<artifactId>repox-manager</artifactId>
-			<version>3.0.1-SNAPSHOT</version>
-		</dependency>
-			-->
+		<!--<dependency> <groupId>repox</groupId> <artifactId>repox-manager</artifactId> 
+			<version>3.0.1-SNAPSHOT</version> </dependency> -->
 		<!-- <dependency> -->
 		<!-- <groupId>javax.ws.rs</groupId> -->
 		<!-- <artifactId>jsr311-api</artifactId> -->
@@ -92,13 +88,17 @@
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
 						<Export-Package>eu.europeana.uim.repoxclient.*,pt.utl.ist.util.exceptions.*,
-							pt.utl.ist.util, pt.utl.ist.recordPackage, pt.utl.ist.dataProvider.dataSource</Export-Package>
+							pt.utl.ist.util, pt.utl.ist.recordPackage,
+							pt.utl.ist.dataProvider.dataSource,pt.utl.ist.http,
+							pt.utl.ist.marc, pt.utl.ist.marc.iso2709.shared</Export-Package>
 						<Import-Package>
 							org.osgi.service.packageadmin; version=1.2.0,
 							org.xml.sax;
 							version=0.0.0,
-							org.osgi.service.blueprint; version=1.0.1,
-							org.osgi.service.blueprint.container; version=1.0.1,
+							org.osgi.service.blueprint;
+							version=1.0.1,
+							org.osgi.service.blueprint.container;
+							version=1.0.1,
 							org.apache.felix.gogo.commands; version=0.6.1,
 							org.apache.felix.gogo.commands.basic; version=0.6.1,
 							org.apache.felix.service.command; version=0.6.1,
@@ -118,7 +118,8 @@
 							javax.sql;
 							version=0.0.0,
 							javax.xml.bind;version=0.0.0,
-							org.apache.commons.lang; version=2.4.0,
+							org.apache.commons.lang;
+							version=2.4.0,
 							org.apache.commons.io; version=2.1.0,
 							eu.europeana.uim;
 							version=0.0.0,

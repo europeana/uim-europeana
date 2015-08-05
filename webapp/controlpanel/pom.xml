@@ -172,6 +172,9 @@
 							pt.utl.ist.dataProvider.dataSource,
 							javax.security.sasl,
 							javax.security.auth.login,
+							pt.utl.ist.http,
+							pt.utl.ist.marc,
+							pt.utl.ist.marc.iso2709.shared,
 							!org.slf4j.*,
 							!*
 						</Import-Package>
