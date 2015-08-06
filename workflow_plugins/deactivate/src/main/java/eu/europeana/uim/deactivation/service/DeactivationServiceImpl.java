@@ -127,7 +127,7 @@ public class DeactivationServiceImpl implements DeactivationService {
           }
         }
       };
-      solrInit.initialize(HttpSolrServer.class.getClassLoader());
+      solrInit.initialize(CloudSolrServer.class.getClassLoader());
 
       BlockingInitializer initializer = new BlockingInitializer() {
 
