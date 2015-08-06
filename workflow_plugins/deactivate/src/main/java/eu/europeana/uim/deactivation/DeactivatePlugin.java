@@ -118,14 +118,21 @@ public class DeactivatePlugin<I> extends
 			if (newCollectionId != null) {
 				collectionId = newCollectionId;
 			}
-			log.log(Level.INFO, "removing from solr");
-			dService.getSolrServer().deleteByQuery(
+			log.log(Level.INFO, "removing from solr(ingestion)");
+			dService.getCloudSolrServer().deleteByQuery(
 					"europeana_collectionName:" + collectionId + "*");
+			log.log(Level.INFO, "removing from solr(production)");
+            dService.getProductionCloudSolrServer().deleteByQuery(
+                    "europeana_collectionName:" + collectionId + "*");
 			log.log(Level.INFO, "removing from mongo");
 			new FullBeanHandler(dService.getMongoServer())
 					.clearData(collectionId);
+			new FullBeanHandler(dService.getProductionMongoServer())
+            .clearData(collectionId);
 			clearData(dService.getGraphDb(), dService.getNeo4jIndex(),
 					collectionId);
+			clearData(dService.getGraphDbProduction(), dService.getNeo4jIndexProduction(),
+                collectionId);
 			 creator = new InstanceCreatorImpl();
 			HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(),creator.getConfig());
 			client.deactivateJobs(new ReferenceOwner(arg0.getDataSetCollection().getProvider().getMnemonic(),((Collection)arg0.getExecution().getDataSet()).getMnemonic(),null));
@@ -182,7 +189,8 @@ public class DeactivatePlugin<I> extends
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
 		try {
-			dService.getSolrServer().commit();
+			dService.getCloudSolrServer().commit();
+			dService.getProductionCloudSolrServer().commit();
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			log.log(Level.SEVERE, e.getMessage());
