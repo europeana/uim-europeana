@@ -112,9 +112,16 @@ public class PublishServiceImpl implements PublishService {
       }
     }
     final Mongo tgtMongo = new Mongo(addresses);
+    BlockingInitializer init2 = new BlockingInitializer() {
+      @Override
+      protected void initializeInternal() {
 
-    idserver = new OsgiEuropeanaIdMongoServer((tgtMongo), mongoDBEuropeanaIDIngestion);
-    idserver.createDatastore();
+        idserver = new OsgiEuropeanaIdMongoServer((tgtMongo), mongoDBEuropeanaIDIngestion);
+        idserver.createDatastore();
+        idserver.retrieveEuropeanaIdFromOld("test");
+      }
+    };
+    init2.initialize(OsgiEuropeanaIdMongoServer.class.getClassLoader());
     List<ServerAddress> addressesProduction = new ArrayList<>();
     for (String mongoStr : mongoHostProduction) {
       ServerAddress address;
@@ -128,8 +135,15 @@ public class PublishServiceImpl implements PublishService {
     }
     final Mongo tgtProductionMongo = new Mongo(addressesProduction);
 
-    idserverProduction = new OsgiEuropeanaIdMongoServer((tgtProductionMongo), mongoDBEuropeanaIDProduction);
-    idserverProduction.createDatastore();
+    BlockingInitializer init1 = new BlockingInitializer() {
+      @Override
+      protected void initializeInternal() {
+        idserverProduction = new OsgiEuropeanaIdMongoServer((tgtProductionMongo), mongoDBEuropeanaIDProduction);
+        idserverProduction.createDatastore();
+        idserverProduction.retrieveEuropeanaIdFromOld("test");
+      }
+    };
+    init1.initialize(OsgiEuropeanaIdMongoServer.class.getClassLoader());
 
     BlockingInitializer initializer = new BlockingInitializer() {
       @Override
