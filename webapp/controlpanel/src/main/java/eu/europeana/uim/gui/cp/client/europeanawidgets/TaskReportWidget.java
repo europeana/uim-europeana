@@ -4,14 +4,16 @@ import static com.google.gwt.dom.client.BrowserEvents.CLICK;
 import static com.google.gwt.dom.client.BrowserEvents.KEYDOWN;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.engine.query.FilterQueryPlan;
+import org.apache.commons.beanutils.BeanComparator;
+import org.apache.commons.collections.comparators.ComparableComparator;
+import org.apache.commons.collections.comparators.ReverseComparator;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ActionCell.Delegate;
-import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
@@ -332,7 +334,12 @@ public class TaskReportWidget extends IngestionWidget {
 					public void onSuccess(TaskReportResultDTO result) {
 						reports.clear();
 						cellTable.setRowCount(result.getNumberRecords());
-						reports.addAll(result.getReports());	
+						List<TaskReportDTO> taskReports = result.getReports();
+						//Sort Task Reports by id in descending order;
+						BeanComparator<TaskReportDTO> reverseOrderBeanComparator = new BeanComparator<TaskReportDTO>(
+								"taskId", new ReverseComparator(new ComparableComparator()));
+						Collections.sort(taskReports, reverseOrderBeanComparator);
+						reports.addAll(taskReports);	
 						cellTable.setRowData(offset, reports);
 					}
 				});
