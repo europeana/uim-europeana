@@ -25,8 +25,9 @@ public enum UimConfigurationProperty {
 
 	MONGO_HOSTURL("mongo.hostUrl"),
 	MONGO_HOSTPORT("mongo.hostPort"),
-	MONGO_USERNAME("mongo.username"),
-	MONGO_PASSWORD("mongo.password"),
+	MONGO_USERNAME("mongo.ingestion.username"),
+	MONGO_PASSWORD("mongo.ingestion.password"),
+
 	MONGO_DB_EUROPEANA("mongo.db.europeana"),
 	ZOOKEEPER_HOSTURL("zookeeper.host"),
 	ZOOKEEPER_HOSTURLPRODUCTION("zookeeper.production.host"),

@@ -51,7 +51,8 @@ public class ImportVocabularyProxyImpl extends
 	{
 		try {
 			mongo = new VocabularyMongoServerImpl(
-			    MongoProvider.getMongo(), MONGO_DB);
+			    MongoProvider.getMongo(), MONGO_DB,PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME),
+					PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD));
 
 		} catch (MongoException e) {
 			// TODO Auto-generated catch block

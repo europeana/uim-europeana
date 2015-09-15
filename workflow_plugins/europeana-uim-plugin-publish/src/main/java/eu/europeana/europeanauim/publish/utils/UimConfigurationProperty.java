@@ -21,8 +21,11 @@ public enum UimConfigurationProperty {
         ZOOKEEPER_PRODUCTION_HOSTURL("zookeeper.production.host"), 
         ZOOKEEPER_INGESTION_HOSTURL("zookeeper.host"),
         MONGODB_EUROPEANA_ID("mongo.db.europeanaId"),
-        MONGODB_EUROPEANA_ID_PRODUCTION("mongo.db.europeanaId.production");
-	
+        MONGODB_EUROPEANA_ID_PRODUCTION("mongo.db.europeanaId.production"),
+	MONGO_INGESTION_USERNAME("mongo.ingestion.username"),
+		MONGO_INGESTION_PASSWORD("mongo.ingestion.password"),
+	MONGO_PRODUCTION_USERNAME("mongo.production.username"),
+	MONGO_PRODUCTION_PASSWORD("mongo.production.password");
 	String field;
 	private UimConfigurationProperty(String field){
 		this.field = field;

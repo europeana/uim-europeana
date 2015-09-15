@@ -68,7 +68,10 @@ public class DeactivationServiceImpl implements DeactivationService {
   private static String neo4jPath = PropertyReader.getProperty(UimConfigurationProperty.NEO4JPATH);
   private static String neo4jPathProduction = PropertyReader.getProperty(UimConfigurationProperty.NEO4JPATHPRODUCTION);
   private static CollectionMongoServer collectionMongoServer;
-
+  private static String usernameIngestion=PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME);
+  private static String passwordIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD);
+  private static String usernameProduction=PropertyReader.getProperty(UimConfigurationProperty.MONGO_PRODUCTION_USERNAME);
+  private static String passwordProduction = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PRODUCTION_PASSWORD);
   public DeactivationServiceImpl() {
 
   }
@@ -147,7 +150,7 @@ public class DeactivationServiceImpl implements DeactivationService {
               addresses.add(address);
             }
             Mongo tgtMongo = new Mongo(addresses);
-            mongoServer = new ExtendedEdmMongoServer(tgtMongo, mongoDB, "", "");
+            mongoServer = new ExtendedEdmMongoServer(tgtMongo, mongoDB, usernameIngestion, passwordIngestion);
             mongoServer.createDatastore(new Morphia());
             mongoServer.getFullBean("test");
             
@@ -163,7 +166,7 @@ public class DeactivationServiceImpl implements DeactivationService {
               addressesProduction.add(addressProduction);
             }
             Mongo tgtMongoProduction = new Mongo(addressesProduction);
-            mongoServerProduction = new ExtendedEdmMongoServer(tgtMongoProduction, mongoDBProduction, "", "");
+            mongoServerProduction = new ExtendedEdmMongoServer(tgtMongoProduction, mongoDBProduction, usernameProduction, passwordProduction);
             mongoServerProduction.createDatastore(new Morphia());
             mongoServerProduction.getFullBean("test");
           } catch (NumberFormatException e) {
@@ -203,7 +206,7 @@ public class DeactivationServiceImpl implements DeactivationService {
             addresses.add(address);
           }
           Mongo tgtMongo = new Mongo(addresses);
-          collectionMongoServer = new CollectionMongoServerImpl(tgtMongo, "collections");
+          collectionMongoServer = new CollectionMongoServerImpl(tgtMongo, "collections",usernameIngestion, passwordIngestion);
 
           collectionMongoServer.findOldCollectionId("test");
         } catch (NumberFormatException e) {

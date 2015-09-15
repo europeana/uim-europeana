@@ -22,6 +22,7 @@ import com.mongodb.Mongo;
 import eu.europeana.corelib.lookup.impl.EuropeanaIdMongoServerImpl;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * TODO: change to reflect the changes in the Interface definition
@@ -30,19 +31,24 @@ import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
  */
 public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServerImpl implements EuropeanaIdMongoServer {
 
-	public OsgiEuropeanaIdMongoServer(Mongo mongoServer, String databaseName) {
-		super(mongoServer,databaseName,"","");
+	public OsgiEuropeanaIdMongoServer(Mongo mongoServer, String databaseName,String username, String password) {
+		super(mongoServer,databaseName,username,password);
 		this.mongoServer = mongoServer;
-		this.databaseName = databaseName;		
+		this.databaseName = databaseName;
+		this.username = username;
+		this.password = password;
 	}
 	@Override
 	public void createDatastore(){
 		Morphia morphia = new Morphia();
-		
-		 morphia.map(EuropeanaId.class);
-		 datastore = morphia.createDatastore(mongoServer, databaseName);
-			datastore.ensureIndexes();
-			super.setDatastore(datastore);
+
+		morphia.map(EuropeanaId.class);
+		datastore = morphia.createDatastore(mongoServer, databaseName);
+		if(StringUtils.isNotBlank(this.username) && StringUtils.isNotBlank(this.password)) {
+			datastore.getDB().authenticate(this.username, this.password.toCharArray());
+		}
+		datastore.ensureIndexes();
+		super.setDatastore(datastore);
 	}
 	@Override
 	public EuropeanaId retrieveEuropeanaIdFromOld(String oldId) {

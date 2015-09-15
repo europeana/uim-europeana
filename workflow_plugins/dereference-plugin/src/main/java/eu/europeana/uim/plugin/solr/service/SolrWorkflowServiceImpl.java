@@ -53,17 +53,21 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
               addresses.add(address);
             }
 
-            List<MongoCredential> credentialsList = new ArrayList<MongoCredential>();
+          /*  List<MongoCredential> credentialsList = new ArrayList<MongoCredential>();
             MongoCredential credentials =
                 MongoCredential.createCredential(PropertyReader
                     .getProperty(UimConfigurationProperty.MONGO_USERNAME), PropertyReader
                     .getProperty(UimConfigurationProperty.MONGO_AUTH_DB), PropertyReader
                     .getProperty(UimConfigurationProperty.MONGO_PASSWORD).toCharArray());
             credentialsList.add(credentials);
-            MongoClient client = new MongoClient(addresses, credentialsList);
+            MongoClient client = new MongoClient(addresses, credentialsList);*/
+
+            Mongo mongo = new Mongo(addresses);
             datastore =
-                morphia.createDatastore(client,
-                    PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
+                morphia.createDatastore(mongo,
+                    PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY),PropertyReader
+                                .getProperty(UimConfigurationProperty.MONGO_USERNAME),PropertyReader
+                                .getProperty(UimConfigurationProperty.MONGO_PASSWORD).toCharArray());
 
           } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
@@ -72,6 +76,10 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
             // TODO Auto-generated catch block
             e.printStackTrace();
           }
+         catch (UnknownHostException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
           datastore.ensureIndexes();
         }
 

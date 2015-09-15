@@ -57,6 +57,8 @@ public class InstanceCreatorImpl implements InstanceCreator {
 
             String username = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_USERNAME);
             String password = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_PASSWORD);
+            final String usernameIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME);
+            final String passwordIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD);
             MongoClient mongo = new MongoClient(mongoHost, mongoPort);
             Morphia morphia = new Morphia();
             if(StringUtils.isNotEmpty(password)) {
@@ -99,7 +101,7 @@ public class InstanceCreatorImpl implements InstanceCreator {
                         Mongo tgtMongo = new Mongo(addresses);
                         Datastore datastore =
                                 morphia.createDatastore(tgtMongo,
-                                        "collections");
+                                        "collections",usernameIngestion,passwordIngestion.toCharArray());
                         collectionMongoServer = new CollectionMongoServerImpl();
                         datastore.ensureIndexes();
                         collectionMongoServer.setDatastore(datastore);

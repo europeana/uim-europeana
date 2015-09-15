@@ -93,7 +93,8 @@ public class EnrichmentServiceImpl implements EnrichmentService {
   private static CollectionMongoServer cmServer;
   private static OsgiEuropeanaIdMongoServer idserver;
   private static OsgiEdmMongoServer server;
-
+  private static String usernameIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME);
+  private static String passwordIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD);
 
   public EnrichmentServiceImpl() {
     
@@ -131,7 +132,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
         Mongo tgtMongo = new Mongo(addresses);
           Datastore datastore =
               morphia.createDatastore(tgtMongo,
-                  "collections");
+                  "collections",usernameIngestion,passwordIngestion.toCharArray());
           cmServer = new CollectionMongoServerImpl();
           datastore.ensureIndexes();
           cmServer.setDatastore(datastore);
@@ -169,12 +170,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
         @Override
         protected void initializeInternal() {
           // TODO Auto-generated method stub
-          String uname =
-              PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME) != null ? PropertyReader
-                  .getProperty(UimConfigurationProperty.MONGO_USERNAME) : "";
-          String pass =
-              PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD) != null ? PropertyReader
-                  .getProperty(UimConfigurationProperty.MONGO_PASSWORD) : "";
+
           Morphia morphia = new Morphia();
 
           morphia.map(FullBeanImpl.class);
@@ -200,7 +196,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
           Mongo tgtMongo = new Mongo(addresses);
             server =
                 new OsgiEdmMongoServer(tgtMongo,
-                    mongoDBEuropeana, uname, pass);
+                    mongoDBEuropeana, usernameIngestion, passwordIngestion);
           } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -229,7 +225,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
     Mongo tgtMongo = new Mongo(addresses);
       idserver =
           new OsgiEuropeanaIdMongoServer((tgtMongo),
-              mongoDBEuropeanaID);
+              mongoDBEuropeanaID, usernameIngestion,passwordIngestion);
       idserver.createDatastore();
 
     } catch (NumberFormatException e) {

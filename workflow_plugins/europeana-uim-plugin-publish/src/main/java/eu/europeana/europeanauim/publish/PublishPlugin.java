@@ -161,43 +161,18 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
                                 new SolrDocumentHandler(publishService.getSolrServer()).generate(fBean);
 
 
-                        ModifiableSolrParams params = new ModifiableSolrParams();
-                        params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
-
-                        params.add("fl", "is_fulltext,has_thumbnails,has_media,filter_tags,facet_tags,has_landingpage");
-                        QueryResponse resp = publishService.getSolrIngestionServer().query(params);
-                        if (resp.getResults().size() > 0) {
-                            SolrDocument retrievedDoc = resp.getResults().get(0);
-                            if (retrievedDoc.containsKey("is_fulltext")) {
-                                doc.addField("is_fulltext", retrievedDoc.get("is_fulltext"));
-                            }
-                            if (retrievedDoc.containsKey("has_thumbnails")) {
-                                doc.addField("has_thumbnails", retrievedDoc.get("has_thumbnails"));
-                            }
-                            if (retrievedDoc.containsKey("has_media")) {
-                                doc.addField("has_media", retrievedDoc.get("has_media"));
-                            }
-                            if (retrievedDoc.containsKey("filter_tags")) {
-                                doc.addField("filter_tags", retrievedDoc.get("filter_tags"));
-                            }
-                            if (retrievedDoc.containsKey("facet_tags")) {
-                                doc.addField("facet_tags", retrievedDoc.get("facet_tags"));
-                            }
-                            if (retrievedDoc.containsKey("has_landingpage")) {
-                                doc.addField("has_landingpage", retrievedDoc.get("has_landingpage"));
-                            }
-                            publishService.getSolrServer().add(doc);
-                            FullBeanImpl saved;
-                            if (publishService.getMongoProduction().getFullBean(fBean.getAbout()) == null) {
-                                new FullBeanHandler(publishService.getMongoProduction()).saveEdmClasses(fBean, true);
-                                publishService.getMongoProduction().getDatastore().save(fBean);
-                                saved = (FullBeanImpl) publishService.getMongoProduction()
-                                        .getFullBean(fBean.getAbout());
-                            } else {
-                                saved = new FullBeanHandler(publishService.getMongoProduction()).updateFullBean(fBean);
-                            }
-
+                        publishService.getSolrServer().add(doc);
+                        FullBeanImpl saved;
+                        if (publishService.getMongoProduction().getFullBean(fBean.getAbout()) == null) {
+                            new FullBeanHandler(publishService.getMongoProduction()).saveEdmClasses(fBean, true);
+                            publishService.getMongoProduction().getDatastore().save(fBean);
+                            saved = (FullBeanImpl) publishService.getMongoProduction()
+                                    .getFullBean(fBean.getAbout());
+                        } else {
+                            saved = new FullBeanHandler(publishService.getMongoProduction()).updateFullBean(fBean);
                         }
+
+
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -223,7 +198,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
                                 publishService
                                         .getEuropeanaIdMongoServer()
                                         .retrieveEuropeanaIdFromNew(
-                                                (String)mdr.getId())
+                                                (String) mdr.getId())
                                         .get(0);
                         publishService.getEuropeanaIdMongoServerProduction().saveEuropeanaId(europeanaId);
                         // Remove it from the mdr
@@ -251,7 +226,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
                         uctx = bfact.createUnmarshallingContext();
                         RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 
-                        handler.removeRecordById(publishService.getSolrServer(), (String)mdr.getId());
+                        handler.removeRecordById(publishService.getSolrServer(), (String) mdr.getId());
 
 
                     } catch (JiBXException e) {
@@ -303,7 +278,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
         }
         if (Boolean.parseBoolean(collection
                 .getValue(ControlledVocabularyProxy.ISNEW.toString()))
-                || (collection.getValue("forcedelete")!= null || Boolean.parseBoolean(collection.getValue("forcedelete")))||check) {
+                || (collection.getValue("forcedelete") != null || Boolean.parseBoolean(collection.getValue("forcedelete"))) || check) {
 
 
             handler.clearData(collection.getMnemonic());

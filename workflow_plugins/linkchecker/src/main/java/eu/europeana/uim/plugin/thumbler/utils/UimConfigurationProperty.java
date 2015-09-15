@@ -14,6 +14,9 @@ public enum UimConfigurationProperty {
         CLIENT_DB("harvester.db"),
 	MONGO_HOSTURL("mongo.hostUrl"),
 	MONGO_HOSTPORT("mongo.hostPort"),
+
+	MONGO_USERNAME("mongo.ingestion.username"),
+	MONGO_PASSWORD("mongo.ingestion.password"),
 	MONGO_DB_COLLECTIONS("mongo.db.collections")
         ;
 	

@@ -42,6 +42,10 @@ public class PublishServiceImpl implements PublishService {
           UimConfigurationProperty.MONGO_PRODUCTION_DB);
   private static String mongoDBEuropeanaIDIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGODB_EUROPEANA_ID);
   private static String mongoDBEuropeanaIDProduction = PropertyReader.getProperty(UimConfigurationProperty.MONGODB_EUROPEANA_ID_PRODUCTION);
+  private static String usernameIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_INGESTION_USERNAME);
+  private static String passwordIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_INGESTION_PASSWORD);
+  private static String usernameProduction = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PRODUCTION_USERNAME);
+  private static String passwordProduction = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PRODUCTION_PASSWORD);
   @Override
   public  OsgiEdmMongoServer getMongoIngestion() {
     return mongoIngestion;
@@ -116,7 +120,7 @@ public class PublishServiceImpl implements PublishService {
       @Override
       protected void initializeInternal() {
 
-        idserver = new OsgiEuropeanaIdMongoServer((tgtMongo), mongoDBEuropeanaIDIngestion);
+        idserver = new OsgiEuropeanaIdMongoServer((tgtMongo), mongoDBEuropeanaIDIngestion,usernameIngestion,passwordIngestion);
         idserver.createDatastore();
         idserver.retrieveEuropeanaIdFromOld("test");
       }
@@ -138,7 +142,7 @@ public class PublishServiceImpl implements PublishService {
     BlockingInitializer init1 = new BlockingInitializer() {
       @Override
       protected void initializeInternal() {
-        idserverProduction = new OsgiEuropeanaIdMongoServer((tgtProductionMongo), mongoDBEuropeanaIDProduction);
+        idserverProduction = new OsgiEuropeanaIdMongoServer((tgtProductionMongo), mongoDBEuropeanaIDProduction,usernameProduction,passwordProduction);
         idserverProduction.createDatastore();
         idserverProduction.retrieveEuropeanaIdFromOld("test");
       }
@@ -149,7 +153,7 @@ public class PublishServiceImpl implements PublishService {
       @Override
       protected void initializeInternal() {
         try {
-          mongoIngestion = new OsgiEdmMongoServer((tgtMongo),mongoDbIngestion,"","");
+          mongoIngestion = new OsgiEdmMongoServer((tgtMongo),mongoDbIngestion,usernameIngestion,passwordIngestion);
           Morphia morphia = new Morphia();
           mongoIngestion.createDatastore(morphia);
           mongoIngestion.getFullBean("test");
@@ -166,7 +170,7 @@ public class PublishServiceImpl implements PublishService {
       @Override
       protected void initializeInternal() {
         try {
-          mongoProduction = new OsgiEdmMongoServer((tgtProductionMongo),mongoDbProduction,"","");
+          mongoProduction = new OsgiEdmMongoServer((tgtProductionMongo),mongoDbProduction,usernameProduction,passwordProduction);
           Morphia morphia = new Morphia();
           mongoProduction.createDatastore(morphia);
           mongoProduction.getFullBean("test");

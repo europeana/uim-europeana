@@ -33,7 +33,7 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 	static {
 		try {
 			//connect to Mongo
-			Mongo mongo = MongoProvider.getMongo();
+			Mongo mongo = MongoProvider.getReindexingMongo();
 			Morphia morphia = new Morphia();
 			morphia.map(TaskReport.class);
 			datastore = morphia.createDatastore(mongo, "taskreports");
@@ -141,7 +141,7 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 	 * @return a string representation of date in the format 'dd-MM-yyyy'
 	 */
 	private static String formatDate(long dateUpdated) {
-        return (new SimpleDateFormat("dd-MM-yyyy")).format(new Date(dateUpdated));
+        return (new SimpleDateFormat("HH:mm:ss dd-MM-yyyy")).format(new Date(dateUpdated));
 	}
 
 //	//stub for testing!

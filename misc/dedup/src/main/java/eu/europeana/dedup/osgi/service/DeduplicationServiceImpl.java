@@ -69,7 +69,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
 
     private IBindingFactory bfact;
     private static String[] mongoHost = PropertyReader.getProperty(
-            UimConfigurationProperty.MONGO_HOSTURL).split(",");
+            UimConfigurationProperty.MONGO_IDREGISTRY_HOST).split(",");
 
     /**
      * Default Constructor
@@ -92,8 +92,8 @@ public class DeduplicationServiceImpl implements DeduplicationService {
                     try {
                         status = STATUS_BOOTING;
                         mongoserver = new EuropeanaIdRegistryMongoServerImpl(mongo,
-                                PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY), "",
-                                "");
+                                PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY), "",""
+                                );
                         Morphia morphia = new Morphia();
                         morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
                             @Override
@@ -103,6 +103,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
                         });
                         morphia.map(EuropeanaIdRegistry.class);
                         morphia.map(FailedRecord.class);
+                        System.out.println("Connecting to EuropeanaIdRegistry on " + mongoHost[0]);
                         Datastore datastore = morphia.createDatastore(mongo, PropertyReader.getProperty(
                                 UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY));
 

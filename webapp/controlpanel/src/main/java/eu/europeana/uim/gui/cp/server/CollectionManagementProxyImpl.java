@@ -34,12 +34,14 @@ public class CollectionManagementProxyImpl extends
 
 	private static final String MONGO_HOST= PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
 	private static final int MONGO_PORT = Integer.parseInt(PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT));
+	private static final String MONGO_USERNAME_INGESTION =PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME);
+	private static final String MONGO_PASSWORD_INGESTION =PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD);
 	private static final String MONGO_DB = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static final String REPOSITORY = PropertyReader.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	
 	static{
 		try {
-			collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB);
+			collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB,MONGO_USERNAME_INGESTION,MONGO_PASSWORD_INGESTION);
 		} catch (MongoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,7 +74,7 @@ public class CollectionManagementProxyImpl extends
 	@Override
 	public Boolean saveOneCollection(CollectionMappingDTO collectionDTO) {
 		try {
-			collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB);
+			collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB,MONGO_USERNAME_INGESTION,MONGO_PASSWORD_INGESTION);
 			collection = new Collection();
 			collection.setNewCollectionId(collectionDTO.getNewCollection());
 			collection

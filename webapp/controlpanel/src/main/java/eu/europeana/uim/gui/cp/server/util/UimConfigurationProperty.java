@@ -9,8 +9,10 @@ public enum UimConfigurationProperty {
 
 	MONGO_HOSTURL("mongo.hostUrl"),
 	MONGO_HOSTPORT("mongo.hostPort"),
-	MONGO_USERNAME("mongo.username"),
-    MONGO_PASSWORD("mongo.password"),
+	MONGO_USERNAME("mongo.ingestion.username"),
+    MONGO_PASSWORD("mongo.ingestion.password"),
+	MONGO_PRODUCTION_USERNAME("mongo.production.username"),
+	MONGO_PRODUCTION_PASSWORD("mongo.production.password"),
 	MONGO_DB_COLLECTIONS("mongo.db.collections"),
 	MONGO_DB_VOCABULARY("mongo.db.vocabulary"),
 	MONGO_DB_EUROPEANA("mongo.db.europeana"),
@@ -32,7 +34,9 @@ public enum UimConfigurationProperty {
 	CLIENT_HOSTPORT("harvester.hostPort"),
 	CLIENT_DB("harvester.db"),
 	CLIENT_USERNAME("harvester.username"),
-	CLIENT_PASSWORD("harvester.password");
+	CLIENT_PASSWORD("harvester.password"),
+	MONGO_REINDEXING_HOST("mongo.reindexing.host"),
+	MONGO_REINDEXING_PORT("mongo.reindexing.port");
 
 	
 	String field;
