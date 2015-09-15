@@ -63,6 +63,7 @@ import eu.europeana.uim.repoxclient.utils.DSType;
 import eu.europeana.uim.storage.StorageEngine;
 import eu.europeana.uim.storage.StorageEngineException;
 import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.ControlledVocabularyKeyValue;
 import eu.europeana.uim.store.Provider;
 import eu.europeana.uim.sugar.LoginFailureException;
 import eu.europeana.uim.sugar.QueryResultException;
@@ -109,7 +110,7 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
       // Create the UIM provider object by information provided by this
       // record
       Provider prov = sugService.updateProviderFromRecord(originalRec);
-
+      
       // Get the current coutry for the given provider
       String provCountry = prov.getValue(ControlledVocabularyProxy.PROVIDERCOUNTRY).toLowerCase();
 
@@ -122,7 +123,8 @@ public class IntegrationSeviceProxyImpl extends IntegrationServicesProviderServl
       if (prov.isAggregator()) {
         throw new ProviderOperationException("The requested object is not a Provider");
       }
-      if (!repoxService.providerExists(prov.getValue(ControlledVocabularyProxy.REPOXID))) {
+      
+      if (prov.getValue(ControlledVocabularyProxy.REPOXID)==null||!repoxService.providerExists(prov.getValue(ControlledVocabularyProxy.REPOXID))) {
         repoxService.createProvider(prov, provCountry, prov.getMnemonic(), prov.getName(), null,
             provCountry, "", prov.getMnemonic(), "", ProviderType.UNKNOWN, "");
       } else {
