@@ -67,9 +67,11 @@ public class ExtendedEdmMongoServer extends EdmMongoServerImpl implements EdmMon
         morphia.map(PhysicalThingImpl.class);
         morphia.map(ConceptSchemeImpl.class);
         morphia.map(BasicProxyImpl.class);
-
-        this.datastore = morphia.createDatastore(mongoServer, databaseName, username, password.toCharArray());
-
+        if(StringUtils.isNotBlank(username)){
+            this.datastore = morphia.createDatastore(mongoServer, databaseName, username, password.toCharArray());
+        } else {
+            this.datastore = morphia.createDatastore(mongoServer, databaseName);
+        }
         // if (StringUtils.isNotBlank(this.username)
         //        && StringUtils.isNotBlank(this.password)) {
         //    datastore.getDB().authenticate(this.username,

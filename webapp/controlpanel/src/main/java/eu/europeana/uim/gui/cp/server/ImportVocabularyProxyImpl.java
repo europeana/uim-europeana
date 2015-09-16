@@ -50,9 +50,14 @@ public class ImportVocabularyProxyImpl extends
 	// Statically initializing VocabularyMongoServer
 	{
 		try {
-			mongo = new VocabularyMongoServerImpl(
-			    MongoProvider.getMongo(), MONGO_DB,PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME),
-					PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD));
+			if(StringUtils.isNotBlank(PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME))) {
+				mongo = new VocabularyMongoServerImpl(
+						MongoProvider.getMongo(), MONGO_DB, PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME),
+						PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD));
+			} else {
+				mongo = new VocabularyMongoServerImpl(
+						MongoProvider.getMongo(), MONGO_DB);
+			}
 
 		} catch (MongoException e) {
 			// TODO Auto-generated catch block

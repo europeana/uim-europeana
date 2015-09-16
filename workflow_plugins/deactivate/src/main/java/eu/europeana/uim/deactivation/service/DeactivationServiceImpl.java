@@ -152,23 +152,11 @@ public class DeactivationServiceImpl implements DeactivationService {
             Mongo tgtMongo = new Mongo(addresses);
             mongoServer = new ExtendedEdmMongoServer(tgtMongo, mongoDB, usernameIngestion, passwordIngestion);
             mongoServer.createDatastore(new Morphia());
+            System.out.println("Replica set status ingestion: " + mongoServer.getDatastore().getMongo().getReplicaSetStatus().toString());
             mongoServer.getFullBean("test");
             
             
-            List<ServerAddress> addressesProduction = new ArrayList<ServerAddress>();
-            for (String mongoStr : mongoHostProduction) {
-              ServerAddress addressProduction = null;
-              try {
-                addressProduction = new ServerAddress(mongoStr, Integer.parseInt(mongoPort));
-              } catch (UnknownHostException e) {
-                e.printStackTrace();
-              }
-              addressesProduction.add(addressProduction);
-            }
-            Mongo tgtMongoProduction = new Mongo(addressesProduction);
-            mongoServerProduction = new ExtendedEdmMongoServer(tgtMongoProduction, mongoDBProduction, usernameProduction, passwordProduction);
-            mongoServerProduction.createDatastore(new Morphia());
-            mongoServerProduction.getFullBean("test");
+
           } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -183,6 +171,40 @@ public class DeactivationServiceImpl implements DeactivationService {
         }
       };
       initializer.initialize(EdmMongoServer.class.getClassLoader());
+
+      BlockingInitializer initializer1 = new BlockingInitializer() {
+        @Override
+        protected void initializeInternal() {
+          try {
+            List<ServerAddress> addressesProduction = new ArrayList<ServerAddress>();
+            for (String mongoStr : mongoHostProduction) {
+              ServerAddress addressProduction = null;
+              try {
+                addressProduction = new ServerAddress(mongoStr, Integer.parseInt(mongoPort));
+              } catch (UnknownHostException e) {
+                e.printStackTrace();
+              }
+              addressesProduction.add(addressProduction);
+            }
+            Mongo tgtMongoProduction = new Mongo(addressesProduction);
+            mongoServerProduction = new ExtendedEdmMongoServer(tgtMongoProduction, mongoDBProduction, usernameProduction, passwordProduction);
+            mongoServerProduction.createDatastore(new Morphia());
+            System.out.println("Replica set status production: " + mongoServerProduction.getDatastore().getMongo().getReplicaSetStatus().toString());
+            mongoServerProduction.getFullBean("test");
+
+          }  catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (MongoDBException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (MongoException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+        }
+      };
+      initializer1.initialize(EdmMongoServer.class.getClassLoader());
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

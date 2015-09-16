@@ -41,7 +41,11 @@ public class CollectionManagementProxyImpl extends
 	
 	static{
 		try {
-			collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB,MONGO_USERNAME_INGESTION,MONGO_PASSWORD_INGESTION);
+			if(StringUtils.isNotBlank(MONGO_USERNAME_INGESTION)) {
+				collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB, MONGO_USERNAME_INGESTION, MONGO_PASSWORD_INGESTION);
+			} else {
+				collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB);
+			}
 		} catch (MongoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -74,7 +78,11 @@ public class CollectionManagementProxyImpl extends
 	@Override
 	public Boolean saveOneCollection(CollectionMappingDTO collectionDTO) {
 		try {
-			collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB,MONGO_USERNAME_INGESTION,MONGO_PASSWORD_INGESTION);
+			if(StringUtils.isNotBlank(MONGO_USERNAME_INGESTION)) {
+				collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB, MONGO_USERNAME_INGESTION, MONGO_PASSWORD_INGESTION);
+			} else {
+				collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB);
+			}
 			collection = new Collection();
 			collection.setNewCollectionId(collectionDTO.getNewCollection());
 			collection

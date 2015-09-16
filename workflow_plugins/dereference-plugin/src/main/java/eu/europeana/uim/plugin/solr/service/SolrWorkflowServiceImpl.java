@@ -22,6 +22,7 @@ import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
 import eu.europeana.uim.plugin.solr.utils.PropertyReader;
 import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
+import org.apache.commons.lang.StringUtils;
 
 public class SolrWorkflowServiceImpl implements SolrWorkflowService {
   private static OsgiExtractor extractor;
@@ -63,11 +64,18 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
             MongoClient client = new MongoClient(addresses, credentialsList);*/
 
             Mongo mongo = new Mongo(addresses);
-            datastore =
-                morphia.createDatastore(mongo,
-                    PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY),PropertyReader
-                                .getProperty(UimConfigurationProperty.MONGO_USERNAME),PropertyReader
-                                .getProperty(UimConfigurationProperty.MONGO_PASSWORD).toCharArray());
+            if(StringUtils.isNotBlank(PropertyReader
+                    .getProperty(UimConfigurationProperty.MONGO_USERNAME))) {
+              datastore =
+                      morphia.createDatastore(mongo,
+                              PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY), PropertyReader
+                                      .getProperty(UimConfigurationProperty.MONGO_USERNAME), PropertyReader
+                                      .getProperty(UimConfigurationProperty.MONGO_PASSWORD).toCharArray());
+            } else {
+              datastore =
+                      morphia.createDatastore(mongo,
+                              PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
+            }
 
           } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
