@@ -335,10 +335,6 @@ public class TaskReportWidget extends IngestionWidget {
 						reports.clear();
 						cellTable.setRowCount(result.getNumberRecords());
 						List<TaskReportDTO> taskReports = result.getReports();
-						//Sort Task Reports by id in descending order;
-						/*BeanComparator<TaskReportDTO> reverseOrderBeanComparator = new BeanComparator<TaskReportDTO>(
-								"taskId", new ReverseComparator(new ComparableComparator()));
-						Collections.sort(taskReports, reverseOrderBeanComparator);*/
 						reports.addAll(taskReports);	
 						cellTable.setRowData(offset, reports);
 					}
