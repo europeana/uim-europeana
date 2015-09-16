@@ -3,8 +3,14 @@ package eu.europeana.uim.gui.cp.server;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.beanutils.BeanComparator;
+import org.apache.commons.collections.comparators.ComparableComparator;
+import org.apache.commons.collections.comparators.ReverseComparator;
+import org.apache.commons.lang.StringUtils;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
@@ -18,7 +24,6 @@ import eu.europeana.reindexing.common.TaskReport;
 import eu.europeana.uim.gui.cp.client.services.TaskReportService;
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportDTO;
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportResultDTO;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * 
@@ -61,6 +66,10 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 			for (TaskReportDTO taskReportDTO : taskReportSublist) {				
 				taskReportDTOList.add(taskReportDTO);
 			}
+			//Sort Task Reports by id in descending order;
+			BeanComparator<TaskReportDTO> reverseOrderBeanComparator = new BeanComparator<TaskReportDTO>(
+					"taskId", new ReverseComparator(new ComparableComparator()));
+			Collections.sort(taskReportDTOList, reverseOrderBeanComparator);
 			result = new TaskReportResultDTO(taskReportDTOList, reportsDTO.size());
 		}
 		return result;
