@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
+/*import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.comparators.ComparableComparator;
-import org.apache.commons.collections.comparators.ReverseComparator;
+import org.apache.commons.collections.comparators.ReverseComparator;*/
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ActionCell;
@@ -336,9 +336,9 @@ public class TaskReportWidget extends IngestionWidget {
 						cellTable.setRowCount(result.getNumberRecords());
 						List<TaskReportDTO> taskReports = result.getReports();
 						//Sort Task Reports by id in descending order;
-						BeanComparator<TaskReportDTO> reverseOrderBeanComparator = new BeanComparator<TaskReportDTO>(
+						/*BeanComparator<TaskReportDTO> reverseOrderBeanComparator = new BeanComparator<TaskReportDTO>(
 								"taskId", new ReverseComparator(new ComparableComparator()));
-						Collections.sort(taskReports, reverseOrderBeanComparator);
+						Collections.sort(taskReports, reverseOrderBeanComparator);*/
 						reports.addAll(taskReports);	
 						cellTable.setRowData(offset, reports);
 					}

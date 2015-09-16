@@ -38,8 +38,8 @@ public class ExtendedEdmMongoServer extends EdmMongoServerImpl implements EdmMon
     private Datastore datastore;
 
     public ExtendedEdmMongoServer(Mongo mongo, String mongoDB, String username,
-            String password) throws MongoDBException {
-        super(mongo,mongoDB,username,password);
+                                  String password) throws MongoDBException {
+        super(mongo, mongoDB, username, password);
         this.mongoServer = mongo;
         this.databaseName = mongoDB;
         this.username = username;
@@ -68,13 +68,13 @@ public class ExtendedEdmMongoServer extends EdmMongoServerImpl implements EdmMon
         morphia.map(ConceptSchemeImpl.class);
         morphia.map(BasicProxyImpl.class);
 
-        this.datastore = morphia.createDatastore(mongoServer, databaseName);
+        this.datastore = morphia.createDatastore(mongoServer, databaseName, username, password.toCharArray());
 
-        if (StringUtils.isNotBlank(this.username)
-                && StringUtils.isNotBlank(this.password)) {
-            datastore.getDB().authenticate(this.username,
-                    this.password.toCharArray());
-        }
+        // if (StringUtils.isNotBlank(this.username)
+        //        && StringUtils.isNotBlank(this.password)) {
+        //    datastore.getDB().authenticate(this.username,
+        //            this.password.toCharArray());
+        //}
         datastore.ensureIndexes();
 
         return datastore;
@@ -100,5 +100,5 @@ public class ExtendedEdmMongoServer extends EdmMongoServerImpl implements EdmMon
         this.getDatastore().delete(obj, WriteConcern.FSYNC_SAFE);
     }
 
-    
+
 }
