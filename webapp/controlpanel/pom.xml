@@ -118,7 +118,7 @@
 							corelib-edm-definitions,morphia,wstx-asl,corelib-db,imgscalr-lib,sanselan,solr-solrj,solr-core,httpcore,httpclient,
 							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,
 							validation-api,publication-common,repox-client-rest-jersey,javax.ws.rs-api,zookeeper,
-							reindexing-common-external,harvester-client,harvester-persistence,noggit, guava,log4j-api, log4j-core
+							reindexing-common-external,harvester-client,harvester-persistence,noggit, guava,log4j-api, log4j-core, commons-beanutils, commons-collections
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
@@ -175,6 +175,7 @@
 							pt.utl.ist.http,
 							pt.utl.ist.marc,
 							pt.utl.ist.marc.iso2709.shared,
+
 							!org.slf4j.*,
 							!*
 						</Import-Package>
@@ -472,6 +473,16 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>16.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.2</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.1</version>
 		</dependency>
 	</dependencies>
 
