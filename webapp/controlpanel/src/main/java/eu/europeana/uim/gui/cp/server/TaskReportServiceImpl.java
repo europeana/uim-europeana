@@ -3,13 +3,9 @@ package eu.europeana.uim.gui.cp.server;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparableComparator;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.code.morphia.Datastore;
@@ -66,10 +62,6 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 			for (TaskReportDTO taskReportDTO : taskReportSublist) {				
 				taskReportDTOList.add(taskReportDTO);
 			}
-			//Sort Task Reports by id in descending order;
-			BeanComparator<TaskReportDTO> reverseOrderBeanComparator = new BeanComparator<TaskReportDTO>(
-					"taskId", new ReverseComparator(new ComparableComparator()));
-			Collections.sort(taskReportDTOList, reverseOrderBeanComparator);
 			result = new TaskReportResultDTO(taskReportDTOList, reportsDTO.size());
 		}
 		return result;
@@ -92,17 +84,18 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
         	datastore.save(createNewTaskReport(newTaskReportQuery));
         }
         //return all task reports
-        if ((filterQuery == null || filterQuery.isEmpty()) && !showActiveOnly) {
-        	return  datastore.find(TaskReport.class).asList();
+        Query<TaskReport> find = datastore.find(TaskReport.class).order("-taskId");
+		if ((filterQuery == null || filterQuery.isEmpty()) && !showActiveOnly) {
+        	return  find.asList();
         //return only unfinished task reports
         } else if ((filterQuery == null || filterQuery.isEmpty()) && showActiveOnly) {        	
-        	return datastore.find(TaskReport.class).field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
+        	return find.field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
         //return all filtered by query 'filterQuery' task reports
         } else if (filterQuery != null && !filterQuery.isEmpty() && !showActiveOnly) {
-        	return datastore.find(TaskReport.class).filter("query", filterQuery).asList();
+        	return find.filter("query", filterQuery).asList();
         //return only unfinished filtered by query 'filterQuery' task reports
         } else {
-        	return datastore.find(TaskReport.class).filter("query", filterQuery).field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
+        	return find.filter("query", filterQuery).field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
         }
 	}
 	
