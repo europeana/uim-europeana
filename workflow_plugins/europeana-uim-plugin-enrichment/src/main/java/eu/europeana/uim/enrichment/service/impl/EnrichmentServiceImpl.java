@@ -134,10 +134,10 @@ public class EnrichmentServiceImpl implements EnrichmentService {
           Datastore datastore = null;
           if(StringUtils.isNotBlank(usernameIngestion)) {
             datastore = morphia.createDatastore(tgtMongo,
-                    "collections", usernameIngestion, passwordIngestion.toCharArray());
+                   PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS), usernameIngestion, passwordIngestion.toCharArray());
           } else {
             datastore =   morphia.createDatastore(tgtMongo,
-                    "collections");
+                    PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS));
           }
           cmServer = new CollectionMongoServerImpl();
           datastore.ensureIndexes();
@@ -205,7 +205,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
                       new OsgiEdmMongoServer(tgtMongo,
                               mongoDBEuropeana, usernameIngestion, passwordIngestion);
             } else {
-              new OsgiEdmMongoServer(tgtMongo,
+              server = new OsgiEdmMongoServer(tgtMongo,
                       mongoDBEuropeana,null,null);
             }
           } catch (NumberFormatException e) {

@@ -99,9 +99,15 @@ public class InstanceCreatorImpl implements InstanceCreator {
                             addresses.add(address);
                         }
                         Mongo tgtMongo = new Mongo(addresses);
-                        Datastore datastore =
-                                morphia.createDatastore(tgtMongo,
-                                        "collections",usernameIngestion,passwordIngestion.toCharArray());
+                        Datastore datastore = null;
+                        if(StringUtils.isNotBlank(usernameIngestion)) {
+                          datastore =  morphia.createDatastore(tgtMongo,
+                                    PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS), usernameIngestion, passwordIngestion.toCharArray());
+                        } else {
+                            datastore = morphia.createDatastore(tgtMongo,
+                                    PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS));
+                        }
+
                         collectionMongoServer = new CollectionMongoServerImpl();
                         datastore.ensureIndexes();
                         collectionMongoServer.setDatastore(datastore);
