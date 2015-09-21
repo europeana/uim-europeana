@@ -22,6 +22,7 @@
         }
         .pager {
         	padding-bottom:20px;
+        	height:60px;
         }
     </ui:style>
      <g:HTMLPanel>
@@ -57,7 +58,7 @@
                     <c:CellTable addStyleNames='{style.cellTable}' ui:field='cellTable' />
                 </td>
             </tr>
-             <tr>
+             <tr style="height:60px;">
                 <td align='center' colspan='2' addStyleNames='{style.pager}'>
                     <c:SimplePager ui:field='pager' />
                 </td>
