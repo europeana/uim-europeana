@@ -115,7 +115,7 @@
 				<configuration>
 					<manifestLocation>META-INF</manifestLocation>
 					<instructions>
-						<Export-Package>eu.europeana.dedup.osgi.service.*,eu.europeana.corelib.tools.lookuptable,eu.europeana.corelib.lookup.impl,eu.europeana.corelib.lookup.tools</Export-Package>
+						<Export-Package>eu.europeana.dedup.osgi.service.*,eu.europeana.corelib.tools.lookuptable,eu.europeana.corelib.lookup.impl,eu.europeana.corelib.lookup.tools,eu.europeana.corelib.definitions.jibx</Export-Package>
 						<Import-Package>
 							org.osgi.framework; version=1.5.0,
 							eu.europeana.uim.common,
@@ -125,6 +125,8 @@
 							org.jibx.runtime.impl;
 							version=1.2.3,
 							gnu.trove.set.hash,
+							eu.europeana.corelib.definitions.jibx,
+							eu.europeana.corelib.tools.lookuptable,
 							!*
 						</Import-Package>
 						<Embed-Dependency>publication-common,corelib-utils,corelib-lookup,morphia,mongo-java-driver,corelib-edm-definitions,corelib-dereference,commons-codec,commons-lang,commons-io,corelib-common-storage</Embed-Dependency>

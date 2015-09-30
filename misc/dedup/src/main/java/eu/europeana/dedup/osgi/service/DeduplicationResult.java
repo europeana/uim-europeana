@@ -18,6 +18,8 @@ package eu.europeana.dedup.osgi.service;
 
 
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
+import eu.europeana.corelib.definitions.jibx.RDF;
+
 
 /**
  *
@@ -33,6 +35,9 @@ public class DeduplicationResult {
 	private LookupResult lookupresult; 
 	
 	private String edm;
+	
+	// caches the final inmarshalled EDM (after updateInternalReferences) for later use so as to avoid inmarshalling again..
+	private RDF unmarshalledEdm;
 	
 
 	
@@ -98,10 +103,13 @@ public class DeduplicationResult {
 		this.edm = edm;
 	}
 
+	public RDF getUnmarshalledEdm() {
+		return unmarshalledEdm;
+	}
 
 	
-	
-	
-	
+	public void setUnmarshalledEdm(RDF unmarshalledEdm) {
+		this.unmarshalledEdm = unmarshalledEdm;
+	}
 
 }
