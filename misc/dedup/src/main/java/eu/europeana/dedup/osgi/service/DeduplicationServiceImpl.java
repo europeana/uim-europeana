@@ -94,6 +94,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
                 public void initializeInternal() {
                     try {
                         status = STATUS_BOOTING;
+
                         mongoserver = new EuropeanaIdRegistryMongoServerImpl(mongo,
                                 PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY), "",""
                                 );

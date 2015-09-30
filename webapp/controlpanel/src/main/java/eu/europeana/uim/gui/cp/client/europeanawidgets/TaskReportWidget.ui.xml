@@ -20,6 +20,9 @@
         .tdLeft {
         	width:340px !important;
         }
+        .pager {
+        	padding-bottom:20px;
+        }
     </ui:style>
      <g:HTMLPanel>
         <table cellspacing='4' cellpadding='0' style='width:100%;'>
@@ -55,7 +58,7 @@
                 </td>
             </tr>
              <tr>
-                <td align='center' colspan='2'>
+                <td align='center' colspan='2' addStyleNames='{style.pager}'>
                     <c:SimplePager ui:field='pager' />
                 </td>
             </tr>

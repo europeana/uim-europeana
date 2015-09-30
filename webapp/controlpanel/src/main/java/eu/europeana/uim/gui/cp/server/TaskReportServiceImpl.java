@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.query.Query;
@@ -18,7 +20,6 @@ import eu.europeana.reindexing.common.TaskReport;
 import eu.europeana.uim.gui.cp.client.services.TaskReportService;
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportDTO;
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportResultDTO;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * 
@@ -83,17 +84,18 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
         	datastore.save(createNewTaskReport(newTaskReportQuery));
         }
         //return all task reports
-        if ((filterQuery == null || filterQuery.isEmpty()) && !showActiveOnly) {
-        	return  datastore.find(TaskReport.class).asList();
+        Query<TaskReport> find = datastore.find(TaskReport.class).order("-taskId");
+		if ((filterQuery == null || filterQuery.isEmpty()) && !showActiveOnly) {
+        	return  find.asList();
         //return only unfinished task reports
         } else if ((filterQuery == null || filterQuery.isEmpty()) && showActiveOnly) {        	
-        	return datastore.find(TaskReport.class).field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
+        	return find.field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
         //return all filtered by query 'filterQuery' task reports
         } else if (filterQuery != null && !filterQuery.isEmpty() && !showActiveOnly) {
-        	return datastore.find(TaskReport.class).filter("query", filterQuery).asList();
+        	return find.filter("query", filterQuery).asList();
         //return only unfinished filtered by query 'filterQuery' task reports
         } else {
-        	return datastore.find(TaskReport.class).filter("query", filterQuery).field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
+        	return find.filter("query", filterQuery).field("status").notIn(Arrays.asList(Status.FINISHED, Status.STOPPED)).asList();
         }
 	}
 	

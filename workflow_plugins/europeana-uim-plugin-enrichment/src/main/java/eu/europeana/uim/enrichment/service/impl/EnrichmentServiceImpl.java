@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
@@ -130,9 +131,14 @@ public class EnrichmentServiceImpl implements EnrichmentService {
             addresses.add(address);
         }
         Mongo tgtMongo = new Mongo(addresses);
-          Datastore datastore =
-              morphia.createDatastore(tgtMongo,
-                  "collections",usernameIngestion,passwordIngestion.toCharArray());
+          Datastore datastore = null;
+          if(StringUtils.isNotBlank(usernameIngestion)) {
+            datastore = morphia.createDatastore(tgtMongo,
+                   PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS), usernameIngestion, passwordIngestion.toCharArray());
+          } else {
+            datastore =   morphia.createDatastore(tgtMongo,
+                    PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS));
+          }
           cmServer = new CollectionMongoServerImpl();
           datastore.ensureIndexes();
           cmServer.setDatastore(datastore);
@@ -194,9 +200,14 @@ public class EnrichmentServiceImpl implements EnrichmentService {
               addresses.add(address);
           }
           Mongo tgtMongo = new Mongo(addresses);
-            server =
-                new OsgiEdmMongoServer(tgtMongo,
-                    mongoDBEuropeana, usernameIngestion, passwordIngestion);
+            if(StringUtils.isNotBlank(usernameIngestion)) {
+              server =
+                      new OsgiEdmMongoServer(tgtMongo,
+                              mongoDBEuropeana, usernameIngestion, passwordIngestion);
+            } else {
+              server = new OsgiEdmMongoServer(tgtMongo,
+                      mongoDBEuropeana,null,null);
+            }
           } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -223,9 +234,15 @@ public class EnrichmentServiceImpl implements EnrichmentService {
         addresses.add(address);
     }
     Mongo tgtMongo = new Mongo(addresses);
-      idserver =
-          new OsgiEuropeanaIdMongoServer((tgtMongo),
-              mongoDBEuropeanaID, usernameIngestion,passwordIngestion);
+      if(StringUtils.isNotBlank(usernameIngestion)) {
+        idserver =
+                new OsgiEuropeanaIdMongoServer((tgtMongo),
+                        mongoDBEuropeanaID, usernameIngestion, passwordIngestion);
+      } else {
+        idserver =
+                new OsgiEuropeanaIdMongoServer((tgtMongo),
+                        mongoDBEuropeanaID,null,null);
+      }
       idserver.createDatastore();
 
     } catch (NumberFormatException e) {

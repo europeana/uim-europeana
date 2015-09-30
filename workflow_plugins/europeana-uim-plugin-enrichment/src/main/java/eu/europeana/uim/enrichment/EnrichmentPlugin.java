@@ -281,7 +281,6 @@ public class EnrichmentPlugin<I> extends
         context.putValue(addedTKey, 0l);
         logEngine = context.getLoggingEngine();
         try {
-//            solrServer = enrichmentService.getSolrServer();
             cloudSolrServer = enrichmentService.getCloudSolrServer();
             productionCloudSolrServer = enrichmentService.getProductionCloudSolrServer();
 
@@ -317,13 +316,16 @@ public class EnrichmentPlugin<I> extends
                     .getValue(ControlledVocabularyProxy.ISNEW.toString()))
                     || check) {
                 handler.clearData(collection.getMnemonic());
-//                solrServer.deleteByQuery("europeana_collectionName:"
-//                        + collection.getName().split("_")[0] + "_*");
+
                 cloudSolrServer.deleteByQuery("europeana_collectionName:"
                     + collection.getName().split("_")[0] + "_*");
                 collection.putValue("forcedelete","true");
-               // productionCloudSolrServer.deleteByQuery("europeana_collectionName:"
-               //     + collection.getName().split("_")[0] + "_*");
+                //Wait for two minutes to ensure tht things are properly removed on large datasets
+                if(context.getStorageEngine().getTotalByCollection(collection)>500000) {
+                    //If its a massive collection sleep for one hour just in case
+                    Thread.sleep(1000*60*60);
+                }
+
             }
 
         } catch (Exception e) {

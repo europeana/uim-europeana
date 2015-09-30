@@ -15,6 +15,7 @@ import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.VocabularyMongoServerImpl;
 import eu.europeana.uim.gui.cp.server.util.PropertyReader;
 import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
+import org.apache.commons.lang.StringUtils;
 
 public class CopyMappingServlet extends HttpServlet {
     /**
@@ -32,14 +33,26 @@ public class CopyMappingServlet extends HttpServlet {
         String vocabularyURI = request.getParameter("vocabularyURI");
         String[] vocabularyRules = request.getParameter("vocabularyRules")
                 .split(" ");
-        VocabularyMongoServer server = new VocabularyMongoServerImpl(
-                new Mongo(PropertyReader
-                                .getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-                        Integer.parseInt(PropertyReader
-                                .getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-                PropertyReader
-                        .getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY), PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME),
-                PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD));
+        VocabularyMongoServer server;
+        if (StringUtils.isNotBlank(PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME))) {
+            server = new VocabularyMongoServerImpl(
+                    new Mongo(PropertyReader
+                            .getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+                            Integer.parseInt(PropertyReader
+                                    .getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
+                    PropertyReader
+                            .getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY), PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME),
+                    PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD));
+        } else {
+            server = new VocabularyMongoServerImpl(
+                    new Mongo(PropertyReader
+                            .getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+                            Integer.parseInt(PropertyReader
+                                    .getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
+                    PropertyReader
+                            .getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
+        }
+
         ControlledVocabularyImpl voc = server
                 .getControlledVocabularyByName(selectedVocabulary);
         ControlledVocabularyImpl copyVoc = new ControlledVocabularyImpl();
