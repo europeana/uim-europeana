@@ -321,7 +321,10 @@ public class EnrichmentPlugin<I> extends
                     + collection.getName().split("_")[0] + "_*");
                 collection.putValue("forcedelete","true");
                 //Wait for two minutes to ensure tht things are properly removed on large datasets
-                Thread.sleep(120000);
+                if(context.getStorageEngine().getTotalByCollection(collection)>500000) {
+                    //If its a massive collection sleep for one hour just in case
+                    Thread.sleep(1000*60*60);
+                }
 
             }
 
