@@ -112,18 +112,23 @@ public class DeactivatePlugin<I> extends
 					.getDataSet();
 			String collectionId = collection.getName().split("_")[0];
 			log.log(Level.INFO, "Removing collectionId: " + collectionId);
-			String newCollectionId = dService.getCollectionMongoServer()
+
+			//We do not need to handle old collection ids. The ones outside UIM must be handled in the record management
+			//tool
+
+
+			/*String newCollectionId = dService.getCollectionMongoServer()
 					.findNewCollectionId(collection.getName().split("_")[0]);
 			log.log(Level.INFO, "New collection id is:" + newCollectionId);
 			if (newCollectionId != null) {
 				collectionId = newCollectionId;
-			}
+			}*/
 			log.log(Level.INFO, "removing from solr(ingestion)");
 			dService.getCloudSolrServer().deleteByQuery(
-					"europeana_collectionName:" + collectionId + "*");
+					"europeana_collectionName:" + collectionId + "_*");
 			log.log(Level.INFO, "removing from solr(production)");
             dService.getProductionCloudSolrServer().deleteByQuery(
-                    "europeana_collectionName:" + collectionId + "*");
+                    "europeana_collectionName:" + collectionId + "_*");
 			log.log(Level.INFO, "removing from mongo");
 			new FullBeanHandler(dService.getMongoServer())
 					.clearData(collectionId);
@@ -188,16 +193,7 @@ public class DeactivatePlugin<I> extends
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
-		try {
-			dService.getCloudSolrServer().commit();
-			dService.getProductionCloudSolrServer().commit();
-		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
-			log.log(Level.SEVERE, e.getMessage());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			log.log(Level.SEVERE, e.getMessage());
-		}
+
 	}
 
 	public DeactivationService getdService() {
