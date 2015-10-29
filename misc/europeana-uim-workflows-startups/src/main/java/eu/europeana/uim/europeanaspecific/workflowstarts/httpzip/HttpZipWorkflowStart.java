@@ -680,7 +680,7 @@ public class HttpZipWorkflowStart<I> extends
 
 		Collection<I> collection = (Collection<I>) context.getDataSet();
 		collection.putValue("Deleted",
-				Integer.toString(value.deletioncandidates.size()));
+				Integer.toString(deletedCounter));
 		collection.putValue(ControlledVocabularyProxy.ISNEW.toString(),
 				Boolean.toString(value.isNew));
 

@@ -471,8 +471,8 @@ public class ZipLoader<I> {
 	@SuppressWarnings("unchecked")
 	private MetaDataRecord<I> processIdenticalRecord(MetaDataRecord<I> mdr) throws JiBXException,
 			StorageEngineException {
-
-	
+		// Remove all previous STATUS information
+		mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 		mdr.deleteValues(EuropeanaModelRegistry.INITIALINGESTIONSESSION);
 			
 		mdr.addValue(EuropeanaModelRegistry.INITIALINGESTIONSESSION,
