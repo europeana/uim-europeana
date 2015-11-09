@@ -663,7 +663,9 @@ public class EnrichmentPlugin<I> extends
                 } else {
                     boolean res = true;
 //                    res = handler.removeRecord(solrServer, rdf);
-                    res = handler.removeRecord(cloudSolrServer, rdf);
+                    if(!check) {
+                        res = handler.removeRecord(cloudSolrServer, rdf);
+                    }
                     HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
                     try {
                         client.setActive(rdf.getProvidedCHOList().get(0).getAbout(),new Boolean(false));

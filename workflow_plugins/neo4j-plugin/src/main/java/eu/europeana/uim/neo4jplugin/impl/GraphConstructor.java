@@ -583,7 +583,7 @@ public class GraphConstructor {
                 }
             }
             if (i == 100) {
-                Logger.getLogger(this.getClass().getName()).info("Reached 1000 in " + (System.currentTimeMillis()
+                Logger.getLogger(this.getClass().getName()).info("Reached 100 in " + (System.currentTimeMillis()
                         - start) + " ms");
                 start = System.currentTimeMillis();
                 try {

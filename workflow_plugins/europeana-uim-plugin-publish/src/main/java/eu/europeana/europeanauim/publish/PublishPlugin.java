@@ -213,32 +213,34 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
                     }
                 } else // Delete records from production
                 {
-                    String value = null;
-                    if (mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD) != null
-                            && mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD).size() > 0) {
-                        value = mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD).get(0);
-                    } else {
-                        value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
-                    }
+                    if (!check) {
+                        String value = null;
+                        if (mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD) != null
+                                && mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD).size() > 0) {
+                            value = mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD).get(0);
+                        } else {
+                            value = mdr.getValues(EuropeanaModelRegistry.EDMRECORD).get(0);
+                        }
 
-                    IUnmarshallingContext uctx;
-                    try {
-                        uctx = bfact.createUnmarshallingContext();
-                        RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
+                        IUnmarshallingContext uctx;
+                        try {
+                            uctx = bfact.createUnmarshallingContext();
+                            RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
 
-                        handler.removeRecordById(publishService.getSolrServer(), (String) mdr.getId());
+                            handler.removeRecordById(publishService.getSolrServer(), (String) mdr.getId());
 
 
-                    } catch (JiBXException e) {
-                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e, e.getMessage());
-                        log.log(Level.SEVERE, "JiBXException occured with error " + e.getMessage() + "\n");
-                        e.printStackTrace();
-                        return false;
-                    } catch (Exception e) {
-                        logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e, e.getMessage());
-                        e.printStackTrace();
-                        log.log(Level.SEVERE, "Generic Exception occurred with error " + e.getMessage() + "\n");
-                        return false;
+                        } catch (JiBXException e) {
+                            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e, e.getMessage());
+                            log.log(Level.SEVERE, "JiBXException occured with error " + e.getMessage() + "\n");
+                            e.printStackTrace();
+                            return false;
+                        } catch (Exception e) {
+                            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e, e.getMessage());
+                            e.printStackTrace();
+                            log.log(Level.SEVERE, "Generic Exception occurred with error " + e.getMessage() + "\n");
+                            return false;
+                        }
                     }
                 }
             }
