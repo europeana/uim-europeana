@@ -167,7 +167,8 @@ public class SolrWorkflowPlugin<I> extends
                         || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
                         .equals(Status.DELETED)) {
                     try {
-                        mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
+                    	// already done this above!
+                    	// mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
                         String value = mdr.getValues(
                                 EuropeanaModelRegistry.EDMRECORD).get(0);
                         IUnmarshallingContext uctx = bfact

@@ -33,6 +33,9 @@ public final class AgentNormalizer {
 		if (str.contains(";")) {
 			str = StringUtils.substringBefore(str, ";").trim();
 		}
+		if (str.contains("<")) {
+			str = StringUtils.substringBefore(str, "<").trim();
+		}
 		if (str.contains(",")) {
 			String[] split = str.split(",");
 			if (split.length > 1) {

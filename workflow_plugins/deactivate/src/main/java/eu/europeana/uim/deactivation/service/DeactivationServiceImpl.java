@@ -6,9 +6,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.code.morphia.Datastore;
-import com.google.code.morphia.mapping.DefaultCreator;
-import com.mongodb.DBObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -233,12 +230,10 @@ public class DeactivationServiceImpl implements DeactivationService {
                     }
                     Mongo tgtMongo = new Mongo(addresses);
                     if (StringUtils.isNotBlank(usernameIngestion)) {
-                        collectionMongoServer = new CollectionMongoServerImpl(createDatastore(tgtMongo, PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS), usernameIngestion, passwordIngestion));
+                        collectionMongoServer = new CollectionMongoServerImpl(tgtMongo, PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS), usernameIngestion, passwordIngestion);
                     } else {
-                        collectionMongoServer = new CollectionMongoServerImpl(createDatastore(tgtMongo, PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS)));
+                        collectionMongoServer = new CollectionMongoServerImpl(tgtMongo, PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS));
                     }
-
-
                     collectionMongoServer.findOldCollectionId("test");
                 } catch (NumberFormatException e) {
                     // TODO Auto-generated catch block
@@ -251,24 +246,6 @@ public class DeactivationServiceImpl implements DeactivationService {
             }
         };
         colInitializer.initialize(Collection.class.getClassLoader());
-    }
-
-    private Datastore createDatastore(Mongo mongo, String collection, String... credentials) {
-        Morphia morphia = new Morphia();
-        Datastore ds;
-        morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
-            @Override
-            protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
-                return MongoBundleActivator.getBundleClassLoader();
-            }
-        });
-        morphia.map(Collection.class);
-        if (credentials.length > 0) {
-            ds = morphia.createDatastore(mongo, collection, credentials[0], credentials[1].toCharArray());
-        } else {
-            ds = morphia.createDatastore(mongo, collection);
-        }
-        return ds;
     }
 
     @Override

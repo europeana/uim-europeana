@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.mongodb.ServerAddress;
+
+import org.apache.commons.lang.StringUtils;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
@@ -42,6 +44,7 @@ import eu.europeana.corelib.definitions.jibx.ProvidedCHOType;
 import eu.europeana.corelib.definitions.jibx.ProxyType;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.lookup.impl.EuropeanaIdRegistryMongoServerImpl;
+import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdRegistry;
 import eu.europeana.corelib.tools.lookuptable.FailedRecord;
 import eu.europeana.corelib.tools.lookuptable.LookupResult;
@@ -115,6 +118,26 @@ public class DeduplicationServiceImpl implements DeduplicationService {
                                 .find(FailedRecord.class)
                                 .filter("collectionId", "test").asList() != null;
                         log.log(java.util.logging.Level.INFO, "OK");
+                        
+                        
+                        
+                        
+                        Morphia morphia2 = new Morphia();
+                        morphia2.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+                            @Override
+                            protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+                                return MongoBundleActivator.getBundleClassLoader();
+                            }
+                        });
+                		morphia2.map(EuropeanaId.class);
+                		Datastore datastore2 = morphia2.createDatastore(mongo, PropertyReader.getProperty(
+                                UimConfigurationProperty.MONGO_DB_EUROPEANAIDREGISTRY));
+                		
+                		
+                		datastore2.ensureIndexes();
+                		mongoserver.getEuropeanaIdMongoServer().setDatastore(datastore2);
+                		
+                		
                         status = STATUS_INITIALIZED;
                     } catch (Throwable t) {
                         log.log(java.util.logging.Level.SEVERE,
@@ -191,6 +214,7 @@ public class DeduplicationServiceImpl implements DeduplicationService {
                     collectionID, dedupres.getEdm(), sessionid);
             updateInternalReferences(result, lookup.getEuropeanaID());
             dedupres.setEdm(unmarshall(result));
+            dedupres.setUnmarshalledEdm(result);
             dedupres.setLookupresult(lookup);
             dedupres.setDerivedRecordID(lookup.getEuropeanaID());
             deduplist.add(dedupres);
