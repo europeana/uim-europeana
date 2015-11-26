@@ -53,7 +53,6 @@ import eu.europeana.uim.store.Request;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  * This class uses the private zipiterator in order to batch load records into
  * the storage engine
@@ -72,25 +71,25 @@ public class ZipLoader<I> {
 
 	@SuppressWarnings("unused")
 	private ProgressMonitor monitor;
-	
+
 	private Iterator<String> zipiterator;
 
 	private ExecutionContext<MetaDataRecord<I>, I> context;
 
 	private int totalProgress = 0;
-	
+
 	private int expectedRecords = 0;
 
 	private int created = 0;
-	
+
 	private int updated = 0;
-	
+
 	private int omitted = 0;
-	
+
 	private int discarded = 0;
-	
+
 	private int generated = 0;
-	
+
 	private boolean forceUpdate;
 
 	/**
@@ -101,16 +100,15 @@ public class ZipLoader<I> {
 	/**
 	 * Static unmarshalling context used for all EDM unmarshalling operations
 	 */
-	private  IBindingFactory bfact;
+	private IBindingFactory bfact;
 
 	/**
 	 * Static Logger reference
 	 */
 	private static final Logger LOGGER = Logger.getLogger(ZipLoader.class.getName());
-	
 
 	/**
-	 * Default constructor for th	is class
+	 * Default constructor for th is class
 	 * 
 	 * @param expectedRecords
 	 *            The number of expected records
@@ -125,9 +123,8 @@ public class ZipLoader<I> {
 	 * @param loggingEngine
 	 *            A reference to the logging engine
 	 */
-	public ZipLoader(int expectedRecords, Iterator<String> zipiterator,
-			ExecutionContext<MetaDataRecord<I>, I> context, Request<I> request,
-			DeduplicationService dedup, String forceupdate) {
+	public ZipLoader(int expectedRecords, Iterator<String> zipiterator, ExecutionContext<MetaDataRecord<I>, I> context,
+			Request<I> request, DeduplicationService dedup, String forceupdate) {
 		super();
 		this.expectedRecords = expectedRecords;
 		this.zipiterator = zipiterator;
@@ -143,7 +140,7 @@ public class ZipLoader<I> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		if (forceupdate != null && forceupdate.toLowerCase().equals("true")) {
 			forceUpdate = true;
 		}
@@ -161,16 +158,11 @@ public class ZipLoader<I> {
 	 * @return list of loaded Metadata records
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public synchronized List<MetaDataRecord<I>> doNext(int batchSize,
-			boolean save) {
+	public synchronized List<MetaDataRecord<I>> doNext(int batchSize, boolean save) {
 		List<MetaDataRecord<I>> result = new ArrayList<MetaDataRecord<I>>();
 		int progress = 0;
 
-
-		
-		
-		HttpZipWorkflowStart.Data value = context
-				.getValue(HttpZipWorkflowStart.DATA_KEY);
+		HttpZipWorkflowStart.Data value = context.getValue(HttpZipWorkflowStart.DATA_KEY);
 
 		while (zipiterator.hasNext()) {
 
@@ -184,230 +176,243 @@ public class ZipLoader<I> {
 
 				// First Check the record for duplicates.
 				List<DeduplicationResult> reslist = dedup.deduplicateRecord(
-						(String) request.getCollection().getMnemonic(),
-						(String) context.getExecution().getId(), rdfstring);
+						(String) request.getCollection().getMnemonic(), (String) context.getExecution().getId(),
+						rdfstring);
 
-				
-				//If the resultlist contains more than one records then we assume that the incoming records
-				//have been split. We append the number of the extra generated records in the "generated"
-				//variable.
-				
-				if(reslist.size() > 1){
-					generated += reslist.size() -1;
-					expectedRecords += reslist.size() -1;
+				// If the resultlist contains more than one records then we
+				// assume that the incoming records
+				// have been split. We append the number of the extra generated
+				// records in the "generated"
+				// variable.
+
+				if (reslist.size() > 1) {
+					generated += reslist.size() - 1;
+					expectedRecords += reslist.size() - 1;
 				}
-				
+
 				for (DeduplicationResult dedupres : reslist) {
 
 					LookupState state = dedupres.getLookupresult().getState();
 
 					MetaDataRecord<I> mdr = null;
-					
-					if(state != null){
 
-					
-					switch (state) {
-					case ID_REGISTERED:						
-						mdr = processrecord(mdr, dedupres, Status.CREATED);
-						
-						LOGGER.log(Level.INFO,"Unique Identifier in ID_REGISTERED state for record with ID " + dedupres
-								.getDerivedRecordID());
-						
-//						value.deletioncandidates.remove(dedupres
-//								.getDerivedRecordID());
-						
-						dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
-						
-						created ++;
-						
-						break;
-					
-					case DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS:
-						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS state for record with ID " + dedupres
-								.getDerivedRecordID());
-						
-						value.deletioncandidates.add(dedupres.getDerivedRecordID());
-						
-						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
-								getMnemonic(),rdfstring,LookupState.DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS);
-						
-						discarded ++;
-						break;
-					case DUPLICATE_INCOLLECTION:										
-						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DUPLICATE_INCOLLECTION state for record with ID " + dedupres
-								.getDerivedRecordID());
-						
-						value.deletioncandidates.add(dedupres.getDerivedRecordID());
-						
-						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
-								getMnemonic(),rdfstring,LookupState.DUPLICATE_INCOLLECTION);
-						
-						discarded ++;
-						break;
-					case DERIVED_DUPLICATE_INCOLLECTION:
-						
-						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DERIVED_DUPLICATE_INCOLLECTION state for record with ID " + dedupres
-								.getDerivedRecordID());
-						
-						value.deletioncandidates.add(dedupres.getDerivedRecordID());
-						
-						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
-								getMnemonic(),rdfstring,LookupState.DERIVED_DUPLICATE_INCOLLECTION);
-						
-						discarded ++;
-						break;
-					case DUPLICATE_RECORD_ACROSS_COLLECTIONS:
-						
-						context.getLoggingEngine().log(context.getExecution(), Level.INFO, "Unique Identifier in DUPLICATE_RECORD_ACROSS_COLLECTIONS state for record with ID " + dedupres
-								.getDerivedRecordID());
-						
-						value.deletioncandidates.add(dedupres.getDerivedRecordID());
-						
-						dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(),dedupres.getOriginalRecordID(),request.getCollection().
-								getMnemonic(),rdfstring,LookupState.DUPLICATE_RECORD_ACROSS_COLLECTIONS);
-						
-						discarded ++;
-						break;
-					case IDENTICAL:
+					if (state != null) {
 
-						if (forceUpdate) {
-							LOGGER.log(Level.INFO,"Unique Identifier in IDENTICAL (forceupdate) state for record with ID " + dedupres
-									.getDerivedRecordID());
+						switch (state) {
+						case ID_REGISTERED:
+							mdr = processrecord(mdr, dedupres, Status.CREATED);
+
+							LOGGER.log(Level.INFO, "Unique Identifier in ID_REGISTERED state for record with ID "
+									+ dedupres.getDerivedRecordID());
+
+							// value.deletioncandidates.remove(dedupres
+							// .getDerivedRecordID());
+
+							dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),
+									(String) request.getCollection().getMnemonic());
+
+							created++;
+
+							break;
+
+//						case DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS:
+//							context.getLoggingEngine().log(context.getExecution(), Level.INFO,
+//									"Unique Identifier in DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS state for record with ID "
+//											+ dedupres.getDerivedRecordID());
+//
+//							value.deletioncandidates.add(dedupres.getDerivedRecordID());
+//
+//							dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(), dedupres.getOriginalRecordID(),
+//									request.getCollection().getMnemonic(), rdfstring,
+//									LookupState.DUPLICATE_IDENTIFIER_ACROSS_COLLECTIONS);
+//
+//							discarded++;
+//							break;
+						case DUPLICATE_INCOLLECTION:
+							context.getLoggingEngine().log(context.getExecution(), Level.INFO,
+									"Unique Identifier in DUPLICATE_INCOLLECTION state for record with ID "
+											+ dedupres.getDerivedRecordID());
+
+							value.deletioncandidates.add(dedupres.getDerivedRecordID());
+
+							dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(), dedupres.getOriginalRecordID(),
+									request.getCollection().getMnemonic(), rdfstring,
+									LookupState.DUPLICATE_INCOLLECTION);
+
+							discarded++;
+							break;
+						case DERIVED_DUPLICATE_INCOLLECTION:
+
+							context.getLoggingEngine().log(context.getExecution(), Level.INFO,
+									"Unique Identifier in DERIVED_DUPLICATE_INCOLLECTION state for record with ID "
+											+ dedupres.getDerivedRecordID());
+
+							value.deletioncandidates.add(dedupres.getDerivedRecordID());
+
+							dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(), dedupres.getOriginalRecordID(),
+									request.getCollection().getMnemonic(), rdfstring,
+									LookupState.DERIVED_DUPLICATE_INCOLLECTION);
+
+							discarded++;
+							break;
+//						case DUPLICATE_RECORD_ACROSS_COLLECTIONS:
+//
+//							context.getLoggingEngine().log(context.getExecution(), Level.INFO,
+//									"Unique Identifier in DUPLICATE_RECORD_ACROSS_COLLECTIONS state for record with ID "
+//											+ dedupres.getDerivedRecordID());
+//
+//							value.deletioncandidates.add(dedupres.getDerivedRecordID());
+//
+//							dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(), dedupres.getOriginalRecordID(),
+//									request.getCollection().getMnemonic(), rdfstring,
+//									LookupState.DUPLICATE_RECORD_ACROSS_COLLECTIONS);
+//
+//							discarded++;
+//							break;
+						case IDENTICAL:
+
+							if (forceUpdate) {
+								LOGGER.log(Level.INFO,
+										"Unique Identifier in IDENTICAL (forceupdate) state for record with ID "
+												+ dedupres.getDerivedRecordID());
+								try {
+									mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
+									processrecord(mdr, dedupres, Status.UPDATED);
+									// value.deletioncandidates.remove(dedupres
+									// .getDerivedRecordID());
+
+								} catch (StorageEngineException e) {
+									e.printStackTrace();
+									mdr = processrecord(mdr, dedupres, Status.UPDATED);
+									// value.deletioncandidates.remove(dedupres
+									// .getDerivedRecordID());
+								}
+
+								updated++;
+
+							} else {
+								LOGGER.log(Level.INFO,
+										"Unique Identifier in IDENTICAL (ignore identical) state for record with ID "
+												+ dedupres.getDerivedRecordID());
+								// value.deletioncandidates.remove(dedupres
+								// .getDerivedRecordID());
+								mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
+								processIdenticalRecord(mdr);
+								omitted++;
+							}
+
+							break;
+						case UPDATE:
+							LOGGER.log(Level.INFO, "Unique Identifier in UPDATE state for record with ID "
+									+ dedupres.getDerivedRecordID());
+							mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
 							try {
-								mdr = storage.getMetaDataRecord(dedupres
-										.getDerivedRecordID());
-								processrecord(mdr,dedupres,Status.UPDATED);
-//								value.deletioncandidates.remove(dedupres
-//										.getDerivedRecordID());
-								
+								processrecord(mdr, dedupres, Status.UPDATED);
+								// value.deletioncandidates.remove(dedupres
+								// .getDerivedRecordID());
+								dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),
+										(String) request.getCollection().getMnemonic());
 							} catch (StorageEngineException e) {
 								e.printStackTrace();
-								mdr = processrecord(mdr,dedupres,Status.UPDATED);
-//								value.deletioncandidates.remove(dedupres
-//										.getDerivedRecordID());
+								mdr = processrecord(mdr, dedupres, Status.UPDATED);
+								// value.deletioncandidates.remove(dedupres
+								// .getDerivedRecordID());
+								dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),
+										(String) request.getCollection().getMnemonic());
+
 							}
-							
-							updated ++;
-
-						} else {
-							LOGGER.log(Level.INFO,"Unique Identifier in IDENTICAL (ignore identical) state for record with ID " + dedupres
-									.getDerivedRecordID());
-//							value.deletioncandidates.remove(dedupres
-//									.getDerivedRecordID());
-							mdr = storage.getMetaDataRecord(dedupres
-									.getDerivedRecordID());
-							processIdenticalRecord(mdr);
-							omitted ++;
+							updated++;
+							break;
+						default:
+							break;
 						}
- 
-						break;
-					case UPDATE:
-						LOGGER.log(Level.INFO,"Unique Identifier in UPDATE state for record with ID " + dedupres
-								.getDerivedRecordID());
-						mdr = storage.getMetaDataRecord(dedupres
-								.getDerivedRecordID());
-						try {					
-							processrecord(mdr, dedupres,Status.UPDATED);
-//							value.deletioncandidates.remove(dedupres
-//									.getDerivedRecordID());
-							dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
+
+						if (mdr != null) {
+							result.add(mdr);
+						}
+
+					}
+					// state is null
+					else {
+						mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
+						try {
+							processrecord(mdr, dedupres, Status.UPDATED);
+							// value.deletioncandidates.remove(dedupres
+							// .getDerivedRecordID());
+							dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),
+									(String) request.getCollection().getMnemonic());
+
+							updated++;
+
 						} catch (StorageEngineException e) {
-							e.printStackTrace();
-							mdr = processrecord(mdr,dedupres,Status.UPDATED);
-//							value.deletioncandidates.remove(dedupres
-//									.getDerivedRecordID());
-							dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
-
+							mdr = processrecord(mdr, dedupres, Status.CREATED);
+							// value.deletioncandidates.remove(dedupres
+							// .getDerivedRecordID());
+							created++;
 						}
-						updated ++;
-						break;
-					default:
-						break;
-					}
 
-					if (mdr != null) {						
-						result.add(mdr);
+						if (mdr != null) {
+							result.add(mdr);
+						}
 					}
-
-				}
-				// state is null
-				else{
-					mdr = storage.getMetaDataRecord(dedupres
-							.getDerivedRecordID());
-					try {					
-						processrecord(mdr,dedupres,Status.UPDATED);
-//						value.deletioncandidates.remove(dedupres
-//								.getDerivedRecordID());
-						dedup.deleteFailedRecord(dedupres.getOriginalRecordID(),(String) request.getCollection().getMnemonic());
-						
-						updated ++;
-						
-					} catch (StorageEngineException e) {
-						mdr = processrecord(mdr,dedupres,Status.CREATED);
-//						value.deletioncandidates.remove(dedupres
-//								.getDerivedRecordID());
-						created ++;
-					}
-					
-					if (mdr != null) {
-						result.add(mdr);
-					}
-				}
 				}
 
 				progress++;
 				totalProgress++;
 
 			} catch (JiBXException e) {
-				LOGGER.log(Level.SEVERE,"ZipLoader:Error unmarshalling xml for object",e);
-				
+				LOGGER.log(Level.SEVERE, "ZipLoader:Error unmarshalling xml for object", e);
+
 				SaxBasedIDExtractor extractor = new SaxBasedIDExtractor();
 				List<String> ids = extractor.extractIDs(rdfstring);
-				
-				for(String id:ids){
+
+				for (String id : ids) {
 					List<String> newids = dedup.retrieveEuropeanaIDFromOld(id, request.getCollection().getMnemonic());
-					
-					for(String newid : newids){
-//						value.deletioncandidates.remove(newid);
-						
-						dedup.createUpdateIdStatus(id,newid,request.getCollection().getMnemonic(),rdfstring,LookupState.INCOMPATIBLE_XML_CONTENT);
-					}	
+
+					for (String newid : newids) {
+						// value.deletioncandidates.remove(newid);
+
+						dedup.createUpdateIdStatus(id, newid, request.getCollection().getMnemonic(), rdfstring,
+								LookupState.INCOMPATIBLE_XML_CONTENT);
+					}
 				}
-				discarded ++;
-				
+				discarded++;
+
 			} catch (StorageEngineException e) {
 				e.printStackTrace();
-				
+
 				SaxBasedIDExtractor extractor = new SaxBasedIDExtractor();
 				List<String> ids = extractor.extractIDs(rdfstring);
-				
-				for(String id:ids){
+
+				for (String id : ids) {
 					List<String> newids = dedup.retrieveEuropeanaIDFromOld(id, request.getCollection().getMnemonic());
-					
-					for(String newid : newids){
-//						value.deletioncandidates.remove(newid);
-						dedup.createUpdateIdStatus(id,newid,request.getCollection().getMnemonic(),rdfstring,LookupState.SYSTEM_ERROR);
+
+					for (String newid : newids) {
+						// value.deletioncandidates.remove(newid);
+						dedup.createUpdateIdStatus(id, newid, request.getCollection().getMnemonic(), rdfstring,
+								LookupState.SYSTEM_ERROR);
 					}
 				}
-				
-				LOGGER.log(Level.SEVERE,"ZipLoader:Storage engine error",e);
-				discarded ++;
+
+				LOGGER.log(Level.SEVERE, "ZipLoader:Storage engine error", e);
+				discarded++;
 			} catch (DeduplicationException e) {
-				LOGGER.log(Level.SEVERE,"ZipLoader:Deduplication Exception",e);
-				
+				LOGGER.log(Level.SEVERE, "ZipLoader:Deduplication Exception", e);
+
 				SaxBasedIDExtractor extractor = new SaxBasedIDExtractor();
 				List<String> ids = extractor.extractIDs(rdfstring);
-				
-				for(String id:ids){
+
+				for (String id : ids) {
 					List<String> newids = dedup.retrieveEuropeanaIDFromOld(id, request.getCollection().getMnemonic());
-					
-					for(String newid : newids){
-//						value.deletioncandidates.remove(newid);
-						dedup.createUpdateIdStatus(id,newid,request.getCollection().getMnemonic(),rdfstring,LookupState.INCOMPATIBLE_XML_CONTENT);
+
+					for (String newid : newids) {
+						// value.deletioncandidates.remove(newid);
+						dedup.createUpdateIdStatus(id, newid, request.getCollection().getMnemonic(), rdfstring,
+								LookupState.INCOMPATIBLE_XML_CONTENT);
 					}
 				}
-				
-				discarded ++;
+
+				discarded++;
 			}
 		}
 
@@ -422,15 +427,12 @@ public class ZipLoader<I> {
 	 * @throws JiBXException
 	 */
 	@SuppressWarnings("unchecked")
-	private MetaDataRecord<I> processrecord(MetaDataRecord<I> mdr,
-			DeduplicationResult dedupres,Status status) throws JiBXException,
-			StorageEngineException {
+	private MetaDataRecord<I> processrecord(MetaDataRecord<I> mdr, DeduplicationResult dedupres, Status status)
+			throws JiBXException, StorageEngineException {
 
 		if (mdr == null) {
-			mdr = storage.createMetaDataRecord(request.getCollection(),
-					dedupres.getDerivedRecordID());
-			mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE,
-					new Date().toString());
+			mdr = storage.createMetaDataRecord(request.getCollection(), dedupres.getDerivedRecordID());
+			mdr.addValue(EuropeanaModelRegistry.UIMINGESTIONDATE, new Date().toString());
 		} else {
 			// Remove the previous ingestion date
 			mdr.deleteValues(EuropeanaModelRegistry.UIMUPDATEDDATE);
@@ -438,45 +440,41 @@ public class ZipLoader<I> {
 			mdr.deleteValues(EuropeanaModelRegistry.EDMRECORD);
 			// Remove the previous registered links
 			mdr.deleteValues(EuropeanaModelRegistry.EUROPEANALINK);
-            // Remove all previous STATUS information
+			// Remove all previous STATUS information
 			mdr.deleteValues(EuropeanaModelRegistry.STATUS);
-			//Removed previous versions of Dereferenced EDM XML
-			//mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
+			// Removed previous versions of Dereferenced EDM XML
+			// mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
 			mdr.deleteValues(EuropeanaModelRegistry.ISHIERARCHY);
 			// Remove the previous ingestion session
 			mdr.deleteValues(EuropeanaModelRegistry.INITIALINGESTIONSESSION);
-			
+
 		}
 
-		mdr.addValue(EuropeanaModelRegistry.INITIALINGESTIONSESSION,
-				(String) context.getExecution().getId());
-		
-		mdr.addValue(EuropeanaModelRegistry.UIMUPDATEDDATE,
-				new Date().toString());
+		mdr.addValue(EuropeanaModelRegistry.INITIALINGESTIONSESSION, (String) context.getExecution().getId());
+
+		mdr.addValue(EuropeanaModelRegistry.UIMUPDATEDDATE, new Date().toString());
 
 		mdr.addValue(EuropeanaModelRegistry.EDMRECORD, dedupres.getEdm());
 
 		// Add Links to be checked values here
 		// haris: use the cached RDF instead of unmarshalling again
 		addLinkcheckingValues(dedupres.getUnmarshalledEdm(), mdr);
-		
+
 		mdr.addValue(EuropeanaModelRegistry.STATUS, status);
-		
+
 		storage.updateMetaDataRecord(mdr);
 
 		return mdr;
 	}
-	
-	
+
 	@SuppressWarnings("unchecked")
-	private MetaDataRecord<I> processIdenticalRecord(MetaDataRecord<I> mdr) throws JiBXException,
-			StorageEngineException {
+	private MetaDataRecord<I> processIdenticalRecord(MetaDataRecord<I> mdr)
+			throws JiBXException, StorageEngineException {
 		// Remove all previous STATUS information
 		mdr.deleteValues(EuropeanaModelRegistry.STATUS);
 		mdr.deleteValues(EuropeanaModelRegistry.INITIALINGESTIONSESSION);
-			
-		mdr.addValue(EuropeanaModelRegistry.INITIALINGESTIONSESSION,
-				(String) context.getExecution().getId());
+
+		mdr.addValue(EuropeanaModelRegistry.INITIALINGESTIONSESSION, (String) context.getExecution().getId());
 		storage.updateMetaDataRecord(mdr);
 
 		return mdr;
@@ -491,7 +489,7 @@ public class ZipLoader<I> {
 		StringReader reader = new StringReader(edm);
 		IUnmarshallingContext mctx = bfact.createUnmarshallingContext();
 		RDF rdf = (RDF) mctx.unmarshalDocument(reader, "UTF-8");
-		
+
 		return rdf;
 	}
 
@@ -504,11 +502,9 @@ public class ZipLoader<I> {
 	private void addLinkcheckingValues(RDF validedmrecord, MetaDataRecord<I> mdr) {
 
 		List<Aggregation> aggregations = validedmrecord.getAggregationList();
-		List<WebResourceType> webresources = validedmrecord
-				.getWebResourceList();
+		List<WebResourceType> webresources = validedmrecord.getWebResourceList();
 
-		Set<String> existingLinks = Collections
-				.synchronizedSet(new HashSet<String>());
+		Set<String> existingLinks = Collections.synchronizedSet(new HashSet<String>());
 
 		if (aggregations != null) {
 			for (Aggregation aggregation : aggregations) {
@@ -553,8 +549,7 @@ public class ZipLoader<I> {
 	 * twice in the EDM record context)
 	 * 
 	 */
-	private void addLink(String link, MetaDataRecord<I> mdr,
-			Set<String> existingLinks, boolean isCacheable) {
+	private void addLink(String link, MetaDataRecord<I> mdr, Set<String> existingLinks, boolean isCacheable) {
 
 		if (!existingLinks.contains(link)) {
 			EuropeanaLink eulink = new EuropeanaLink();
@@ -599,8 +594,7 @@ public class ZipLoader<I> {
 	public int getUpdated() {
 		return updated;
 	}
-	
-	
+
 	/**
 	 * @return the generated
 	 */
@@ -614,15 +608,14 @@ public class ZipLoader<I> {
 	public int getDiscarded() {
 		return discarded;
 	}
-	
+
 	/**
 	 * @return the omitted
 	 */
 	public int getOmitted() {
 		return omitted;
 	}
-	
-	
+
 	/**
 	 * Finalizes the current object and make its fields eligible for garbage
 	 * collection

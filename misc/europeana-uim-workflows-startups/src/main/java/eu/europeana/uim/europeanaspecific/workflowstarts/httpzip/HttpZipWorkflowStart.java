@@ -510,7 +510,7 @@ public class HttpZipWorkflowStart<I> extends
 	 * @throws StorageEngineException 
 	 */
 	private void processDeletedEntries(Data value,ExecutionContext<MetaDataRecord<I>, I> context) throws StorageEngineException{
-		int deletedCounter = 0;
+		
 		
 		StorageEngine<I> uimengine = context.getStorageEngine();
 
@@ -629,7 +629,6 @@ public class HttpZipWorkflowStart<I> extends
 										"Marked Record " + mdr.getId()
 												+ " as Deleted.");
 						dedup.markdeleted(id, true);
-						deletedCounter ++;
 					}
 				} catch (StorageEngineException e) {
 					context.getLoggingEngine()
@@ -645,6 +644,7 @@ public class HttpZipWorkflowStart<I> extends
 		}
 
 		// left overs from previous ingestions that are not marked as deleted <EuropeanaModelRegistry, String>. 
+		
 		
 		Collection<I> coll = context.getDataSetCollection();
 		KeyCriterium<EuropeanaModelRegistry, String> notOfThisSession  = KeyCriterium.buildNotKeyCriterium(EuropeanaModelRegistry.INITIALINGESTIONSESSION, (String) context.getExecution().getId());
@@ -663,8 +663,6 @@ public class HttpZipWorkflowStart<I> extends
 					context.getLoggingEngine().log(context.getExecution(), Level.INFO, "HttpZipWorkflowStart",
 							"Marked Record " + mdr.getId() + " as Deleted.");
 					dedup.markdeleted(id, true);
-					deletedCounter ++;
-
 				} catch (StorageEngineException e) {
 					context.getLoggingEngine().log(context.getExecution(), Level.SEVERE, "HttpZipWorkflowStart",
 							"Error marking record " + id + " as deleted due to UIM storage engine failure "
@@ -674,13 +672,18 @@ public class HttpZipWorkflowStart<I> extends
 		}
 		
 		
+		KeyCriterium<EuropeanaModelRegistry, Status> markedAsDeleted  = KeyCriterium.buildKeyCriterium(EuropeanaModelRegistry.STATUS, Status.DELETED);
+
+		
+		int deletedRecotds = uimengine.countByCollectionAndCriteria(coll, markedAsDeleted);
+		
 		Execution<I> execution = context.getExecution();
 		execution.putValue("Deleted",
-				Integer.toString(deletedCounter));
+				Integer.toString(deletedRecotds));
 
 		Collection<I> collection = (Collection<I>) context.getDataSet();
 		collection.putValue("Deleted",
-				Integer.toString(deletedCounter));
+				Integer.toString(deletedRecotds));
 		collection.putValue(ControlledVocabularyProxy.ISNEW.toString(),
 				Boolean.toString(value.isNew));
 
