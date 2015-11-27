@@ -335,6 +335,7 @@ public class ZipLoader<I> {
 					// state is null
 					else {
 						mdr = storage.getMetaDataRecord(dedupres.getDerivedRecordID());
+						
 						try {
 							processrecord(mdr, dedupres, Status.UPDATED);
 							// value.deletioncandidates.remove(dedupres
