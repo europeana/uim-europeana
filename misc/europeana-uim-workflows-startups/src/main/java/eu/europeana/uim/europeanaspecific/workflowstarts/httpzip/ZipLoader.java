@@ -233,7 +233,7 @@ public class ZipLoader<I> {
 									"Unique Identifier in DUPLICATE_INCOLLECTION state for record with ID "
 											+ dedupres.getDerivedRecordID());
 
-							value.deletioncandidates.add(dedupres.getDerivedRecordID());
+							//value.deletioncandidates.add(dedupres.getDerivedRecordID());
 
 							dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(), dedupres.getOriginalRecordID(),
 									request.getCollection().getMnemonic(), rdfstring,
@@ -247,7 +247,7 @@ public class ZipLoader<I> {
 									"Unique Identifier in DERIVED_DUPLICATE_INCOLLECTION state for record with ID "
 											+ dedupres.getDerivedRecordID());
 
-							value.deletioncandidates.add(dedupres.getDerivedRecordID());
+							//value.deletioncandidates.add(dedupres.getDerivedRecordID());
 
 							dedup.createUpdateIdStatus(dedupres.getDerivedRecordID(), dedupres.getOriginalRecordID(),
 									request.getCollection().getMnemonic(), rdfstring,
