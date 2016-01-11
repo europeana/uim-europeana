@@ -36,7 +36,8 @@ public enum UimConfigurationProperty {
 	CLIENT_USERNAME("harvester.username"),
 	CLIENT_PASSWORD("harvester.password"),
 	MONGO_REINDEXING_HOST("mongo.reindexing.host"),
-	MONGO_REINDEXING_PORT("mongo.reindexing.port");
+	MONGO_REINDEXING_PORT("mongo.reindexing.port"),
+	MONGO_REINDEXING_DB("mongo.reindexing.db");
 
 	
 	String field;

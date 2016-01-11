@@ -144,7 +144,7 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
                     || check || checkUpdate) {
 
 
-                if (!(status != null && status.get(0).equals(Status.DELETED))) {
+                if (!(status != null && status.size()>0 && status.get(0).equals(Status.DELETED))) {
                     String value = null;
                     if (mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD) != null
                             && mdr.getValues(EuropeanaModelRegistry.EDMENRICHEDRECORD).size() > 0) {
