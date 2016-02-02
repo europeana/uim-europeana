@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features name="uim-features">
 	<feature name="uim-europeana-complete" version="2.0.1.SNAPSHOT">
-		<feature version="2.2.11">war</feature>
-		<bundle>mvn:org.jibx/jibx-run/1.2.5</bundle>
-		<bundle>mvn:org.jibx/jibx-extras/1.2.5</bundle>
+		<feature version="2.4.4">war</feature>
+		<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/1.1.4c_7</bundle>
+		<bundle>mvn:org.jibx/jibx-run/1.2.6</bundle>
+		<bundle>mvn:org.jibx/jibx-extras/1.2.6</bundle>
+
 		<bundle>mvn:org.apache.geronimo.specs/geronimo-annotation_1.2_spec/1.0.MR2-SNAPSHOT</bundle>
 		<bundle>mvn:eu.europeana/europeana-uim-common/2.0.1-SNAPSHOT</bundle>
 		<bundle>mvn:eu.europeana/europeana-uim-api/2.0.1-SNAPSHOT</bundle>

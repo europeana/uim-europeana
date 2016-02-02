@@ -391,7 +391,7 @@
 							org.ietf.jgss;
 							version=0.0.0,
 							org.osgi.service.blueprint;
-							version=1.0.1,
+							version=0.0.0,
 							jline;
 							version=2.5.0,
 							javax.servlet; version=2.5.0,

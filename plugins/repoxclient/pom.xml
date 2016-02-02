@@ -96,9 +96,9 @@
 							org.xml.sax;
 							version=0.0.0,
 							org.osgi.service.blueprint;
-							version=1.0.1,
+							version=0.0.0,
 							org.osgi.service.blueprint.container;
-							version=1.0.1,
+							version=0.0.0,
 							org.apache.felix.gogo.commands; version=0.6.1,
 							org.apache.felix.gogo.commands.basic; version=0.6.1,
 							org.apache.felix.service.command; version=0.6.1,

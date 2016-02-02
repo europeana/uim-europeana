@@ -9,11 +9,8 @@ import com.google.code.morphia.Morphia;
 import com.google.code.morphia.mapping.DefaultCreator;
 import com.hp.hpl.jena.rdf.model.RDFReaderF;
 import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
-import com.mongodb.DB;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
 import com.mongodb.MongoException;
 import com.mongodb.ServerAddress;
 

@@ -193,7 +193,7 @@
 							org.xml.sax.helpers;
 							version=0.0.0,
 							org.osgi.service.blueprint;
-							version=1.0.1,
+							version=0.0.0,
 							eu.europeana.uim.common; version=0.0.0,
 							eu.europeana.uim.store;
 							version=0.0.0,
