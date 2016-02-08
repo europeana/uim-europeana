@@ -191,18 +191,16 @@ public class PublishPlugin<I> extends AbstractIngestionPlugin<MetaDataRecord<I>,
                     }
 
                     // Check if a redirect exist and push it to production
-                    if (mdr.getValues(EuropeanaModelRegistry.EDMRECORDREDIRECT) != null
-                            && mdr.getValues(EuropeanaModelRegistry.EDMRECORDREDIRECT).size() > 0) {
+                    if (mdr.getValues(EuropeanaModelRegistry.EDMRECORDREDIRECTID) != null
+                            && mdr.getValues(EuropeanaModelRegistry.EDMRECORDREDIRECTID).size() > 0) {
                         // Push redirects to production
-                        EuropeanaId europeanaId =
-                                publishService
-                                        .getEuropeanaIdMongoServer()
-                                        .retrieveEuropeanaIdFromNew(
-                                                (String) mdr.getId())
-                                        .get(0);
+                       EuropeanaId europeanaId = new EuropeanaId();
+                        europeanaId.setOldId(mdr.getValues(EuropeanaModelRegistry.EDMRECORDREDIRECTID).get(0));
+                        europeanaId.setNewId(mdr.getId().toString());
+                        europeanaId.setTimestamp(new Date().getTime());
                         publishService.getEuropeanaIdMongoServerProduction().saveEuropeanaId(europeanaId);
                         // Remove it from the mdr
-                        mdr.deleteValues(EuropeanaModelRegistry.EDMRECORDREDIRECT);
+                        mdr.deleteValues(EuropeanaModelRegistry.EDMRECORDREDIRECTID);
                         try {
                             context.getStorageEngine().updateMetaDataRecord(mdr);
                         } catch (StorageEngineException e) {
