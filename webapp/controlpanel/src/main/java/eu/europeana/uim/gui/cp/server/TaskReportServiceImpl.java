@@ -138,6 +138,7 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 	}
 	
 	/**
+	 * TODO move it to a separate utility class!
 	 * Utility method for date formating
 	 * @param dateUpdated is long representation of date
 	 * @return a string representation of date in the format 'dd-MM-yyyy'
