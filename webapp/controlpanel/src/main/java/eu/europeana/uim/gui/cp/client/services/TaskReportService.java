@@ -5,6 +5,11 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportResultDTO;
 
+/**
+ * 
+ * @author Alena Fedasenka
+ *
+ */
 @RemoteServiceRelativePath("taskreports")
 public interface TaskReportService extends RemoteService {
 

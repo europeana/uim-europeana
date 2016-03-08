@@ -8,10 +8,10 @@ import eu.europeana.uim.gui.cp.client.europeanawidgets.CollectionManagement;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.EuropeanaIngestionHistoryWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ExpandedResourceManagementWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.FailedRecordsWidget;
+import eu.europeana.uim.gui.cp.client.europeanawidgets.ImageCachingStatisticsWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportControlledVocabularyWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.ImportResourcesWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkCachingWidget;
-import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkReportingWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.LinkValidationWidget;
 import eu.europeana.uim.gui.cp.client.europeanawidgets.TaskReportWidget;
 import eu.europeana.uim.gui.cp.client.management.IngestionTriggerWidget;
@@ -22,6 +22,8 @@ import eu.europeana.uim.gui.cp.client.services.ExecutionService;
 import eu.europeana.uim.gui.cp.client.services.ExecutionServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.FailedRecordService;
 import eu.europeana.uim.gui.cp.client.services.FailedRecordServiceAsync;
+import eu.europeana.uim.gui.cp.client.services.ImageCachingStatisticsService;
+import eu.europeana.uim.gui.cp.client.services.ImageCachingStatisticsServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxy;
 import eu.europeana.uim.gui.cp.client.services.ImportVocabularyProxyAsync;
 import eu.europeana.uim.gui.cp.client.services.IntegrationSeviceProxy;
@@ -82,6 +84,8 @@ public class EuropeanaIngestionControlPanel extends
 				.create(FailedRecordService.class);
 		final TaskReportServiceAsync taskReportService = (TaskReportServiceAsync) GWT
 				.create(TaskReportService.class);
+		final ImageCachingStatisticsServiceAsync imageCachingStatisticsService = (ImageCachingStatisticsServiceAsync) GWT
+				.create(ImageCachingStatisticsService.class);
 		// Initialize Panel Components here
 		treeModel.addMenuEntry("Monitoring", new IngestionDetailWidget(
 				executionService), RunAsyncCode
@@ -108,20 +112,18 @@ public class EuropeanaIngestionControlPanel extends
 				repositoryService, failedRecordService), RunAsyncCode
 				.runAsyncCode(FailedRecordsWidget.class));
 		
-		treeModel
-				.addMenuEntry("Link Checker/ Thumbler",
-						new LinkReportingWidget(reportService,
-								"Link Validation",
-								new String[] { "LinkCheckWorkflow" },
-								"linkcheck_overview.rptdesign",
-								new String[] { "pdf" }), RunAsyncCode
-								.runAsyncCode(LinkReportingWidget.class));
-
 		treeModel.addMenuEntry("Link Checker/ Thumbler", new LinkCachingWidget(
 				reportService, "Link Caching",
 				new String[] { "ImageCacheWorkflow" },
 				"thumbler_overview.rptdesign", new String[] { "pdf" }),
 				RunAsyncCode.runAsyncCode(LinkCachingWidget.class));
+		
+		treeModel.addMenuEntry("Link Checker/ Thumbler", new ImageCachingStatisticsWidget(
+				"Image Caching Statistics",
+				"This page allows you to preview the image cache statistics, filter the image caching jobs by provider or dataset, generate statistics reports in PDF and failure reports in TXT.",
+				repositoryService, imageCachingStatisticsService
+				), RunAsyncCode
+				.runAsyncCode(ImageCachingStatisticsWidget.class));
 
 		treeModel.addMenuEntry("Importing", new ImportResourcesWidget(
 				repositoryService, resourceService, integrationService),

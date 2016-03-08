@@ -125,6 +125,7 @@ public class PublishServiceImpl implements PublishService {
                 }
                 idserver.createDatastore();
                 idserver.retrieveEuropeanaIdFromOld("test");
+                idserver.retrieveEuropeanaIdFromNew("test");
             }
         };
         init2.initialize(OsgiEuropeanaIdMongoServer.class.getClassLoader());
@@ -151,6 +152,7 @@ public class PublishServiceImpl implements PublishService {
                 }
                 idserverProduction.createDatastore();
                 idserverProduction.retrieveEuropeanaIdFromOld("test");
+                idserverProduction.retrieveEuropeanaIdFromNew("test");
             }
         };
         init1.initialize(OsgiEuropeanaIdMongoServer.class.getClassLoader());

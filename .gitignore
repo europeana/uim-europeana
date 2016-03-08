@@ -11,4 +11,4 @@
 *~
 *.bak
 target/
-.idea/
+.idea/**

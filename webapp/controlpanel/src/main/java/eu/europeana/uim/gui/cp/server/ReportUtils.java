@@ -63,7 +63,7 @@ public class ReportUtils {
      * @param reportDesign
      * @param executionID
      * @param formats
-     * @return True iff the generation was succesfull
+     * @return <b>true</b> if the generation was successful
      */
     public static Boolean generateReport(String reportDesign, String executionID, String[] formats) {
         Engine engine = Engine.getInstance();

@@ -6,27 +6,20 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.hp.hpl.jena.rdf.model.RDFReaderF;
+import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.DatastoreImpl;
 import com.google.code.morphia.Morphia;
-import com.hp.hpl.jena.rdf.model.RDFReaderF;
-import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import com.mongodb.Mongo;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -35,7 +28,6 @@ import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
-import eu.europeana.corelib.dereference.impl.EdmMappedField;
 import eu.europeana.corelib.dereference.impl.VocabularyMongoServerImpl;
 import eu.europeana.uim.logging.LoggingEngine;
 import eu.europeana.uim.logging.LoggingEngineAdapter;

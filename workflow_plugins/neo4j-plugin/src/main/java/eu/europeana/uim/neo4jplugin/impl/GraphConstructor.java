@@ -691,7 +691,7 @@ public class GraphConstructor {
     private void createFakeSequence(Set<String> parents) {
         HttpClient httpClient = new HttpClient();
         for (String parent : parents) {
-            GetMethod method = new GetMethod(StringUtils.remove(restapi.getBaseUri(), "/db/data/") + "/order/fakeorder/nodeId/" + StringUtils.replace(parent, "/", "%2F"));
+            GetMethod method = new GetMethod(StringUtils.remove(restapi.getBaseUri(), "/db/data") + "/order/fakeorder/nodeId/" + StringUtils.replace(parent, "/", "%2F"));
             try {
                 System.out.println(method.getPath());
                 httpClient.executeMethod(method);

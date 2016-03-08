@@ -399,6 +399,9 @@ public class SolrWorkflowPlugin<I> extends
         if(rdf.getLicenseList()!=null){
         	rdfCopy.setLicenseList(copyList(rdf.getLicenseList()));
         }
+        if(rdf.getServiceList()!=null){
+            rdfCopy.setServiceList(copyList(rdf.getServiceList()));
+        }
         return rdfCopy;
     }
 
@@ -516,6 +519,7 @@ public class SolrWorkflowPlugin<I> extends
         rdfFinal.setLicenseList(rdf.getLicenseList());
         rdfFinal.setOrganizationList(rdf.getOrganizationList());
         rdfFinal.setDatasetList(rdf.getDatasetList());
+        rdfFinal.setServiceList(rdf.getServiceList());
         return rdfFinal;
     }
 

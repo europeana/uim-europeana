@@ -61,9 +61,9 @@ public class CrfReportingWidget extends IngestionWidget {
     SimplePager pager;
     @UiField(provided = true)
     CellTable<CRFReplyDTO> cellTable;
-    private final List<CRFReplyDTO> records = new ArrayList<>();
-    private final List<ProviderDTO> providers = new ArrayList<>();
-    private final List<CollectionDTO> collections = new ArrayList<>();
+    private final List<CRFReplyDTO> records = new ArrayList<CRFReplyDTO>();
+    private final List<ProviderDTO> providers = new ArrayList<ProviderDTO>();
+    private final List<CollectionDTO> collections = new ArrayList<CollectionDTO>();
 
 
     public CrfReportingWidget(String name, String description,RepositoryServiceAsync repositoryService,CrfReportProxyAsync crfReportProxy) {
@@ -74,7 +74,7 @@ public class CrfReportingWidget extends IngestionWidget {
 
     @Override
     public Widget onInitialize() {
-        cellTable = new CellTable<>(CRFReplyDTO.KEY_PROVIDER);
+        cellTable = new CellTable<CRFReplyDTO>(CRFReplyDTO.KEY_PROVIDER);
         cellTable.setWidth("100%", true);
         cellTable.setPageSize(20);
         cellTable.addRangeChangeHandler(new RangeChangeEvent.Handler() {
@@ -97,7 +97,6 @@ public class CrfReportingWidget extends IngestionWidget {
                 }
             }
         });
-        sortProvider = new ListDataProvider<>();
         sortProvider.setList(records);
         //set the cellTable as the display for the provider!
         sortProvider.addDataDisplay(cellTable);

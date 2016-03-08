@@ -63,7 +63,7 @@ public enum ControlledVocabularyProxy implements ControlledVocabularyKeyValue {
 	
 	//Ingestion Results
 	AMOUNT(EuropeanaUpdatableField.AMOUNT), 
-	TOTAL_INGESTED(EuropeanaUpdatableField.TOTAL_INGESTED), 
+	TOTAL_INGESTED(EuropeanaUpdatableField.TOTAL_INGESTED),
 	INGESTED_SOUND(EuropeanaUpdatableField.INGESTED_SOUND), 
 	INGESTED_VIDEO(EuropeanaUpdatableField.INGESTED_VIDEO), 
 	INGESTED_TEXT(EuropeanaUpdatableField.INGESTED_TEXT), 

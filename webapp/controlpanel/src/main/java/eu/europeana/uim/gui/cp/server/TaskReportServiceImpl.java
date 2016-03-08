@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import eu.europeana.uim.gui.cp.server.util.PropertyReader;
+import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.code.morphia.Datastore;
@@ -37,7 +39,7 @@ public class TaskReportServiceImpl extends IntegrationServicesProviderServlet im
 			Mongo mongo = MongoProvider.getReindexingMongo();
 			Morphia morphia = new Morphia();
 			morphia.map(TaskReport.class);
-			datastore = morphia.createDatastore(mongo, "taskreports");
+			datastore = morphia.createDatastore(mongo, PropertyReader.getProperty(UimConfigurationProperty.MONGO_REINDEXING_DB));
 	        datastore.ensureIndexes();
 		} catch (MongoException e) {
 			e.printStackTrace();

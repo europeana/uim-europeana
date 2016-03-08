@@ -4,18 +4,10 @@ import static com.google.gwt.dom.client.BrowserEvents.CLICK;
 import static com.google.gwt.dom.client.BrowserEvents.KEYDOWN;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-/*import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparableComparator;
-import org.apache.commons.collections.comparators.ReverseComparator;*/
-
-import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ActionCell;
-import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.dom.client.Element;
@@ -52,6 +44,12 @@ import eu.europeana.uim.gui.cp.client.IngestionWidget;
 import eu.europeana.uim.gui.cp.client.services.TaskReportServiceAsync;
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportDTO;
 import eu.europeana.uim.gui.cp.shared.validation.TaskReportResultDTO;
+/*import org.apache.commons.beanutils.BeanComparator;
+import org.apache.commons.collections.comparators.ComparableComparator;
+import org.apache.commons.collections.comparators.ReverseComparator;*/
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.ActionCell.Delegate;
+import com.google.gwt.cell.client.ValueUpdater;
 
 /**
  * 

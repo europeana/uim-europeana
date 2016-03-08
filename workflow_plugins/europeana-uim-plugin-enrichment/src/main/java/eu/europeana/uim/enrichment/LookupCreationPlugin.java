@@ -315,7 +315,8 @@ public class LookupCreationPlugin<I> extends
                                         USE_FUNCTIONS), rdf.getProvidedCHOList().get(0).getAbout());
                         if(id!=null) {
 
-                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
+                            //mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
+                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECTID,id.getOldId());
                         }
                     }
 

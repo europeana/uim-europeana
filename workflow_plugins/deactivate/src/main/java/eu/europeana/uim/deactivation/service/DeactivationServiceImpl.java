@@ -154,7 +154,6 @@ public class DeactivationServiceImpl implements DeactivationService {
                         Mongo tgtMongo = new Mongo(addresses);
                         mongoServer = new ExtendedEdmMongoServer(tgtMongo, mongoDB, usernameIngestion, passwordIngestion);
                         mongoServer.createDatastore(new Morphia());
-                        System.out.println("Replica set status ingestion: " + mongoServer.getDatastore().getMongo().getReplicaSetStatus().toString());
                         mongoServer.getFullBean("test");
 
 
@@ -190,7 +189,6 @@ public class DeactivationServiceImpl implements DeactivationService {
                         Mongo tgtMongoProduction = new Mongo(addressesProduction);
                         mongoServerProduction = new ExtendedEdmMongoServer(tgtMongoProduction, mongoDBProduction, usernameProduction, passwordProduction);
                         mongoServerProduction.createDatastore(new Morphia());
-                        System.out.println("Replica set status production: " + mongoServerProduction.getDatastore().getMongo().getReplicaSetStatus().toString());
                         mongoServerProduction.getFullBean("test");
 
                     } catch (NumberFormatException e) {

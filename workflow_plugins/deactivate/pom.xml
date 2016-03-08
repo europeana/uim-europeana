@@ -209,7 +209,7 @@
 						org.xml.sax; version=0.0.0,
 						org.xml.sax.ext; version=0.0.0,
 						org.xml.sax.helpers; version=0.0.0,
-						org.osgi.service.blueprint; version=1.0.1,
+						org.osgi.service.blueprint; version=0.0.0,
 						eu.europeana.uim.common; version=2.0.0.SNAPSHOT,
 						eu.europeana.uim.store; version=2.0.0.SNAPSHOT,
 						eu.europeana.uim.orchestration; version=2.0.0.SNAPSHOT,
