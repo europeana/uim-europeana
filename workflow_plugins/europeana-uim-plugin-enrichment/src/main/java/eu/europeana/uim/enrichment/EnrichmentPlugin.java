@@ -723,10 +723,6 @@ public class EnrichmentPlugin<I> extends
         try {
             jobs = ProcessingJobTuple.processingJobsFromList(JobCreator.createJobs(collectionId, providerId, recordId, executionId, aggr.getEdmObject(), aggr.getHasView()!=null?Arrays.asList(aggr.getHasView()):null, aggr.getEdmIsShownBy(), aggr.getEdmIsShownAt(), 50, new ProcessingJobCreationOptions(false)));
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
