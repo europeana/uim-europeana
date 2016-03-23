@@ -110,6 +110,11 @@
 			<artifactId>corelib-lookup</artifactId>
 			<version>${corelib.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.6</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -165,6 +170,8 @@
 							eu.europeana.uim.model.europeana,
 							eu.europeana.uim.common.progress,
 							eu.europeana.uim.model.adapters.*,
+							eu.europeana.uim.model.europeanaspecific.fieldvalues;
+							version=1.0.0.SNAPSHOT,
 							org.osgi.service.blueprint,
 							javax.net.ssl,
 							javax.management.*,
@@ -183,7 +190,8 @@
 						</Import-Package>
 						<Embed-Dependency>morphia,
 							corelib-definitions,corelib-edm-definitions,spring-test,jibx-run,harvester-client,harvester-persistence,
-							mongo-java-driver,log4j-core,log4j-api,guava,commons-lang3,com.springsource.org.apache.commons.io,corelib-lookup,corelib-common-storage
+							mongo-java-driver,log4j-core,log4j-api,guava,commons-lang3,com.springsource.org.apache.commons.io,corelib-lookup,corelib-common-storage,
+							harvester-persistence,harvester-client,JobCreator,joda-time
 
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
