@@ -9,6 +9,7 @@ package eu.europeana.uim.enrichment.service.impl;
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
 import eu.europeana.harvester.client.HarvesterClientConfig;
 
 import eu.europeana.harvester.domain.ProcessingJob;
@@ -20,6 +21,8 @@ import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,13 +38,19 @@ public class InstanceCreatorImpl implements InstanceCreator {
         
         try {
             
-            String mongoHost = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTURL);
+            String mongoHosts[] = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTURL).split(",");
             int mongoPort = Integer.parseInt(PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTPORT));
             String dbName = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_DB);
 
             String username = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_USERNAME);
             String password = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_PASSWORD);
-            MongoClient mongo = new MongoClient(mongoHost, mongoPort);
+            List<ServerAddress> addresses = new ArrayList<>();
+            for(String mongoHost :mongoHosts) {
+                ServerAddress address = new ServerAddress(mongoHost, mongoPort);
+                addresses.add(address);
+            }
+
+            MongoClient mongo = new MongoClient(addresses);
             Morphia morphia = new Morphia();
             if(StringUtils.isNotEmpty(password)) {
                 ds = morphia.createDatastore(mongo, dbName, username, password.toCharArray());

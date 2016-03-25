@@ -52,7 +52,7 @@ public class InstanceCreatorImpl implements InstanceCreator {
         
         try {
 
-            String mongoHost = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTURL);
+            String mongoHosts[] = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTURL).split(",");
             int mongoPort = Integer.parseInt(PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTPORT));
             String dbName = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_DB);
 
@@ -60,7 +60,14 @@ public class InstanceCreatorImpl implements InstanceCreator {
             String password = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_PASSWORD);
             final String usernameIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME);
             final String passwordIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD);
-            MongoClient mongo = new MongoClient(mongoHost, mongoPort);
+
+            List<ServerAddress> addresses = new ArrayList<>();
+            for(String mongoHost :mongoHosts) {
+                ServerAddress address = new ServerAddress(mongoHost, mongoPort);
+                addresses.add(address);
+            }
+
+            MongoClient mongo = new MongoClient(addresses);
             Morphia morphia = new Morphia();
             morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
                 @Override
