@@ -173,6 +173,7 @@
 							eu.europeana.uim.model.europeanaspecific.fieldvalues;
 							version=1.0.0.SNAPSHOT,
 							org.osgi.service.blueprint,
+							org.osgi.framework,
 							javax.net.ssl,
 							javax.management.*,
 							javax.imageio.*,
@@ -196,6 +197,7 @@
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Include-Resource>src/main/resources</Include-Resource>
+						<Bundle-Activator>eu.europeana.uim.plugin.thumbler.MongoBundleActivator</Bundle-Activator>
 					</instructions>
 				</configuration>
 			</plugin>

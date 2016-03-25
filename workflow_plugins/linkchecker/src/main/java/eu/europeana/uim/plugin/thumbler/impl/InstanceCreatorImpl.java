@@ -8,20 +8,19 @@ package eu.europeana.uim.plugin.thumbler.impl;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.ServerAddress;
+import com.google.code.morphia.mapping.DefaultCreator;
+import com.mongodb.*;
 import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
-import eu.europeana.corelib.storage.MongoServer;
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
+import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientConfig;
-import eu.europeana.harvester.db.MorphiaDataStore;
+import eu.europeana.harvester.client.HarvesterClientImpl;
 import eu.europeana.harvester.domain.ProcessingJob;
 import eu.europeana.harvester.domain.SourceDocumentReference;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.plugin.thumbler.InstanceCreator;
+import eu.europeana.uim.plugin.thumbler.MongoBundleActivator;
 import eu.europeana.uim.plugin.thumbler.utils.PropertyReader;
 import eu.europeana.uim.plugin.thumbler.utils.UimConfigurationProperty;
 import org.apache.commons.lang.StringUtils;
@@ -40,6 +39,8 @@ import java.util.logging.Logger;
 public class InstanceCreatorImpl implements InstanceCreator {
     private static Datastore ds;
     private static HarvesterClientConfig config;
+
+    private static HarvesterClient client;
     private static CollectionMongoServer collectionMongoServer;
     private static String mongoDB = PropertyReader
             .getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
@@ -61,6 +62,13 @@ public class InstanceCreatorImpl implements InstanceCreator {
             final String passwordIngestion = PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD);
             MongoClient mongo = new MongoClient(mongoHost, mongoPort);
             Morphia morphia = new Morphia();
+            morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+                @Override
+                protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+                    return MongoBundleActivator.getBundleClassLoader();
+                }
+            });
+            morphia.map(SourceDocumentReference.class,ProcessingJob.class);
             if(StringUtils.isNotEmpty(password)) {
                 ds = morphia.createDatastore(mongo, dbName, username, password.toCharArray());
             } else {
@@ -68,7 +76,7 @@ public class InstanceCreatorImpl implements InstanceCreator {
             }
 
             config = new HarvesterClientConfig();
-
+            client = new HarvesterClientImpl(ds,config);
             BlockingInitializer sdr = new BlockingInitializer() {
 
                 @Override
@@ -157,5 +165,10 @@ public class InstanceCreatorImpl implements InstanceCreator {
 
 
         return collectionMongoServer;
+    }
+
+    @Override
+    public HarvesterClient getClient(){
+        return client;
     }
 }
