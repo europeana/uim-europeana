@@ -6,6 +6,7 @@ import static com.google.gwt.dom.client.BrowserEvents.KEYDOWN;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -42,12 +43,16 @@ import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.RangeChangeEvent;
 
 import eu.europeana.uim.gui.cp.client.IngestionWidget;
+import eu.europeana.uim.gui.cp.client.services.ExecutionServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.ImageCachingStatisticsServiceAsync;
 import eu.europeana.uim.gui.cp.client.services.RepositoryServiceAsync;
+import eu.europeana.uim.gui.cp.client.services.RetrievalServiceAsync;
 import eu.europeana.uim.gui.cp.shared.CollectionDTO;
+import eu.europeana.uim.gui.cp.shared.ExecutionDTO;
 import eu.europeana.uim.gui.cp.shared.ProviderDTO;
 import eu.europeana.uim.gui.cp.shared.validation.ImageCachingStatisticsDTO;
 import eu.europeana.uim.gui.cp.shared.validation.ImageCachingStatisticsResultDTO;
+import eu.europeana.uim.gui.cp.shared.validation.MetaDataResultDTO;
 
 /**
  * 
@@ -55,19 +60,30 @@ import eu.europeana.uim.gui.cp.shared.validation.ImageCachingStatisticsResultDTO
  *
  */
 public class ImageCachingStatisticsWidget extends IngestionWidget {
-	
-    private final RepositoryServiceAsync  repositoryService;
-    private final ImageCachingStatisticsServiceAsync   imageCachingStatisticsRetrievalService;
+    
+    private final ImageCachingStatisticsServiceAsync	imageCachingStatisticsRetrievalService;
 
-    private final List<ImageCachingStatisticsDTO> statisticsReports     = new ArrayList<ImageCachingStatisticsDTO>();
+    private final List<ImageCachingStatisticsDTO> 		statisticsReports     = new ArrayList<ImageCachingStatisticsDTO>();
     
-    private final List<ProviderDTO>       providers   = new ArrayList<ProviderDTO>();
+    private ListDataProvider<ImageCachingStatisticsDTO> sortProvider;
     
-    private final List<CollectionDTO>     collections = new ArrayList<CollectionDTO>();
+    private final RepositoryServiceAsync	repositoryService;
     
-    private ProviderDTO selectedProvider = null;
+    private final ExecutionServiceAsync		executionService;
     
-    private CollectionDTO selectedCollection = null;
+    private final RetrievalServiceAsync		retrievalService;
+    
+    private final List<ProviderDTO>			providers   = new ArrayList<ProviderDTO>();
+    
+    private final List<CollectionDTO>		collections = new ArrayList<CollectionDTO>();
+    
+    private Date							dateProcessingStarted = null;		
+    
+    private int								recordsCount = 0;
+    
+    private ProviderDTO 					selectedProvider = null;
+    
+    private CollectionDTO 					selectedCollection = null;
     
     @UiField
     ListBox									providerBox;
@@ -77,6 +93,9 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 
     @UiField
     Button									clearAllButton;
+    
+    @UiField
+    Button									generatePDFButton;
 
 	@UiField(provided = true)
 	CellTable<ImageCachingStatisticsDTO> 	cellTable;
@@ -84,17 +103,23 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
     @UiField(provided = true)
     SimplePager								pager;
     
-    ListDataProvider<ImageCachingStatisticsDTO> 	sortProvider;
-    
-    private static final short MAX_SIZE = 20; 
+    private static final short 				MAX_SIZE = 20; 
     
     
 	interface Binder extends UiBinder<Widget, ImageCachingStatisticsWidget> {
 	}
 
-	public ImageCachingStatisticsWidget(String name, String description, RepositoryServiceAsync repositoryService, ImageCachingStatisticsServiceAsync imageCachingStatisticsRetrievalService) {
+	public ImageCachingStatisticsWidget(
+			String name,
+			String description,
+			RepositoryServiceAsync repositoryService,
+			ExecutionServiceAsync executionService,
+			RetrievalServiceAsync retrievalService,
+			ImageCachingStatisticsServiceAsync imageCachingStatisticsRetrievalService) {
 		super(name, description);
 		this.repositoryService = repositoryService;
+		this.executionService = executionService;
+		this.retrievalService = retrievalService;
 		this.imageCachingStatisticsRetrievalService = imageCachingStatisticsRetrievalService;
 	}
 
@@ -103,7 +128,6 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 		cellTable = new CellTable<ImageCachingStatisticsDTO>(ImageCachingStatisticsDTO.KEY_PROVIDER);
 		cellTable.setWidth("100%", true);
 		cellTable.setPageSize(MAX_SIZE);
-	    
 		cellTable.addRangeChangeHandler(new RangeChangeEvent.Handler() {
 			@Override
 			public void onRangeChange(RangeChangeEvent arg0) {
@@ -139,8 +163,11 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 					//"selectedIndex-1" - because we have an empty item on 0-index!
 					selectedProvider = providers.get(providerBox.getSelectedIndex() - 1);
 					selectedCollection = null;
+					dateProcessingStarted = null;
+					recordsCount = 0;
 					loadCollections();
 				}
+				generatePDFButton.setVisible(false);
 				updateRows(0, MAX_SIZE);
 			}
 		});
@@ -151,8 +178,12 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 			public void onChange(ChangeEvent event) {
 				if (collectionBox.getSelectedIndex() != 0) {
 					selectedCollection = collections.get(collectionBox.getSelectedIndex() - 1);
+					generatePDFButton.setVisible(true);
+					setDateProcessingStarted();
+					setRecordsCount();
 				} else {
 					selectedCollection = null;
+					generatePDFButton.setVisible(false);
 				}
 				updateRows(0, MAX_SIZE);					
 			}
@@ -166,7 +197,22 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 				collectionBox.clear();
 				selectedCollection = null;
 				selectedProvider = null;
+				generatePDFButton.setVisible(false);
 				updateRows(0, MAX_SIZE);
+			}
+
+		});
+		
+		generatePDFButton.setVisible(false);
+		generatePDFButton.setText("Statistics Report");
+		generatePDFButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.Location.assign(GWT.getHostPageBaseURL()
+					+ "EuropeanaIngestionControlPanel/generatePDF?providerId=" + selectedProvider.getName() 
+					+ "&collectionId=" + selectedCollection.getName() 
+					+ (dateProcessingStarted != null ? "&dateStart=" + dateProcessingStarted.toString() : "")
+					+ "&recordsCount=" + recordsCount);
 			}
 
 		});
@@ -260,35 +306,35 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 		cellTable.addColumn(totalJobsColumn, "Jobs Total");
 		cellTable.setColumnWidth(totalJobsColumn, 4, Unit.PCT);
 		
-		Column<ImageCachingStatisticsDTO, String> totalColumn = new Column<ImageCachingStatisticsDTO, String>(new TextCell()) {
-			@Override
-			public String getValue(ImageCachingStatisticsDTO object) {
-				return object.getTotal() + "";
-			}
-		};
-		cellTable.addColumn(totalColumn, "Total Number of Records");
-		cellTable.setColumnWidth(totalColumn, 4, Unit.PCT);		
+//		Column<ImageCachingStatisticsDTO, String> totalColumn = new Column<ImageCachingStatisticsDTO, String>(new TextCell()) {
+//			@Override
+//			public String getValue(ImageCachingStatisticsDTO object) {
+//				return object.getTotal() + "";
+//			}
+//		};
+//		cellTable.addColumn(totalColumn, "Total Number of Records");
+//		cellTable.setColumnWidth(totalColumn, 4, Unit.PCT);		
 
 		//Button columns
-		CustomActionCell pdfButtonCell = new CustomActionCell("PDF", new ActionCell.Delegate<ImageCachingStatisticsDTO>() {
-			@Override
-			public void execute(ImageCachingStatisticsDTO statisticsDTO) {
-						Window.Location.assign(GWT.getHostPageBaseURL()
-								+ "EuropeanaIngestionControlPanel/generatePDF?providerId=" + statisticsDTO.getProviderId() + "&collectionId="
-								+ statisticsDTO.getCollectionId() + "&executionId="
-								+ statisticsDTO.getExecutionId() + "&dateStart=" + statisticsDTO.getDateCreated());
-			}
-		});
-		
-		Column<ImageCachingStatisticsDTO, ImageCachingStatisticsDTO> generatePdfColumn = new Column<ImageCachingStatisticsDTO, ImageCachingStatisticsDTO>(pdfButtonCell) {		
-			@Override
-			public ImageCachingStatisticsDTO getValue(ImageCachingStatisticsDTO object) {
-				return object;
-			}
-		};
-
-		cellTable.addColumn(generatePdfColumn, "Generate Report");
-		cellTable.setColumnWidth(generatePdfColumn, 3, Unit.PCT);
+//		CustomActionCell pdfButtonCell = new CustomActionCell("PDF", new ActionCell.Delegate<ImageCachingStatisticsDTO>() {
+//			@Override
+//			public void execute(ImageCachingStatisticsDTO statisticsDTO) {
+//						Window.Location.assign(GWT.getHostPageBaseURL()
+//								+ "EuropeanaIngestionControlPanel/generatePDF?providerId=" + statisticsDTO.getProviderId() + "&collectionId="
+//								+ statisticsDTO.getCollectionId() + "&executionId="
+//								+ statisticsDTO.getExecutionId() + "&dateStart=" + statisticsDTO.getDateCreated());
+//			}
+//		});
+//		
+//		Column<ImageCachingStatisticsDTO, ImageCachingStatisticsDTO> generatePdfColumn = new Column<ImageCachingStatisticsDTO, ImageCachingStatisticsDTO>(pdfButtonCell) {		
+//			@Override
+//			public ImageCachingStatisticsDTO getValue(ImageCachingStatisticsDTO object) {
+//				return object;
+//			}
+//		};
+//
+//		cellTable.addColumn(generatePdfColumn, "Generate Report");
+//		cellTable.setColumnWidth(generatePdfColumn, 3, Unit.PCT);
 		
 		CustomActionCell csvButtonCell = new CustomActionCell("CSV", new ActionCell.Delegate<ImageCachingStatisticsDTO>() {
 			@Override
@@ -327,7 +373,7 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 				collectionsForStatisics.add(coll.getName());
 			}			
 		}
-		imageCachingStatisticsRetrievalService.getImageCachingStatistics(offset, maxSize, collectionsForStatisics,
+		imageCachingStatisticsRetrievalService.getImageCachingStatistics(offset, maxSize, collectionsForStatisics, selectedProvider != null ? selectedProvider.getName() : "",
 				new AsyncCallback<ImageCachingStatisticsResultDTO>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -457,6 +503,52 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 				}
 			}
 		});
+	}
+	
+
+	/**
+	 * to get start date for generation PDF report per collection.
+	 */
+	private void setDateProcessingStarted() {
+		final String[] imageCachingWorkflow = {"ImageCacheWorkflow"};
+		if (selectedCollection != null) {
+			executionService.getPastExecutions(imageCachingWorkflow, selectedCollection.getMnemonic(), null, null, new AsyncCallback<List<ExecutionDTO>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+				}
+				
+				@Override
+				public void onSuccess(List<ExecutionDTO> result) {
+					List<Date> startDates = new ArrayList<Date>();
+					for (ExecutionDTO execution : result) {
+						startDates.add(execution.getStartTime());
+					}
+					if (!result.isEmpty()) {
+						Collections.sort(startDates);
+						dateProcessingStarted = startDates.get(0);
+					}
+				}
+			});
+		}
+	}
+	
+	/**
+	 * to get number of active records for generation PDF report per collection.
+	 */
+	private void setRecordsCount() {
+		if (selectedCollection != null) {
+			retrievalService.getRecordsForCollection((String)selectedCollection.getId(), 0, MAX_SIZE, "", new AsyncCallback<MetaDataResultDTO>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
+				}
+				@Override
+				public void onSuccess(MetaDataResultDTO result) {
+					recordsCount = result.getActiverecords();
+				};
+			});
+		}
 	}
 	
 	/**

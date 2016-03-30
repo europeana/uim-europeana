@@ -3,6 +3,10 @@ package eu.europeana.uim.gui.cp.server;
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
+import com.mongodb.ReadPreference;
+import com.mongodb.ServerAddress;
+
 import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientConfig;
 import eu.europeana.harvester.client.HarvesterClientImpl;
@@ -16,9 +20,11 @@ import eu.europeana.uim.gui.cp.shared.CRFFailedRecordReportDTO;
 import eu.europeana.uim.gui.cp.shared.CRFFailedTaskDTO;
 import eu.europeana.uim.gui.cp.shared.CRFReplyDTO;
 import eu.europeana.uim.gui.cp.shared.CRFTaskDTO;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,17 +39,27 @@ public class CrfReportProxyImpl extends
     public CrfReportProxyImpl(){
         try {
 
-            String mongoHost = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTURL);
+            String[] mongoHosts = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTURL).split(",");
             int mongoPort = Integer.parseInt(PropertyReader.getProperty(UimConfigurationProperty.CLIENT_HOSTPORT));
             String dbName = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_DB);
 
             String username = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_USERNAME);
             String password = PropertyReader.getProperty(UimConfigurationProperty.CLIENT_PASSWORD);
-            MongoClient mongo = new MongoClient(mongoHost, mongoPort);
+			List<ServerAddress> serverAddresses = new ArrayList<ServerAddress>();
+			for (String address : mongoHosts) {
+				serverAddresses.add(new ServerAddress(address, mongoPort));
+			}
+            MongoClient mongo = new MongoClient(serverAddresses);
             Morphia morphia = new Morphia();
             Datastore ds;
             if(StringUtils.isNotEmpty(password)) {
-                ds = morphia.createDatastore(mongo, dbName, username, password.toCharArray());
+            	boolean auth = mongo.getDB("admin").authenticate("admin", password.toCharArray());
+                mongo.setReadPreference(ReadPreference.secondary());
+                if (!auth) {
+                	//FIXME this implementation is not used!
+//    				throw new MongoException("ERROR: Couldn't authenticate the admin-user against admin-db");
+    			}
+                ds = morphia.createDatastore(mongo, dbName);
             } else {
                 ds = morphia.createDatastore(mongo, dbName);
             }

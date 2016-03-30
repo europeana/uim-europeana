@@ -13,5 +13,5 @@ import eu.europeana.uim.gui.cp.shared.validation.ImageCachingStatisticsResultDTO
  */
 public interface ImageCachingStatisticsServiceAsync {
 
-	public void getImageCachingStatistics(int offset, int maxSize, List<String> collections, AsyncCallback<ImageCachingStatisticsResultDTO> reports);
+	public void getImageCachingStatistics(int offset, int maxSize, List<String> collections, String providerId, AsyncCallback<ImageCachingStatisticsResultDTO> reports);
 }

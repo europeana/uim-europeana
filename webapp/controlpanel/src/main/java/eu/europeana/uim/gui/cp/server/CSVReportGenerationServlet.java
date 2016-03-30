@@ -29,16 +29,18 @@ public class CSVReportGenerationServlet extends HttpServlet {
     }
    
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {    	resp.setContentType("application/txt");  
-    	resp.setHeader("Content-Disposition", "attachment; filename=\"" + CsvReportGenerator.getFileName() + "\"");
-//    	resp.setHeader("Content-Disposition", "attachment; filename=\"" + "TEST_CRF.pdf" + "\"");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {    	String collectionId = req.getParameter("collectionId");
+    	String executionId = req.getParameter("executionId");
+
+    	resp.setContentType("application/txt");  
+    	resp.setHeader("Content-Disposition", "attachment; filename=\"" + CsvReportGenerator.getFileName(collectionId) + "\"");
     	resp.setHeader("Cache-Control", "no-cache"); 
     	resp.setDateHeader("Expires", 0);  
     	resp.setHeader("Pragma", "No-cache");
 		try {
 			System.out.println("*** Generating CSV... ***");
 			ServletOutputStream op = resp.getOutputStream();
-			CsvReportGenerator.generateReport(op);
+			CsvReportGenerator.generateReport(op, executionId, collectionId);
 			op.flush();
 			op.close();
 			System.out.println("*** CSV error log file was successfully generated! ***");

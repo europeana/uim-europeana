@@ -34,11 +34,11 @@ public class ImageCachingStatisticsDTO implements IsSerializable {
      * Total number of jobs per collection.
      */
     private long totalJobs;
-    
-    /**
-     * Total number of records per executionId.
-     */
-    private long total;
+//    
+//    /**
+//     * Total number of records per executionId.
+//     */
+//    private long total;
     
     /**
      * Creation date of the job
@@ -103,14 +103,14 @@ public class ImageCachingStatisticsDTO implements IsSerializable {
 	public void setTotalJobs(long totalJobs) {
 		this.totalJobs = totalJobs;
 	}
-
-	public long getTotal() {
-		return total;
-	}
-
-	public void setTotal(long total) {
-		this.total = total;
-	}
+//
+//	public long getTotal() {
+//		return total;
+//	}
+//
+//	public void setTotal(long total) {
+//		this.total = total;
+//	}
 
 	public String getDateCreated() {
 		return dateCreated;
@@ -154,7 +154,7 @@ public class ImageCachingStatisticsDTO implements IsSerializable {
 				"\" | failed jobs: \"" + this.getFailedJobs() +
 				"\" | pending jobs: \"" + this.getPendingJobs() +
 				"\" | successful jobs: \"" + this.getSuccessfulJobs() +
-				"\" | total jobs: \"" + this.getTotalJobs() +
-				"\" | total: \"" + this.getTotal();
+				"\" | total jobs: \"" + this.getTotalJobs();
+//		"\" | total: \"" + this.getTotal();
 	}
 }

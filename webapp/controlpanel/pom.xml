@@ -119,7 +119,7 @@
 							httpmime,slf4j-jdk14,slf4j-api,slf4j-simple,jcl-over-slf4j,log4j-over-slf4j,commons-net,commons-net,commons-lang,stax-api,
 							validation-api,publication-common,repox-client-rest-jersey,javax.ws.rs-api,zookeeper,
 							reindexing-common-external,harvester-client,harvester-persistence,noggit, guava,log4j-api, log4j-core,
-							commons-beanutils, commons-collections,xmlpull,xpp3,xercesImpl,itextpdf
+							commons-beanutils, commons-collections,xmlpull,xpp3,xercesImpl,itextpdf,joda-time
 						</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripVersion>true</Embed-StripVersion>
@@ -179,7 +179,6 @@
 							pt.utl.ist.http,
 							pt.utl.ist.marc,
 							pt.utl.ist.marc.iso2709.shared,
-
 							!org.slf4j.*,
 							!*
 						</Import-Package>
@@ -224,6 +223,11 @@
 		</plugins>
 	</reporting>
 	<dependencies>
+		<dependency>
+			<groupId>eu.europeana.europeanauim</groupId>
+			<artifactId>europeana-uim-plugin-linkchecker</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>repox</groupId>
 			<artifactId>repox-client-rest-jersey</artifactId>

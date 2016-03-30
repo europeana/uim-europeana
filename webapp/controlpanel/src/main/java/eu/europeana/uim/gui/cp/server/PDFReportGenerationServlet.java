@@ -32,20 +32,22 @@ public class PDFReportGenerationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {    	resp.setContentType("application/pdf");  
     	String collection = req.getParameter("collectionId");
     	String provider = req.getParameter("providerId");
-    	String executionId = req.getParameter("executionId");
     	String dateStart = req.getParameter("dateStart");
-		resp.setHeader("Content-Disposition", "attachment; filename=\"" + PdfReportGenerator.getFileName(collection, dateStart) + "\"");
-//    	resp.setHeader("Content-Disposition", "attachment; filename=\"" + "TEST_CRF.pdf" + "\"");
+    	String recordsCount = req.getParameter("recordsCount");
+		resp.setHeader("Content-Disposition", "attachment; filename=\"" + PdfReportGenerator.getFileName(collection) + "\"");
     	resp.setHeader("Cache-Control", "no-cache"); 
     	resp.setDateHeader("Expires", 0);  
     	resp.setHeader("Pragma", "No-cache");
 		try {
 			System.out.println("*** Generating PDF... ***");
 			ServletOutputStream op = resp.getOutputStream();
-			PdfReportGenerator.generatePDFReport(op, provider, collection);
+			String requestUrl = req.getRequestURL().toString();
+			String contextPath = req.getContextPath();
+			String path = requestUrl.substring(0, requestUrl.indexOf(contextPath) + contextPath.length()); 
+			PdfReportGenerator.generatePDFReport(op, provider, collection, dateStart, recordsCount, path);
 			op.flush();
 			op.close();
-			System.out.println("*** \"TEST_CRF.pdf\" was successfully generated! ***");
+			System.out.println("*** CRF statistics report was successfully generated! ***");
 		} catch (Exception e) {
 			System.out.println("*** Failure of PDF generation! ***");
 			e.printStackTrace();

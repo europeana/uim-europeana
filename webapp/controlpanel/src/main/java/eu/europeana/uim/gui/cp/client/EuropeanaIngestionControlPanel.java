@@ -121,7 +121,7 @@ public class EuropeanaIngestionControlPanel extends
 		treeModel.addMenuEntry("Link Checker/ Thumbler", new ImageCachingStatisticsWidget(
 				"Image Caching Statistics",
 				"This page allows you to preview the image cache statistics, filter the image caching jobs by provider or dataset, generate statistics reports in PDF and failure reports in TXT.",
-				repositoryService, imageCachingStatisticsService
+				repositoryService, executionService, retrievalService, imageCachingStatisticsService
 				), RunAsyncCode
 				.runAsyncCode(ImageCachingStatisticsWidget.class));
 

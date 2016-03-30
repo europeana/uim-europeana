@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.google.code.morphia.Datastore;
-import com.google.code.morphia.Morphia;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -24,19 +22,14 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.ServerAddress;
 
 import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientConfig;
 import eu.europeana.harvester.client.HarvesterClientImpl;
-import eu.europeana.harvester.domain.DocumentReferenceTaskType;
-import eu.europeana.harvester.domain.ProcessingState;
 import eu.europeana.harvester.domain.URLSourceType;
 import eu.europeana.harvester.domain.report.SubTaskState;
 import eu.europeana.harvester.domain.report.SubTaskType;
+import eu.europeana.uim.gui.cp.server.util.CRFStatisticsUtil;;
 
 public class PdfReportGenerator {
 	
@@ -65,29 +58,28 @@ public class PdfReportGenerator {
 	
 	private static HarvesterClient client;
 	
-	private static String providerId;
-	
-	private static String collectionId;
-	
 	static {
-		try {
-			List<ServerAddress> addresses = new ArrayList<ServerAddress>();
-			addresses.add(new ServerAddress("mongo1.crf.europeana.eu", 27017));
-			addresses.add(new ServerAddress("mongo2.crf.europeana.eu", 27017));
-			Mongo mongo = new MongoClient(addresses);
-            Morphia morphia = new Morphia();
-            boolean auth = mongo.getDB("admin").authenticate("admin", "Nhck0zCfcu0M6kK".toCharArray());
-            if (!auth) {
-                throw new MongoException("ERROR: Couldn't authenticate the admin-user against admin-db");
-            }
-			datastore = morphia.createDatastore(mongo, "crf_harvester_second");
-		} catch (MongoException e) {
-			e.printStackTrace();
-		} catch (Exception any) {
-			any.printStackTrace();
-		}
+		datastore = CRFStatisticsUtil.getMongo();
 		HarvesterClientConfig config = new HarvesterClientConfig();
 		client = new HarvesterClientImpl(datastore, config);
+//		try {
+//			List<ServerAddress> addresses = new ArrayList<ServerAddress>();
+//			addresses.add(new ServerAddress("mongo1.crf.europeana.eu", 27017));
+//			addresses.add(new ServerAddress("mongo2.crf.europeana.eu", 27017));
+//			Mongo mongo = new MongoClient(addresses);
+//            Morphia morphia = new Morphia();
+//            boolean auth = mongo.getDB("admin").authenticate("admin", "Nhck0zCfcu0M6kK".toCharArray());
+//            if (!auth) {
+//                throw new MongoException("ERROR: Couldn't authenticate the admin-user against admin-db");
+//            }
+//			datastore = morphia.createDatastore(mongo, "crf_harvester_second");
+//		} catch (MongoException e) {
+//			e.printStackTrace();
+//		} catch (Exception any) {
+//			any.printStackTrace();
+//		}
+//		HarvesterClientConfig config = new HarvesterClientConfig();
+//		client = new HarvesterClientImpl(datastore, config);
 	}
 
 
@@ -97,11 +89,12 @@ public class PdfReportGenerator {
 	 * @param provId
 	 * @param colId
 	 */
-	public static void generatePDFReport(OutputStream os, String provId, String colId) {
-		providerId = provId;
-		collectionId = colId;
-		
-		Report report = Stub.getReport();
+	public static void generatePDFReport(OutputStream os, String provId, String colId, String dateStart, String recordsCount, String imagePath) {
+		if (provId == null || colId == null) {
+			return;
+		}
+		Report report = generateStatistics(provId, colId, dateStart, recordsCount);
+//		Report report = Stub.getReport();
 		// Landscape page layout
 		// Document document = new Document(PageSize.A4.rotate(), 30f, 30f, 30f, 30f);
     	Document document = new Document(PageSize.A4, 30f, 30f, 30f, 30f);
@@ -115,7 +108,7 @@ public class PdfReportGenerator {
 			document.open();
 			
 			// Add Image
-			String imageUrl = "https://upload.wikimedia.org/wikipedia/en/f/f3/Europeana_logo.png";
+			String imageUrl = imagePath + "/images/Europeana_logo.png";
 			Image image = Image.getInstance(new URL(imageUrl));
 			image.setAbsolutePosition(30f, 700f);
 			image.scaleAbsolute(68f, 94f);
@@ -123,7 +116,7 @@ public class PdfReportGenerator {
 			
 			// File name title
 			Paragraph fileNameTitle = new Paragraph("Name of the file: ", FONT_FILE_NAME);		
-			fileNameTitle.add(new Chunk(getFileName(report.getCollection_name(), report.getTime_start()), FONT_TEXT));
+			fileNameTitle.add(new Chunk(getFileName(report.getCollection_name()), FONT_TEXT));
 			fileNameTitle.setIndentationLeft(INDENT_AFTER_IMAGE);
 			document.add(fileNameTitle);
 			
@@ -180,9 +173,9 @@ public class PdfReportGenerator {
 
 			// Metadata Extraction Table
 			PdfPTable metadataExtractionTable = buildTable();
-			addTableLine(metadataExtractionTable, EDM_OBJECT, report.getEdm_object_processed() + "", report.getEdm_object_processed_successful() + "", PROCESSED);	 
+//			addTableLine(metadataExtractionTable, EDM_OBJECT, report.getEdm_object_processed() + "", report.getEdm_object_processed_successful() + "", PROCESSED);	 
 			addTableLine(metadataExtractionTable, EDM_IS_SHOWN_BY, report.getEdm_isshownby_processed() + "", report.getEdm_isshownby_processed_successful() + "", PROCESSED);
-			addTableLine(metadataExtractionTable, EDM_IS_SHOWN_AT, report.getEdm_isshownat_processed() + "", report.getEdm_isshownat_processed_successful() + "", PROCESSED);
+//			addTableLine(metadataExtractionTable, EDM_IS_SHOWN_AT, report.getEdm_isshownat_processed() + "", report.getEdm_isshownat_processed_successful() + "", PROCESSED);
 			addTableLine(metadataExtractionTable, EDM_HAS_VIEW, report.getEdm_hasview_processed() + "", report.getEdm_hasview_processed_successful() + "", PROCESSED);
 	        document.add(metadataExtractionTable);
 	        
@@ -208,88 +201,65 @@ public class PdfReportGenerator {
 		}
 	}
 	
-	private static Report generateStatistics() {
+	private static Report generateStatistics(String providerId, String collectionId, String dateStart, String recordsCount) {
 		Report report = new Report();
 		report.setProvider_name(providerId);
 		report.setCollection_name(collectionId);
 		
 		// For link checking edm:object
-		Map<ProcessingState, Long> jobsByStateObject = client.countJobStatesByUrlSourceType(null, URLSourceType.OBJECT, DocumentReferenceTaskType.CHECK_LINK);
-		Long linkCheckObjectSuccess = jobsByStateObject.get(ProcessingState.SUCCESS);
-		long linkCheckObject = 0;
-		for (Long value : jobsByStateObject.values()) {
-			linkCheckObject = linkCheckObject + value;
-		}
+		Long linkCheckObject = client.countAllTaskTypesByUrlSourceType(collectionId, URLSourceType.OBJECT);
+		Long linkCheckObjectSuccess = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.OBJECT, SubTaskType.RETRIEVE, SubTaskState.SUCCESS);
 		
 		// For link checking edm:isShownBy
-		Map<ProcessingState, Long> jobsByStateIsShowBy = client.countJobStatesByUrlSourceType(null, URLSourceType.ISSHOWNBY, DocumentReferenceTaskType.CHECK_LINK);
-		Long linkCheckIsShownBySuccess = jobsByStateIsShowBy.get(ProcessingState.SUCCESS);
-		long linkCheckIsShownBy = 0;
-		for (Long value : jobsByStateIsShowBy.values()) {
-			linkCheckIsShownBy = linkCheckIsShownBy + value;
-		}
+		Long linkCheckIsShownBy = client.countAllTaskTypesByUrlSourceType(collectionId, URLSourceType.ISSHOWNBY);
+		Long linkCheckIsShownBySuccess = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.ISSHOWNBY, SubTaskType.RETRIEVE, SubTaskState.SUCCESS);
 		
 		// For link checking edm:isShownAt
-		Map<ProcessingState, Long> jobsByStateIsShowAt = client.countJobStatesByUrlSourceType(null, URLSourceType.ISSHOWNAT, DocumentReferenceTaskType.CHECK_LINK);
-		Long linkCheckIsShownAtSuccess = jobsByStateIsShowAt.get(ProcessingState.SUCCESS);
-		long linkCheckIsShownAt = 0;
-		for (Long value : jobsByStateIsShowAt.values()) {
-			linkCheckIsShownAt = linkCheckIsShownAt + value;
-		}
+		Long linkCheckIsShownAt = client.countAllTaskTypesByUrlSourceType(collectionId, URLSourceType.ISSHOWNAT);
+		Long linkCheckIsShownAtSuccess = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.ISSHOWNAT, SubTaskType.RETRIEVE, SubTaskState.SUCCESS);
 		
 		// For link checking edm:hasView
-		Map<ProcessingState, Long> jobsByStateHasView = client.countJobStatesByUrlSourceType(null, URLSourceType.HASVIEW, DocumentReferenceTaskType.CHECK_LINK);
-		Long linkCheckHasViewSuccess = jobsByStateHasView.get(ProcessingState.SUCCESS);
-		long linkCheckHasView = 0;
-		for (Long value : jobsByStateHasView.values()) {
-			linkCheckHasView = linkCheckHasView + value;
-		}
-		
-		// For metadata extraction edm:Object
-		Map<SubTaskState, Long> countByStateObject = client.countSubTaskStatesByUrlSourceType(null, URLSourceType.OBJECT, SubTaskType.META_EXTRACTION);
-		Long metaExtractObjectSuccess = countByStateObject.get(SubTaskState.SUCCESS);
-		long metaExtractObject = 0;
-		for (Long value : countByStateObject.values()) {
-			metaExtractObject = metaExtractObject + value;
-		}
+		Long linkCheckHasView = client.countAllTaskTypesByUrlSourceType(collectionId, URLSourceType.HASVIEW);
+		Long linkCheckHasViewSuccess = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.HASVIEW, SubTaskType.RETRIEVE, SubTaskState.SUCCESS);
 		
 		// For metadata extraction edm:isShownBy
-		Map<SubTaskState, Long> countByStateIsShownBy = client.countSubTaskStatesByUrlSourceType(null, URLSourceType.ISSHOWNBY, SubTaskType.META_EXTRACTION);
-		Long metaExtractIsShownBySuccess = countByStateIsShownBy.get(SubTaskState.SUCCESS);
-		long metaExtractIsShownBy = 0;
-		for (Long value : countByStateIsShownBy.values()) {
-			metaExtractIsShownBy = metaExtractIsShownBy + value;
-		}
-
-		// For metadata extraction edm:isShownAt
-		Map<SubTaskState, Long> countByStateIsShownAt = client.countSubTaskStatesByUrlSourceType(null, URLSourceType.ISSHOWNAT, SubTaskType.META_EXTRACTION);
-		Long metaExtractIsShownAtSuccess = countByStateIsShownAt.get(SubTaskState.SUCCESS);
-		long metaExtractIsShownAt = 0;
-		for (Long value : countByStateIsShownAt.values()) {
-			metaExtractIsShownAt = metaExtractIsShownAt + value;
-		}
+		Long metaExtractIsShownBy = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.ISSHOWNBY, SubTaskType.META_EXTRACTION, null);
+		Long metaExtractIsShownBySuccess = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.ISSHOWNBY, SubTaskType.META_EXTRACTION, SubTaskState.SUCCESS);
 		
 		// For metadata extraction edm:hasView
-		Map<SubTaskState, Long> countByStateHasView = client.countSubTaskStatesByUrlSourceType(null, URLSourceType.HASVIEW, SubTaskType.META_EXTRACTION);
-		Long metaExtractHasViewSuccess = countByStateHasView.get(SubTaskState.SUCCESS);
-		long metaExtractHasView = 0;
-		for (Long value : countByStateHasView.values()) {
-			metaExtractHasView = metaExtractHasView + value;
-		}
+		Long metaExtractHasView = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.HASVIEW, SubTaskType.META_EXTRACTION, null);
+		Long metaExtractHasViewSuccess = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.HASVIEW, SubTaskType.META_EXTRACTION, SubTaskState.SUCCESS);
 		
 		// For preview caching
-		Map<SubTaskState, Long> countThumbnailsGenerated = client.countSubTaskStatesByUrlSourceType(null, URLSourceType.OBJECT, SubTaskType.THUMBNAIL_GENERATION);
-		countThumbnailsGenerated.putAll(client.countSubTaskStatesByUrlSourceType(null, URLSourceType.HASVIEW, SubTaskType.THUMBNAIL_GENERATION));
-		countThumbnailsGenerated.putAll(client.countSubTaskStatesByUrlSourceType(null, URLSourceType.ISSHOWNBY, SubTaskType.THUMBNAIL_GENERATION));
-		Long thumbnailGenerationSuccess = countThumbnailsGenerated.get(SubTaskState.SUCCESS);
-		long thumbnailGeneration = 0;
-		for (Long value : countThumbnailsGenerated.values()) {
-			thumbnailGeneration = thumbnailGeneration + value;
+		Long thumbnailGeneration = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.OBJECT, SubTaskType.THUMBNAIL_GENERATION, null) +
+				client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.HASVIEW, SubTaskType.THUMBNAIL_GENERATION, null) +
+				client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.ISSHOWNBY, SubTaskType.THUMBNAIL_GENERATION, null);
+		
+		Long thumbnailGenerationSuccess = client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.OBJECT, SubTaskType.THUMBNAIL_GENERATION, SubTaskState.SUCCESS) +
+				client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.HASVIEW, SubTaskType.THUMBNAIL_GENERATION, SubTaskState.SUCCESS) +
+				client.countSubtaskStatesByUrlSourceType(collectionId, URLSourceType.ISSHOWNBY, SubTaskType.THUMBNAIL_GENERATION, SubTaskState.SUCCESS);
+
+		
+		// Date start
+		if (dateStart == null) {
+			report.setTime_start("0");
+		} else {
+			report.setTime_start(dateStart);			
 		}
 		
-		report.setTime_start("16:45:31 18-09-2015");
+		// Date End - FIXME: hard-coded stub!
 		report.setTime_end("21:00:39 18-09-2015");
-		report.setRecords_number(10330l);
+		
+		// Amount of active records
+		if (recordsCount == null) {
+			try { 
+				report.setRecords_number(new Long(recordsCount));
+			} catch (NumberFormatException e) {
+				report.setRecords_number(0l);
+			}
+		} else {
+			report.setRecords_number(0l);
+		}
 		
 		report.setNumber_links_checked(linkCheckObject + linkCheckIsShownBy + linkCheckIsShownAt + linkCheckHasView);
 		report.setNumber_links_checked_successful(linkCheckObjectSuccess + linkCheckIsShownBySuccess + linkCheckIsShownAtSuccess + linkCheckHasViewSuccess);
@@ -303,15 +273,15 @@ public class PdfReportGenerator {
 		report.setEdm_hasview_checked(linkCheckHasView);
 		report.setEdm_hasview_checked_successful(linkCheckHasViewSuccess);
 		
-		report.setNumber_metadata_extracted(metaExtractObject + metaExtractIsShownBy + metaExtractIsShownAt + metaExtractHasView);
-		report.setNumber_metadata_extracted_successul(metaExtractObjectSuccess + metaExtractIsShownBySuccess + metaExtractIsShownAtSuccess + metaExtractHasViewSuccess);
+		report.setNumber_metadata_extracted(metaExtractIsShownBy + metaExtractHasView);
+		report.setNumber_metadata_extracted_successul(metaExtractIsShownBySuccess + metaExtractHasViewSuccess);
 		
-		report.setEdm_object_processed(metaExtractObject);
-		report.setEdm_object_processed_successful(metaExtractObjectSuccess);
+//		report.setEdm_object_processed(metaExtractObject);
+//		report.setEdm_object_processed_successful(metaExtractObjectSuccess);
 		report.setEdm_isshownby_processed(metaExtractIsShownBy);
 		report.setEdm_isshownby_processed_successful(metaExtractIsShownBySuccess);
-		report.setEdm_isshownat_processed(metaExtractIsShownAt);
-		report.setEdm_isshownat_processed_successful(metaExtractIsShownAtSuccess);
+//		report.setEdm_isshownat_processed(metaExtractIsShownAt);
+//		report.setEdm_isshownat_processed_successful(metaExtractIsShownAtSuccess);
 		report.setEdm_hasview_processed(metaExtractHasView);
 		report.setEdm_hasview_processed_successful(metaExtractHasViewSuccess);
 		
@@ -321,9 +291,9 @@ public class PdfReportGenerator {
 		return report;
 	}
 	
-	public static String getFileName(String collectionName, String startDate) {
-		//TODO
-		return collectionName + "_" + convertDate(startDate) + "_statistics.pdf";
+	public static String getFileName(String collectionName) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		return collectionName + "_" + df.format(new Date()) + "_statistics.pdf";
 	}
 
 	private static void addTableLine(PdfPTable table, String prefix, String first, String second, String postfix) throws DocumentException {

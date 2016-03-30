@@ -21,6 +21,7 @@ import eu.europeana.harvester.client.HarvesterClientConfig;
 import eu.europeana.harvester.client.HarvesterClientImpl;
 import eu.europeana.harvester.domain.DocumentReferenceTaskType;
 import eu.europeana.harvester.domain.LastSourceDocumentProcessingStatistics;
+import eu.europeana.harvester.domain.ProcessingJobRetrieveSubTaskState;
 import eu.europeana.harvester.domain.ProcessingJobSubTaskState;
 import eu.europeana.harvester.domain.ProcessingJobSubTaskStats;
 import eu.europeana.harvester.domain.ProcessingState;
@@ -34,11 +35,11 @@ public class CsvReportGenerator {
 //	private static final String LINK_CHECKING = "Link checking / ";
 //	private static final String METADATA_EXTRACTION = "Metadata extraction / ";
 //	private static final String PREVIEW_CACHING = "Preview caching / ";
-	
-	private static final String EDM_OBJECT = "edm:object";
-	private static final String EDM_ISSHOWNBY = "edm:isShownBy";
-	private static final String EDM_ISSHOWNAT = "edm:isShownAt";
-	private static final String EDM_HASVIEW = "emd:hasView";
+//	
+//	private static final String EDM_OBJECT = "edm:object";
+//	private static final String EDM_ISSHOWNBY = "edm:isShownBy";
+//	private static final String EDM_ISSHOWNAT = "edm:isShownAt";
+//	private static final String EDM_HASVIEW = "emd:hasView";
 	
     private static Datastore datastore;
 	
@@ -49,31 +50,21 @@ public class CsvReportGenerator {
 	private static Statistics statistics;
 	
 	static {
-		try {
-			//connect to Mongo
-			//TODO need host, port and DB name
-			Mongo mongo = new MongoClient("", 0);
-			Morphia morphia = new Morphia();
-			datastore = morphia.createDatastore(mongo, "europeana");
-		} catch (MongoException e) {
-			e.printStackTrace();
-		} catch (Exception any) {
-			any.printStackTrace();
-		}
+		datastore = CRFStatisticsUtil.getMongo();
 		HarvesterClientConfig config = new HarvesterClientConfig();
 		client = new HarvesterClientImpl(datastore, config);
 	}
 
 	
-	public static void generateReport (OutputStream os) {
-		//FIXME remove stub, use generateStatistics() instead!
-		statistics = Stub.getStatistics();		
+	public static void generateReport (OutputStream os, String executionId, String collectionId) {
+		statistics = generateStatistics(executionId, collectionId);
+//		statistics = Stub.getStatistics();
 		writer = new OutputStreamWriter(os);
 		try {
 			writer.write(COLLECTION_NAME);
-			writer.write(Stub.collection_name + "\n");
+			writer.write(collectionId + "\n");
 			writer.write("\n");
-			///////////////////////////////////////////////////
+
 			writeStatisticsItem(StatisticsType.LINK_CHECKING, URLSourceType.OBJECT);
 			writeStatisticsItem(StatisticsType.LINK_CHECKING, URLSourceType.ISSHOWNBY);
 			writeStatisticsItem(StatisticsType.LINK_CHECKING, URLSourceType.ISSHOWNAT);
@@ -85,7 +76,8 @@ public class CsvReportGenerator {
 			writeStatisticsItem(StatisticsType.METADATA_EXTRACTION, URLSourceType.HASVIEW);
 			
 			writeStatisticsItem(StatisticsType.PREVIEW_CACHING, URLSourceType.OBJECT);
-			writeStatisticsItem(StatisticsType.PREVIEW_CACHING, URLSourceType.ISSHOWNBY);			
+			writeStatisticsItem(StatisticsType.PREVIEW_CACHING, URLSourceType.ISSHOWNBY);
+			
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
@@ -111,22 +103,20 @@ public class CsvReportGenerator {
 	 */
 	private static Statistics generateStatistics(String executionId, String collectionId) {
 		Statistics statistics = new Statistics();
-
-		// For link checking
 		List<LastSourceDocumentProcessingStatistics> findLastSourceDocumentProcessingStatistics = 
-				client.findLastSourceDocumentProcessingStatistics(collectionId, executionId, Arrays.asList(ProcessingState.ERROR, ProcessingState.FAILED));		
-		
+				client.findLastSourceDocumentProcessingStatistics(collectionId, executionId, Arrays.asList(ProcessingState.ERROR, ProcessingState.FAILED));				
 		Map<String, LastSourceDocumentProcessingStatistics> linkCheckStats = new HashMap<String, LastSourceDocumentProcessingStatistics>();		
 		Map<String, LastSourceDocumentProcessingStatistics> metaExtractStats = new HashMap<String, LastSourceDocumentProcessingStatistics>();
 		Map<String, LastSourceDocumentProcessingStatistics> previewCachingStats = new HashMap<String, LastSourceDocumentProcessingStatistics>();
 		
 		for(LastSourceDocumentProcessingStatistics st : findLastSourceDocumentProcessingStatistics) {
-			// link check
-			if (st.getTaskType() == DocumentReferenceTaskType.CHECK_LINK) {
-				linkCheckStats.put(st.getSourceDocumentReferenceId(), st);									
-			}
-			
 			ProcessingJobSubTaskStats processingJobSubTaskStats = st.getProcessingJobSubTaskStats();
+			
+			// link check
+			ProcessingJobRetrieveSubTaskState retrieveState = processingJobSubTaskStats.getRetrieveState();
+			if (retrieveState == ProcessingJobRetrieveSubTaskState.FAILED || retrieveState == ProcessingJobRetrieveSubTaskState.ERROR) {
+				linkCheckStats.put(st.getSourceDocumentReferenceId(), st);
+			}			
 			// metadata extraction
 			ProcessingJobSubTaskState metaExtractionState = processingJobSubTaskStats.getMetaExtractionState();
 			if (metaExtractionState == ProcessingJobSubTaskState.FAILED || metaExtractionState == ProcessingJobSubTaskState.ERROR) {
@@ -134,7 +124,7 @@ public class CsvReportGenerator {
 			}
 			// preview caching
 			ProcessingJobSubTaskState thumbGenerationState = processingJobSubTaskStats.getThumbnailGenerationState();
-			if (thumbGenerationState == ProcessingJobSubTaskState.FAILED || metaExtractionState == ProcessingJobSubTaskState.ERROR) {
+			if (thumbGenerationState == ProcessingJobSubTaskState.FAILED || thumbGenerationState == ProcessingJobSubTaskState.ERROR) {
 				previewCachingStats.put(st.getSourceDocumentReferenceId(), st);
 			}
  		}
@@ -148,7 +138,8 @@ public class CsvReportGenerator {
 		StatisticsItem linkCheckItem = new StatisticsItem();
 		for (String id : linkCheckStats.keySet()) {
 			LastSourceDocumentProcessingStatistics stats = linkCheckStats.get(id);
-			linkCheckItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry(stats.getHttpResponseCode(), linkChecUris.get(id)));
+			Integer httpResponseCode = stats.getHttpResponseCode();
+			linkCheckItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry("ERROR " + (httpResponseCode == -1 ? "408" : httpResponseCode + ""), linkChecUris.get(id)));
 		}
 		statistics.addStatisticsItemByType(StatisticsType.LINK_CHECKING, linkCheckItem);
 		
@@ -161,7 +152,8 @@ public class CsvReportGenerator {
 		StatisticsItem metaExtractionItem = new StatisticsItem();
 		for (String id : metaExtractStats.keySet()) {
 			LastSourceDocumentProcessingStatistics stats = metaExtractStats.get(id);
-			metaExtractionItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry(stats.getHttpResponseCode(), metaExtractUris.get(id)));
+			String errorCode = stats.getHttpResponseCode() == 200 ? "ERROR" : "ERROR " + stats.getHttpResponseCode() + " : " + stats.getProcessingJobSubTaskStats().getMetaExtractionLog();
+			metaExtractionItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry(errorCode, metaExtractUris.get(id)));
 		}
 		statistics.addStatisticsItemByType(StatisticsType.METADATA_EXTRACTION, metaExtractionItem);
 		
@@ -174,15 +166,16 @@ public class CsvReportGenerator {
 		StatisticsItem thumbnailGenerationItem = new StatisticsItem();
 		for (String id : previewCachingStats.keySet()) {
 			LastSourceDocumentProcessingStatistics stats = previewCachingStats.get(id);
-			thumbnailGenerationItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry(stats.getHttpResponseCode(), previewCachingUris.get(id)));
+			String errorCode = stats.getHttpResponseCode() == 200 ? "ERROR" : "ERROR " + stats.getHttpResponseCode() + " : " + stats.getProcessingJobSubTaskStats().getThumbnailGenerationLog();
+			thumbnailGenerationItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry(errorCode, previewCachingUris.get(id)));
 		}
 		statistics.addStatisticsItemByType(StatisticsType.PREVIEW_CACHING, thumbnailGenerationItem);
 		
 		return statistics;
 	}
 	 
-	 public static String getFileName() {
-		 return Stub.collection_name + "_error_log.txt";
+	 public static String getFileName(String collectionId) {
+		 return collectionId + "_error_log.txt";
 	 }
 	
 	 private static class Statistics {
@@ -269,17 +262,17 @@ public class CsvReportGenerator {
 		 }
 	 }
 	 
-	 private static class StatisticsEntry implements Entry<Integer, String> {
-		Integer errorCode;
+	 private static class StatisticsEntry implements Entry<String, String> {
+		String errorCode;
 		String url;
 
-		public StatisticsEntry(Integer errorCode, String url) {
+		public StatisticsEntry(String errorCode, String url) {
 			this.errorCode = errorCode;
 			this.url = url;
 		}
 		
 		@Override
-		public Integer getKey() {
+		public String getKey() {
 			return errorCode;
 		}
 
@@ -325,7 +318,7 @@ public class CsvReportGenerator {
 				StatisticsItem item = new StatisticsItem();
 				for (URLSourceType urlType : URLSourceType.values()) {
 					for (int i = 0; i < 10; i++) {
-						item.addStatisticsEntryByURLtype(urlType, new StatisticsEntry(400 + i, "http://link.sample.com/" + stType.name() + "/" + urlType.name() + "_"+ i));
+						item.addStatisticsEntryByURLtype(urlType, new StatisticsEntry("400" + i, "http://link.sample.com/" + stType.name() + "/" + urlType.name() + "_"+ i));
 					}
 					statistics.addStatisticsItemByType(stType, item);
 				}

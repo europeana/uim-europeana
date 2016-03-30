@@ -18,5 +18,5 @@ public interface ImageCachingStatisticsService extends RemoteService {
 	/**
 	 * Retrieval method for image caching reports.
 	 */
-	public ImageCachingStatisticsResultDTO getImageCachingStatistics(int offset, int maxSize, List<String> collections); 
+	public ImageCachingStatisticsResultDTO getImageCachingStatistics(int offset, int maxSize, List<String> collections, String providerId);
 }

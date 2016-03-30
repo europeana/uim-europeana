@@ -4,34 +4,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.joda.time.Interval;
 
 import com.google.code.morphia.Datastore;
-import com.google.code.morphia.Morphia;
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.ServerAddress;
 
 import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientConfig;
 import eu.europeana.harvester.client.HarvesterClientImpl;
 import eu.europeana.harvester.domain.JobState;
-import eu.europeana.harvester.domain.LastSourceDocumentProcessingStatistics;
+import eu.europeana.harvester.domain.JobStatistics;
 import eu.europeana.harvester.domain.Page;
 import eu.europeana.harvester.domain.ProcessingJob;
-import eu.europeana.harvester.domain.ProcessingState;
 import eu.europeana.harvester.util.pagedElements.PagedElements;
 import eu.europeana.uim.gui.cp.client.services.ImageCachingStatisticsService;
+import eu.europeana.uim.gui.cp.server.util.CRFStatisticsUtil;
 import eu.europeana.uim.gui.cp.shared.validation.ImageCachingStatisticsDTO;
 import eu.europeana.uim.gui.cp.shared.validation.ImageCachingStatisticsResultDTO;
 
@@ -44,33 +36,18 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 	private static HarvesterClient client;
 	
 	private static void setupMongo() {
-		try {
-			List<ServerAddress> addresses = new ArrayList<ServerAddress>();
-			addresses.add(new ServerAddress("mongo1.crf.europeana.eu", 27017));
-			addresses.add(new ServerAddress("mongo2.crf.europeana.eu", 27017));
-			Mongo mongo = new MongoClient(addresses);
-            Morphia morphia = new Morphia();
-            boolean auth = mongo.getDB("admin").authenticate("admin", "Nhck0zCfcu0M6kK".toCharArray());
-            if (!auth) {
-                throw new MongoException("ERROR: Couldn't authenticate the admin-user against admin-db");
-            }
-			datastore = morphia.createDatastore(mongo, "crf_harvester_second");
-		} catch (MongoException e) {
-			e.printStackTrace();
-		} catch (Exception any) {
-			any.printStackTrace();
-		}
+		datastore = CRFStatisticsUtil.getMongo();
 		HarvesterClientConfig config = new HarvesterClientConfig();
 		client = new HarvesterClientImpl(datastore, config);
 	}
 	
 	@Override
-	public ImageCachingStatisticsResultDTO getImageCachingStatistics(int offset, int maxSize, List<String> collections) {
+	public ImageCachingStatisticsResultDTO getImageCachingStatistics(int offset, int maxSize, List<String> collections, String providerId) {
 		setupMongo();
 		ImageCachingStatisticsResultDTO result = null;
 		try {
 //			List<Statistics> statisticsReports = generateStub();
-			List<Statistics> statisticsReports = getStatisticsReports(offset, maxSize, collections);  
+			List<Statistics> statisticsReports = getStatisticsReports(offset, maxSize, collections, providerId);  
 			List<ImageCachingStatisticsDTO> reportsDTO = convertStatisticsReportsToDTO(statisticsReports);
 			if (maxSize > 0) {
 				List<ImageCachingStatisticsDTO> statisticsReportDTOList = new ArrayList<ImageCachingStatisticsDTO>();			
@@ -93,62 +70,30 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 	 * @return lists of statistics per work-flow executionIds
 	 * @throws Exception
 	 */
-	private static List<Statistics> getStatisticsReports(int offset, int maxSize, List<String> collections) throws Exception {
+	private static List<Statistics> getStatisticsReports(int offset, int maxSize, List<String> collections, String providerId) throws Exception {
 		List<Statistics> statisticsList = new ArrayList<Statistics>();
 		for (String collId : collections) {
 			long time = System.currentTimeMillis();
-			List<LastSourceDocumentProcessingStatistics> stat = client.findLastSourceDocumentProcessingStatistics(collId, null, Arrays.asList(ProcessingState.values()));
+//			List<LastSourceDocumentProcessingStatistics> stat = client.findLastSourceDocumentProcessingStatistics(collId, null, Arrays.asList(ProcessingState.values()));
+			//PagedElements<ProcessingJob> jobsByCollectionAndState = client.findJobsByCollectionAndState(new HashSet<String>(Arrays.asList(collId)), new HashSet<JobState>(Arrays.asList(JobState.values())), new Page(offset, maxSize));
+			Map<String, JobStatistics> map = client.findJobsByCollectionId(collId);
 			
-			System.out.println("*** The time elapsed for the statistics for collection " + collId + ": " + ((System.currentTimeMillis() - time)/1000) + " ***");
-			for (LastSourceDocumentProcessingStatistics s: stat) {
-				String execId = s.getReferenceOwner().getExecutionId();
-				if (execId == null) {
-					continue;
-				}
-				final Set<String> collectionIds = new HashSet<>();
-				collectionIds.add(collId);
-		        final Set<JobState> state = new HashSet<>();
-		        state.addAll(Arrays.asList(JobState.values()));
-		        
-				PagedElements<ProcessingJob> jobsByCollectionAndState = client.findJobsByCollectionAndState(collectionIds, state, new Page(offset, maxSize));
-				Interval dateIntervalForProcessing = client.getDateIntervalForProcessing(execId);
+			System.out.println("*** The time elapsed for the CRF Statistics UIM page generation for collection " + collId + ": " + ((System.currentTimeMillis() - time)/1000) + " second ***");
+			
+			
+		    for (Entry<String,JobStatistics> execId : map.entrySet()) { 
+				Interval dateIntervalForProcessing = client.getDateIntervalForProcessing(execId.getKey());
 				Statistics statistics = new Statistics();
 				statistics.setDateCreated(new Date(dateIntervalForProcessing.getStartMillis()));
 				statistics.setDateCompleted(new Date(dateIntervalForProcessing.getEndMillis()));
-				
-//				Map<JobState, Long> countProcessingJobsByState = client.countProcessingJobsByState(execId);
-//				long pendingJobs = countProcessingJobsByState.get(JobState.LOADED) + countProcessingJobsByState.get(JobState.PAUSE) + countProcessingJobsByState.get(JobState.PAUSED) + countProcessingJobsByState.get(JobState.READY) + countProcessingJobsByState.get(JobState.RESUME);
-//				long successfulJobs = countProcessingJobsByState.get(JobState.FINISHED);
-//				long failedJobs = countProcessingJobsByState.get(JobState.ERROR) + countProcessingJobsByState.get(JobState.FAILED);
-				
-				long pendingJobs = 0;
-				long successfulJobs = 0;
-				long failedJobs = 0;
-				for (Iterator<List<ProcessingJob>> iterator = jobsByCollectionAndState.iterator(); iterator.hasNext();) {
-					List<ProcessingJob> listOfJobs = iterator.next();
-					for (ProcessingJob job : listOfJobs) {
-						switch (job.getState()) {
-						case FINISHED: 
-							successfulJobs++;
-							break;
-						case ERROR: 
-							failedJobs++;
-							break;
-						case FAILED: 
-							failedJobs++;
-							break;
-						default:
-							pendingJobs++;
-							break;
-						}
-					}
-				}
+				statistics.setProviderId(providerId);				
 				statistics.setCollectionId(collId);
-				statistics.setPendingJobs(pendingJobs);
-				statistics.setFailedJobs(failedJobs);
-				statistics.setSuccessfulJobs(successfulJobs);
-				statistics.setTotal(pendingJobs + failedJobs + successfulJobs);
-				statistics.setExecutionId(execId);
+				statistics.setPendingJobs(execId.getValue().getPending());
+				statistics.setFailedJobs(execId.getValue().getFailed());
+				statistics.setSuccessfulJobs(execId.getValue().getSuccessful());
+				statistics.setTotal(execId.getValue().getPending() + execId.getValue().getFailed() + execId.getValue().getSuccessful());
+			
+				statistics.setExecutionId(execId.getKey());
 				statisticsList.add(statistics);
 			}
 		}
@@ -162,12 +107,13 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 			imageCachingStatisticsDTO.setDateCreated(formatDate(st.getDateCreated()));
 			imageCachingStatisticsDTO.setDateCompleted(formatDate(st.getDateCompleted()));
 			imageCachingStatisticsDTO.setCollectionId(st.getCollectionId());
-			imageCachingStatisticsDTO.setTotal(st.getTotal());
+//			imageCachingStatisticsDTO.setTotal(st.getTotal());
 			imageCachingStatisticsDTO.setTotalJobs(st.getPendingJobs() + st.getFailedJobs() + st.getSuccessfulJobs());
 			imageCachingStatisticsDTO.setPendingJobs(st.getPendingJobs());
 			imageCachingStatisticsDTO.setFailedJobs(st.getFailedJobs());
 			imageCachingStatisticsDTO.setSuccessfulJobs(st.getSuccessfulJobs());
 			imageCachingStatisticsDTO.setExecutionId(st.getExecutionId());
+			imageCachingStatisticsDTO.setProviderId(st.getProviderId());
 			imageCachingStatisticsDTOList.add(imageCachingStatisticsDTO);
 		}
 		return imageCachingStatisticsDTOList;
@@ -175,6 +121,7 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 	
 	private static class Statistics {		
 		String collectionId;
+		private String providerId;
 		Date dateCreated;
 		Date dateCompleted;
 		long total;
@@ -231,6 +178,12 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 		public void setExecutionId(String executionId) {
 			this.executionId = executionId;
 		}
+		public String getProviderId() {
+			return providerId;
+		}
+		public void setProviderId(String providerId) {
+			this.providerId = providerId;
+		}
 	}
 
 	//TODO
@@ -244,7 +197,7 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 			statistics.setDateCreated(cal.getTime());
 			cal.set(2015, 9, 18, 21, 01);
 			statistics.setDateCompleted(cal.getTime());
-			statistics.setTotal(1000);
+//			statistics.setTotal(1000);
 			statistics.setPendingJobs(100);
 			statistics.setSuccessfulJobs(600);
 			statistics.setFailedJobs(200);
@@ -258,7 +211,7 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 			statistics.setDateCreated(cal.getTime());
 			cal.set(2015, 10, 6, 16, 11);
 			statistics.setDateCompleted(cal.getTime());
-			statistics.setTotal(4000);
+//			statistics.setTotal(4000);
 			statistics.setPendingJobs(1000);
 			statistics.setSuccessfulJobs(2900);
 			statistics.setFailedJobs(100);
@@ -272,7 +225,7 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 			statistics.setDateCreated(cal.getTime());
 			cal.set(2015, 10, 2, 10, 17);
 			statistics.setDateCompleted(cal.getTime());
-			statistics.setTotal(620);
+//			statistics.setTotal(620);
 			statistics.setPendingJobs(100);
 			statistics.setSuccessfulJobs(420);
 			statistics.setFailedJobs(100);
@@ -286,7 +239,7 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 			statistics.setDateCreated(cal.getTime());
 			cal.set(2015, 11, 17, 6, 00);
 			statistics.setDateCompleted(cal.getTime());
-			statistics.setTotal(10800);
+//			statistics.setTotal(10800);
 			statistics.setPendingJobs(0);
 			statistics.setSuccessfulJobs(10000);
 			statistics.setFailedJobs(800);
