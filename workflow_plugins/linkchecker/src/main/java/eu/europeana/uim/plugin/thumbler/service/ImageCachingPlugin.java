@@ -8,7 +8,6 @@ package eu.europeana.uim.plugin.thumbler.service;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.harvester.client.HarvesterClient;
-import eu.europeana.harvester.domain.ProcessingJob;
 import eu.europeana.harvester.domain.ReferenceOwner;
 import eu.europeana.jobcreator.JobCreator;
 import eu.europeana.jobcreator.domain.ProcessingJobCreationOptions;
@@ -49,7 +48,7 @@ public class ImageCachingPlugin<I> extends
     private static String colId;
     private static String provId;
     private static String execId;
-    private static int priority = 50;
+    private static int priority = 0;
     private static boolean forceUnconditional=true;
 
 
@@ -103,7 +102,7 @@ public class ImageCachingPlugin<I> extends
 
         String value = null;
         String collection = ((Collection) context.getExecution().getDataSet()).
-                getMnemonic();
+                getName();
         String provider = ((Collection) context.getExecution().getDataSet()).getProvider().getMnemonic();
         if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
                 && mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
@@ -118,7 +117,7 @@ public class ImageCachingPlugin<I> extends
             RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
             List<Status> status = mdr
                     .getValues(EuropeanaModelRegistry.STATUS);
-            String record = StringUtils.substringAfter(rdf.getProvidedCHOList().get(0).getAbout(), "/item/") + "/";
+            String record = mdr.getId().toString();
             if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED))) {
 
                 List<String> hasView = new ArrayList<>();
@@ -126,21 +125,21 @@ public class ImageCachingPlugin<I> extends
 
                 if (hasViewList != null) {
                     for (HasView hV : hasViewList) {
-                        hasView.add(hV.getResource());
+                        hasView.add(hV.getResource().replace(" ","%20"));
                     }
                 }
 
 
-                List<ProcessingJob> jobs = ProcessingJobTuple.processingJobsFromList(JobCreator.createJobs(
+                List<ProcessingJobTuple> jobs =JobCreator.createJobs(
                         colId, provId, record, execId,
-                        rdf.getAggregationList().get(0).getObject() != null ? rdf.getAggregationList().get(0).getObject().getResource() : null,
+                        rdf.getAggregationList().get(0).getObject() != null ? rdf.getAggregationList().get(0).getObject().getResource().replace(" ","%20") : null,
                         hasView,
-                        rdf.getAggregationList().get(0).getIsShownBy() != null ? rdf.getAggregationList().get(0).getIsShownBy().getResource() : null,
-                        rdf.getAggregationList().get(0).getIsShownAt() != null ? rdf.getAggregationList().get(0).getIsShownAt().getResource() : null,
+                        rdf.getAggregationList().get(0).getIsShownBy() != null ? rdf.getAggregationList().get(0).getIsShownBy().getResource().replace(" ","%20") : null,
+                        rdf.getAggregationList().get(0).getIsShownAt() != null ? rdf.getAggregationList().get(0).getIsShownAt().getResource().replace(" ","%20") : null,
                         priority,
                         new ProcessingJobCreationOptions(forceUnconditional)
-                ));
-                client.createOrModify(jobs);
+                );
+                client.createOrModifyProcessingJobTuples(jobs);
 
 
             } else {
@@ -164,7 +163,7 @@ public class ImageCachingPlugin<I> extends
         client = creator.getClient();
 
         Collection collection = (Collection) context.getExecution().getDataSet();
-        String collectionId = collection.getMnemonic();
+        String collectionId = collection.getName();
         colId = collectionId;
         provId = context.getDataSetCollection().getProvider().getMnemonic();
         execId = (String)context.getExecution().getId();

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.europeana.uim.gui.cp.server.util.PdfReportGenerator;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 
@@ -29,10 +30,11 @@ public class PDFReportGenerationServlet extends HttpServlet {
     }
    
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {    	resp.setContentType("application/pdf");  
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    	resp.setContentType("application/pdf");  
     	String collection = req.getParameter("collectionId");
     	String provider = req.getParameter("providerId");
-    	String dateStart = req.getParameter("dateStart");
+		long dateStart = StringUtils.isNotEmpty(req.getParameter("dateStart"))?Long.parseLong(req.getParameter("dateStart")):0l;
     	String recordsCount = req.getParameter("recordsCount");
 		resp.setHeader("Content-Disposition", "attachment; filename=\"" + PdfReportGenerator.getFileName(collection) + "\"");
     	resp.setHeader("Cache-Control", "no-cache"); 

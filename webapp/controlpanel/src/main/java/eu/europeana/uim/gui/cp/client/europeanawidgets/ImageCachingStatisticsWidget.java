@@ -211,7 +211,7 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 				Window.Location.assign(GWT.getHostPageBaseURL()
 					+ "EuropeanaIngestionControlPanel/generatePDF?providerId=" + selectedProvider.getName() 
 					+ "&collectionId=" + selectedCollection.getName() 
-					+ (dateProcessingStarted != null ? "&dateStart=" + dateProcessingStarted.toString() : "")
+					+ (dateProcessingStarted != null ? "&dateStart=" + dateProcessingStarted.getTime() : "")
 					+ "&recordsCount=" + recordsCount);
 			}
 
