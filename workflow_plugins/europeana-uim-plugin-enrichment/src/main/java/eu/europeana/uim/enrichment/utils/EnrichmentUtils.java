@@ -30,6 +30,8 @@ public class EnrichmentUtils {
                                             .getFieldValues(fieldName))) {
                                 InputValue inValue = new InputValue();
                                 inValue.setOriginalField(field.getValue());
+                                //Temporary fix until the MongoDB is properly updated
+                                //inValue.setLanguage(StringUtils.substringAfter(fieldName,field.getValue()+"."));
                                 inValue.setValue(str);
                                 inValue.setVocabularies(field.getVocabularies());
                                 inputValueList.add(inValue);
@@ -39,7 +41,7 @@ public class EnrichmentUtils {
                                     .getFieldValues(fieldName)) {
                                 InputValue inValue = new InputValue();
                                 inValue.setOriginalField(field.getValue());
-                                inValue.setLanguage(StringUtils.substringAfter(fieldName,field.getValue()+"."));
+                               // inValue.setLanguage(StringUtils.substringAfter(fieldName,field.getValue()+"."));
                                 inValue.setValue(str.toString());
                                 inValue.setVocabularies(field.getVocabularies());
                                 inputValueList.add(inValue);

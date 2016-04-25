@@ -1,299 +1,304 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
-		<artifactId>europeana-uim</artifactId>
-		<groupId>eu.europeana</groupId>
-		<version>2.0.1-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <artifactId>europeana-uim</artifactId>
+        <groupId>eu.europeana</groupId>
+        <version>2.0.1-SNAPSHOT</version>
+    </parent>
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>europeana-uim-europeanaspecific</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<groupId>eu.europeana.europeanauim</groupId>
-	<packaging>pom</packaging>
-	<name>Unified Ingestion Manager: Europeana Specific Modules</name>
+    <artifactId>europeana-uim-europeanaspecific</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <groupId>eu.europeana.europeanauim</groupId>
+    <packaging>pom</packaging>
+    <name>Unified Ingestion Manager: Europeana Specific Modules</name>
 
-	<modules>
-		<module>misc/dedup</module>
-		<module>misc/europeana-uim-definitions</module>
-		<module>plugins</module>
-		<module>plugins/clientbindings</module>
-		<module>plugins/mintjmsclient</module>
-		<module>plugins/sugarcrmclient</module>
-		<module>plugins/repoxclient</module>
-		<module>misc/europeana-uim-workflows-startups</module>
-		<module>workflow_plugins/europeana-uim-plugin-enrichment</module>
-		<module>workflow_plugins/linkchecker</module>
-		<module>workflow_plugins/dereference-plugin</module>
-		<module>workflow_plugins/deactivate</module>
-		<module>workflow_plugins/europeana-uim-plugin-publish</module>
-		<module>workflow_plugins/neo4j-plugin</module>
-		<module>workflows/workflow-basic</module>
-		<module>webapp/controlpanel</module>
-		<module>misc/europeana-uim-deploy</module>
-	</modules>
-
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<slf4j.version>1.6.1</slf4j.version>
-		<spring.maven.artifact.version>3.1.2.RELEASE</spring.maven.artifact.version>
-		<spring.osgi.version>1.2.1</spring.osgi.version>
-		<spring.ws.version>2.1.0.RELEASE</spring.ws.version>
-		<spring.quartz.version>1.6.2</spring.quartz.version>
-		<equinox.ver>3.2.2</equinox.ver>
-		<jibx.version>1.2.6</jibx.version>
-		<junit-version>4.11</junit-version>
-		<pax-exam-version>1.2.4</pax-exam-version>
-		<europeana.uim.version>2.0.1-SNAPSHOT</europeana.uim.version>
-		<europeana.uim.groupId>eu.europeana</europeana.uim.groupId>
-		<corelib.version>2.2</corelib.version>
-	</properties>
+    <modules>
+        <module>misc/dedup</module>
+        <module>misc/europeana-uim-definitions</module>
+        <module>plugins</module>
+        <module>plugins/clientbindings</module>
+        <module>plugins/mintjmsclient</module>
+        <module>plugins/sugarcrmclient</module>
+        <module>plugins/repoxclient</module>
+        <module>misc/europeana-uim-workflows-startups</module>
+        <module>workflow_plugins/europeana-uim-plugin-enrichment</module>
+        <module>workflow_plugins/linkchecker</module>
+        <module>workflow_plugins/dereference-plugin</module>
+        <module>workflow_plugins/deactivate</module>
+        <module>workflow_plugins/europeana-uim-plugin-publish</module>
+        <module>workflow_plugins/neo4j-plugin</module>
+        <module>workflows/workflow-basic</module>
+        <module>webapp/controlpanel</module>
+        <module>misc/europeana-uim-deploy</module>
+    </modules>
 
 
-
-	<dependencies>
-
-		<dependency>
-			<groupId>${europeana.uim.groupId}</groupId>
-			<artifactId>europeana-uim-common</artifactId>
-			<version>${europeana.uim.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>${europeana.uim.groupId}</groupId>
-			<artifactId>europeana-uim-api</artifactId>
-			<version>${europeana.uim.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-definitions</artifactId>
-			<version>${corelib.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-dereference</artifactId>
-			<version>${corelib.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-edm-definitions</artifactId>
-			<version>${corelib.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-storage</artifactId>
-			<version>${corelib.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-hierarchies</artifactId>
-			<version>${corelib.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-lookup</artifactId>
-			<version>${corelib.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-utils</artifactId>
-			<version>${corelib.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>eu.europeana.corelib</groupId>
-			<artifactId>corelib-db</artifactId>
-			<version>${corelib.version}</version>
-		</dependency>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <slf4j.version>1.6.1</slf4j.version>
+        <spring.maven.artifact.version>3.1.2.RELEASE</spring.maven.artifact.version>
+        <spring.osgi.version>1.2.1</spring.osgi.version>
+        <spring.ws.version>2.1.0.RELEASE</spring.ws.version>
+        <spring.quartz.version>1.6.2</spring.quartz.version>
+        <equinox.ver>3.2.2</equinox.ver>
+        <jibx.version>1.2.6</jibx.version>
+        <junit-version>4.11</junit-version>
+        <pax-exam-version>1.2.4</pax-exam-version>
+        <europeana.uim.version>2.0.1-SNAPSHOT</europeana.uim.version>
+        <europeana.uim.groupId>eu.europeana</europeana.uim.groupId>
+        <corelib.version>2.2</corelib.version>
+    </properties>
 
 
-	</dependencies>
+    <dependencies>
 
-	<repositories>
-		<repository>
-			<id>libs-release-local</id>
-			<name>artifactory.eanadev.org-releases</name>
-			<url>http://artifactory.eanadev.org/artifactory/libs-release-local</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<!-- Europeana Labs UIM external libraries repository -->
-		<repository>
-			<id>artifactory.eanadev.org</id>
-			<name>artifactory.eanadev.org-releases</name>
-			<url>http://artifactory.eanadev.org/artifactory/ext-release-local</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
+        <dependency>
+            <groupId>${europeana.uim.groupId}</groupId>
+            <artifactId>europeana-uim-common</artifactId>
+            <version>${europeana.uim.version}</version>
+        </dependency>
 
-		<repository>
-			<id>ext-snapshots-local</id>
-			<name>artifactory.eanadev.org-snapshot</name>
-			<url>http://artifactory.eanadev.org/artifactory/ext-snapshot-local</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
+        <dependency>
+            <groupId>${europeana.uim.groupId}</groupId>
+            <artifactId>europeana-uim-api</artifactId>
+            <version>${europeana.uim.version}</version>
+        </dependency>
 
-		<!-- Europeana Labs Java.net Maven 2 Repository (mirror) -->
-		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Maven 2 Repository (mirror)</name>
-			<url>http://artifactory.eanadev.org/artifactory/java.net.m2</url>
-		</repository>
+        <dependency>
+            <groupId>eu.europeana.corelib</groupId>
+            <artifactId>corelib-definitions</artifactId>
+            <version>${corelib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana.corelib</groupId>
+            <artifactId>corelib-dereference</artifactId>
+            <version>${corelib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana.corelib</groupId>
+            <artifactId>corelib-edm-definitions</artifactId>
+            <version>${corelib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana.corelib</groupId>
+            <artifactId>corelib-storage</artifactId>
+            <version>${corelib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana.corelib</groupId>
+            <artifactId>corelib-hierarchies</artifactId>
+            <version>${corelib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana.corelib</groupId>
+            <artifactId>corelib-lookup</artifactId>
+            <version>${corelib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europeana.corelib</groupId>
+            <artifactId>corelib-utils</artifactId>
+            <version>${corelib.version}</version>
+        </dependency>
 
-
-
-		<!-- Europeana Labs UIM releases repository -->
-		<repository>
-			<id>uim-releases-local</id>
-			<name>UIM Releases Repository</name>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<url>http://artifactory.eanadev.org/artifactory/uim-releases-local</url>
-		</repository>
-
-
-
-		<!-- Europeana Labs Core snapshot libraries -->
-		<repository>
-			<id>artifactory.eanadev.org.corelibs.eu.snapshot</id>
-			<name>artifactory.eanadev.org.libs-snapshot-local</name>
-			<url>http://artifactory.eanadev.org/artifactory/libs-snapshot-local</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-
-	</repositories>
+        <dependency>
+            <groupId>eu.europeana.corelib</groupId>
+            <artifactId>corelib-db</artifactId>
+            <version>${corelib.version}</version>
+        </dependency>
 
 
-	<distributionManagement>
-		<repository>
-			<id>artifactory.eanadev.org-releases</id>
-			<name>artifactory.eanadev.org-releases</name>
-			<url>http://artifactory.eanadev.org/artifactory/plugins-release-local</url>
-		</repository>
+    </dependencies>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>ext-snapshots</id>
+            <url>http://artifactory.eanadev.org/artifactory/ext-snapshot-local</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+    <repositories>
+        <repository>
+            <id>libs-release-local</id>
+            <name>artifactory.eanadev.org-releases</name>
+            <url>http://artifactory.eanadev.org/artifactory/libs-release-local</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- Europeana Labs UIM external libraries repository -->
+        <repository>
+            <id>artifactory.eanadev.org</id>
+            <name>artifactory.eanadev.org-releases</name>
+            <url>http://artifactory.eanadev.org/artifactory/ext-release-local</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 
-		<snapshotRepository>
-			<id>artifactory.eanadev.org</id>
-			<name>artifactory.eanadev.org-snapshot</name>
-			<url>http://artifactory.eanadev.org/artifactory/plugins-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
+        <repository>
+            <id>ext-snapshots-local</id>
+            <name>artifactory.eanadev.org-snapshot</name>
+            <url>http://artifactory.eanadev.org/artifactory/ext-snapshot-local</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
 
-	<build>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.servicemix.tooling
-										</groupId>
-										<artifactId>
-											depends-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.2,)
-										</versionRange>
-										<goals>
-											<goal>
-												generate-depends-file
-											</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-war-plugin
-										</artifactId>
-										<versionRange>
-											[2.1.1,)
-										</versionRange>
-										<goals>
-											<goal>exploded</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.felix
-										</groupId>
-										<artifactId>
-											maven-bundle-plugin
-										</artifactId>
-										<versionRange>
-											[2.1.0,)
-										</versionRange>
-										<goals>
-											<goal>manifest</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.18.1</version>
-					<configuration>
-						<argLine>-XX:-UseSplitVerifier</argLine>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>cobertura-maven-plugin</artifactId>
-					<version>2.6</version>
-					<configuration>
-						<aggregate>true</aggregate>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<aggregate>true</aggregate>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
+        <!-- Europeana Labs Java.net Maven 2 Repository (mirror) -->
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Maven 2 Repository (mirror)</name>
+            <url>http://artifactory.eanadev.org/artifactory/java.net.m2</url>
+        </repository>
+
+
+        <!-- Europeana Labs UIM releases repository -->
+        <repository>
+            <id>uim-releases-local</id>
+            <name>UIM Releases Repository</name>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>http://artifactory.eanadev.org/artifactory/uim-releases-local</url>
+        </repository>
+
+
+        <!-- Europeana Labs Core snapshot libraries -->
+        <repository>
+            <id>artifactory.eanadev.org.corelibs.eu.snapshot</id>
+            <name>artifactory.eanadev.org.libs-snapshot-local</name>
+            <url>http://artifactory.eanadev.org/artifactory/libs-snapshot-local</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+
+    </repositories>
+
+
+    <distributionManagement>
+        <repository>
+            <id>artifactory.eanadev.org-releases</id>
+            <name>artifactory.eanadev.org-releases</name>
+            <url>http://artifactory.eanadev.org/artifactory/plugins-release-local</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>artifactory.eanadev.org</id>
+            <name>artifactory.eanadev.org-snapshot</name>
+            <url>http://artifactory.eanadev.org/artifactory/plugins-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings
+                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.servicemix.tooling
+                                        </groupId>
+                                        <artifactId>
+                                            depends-maven-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.2,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>
+                                                generate-depends-file
+                                            </goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.maven.plugins
+                                        </groupId>
+                                        <artifactId>
+                                            maven-war-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.1.1,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>exploded</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.felix
+                                        </groupId>
+                                        <artifactId>
+                                            maven-bundle-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.1.0,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>manifest</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore/>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.18.1</version>
+                    <configuration>
+                        <argLine>-XX:-UseSplitVerifier</argLine>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.6</version>
+                    <configuration>
+                        <aggregate>true</aggregate>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

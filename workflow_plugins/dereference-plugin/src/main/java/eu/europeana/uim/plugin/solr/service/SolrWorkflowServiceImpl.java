@@ -1,19 +1,14 @@
 package eu.europeana.uim.plugin.solr.service;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.mapping.DefaultCreator;
-import com.hp.hpl.jena.rdf.model.RDFReaderF;
+import com.hp.hpl.jena.rdf.model.RDFReader;
 import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.ServerAddress;
-
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.uim.common.BlockingInitializer;
 import eu.europeana.uim.plugin.solr.utils.OsgiExtractor;
@@ -21,8 +16,13 @@ import eu.europeana.uim.plugin.solr.utils.PropertyReader;
 import eu.europeana.uim.plugin.solr.utils.UimConfigurationProperty;
 import org.apache.commons.lang.StringUtils;
 
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class SolrWorkflowServiceImpl implements SolrWorkflowService {
   private static OsgiExtractor extractor;
+  private static RDFReader readerF;
   private static Datastore datastore;
 
   public SolrWorkflowServiceImpl() {
@@ -122,7 +122,7 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
 
       @Override
       protected void initializeInternal() {
-        new RDFReaderFImpl();
+       readerF =  new RDFReaderFImpl().getReader();
 
       }
     };
@@ -140,14 +140,15 @@ public class SolrWorkflowServiceImpl implements SolrWorkflowService {
     return extractor;
   }
 
+
   @Override
   public Datastore getDatastore() {
     return datastore;
   }
 
   @Override
-  public RDFReaderF getRDFReaderF() {
-    return new RDFReaderFImpl();
+  public RDFReader getRDFReader() {
+    return readerF;
   }
 
 }

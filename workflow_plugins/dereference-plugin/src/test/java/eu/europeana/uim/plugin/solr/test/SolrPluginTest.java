@@ -1,27 +1,11 @@
 package eu.europeana.uim.plugin.solr.test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import com.hp.hpl.jena.rdf.model.RDFReaderF;
-import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
-import org.apache.commons.io.FileUtils;
-import org.junit.Ignore;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.DatastoreImpl;
 import com.google.code.morphia.Morphia;
+import com.hp.hpl.jena.rdf.model.RDFReader;
+import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import com.mongodb.Mongo;
-
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
@@ -48,6 +32,19 @@ import eu.europeana.uim.sugar.SugarCrmRecord;
 import eu.europeana.uim.sugar.SugarCrmService;
 import eu.europeana.uim.sugarcrmclient.plugin.SugarCRMServiceImpl;
 import eu.europeana.uim.sugarcrmclient.plugin.objects.SugarCrmRecordImpl;
+import org.apache.commons.io.FileUtils;
+import org.junit.Ignore;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 @Ignore
 public class SolrPluginTest {
  
@@ -127,8 +124,8 @@ public class SolrPluginTest {
 		
 		
 
-		RDFReaderF reader = new RDFReaderFImpl();
-		when(solrService.getRDFReaderF()).thenReturn(reader);
+		RDFReader reader = new RDFReaderFImpl().getReader();
+		when(solrService.getRDFReader()).thenReturn(reader);
 		when(solrService.getDatastore()).thenReturn(datastore);
 		when(solrService.getExtractor()).thenReturn(extractor);
 		plugin = new SolrWorkflowPlugin(solrService);
