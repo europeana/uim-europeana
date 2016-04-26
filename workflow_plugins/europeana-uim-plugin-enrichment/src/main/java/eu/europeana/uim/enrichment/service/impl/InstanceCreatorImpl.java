@@ -8,6 +8,8 @@ package eu.europeana.uim.enrichment.service.impl;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
+import com.google.code.morphia.mapping.DefaultCreator;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import eu.europeana.harvester.client.HarvesterClientConfig;
@@ -17,6 +19,7 @@ import eu.europeana.harvester.db.mongo.SourceDocumentReferenceDaoImpl;
 import eu.europeana.harvester.domain.ProcessingJob;
 import eu.europeana.harvester.domain.SourceDocumentReference;
 import eu.europeana.uim.common.BlockingInitializer;
+import eu.europeana.uim.enrichment.MongoBundleActivator;
 import eu.europeana.uim.enrichment.service.InstanceCreator;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
@@ -54,6 +57,12 @@ public class InstanceCreatorImpl implements InstanceCreator {
 
             MongoClient mongo = new MongoClient(addresses);
             Morphia morphia = new Morphia();
+            morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+                @Override
+                protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+                    return MongoBundleActivator.getBundleClassLoader();
+                }
+            });
             morphia.map(SourceDocumentReference.class);
             morphia.map(ProcessingJob.class);
             if(StringUtils.isNotEmpty(password)) {
