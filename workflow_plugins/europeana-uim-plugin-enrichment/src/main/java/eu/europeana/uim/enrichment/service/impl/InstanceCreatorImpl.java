@@ -12,6 +12,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import eu.europeana.harvester.client.HarvesterClientConfig;
 
+import eu.europeana.harvester.db.interfaces.SourceDocumentReferenceDao;
+import eu.europeana.harvester.db.mongo.SourceDocumentReferenceDaoImpl;
 import eu.europeana.harvester.domain.ProcessingJob;
 import eu.europeana.harvester.domain.SourceDocumentReference;
 import eu.europeana.uim.common.BlockingInitializer;
@@ -52,13 +54,15 @@ public class InstanceCreatorImpl implements InstanceCreator {
 
             MongoClient mongo = new MongoClient(addresses);
             Morphia morphia = new Morphia();
+            morphia.map(SourceDocumentReference.class);
+            morphia.map(ProcessingJob.class);
             if(StringUtils.isNotEmpty(password)) {
                 ds = morphia.createDatastore(mongo, dbName, username, password.toCharArray());
             } else {
                 ds = morphia.createDatastore(mongo, dbName);
             }
 
-            config = new HarvesterClientConfig();
+
             
             BlockingInitializer sdr = new BlockingInitializer() {
 
@@ -67,6 +71,8 @@ public class InstanceCreatorImpl implements InstanceCreator {
                     SourceDocumentReference sdrRef = new SourceDocumentReference();
                 }
             };
+
+
             sdr.initialize(SourceDocumentReference.class.getClassLoader());
             BlockingInitializer pj = new BlockingInitializer() {
 
@@ -76,6 +82,15 @@ public class InstanceCreatorImpl implements InstanceCreator {
                 }
             };
             pj.initialize(ProcessingJob.class.getClassLoader());
+            BlockingInitializer configInit = new BlockingInitializer() {
+                @Override
+                protected void initializeInternal() {
+                    config = new HarvesterClientConfig();
+                }
+            };
+            configInit.initialize(HarvesterClientConfig.class.getClassLoader());
+
+
         } catch (IOException ex) {
             Logger.getLogger(InstanceCreatorImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
