@@ -7,6 +7,7 @@
 package eu.europeana.uim.enrichment.service;
 
 import com.google.code.morphia.Datastore;
+import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientConfig;
 
 
@@ -19,4 +20,6 @@ public interface InstanceCreator {
      Datastore getDatastore();
     
     HarvesterClientConfig getConfig();
+
+    HarvesterClient getClient();
 }

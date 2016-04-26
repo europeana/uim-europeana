@@ -12,8 +12,10 @@ import com.google.code.morphia.mapping.DefaultCreator;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
+import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientConfig;
 
+import eu.europeana.harvester.client.HarvesterClientImpl;
 import eu.europeana.harvester.db.interfaces.SourceDocumentReferenceDao;
 import eu.europeana.harvester.db.mongo.SourceDocumentReferenceDaoImpl;
 import eu.europeana.harvester.domain.ProcessingJob;
@@ -38,6 +40,7 @@ import java.util.logging.Logger;
 public class InstanceCreatorImpl implements InstanceCreator {
     private static Datastore ds;
     private static HarvesterClientConfig config;
+    private static HarvesterClient client;
     
     public InstanceCreatorImpl(){
         
@@ -99,6 +102,13 @@ public class InstanceCreatorImpl implements InstanceCreator {
             };
             configInit.initialize(HarvesterClientConfig.class.getClassLoader());
 
+            BlockingInitializer clientInit = new BlockingInitializer() {
+                @Override
+                protected void initializeInternal() {
+                    client = new HarvesterClientImpl(ds, config);
+                }
+            };
+            clientInit.initialize(HarvesterClientImpl.class.getClassLoader());
 
         } catch (IOException ex) {
             Logger.getLogger(InstanceCreatorImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -115,5 +125,10 @@ public class InstanceCreatorImpl implements InstanceCreator {
     @Override
     public HarvesterClientConfig getConfig(){
         return config;
+    }
+
+    @Override
+    public HarvesterClient getClient(){
+        return client;
     }
 }
