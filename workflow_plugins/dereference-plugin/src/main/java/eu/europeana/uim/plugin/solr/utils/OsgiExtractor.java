@@ -1,57 +1,16 @@
 package eu.europeana.uim.plugin.solr.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.query.Query;
 import com.google.code.morphia.query.UpdateOperations;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFReaderF;
-
-
+import com.hp.hpl.jena.rdf.model.RDFReader;
 import com.mongodb.MongoException;
-
-import eu.europeana.corelib.definitions.jibx.AgentType;
-import eu.europeana.corelib.definitions.jibx.Alt;
-import eu.europeana.corelib.definitions.jibx.Concept;
-import eu.europeana.corelib.definitions.jibx.Lat;
-import eu.europeana.corelib.definitions.jibx.LiteralType;
-import eu.europeana.corelib.definitions.jibx.PlaceType;
-import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
+import eu.europeana.corelib.definitions.jibx.*;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Lang;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType.Resource;
-import eu.europeana.corelib.definitions.jibx.ResourceType;
-import eu.europeana.corelib.definitions.jibx.TimeSpanType;
-import eu.europeana.corelib.definitions.jibx._Long;
 import eu.europeana.corelib.definitions.model.EdmLabel;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.EdmMappedField;
@@ -59,6 +18,21 @@ import eu.europeana.corelib.dereference.impl.EntityImpl;
 import eu.europeana.corelib.dereference.impl.Extractor;
 import eu.europeana.uim.plugin.solr.helpers.ResourceNotRDFException;
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.Date;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class OsgiExtractor extends Extractor {
 
@@ -215,10 +189,10 @@ public class OsgiExtractor extends Extractor {
 		AgentType lastAgent = null;
 		TimeSpanType lastTimespan = null;
 		PlaceType lastPlace = null;
-		RDFReaderF rdfReader = solrWorkFlowService.getRDFReaderF();
+		RDFReader rdfReader = solrWorkFlowService.getRDFReader();
 		Model model = ModelFactory.createDefaultModel();
 		try{
-		rdfReader.getReader().read(model,
+		rdfReader.read(model,
 				new ByteArrayInputStream(xmlString.getBytes("UTF-8")), "");
 		} catch (UnsupportedEncodingException e){
 			e.printStackTrace();

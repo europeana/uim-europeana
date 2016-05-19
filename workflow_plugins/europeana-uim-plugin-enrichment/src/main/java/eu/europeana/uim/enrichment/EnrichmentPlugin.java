@@ -666,9 +666,9 @@ public class EnrichmentPlugin<I> extends
                     if(!check) {
                         res = handler.removeRecord(cloudSolrServer, rdf);
                     }
-                    HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+                    //HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
                     try {
-                        client.setActive(rdf.getProvidedCHOList().get(0).getAbout(),new Boolean(false));
+                        creator.getClient().setActive(rdf.getProvidedCHOList().get(0).getAbout(),new Boolean(false));
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     } catch (UnknownHostException e) {
