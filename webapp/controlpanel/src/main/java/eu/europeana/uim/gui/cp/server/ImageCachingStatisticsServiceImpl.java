@@ -72,29 +72,31 @@ public class ImageCachingStatisticsServiceImpl extends IntegrationServicesProvid
 	 */
 	private static List<Statistics> getStatisticsReports(int offset, int maxSize, List<String> collections, String providerId) throws Exception {
 		List<Statistics> statisticsList = new ArrayList<Statistics>();
-		for (String collId : collections) {
-			long time = System.currentTimeMillis();
+		if (collections != null && collections.size() == 1) {
+			for (String collId : collections) {
+				long time = System.currentTimeMillis();
 //			List<LastSourceDocumentProcessingStatistics> stat = client.findLastSourceDocumentProcessingStatistics(collId, null, Arrays.asList(ProcessingState.values()));
-			//PagedElements<ProcessingJob> jobsByCollectionAndState = client.findJobsByCollectionAndState(new HashSet<String>(Arrays.asList(collId)), new HashSet<JobState>(Arrays.asList(JobState.values())), new Page(offset, maxSize));
-			Map<String, JobStatistics> map = client.findJobsByCollectionId(collId);
-			
-			System.out.println("*** The time elapsed for the CRF Statistics UIM page generation for collection " + collId + ": " + ((System.currentTimeMillis() - time)/1000) + " second ***");
-			
-			
-		    for (Entry<String,JobStatistics> execId : map.entrySet()) { 
-				Interval dateIntervalForProcessing = client.getDateIntervalForProcessing(execId.getKey());
-				Statistics statistics = new Statistics();
-				statistics.setDateCreated(new Date(dateIntervalForProcessing.getStartMillis()));
-				statistics.setDateCompleted(new Date(dateIntervalForProcessing.getEndMillis()));
-				statistics.setProviderId(providerId);				
-				statistics.setCollectionId(collId);
-				statistics.setPendingJobs(execId.getValue().getPending());
-				statistics.setFailedJobs(execId.getValue().getFailed());
-				statistics.setSuccessfulJobs(execId.getValue().getSuccessful());
-				statistics.setTotal(execId.getValue().getPending() + execId.getValue().getFailed() + execId.getValue().getSuccessful());
-			
-				statistics.setExecutionId(execId.getKey());
-				statisticsList.add(statistics);
+				//PagedElements<ProcessingJob> jobsByCollectionAndState = client.findJobsByCollectionAndState(new HashSet<String>(Arrays.asList(collId)), new HashSet<JobState>(Arrays.asList(JobState.values())), new Page(offset, maxSize));
+				Map<String, JobStatistics> map = client.findJobsByCollectionId(collId);
+				
+				System.out.println("*** The time elapsed for the CRF Statistics UIM page generation for collection " + collId + ": " + ((System.currentTimeMillis() - time)/1000) + " second ***");
+				
+				
+				for (Entry<String,JobStatistics> execId : map.entrySet()) { 
+					Interval dateIntervalForProcessing = client.getDateIntervalForProcessing(execId.getKey());
+					Statistics statistics = new Statistics();
+					statistics.setDateCreated(new Date(dateIntervalForProcessing.getStartMillis()));
+					statistics.setDateCompleted(new Date(dateIntervalForProcessing.getEndMillis()));
+					statistics.setProviderId(providerId);				
+					statistics.setCollectionId(collId);
+					statistics.setPendingJobs(execId.getValue().getPending());
+					statistics.setFailedJobs(execId.getValue().getFailed());
+					statistics.setSuccessfulJobs(execId.getValue().getSuccessful());
+					statistics.setTotal(execId.getValue().getPending() + execId.getValue().getFailed() + execId.getValue().getSuccessful());
+					
+					statistics.setExecutionId(execId.getKey());
+					statisticsList.add(statistics);
+				}
 			}
 		}
 		return statisticsList;
