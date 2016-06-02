@@ -34,7 +34,7 @@ public class PDFReportGenerationServlet extends HttpServlet {
     	resp.setContentType("application/pdf");  
     	String collection = req.getParameter("collectionId");
     	String provider = req.getParameter("providerId");
-		long dateStart = StringUtils.isNotEmpty(req.getParameter("dateStart"))?Long.parseLong(req.getParameter("dateStart")):0l;
+		long dateStart = StringUtils.isNotEmpty(req.getParameter("dateStart")) ? Long.parseLong(req.getParameter("dateStart")) : System.currentTimeMillis();
     	String recordsCount = req.getParameter("recordsCount");
 		resp.setHeader("Content-Disposition", "attachment; filename=\"" + PdfReportGenerator.getFileName(collection) + "\"");
     	resp.setHeader("Cache-Control", "no-cache"); 

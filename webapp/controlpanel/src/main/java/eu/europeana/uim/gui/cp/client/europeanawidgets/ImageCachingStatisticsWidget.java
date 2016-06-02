@@ -368,10 +368,10 @@ public class ImageCachingStatisticsWidget extends IngestionWidget {
 		List<String> collectionsForStatisics = new ArrayList<String>();
 		if (selectedCollection != null) {
 			collectionsForStatisics.add(selectedCollection.getName());
-		} else if (selectedProvider != null) {
-			for (CollectionDTO coll : collections) {
-				collectionsForStatisics.add(coll.getName());
-			}			
+//		} else if (selectedProvider != null) {
+//			for (CollectionDTO coll : collections) {
+//				collectionsForStatisics.add(coll.getName());
+//			}			
 		}
 		imageCachingStatisticsRetrievalService.getImageCachingStatistics(offset, maxSize, collectionsForStatisics, selectedProvider != null ? selectedProvider.getName() : "",
 				new AsyncCallback<ImageCachingStatisticsResultDTO>() {
