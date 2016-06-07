@@ -1,6 +1,10 @@
 package eu.europeana.europeanauim.publish.service;
 
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import eu.europeana.corelib.mongo.server.EdmMongoServer;
+import eu.europeana.europeanauim.publish.OsgiEdmMongoServer;
+import org.apache.solr.client.solrj.SolrServer;
+
+import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 
 /**
  * Interface exposing the a Solr Server
@@ -9,9 +13,16 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
  */
 public interface PublishService {
 
+	OsgiEdmMongoServer getMongoIngestion();
+
+	OsgiEdmMongoServer getMongoProduction();
+
 	/**
 	 * Retrieve the Solr Server to Optimize
 	 * @return
 	 */
-	public HttpSolrServer getSolrServer();
+	SolrServer getSolrServer();
+	EuropeanaIdMongoServer getEuropeanaIdMongoServer();
+	EuropeanaIdMongoServer getEuropeanaIdMongoServerProduction();
+	SolrServer getSolrIngestionServer();
 }

@@ -32,5 +32,5 @@ public class CRFTaskDTO implements IsSerializable{
         this.datasetId = datasetId;
     }
 
-    
+
 }

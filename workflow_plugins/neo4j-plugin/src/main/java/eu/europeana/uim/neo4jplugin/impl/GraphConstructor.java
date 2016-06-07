@@ -295,8 +295,7 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-            //TODO: temp removal because of unsupported functionality on the portal
-            /*
+
             if(provProxy.getDctermsIssued()!=null){
                  Map<String, List<String>> issued = provProxy
                         .getDctermsIssued();
@@ -323,7 +322,7 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-            
+
             if(provProxy.getDctermsCreated()!=null){
                  Map<String, List<String>> created = provProxy
                         .getDctermsCreated();
@@ -337,7 +336,7 @@ public class GraphConstructor {
                             langStr);
                 }
             }
-                    */
+
             elementsToSave.put("edm:type", docType);
             elementsForCollection.put(id, elementsToSave);
             edmelementsmap.put(collection, elementsForCollection);
@@ -406,7 +405,9 @@ public class GraphConstructor {
 
     public void computeDependencies(String collectionId) {
         Set<RelTemp> map = relationsmap.get(collectionId);
-        System.out.println("Relationships are: " + map.size());
+        if(map!=null) {
+            System.out.println("Relationships are: " + map.size());
+        }
     }
 
     public void generateNodes(final String collectionId) {
@@ -414,7 +415,7 @@ public class GraphConstructor {
     }
 
     public void generateNodes(final String collectionId, int limit) {
-        computeDependencies(collectionId);
+        //computeDependencies(collectionId);
         final ConcurrentHashMap<String, Map<String, Object>> map = new ConcurrentHashMap<String, Map<String, Object>>();
         File f = new File("urls");
         List<String> urls = new ArrayList<>();
@@ -582,7 +583,7 @@ public class GraphConstructor {
                 }
             }
             if (i == 100) {
-                Logger.getLogger(this.getClass().getName()).info("Reached 1000 in " + (System.currentTimeMillis()
+                Logger.getLogger(this.getClass().getName()).info("Reached 100 in " + (System.currentTimeMillis()
                         - start) + " ms");
                 start = System.currentTimeMillis();
                 try {
@@ -683,14 +684,14 @@ public class GraphConstructor {
         }
         createIsFirstInSequence(parents.get(mnemonic));
         createIsLastInSequence(parents.get(mnemonic));
-        //TODO: temp removal because of unsupported functionality on the production side
-//        createFakeSequence(parents.get(mnemonic));
+
+       createFakeSequence(parents.get(mnemonic));
     }
 
     private void createFakeSequence(Set<String> parents) {
         HttpClient httpClient = new HttpClient();
         for (String parent : parents) {
-            GetMethod method = new GetMethod(StringUtils.remove(restapi.getBaseUri(), "/db/data/") + "/order/fakeorder/nodeId/" + StringUtils.replace(parent, "/", "%2F"));
+            GetMethod method = new GetMethod(StringUtils.remove(restapi.getBaseUri(), "/db/data") + "/order/fakeorder/nodeId/" + StringUtils.replace(parent, "/", "%2F"));
             try {
                 System.out.println(method.getPath());
                 httpClient.executeMethod(method);

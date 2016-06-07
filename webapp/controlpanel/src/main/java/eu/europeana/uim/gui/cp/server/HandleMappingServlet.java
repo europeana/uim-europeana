@@ -29,109 +29,111 @@ import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.VocabularyMongoServerImpl;
 import eu.europeana.uim.gui.cp.server.util.PropertyReader;
 import eu.europeana.uim.gui.cp.server.util.UimConfigurationProperty;
+import org.apache.commons.lang.StringUtils;
 
 public class HandleMappingServlet extends HttpServlet {
-	VocabularyMongoServer server;
+    VocabularyMongoServer server;
 
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		try {
-			server = new VocabularyMongoServerImpl(
-					new Mongo(
-							PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-							Integer.parseInt(PropertyReader
-									.getProperty(UimConfigurationProperty.MONGO_HOSTPORT))),
-					PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MongoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        try {
+            if (StringUtils.isBlank(PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME))) {
+                server = new VocabularyMongoServerImpl(
+                        MongoProvider.getMongo(),
+                        PropertyReader
+                                .getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY));
+            } else {
+                server = new VocabularyMongoServerImpl(
+                        MongoProvider.getMongo(),
+                        PropertyReader
+                                .getProperty(UimConfigurationProperty.MONGO_DB_VOCABULARY),
+                        PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME), PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD));
+            }
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MongoException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
 
-		DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
-		/*
+        DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+        /*
 		 * Set the size threshold, above which content will be stored on disk.
 		 */
-		fileItemFactory.setSizeThreshold(1024 * 1024); // 1 MB
+        fileItemFactory.setSizeThreshold(1024 * 1024); // 1 MB
 		/*
 		 * Set the temporary directory to store the uploaded files of size above
 		 * threshold.
 		 */
-		fileItemFactory.setRepository(new File(""));
+        fileItemFactory.setRepository(new File(""));
 
-		ServletFileUpload uploadHandler = new ServletFileUpload(fileItemFactory);
-		try {
+        ServletFileUpload uploadHandler = new ServletFileUpload(fileItemFactory);
+        try {
 
-			@SuppressWarnings("unchecked")
-			List<FileItem> items = uploadHandler.parseRequest(request);
-			for (FileItem item : items) {
-				if (!item.isFormField()) {
-					InputStream is = item.getInputStream();
-					System.out.println(is.available());
-					if (is.available() > 0) {
-						ObjectInputStream ois = new ObjectInputStream(is);
+            @SuppressWarnings("unchecked")
+            List<FileItem> items = uploadHandler.parseRequest(request);
+            for (FileItem item : items) {
+                if (!item.isFormField()) {
+                    InputStream is = item.getInputStream();
+                    System.out.println(is.available());
+                    if (is.available() > 0) {
+                        ObjectInputStream ois = new ObjectInputStream(is);
 
-						ControlledVocabularyImpl voc = (ControlledVocabularyImpl) ois
-								.readObject();
+                        ControlledVocabularyImpl voc = (ControlledVocabularyImpl) ois
+                                .readObject();
 
-						server.getDatastore().save(voc);
-						response.setStatus(HttpServletResponse.SC_CREATED);
-						response.getWriter().print(
-								"The mapping was uploaded successfully.");
-						response.flushBuffer();
-						is.close();
-					}
-				}
-			}
-		} catch (FileUploadException ex) {
-			ex.printStackTrace();
-			response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-			response.getWriter().print("The file was not created");
-			response.flushBuffer();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-			response.getWriter().print("The file was not created");
-			response.flushBuffer();
-		}
+                        server.getDatastore().save(voc);
+                        response.setStatus(HttpServletResponse.SC_CREATED);
+                        response.getWriter().print(
+                                "The mapping was uploaded successfully.");
+                        response.flushBuffer();
+                        is.close();
+                    }
+                }
+            }
+        } catch (FileUploadException ex) {
+            ex.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+            response.getWriter().print("The file was not created");
+            response.flushBuffer();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            response.getWriter().print("The file was not created");
+            response.flushBuffer();
+        }
 
-	}
+    }
 
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) {
-		String vocabularyName = request.getParameter("vocabularyName");
-		ControlledVocabularyImpl voc = server
-				.getControlledVocabularyByName(vocabularyName);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) {
+        String vocabularyName = request.getParameter("vocabularyName");
+        ControlledVocabularyImpl voc = server
+                .getControlledVocabularyByName(vocabularyName);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		try {
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentType("application/octet-stream");
-			response.setHeader("Content-Disposition", "attachment; filename="
-					+ vocabularyName + ".ser");
-			ObjectOutputStream out = new ObjectOutputStream(baos);
-			out.writeObject(voc);
-			ServletOutputStream sout = response.getOutputStream();
-			byte[] b = baos.toByteArray();
-			sout.write(b);
-			sout.close();
+        try {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename="
+                    + vocabularyName + ".ser");
+            ObjectOutputStream out = new ObjectOutputStream(baos);
+            out.writeObject(voc);
+            ServletOutputStream sout = response.getOutputStream();
+            byte[] b = baos.toByteArray();
+            sout.write(b);
+            sout.close();
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	}
+    }
 }

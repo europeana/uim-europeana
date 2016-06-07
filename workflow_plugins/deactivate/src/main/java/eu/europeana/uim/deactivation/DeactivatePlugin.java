@@ -10,6 +10,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import eu.europeana.harvester.client.HarvesterClientImpl;
+import eu.europeana.harvester.domain.ReferenceOwner;
+import eu.europeana.uim.deactivation.service.InstanceCreator;
+import eu.europeana.uim.deactivation.service.InstanceCreatorImpl;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -42,6 +46,7 @@ public class DeactivatePlugin<I> extends
 		AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
 	private static DeactivationService dService;
+	private static InstanceCreator creator;
 	private final static Logger log = Logger.getLogger(DeactivatePlugin.class
 			.getName());
 
@@ -107,20 +112,35 @@ public class DeactivatePlugin<I> extends
 					.getDataSet();
 			String collectionId = collection.getName().split("_")[0];
 			log.log(Level.INFO, "Removing collectionId: " + collectionId);
-			String newCollectionId = dService.getCollectionMongoServer()
+
+			//We do not need to handle old collection ids. The ones outside UIM must be handled in the record management
+			//tool
+
+
+			/*String newCollectionId = dService.getCollectionMongoServer()
 					.findNewCollectionId(collection.getName().split("_")[0]);
 			log.log(Level.INFO, "New collection id is:" + newCollectionId);
 			if (newCollectionId != null) {
 				collectionId = newCollectionId;
-			}
-			log.log(Level.INFO, "removing from solr");
-			dService.getSolrServer().deleteByQuery(
-					"europeana_collectionName:" + collectionId + "*");
+			}*/
+			log.log(Level.INFO, "removing from solr(ingestion)");
+			dService.getCloudSolrServer().deleteByQuery(
+					"europeana_collectionName:" + collectionId + "_*");
+			log.log(Level.INFO, "removing from solr(production)");
+            dService.getProductionCloudSolrServer().deleteByQuery(
+                    "europeana_collectionName:" + collectionId + "_*");
 			log.log(Level.INFO, "removing from mongo");
 			new FullBeanHandler(dService.getMongoServer())
 					.clearData(collectionId);
+			new FullBeanHandler(dService.getProductionMongoServer())
+            .clearData(collectionId);
 			clearData(dService.getGraphDb(), dService.getNeo4jIndex(),
 					collectionId);
+			clearData(dService.getGraphDbProduction(), dService.getNeo4jIndexProduction(),
+                collectionId);
+			 creator = new InstanceCreatorImpl();
+			HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(),creator.getConfig());
+			client.deactivateJobs(new ReferenceOwner(arg0.getDataSetCollection().getProvider().getMnemonic(),((Collection)arg0.getExecution().getDataSet()).getMnemonic(),null));
 		} catch (SolrServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -173,15 +193,7 @@ public class DeactivatePlugin<I> extends
 	@Override
 	public void completed(ExecutionContext<MetaDataRecord<I>, I> arg0)
 			throws IngestionPluginFailedException {
-		try {
-			dService.getSolrServer().commit();
-		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
-			log.log(Level.SEVERE, e.getMessage());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			log.log(Level.SEVERE, e.getMessage());
-		}
+
 	}
 
 	public DeactivationService getdService() {

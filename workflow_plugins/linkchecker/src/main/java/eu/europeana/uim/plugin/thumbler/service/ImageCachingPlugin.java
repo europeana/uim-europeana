@@ -5,27 +5,16 @@
  */
 package eu.europeana.uim.plugin.thumbler.service;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
-import org.theeuropeanlibrary.model.common.qualifier.Status;
-
-import eu.europeana.corelib.definitions.jibx.Aggregation;
 import eu.europeana.corelib.definitions.jibx.HasView;
 import eu.europeana.corelib.definitions.jibx.RDF;
-import eu.europeana.harvester.client.HarvesterClientImpl;
+import eu.europeana.harvester.client.HarvesterClient;
+import eu.europeana.harvester.domain.ReferenceOwner;
+import eu.europeana.jobcreator.JobCreator;
+import eu.europeana.jobcreator.domain.ProcessingJobCreationOptions;
+import eu.europeana.jobcreator.domain.ProcessingJobTuple;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
@@ -33,17 +22,35 @@ import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.plugin.thumbler.InstanceCreator;
 import eu.europeana.uim.store.Collection;
 import eu.europeana.uim.store.MetaDataRecord;
+import org.apache.commons.lang.StringUtils;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IUnmarshallingContext;
+import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
  * @author gmamakis
  */
 public class ImageCachingPlugin<I> extends
         AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
     private static IBindingFactory bfact;
-    private static HarvesterClientImpl client;
+    private static HarvesterClient client;
     private static InstanceCreator creator;
+    private static String colId;
+    private static String provId;
+    private static String execId;
+    private static int priority = 0;
+    private static boolean forceUnconditional=true;
+
 
     static {
         try {
@@ -55,11 +62,13 @@ public class ImageCachingPlugin<I> extends
         }
 
     }
+
     private static final List<String> params = new ArrayList<String>() {
         private static final long serialVersionUID = 1L;
 
         {
             add("collection.priority");
+            add("force.unconditional");
 
         }
     };
@@ -93,7 +102,7 @@ public class ImageCachingPlugin<I> extends
 
         String value = null;
         String collection = ((Collection) context.getExecution().getDataSet()).
-                getMnemonic();
+                getName();
         String provider = ((Collection) context.getExecution().getDataSet()).getProvider().getMnemonic();
         if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
                 && mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
@@ -108,41 +117,42 @@ public class ImageCachingPlugin<I> extends
             RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
             List<Status> status = mdr
                     .getValues(EuropeanaModelRegistry.STATUS);
+            String record = mdr.getId().toString();
             if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED))) {
-                String record = rdf.getProvidedCHOList().get(0).getAbout();
 
-//                ReferenceOwner owner = new ReferenceOwner(provider, collection, record);
-//                List<ProcessingJobTaskDocumentReference> tasks = new ArrayList<>();
-//                List<SourceDocumentReference> docRefs = new ArrayList<>();
-//                Set<Link> urls = getUrls(rdf);
-//                for (Link url : urls) {
-//                    SourceDocumentReference docRef = new SourceDocumentReference(owner, null, url.getUrl(), null, null, 1l,
-//                            null, true);
-//                    docRefs.add(docRef);
-//
-//                    List<ProcessingJobSubTask> jobTask = new ArrayList<>();
-//                    ProcessingJobSubTask subTask = new ProcessingJobSubTask(ProcessingJobSubTaskType.META_EXTRACTION, null);
-//                    jobTask.add(subTask);
-//                    if (url.getIsEdmObject()) {
-//                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.COLOR_EXTRACTION, null));
-//                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, new GenericSubTaskConfiguration(new ThumbnailConfig(180,180))));
-//                        jobTask.add(new ProcessingJobSubTask(ProcessingJobSubTaskType.GENERATE_THUMBNAIL, new GenericSubTaskConfiguration(new ThumbnailConfig(200,200))));
-//                    }
-//                    tasks.add(new ProcessingJobTaskDocumentReference(DocumentReferenceTaskType.UNCONDITIONAL_DOWNLOAD,
-//                            docRef.getId(), jobTask));
-//                }
-//                client.createOrModifySourceDocumentReference(docRefs);
-//                int priority = context.getProperties().getProperty(
-//                        "collection.priority") != null ? Integer.parseInt(context.getProperties().getProperty(
-//                                                "collection.priority")) : 50;
-//                ProcessingJob job = new ProcessingJob(priority, new Date(), owner, tasks, JobState.READY, record);
-//                client.createProcessingJob(job);
-//                client.startJob(job.getId());
+                List<String> hasView = new ArrayList<>();
+                List<HasView> hasViewList = rdf.getAggregationList().get(0).getHasViewList();
+
+                if (hasViewList != null) {
+                    for (HasView hV : hasViewList) {
+                        hasView.add(hV.getResource().replace(" ","%20"));
+                    }
+                }
+
+
+                List<ProcessingJobTuple> jobs =JobCreator.createJobs(
+                        colId, provId, record, execId,
+                        rdf.getAggregationList().get(0).getObject() != null ? rdf.getAggregationList().get(0).getObject().getResource().replace(" ","%20") : null,
+                        hasView,
+                        rdf.getAggregationList().get(0).getIsShownBy() != null ? rdf.getAggregationList().get(0).getIsShownBy().getResource().replace(" ","%20") : null,
+                        rdf.getAggregationList().get(0).getIsShownAt() != null ? rdf.getAggregationList().get(0).getIsShownAt().getResource().replace(" ","%20") : null,
+                        priority,
+                        new ProcessingJobCreationOptions(forceUnconditional)
+                );
+                client.createOrModifyProcessingJobTuples(jobs);
+
+
+            } else {
+
+                client.setActive(record, new Boolean(false));
+                client.deactivateJobs(new ReferenceOwner(provId, colId, record));
 
             }
-        } catch (JiBXException ex) {
-            Logger.getLogger(LinkCheckingPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(ImageCachingPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
+
 
         return true;
 
@@ -150,7 +160,35 @@ public class ImageCachingPlugin<I> extends
 
     @Override
     public void initialize(ExecutionContext<MetaDataRecord<I>, I> context) throws IngestionPluginFailedException {
-        client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+        client = creator.getClient();
+
+        Collection collection = (Collection) context.getExecution().getDataSet();
+        String collectionId = collection.getName();
+        colId = collectionId;
+        provId = context.getDataSetCollection().getProvider().getMnemonic();
+        execId = (String)context.getExecution().getId();
+        String prio = context.getProperties().getProperty(
+                "collection.priority");
+        String force = context.getProperties().getProperty(
+                "force.unconditional");
+
+        if(StringUtils.isNotEmpty(force)&&StringUtils.equals(force,"false")){
+            forceUnconditional = false;
+        } else {
+            forceUnconditional = true;
+        }
+        if(StringUtils.isNotEmpty(prio)&& StringUtils.isNumeric(prio)){
+            priority = Integer.parseInt(prio);
+        }
+        String oldId = creator.getCollectionMongoServer().findOldCollectionId(collectionId);
+        if (oldId != null) {
+            collectionId = oldId;
+        }
+        if (Boolean.parseBoolean(collection
+                .getValue(ControlledVocabularyProxy.ISNEW.toString()))|| !StringUtils.equals(oldId,collectionId)) {
+            ReferenceOwner owner = new ReferenceOwner(provId, collectionId, null);
+            client.deactivateJobs(owner);
+        }
     }
 
     @Override
@@ -182,27 +220,6 @@ public class ImageCachingPlugin<I> extends
         return 10;
     }
 
-    private Set<Link> getUrls(RDF rdf) {
-        Set<Link> urls = new HashSet<>();
-        Aggregation aggr = rdf.getAggregationList().get(0);
-
-        if (aggr.getIsShownBy() != null) {
-            String url = aggr.getIsShownBy().getResource();
-            urls.add(new Link(url, false));
-        }
-        if (aggr.getObject() != null) {
-            String url = aggr.getObject().getResource();
-            urls.add(new Link(url, true));
-        }
-        if (aggr.getHasViewList() != null) {
-            for (HasView hasView : aggr.getHasViewList()) {
-                String url = hasView.getResource();
-                urls.add(new Link(url, false));
-            }
-        }
-
-        return urls;
-    }
 
     public void setCreator(InstanceCreator creator) {
         this.creator = creator;

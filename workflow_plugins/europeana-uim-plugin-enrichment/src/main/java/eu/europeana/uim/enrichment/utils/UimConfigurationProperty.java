@@ -25,11 +25,16 @@ public enum UimConfigurationProperty {
 
 	MONGO_HOSTURL("mongo.hostUrl"),
 	MONGO_HOSTPORT("mongo.hostPort"),
-	MONGO_USERNAME("mongo.username"),
-	MONGO_PASSWORD("mongo.password"),
+	MONGO_USERNAME("mongo.ingestion.username"),
+	MONGO_PASSWORD("mongo.ingestion.password"),
+
 	MONGO_DB_EUROPEANA("mongo.db.europeana"),
+	ZOOKEEPER_HOSTURL("zookeeper.host"),
+	ZOOKEEPER_HOSTURLPRODUCTION("zookeeper.production.host"),
 	SOLR_HOSTURL("solr.hostUrl"),
+	CLOUD_SOLR_HOSTURL("cloud.solr.hostUrl"),
 	SOLR_CORE("solr.core"),
+	CLOUD_SOLR_CORE("cloud.solr.core"),
 	SOLR_CORE_MIGRATION("solr.core.migration"),
 	MONGO_DB_COLLECTIONS("mongo.db.collections"),
 	MONGO_DB_EUROPEANA_ID("mongo.db.europeanaId"),
@@ -37,11 +42,13 @@ public enum UimConfigurationProperty {
 	SUGARCRM_USERNAME("sugarcrm.username"),
 	SUGARCRM_PASSWORD("sugarcrm.password"),
 	UIM_REPOSITORY("uim.repository"),
-	SOLR_PRODUCTION_HOSTURL("solr.productionHostUrl"),
+	SOLR_PRODUCTION_HOSTURL("cloud.solr.hostUrl"),
 	ENRICHMENT_PATH("enrichment.path"),
         CLIENT_HOSTURL("harvester.hostUrl"),
 	CLIENT_HOSTPORT("harvester.hostPort"),
-        CLIENT_DB("harvester.db");
+        CLIENT_DB("harvester.db"),
+	CLIENT_USERNAME("harvester.username"),
+	CLIENT_PASSWORD("harvester.password");
 	
 	String field;
 	private UimConfigurationProperty(String field){

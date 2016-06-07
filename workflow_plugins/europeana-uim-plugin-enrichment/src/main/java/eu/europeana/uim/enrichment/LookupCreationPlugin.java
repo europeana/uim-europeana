@@ -16,26 +16,6 @@
  */
 package eu.europeana.uim.enrichment;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
-import org.theeuropeanlibrary.model.common.qualifier.Status;
-
 import eu.europeana.corelib.definitions.edm.beans.FullBean;
 import eu.europeana.corelib.definitions.edm.entity.ProvidedCHO;
 import eu.europeana.corelib.definitions.jibx.EuropeanaType.Choice;
@@ -58,11 +38,28 @@ import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
+import eu.europeana.uim.model.europeana.EuropeanaRedirectId;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.store.MetaDataRecord;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IUnmarshallingContext;
+import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
+
+import java.io.StringReader;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Redirect creation plugin
@@ -222,7 +219,9 @@ public class LookupCreationPlugin<I> extends
                     }
 
                     if (StringUtils.isNotEmpty(hash)) {
-                        createLookupEntry(fullBean, fileName, collectionId, hash);
+                        EuropeanaId id = createLookupEntry(fullBean, fileName, collectionId, hash);
+
+                        mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
                         return true;
                     }
                 } else {
@@ -260,13 +259,17 @@ public class LookupCreationPlugin<I> extends
                             fieldValue = rdf.getProvidedCHOList().get(0)
                                     .getSameAList().get(0).getResource();
                         }
-                        createLookupEntry(
+                        EuropeanaId id = createLookupEntry(
                                 rdf.getProvidedCHOList().get(0).getAbout(),
                                 fileName,collectionId,
                                 applyTransformations(
                                         createHash?HashUtils.createHash(fieldValue):fieldValue,
                                         context.getProperties().getProperty(
                                                 USE_FUNCTIONS)));
+                        if(id!=null) {
+
+                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
+                        }
                     } else {
                         String edmValue = null;
                         if (context.getProperties()
@@ -305,11 +308,16 @@ public class LookupCreationPlugin<I> extends
                                     .getObject().getResource();
                             edmValue = "provider_aggregation_edm_object";
                         }
-                        generateRedirectsFromCustomField(
+                        EuropeanaId id = generateRedirectsFromCustomField(
                                 fieldValue,
                                 edmValue,
                                 context.getProperties().getProperty(
                                         USE_FUNCTIONS), rdf.getProvidedCHOList().get(0).getAbout());
+                        if(id!=null) {
+
+                            //mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
+                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECTID,id.getOldId());
+                        }
                     }
 
                 }
@@ -321,7 +329,7 @@ public class LookupCreationPlugin<I> extends
         return false;
     }
 
-    private void generateRedirectsFromCustomField(String fieldValue,
+    private EuropeanaId generateRedirectsFromCustomField(String fieldValue,
             String property, String transformations, String newId) {
 
         try {
@@ -330,17 +338,19 @@ public class LookupCreationPlugin<I> extends
             paramsOld.add(
                     "q",
                     property
-                    + ":"
-                    + ClientUtils
-                    .escapeQueryChars(applyTransformations(
+                            + ":"
+                            + ClientUtils
+                            .escapeQueryChars(applyTransformations(
                                     fieldValue, transformations)));
             System.out.println(property
                     + ":"
                     + ClientUtils
                     .escapeQueryChars(applyTransformations(
                                     fieldValue, transformations)));
-            SolrDocumentList solrOldList = enrichmentService
-                    .getProductionSolrServer().query(paramsOld).getResults();
+            CloudSolrServer solrServerProduction = enrichmentService
+                    .getProductionCloudSolrServer();
+
+            SolrDocumentList solrOldList = solrServerProduction.query(paramsOld).getResults();
 
             if (solrOldList.size() == 1) {
                 finalId = solrOldList.get(0).getFirstValue("europeana_id")
@@ -353,13 +363,15 @@ public class LookupCreationPlugin<I> extends
                 id.setTimestamp(new Date().getTime());
                 id.setNewId(newId);
                 saveEuropeanaId(id);
+                return id;
             }
         } catch (SolrServerException e) {
             log.log(Level.SEVERE, e.getMessage());
         }
+        return null;
     }
 
-    private void createLookupEntry(String newId, String oldCollectionId, String newCollectionId,
+    private EuropeanaId createLookupEntry(String newId, String oldCollectionId, String newCollectionId,
             String value) {
         ModifiableSolrParams params = new ModifiableSolrParams();
         if (oldCollectionId.equals(newCollectionId)) {
@@ -368,7 +380,7 @@ public class LookupCreationPlugin<I> extends
             params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionSolrServer().query(params).getResults();
+                        .getProductionCloudSolrServer().query(params).getResults();
                 if (solrList.size() > 0 && !(finalId.equals(newId))) {
                     EuropeanaId id = new EuropeanaId();
                     id.setOldId(finalId);
@@ -376,7 +388,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(newId);
                     saveEuropeanaId(id);
-
+                    return id;
                 }
 
             } catch (SolrServerException e) {
@@ -388,7 +400,7 @@ public class LookupCreationPlugin<I> extends
             params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionSolrServer().query(params).getResults();
+                        .getProductionCloudSolrServer().query(params).getResults();
                 if (solrList.size() > 0 && !(finalId.equals(newId))) {
                     EuropeanaId id = new EuropeanaId();
                     id.setOldId(finalId);
@@ -396,6 +408,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(newId);
                     saveEuropeanaId(id);
+                    return id;
 
                 } else if(solrList.size()==0) {
                      finalId = EuropeanaUriUtils.createEuropeanaId(newCollectionId,
@@ -408,6 +421,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(newId);
                     saveEuropeanaId(id);
+                    return id;
 
                 }
                 }
@@ -416,6 +430,7 @@ public class LookupCreationPlugin<I> extends
                 log.log(Level.SEVERE, e.getMessage());
             }
         }
+        return null;
     }
 
     // Generate a minimum Fullbean
@@ -485,7 +500,7 @@ public class LookupCreationPlugin<I> extends
     @Override
     public void initialize(ExecutionContext<MetaDataRecord<I>, I> context)
             throws IngestionPluginFailedException {
-        System.out.println(enrichmentService.getProductionSolrServer().getBaseURL());
+        System.out.println(enrichmentService.getProductionCloudSolrServer().getZkStateReader().getClusterState().getLiveNodes());
     }
 
     @Override
@@ -603,10 +618,9 @@ public class LookupCreationPlugin<I> extends
     private void saveEuropeanaId(EuropeanaId europeanaId) {
         enrichmentService.getEuropeanaIdMongoServer().saveEuropeanaId(
                 europeanaId);
-
     }
 
-    private void createLookupEntry(FullBean fullBean, String oldCollectionId, String newCollectionId,
+    private EuropeanaId createLookupEntry(FullBean fullBean, String oldCollectionId, String newCollectionId,
             String hash) {
 
         ModifiableSolrParams params = new ModifiableSolrParams();
@@ -618,7 +632,7 @@ public class LookupCreationPlugin<I> extends
         if (oldCollectionId.equals(newCollectionId)) {
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionSolrServer().query(params).getResults();
+                        .getProductionCloudSolrServer().query(params).getResults();
                 if (solrList.size() > 0) {
                     EuropeanaId id = new EuropeanaId();
                     id.setOldId("/" + oldCollectionId + "/" + hash);
@@ -626,6 +640,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(fullBean.getAbout());
                     saveEuropeanaId(id);
+                    return id;
 
                 }
 
@@ -635,7 +650,7 @@ public class LookupCreationPlugin<I> extends
         } else {
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionSolrServer().query(params).getResults();
+                        .getProductionCloudSolrServer().query(params).getResults();
                 if (solrList.size() > 0) {
                     EuropeanaId id = new EuropeanaId();
                     id.setOldId("/" + oldCollectionId + "/" + hash);
@@ -643,6 +658,7 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(fullBean.getAbout());
                     saveEuropeanaId(id);
+                    return id;
 
                 } else {
                     EuropeanaId id = new EuropeanaId();
@@ -651,12 +667,14 @@ public class LookupCreationPlugin<I> extends
                     id.setTimestamp(new Date().getTime());
                     id.setNewId(fullBean.getAbout());
                     saveEuropeanaId(id);
+                    return id;
                 }
 
             } catch (SolrServerException e) {
                 log.log(Level.SEVERE, e.getMessage());
             }
         }
+        return null;
     }
 
     public void setEnrichmentService(EnrichmentService service) {

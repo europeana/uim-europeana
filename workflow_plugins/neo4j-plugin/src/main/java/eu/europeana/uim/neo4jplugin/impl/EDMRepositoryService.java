@@ -15,26 +15,29 @@ import eu.europeana.uim.neo4jplugin.utils.UimConfigurationProperty;
  */
 
 public class EDMRepositoryService {
-	
-	private RestGraphDatabase dbservice;
-	private String index;
 
-	public EDMRepositoryService(){
-		System.setProperty("org.neo4j.rest.batch_transaction", "true");
-		dbservice = new RestGraphDatabase(PropertyReader
-					.getProperty(UimConfigurationProperty.NEO4JPATH));
-		index = PropertyReader
-					.getProperty(UimConfigurationProperty.NEO4JINDEX);
-                        
+  private RestGraphDatabase dbservice;
+  private String index;
 
+  public EDMRepositoryService() {
+    System.setProperty("org.neo4j.rest.batch_transaction", "true");
+    dbservice =
+        new RestGraphDatabase(PropertyReader.getProperty(UimConfigurationProperty.NEO4JPATH));
+    index = PropertyReader.getProperty(UimConfigurationProperty.NEO4JINDEX);
+  }
 
-	}
-	
-	public RestGraphDatabase getGraphDatabaseService(){
-		return this.dbservice;
-	}
-	
-        public String getIndex(){
-            return this.index;
-        }
+  public EDMRepositoryService(String serverUrl, String serverIndex) {
+    System.setProperty("org.neo4j.rest.batch_transaction", "true");
+    dbservice =
+        new RestGraphDatabase(serverUrl);
+    index = serverIndex;
+  }
+
+  public RestGraphDatabase getGraphDatabaseService() {
+    return this.dbservice;
+  }
+
+  public String getIndex() {
+    return this.index;
+  }
 }

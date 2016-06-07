@@ -1,12 +1,12 @@
 package eu.europeana.uim.plugin.solr.helpers;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-
 import eu.europeana.corelib.definitions.jibx.Concept;
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.uim.plugin.solr.service.SolrWorkflowService;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 
 public class ConceptDereferencer extends Dereferencer {
 
@@ -24,16 +24,12 @@ public class ConceptDereferencer extends Dereferencer {
 		if(concept.getChoiceList()!=null){
 		for (eu.europeana.corelib.definitions.jibx.Concept.Choice choice : concept
 				.getChoiceList()) {
-			if (choice.ifBroader())
-				derefResourceOrLiteral(rdf, choice.getBroader());
 			if (choice.ifBroadMatch())
 				derefResourceOrLiteral(rdf, choice.getBroadMatch());
 			if (choice.ifCloseMatch())
 				derefResourceOrLiteral(rdf, choice.getCloseMatch());
 			if (choice.ifExactMatch())
 				derefResourceOrLiteral(rdf, choice.getExactMatch());
-			if (choice.ifNarrower())
-				derefResourceOrLiteral(rdf, choice.getNarrower());
 			if (choice.ifNarrowMatch())
 				derefResourceOrLiteral(rdf, choice.getNarrowMatch());
 			if (choice.ifRelated())

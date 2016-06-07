@@ -17,32 +17,42 @@
 package eu.europeana.uim.enrichment;
 
 import eu.europeana.corelib.definitions.edm.entity.WebResource;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import eu.europeana.harvester.client.HarvesterClient;
+import eu.europeana.harvester.domain.*;
+import eu.europeana.jobcreator.JobCreator;
+import eu.europeana.jobcreator.domain.ProcessingJobCreationOptions;
+import eu.europeana.jobcreator.domain.ProcessingJobTuple;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
+
+import com.ctc.wstx.io.EBCDICCodec;
 
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.edm.utils.EdmUtils;
@@ -61,6 +71,7 @@ import eu.europeana.enrichment.api.external.EntityWrapper;
 import eu.europeana.enrichment.api.external.InputValue;
 import eu.europeana.enrichment.rest.client.EnrichmentDriver;
 import eu.europeana.harvester.client.HarvesterClientImpl;
+
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.service.InstanceCreator;
@@ -89,6 +100,7 @@ import eu.europeana.uim.sugar.QueryResultException;
 import eu.europeana.uim.sugar.SugarCrmRecord;
 import eu.europeana.uim.sugar.SugarCrmService;
 
+
 /**
  * Enrichment plugin implementation
  *
@@ -99,7 +111,9 @@ import eu.europeana.uim.sugar.SugarCrmService;
 public class EnrichmentPlugin<I> extends
         AbstractIngestionPlugin<MetaDataRecord<I>, I> {
 
-    private static HttpSolrServer solrServer;
+//    private static HttpSolrServer solrServer;
+    private static CloudSolrServer cloudSolrServer;
+    private static CloudSolrServer productionCloudSolrServer;
     private static SugarCrmService sugarCrmService;
     private static EnrichmentService enrichmentService;
     private static String previewsOnlyInPortal;
@@ -115,7 +129,7 @@ public class EnrichmentPlugin<I> extends
             .getName());
     private final static String OVERRIDECHECKS
             = "override.all.checks.force.delete";
-    private final static String OVERRIDEENRICHMENT = "override.enrichment.save";
+//    private final static String OVERRIDEENRICHMENT = "override.enrichment.save";
     private final static String FORCELASTUPDATE = "override.last.update.check";
     private static FullBeanHandler handler;
     private final static SolrDocumentGenerator docGen
@@ -167,7 +181,7 @@ public class EnrichmentPlugin<I> extends
 
         {
             add(OVERRIDECHECKS);
-            add(OVERRIDEENRICHMENT);
+//            add(OVERRIDEENRIHMENT);
             add(FORCELASTUPDATE);
         }
     };
@@ -267,7 +281,8 @@ public class EnrichmentPlugin<I> extends
         context.putValue(addedTKey, 0l);
         logEngine = context.getLoggingEngine();
         try {
-            solrServer = enrichmentService.getSolrServer();
+            cloudSolrServer = enrichmentService.getCloudSolrServer();
+            productionCloudSolrServer = enrichmentService.getProductionCloudSolrServer();
 
             if (mongoServer == null) {
 
@@ -301,8 +316,16 @@ public class EnrichmentPlugin<I> extends
                     .getValue(ControlledVocabularyProxy.ISNEW.toString()))
                     || check) {
                 handler.clearData(collection.getMnemonic());
-                solrServer.deleteByQuery("europeana_collectionName:"
-                        + collection.getName().split("_")[0] + "_*");
+
+                cloudSolrServer.deleteByQuery("europeana_collectionName:"
+                    + collection.getName().split("_")[0] + "_*");
+                collection.putValue("forcedelete","true");
+                //Wait for two minutes to ensure tht things are properly removed on large datasets
+                if(context.getStorageEngine().getTotalByCollection(collection)>500000) {
+                    //If its a massive collection sleep for one hour just in case
+                    Thread.sleep(1000*60*60);
+                }
+
             }
 
         } catch (Exception e) {
@@ -377,23 +400,24 @@ public class EnrichmentPlugin<I> extends
                 "Adding " + recordNumber + " documents");
         context.getLoggingEngine().log(context.getExecution(), Level.INFO,
                 "Process called " + processCount);
-        try {
-            solrServer.commit();
+//        try {
+//            solrServer.commit();
+//            cloudSolrServer.commit();
             logEngine.log(context.getExecution(), Level.INFO,
                     "Added " + recordNumber + " documents");
             log.log(Level.INFO, "Added " + recordNumber + " documents");
             logEngine.log(context.getExecution(), Level.INFO,
                     "Deleted are " + deleted);
             log.log(Level.INFO, "Deleted are " + deleted);
-        } catch (SolrServerException e) {
-            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
-                    e.getMessage());
-            log.log(Level.SEVERE, e.getMessage());
-        } catch (IOException e) {
-            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
-                    e.getMessage());
-            log.log(Level.SEVERE, e.getMessage());
-        }
+//        } catch (SolrServerException e) {
+//            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
+//                    e.getMessage());
+//            log.log(Level.SEVERE, e.getMessage());
+//        } catch (IOException e) {
+//            logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
+//                    e.getMessage());
+//            log.log(Level.SEVERE, e.getMessage());
+//        }
         log.log(Level.INFO, "Committed in Solr Server");
 
     }
@@ -452,6 +476,7 @@ public class EnrichmentPlugin<I> extends
                         .getValues(EuropeanaModelRegistry.STATUS);
                 if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED))) {
                     try {
+                        mdr.deleteValues(EuropeanaModelRegistry.EDMENRICHEDRECORD);
                         SolrInputDocument basicDocument = new SolrConstructor()
                                 .constructSolrDocument(rdf);
 
@@ -459,83 +484,26 @@ public class EnrichmentPlugin<I> extends
                                 .constructFullBean(rdf);
                         List<InputValue> inputValues = new EnrichmentUtils()
                                 .createValuesForEnrichment(basicDocument);
-                        List<InputValue> notEnriched
-                                = new ArrayList<InputValue>();
+
                         List<RetrievedEntity> enrichedEntities
                                 = new ArrayList();
 
-                        for (InputValue inputValue : inputValues) {
-                            if (StringUtils.isNotBlank(inputValue.getValue())) {
-                                if (entityCache.containsEntity(inputValue
-                                        .getValue().toLowerCase())) {
-                                    enrichedEntities.addAll(entityCache
-                                            .retrieveEntities(inputValue.
-                                                    getValue()
-                                                    .toLowerCase(), inputValue.
-                                                    getOriginalField()));
-                                } else {
-                                    if (enrichmentQueryCache.get(collection)
-                                            != null && enrichmentQueryCache.
-                                            get(collection).
-                                            get(inputValue.getValue().
-                                                    toLowerCase()) == null) {
-                                        notEnriched.add(inputValue);
-                                        enrichmentQueryCache.get(collection).
-                                                put(inputValue.getValue().toLowerCase(), State.PENDING);
-                                    } else if (enrichmentQueryCache.get(collection)
-                                            != null && enrichmentQueryCache.
-                                            get(collection).
-                                            get(inputValue.getValue().
-                                                    toLowerCase()) != null) {
-                                        int i = 0;
-                                        while (enrichmentQueryCache.
-                                                get(collection).
-                                                get(inputValue.getValue().
-                                                        toLowerCase()).equals(State.PENDING) && i < 100) {
-                                            try {
-                                                i++;
-                                                Thread.sleep(10);
-
-                                                if (i == 100) {
-                                                    notEnriched.add(inputValue);
-                                                    enrichmentQueryCache.
-                                                            get(collection).
-                                                            put(inputValue.getValue().
-                                                                    toLowerCase(), State.DONE);
-                                                }
-                                            } catch (InterruptedException ex) {
-                                                Logger.getLogger(EnrichmentPlugin.class.getName()).
-                                                        log(Level.SEVERE, null, ex);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (notEnriched.size() > 0) {
-                            List<RetrievedEntity> enriched = convertToObjects(
+                        List<RetrievedEntity> enriched = new ArrayList<>();
+                        if (inputValues.size() > 0) {
+                           enriched = convertToObjects(
                                     enricher.enrich(
-                                            notEnriched, false));
-                            entityCache.addEntities(enriched);
+                                            inputValues, false));
+
                             enrichedEntities.addAll(enriched);
                         }
-                        for (InputValue val : inputValues) {
 
-                            if (enrichmentQueryCache.
-                                    get(collection).get(val.getValue().toLowerCase()) != State.DONE) {
-                                enrichmentQueryCache.
-                                        get(collection).put(val.getValue().toLowerCase(), State.DONE);
-                            }
-
-                        }
                         ProxyImpl europeanaProxy = EuropeanaProxyUtils
                                 .getEuropeanaProxy(fBean);
-                        docGen.addEntities(basicDocument, fBean,
-                                europeanaProxy, enrichedEntities);
+                        if(enriched.size()>0) {
+                            docGen.addEntities(basicDocument, fBean,
+                                    europeanaProxy, enrichedEntities);
+                        }
 
-//                        basicDocument.addField(
-//                                EdmLabel.PREVIEW_NO_DISTRIBUTE.toString(),
-//                                previewsOnlyInPortal);
                         boolean prOO = StringUtils.contains(previewsOnlyInPortal, "1");
                         fBean.getAggregations()
                                 .get(0)
@@ -543,9 +511,7 @@ public class EnrichmentPlugin<I> extends
                         int completeness = RecordCompletenessRanking
                                 .rankRecordCompleteness(basicDocument);
                         fBean.setEuropeanaCompleteness(completeness);
-//                        basicDocument.addField(
-//                                EdmLabel.EUROPEANA_COMPLETENESS.toString(),
-//                                completeness);
+
                         fBean.setEuropeanaCollectionName(new String[]{mdr
                             .getCollection().getName()});
                         if (fBean.getEuropeanaAggregation().getEdmLanguage()
@@ -561,16 +527,10 @@ public class EnrichmentPlugin<I> extends
                         }
                         fBean.getEuropeanaAggregation().setAbout(
                                 "/aggregation/europeana" + fBean.getAbout());
-//                        basicDocument.setField(
-//                                EdmLabel.EDM_EUROPEANA_AGGREGATION.toString(),
-//                                "/aggregation/europeana" + fBean.getAbout());
+
                         fBean.getEuropeanaAggregation().setAggregatedCHO(
                                 "/item" + fBean.getAbout());
-//                        basicDocument.setField(
-//                                "europeana_aggregation_ore_aggregatedCHO",
-//                                "/item" + fBean.getAbout());
-//                        basicDocument.setField("europeana_collectionName", mdr
-//                                .getCollection().getName());
+
                         fBean.setEuropeanaCollectionName(new String[]{mdr
                             .getCollection().getName()});
                         if (europeanaProxy.getYear() != null) {
@@ -606,17 +566,14 @@ public class EnrichmentPlugin<I> extends
                                     timestampCreated.getTime());
                         }
                         fBean.setTimestampCreated(timestampCreated);
-//                        basicDocument.addField("timestamp_created",
-//                                timestampCreated);
+
                         mdr.deleteValues(EuropeanaModelRegistry.UPDATEDSAVE);
                         Date timestampUpdated = new Date();
                         fBean.setTimestampUpdated(timestampUpdated);
-//                        basicDocument.addField("timestamp_update",
-//                                timestampUpdated);
+
                         mdr.addValue(EuropeanaModelRegistry.UPDATEDSAVE,
                                 timestampUpdated.getTime());
-                        String overrideEnrichment = context.getProperties()
-                                .getProperty(OVERRIDEENRICHMENT);
+
                         List<ProxyImpl> proxies = new ArrayList<ProxyImpl>();
                         proxies.add(providerProxy);
                         proxies.add(europeanaProxy);
@@ -635,34 +592,52 @@ public class EnrichmentPlugin<I> extends
                         } else {
                             saved = handler.updateFullBean(fBean);
                         }
-                        if (check) {
-                            HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+                        if (check|| checkUpdate) {
+                            HarvesterClient client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+
                             AggregationImpl aggr = fBean.getAggregations().get(0);
-                            if (aggr.getWebResources() != null) {
-                                for (WebResource wr : aggr.getWebResources()) {
-                                   // client.updateSourceDocumentProcesssingStatisticsForUrl(wr.getAbout());
-                                }
-                            }
+                            client.createOrModify(getProcessingJobs(aggr,(String)context.getExecution().getId(),context.getDataSetCollection().getProvider().getMnemonic(),collection,fBean.getAbout()));
                         }
-                        boolean overrideWriteBack = false;
-                        if (StringUtils.isNotEmpty(overrideEnrichment)) {
-                            overrideWriteBack = Boolean
-                                    .parseBoolean(overrideEnrichment);
-                        }
-                        if (!overrideWriteBack) {
-                            mdr.deleteValues(
-                                    EuropeanaModelRegistry.EDMENRICHEDRECORD);
-                            mdr.addValue(
-                                    EuropeanaModelRegistry.EDMENRICHEDRECORD,
-                                    EdmUtils.toEDM(saved, true));
-                        }
+                        mdr.addValue(EuropeanaModelRegistry.EDMENRICHEDRECORD,EdmUtils.toEDM(saved,true));
                         context.getStorageEngine().updateMetaDataRecord(mdr);
 
                         context.putValue(addedTKey,
                                 context.getValue(addedTKey) + 1);
+                        context.getStorageEngine().checkpoint();
                         fBean.setState(eu.europeana.publication.common.State.ACCEPTED);
-                        new SolrDocumentHandler(solrServer).save(fBean);
-//                        solrServer.add(basicDocument);
+
+                        SolrInputDocument doc = new SolrDocumentHandler(cloudSolrServer).generate(fBean);
+                        if(!(check||checkUpdate)) {
+                            ModifiableSolrParams params = new ModifiableSolrParams();
+                            params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
+
+
+                            params.add("fl", "is_fulltext,has_thumbnails,has_media,filter_tags,facet_tags,has_landingpage");
+                            QueryResponse resp = cloudSolrServer.query(params);
+                            if(resp.getResults().size()>0){
+                                SolrDocument retrievedDoc = resp.getResults().get(0);
+                                if(retrievedDoc.containsKey("is_fulltext")){
+                                    doc.addField("is_fulltext",retrievedDoc.get("is_fulltext"));
+                                }
+                                if(retrievedDoc.containsKey("has_thumbnails")){
+                                    doc.addField("has_thumbnails",retrievedDoc.get("has_thumbnails"));
+                                }
+                                if(retrievedDoc.containsKey("has_media")){
+                                    doc.addField("has_media",retrievedDoc.get("has_media"));
+                                }
+                                if(retrievedDoc.containsKey("filter_tags")){
+                                    doc.addField("filter_tags",retrievedDoc.get("filter_tags"));
+                                }
+                                if(retrievedDoc.containsKey("facet_tags")){
+                                    doc.addField("facet_tags",retrievedDoc.get("facet_tags"));
+                                }
+                                if(retrievedDoc.containsKey("has_landingpage")){
+                                    doc.addField("has_landingpage",retrievedDoc.get("has_landingpage"));
+                                }
+                            }
+                        }
+
+                        cloudSolrServer.add(doc);
                         return true;
                     } catch (MalformedURLException e) {
                         logEngine.logFailed(context.getExecution(), Level.SEVERE, this, e,
@@ -687,7 +662,25 @@ public class EnrichmentPlugin<I> extends
                     return false;
                 } else {
                     boolean res = true;
-                    res = handler.removeRecord(solrServer, rdf);
+//                    res = handler.removeRecord(solrServer, rdf);
+                    if(!check) {
+                        res = handler.removeRecord(cloudSolrServer, rdf);
+                    }
+                    //HarvesterClientImpl client = new HarvesterClientImpl(creator.getDatastore(), creator.getConfig());
+                    try {
+                        creator.getClient().setActive(rdf.getProvidedCHOList().get(0).getAbout(),new Boolean(false));
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (TimeoutException e) {
+                        e.printStackTrace();
+                    }
+
                     if (res) {
                         context.putValue(deletedTKey,
                                 context.getValue(deletedTKey) + 1);
@@ -723,6 +716,20 @@ public class EnrichmentPlugin<I> extends
         return false;
     }
 
+    private List<ProcessingJob> getProcessingJobs(AggregationImpl aggr, String executionId, String providerId, String collectionId,String recordId) {
+        ReferenceOwner owner = new ReferenceOwner(providerId,collectionId,recordId,executionId);
+
+        List<ProcessingJob> jobs = new ArrayList<>();
+        try {
+            jobs = ProcessingJobTuple.processingJobsFromList(JobCreator.createJobs(collectionId, providerId, recordId, executionId, aggr.getEdmObject(), aggr.getHasView()!=null?Arrays.asList(aggr.getHasView()):null, aggr.getEdmIsShownBy(), aggr.getEdmIsShownAt(), 50, new ProcessingJobCreationOptions(false)));
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return jobs;
+    }
+
     public void setSugarCrmService(SugarCrmService sugarCrmService) {
         EnrichmentPlugin.sugarCrmService = sugarCrmService;
     }
@@ -739,24 +746,32 @@ public class EnrichmentPlugin<I> extends
             List<EntityWrapper> enrichments) throws IOException {
         List<RetrievedEntity> entities = new ArrayList<RetrievedEntity>();
         for (EntityWrapper entity : enrichments) {
-            RetrievedEntity ret = new RetrievedEntity();
-            ret.setOriginalField(entity.getOriginalField());
-            ret.setOriginalLabel(entity.getOriginalValue());
-            ret.setUri(entity.getUrl());
-            if (entity.getClassName().equals(TimespanImpl.class.getName())) {
-                ret.setEntity(new ObjectMapper().readValue(entity.
-                        getContextualEntity(), TimespanImpl.class));
-            } else if (entity.getClassName().equals(AgentImpl.class.getName())) {
-                ret.setEntity(new ObjectMapper().readValue(entity.
-                        getContextualEntity(), AgentImpl.class));
-            } else if (entity.getClassName().equals(ConceptImpl.class.getName())) {
-                ret.setEntity(new ObjectMapper().readValue(entity.
-                        getContextualEntity(), ConceptImpl.class));
-            } else {
-                ret.setEntity(new ObjectMapper().readValue(entity.
-                        getContextualEntity(), PlaceImpl.class));
+            if(entity!=null) {
+                RetrievedEntity ret = new RetrievedEntity();
+                //This can be null
+                if (entity.getOriginalField() != null) {
+                    ret.setOriginalField(entity.getOriginalField());
+                }
+                //This should not but just in case
+                if (entity.getOriginalValue() != null) {
+                    ret.setOriginalLabel(entity.getOriginalValue());
+                }
+                ret.setUri(entity.getUrl());
+                if (entity.getClassName().equals(TimespanImpl.class.getName())) {
+                    ret.setEntity(new ObjectMapper().readValue(entity.
+                            getContextualEntity(), TimespanImpl.class));
+                } else if (entity.getClassName().equals(AgentImpl.class.getName())) {
+                    ret.setEntity(new ObjectMapper().readValue(entity.
+                            getContextualEntity(), AgentImpl.class));
+                } else if (entity.getClassName().equals(ConceptImpl.class.getName())) {
+                    ret.setEntity(new ObjectMapper().readValue(entity.
+                            getContextualEntity(), ConceptImpl.class));
+                } else {
+                    ret.setEntity(new ObjectMapper().readValue(entity.
+                            getContextualEntity(), PlaceImpl.class));
+                }
+                entities.add(ret);
             }
-            entities.add(ret);
         }
 
         return entities;

@@ -6,8 +6,11 @@
 
 package eu.europeana.uim.plugin.thumbler;
 
+import com.google.code.morphia.Datastore;
+import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
+import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientConfig;
-import eu.europeana.harvester.db.MorphiaDataStore;
+
 
 /**
  *
@@ -15,7 +18,11 @@ import eu.europeana.harvester.db.MorphiaDataStore;
  */
 public interface InstanceCreator {
     
-     MorphiaDataStore getDatastore();
+    Datastore getDatastore();
     
     HarvesterClientConfig getConfig();
+
+    CollectionMongoServer getCollectionMongoServer();
+
+    HarvesterClient getClient();
 }

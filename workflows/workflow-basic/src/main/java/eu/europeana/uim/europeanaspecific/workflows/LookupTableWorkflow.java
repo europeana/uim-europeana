@@ -19,7 +19,7 @@ public class LookupTableWorkflow<I> extends AbstractWorkflow<MetaDataRecord<I>, 
 	@Override
 	public boolean isSavepoint(String pluginIdentifier) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override

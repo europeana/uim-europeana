@@ -9,16 +9,15 @@
 	</bean>
 
 	<service id="repoxAgentService" ref="repoxAgent"
-		interface="eu.europeana.uim.repox.RepoxUIMService" />
+		interface="eu.europeana.uim.repoxclient.rest.RepoxUIMServiceT" />
 
-	<reference id="registry" interface="eu.europeana.uim.Registry" />
+	<bp:reference id="registry" interface="eu.europeana.uim.Registry" />
 
-	<reference id="sugarcrm" interface="eu.europeana.uim.sugar.SugarCrmService" />
+
 
    <!--Plugins & Workflow Plugins-->  
     <bean id="repoxHarvestWf" class="eu.europeana.uim.repoxclient.workflow.RepoxHarvestingWorkflow">
        <argument ref="repoxAgent"/>
-       <argument ref="sugarcrm"/>
     </bean>
 
    <service id="repoxHarvestingWorkflow" ref="repoxHarvestWf" interface="eu.europeana.uim.workflow.Workflow"/> 

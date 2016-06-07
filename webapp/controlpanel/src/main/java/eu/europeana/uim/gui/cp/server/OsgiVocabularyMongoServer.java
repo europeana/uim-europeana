@@ -7,12 +7,14 @@ import com.mongodb.Mongo;
 import eu.europeana.corelib.dereference.VocabularyMongoServer;
 import eu.europeana.corelib.dereference.impl.ControlledVocabularyImpl;
 import eu.europeana.corelib.dereference.impl.VocabularyMongoServerImpl;
-
+import org.apache.commons.lang.StringUtils;
 
 
 public class OsgiVocabularyMongoServer extends VocabularyMongoServerImpl implements VocabularyMongoServer{
 	private Mongo mongoServer;
 	private String databaseName;
+	private String username;
+	private String password;
 	private Datastore datastore;
 	
 	@Override
@@ -26,9 +28,11 @@ public class OsgiVocabularyMongoServer extends VocabularyMongoServerImpl impleme
 	}
 
 	
-	public OsgiVocabularyMongoServer(Mongo mongoServer, String databaseName) {
+	public OsgiVocabularyMongoServer(Mongo mongoServer, String databaseName, String username, String password) {
 		this.mongoServer = mongoServer;
 		this.databaseName = databaseName;
+		this.username = username;
+		this.password = password;
 		createDatastore();
 	}
 
@@ -36,7 +40,11 @@ public class OsgiVocabularyMongoServer extends VocabularyMongoServerImpl impleme
 
 		Morphia morphia = new Morphia();
 		morphia.map(ControlledVocabularyImpl.class);
-		datastore = morphia.createDatastore(mongoServer, databaseName);
+		if(StringUtils.isNotBlank(username)) {
+			datastore = morphia.createDatastore(mongoServer, databaseName, username, password.toCharArray());
+		} else {
+			datastore = morphia.createDatastore(mongoServer, databaseName);
+		}
 		datastore.ensureIndexes();
 	}
 }

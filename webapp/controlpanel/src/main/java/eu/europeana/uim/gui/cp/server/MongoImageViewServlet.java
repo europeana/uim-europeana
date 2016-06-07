@@ -211,16 +211,16 @@ public class MongoImageViewServlet extends HttpServlet {
 	 */
 	public void init(ServletConfig config) throws ServletException {
 		Morphia mor = new Morphia();
-		Mongo mongo;
+//		Mongo mongo;
 		try {
-			mongo = new Mongo(
-					PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
-					Integer.parseInt(PropertyReader
-							.getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
+//			mongo = new Mongo(
+//					PropertyReader
+//							.getProperty(UimConfigurationProperty.MONGO_HOSTURL),
+//					Integer.parseInt(PropertyReader
+//							.getProperty(UimConfigurationProperty.MONGO_HOSTPORT)));
 			String dbName = PropertyReader
 					.getProperty(UimConfigurationProperty.MONGO_DB_IMAGE);
-			Datastore store = mor.createDatastore(mongo, dbName);
+			Datastore store = mor.createDatastore(MongoProvider.getMongo(), dbName);
 
 			@SuppressWarnings("unchecked")
 			NosqlDaoImpl morphiaDAOImpl = new NosqlDaoImpl(
@@ -230,10 +230,7 @@ public class MongoImageViewServlet extends HttpServlet {
 			thumbnailService.setDao(morphiaDAOImpl);
 
 			thumbnailHandler = thumbnailService;
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MongoException e) {
+		}catch (MongoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 import eu.europeana.corelib.definitions.jibx.LiteralType;
 import eu.europeana.corelib.definitions.jibx.ResourceOrLiteralType;
@@ -49,12 +50,15 @@ public class ImportVocabularyProxyImpl extends
 	// Statically initializing VocabularyMongoServer
 	{
 		try {
-			mongo = new VocabularyMongoServerImpl(
-					new Mongo(MONGO_HOST, MONGO_PORT), MONGO_DB);
+			if(StringUtils.isNotBlank(PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME))) {
+				mongo = new VocabularyMongoServerImpl(
+						MongoProvider.getMongo(), MONGO_DB, PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME),
+						PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD));
+			} else {
+				mongo = new VocabularyMongoServerImpl(
+						MongoProvider.getMongo(), MONGO_DB);
+			}
 
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (MongoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

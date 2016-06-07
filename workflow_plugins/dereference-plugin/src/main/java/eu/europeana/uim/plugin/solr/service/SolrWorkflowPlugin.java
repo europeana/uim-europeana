@@ -167,7 +167,8 @@ public class SolrWorkflowPlugin<I> extends
                         || !mdr.getValues(EuropeanaModelRegistry.STATUS).get(0)
                         .equals(Status.DELETED)) {
                     try {
-                        mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
+                    	// already done this above!
+                    	// mdr.deleteValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD);
                         String value = mdr.getValues(
                                 EuropeanaModelRegistry.EDMRECORD).get(0);
                         IUnmarshallingContext uctx = bfact
@@ -398,6 +399,9 @@ public class SolrWorkflowPlugin<I> extends
         if(rdf.getLicenseList()!=null){
         	rdfCopy.setLicenseList(copyList(rdf.getLicenseList()));
         }
+        if(rdf.getServiceList()!=null){
+            rdfCopy.setServiceList(copyList(rdf.getServiceList()));
+        }
         return rdfCopy;
     }
 
@@ -515,6 +519,7 @@ public class SolrWorkflowPlugin<I> extends
         rdfFinal.setLicenseList(rdf.getLicenseList());
         rdfFinal.setOrganizationList(rdf.getOrganizationList());
         rdfFinal.setDatasetList(rdf.getDatasetList());
+        rdfFinal.setServiceList(rdf.getServiceList());
         return rdfFinal;
     }
 

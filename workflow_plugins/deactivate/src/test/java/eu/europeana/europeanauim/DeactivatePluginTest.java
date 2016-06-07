@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -146,10 +146,10 @@ public class DeactivatePluginTest {
 		when(mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD))
 				.thenReturn(tmpList);
 		when(tmpList.get(0)).thenReturn(RECORD);
-		HttpSolrServer solr = mock(HttpSolrServer.class);
+		CloudSolrServer solr = mock(CloudSolrServer.class);
 		ExtendedEdmMongoServer mongo = new ExtendedEdmMongoServer(new Mongo("localhost",10000), "test", "", "");
 		CollectionMongoServer colMongo = mock(CollectionMongoServerImpl.class);
-		when(dService.getSolrServer())
+		when(dService.getCloudSolrServer())
 				.thenReturn(
 						solr);
 		when(dService.getMongoServer())

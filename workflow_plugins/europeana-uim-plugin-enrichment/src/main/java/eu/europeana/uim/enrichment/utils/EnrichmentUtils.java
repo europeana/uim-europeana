@@ -1,15 +1,14 @@
 package eu.europeana.uim.enrichment.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.common.SolrInputDocument;
-
 import eu.europeana.enrichment.api.external.InputValue;
 import eu.europeana.uim.enrichment.enums.EnrichmentFields;
 import eu.europeana.uim.enrichment.normalizer.AgentNormalizer;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.solr.common.SolrInputDocument;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EnrichmentUtils {
 
@@ -31,6 +30,8 @@ public class EnrichmentUtils {
                                             .getFieldValues(fieldName))) {
                                 InputValue inValue = new InputValue();
                                 inValue.setOriginalField(field.getValue());
+                                //Temporary fix until the MongoDB is properly updated
+                                //inValue.setLanguage(StringUtils.substringAfter(fieldName,field.getValue()+"."));
                                 inValue.setValue(str);
                                 inValue.setVocabularies(field.getVocabularies());
                                 inputValueList.add(inValue);
@@ -40,6 +41,7 @@ public class EnrichmentUtils {
                                     .getFieldValues(fieldName)) {
                                 InputValue inValue = new InputValue();
                                 inValue.setOriginalField(field.getValue());
+                               // inValue.setLanguage(StringUtils.substringAfter(fieldName,field.getValue()+"."));
                                 inValue.setValue(str.toString());
                                 inValue.setVocabularies(field.getVocabularies());
                                 inputValueList.add(inValue);

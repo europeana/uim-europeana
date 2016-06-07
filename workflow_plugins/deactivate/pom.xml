@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>europeana-uim-plugin-deactivate</artifactId>
@@ -22,6 +21,18 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>europeana-datamodel-definitions</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+			<version>3.4.0</version>
+		</dependency>
+		
+		<dependency>
+			<artifactId>guava</artifactId>
+			<groupId>com.google.guava</groupId>
+			<version>16.0.1</version>
 		</dependency>
 
 		<dependency>
@@ -51,6 +62,21 @@
 			<artifactId>geronimo-stax-api_1.0_spec</artifactId>
 			<version>1.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>harvester-client</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>harvester-persistence</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana</groupId>
+			<artifactId>JobCreator</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 		<!--Optional Jars (for certain features) but required by maven for building. -->
 		<dependency>
 			<groupId>cglib</groupId>
@@ -69,7 +95,7 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>2.7.2</version>
+			<version>2.12.4</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -102,38 +128,38 @@
 			<artifactId>neo4j-community</artifactId>
 			<version>2.1.2</version>
 			<exclusions>
-            	<exclusion>
-            		<artifactId>neo4j-cypher-compiler-2.0</artifactId>
-            		<groupId>org.neo4j</groupId>
-            	</exclusion>
-            	<exclusion>
-            		<artifactId>neo4j-cypher-compiler-1.9</artifactId>
-            		<groupId>org.neo4j</groupId>
-            	</exclusion>
-            </exclusions>
+				<exclusion>
+					<artifactId>neo4j-cypher-compiler-2.0</artifactId>
+					<groupId>org.neo4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>neo4j-cypher-compiler-1.9</artifactId>
+					<groupId>org.neo4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>com.springsource.org.apache.commons.io</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-		<dependency> 
- 			<groupId>org.neo4j</groupId> 
- 			<artifactId>neo4j-rest-graphdb</artifactId> 
- 			<version>2.0.1</version> 
-  		</dependency>
 		<dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-            <version>1.46.4</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.io</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-rest-graphdb</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<version>1.46.4</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>guava</artifactId>
+					<groupId>com.google.guava</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 	</dependencies>
 	<build>
@@ -165,50 +191,43 @@
 					<instructions>
 						<Export-Package>eu.europeana.uim.deactivation.*</Export-Package>
 						<Import-Package>
-                                                    org.osgi.framework; version=1.5.0,
-							javax.annotation; version=0.0.0,
-							javax.imageio; version=0.0.0,
-							javax.management; version=0.0.0,
-							javax.net; version=0.0.0,
-							 javax.net.ssl,
-							javax.security.auth; version=0.0.0,
-							javax.xml.namespace; version=0.0.0,
-							javax.xml.parsers; version=0.0.0,
-							javax.xml.transform; version=0.0.0,
-							javax.xml.transform.dom; version=0.0.0,
-							javax.xml.transform.sax; version=0.0.0,
-							javax.xml.transform.stream; version=0.0.0,
-							org.w3c.dom; version=0.0.0,
-							org.xml.sax; version=0.0.0,
-							org.xml.sax.ext; version=0.0.0,
-							org.xml.sax.helpers; version=0.0.0,
-							org.osgi.service.blueprint; version=1.0.1,
-							eu.europeana.uim.common; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.store; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.orchestration; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.plugin.ingestion; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.plugin.source; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.util; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.workflow; version=2.0.0.SNAPSHOT,
-							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
-							org.theeuropeanlibrary.model.common.qualifier;
-							version=1.0.0.SNAPSHOT,
-							org.apache.solr.client.solrj.request; version=4.0.0,
-							org.apache.solr.common.util; version=4.0.0,
-							org.apache.solr.client.solrj.impl; version=4.0.0,
-							org.apache.solr.client.solrj.util; version=4.0.0,
-							org.apache.solr.common; version=4.0.0,
-							org.apache.solr.client.solrj; version=4.0.0,
-							org.apache.solr.common.params; version=4.0.0,
-							org.apache.solr.client.solrj.response; version=4.0.0,
-							org.apache.solr.client.solrj.beans; version=4.0.0,
-							!*
+						org.osgi.framework; version=1.5.0,
+						javax.annotation; version=0.0.0,
+						javax.imageio; version=0.0.0,
+						javax.management; version=0.0.0,
+						javax.net; version=0.0.0,
+						javax.net.ssl,
+						javax.security.auth; version=0.0.0,
+						javax.xml.namespace; version=0.0.0,
+						javax.xml.parsers; version=0.0.0,
+						javax.xml.transform; version=0.0.0,
+						javax.xml.transform.dom; version=0.0.0,
+						javax.xml.transform.sax; version=0.0.0,
+						javax.xml.transform.stream; version=0.0.0,
+						org.w3c.dom; version=0.0.0,
+						org.xml.sax; version=0.0.0,
+						org.xml.sax.ext; version=0.0.0,
+						org.xml.sax.helpers; version=0.0.0,
+						org.osgi.service.blueprint; version=0.0.0,
+						eu.europeana.uim.common; version=2.0.0.SNAPSHOT,
+						eu.europeana.uim.store; version=2.0.0.SNAPSHOT,
+						eu.europeana.uim.orchestration; version=2.0.0.SNAPSHOT,
+						eu.europeana.uim.plugin.ingestion; version=2.0.0.SNAPSHOT,
+						eu.europeana.uim.plugin.source; version=2.0.0.SNAPSHOT,
+						eu.europeana.uim.util; version=2.0.0.SNAPSHOT,
+						eu.europeana.uim.workflow; version=2.0.0.SNAPSHOT,
+						eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
+						org.theeuropeanlibrary.model.common.qualifier;
+						version=1.0.0.SNAPSHOT,
+						javax.security.sasl,
+						javax.security.auth.login,
+						!*
 						</Import-Package>
 						<Include-Resource>src/main/resources</Include-Resource>
 						<Embed-Dependency>
 							*;scope=compile|runtime;artifactId=!europeana-datamodel-definitions|europeana-uim-api|europeana-uim-common|lucene-core|solr-core|spring-context-support
 						</Embed-Dependency>
-                                                <Bundle-Activator>eu.europeana.uim.deactivation.service.MongoBundleActivator</Bundle-Activator>
+						<Bundle-Activator>eu.europeana.uim.deactivation.service.MongoBundleActivator</Bundle-Activator>
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
@@ -231,12 +250,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				    <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                     <testSource>1.7</testSource>
-                    <testTarget>1.7</testTarget>
-                </configuration>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<testSource>1.7</testSource>
+					<testTarget>1.7</testTarget>
+				</configuration>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -266,7 +285,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -277,15 +296,15 @@
 		</pluginManagement>
 	</build>
 	<reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>

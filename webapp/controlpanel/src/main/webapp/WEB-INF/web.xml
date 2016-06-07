@@ -64,7 +64,15 @@
         <servlet-name>reportDownloadServlet</servlet-name>
         <servlet-class>eu.europeana.uim.gui.cp.server.ReportDownloadServlet</servlet-class>
     </servlet>
-    	<servlet>
+    <servlet>
+        <servlet-name>reportPDFGenerationServlet</servlet-name>
+    	<servlet-class>eu.europeana.uim.gui.cp.server.PDFReportGenerationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>reportCSVGenerationServlet</servlet-name>
+    	<servlet-class>eu.europeana.uim.gui.cp.server.CSVReportGenerationServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>downloadPDFServlet</servlet-name>
         <servlet-class>eu.europeana.uim.gui.cp.server.PDFDownloadServlet</servlet-class>
     </servlet>
@@ -76,7 +84,20 @@
 		<servlet-name>failedRecordsService</servlet-name>
 		<servlet-class>eu.europeana.uim.gui.cp.server.FailedRecordServiceImpl</servlet-class>
 	</servlet>
-	
+	<servlet>
+		<servlet-name>CrfReportProxy</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.CrfReportProxyImpl</servlet-class>
+	</servlet>
+
+
+	<servlet>
+		<servlet-name>taskReportsService</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.TaskReportServiceImpl</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>imageCachingStatisticsService</servlet-name>
+		<servlet-class>eu.europeana.uim.gui.cp.server.ImageCachingStatisticsServiceImpl</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>logFileService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/logfile</url-pattern>
@@ -84,6 +105,14 @@
 	<servlet-mapping>
 		<servlet-name>failedRecordsService</servlet-name>
 		<url-pattern>/EuropeanaIngestionControlPanel/failedrecords</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>taskReportsService</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/taskreports</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>imageCachingStatisticsService</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/imagecachingstatistics</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>repositoryService</servlet-name>
@@ -141,7 +170,15 @@
         <servlet-name>reportDownloadServlet</servlet-name>
         <url-pattern>/EuropeanaIngestionControlPanel/reportDownload</url-pattern>
     </servlet-mapping>
-        <servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>reportPDFGenerationServlet</servlet-name>
+    	<url-pattern>/EuropeanaIngestionControlPanel/generatePDF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>reportCSVGenerationServlet</servlet-name>
+    	<url-pattern>/EuropeanaIngestionControlPanel/generateCSV</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>downloadPDFServlet</servlet-name>
         <url-pattern>/EuropeanaIngestionControlPanel/downloadPDF</url-pattern>
     </servlet-mapping>
@@ -149,7 +186,12 @@
         <servlet-name>mongoImageViewServlet</servlet-name>
         <url-pattern>/EuropeanaIngestionControlPanel/mongoImageView</url-pattern>
     </servlet-mapping>
-    <!-- Default page to serve -->
+	<servlet-mapping>
+		<servlet-name>CrfReportProxy</servlet-name>
+		<url-pattern>/EuropeanaIngestionControlPanel/media</url-pattern>
+	</servlet-mapping>
+
+	<!-- Default page to serve -->
     <welcome-file-list>
         <welcome-file>EuropeanaIngestionControlPanel.html</welcome-file>
     </welcome-file-list>

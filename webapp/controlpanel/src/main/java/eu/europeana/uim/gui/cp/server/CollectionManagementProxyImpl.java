@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
@@ -33,16 +34,18 @@ public class CollectionManagementProxyImpl extends
 
 	private static final String MONGO_HOST= PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTURL);
 	private static final int MONGO_PORT = Integer.parseInt(PropertyReader.getProperty(UimConfigurationProperty.MONGO_HOSTPORT));
+	private static final String MONGO_USERNAME_INGESTION =PropertyReader.getProperty(UimConfigurationProperty.MONGO_USERNAME);
+	private static final String MONGO_PASSWORD_INGESTION =PropertyReader.getProperty(UimConfigurationProperty.MONGO_PASSWORD);
 	private static final String MONGO_DB = PropertyReader.getProperty(UimConfigurationProperty.MONGO_DB_COLLECTIONS);
 	private static final String REPOSITORY = PropertyReader.getProperty(UimConfigurationProperty.UIM_REPOSITORY);
 	
 	static{
 		try {
-			collectionMongoServer = new CollectionMongoServerImpl(new Mongo(
-					MONGO_HOST, MONGO_PORT), MONGO_DB);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(StringUtils.isNotBlank(MONGO_USERNAME_INGESTION)) {
+				collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB, MONGO_USERNAME_INGESTION, MONGO_PASSWORD_INGESTION);
+			} else {
+				collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB);
+			}
 		} catch (MongoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,16 +78,17 @@ public class CollectionManagementProxyImpl extends
 	@Override
 	public Boolean saveOneCollection(CollectionMappingDTO collectionDTO) {
 		try {
-			collectionMongoServer = new CollectionMongoServerImpl(new Mongo(
-					MONGO_HOST, MONGO_PORT), MONGO_DB);
+			if(StringUtils.isNotBlank(MONGO_USERNAME_INGESTION)) {
+				collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB, MONGO_USERNAME_INGESTION, MONGO_PASSWORD_INGESTION);
+			} else {
+				collectionMongoServer = new CollectionMongoServerImpl(MongoProvider.getMongo(), MONGO_DB);
+			}
 			collection = new Collection();
 			collection.setNewCollectionId(collectionDTO.getNewCollection());
 			collection
 					.setOldCollectionId(collectionDTO.getOriginalCollection());
 			collectionMongoServer.saveCollection(collection);
 //			collectionMongoServer.close();
-		} catch (UnknownHostException e) {
-			return false;
 		} catch (MongoException e) {
 			return false;
 		}
