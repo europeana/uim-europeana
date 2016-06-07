@@ -46,6 +46,8 @@ public class PdfReportGenerator {
     private static final Font FONT_TEXT = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL);
 
     private static float INDENT_AFTER_IMAGE = 80f;
+    
+    private static float INDENT_TITLE = 60f;
 
     private static Datastore datastore;
 
@@ -99,10 +101,15 @@ public class PdfReportGenerator {
             PdfWriter writer = PdfWriter.getInstance(document, os);
             document.open();
 
+            //Document title
+            Paragraph title = new Paragraph("Statistics report on link checking, technical metadata extraction and preview caching\n\n", FONT_CAPTION);
+            title.setIndentationLeft(INDENT_TITLE);
+			document.add(title);
+
             // Add Image
             String imageUrl = imagePath + "/images/EU_basic_logo_portrait_black.png";
             Image image = Image.getInstance(new URL(imageUrl));
-            image.setAbsolutePosition(30f, 700f);
+            image.setAbsolutePosition(30f, 690f);
             image.scaleAbsolute(68f, 94f);
             document.add(image);
 
@@ -111,6 +118,7 @@ public class PdfReportGenerator {
             fileNameTitle.add(new Chunk(getFileName(report.getCollection_name()), FONT_TEXT));
             fileNameTitle.setIndentationLeft(INDENT_AFTER_IMAGE);
             document.add(fileNameTitle);
+            
 
             // General Information
             Phrase generalnfoPhrase = new Phrase("\nGeneral Information: ", FONT_CAPTION);
