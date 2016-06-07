@@ -14,17 +14,22 @@
 package eu.europeana.uim.repoxclient.rest;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.InternalServerErrorException;
-
+import eu.europeana.repox.rest.client.accessors.AggregatorsAccessor;
+import eu.europeana.repox.rest.client.accessors.DatasetsAccessor;
+import eu.europeana.repox.rest.client.accessors.HarvestAccessor;
+import eu.europeana.repox.rest.client.accessors.ProvidersAccessor;
+import eu.europeana.uim.Registry;
+import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
+import eu.europeana.uim.repox.model.RepoxConnectionStatus;
+import eu.europeana.uim.repoxclient.utils.DSType;
+import eu.europeana.uim.repoxclient.utils.PropertyReader;
+import eu.europeana.uim.repoxclient.utils.UimConfigurationProperty;
+import eu.europeana.uim.storage.StorageEngine;
+import eu.europeana.uim.storage.StorageEngineException;
+import eu.europeana.uim.store.Collection;
+import eu.europeana.uim.store.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import pt.utl.ist.dataProvider.Aggregator;
 import pt.utl.ist.dataProvider.DataProvider;
 import pt.utl.ist.dataProvider.DataSource;
@@ -48,20 +53,13 @@ import pt.utl.ist.util.exceptions.DoesNotExistException;
 import pt.utl.ist.util.exceptions.InvalidArgumentsException;
 import pt.utl.ist.util.exceptions.MissingArgumentsException;
 import pt.utl.ist.z3950.DataSourceZ3950;
-import eu.europeana.repox.rest.client.accessors.AggregatorsAccessor;
-import eu.europeana.repox.rest.client.accessors.DatasetsAccessor;
-import eu.europeana.repox.rest.client.accessors.HarvestAccessor;
-import eu.europeana.repox.rest.client.accessors.ProvidersAccessor;
-import eu.europeana.uim.Registry;
-import eu.europeana.uim.model.europeanaspecific.fieldvalues.ControlledVocabularyProxy;
-import eu.europeana.uim.repox.model.RepoxConnectionStatus;
-import eu.europeana.uim.repoxclient.utils.DSType;
-import eu.europeana.uim.repoxclient.utils.PropertyReader;
-import eu.europeana.uim.repoxclient.utils.UimConfigurationProperty;
-import eu.europeana.uim.storage.StorageEngine;
-import eu.europeana.uim.storage.StorageEngineException;
-import eu.europeana.uim.store.Collection;
-import eu.europeana.uim.store.Provider;
+
+import javax.ws.rs.InternalServerErrorException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This Class implements the functionality exposed by the OSGI service.
@@ -356,28 +354,31 @@ public class RepoxUIMServiceImpl implements RepoxUIMServiceT {
                 }
                 break;
             case folder:
-                if (!(dataSource instanceof DirectoryImporterDataSource)) {
+                if (dataSource instanceof DirectoryImporterDataSource) {
                     DirectoryImporterDataSource dids = (DirectoryImporterDataSource) dataSource;
                     FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
                     if (!(retrieveStrategy instanceof FolderFileRetrieveStrategy))
                         return true;
                 }
+                else return true;
                 break;
             case ftp:
-                if (!(dataSource instanceof DirectoryImporterDataSource)) {
+                if (dataSource instanceof DirectoryImporterDataSource) {
                     DirectoryImporterDataSource dids = (DirectoryImporterDataSource) dataSource;
                     FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
                     if (!(retrieveStrategy instanceof FtpFileRetrieveStrategy))
                         return true;
                 }
+                else return true;
                 break;
             case http:
-                if (!(dataSource instanceof DirectoryImporterDataSource)) {
+                if (dataSource instanceof DirectoryImporterDataSource) {
                     DirectoryImporterDataSource dids = (DirectoryImporterDataSource) dataSource;
                     FileRetrieveStrategy retrieveStrategy = dids.getRetrieveStrategy();
                     if (!(retrieveStrategy instanceof HttpFileRetrieveStrategy))
                         return true;
                 }
+                else return true;
                 break;
             case z39_50:
                 if (!(dataSource instanceof DataSourceZ3950)) {
