@@ -194,7 +194,12 @@
             <url>http://artifactory.eanadev.org/artifactory/plugins-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
-
+    <scm>
+        <connection>scm:git:https://github.com/europeana/uim-europeana</connection>
+        <developerConnection>scm:git:https://github.com/europeana/uim-europeana</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/europeana/uim-europeana</url>
+    </scm>
     <build>
         <pluginManagement>
             <plugins>
