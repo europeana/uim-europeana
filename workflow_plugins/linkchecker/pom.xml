@@ -170,7 +170,7 @@
 							eu.europeana.uim.common.progress,
 							eu.europeana.uim.model.adapters.*,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues;
-							version=1.0.0.SNAPSHOT,
+							version=1.0.0,
 							org.osgi.service.blueprint,
 							org.osgi.framework,
 							javax.net.ssl,
