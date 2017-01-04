@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>europeana-uim-europeanaspecific</artifactId>
 		<groupId>eu.europeana.europeanauim</groupId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -297,9 +296,9 @@
 							eu.europeana.uim.orchestration; version=0.0.0,
 							eu.europeana.uim.plugin; version=0.0.0,
 							eu.europeana.uim.plugin.ingestion; version=0.0.0,
-							eu.europeana.uim.model.europeana; version=1.0.0.SNAPSHOT,
+							eu.europeana.uim.model.europeana; version=1.0.0,
 							eu.europeana.uim.model.europeanaspecific.fieldvalues;
-							version=1.0.0.SNAPSHOT,
+							version=1.0.0,
 							eu.europeana.uim.plugin.source,
 							eu.europeana.uim.util,
 							eu.europeana.uim.workflow,
@@ -378,7 +377,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

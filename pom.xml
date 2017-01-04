@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <artifactId>europeana-uim</artifactId>
@@ -11,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>europeana-uim-europeanaspecific</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <groupId>eu.europeana.europeanauim</groupId>
     <packaging>pom</packaging>
     <name>Unified Ingestion Manager: Europeana Specific Modules</name>
@@ -194,7 +193,12 @@
             <url>http://artifactory.eanadev.org/artifactory/plugins-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
-
+    <scm>
+        <connection>scm:git:https://github.com/europeana/uim-europeana</connection>
+        <developerConnection>scm:git:https://github.com/europeana/uim-europeana</developerConnection>
+        <tag>europeana-uim-europeanaspecific-1.0.0</tag>
+        <url>https://github.com/europeana/uim-europeana</url>
+    </scm>
     <build>
         <pluginManagement>
             <plugins>
@@ -225,7 +229,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -244,7 +248,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -263,7 +267,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore/>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -285,6 +289,11 @@
                     <configuration>
                         <aggregate>true</aggregate>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.3</version>
                 </plugin>
             </plugins>
         </pluginManagement>

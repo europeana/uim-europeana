@@ -70,6 +70,10 @@ public class CsvReportGenerator {
 			writeStatisticsItem(StatisticsType.LINK_CHECKING, URLSourceType.ISSHOWNAT);
 			writeStatisticsItem(StatisticsType.LINK_CHECKING, URLSourceType.HASVIEW);
 			
+			writeStatisticsItem(StatisticsType.LINK_CACHING, URLSourceType.OBJECT);
+			writeStatisticsItem(StatisticsType.LINK_CACHING, URLSourceType.ISSHOWNBY);
+			writeStatisticsItem(StatisticsType.LINK_CACHING, URLSourceType.HASVIEW);
+			
 			writeStatisticsItem(StatisticsType.METADATA_EXTRACTION, URLSourceType.OBJECT);
 			writeStatisticsItem(StatisticsType.METADATA_EXTRACTION, URLSourceType.ISSHOWNBY);
 			writeStatisticsItem(StatisticsType.METADATA_EXTRACTION, URLSourceType.ISSHOWNAT);
@@ -105,17 +109,22 @@ public class CsvReportGenerator {
 		Statistics statistics = new Statistics();
 		List<LastSourceDocumentProcessingStatistics> findLastSourceDocumentProcessingStatistics = 
 				client.findLastSourceDocumentProcessingStatistics(collectionId, executionId, Arrays.asList(ProcessingState.ERROR, ProcessingState.FAILED));				
-		Map<String, LastSourceDocumentProcessingStatistics> linkCheckStats = new HashMap<String, LastSourceDocumentProcessingStatistics>();		
+		Map<String, LastSourceDocumentProcessingStatistics> linkCheckStats = new HashMap<String, LastSourceDocumentProcessingStatistics>();
+		Map<String, LastSourceDocumentProcessingStatistics> retrieveStateStats = new HashMap<String, LastSourceDocumentProcessingStatistics>();
 		Map<String, LastSourceDocumentProcessingStatistics> metaExtractStats = new HashMap<String, LastSourceDocumentProcessingStatistics>();
 		Map<String, LastSourceDocumentProcessingStatistics> previewCachingStats = new HashMap<String, LastSourceDocumentProcessingStatistics>();
 		
 		for(LastSourceDocumentProcessingStatistics st : findLastSourceDocumentProcessingStatistics) {
 			ProcessingJobSubTaskStats processingJobSubTaskStats = st.getProcessingJobSubTaskStats();
 			
-			// link check
+			// link check and retrieve state
 			ProcessingJobRetrieveSubTaskState retrieveState = processingJobSubTaskStats.getRetrieveState();
 			if (retrieveState == ProcessingJobRetrieveSubTaskState.FAILED || retrieveState == ProcessingJobRetrieveSubTaskState.ERROR) {
-				linkCheckStats.put(st.getSourceDocumentReferenceId(), st);
+				if (st.getHttpResponseCode() == 200) {
+					retrieveStateStats.put(st.getSourceDocumentReferenceId(), st);
+				} else {
+					linkCheckStats.put(st.getSourceDocumentReferenceId(), st);
+				}
 			}			
 			// metadata extraction
 			ProcessingJobSubTaskState metaExtractionState = processingJobSubTaskStats.getMetaExtractionState();
@@ -139,9 +148,23 @@ public class CsvReportGenerator {
 		for (String id : linkCheckStats.keySet()) {
 			LastSourceDocumentProcessingStatistics stats = linkCheckStats.get(id);
 			Integer httpResponseCode = stats.getHttpResponseCode();
-			linkCheckItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry("ERROR " + (httpResponseCode == -1 ? "408" : httpResponseCode + ""), linkChecUris.get(id)));
+			linkCheckItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry("ERROR " + (httpResponseCode == -1 ? "408" : httpResponseCode + ""), linkChecUris.get(id)));
 		}
 		statistics.addStatisticsItemByType(StatisticsType.LINK_CHECKING, linkCheckItem);
+		
+		// retrieve state
+		Map<String, String> retrieveStateUris = new HashMap<String, String>(); 
+		List<SourceDocumentReference> retrieveStateSourceDocRefById = client.retrieveSourceDocumentReferencesByIds(new ArrayList<String>(retrieveStateStats.keySet()));
+		for (SourceDocumentReference reference : retrieveStateSourceDocRefById) {
+			retrieveStateUris.put(reference.getId(), reference.getUrl());
+		}
+		StatisticsItem retrieveStateItem = new StatisticsItem();
+		for (String id : retrieveStateStats.keySet()) {
+			LastSourceDocumentProcessingStatistics stats = retrieveStateStats.get(id);
+			String retrieveStateLog = stats.getProcessingJobSubTaskStats().getRetrieveLog();
+			retrieveStateItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry("ERROR: " +  (retrieveStateLog == null ? "" : retrieveStateLog), retrieveStateUris.get(id)));
+		}
+		statistics.addStatisticsItemByType(StatisticsType.LINK_CACHING, retrieveStateItem);
 		
 		// meatdata extraction
 		Map<String, String> metaExtractUris = new HashMap<String, String>(); 
@@ -152,8 +175,9 @@ public class CsvReportGenerator {
 		StatisticsItem metaExtractionItem = new StatisticsItem();
 		for (String id : metaExtractStats.keySet()) {
 			LastSourceDocumentProcessingStatistics stats = metaExtractStats.get(id);
-			String errorCode = stats.getHttpResponseCode() == 200 ? "ERROR" : "ERROR " + stats.getHttpResponseCode() + " : " + stats.getProcessingJobSubTaskStats().getMetaExtractionLog();
-			metaExtractionItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry(errorCode, metaExtractUris.get(id)));
+			String metaExtractionLog = stats.getProcessingJobSubTaskStats().getMetaExtractionLog();
+			String errorCode = stats.getHttpResponseCode() == 200 ? "ERROR" : "ERROR " + stats.getHttpResponseCode() + " : " + (metaExtractionLog == null ? "" : metaExtractionLog);
+			metaExtractionItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry(errorCode, metaExtractUris.get(id)));
 		}
 		statistics.addStatisticsItemByType(StatisticsType.METADATA_EXTRACTION, metaExtractionItem);
 		
@@ -166,8 +190,9 @@ public class CsvReportGenerator {
 		StatisticsItem thumbnailGenerationItem = new StatisticsItem();
 		for (String id : previewCachingStats.keySet()) {
 			LastSourceDocumentProcessingStatistics stats = previewCachingStats.get(id);
-			String errorCode = stats.getHttpResponseCode() == 200 ? "ERROR" : "ERROR " + stats.getHttpResponseCode() + " : " + stats.getProcessingJobSubTaskStats().getThumbnailGenerationLog();
-			thumbnailGenerationItem.addStatisticsEntryByURLtype(stats.getUrlSourceType(), new StatisticsEntry(errorCode, previewCachingUris.get(id)));
+			String thumbnailGenerationLog = stats.getProcessingJobSubTaskStats().getThumbnailGenerationLog();
+			String errorCode = stats.getHttpResponseCode() == 200 ? "ERROR" : "ERROR " + stats.getHttpResponseCode() + " : " + (thumbnailGenerationLog == null ? "" : thumbnailGenerationLog);
+			thumbnailGenerationItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry(errorCode, previewCachingUris.get(id)));
 		}
 		statistics.addStatisticsItemByType(StatisticsType.PREVIEW_CACHING, thumbnailGenerationItem);
 		
@@ -182,6 +207,7 @@ public class CsvReportGenerator {
 		private String collection_name;
 
 		private final List<StatisticsItem>  link_check = new ArrayList<StatisticsItem>();
+		private final List<StatisticsItem>  retrieve_state = new ArrayList<StatisticsItem>();
 		private final List<StatisticsItem>  metadata_extract = new ArrayList<StatisticsItem>();
 		private final List<StatisticsItem>  preview_cache = new ArrayList<StatisticsItem>();
 		 
@@ -198,6 +224,9 @@ public class CsvReportGenerator {
 			case LINK_CHECKING:
 				link_check.add(item);
 				break;
+			case LINK_CACHING:
+				retrieve_state.add(item);
+				break;
 			case METADATA_EXTRACTION:
 				metadata_extract.add(item);
 				break;
@@ -211,6 +240,8 @@ public class CsvReportGenerator {
 			switch (type) {
 			case LINK_CHECKING:
 				return link_check;
+			case LINK_CACHING: 
+				return retrieve_state;
 			case METADATA_EXTRACTION:
 				return metadata_extract;
 			case PREVIEW_CACHING:
@@ -230,7 +261,7 @@ public class CsvReportGenerator {
 		 
 		 private List<StatisticsEntry> errorCodesAndUrisForHasView = new ArrayList<StatisticsEntry>();
 
-		 public void addStatisticsEntryByURLtype(URLSourceType type, StatisticsEntry entry) {
+		 public void addStatisticsEntryByURLType(URLSourceType type, StatisticsEntry entry) {
 			 switch (type) {
 			 case OBJECT:
 				 errorCodesAndUrisForObject.add(entry);
@@ -289,7 +320,8 @@ public class CsvReportGenerator {
 	 }
 	 
 	 private enum StatisticsType {
-		 LINK_CHECKING("Link checking / "), 
+		 LINK_CHECKING("Link checking / "),
+		 LINK_CACHING("Link caching /"),
 		 METADATA_EXTRACTION("Metadata extraction / "), 
 		 PREVIEW_CACHING("Preview caching / ");
 		 
@@ -318,7 +350,7 @@ public class CsvReportGenerator {
 				StatisticsItem item = new StatisticsItem();
 				for (URLSourceType urlType : URLSourceType.values()) {
 					for (int i = 0; i < 10; i++) {
-						item.addStatisticsEntryByURLtype(urlType, new StatisticsEntry("400" + i, "http://link.sample.com/" + stType.name() + "/" + urlType.name() + "_"+ i));
+						item.addStatisticsEntryByURLType(urlType, new StatisticsEntry("400" + i, "http://link.sample.com/" + stType.name() + "/" + urlType.name() + "_"+ i));
 					}
 					statistics.addStatisticsItemByType(stType, item);
 				}
