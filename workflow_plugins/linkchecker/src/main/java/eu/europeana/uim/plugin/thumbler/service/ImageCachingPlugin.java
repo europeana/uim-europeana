@@ -185,7 +185,7 @@ public class ImageCachingPlugin<I> extends
             collectionId = oldId;
         }
         if (Boolean.parseBoolean(collection
-                .getValue(ControlledVocabularyProxy.ISNEW.toString()))|| !StringUtils.equals(oldId,collectionId)) {
+                .getValue(ControlledVocabularyProxy.ISNEW.toString())) || StringUtils.equals(oldId,collectionId)) {
             ReferenceOwner owner = new ReferenceOwner(provId, collectionId, null);
             client.deactivateJobs(owner);
         }
