@@ -103,6 +103,7 @@ public class ImageCachingPlugin<I> extends
         String value = null;
         String collection = ((Collection) context.getExecution().getDataSet()).
                 getName();
+        String executionId = (String)context.getExecution().getId();
         String provider = ((Collection) context.getExecution().getDataSet()).getProvider().getMnemonic();
         if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD) != null
                 && mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
@@ -131,7 +132,7 @@ public class ImageCachingPlugin<I> extends
 
 
                 List<ProcessingJobTuple> jobs =JobCreator.createJobs(
-                        colId, provId, record, execId,
+                        collection, provider, record, executionId,
                         rdf.getAggregationList().get(0).getObject() != null ? rdf.getAggregationList().get(0).getObject().getResource().replace(" ","%20") : null,
                         hasView,
                         rdf.getAggregationList().get(0).getIsShownBy() != null ? rdf.getAggregationList().get(0).getIsShownBy().getResource().replace(" ","%20") : null,
@@ -145,7 +146,7 @@ public class ImageCachingPlugin<I> extends
             } else {
 
                 client.setActive(record, new Boolean(false));
-                client.deactivateJobs(new ReferenceOwner(provId, colId, record));
+                client.deactivateJobs(new ReferenceOwner(provider, collection, record));
 
             }
         } catch (Exception ex) {
