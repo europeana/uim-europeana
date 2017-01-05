@@ -180,7 +180,7 @@ public class PdfReportGenerator {
             // Preview Caching
             Phrase previewCachingPhrase = new Phrase("Preview caching", FONT_CAPTION);
             previewCachingPhrase.add("\n");
-            previewCachingPhrase.add(new Chunk("Number of links (edm:object, edm:IsShownBy, edm:hasView) checked within the dataset for which there was an attempt for preview caching: ", FONT_TEXT));
+            previewCachingPhrase.add(new Chunk("Total number of values for edm:object, edm:IsShownBy, edm:hasView present within the dataset: " , FONT_TEXT));
             previewCachingPhrase.add(new Chunk(report.getNumber_images_cached() + "", FONT_TEXT));
             previewCachingPhrase.add("\n");
             previewCachingPhrase.add(new Chunk("Number of successfully cached previews: ", FONT_TEXT));
