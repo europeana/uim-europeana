@@ -50,7 +50,7 @@ public class CsvReportGenerator {
 
 
     public static void generateReport(OutputStream os, String executionId, String collectionId) {
-        statistics = generateStatistics(executionId, collectionId);
+        statistics = generateStatistics(executionId);
 //		statistics = Stub.getStatistics();
         writer = new OutputStreamWriter(os);
         try {
