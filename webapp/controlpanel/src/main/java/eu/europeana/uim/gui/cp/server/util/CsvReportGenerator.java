@@ -19,14 +19,7 @@ import com.mongodb.MongoException;
 import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientConfig;
 import eu.europeana.harvester.client.HarvesterClientImpl;
-import eu.europeana.harvester.domain.DocumentReferenceTaskType;
-import eu.europeana.harvester.domain.LastSourceDocumentProcessingStatistics;
-import eu.europeana.harvester.domain.ProcessingJobRetrieveSubTaskState;
-import eu.europeana.harvester.domain.ProcessingJobSubTaskState;
-import eu.europeana.harvester.domain.ProcessingJobSubTaskStats;
-import eu.europeana.harvester.domain.ProcessingState;
-import eu.europeana.harvester.domain.SourceDocumentReference;
-import eu.europeana.harvester.domain.URLSourceType;
+import eu.europeana.harvester.domain.*;
 
 public class CsvReportGenerator {
 
@@ -223,6 +216,127 @@ public class CsvReportGenerator {
         statistics.addStatisticsItemByType(StatisticsType.COLOR_EXTRACTION, colorExtractionItem);
         return statistics;
     }
+
+    /**
+     * @param executionId
+     * @return
+     */
+    private static Statistics generateStatistics(String executionId) {
+        Statistics statistics = new Statistics();
+        List<SourceDocumentProcessingStatistics> findSourceDocumentProcessingStatistics =
+                client.findSourceDocumentProcessingStatistics(executionId, Arrays.asList(ProcessingState.ERROR, ProcessingState.FAILED));
+        Map<String, SourceDocumentProcessingStatistics> linkCheckStats = new HashMap<>();
+        Map<String, SourceDocumentProcessingStatistics> retrieveStateStats = new HashMap<>();
+        Map<String, SourceDocumentProcessingStatistics> metaExtractStats = new HashMap<>();
+        Map<String, SourceDocumentProcessingStatistics> previewCachingStats = new HashMap<>();
+        Map<String, SourceDocumentProcessingStatistics> colorExtractionStats = new HashMap<>();
+        for (SourceDocumentProcessingStatistics st : findSourceDocumentProcessingStatistics) {
+            ProcessingJobSubTaskStats processingJobSubTaskStats = st.getProcessingJobSubTaskStats();
+
+            // link check and retrieve state
+            ProcessingJobRetrieveSubTaskState retrieveState = processingJobSubTaskStats.getRetrieveState();
+            if (retrieveState == ProcessingJobRetrieveSubTaskState.FAILED || retrieveState == ProcessingJobRetrieveSubTaskState.ERROR) {
+                if (st.getHttpResponseCode() == 200) {
+                    retrieveStateStats.put(st.getSourceDocumentReferenceId(), st);
+                } else {
+                    linkCheckStats.put(st.getSourceDocumentReferenceId(), st);
+                }
+            }
+            // metadata extraction
+            ProcessingJobSubTaskState metaExtractionState = processingJobSubTaskStats.getMetaExtractionState();
+            if (metaExtractionState == ProcessingJobSubTaskState.FAILED || metaExtractionState == ProcessingJobSubTaskState.ERROR) {
+                metaExtractStats.put(st.getSourceDocumentReferenceId(), st);
+            }
+            // preview caching
+            ProcessingJobSubTaskState thumbGenerationState = processingJobSubTaskStats.getThumbnailGenerationState();
+            if (thumbGenerationState == ProcessingJobSubTaskState.FAILED || thumbGenerationState == ProcessingJobSubTaskState.ERROR) {
+                previewCachingStats.put(st.getSourceDocumentReferenceId(), st);
+            }
+
+            //color extraction
+            ProcessingJobSubTaskState colorExtactionState = processingJobSubTaskStats.getColorExtractionState();
+            if (colorExtactionState == ProcessingJobSubTaskState.FAILED || colorExtactionState == ProcessingJobSubTaskState.ERROR) {
+                colorExtractionStats.put(st.getSourceDocumentReferenceId(), st);
+            }
+        }
+
+        // link check
+        Map<String, String> linkChecUris = new HashMap<String, String>();
+        List<SourceDocumentReference> linkCheckSourceDocRefById = client.retrieveSourceDocumentReferencesByIds(new ArrayList<String>(linkCheckStats.keySet()));
+        for (SourceDocumentReference reference : linkCheckSourceDocRefById) {
+            linkChecUris.put(reference.getId(), reference.getUrl());
+        }
+        StatisticsItem linkCheckItem = new StatisticsItem();
+        for (String id : linkCheckStats.keySet()) {
+            SourceDocumentProcessingStatistics stats = linkCheckStats.get(id);
+            Integer httpResponseCode = stats.getHttpResponseCode();
+            linkCheckItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry("ERROR " + (httpResponseCode == -1 ? "408" : httpResponseCode + ""), linkChecUris.get(id)));
+        }
+        statistics.addStatisticsItemByType(StatisticsType.LINK_CHECKING, linkCheckItem);
+
+        // retrieve state
+        Map<String, String> retrieveStateUris = new HashMap<String, String>();
+        List<SourceDocumentReference> retrieveStateSourceDocRefById = client.retrieveSourceDocumentReferencesByIds(new ArrayList<String>(retrieveStateStats.keySet()));
+        for (SourceDocumentReference reference : retrieveStateSourceDocRefById) {
+            retrieveStateUris.put(reference.getId(), reference.getUrl());
+        }
+        StatisticsItem retrieveStateItem = new StatisticsItem();
+        for (String id : retrieveStateStats.keySet()) {
+            SourceDocumentProcessingStatistics stats = retrieveStateStats.get(id);
+            String retrieveStateLog = stats.getProcessingJobSubTaskStats().getRetrieveLog();
+            retrieveStateItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry("ERROR: " + (retrieveStateLog == null ? "" : retrieveStateLog), retrieveStateUris.get(id)));
+        }
+        statistics.addStatisticsItemByType(StatisticsType.LINK_CACHING, retrieveStateItem);
+
+        // meatdata extraction
+        Map<String, String> metaExtractUris = new HashMap<String, String>();
+        List<SourceDocumentReference> metaExtrSourceDocRefById = client.retrieveSourceDocumentReferencesByIds(new ArrayList<String>(metaExtractStats.keySet()));
+        for (SourceDocumentReference reference : metaExtrSourceDocRefById) {
+            metaExtractUris.put(reference.getId(), reference.getUrl());
+        }
+        StatisticsItem metaExtractionItem = new StatisticsItem();
+        for (String id : metaExtractStats.keySet()) {
+            SourceDocumentProcessingStatistics stats = metaExtractStats.get(id);
+            String metaExtractionLog = stats.getProcessingJobSubTaskStats().getMetaExtractionLog();
+            String errorCode = stats.getHttpResponseCode() == 200 ? "ERROR" : "ERROR " + stats.getHttpResponseCode() + " : " + (metaExtractionLog == null ? "" : metaExtractionLog);
+            metaExtractionItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry(errorCode, metaExtractUris.get(id)));
+        }
+        statistics.addStatisticsItemByType(StatisticsType.METADATA_EXTRACTION, metaExtractionItem);
+
+        // preview caching
+        Map<String, String> previewCachingUris = new HashMap<String, String>();
+        List<SourceDocumentReference> thumbGenerationSourceDocRefById = client.retrieveSourceDocumentReferencesByIds(new ArrayList<String>(previewCachingStats.keySet()));
+        for (SourceDocumentReference reference : thumbGenerationSourceDocRefById) {
+            previewCachingUris.put(reference.getId(), reference.getUrl());
+        }
+        StatisticsItem thumbnailGenerationItem = new StatisticsItem();
+        for (String id : previewCachingStats.keySet()) {
+            SourceDocumentProcessingStatistics stats = previewCachingStats.get(id);
+            String thumbnailGenerationLog = stats.getProcessingJobSubTaskStats().getThumbnailGenerationLog();
+            String errorCode = stats.getHttpResponseCode() == 200 ? "ERROR" : "ERROR " + stats.getHttpResponseCode() + " : " + (thumbnailGenerationLog == null ? "" : thumbnailGenerationLog);
+            thumbnailGenerationItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry(errorCode, previewCachingUris.get(id)));
+        }
+        statistics.addStatisticsItemByType(StatisticsType.PREVIEW_CACHING, thumbnailGenerationItem);
+
+
+        // color extraction
+        Map<String, String> colorExtractionUris = new HashMap<String, String>();
+        List<SourceDocumentReference> colorExtractionSourceDocRefById = client.retrieveSourceDocumentReferencesByIds(new ArrayList<String>(colorExtractionStats.keySet()));
+        for (SourceDocumentReference reference : colorExtractionSourceDocRefById) {
+            colorExtractionUris.put(reference.getId(), reference.getUrl());
+        }
+        StatisticsItem colorExtractionItem = new StatisticsItem();
+        for (String id : colorExtractionStats.keySet()) {
+            SourceDocumentProcessingStatistics stats = colorExtractionStats.get(id);
+            String colorExtractionLog = stats.getProcessingJobSubTaskStats().getColorExtractionLog();
+            String errorCode = "ERROR: Color extraction failed. " + (colorExtractionLog == null ? "" : colorExtractionLog);
+            colorExtractionItem.addStatisticsEntryByURLType(stats.getUrlSourceType(), new StatisticsEntry(errorCode, colorExtractionUris.get(id)));
+        }
+        statistics.addStatisticsItemByType(StatisticsType.COLOR_EXTRACTION, colorExtractionItem);
+        return statistics;
+    }
+
+
 
     public static String getFileName(String collectionId) {
         return collectionId + "_error_log.txt";
