@@ -19,11 +19,23 @@
 			<groupId>eu.europeana.enrichment</groupId>
 			<artifactId>enrichment-framework-common</artifactId>
 			<version>0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>corelib-storage</artifactId>
+					<groupId>eu.europeana.corelib</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.enrichment</groupId>
 			<artifactId>enrichment-framework-client</artifactId>
 			<version>0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>corelib-storage</artifactId>
+					<groupId>eu.europeana.corelib</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

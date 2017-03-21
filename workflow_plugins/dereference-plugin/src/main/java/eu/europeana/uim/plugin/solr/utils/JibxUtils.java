@@ -1,8 +1,5 @@
 package eu.europeana.uim.plugin.solr.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import eu.europeana.corelib.definitions.jibx.AgentType;
 import eu.europeana.corelib.definitions.jibx.AltLabel;
 import eu.europeana.corelib.definitions.jibx.Concept;
@@ -16,8 +13,11 @@ import eu.europeana.corelib.definitions.jibx.Name;
 import eu.europeana.corelib.definitions.jibx.Note;
 import eu.europeana.corelib.definitions.jibx.PlaceType;
 import eu.europeana.corelib.definitions.jibx.PrefLabel;
+import eu.europeana.corelib.definitions.jibx.ProfessionOrOccupation;
 import eu.europeana.corelib.definitions.jibx.SameAs;
 import eu.europeana.corelib.definitions.jibx.TimeSpanType;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JibxUtils {
 
@@ -63,16 +63,22 @@ public class JibxUtils {
 			agent.setGender(fAgent.getGender() != null ? fAgent.getGender()
 					: sAgent.getGender());
 		}
-		if (fAgent.getProfessionOrOccupation() != null
-				&& (fAgent.getProfessionOrOccupation().getResource() != null || fAgent
-						.getProfessionOrOccupation().getString() != null)
-				|| sAgent.getProfessionOrOccupation() != null
-				&& (sAgent.getProfessionOrOccupation().getResource() != null || sAgent
-						.getProfessionOrOccupation().getString() != null)) {
-			agent.setProfessionOrOccupation(fAgent.getProfessionOrOccupation() != null ? fAgent
-					.getProfessionOrOccupation() : sAgent
-					.getProfessionOrOccupation());
+
+		if (sAgent.getProfessionOrOccupationList() != null) {
+			agent.setProfessionOrOccupationList(sAgent.getProfessionOrOccupationList());
+			if (fAgent.getProfessionOrOccupationList() != null) {
+				for (ProfessionOrOccupation professionOrOccupation : fAgent.getProfessionOrOccupationList()) {
+					if (!agent.getProfessionOrOccupationList().contains(professionOrOccupation)) {
+						agent.getProfessionOrOccupationList().add(professionOrOccupation);
+					}
+				}
+			}
+		} else {
+			if (fAgent.getProfessionOrOccupationList() != null) {
+				agent.setProfessionOrOccupationList(fAgent.getProfessionOrOccupationList());
+			}
 		}
+
 		if (sAgent.getPrefLabelList() != null) {
 			agent.setPrefLabelList(sAgent.getPrefLabelList());
 			if (fAgent.getPrefLabelList() != null) {
