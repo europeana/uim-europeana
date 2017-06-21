@@ -142,6 +142,44 @@ public enum EnrichmentFields {
 
 		}
 	},
+	DCTERMS_MEDIUM("proxy_dcterms_medium") {
+		@Override
+		public List<EntityClass> getVocabularies() {
+			List<EntityClass> vocs = new ArrayList<EntityClass>();
+			vocs.add(EntityClass.CONCEPT);
+			return vocs;
+		}
+
+		@Override
+		public void appendInDoc(SolrInputDocument doc,
+				ProxyImpl europeanaProxy) {
+			java.util.Collection<Object> col = doc.getFieldValues(value);
+			if (col != null && europeanaProxy.getDctermsMedium() != null) {
+				col.addAll(europeanaProxy.getDctermsMedium().get("def"));
+				doc.setField(value, col);
+			}
+
+		}
+	},
+	DC_FORMAT("proxy_dc_format") {
+		@Override
+		public List<EntityClass> getVocabularies() {
+			List<EntityClass> vocs = new ArrayList<EntityClass>();
+			vocs.add(EntityClass.CONCEPT);
+			return vocs;
+		}
+
+		@Override
+		public void appendInDoc(SolrInputDocument doc,
+				ProxyImpl europeanaProxy) {
+			java.util.Collection<Object> col = doc.getFieldValues(value);
+			if (col != null && europeanaProxy.getDcFormat() != null) {
+				col.addAll(europeanaProxy.getDcFormat().get("def"));
+				doc.setField(value, col);
+			}
+
+		}
+	},
 	DC_TYPE("proxy_dc_type") {
 		@Override
 		public List<EntityClass> getVocabularies() {
