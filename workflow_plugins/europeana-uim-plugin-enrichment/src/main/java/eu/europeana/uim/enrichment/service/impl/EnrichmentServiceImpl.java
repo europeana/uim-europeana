@@ -85,9 +85,9 @@ public class EnrichmentServiceImpl implements EnrichmentService {
   private static String solrCore = PropertyReader.getProperty(UimConfigurationProperty.SOLR_CORE);
 
   private static String[] cloudSolrUrl = PropertyReader.getProperty(
-      UimConfigurationProperty.CLOUD_SOLR_HOSTURL).split(",");
+      UimConfigurationProperty.SOLR_HOSTURL).split(",");
   private static String[] cloudSolrUrlProduction = PropertyReader.getProperty(
-          UimConfigurationProperty.SOLR_PRODUCTION_HOSTURL).split(",");
+          UimConfigurationProperty.CLOUD_SOLR_HOSTURL).split(",");
   private static String cloudSolrCore = PropertyReader
       .getProperty(UimConfigurationProperty.CLOUD_SOLR_CORE);
 
@@ -103,7 +103,7 @@ public class EnrichmentServiceImpl implements EnrichmentService {
 
       LBHttpSolrServer lbTarget = new LBHttpSolrServer(cloudSolrUrl);
       cloudSolrServer = new CloudSolrServer(zookeeperUrl, lbTarget);
-      cloudSolrServer.setDefaultCollection(cloudSolrCore);
+      cloudSolrServer.setDefaultCollection(solrCore);
       cloudSolrServer.connect();
       LBHttpSolrServer lbTargetProduction = new LBHttpSolrServer(cloudSolrUrlProduction);
       cloudSolrProductionServer = new CloudSolrServer(zookeeperUrlProduction, lbTargetProduction);

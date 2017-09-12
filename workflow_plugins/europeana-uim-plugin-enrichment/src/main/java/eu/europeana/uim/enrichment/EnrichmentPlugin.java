@@ -16,44 +16,6 @@
  */
 package eu.europeana.uim.enrichment;
 
-import eu.europeana.corelib.definitions.edm.entity.WebResource;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import eu.europeana.harvester.client.HarvesterClient;
-import eu.europeana.harvester.domain.*;
-import eu.europeana.jobcreator.JobCreator;
-import eu.europeana.jobcreator.domain.ProcessingJobCreationOptions;
-import eu.europeana.jobcreator.domain.ProcessingJobTuple;
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CloudSolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
-import org.theeuropeanlibrary.model.common.qualifier.Status;
-
-import com.ctc.wstx.io.EBCDICCodec;
-
 import eu.europeana.corelib.definitions.jibx.RDF;
 import eu.europeana.corelib.edm.utils.EdmUtils;
 import eu.europeana.corelib.edm.utils.MongoConstructor;
@@ -70,8 +32,13 @@ import eu.europeana.corelib.solr.entity.TimespanImpl;
 import eu.europeana.enrichment.api.external.EntityWrapper;
 import eu.europeana.enrichment.api.external.InputValue;
 import eu.europeana.enrichment.rest.client.EnrichmentDriver;
+import eu.europeana.harvester.client.HarvesterClient;
 import eu.europeana.harvester.client.HarvesterClientImpl;
-
+import eu.europeana.harvester.domain.ProcessingJob;
+import eu.europeana.harvester.domain.ReferenceOwner;
+import eu.europeana.jobcreator.JobCreator;
+import eu.europeana.jobcreator.domain.ProcessingJobCreationOptions;
+import eu.europeana.jobcreator.domain.ProcessingJobTuple;
 import eu.europeana.uim.common.TKey;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.service.InstanceCreator;
@@ -99,6 +66,34 @@ import eu.europeana.uim.sugar.LoginFailureException;
 import eu.europeana.uim.sugar.QueryResultException;
 import eu.europeana.uim.sugar.SugarCrmRecord;
 import eu.europeana.uim.sugar.SugarCrmService;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
+import org.apache.solr.common.SolrInputDocument;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IUnmarshallingContext;
+import org.jibx.runtime.JiBXException;
+import org.theeuropeanlibrary.model.common.qualifier.Status;
 
 
 /**
@@ -188,7 +183,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getInputFields()
      */
     @Override
@@ -198,7 +193,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOptionalFields()
      */
@@ -209,7 +204,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.ingestion.IngestionPlugin#getOutputFields()
      */
     @Override
@@ -219,7 +214,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.Plugin#initialize()
      */
     @Override
@@ -228,7 +223,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.Plugin#shutdown()
      */
     @Override
@@ -237,7 +232,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.Plugin#getParameters()
      */
     @Override
@@ -248,7 +243,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.Plugin#getPreferredThreadCount()
      */
     @Override
@@ -258,7 +253,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.Plugin#getMaximumThreadCount()
      */
     @Override
@@ -268,7 +263,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.ExecutionPlugin#initialize(eu.europeana.uim.
      * orchestration.ExecutionContext)
      */
@@ -382,7 +377,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eu.europeana.uim.plugin.ExecutionPlugin#completed(eu.europeana.uim.
      * orchestration.ExecutionContext)
      */
@@ -424,7 +419,7 @@ public class EnrichmentPlugin<I> extends
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * eu.europeana.uim.plugin.ingestion.IngestionPlugin#process(eu.europeana
      * .uim.store.UimDataSet, eu.europeana.uim.orchestration.ExecutionContext)
@@ -607,35 +602,35 @@ public class EnrichmentPlugin<I> extends
                         fBean.setState(eu.europeana.publication.common.State.ACCEPTED);
 
                         SolrInputDocument doc = new SolrDocumentHandler(cloudSolrServer).generate(fBean);
-                        if(!(check||checkUpdate)) {
-                            ModifiableSolrParams params = new ModifiableSolrParams();
-                            params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
-
-
-                            params.add("fl", "is_fulltext,has_thumbnails,has_media,filter_tags,facet_tags,has_landingpage");
-                            QueryResponse resp = cloudSolrServer.query(params);
-                            if(resp.getResults().size()>0){
-                                SolrDocument retrievedDoc = resp.getResults().get(0);
-                                if(retrievedDoc.containsKey("is_fulltext")){
-                                    doc.addField("is_fulltext",retrievedDoc.get("is_fulltext"));
-                                }
-                                if(retrievedDoc.containsKey("has_thumbnails")){
-                                    doc.addField("has_thumbnails",retrievedDoc.get("has_thumbnails"));
-                                }
-                                if(retrievedDoc.containsKey("has_media")){
-                                    doc.addField("has_media",retrievedDoc.get("has_media"));
-                                }
-                                if(retrievedDoc.containsKey("filter_tags")){
-                                    doc.addField("filter_tags",retrievedDoc.get("filter_tags"));
-                                }
-                                if(retrievedDoc.containsKey("facet_tags")){
-                                    doc.addField("facet_tags",retrievedDoc.get("facet_tags"));
-                                }
-                                if(retrievedDoc.containsKey("has_landingpage")){
-                                    doc.addField("has_landingpage",retrievedDoc.get("has_landingpage"));
-                                }
-                            }
-                        }
+//                        if(!(check||checkUpdate)) {
+//                            ModifiableSolrParams params = new ModifiableSolrParams();
+//                            params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(fBean.getAbout()));
+//
+//
+//                            params.add("fl", "is_fulltext,has_thumbnails,has_media,filter_tags,facet_tags,has_landingpage");
+//                            QueryResponse resp = cloudSolrServer.query(params);
+//                            if(resp.getResults().size()>0){
+//                                SolrDocument retrievedDoc = resp.getResults().get(0);
+//                                if(retrievedDoc.containsKey("is_fulltext")){
+//                                    doc.addField("is_fulltext",retrievedDoc.get("is_fulltext"));
+//                                }
+//                                if(retrievedDoc.containsKey("has_thumbnails")){
+//                                    doc.addField("has_thumbnails",retrievedDoc.get("has_thumbnails"));
+//                                }
+//                                if(retrievedDoc.containsKey("has_media")){
+//                                    doc.addField("has_media",retrievedDoc.get("has_media"));
+//                                }
+//                                if(retrievedDoc.containsKey("has_landingpage")){
+//                                    doc.addField("has_landingpage",retrievedDoc.get("has_landingpage"));
+//                                }
+//                                if(retrievedDoc.containsKey("filter_tags")){
+//                                    doc.addField("filter_tags",retrievedDoc.get("filter_tags"));
+//                                }
+//                                if(retrievedDoc.containsKey("facet_tags")){
+//                                    doc.addField("facet_tags",retrievedDoc.get("facet_tags"));
+//                                }
+//                            }
+//                        }
 
                         cloudSolrServer.add(doc);
                         return true;
