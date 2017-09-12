@@ -1,42 +1,38 @@
 package eu.europeana.uim.deactivation.service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.impl.CloudSolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
-import org.neo4j.rest.graphdb.RestGraphDatabase;
-
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.ServerAddress;
-
 import eu.europeana.corelib.edm.exceptions.MongoDBException;
 import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
 import eu.europeana.corelib.mongo.server.EdmMongoServer;
-import eu.europeana.corelib.neo4j.entity.Neo4jBean;
 import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.europeanauim.utils.PropertyReader;
 import eu.europeana.europeanauim.utils.UimConfigurationProperty;
 import eu.europeana.uim.common.BlockingInitializer;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
+import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
+import org.neo4j.rest.graphdb.RestGraphDatabase;
 
 public class DeactivationServiceImpl implements DeactivationService {
 
     //  private static HttpSolrServer solrServer;
     private static CloudSolrServer cloudSolrServer;
     private static CloudSolrServer cloudSolrProductionServer;
-    private static String[] cloudSolrUrl = PropertyReader.getProperty(
-            UimConfigurationProperty.CLOUD_SOLR_HOSTURL).split(",");
+    private static String[] solrUrl = PropertyReader.getProperty(
+            UimConfigurationProperty.SOLR_HOSTURL).split(",");
     private static String[] cloudSolrUrlProduction = PropertyReader.getProperty(
             UimConfigurationProperty.CLOUD_PRODUCTION_SOLR_HOSTURL).split(",");
-    private static String cloudSolrCore = PropertyReader
+    private static String solrCore = PropertyReader
+        .getProperty(UimConfigurationProperty.SOLR_CORE);
+    private static String cloudSolrProductionCore = PropertyReader
             .getProperty(UimConfigurationProperty.CLOUD_SOLR_CORE);
     private static String zookeeperUrl = PropertyReader
             .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURL);
@@ -117,13 +113,13 @@ public class DeactivationServiceImpl implements DeactivationService {
                 @Override
                 protected void initializeInternal() {
                     try {
-                        LBHttpSolrServer lbTarget = new LBHttpSolrServer(cloudSolrUrl);
+                        LBHttpSolrServer lbTarget = new LBHttpSolrServer(solrUrl);
                         cloudSolrServer = new CloudSolrServer(zookeeperUrl, lbTarget);
-                        cloudSolrServer.setDefaultCollection(cloudSolrCore);
+                        cloudSolrServer.setDefaultCollection(solrCore);
                         cloudSolrServer.connect();
                         LBHttpSolrServer lbTargetProduction = new LBHttpSolrServer(cloudSolrUrlProduction);
                         cloudSolrProductionServer = new CloudSolrServer(zookeeperUrlProduction, lbTargetProduction);
-                        cloudSolrProductionServer.setDefaultCollection(cloudSolrCore);
+                        cloudSolrProductionServer.setDefaultCollection(cloudSolrProductionCore);
                         cloudSolrProductionServer.connect();
 //            solrServer = new HttpSolrServer(new URL(solrUrl) + solrCore);
                     } catch (MalformedURLException e) {

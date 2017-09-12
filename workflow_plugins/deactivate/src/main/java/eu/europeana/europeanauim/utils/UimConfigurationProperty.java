@@ -18,7 +18,7 @@ public enum UimConfigurationProperty {
 	MONGO_DB_EUROPEANA_PRODUCTION("mongo.db.europeana.production"),
 	ZOOKEEPER_HOSTURL("zookeeper.host"),
     ZOOKEEPER_HOSTURLPRODUCTION("zookeeper.production.host"),
-    CLOUD_SOLR_HOSTURL("cloud.solr.hostUrl"),
+//    CLOUD_SOLR_HOSTURL("cloud.solr.hostUrl"),
     CLOUD_PRODUCTION_SOLR_HOSTURL("cloud.solr.hostUrl"),
     CLOUD_SOLR_CORE("cloud.solr.core"),
 	SOLR_HOSTURL("solr.hostUrl"),
