@@ -38,12 +38,19 @@ import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
 import eu.europeana.uim.model.europeana.EuropeanaModelRegistry;
-import eu.europeana.uim.model.europeana.EuropeanaRedirectId;
 import eu.europeana.uim.orchestration.ExecutionContext;
 import eu.europeana.uim.plugin.ingestion.AbstractIngestionPlugin;
 import eu.europeana.uim.plugin.ingestion.CorruptedDatasetException;
 import eu.europeana.uim.plugin.ingestion.IngestionPluginFailedException;
 import eu.europeana.uim.store.MetaDataRecord;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrServer;
@@ -55,11 +62,6 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.theeuropeanlibrary.model.common.qualifier.Status;
-
-import java.io.StringReader;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Redirect creation plugin
@@ -229,46 +231,63 @@ public class LookupCreationPlugin<I> extends
                     if (context.getProperties().getProperty(OVERRIDESIPCREATOR)
                             != null) {
                     	boolean createHash = false;
-                    	if(context.getProperties().getProperty(OVERRIDESIPCREATOR)
-                            != null){
-                    		createHash = true;
-                    	}
                         if (context.getProperties()
-                                .getProperty(OVERRIDESIPCREATOR)
+                            .getProperty(USE_CUSTOM_FIELD) != null) {
+                            if (context.getProperties()
+                                .getProperty(USE_CUSTOM_FIELD)
                                 .equalsIgnoreCase("edm:isShownAt")) {
-                            fieldValue = rdf.getAggregationList().get(0)
+                                fieldValue = rdf.getAggregationList().get(0)
                                     .getIsShownAt().getResource();
-                        } else if (context.getProperties()
-                                .getProperty(OVERRIDESIPCREATOR)
+                            } else if (context.getProperties()
+                                .getProperty(USE_CUSTOM_FIELD)
                                 .equalsIgnoreCase("edm:isShownBy")) {
-                            fieldValue = rdf.getAggregationList().get(0)
+                                fieldValue = rdf.getAggregationList().get(0)
                                     .getIsShownBy().getResource();
-                        } else if (context.getProperties()
-                                .getProperty(OVERRIDESIPCREATOR)
+                            } else if (context.getProperties()
+                                .getProperty(USE_CUSTOM_FIELD)
                                 .equalsIgnoreCase("dc:identifier")) {
-                            ProxyType proxy = findProxy(rdf);
-                            for (Choice choice : proxy.getChoiceList()) {
-                                if (choice.ifIdentifier()) {
-                                    fieldValue = choice.getIdentifier()
+                                ProxyType proxy = findProxy(rdf);
+                                for (Choice choice : proxy.getChoiceList()) {
+                                    if (choice.ifIdentifier()) {
+                                        fieldValue = choice.getIdentifier()
                                             .getString();
+                                    }
                                 }
-                            }
-                        } else if (context.getProperties()
-                                .getProperty(OVERRIDESIPCREATOR)
+                            } else if (context.getProperties()
+                                .getProperty(USE_CUSTOM_FIELD)
                                 .equalsIgnoreCase("owl:sameAs")) {
-                            fieldValue = rdf.getProvidedCHOList().get(0)
+                                fieldValue = rdf.getProvidedCHOList().get(0)
                                     .getSameAList().get(0).getResource();
+                            }
                         }
-                        EuropeanaId id = createLookupEntry(
-                                rdf.getProvidedCHOList().get(0).getAbout(),
-                                fileName,collectionId,
-                                applyTransformations(
-                                        createHash?HashUtils.createHash(fieldValue):fieldValue,
-                                        context.getProperties().getProperty(
-                                                USE_FUNCTIONS)));
-                        if(id!=null) {
+                        else
+                        {
+                            fieldValue = rdf.getProvidedCHOList().get(0).getAbout();
+                        }
 
-                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
+                        EuropeanaId id = null;
+                        List<String> allOldCollectionIds = null;
+                        if (context.getProperties()
+                            .getProperty(OVERRIDESIPCREATOR)
+                            .equalsIgnoreCase("mapManyOldToOneCollections")) {
+                            allOldCollectionIds = enrichmentService
+                                .getCollectionMongoServer().findAllOldCollectionIds(collectionId);
+                        }
+                        else {
+                            allOldCollectionIds = new ArrayList<>(1);
+                            allOldCollectionIds.add(fileName);
+                        }
+                        id = createLookupEntry(
+                            rdf.getProvidedCHOList().get(0).getAbout(),
+                            allOldCollectionIds, collectionId,
+                            applyTransformations(
+                                createHash ? HashUtils.createHash(fieldValue) : fieldValue,
+                                context.getProperties().getProperty(
+                                    USE_FUNCTIONS)));
+
+                        if(id!=null) {
+                            //                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
+                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECTID,id.getOldId());
                         }
                     } else {
                         String edmValue = null;
@@ -371,11 +390,11 @@ public class LookupCreationPlugin<I> extends
         return null;
     }
 
-    private EuropeanaId createLookupEntry(String newId, String oldCollectionId, String newCollectionId,
+    private EuropeanaId createLookupEntry(String newId, List<String> oldCollectionIds, String newCollectionId,
             String value) {
         ModifiableSolrParams params = new ModifiableSolrParams();
-        if (oldCollectionId.equals(newCollectionId)) {
-            String finalId = EuropeanaUriUtils.createEuropeanaId(oldCollectionId,
+        if (oldCollectionIds.size() == 1 && oldCollectionIds.get(0).equals(newCollectionId)) {
+            String finalId = EuropeanaUriUtils.createEuropeanaId(oldCollectionIds.get(0),
                     value);
             params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
             try {
@@ -395,36 +414,58 @@ public class LookupCreationPlugin<I> extends
                 log.log(Level.SEVERE, e.getMessage());
             }
         } else {
-            String finalId = EuropeanaUriUtils.createEuropeanaId(oldCollectionId,
-                    value);
-            params.add("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
+            StringBuilder query = new StringBuilder();
+            for (String oldCollectionId: oldCollectionIds) {
+                String oldRecordId = EuropeanaUriUtils.createEuropeanaId(oldCollectionId, value);
+                query.append("europeana_id:\"").append(oldRecordId).append("\" OR ");
+            }
+            query.delete(query.lastIndexOf(" OR "), query.length());
+
+            params.add("q", query.toString());
             try {
                 SolrDocumentList solrList = enrichmentService
-                        .getProductionCloudSolrServer().query(params).getResults();
-                if (solrList.size() > 0 && !(finalId.equals(newId))) {
-                    EuropeanaId id = new EuropeanaId();
-                    id.setOldId(finalId);
-                    id.setLastAccess(0);
-                    id.setTimestamp(new Date().getTime());
-                    id.setNewId(newId);
-                    saveEuropeanaId(id);
-                    return id;
-
-                } else if(solrList.size()==0) {
-                     finalId = EuropeanaUriUtils.createEuropeanaId(newCollectionId,
-                    value);
-                    params.set("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
-                    if (solrList.size() > 0 && !(finalId.equals(newId))) {
-                    EuropeanaId id = new EuropeanaId();
-                    id.setOldId(finalId);
-                    id.setLastAccess(0);
-                    id.setTimestamp(new Date().getTime());
-                    id.setNewId(newId);
-                    saveEuropeanaId(id);
-                    return id;
-
+                    .getProductionCloudSolrServer().query(params).getResults();
+                if (solrList.size() > 0) {
+                    String europeana_id = solrList.get(0).getFieldValue("europeana_id").toString();
+                    if (!europeana_id.equals(newId)) {
+                        EuropeanaId id = new EuropeanaId();
+                        id.setOldId(europeana_id);
+                        id.setLastAccess(0);
+                        id.setTimestamp(new Date().getTime());
+                        id.setNewId(newId);
+                        saveEuropeanaId(id);
+                        return id;
+                    }
                 }
+                else{
+                    List<EuropeanaId> europeanaIds = enrichmentService.getEuropeanaIdMongoServer()
+                        .retrieveEuropeanaIdFromNew(newId);
+                    for (String oldCollectionId: oldCollectionIds) {
+                        String oldRecordId = EuropeanaUriUtils.createEuropeanaId(oldCollectionId, value);
+                        for (EuropeanaId europeanaId :
+                            europeanaIds) {
+                            if (oldRecordId.equals(europeanaId.getOldId()))
+                            {
+                                return europeanaId;
+                            }
+                        }
+                    }
+                    return null;
                 }
+//                else if (solrList.size() == 0) {
+////                     finalId = EuropeanaUriUtils.createEuropeanaId(newCollectionId,
+////                    value);
+////                    params.set("q", "europeana_id:" + ClientUtils.escapeQueryChars(finalId));
+////                    if (solrList.size() > 0 && !(finalId.equals(newId))) {
+//                    EuropeanaId id = new EuropeanaId();
+//                    id.setOldId(finalId);
+//                    id.setLastAccess(0);
+//                    id.setTimestamp(new Date().getTime());
+//                    id.setNewId(newId);
+//                    saveEuropeanaId(id);
+//                    return id;
+////                }
+//                }
 
             } catch (SolrServerException e) {
                 log.log(Level.SEVERE, e.getMessage());

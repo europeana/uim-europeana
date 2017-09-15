@@ -13,21 +13,13 @@
  */
 package eu.europeana.uim.enrichment.service.impl;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.impl.CloudSolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
+import com.google.code.morphia.mapping.DefaultCreator;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.ServerAddress;
-
 import eu.europeana.corelib.edm.exceptions.MongoDBException;
 import eu.europeana.corelib.lookup.impl.CollectionMongoServerImpl;
 import eu.europeana.corelib.solr.bean.impl.FullBeanImpl;
@@ -48,11 +40,19 @@ import eu.europeana.corelib.tools.lookuptable.Collection;
 import eu.europeana.corelib.tools.lookuptable.CollectionMongoServer;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
 import eu.europeana.uim.common.BlockingInitializer;
+import eu.europeana.uim.enrichment.MongoBundleActivator;
 import eu.europeana.uim.enrichment.service.EnrichmentService;
 import eu.europeana.uim.enrichment.utils.OsgiEdmMongoServer;
 import eu.europeana.uim.enrichment.utils.OsgiEuropeanaIdMongoServer;
 import eu.europeana.uim.enrichment.utils.PropertyReader;
 import eu.europeana.uim.enrichment.utils.UimConfigurationProperty;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.impl.CloudSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
 
 /**
  * See EnrichmentService
@@ -124,6 +124,13 @@ public class EnrichmentServiceImpl implements EnrichmentService {
       protected void initializeInternal() {      
         try {
           Morphia morphia = new Morphia();
+          morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+                 @Override
+                 protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+                     // the classloader of this bundle has to be used
+                     return MongoBundleActivator.getBundleClassLoader();
+                 }
+             });
           morphia.map(Collection.class);
           List<ServerAddress> addresses = new ArrayList<>();
           for (String mongoStr : mongoHost) {

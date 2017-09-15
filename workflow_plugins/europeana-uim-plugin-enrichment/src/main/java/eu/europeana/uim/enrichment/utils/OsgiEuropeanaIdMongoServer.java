@@ -17,43 +17,56 @@
 package eu.europeana.uim.enrichment.utils;
 
 import com.google.code.morphia.Morphia;
+import com.google.code.morphia.mapping.DefaultCreator;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
-
 import eu.europeana.corelib.lookup.impl.EuropeanaIdMongoServerImpl;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaId;
 import eu.europeana.corelib.tools.lookuptable.EuropeanaIdMongoServer;
+import eu.europeana.uim.enrichment.MongoBundleActivator;
 import org.apache.commons.lang.StringUtils;
 
 /**
  * TODO: change to reflect the changes in the Interface definition
- * @author Yorgos.Mamakis@ kb.nl
  *
+ * @author Yorgos.Mamakis@ kb.nl
  */
-public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServerImpl implements EuropeanaIdMongoServer {
+public class OsgiEuropeanaIdMongoServer extends EuropeanaIdMongoServerImpl implements
+    EuropeanaIdMongoServer {
 
-	public OsgiEuropeanaIdMongoServer(Mongo mongoServer, String databaseName, String username, String password) {
-		super(mongoServer,databaseName,username,password);
-		this.mongoServer = mongoServer;
-		this.databaseName = databaseName;
-		this.username = username;
-		this.password = password;
-	}
-	@Override
-	public void createDatastore(){
-		Morphia morphia = new Morphia();
-		
-		 morphia.map(EuropeanaId.class);
-		 datastore = morphia.createDatastore(mongoServer, databaseName);
-		if(StringUtils.isNotBlank(this.username) && StringUtils.isNotBlank(this.password)) {
-			datastore.getDB().authenticate(this.username, this.password.toCharArray());
-		}
-			datastore.ensureIndexes();
-			super.setDatastore(datastore);
-	}
-	@Override
-	public EuropeanaId retrieveEuropeanaIdFromOld(String oldId) {
-		return datastore.find(EuropeanaId.class).field("oldId").equal(oldId).get();
-	}
+  public OsgiEuropeanaIdMongoServer(Mongo mongoServer, String databaseName, String username,
+      String password) {
+    super(mongoServer, databaseName, username, password);
+    this.mongoServer = mongoServer;
+    this.databaseName = databaseName;
+    this.username = username;
+    this.password = password;
+  }
 
-    
+  @Override
+  public void createDatastore() {
+    Morphia morphia = new Morphia();
+
+    morphia.map(EuropeanaId.class);
+    morphia.getMapper().getOptions().setObjectFactory(new DefaultCreator() {
+      @Override
+      protected ClassLoader getClassLoaderForClass(String clazz, DBObject object) {
+        // the classloader of this bundle has to be used
+        return MongoBundleActivator.getBundleClassLoader();
+      }
+    });
+    datastore = morphia.createDatastore(mongoServer, databaseName);
+    if (StringUtils.isNotBlank(this.username) && StringUtils.isNotBlank(this.password)) {
+      datastore.getDB().authenticate(this.username, this.password.toCharArray());
+    }
+    datastore.ensureIndexes();
+    super.setDatastore(datastore);
+  }
+
+  @Override
+  public EuropeanaId retrieveEuropeanaIdFromOld(String oldId) {
+    return datastore.find(EuropeanaId.class).field("oldId").equal(oldId).get();
+  }
+
+
 }
