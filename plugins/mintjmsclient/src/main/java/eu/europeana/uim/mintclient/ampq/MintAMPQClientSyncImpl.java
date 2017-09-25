@@ -102,6 +102,7 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 			factory.setHost(getHost());
 			factory.setUsername(getUsername());
 			factory.setPassword(getPassword());
+			System.out.println("------> (Rabbit Host)" + getHost());
 			try {
 				rabbitConnection = factory.newConnection();
 				sendChannel = rabbitConnection.createChannel();
@@ -112,7 +113,8 @@ public final class MintAMPQClientSyncImpl extends MintAbstractAMPQClient impleme
 				receiveChannel.basicConsume(rndReplyqueue, true, consumer);
 				instance = new MintAMPQClientSyncImpl();
 				
-			} catch (IOException e) {			
+			} catch (IOException e) {
+				System.out.println("------> (Problem initiating Rabbitmq)" + getHost());
 				throw MintClientUtils.propagateException(e, MintOSGIClientException.class,
 						"Error in instantiating synchronous client");
 			}

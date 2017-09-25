@@ -169,6 +169,12 @@
 			<groupId>org.jibx</groupId>
 			<artifactId>jibx-extras</artifactId>
 			<version>${jibx.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>xml-apis</artifactId>
+					<groupId>xml-apis</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Karaf Shell, for OSGi shell commands -->

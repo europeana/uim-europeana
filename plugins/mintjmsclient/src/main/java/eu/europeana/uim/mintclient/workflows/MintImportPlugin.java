@@ -67,6 +67,7 @@ public class MintImportPlugin<I> extends AbstractIngestionPlugin<Collection<I>,I
 	public MintImportPlugin(MintUIMService mintservice,
 			SugarCrmService sugarservice,String name, String description) {
 		super(name, description);
+		System.out.println("-----{MintImportPluginConstructor: ---> " + name + ", " + description);
 		MintImportPlugin.mintservice = mintservice;
 		MintImportPlugin.sugarservice = sugarservice;
 	}

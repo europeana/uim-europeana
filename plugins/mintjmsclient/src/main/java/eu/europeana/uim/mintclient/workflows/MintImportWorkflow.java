@@ -33,6 +33,7 @@ public class MintImportWorkflow<I> extends AbstractWorkflow<Collection<I>,I>{
 	public MintImportWorkflow(MintUIMService mintservice,
 			SugarCrmService sugarservice) {
 		super("B: Import Repox data into Mint", "Imports data from Repox into Mint, thus creating a mapping session");
+		System.out.println("-----{MintImportWorkflowConstructor: ---> " + mintservice.toString() + " |||| " + sugarservice.toString());
 		setStart(new CollectionBatchWorkflowStart<I>());
 	    addStep(new MintImportPlugin<I>(mintservice, sugarservice,
         		"Mint Importer Plugin","Preforms the migration from Repox to Mint"));

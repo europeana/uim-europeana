@@ -138,6 +138,12 @@
                             spring-asm,spring-expression,spring-beans,spring-aop,spring-context,spring-context-support,saaj-impl,stax-ex
                         </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
+                        <exclusions>
+                            <exclusion>
+                                <artifactId>xml-apis</artifactId>
+                                <groupId>xml-apis</groupId>
+                            </exclusion>
+                        </exclusions>
                     </instructions>
                 </configuration>
             </plugin>
@@ -194,10 +200,10 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
-                        <testSource>1.7</testSource>
-                        <testTarget>1.7</testTarget>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <testSource>1.8</testSource>
+                        <testTarget>1.8</testTarget>
                     </configuration>
                 </plugin>
                 <plugin>
