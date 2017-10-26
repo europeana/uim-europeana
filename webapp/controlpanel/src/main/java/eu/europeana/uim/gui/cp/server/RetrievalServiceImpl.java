@@ -118,10 +118,10 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
 
   private static String zookeeperUrl = PropertyReader
       .getProperty(UimConfigurationProperty.ZOOKEEPER_HOSTURL);
-  private static String cloudSolrCore = PropertyReader
-      .getProperty(UimConfigurationProperty.CLOUD_SOLR_CORE);
-  private static String[] cloudSolrUrl = PropertyReader.getProperty(
-      UimConfigurationProperty.CLOUD_SOLR_HOSTURL).split(",");
+  private static String solrCore = PropertyReader
+      .getProperty(UimConfigurationProperty.SOLR_CORE);
+  private static String[] solrHostUrl = PropertyReader.getProperty(
+      UimConfigurationProperty.SOLR_HOSTURL).split(",");
 
   private static IUnmarshallingContext uctx;
 
@@ -154,9 +154,9 @@ public class RetrievalServiceImpl extends AbstractOSGIRemoteServiceServlet imple
         @Override
         protected void initializeInternal() {
           try {
-            LBHttpSolrServer lbTarget = new LBHttpSolrServer(cloudSolrUrl);
+            LBHttpSolrServer lbTarget = new LBHttpSolrServer(solrHostUrl);
             cloudSolrServer = new CloudSolrServer(zookeeperUrl, lbTarget);
-            cloudSolrServer.setDefaultCollection(cloudSolrCore);
+            cloudSolrServer.setDefaultCollection(solrCore);
             cloudSolrServer.connect();
           } catch (MalformedURLException e) {
             e.printStackTrace();
