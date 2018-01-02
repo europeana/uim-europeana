@@ -176,8 +176,8 @@ public class OsgiExtractor extends Extractor {
 			ControlledVocabularyImpl vocabulary, String resource,
 			String xmlString, int iterations) {
 
-		String SPARQL_TEMPLATE = "%s SELECT ?predicate ?object WHERE {?res ?predicate ?object . FILTER(?res=<%s>||?res=<%s>||?res=<%s>)}";
-		String ROOT_TEMPLATE = "%s SELECT ?object WHERE {?res rdf:type ?object . FILTER(?res=<%s>||?res=<%s>||?res=<%s>)}";
+		String SPARQL_TEMPLATE = "%s SELECT ?predicate ?object WHERE {?res ?predicate ?object . FILTER(?res=<%s>||?res=<%s>)}";
+		String ROOT_TEMPLATE = "%s SELECT ?object WHERE {?res rdf:type ?object . FILTER(?res=<%s>||?res=<%s>)}";
 		String PREFIX_TEMPLATE = "PREFIX  %s:<%s> ";
 		Map<String, List> denormalizedValues = new HashMap<String, List>();
 		List<Concept> concepts = new ArrayList<Concept>();
@@ -205,9 +205,12 @@ public class OsgiExtractor extends Extractor {
 					prefix.getValue()));
 		}
 
+//		String rootEntity = String.format(ROOT_TEMPLATE, sb.toString(),
+//				resource, resource + "/",
+//				resource.subSequence(0, resource.length() - 1));
+		resource = resource.replace(" ", "%20");
 		String rootEntity = String.format(ROOT_TEMPLATE, sb.toString(),
-				resource, resource + "/",
-				resource.subSequence(0, resource.length() - 1));
+				resource, (resource.charAt(resource.length()-1) == '/' ? resource.substring(0, resource.length() - 1):resource + "/"));
 
 		com.hp.hpl.jena.query.Query queryRoot = QueryFactory.create(rootEntity);
 		QueryExecution qRoot = QueryExecutionFactory.create(queryRoot, model);
@@ -314,8 +317,7 @@ public class OsgiExtractor extends Extractor {
 		if (foundRoot) {
 			// Find the rest and append them as appropriate
 			String qString = String.format(SPARQL_TEMPLATE, sb.toString(),
-					resource, resource + "/",
-					resource.substring(0, resource.length() - 1));
+					resource, (resource.charAt(resource.length()-1) == '/' ? resource.substring(0, resource.length() - 1):resource + "/"));
 			com.hp.hpl.jena.query.Query query = QueryFactory.create(qString);
 			QueryExecution qexec = QueryExecutionFactory.create(query, model);
 			try {
