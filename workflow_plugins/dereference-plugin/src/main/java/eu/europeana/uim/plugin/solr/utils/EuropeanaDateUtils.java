@@ -62,6 +62,14 @@ public class EuropeanaDateUtils {
 							}
 						}
 					}
+					if (choice.ifIssued() && choice.getIssued().getString() != null) {
+						List<String> year = refineDates(bc, choice.getIssued().getString());
+						for (String yr : year) {
+							if (!years.contains(yr)) {
+								years.add(yr);
+							}
+						}
+					}
 				}
 			}
 		} catch (IOException e) {
