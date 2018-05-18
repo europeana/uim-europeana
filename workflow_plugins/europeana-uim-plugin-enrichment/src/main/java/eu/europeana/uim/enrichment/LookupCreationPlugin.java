@@ -170,7 +170,7 @@ public class LookupCreationPlugin<I> extends
         try {
             List<Status> status = mdr.getValues(EuropeanaModelRegistry.STATUS);
 
-            if (!(status != null && status.get(0).equals(Status.DELETED))) {
+            if (!(status != null && status.size() > 0 && status.get(0).equals(Status.DELETED))) {
                 String value = null;
                 if (mdr.getValues(EuropeanaModelRegistry.EDMDEREFERENCEDRECORD)
                         != null
