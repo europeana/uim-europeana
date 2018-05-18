@@ -4,7 +4,7 @@
  *  Licenced under the EUPL, Version 1.1 (the "Licence") and subsequent versions as approved
  *  by the European Commission;
  *  You may not use this work except in compliance with the Licence.
- * 
+ *
  *  You may obtain a copy of the Licence at:
  *  http://joinup.ec.europa.eu/software/page/eupl
  *
@@ -197,12 +197,12 @@ public class LookupCreationPlugin<I> extends
                     }
                 uctx = bfact.createUnmarshallingContext();
                 RDF rdf = (RDF) uctx.unmarshalDocument(new StringReader(value));
-                
+
                 if (context.getProperties().getProperty(OVERRIDESIPCREATOR)
                         == null
                         && context.getProperties()
                         .getProperty(USE_CUSTOM_FIELD) == null) {
-                   
+
 
                     FullBeanImpl fullBean = constructFullBeanMock(rdf,
                             collectionId);
@@ -229,7 +229,8 @@ public class LookupCreationPlugin<I> extends
                 } else {
                     String fieldValue = "";
                     if (context.getProperties().getProperty(OVERRIDESIPCREATOR)
-                            != null) {
+                            != null && !context.getProperties().getProperty(OVERRIDESIPCREATOR)
+                        .equalsIgnoreCase("mapManyOldToOneCollections")) {
                     	boolean createHash = false;
                         if (context.getProperties()
                             .getProperty(USE_CUSTOM_FIELD) != null) {
@@ -267,16 +268,9 @@ public class LookupCreationPlugin<I> extends
 
                         EuropeanaId id = null;
                         List<String> allOldCollectionIds = null;
-                        if (context.getProperties()
-                            .getProperty(OVERRIDESIPCREATOR)
-                            .equalsIgnoreCase("mapManyOldToOneCollections")) {
-                            allOldCollectionIds = enrichmentService
-                                .getCollectionMongoServer().findAllOldCollectionIds(collectionId);
-                        }
-                        else {
-                            allOldCollectionIds = new ArrayList<>(1);
-                            allOldCollectionIds.add(fileName);
-                        }
+                        allOldCollectionIds = new ArrayList<>(1);
+                        allOldCollectionIds.add(fileName);
+
                         id = createLookupEntry(
                             rdf.getProvidedCHOList().get(0).getAbout(),
                             allOldCollectionIds, collectionId,
@@ -284,6 +278,11 @@ public class LookupCreationPlugin<I> extends
                                 createHash ? HashUtils.createHash(fieldValue) : fieldValue,
                                 context.getProperties().getProperty(
                                     USE_FUNCTIONS)));
+//                        EuropeanaId id = generateRedirectsFromCustomField(
+//                            fieldValue,
+//                            edmValue,
+//                            context.getProperties().getProperty(
+//                                USE_FUNCTIONS), rdf.getProvidedCHOList().get(0).getAbout());
 
                         if(id!=null) {
                             //                            mdr.addValue(EuropeanaModelRegistry.EDMRECORDREDIRECT, true);
@@ -327,9 +326,24 @@ public class LookupCreationPlugin<I> extends
                                     .getObject().getResource();
                             edmValue = "provider_aggregation_edm_object";
                         }
+                        else
+                        {
+                          //Get the default value but only the part after the last slash '/' which is the record identifier
+                          fieldValue = applyTransformations(rdf.getProvidedCHOList().get(0).getAbout(), "substringAfterLast(/)");
+                          edmValue = "europeana_id";
+                        }
+
+                      List<String> allOldCollectionIds = null;
+                      if (context.getProperties()
+                          .getProperty(OVERRIDESIPCREATOR) != null && context.getProperties()
+                          .getProperty(OVERRIDESIPCREATOR).equalsIgnoreCase("mapManyOldToOneCollections")) {
+                        allOldCollectionIds = enrichmentService
+                            .getCollectionMongoServer().findAllOldCollectionIds(collectionId);
+                      }
+
                         EuropeanaId id = generateRedirectsFromCustomField(
                                 fieldValue,
-                                edmValue,
+                                edmValue, allOldCollectionIds,
                                 context.getProperties().getProperty(
                                         USE_FUNCTIONS), rdf.getProvidedCHOList().get(0).getAbout());
                         if(id!=null) {
@@ -348,42 +362,54 @@ public class LookupCreationPlugin<I> extends
         return false;
     }
 
-    private EuropeanaId generateRedirectsFromCustomField(String fieldValue,
-            String property, String transformations, String newId) {
+    private EuropeanaId generateRedirectsFromCustomField(String customFieldValue,
+        String solrPropertyName, List<String> allOldCollectionIds,
+        String transformations, String newId) {
 
         try {
-            String finalId = null;
             ModifiableSolrParams paramsOld = new ModifiableSolrParams();
-            paramsOld.add(
-                    "q",
-                    property
-                            + ":"
-                            + ClientUtils
-                            .escapeQueryChars(applyTransformations(
-                                    fieldValue, transformations)));
-            System.out.println(property
-                    + ":"
-                    + ClientUtils
-                    .escapeQueryChars(applyTransformations(
-                                    fieldValue, transformations)));
+            if (solrPropertyName.equals("europeana_id") && allOldCollectionIds != null && !allOldCollectionIds.isEmpty())
+            {
+              StringBuilder query = new StringBuilder();
+              for (String oldCollectionId: allOldCollectionIds) {
+                String oldRecordId = EuropeanaUriUtils.createEuropeanaId(oldCollectionId, customFieldValue);
+                query.append("europeana_id:\"").append(oldRecordId).append("\" OR ");
+              }
+              query.delete(query.lastIndexOf(" OR "), query.length());
+
+              paramsOld.add("q", query.toString());
+            }
+            else {
+              paramsOld.add(
+                  "q",
+                  solrPropertyName
+                      + ":"
+                      + ClientUtils
+                      .escapeQueryChars(applyTransformations(
+                          customFieldValue, transformations)));
+              System.out.println(solrPropertyName
+                  + ":"
+                  + ClientUtils
+                  .escapeQueryChars(applyTransformations(
+                      customFieldValue, transformations)));
+            }
             CloudSolrServer solrServerProduction = enrichmentService
                     .getProductionCloudSolrServer();
 
             SolrDocumentList solrOldList = solrServerProduction.query(paramsOld).getResults();
 
-            if (solrOldList.size() == 1) {
-                finalId = solrOldList.get(0).getFirstValue("europeana_id")
-                        .toString();
+          if (solrOldList.size() > 0) {
+            String europeana_id = solrOldList.get(0).getFieldValue("europeana_id").toString();
+            if (!europeana_id.equals(newId)) {
+              EuropeanaId id = new EuropeanaId();
+              id.setOldId(europeana_id);
+              id.setLastAccess(0);
+              id.setTimestamp(new Date().getTime());
+              id.setNewId(newId);
+              saveEuropeanaId(id);
+              return id;
             }
-            if (finalId != null && newId != null && !newId.equalsIgnoreCase(finalId)) {
-                EuropeanaId id = new EuropeanaId();
-                id.setOldId(finalId);
-                id.setLastAccess(0);
-                id.setTimestamp(new Date().getTime());
-                id.setNewId(newId);
-                saveEuropeanaId(id);
-                return id;
-            }
+          }
         } catch (SolrServerException e) {
             log.log(Level.SEVERE, e.getMessage());
         }
